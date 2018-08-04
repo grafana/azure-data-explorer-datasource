@@ -1,0 +1,41 @@
+{
+  "name": "grafana-kustodb-datasource",
+  "version": "1.0.0",
+  "description": "Grafana data source for KustoDB",
+  "scripts": {
+    "build": "webpack --config webpack.config.prod.js",
+    "dev": "webpack --mode development",
+    "watch": "webpack --mode development --watch",
+    "test": "jest --config jest.config.js"
+  },
+  "author": "Grafana Labs",
+  "license": "Apache",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "moment": "^2.22.2",
+    "q": "^1.5.0",
+    "typescript": "^2.8.3"
+  },
+  "devDependencies": {
+    "@types/angular": "^1.6.43",
+    "@types/grafana": "https://git@github.com/CorpGlory/types-grafana.git",
+    "@types/jest": "^22.2.3",
+    "@types/lodash": "^4.14.110",
+    "@types/moment": "^2.13.0",
+    "@types/q": "^1.5.0",
+    "babel-core": "^6.26.3",
+    "babel-jest": "^23.0.1",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.1",
+    "css-loader": "^0.28.11",
+    "jest": "^23.0.1",
+    "ng-annotate-webpack-plugin": "^0.3.0",
+    "style-loader": "^0.21.0",
+    "ts-jest": "^22.4.6",
+    "ts-loader": "^4.3.0",
+    "webpack": "^4.9.1",
+    "webpack-cli": "^2.1.4"
+  }
+}
