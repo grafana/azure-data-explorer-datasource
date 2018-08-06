@@ -1,5 +1,6 @@
 import {QueryCtrl} from 'grafana/app/plugins/sdk';
 import _ from 'lodash';
+import './monaco/kusto_monaco_editor';
 
 export interface ResultFormat {
   text: string;
@@ -71,6 +72,10 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     } else {
       this.lastQueryError = err;
     }
+  }
+
+  getSchema() {
+    return Promise.resolve({});
   }
 
 }

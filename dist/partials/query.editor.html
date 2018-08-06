@@ -11,7 +11,7 @@
     </div>
   </div>
 
-  <input ng-model="ctrl.target.query"></input>
+  <kusto-monaco-editor content="ctrl.target.query" on-change="ctrl.refresh()" get-schema="ctrl.getSchema()"></kusto-monaco-editor>
 
   <div class="gf-form-inline">
     <div class="gf-form">
