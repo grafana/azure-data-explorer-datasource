@@ -1,6 +1,7 @@
 import {QueryCtrl} from 'grafana/app/plugins/sdk';
 import _ from 'lodash';
 import './monaco/kusto_monaco_editor';
+import { DatabaseItem } from './response_parser';
 
 export interface ResultFormat {
   text: string;
@@ -18,6 +19,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       '| summarize count() by <group by column>, bin(TimeGenerated, $__interval)',
       '| order by TimeGenerated asc'].join('\n'),
     resultFormat: 'time_series',
+    database: '',
   };
 
   resultFormats: ResultFormat[];
@@ -25,6 +27,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   showLastQuery: boolean;
   lastQuery: string;
   lastQueryError?: string;
+  databases: DatabaseItem[];
 
   /** @ngInject **/
   constructor($scope, $injector) {
@@ -34,7 +37,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
     this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
     this.resultFormats = [{ text: 'Time series', value: 'time_series' }, { text: 'Table', value: 'table' }];
-
+    this.getDatabases();
   }
   onDataReceived(dataList) {
     this.lastQueryError = undefined;
@@ -72,6 +75,15 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     } else {
       this.lastQueryError = err;
     }
+  }
+
+  getDatabases() {
+    this.datasource.getDatabases().then(dbs => {
+      this.databases = dbs;
+      if (dbs.length > 0) {
+        this.target.database = dbs[0].value;
+      }
+    });
   }
 
   getSchema() {

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import {ResponseParser, DatabaseItem} from './response_parser';
 
 export class KustoDBDatasource {
   id: number;
@@ -10,7 +11,7 @@ export class KustoDBDatasource {
   constructor(instanceSettings, private backendSrv) {
     this.name = instanceSettings.name;
     this.id = instanceSettings.id;
-    this.baseUrl = ``;
+    this.baseUrl = `/kustodb`;
     this.url = instanceSettings.url;
   }
 
@@ -23,7 +24,7 @@ export class KustoDBDatasource {
   testDatasource() {
     const url = `${this.baseUrl}/v1/rest/mgmt`;
     const req = {
-      csl: '.show databases'
+      csl: '.show databases',
     };
     return this.doRequest(url, req)
       .then(response => {
@@ -44,10 +45,8 @@ export class KustoDBDatasource {
         let message = 'KustoDB: ';
         message += error.statusText ? error.statusText + ': ' : '';
 
-        if (error.data && error.data.error && error.data.error.code) {
-          message += error.data.error.code + '. ' + error.data.error.message;
-        } else if (error.data && error.data.error) {
-          message += error.data.error;
+        if (error.data && error.data.Message) {
+          message += error.data.Message;
         } else if (error.data) {
           message += error.data;
         } else {
@@ -58,6 +57,17 @@ export class KustoDBDatasource {
           message: message,
         };
       });
+  }
+
+  getDatabases(): DatabaseItem {
+    const url = `${this.baseUrl}/v1/rest/mgmt`;
+    const req = {
+      csl: '.show databases',
+    };
+
+    return this.doRequest(url, req).then(response => {
+      return new ResponseParser().parseDatabases(response);
+    });
   }
 
   doQueries(queries) {
@@ -83,7 +93,7 @@ export class KustoDBDatasource {
       .datasourceRequest({
         url: this.url + url,
         method: 'POST',
-        data: data
+        data: data,
       })
       .catch(error => {
         if (maxRetries > 0) {

@@ -24,6 +24,23 @@
     "updated": "2018-07-18"
   },
 
+  "routes": [
+    {
+      "path": "kustodb",
+      "method": "POST",
+      "url": "https://kustopaas2.kusto.windows.net",
+      "tokenAuth": {
+        "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
+        "params": {
+          "grant_type":  "client_credentials",
+          "client_id": "{{.JsonData.clientId}}",
+          "client_secret": "{{.SecureJsonData.clientSecret}}",
+          "resource": "https://kusto.kusto.windows.net"
+        }
+      }
+    }
+  ],
+
   "dependencies": {
     "grafanaVersion": "4.5.x",
     "plugins": [ ]

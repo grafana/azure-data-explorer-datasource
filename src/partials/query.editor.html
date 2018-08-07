@@ -1,6 +1,16 @@
 <query-editor-row query-ctrl="ctrl" can-collapse="false">
   <div class="gf-form-inline">
     <div class="gf-form">
+      <label class="gf-form-label query-keyword width-9">Database</label>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input min-width-12" ng-model="ctrl.target.database" ng-options="f.value as f.text for f in ctrl.databases"
+          ng-change="ctrl.refresh()"></select>
+      </div>
+    </div>
+    <div class="gf-form">
+      <div class="width-1"></div>
+    </div>
+    <div class="gf-form">
       <button class="btn btn-primary width-10" ng-click="ctrl.refresh()">Run</button>
     </div>
     <div class="gf-form">
@@ -76,7 +86,7 @@
     </pre>
   </div>
 
-</div>
+  </div>
 
   <div class="gf-form" ng-show="ctrl.lastQueryError">
     <pre class="gf-form-pre alert alert-error">{{ctrl.lastQueryError}}</pre>
