@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Grafana data source for KustoDB",
   "scripts": {
-    "build": "webpack --config webpack.config.prod.js",
+    "build": "node --max-old-space-size=8192 ./node_modules/.bin/webpack --config webpack.config.prod.js",
     "dev": "webpack --mode development",
     "watch": "webpack --mode development --watch",
     "test": "jest --config jest.config.js",

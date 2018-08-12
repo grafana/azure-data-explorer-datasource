@@ -102,7 +102,8 @@ function link(scope, elem, attrs) {
       monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
         const model = codeEditor.getModel();
         workerAccessor(model.uri).then(worker => {
-          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', 'Default');
+          const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
+          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
         });
       });
     });

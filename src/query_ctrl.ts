@@ -78,7 +78,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   }
 
   getDatabases() {
-    this.datasource.getDatabases().then(dbs => {
+    return this.datasource.getDatabases().then(dbs => {
       this.databases = dbs;
       if (dbs.length > 0) {
         this.target.database = dbs[0].value;
@@ -87,7 +87,9 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   }
 
   getSchema() {
-    return Promise.resolve({});
+    return this.getDatabases().then(() => {
+      return this.datasource.getSchema(this.target.database);
+    });
   }
 
 }

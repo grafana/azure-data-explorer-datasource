@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import {ResponseParser, DatabaseItem} from './response_parser';
+import { ResponseParser, DatabaseItem } from './response_parser';
+import QueryBuilder from './query_builder';
 
 export class KustoDBDatasource {
   id: number;
@@ -8,14 +9,48 @@ export class KustoDBDatasource {
   url: string;
 
   /** @ngInject */
-  constructor(instanceSettings, private backendSrv) {
+  constructor(instanceSettings, private backendSrv, private $q, private templateSrv) {
     this.name = instanceSettings.name;
     this.id = instanceSettings.id;
     this.baseUrl = `/kustodb`;
     this.url = instanceSettings.url;
   }
 
-  query(options) {}
+  query(options) {
+    const queries = _.filter(options.targets, item => {
+      return item.hide !== true;
+    }).map(target => {
+      const url = `${this.baseUrl}/v1/rest/query`;
+
+      return {
+        refId: target.refId,
+        intervalMs: options.intervalMs,
+        maxDataPoints: options.maxDataPoints,
+        datasourceId: this.id,
+        url: url,
+        query: target.query,
+        format: options.format,
+        resultFormat: target.resultFormat,
+        data: {
+          csl: new QueryBuilder(
+            this.templateSrv.replace(target.query, options.scopedVars, this.interpolateVariable),
+            options
+          ).interpolate().query,
+          db: target.database,
+        },
+      };
+    });
+
+    if (!queries || queries.length === 0) {
+      return;
+    }
+
+    const promises = this.doQueries(queries);
+
+    return this.$q.all(promises).then(results => {
+      return new ResponseParser().parseQueryResult(results);
+    });
+  }
 
   annotationQuery(options) {}
 
@@ -70,6 +105,17 @@ export class KustoDBDatasource {
     });
   }
 
+  getSchema(database) {
+    const url = `${this.baseUrl}/v1/rest/mgmt`;
+    const req = {
+      csl: `.show database [${database}] schema as json`,
+    };
+
+    return this.doRequest(url, req).then(response => {
+      return new ResponseParser().parseSchemaResult(response.data);
+    });
+  }
+
   doQueries(queries) {
     return _.map(queries, query => {
       return this.doRequest(query.url, query.data)
@@ -102,5 +148,28 @@ export class KustoDBDatasource {
 
         throw error;
       });
+  }
+
+  interpolateVariable(value, variable) {
+    if (typeof value === 'string') {
+      if (variable.multi || variable.includeAll) {
+        return "'" + value + "'";
+      } else {
+        return value;
+      }
+    }
+
+    if (typeof value === 'number') {
+      return value;
+    }
+
+    var quotedValues = _.map(value, function(val) {
+      if (typeof value === 'number') {
+        return value;
+      }
+
+      return "'" + val + "'";
+    });
+    return quotedValues.join(',');
   }
 }
