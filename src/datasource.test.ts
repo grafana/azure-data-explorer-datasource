@@ -184,7 +184,6 @@ describe('KustoDBDatasource', () => {
 
     beforeEach(async () => {
       ctx.backendSrv.datasourceRequest = options => {
-        console.log(options.url);
         if (options.url.indexOf('rest/mgmt') > -1) {
           return ctx.$q.when({ data: databasesResponse, status: 200 });
         } else {
@@ -264,6 +263,41 @@ describe('KustoDBDatasource', () => {
           expect(results.data[0].target).toEqual('Error');
           expect(results.data[0].datapoints[0][1]).toEqual(1532972039927);
           expect(results.data[0].datapoints[0][0]).toEqual(1);
+        });
+      });
+
+      describe('and the data has no time column)', () => {
+        beforeEach(() => {
+          const invalidResponse = {
+            tables: [
+              {
+                name: 'PrimaryResult',
+                columns: [
+                  {
+                    name: 'Category',
+                    type: 'string',
+                  },
+                  {
+                    name: 'count_',
+                    type: 'long',
+                  },
+                ],
+                rows: [['Administrative', 2]],
+              },
+            ],
+          };
+          ctx.backendSrv.datasourceRequest = options => {
+            expect(options.url).toContain('rest/query');
+            expect(options.data.db).toBe('Grafana');
+            expect(options.data.csl).toBe(queryOptions.targets[0].query);
+            return ctx.$q.when({ data: invalidResponse, status: 200 });
+          };
+        });
+
+        it('should throw an exception', () => {
+          ctx.ds.query(queryOptions).catch(err => {
+            expect(err.message).toContain('The Time Series format requires a time column.');
+          });
         });
       });
     });
