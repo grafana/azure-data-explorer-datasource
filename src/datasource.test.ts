@@ -134,6 +134,76 @@ describe('KustoDBDatasource', () => {
     });
   });
 
+  describe('When performing metricFindQuery', () => {
+    const tableResponseWithOneColumn = {
+      Tables: [
+        {
+          TableName: 'Table_0',
+          Columns: [
+            {
+              ColumnName: 'Category',
+              ColumnType: 'string',
+            },
+          ],
+          Rows: [['Administrative'], ['Policy']],
+        },
+      ],
+    };
+
+    const databasesResponse = {
+      Tables: [
+        {
+          TableName: 'Table_0',
+          Columns: [
+            { ColumnName: 'DatabaseName', DataType: 'String' },
+            { ColumnName: 'PersistentStorage', DataType: 'String' },
+            { ColumnName: 'Version', DataType: 'String' },
+            { ColumnName: 'IsCurrent', DataType: 'Boolean' },
+            { ColumnName: 'DatabaseAccessMode', DataType: 'String' },
+            { ColumnName: 'PrettyName', DataType: 'String' },
+            { ColumnName: 'CurrentUserIsUnrestrictedViewer', DataType: 'Boolean' },
+            { ColumnName: 'DatabaseId', DataType: 'Guid' },
+          ],
+          Rows: [
+            [
+              'Grafana',
+              'https://4bukustoragekus86a3c.blob.core.windows.net/grafanamd201806201624130602',
+              'v5.2',
+              false,
+              'ReadWrite',
+              null,
+              false,
+              'a955a3ed-0668-4d00-a2e5-9c4e610ef057',
+            ],
+          ],
+        },
+      ],
+    };
+
+    let queryResults;
+
+    beforeEach(async () => {
+      ctx.backendSrv.datasourceRequest = options => {
+        console.log(options.url);
+        if (options.url.indexOf('rest/mgmt') > -1) {
+          return ctx.$q.when({ data: databasesResponse, status: 200 });
+        } else {
+          return ctx.$q.when({ data: tableResponseWithOneColumn, status: 200 });
+        }
+      };
+
+      queryResults = await ctx.ds.metricFindQuery('Activity | distinct Category');
+    });
+
+    it('should return a list of categories in the correct format', () => {
+      expect(queryResults.length).toBe(2);
+      expect(queryResults[0].text).toBe('Administrative');
+      expect(queryResults[0].value).toBe('Administrative');
+      expect(queryResults[1].text).toBe('Policy');
+      expect(queryResults[1].value).toBe('Policy');
+    });
+  });
+
   describe('when performing query', () => {
     const queryOptions = {
       range: {

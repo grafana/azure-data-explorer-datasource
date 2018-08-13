@@ -7,6 +7,7 @@ export class KustoDBDatasource {
   name: string;
   baseUrl: string;
   url: string;
+  defaultOrFirstDatabase: string;
 
   /** @ngInject */
   constructor(instanceSettings, private backendSrv, private $q, private templateSrv) {
@@ -54,7 +55,17 @@ export class KustoDBDatasource {
 
   annotationQuery(options) {}
 
-  metricFindQuery(query: string) {}
+  metricFindQuery(query: string) {
+    return this.getDefaultOrFirstDatabase().then(database => {
+      const queries: any[] = this.buildQuery(query, null, database);
+
+      const promises = this.doQueries(queries);
+
+      return this.$q.all(promises).then(results => {
+        return new ResponseParser().parseToVariables(results);
+      });
+    });
+  }
 
   testDatasource() {
     const url = `${this.baseUrl}/v1/rest/mgmt`;
@@ -94,7 +105,7 @@ export class KustoDBDatasource {
       });
   }
 
-  getDatabases(): DatabaseItem {
+  getDatabases(): Promise<DatabaseItem[]> {
     const url = `${this.baseUrl}/v1/rest/mgmt`;
     const req = {
       csl: '.show databases',
@@ -102,6 +113,17 @@ export class KustoDBDatasource {
 
     return this.doRequest(url, req).then(response => {
       return new ResponseParser().parseDatabases(response);
+    });
+  }
+
+  getDefaultOrFirstDatabase() {
+    if (this.defaultOrFirstDatabase) {
+      return Promise.resolve(this.defaultOrFirstDatabase);
+    }
+
+    return this.getDatabases().then(databases => {
+      this.defaultOrFirstDatabase = databases[0].value;
+      return this.defaultOrFirstDatabase;
     });
   }
 
@@ -132,6 +154,26 @@ export class KustoDBDatasource {
           };
         });
     });
+  }
+
+  private buildQuery(query: string, options: any, database: string) {
+    const queryBuilder = new QueryBuilder(
+      this.templateSrv.replace(query, {}, this.interpolateVariable),
+      options,
+    );
+    const url = `${this.baseUrl}/v1/rest/query`;
+
+    const queries: any[] = [];
+    queries.push({
+      datasourceId: this.id,
+      url: url,
+      resultFormat: 'table',
+      data: {
+        csl: queryBuilder.interpolate().query,
+        db: database,
+      }
+    });
+    return queries;
   }
 
   doRequest(url, data, maxRetries = 1) {

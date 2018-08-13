@@ -21,6 +21,11 @@ export interface TableColumn {
   type: string;
 }
 
+export interface Variable {
+  text: string;
+  value: string;
+}
+
 // API interfaces
 export interface KustoDatabaseList {
   data: {
@@ -107,7 +112,6 @@ export class ResponseParser {
         data = _.concat(data, this.parseTableResult(results[i].query, columns, rows));
       }
     }
-
     return {data: data};
   }
 
@@ -157,6 +161,22 @@ export class ResponseParser {
     };
 
     return tableResult;
+  }
+
+  parseToVariables(results): Variable[] {
+    const queryResult = this.parseQueryResult(results);
+
+    const variables: Variable[] = [];
+    for (let result of queryResult.data) {
+      for (let row of _.flattenDeep(result.rows)) {
+        variables.push(<Variable>{
+          text: row,
+          value: row,
+        });
+      }
+    }
+
+    return variables;
   }
 
   static findOrCreateBucket(data, target): DataTarget {
