@@ -15,6 +15,7 @@ export class KustoDBDatasource {
     this.id = instanceSettings.id;
     this.baseUrl = `/kustodb`;
     this.url = instanceSettings.url;
+    this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
   }
 
   query(options) {

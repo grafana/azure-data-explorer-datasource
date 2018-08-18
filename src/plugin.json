@@ -15,11 +15,10 @@
       "large": "img/logo.png"
     },
     "links": [
-      {"name": "Project site", "url": "https://github.com/grafana/kustodb-datasource"},
-      {"name": "Apache License", "url": "https://github.com/grafana/kustodb-datasource/blob/master/LICENSE"}
+      { "name": "Project site", "url": "https://github.com/grafana/kustodb-datasource" },
+      { "name": "Apache License", "url": "https://github.com/grafana/kustodb-datasource/blob/master/LICENSE" }
     ],
-    "screenshots": [
-    ],
+    "screenshots": [],
     "version": "0.1.0",
     "updated": "2018-07-18"
   },
@@ -32,7 +31,7 @@
       "tokenAuth": {
         "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
         "params": {
-          "grant_type":  "client_credentials",
+          "grant_type": "client_credentials",
           "client_id": "{{.JsonData.clientId}}",
           "client_secret": "{{.SecureJsonData.clientSecret}}",
           "resource": "https://kusto.kusto.windows.net"
@@ -43,7 +42,7 @@
 
   "dependencies": {
     "grafanaVersion": "4.5.x",
-    "plugins": [ ]
+    "plugins": []
   },
 
   "metrics": true,
