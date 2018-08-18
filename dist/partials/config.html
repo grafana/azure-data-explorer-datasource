@@ -2,6 +2,18 @@
 <div class="gf-form-group">
   <div class="gf-form-inline">
     <div class="gf-form">
+      <span class="gf-form-label width-9">Cluster URL</span>
+      <input class="gf-form-input width-30" type="text"
+              ng-model="ctrl.current.jsonData.clusterUrl" placeholder="{{ctrl.suggestUrl}}"
+              bs-typeahead="getSuggestUrls"  min-length="0"
+              ng-pattern="/^(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/" required></input>
+      <info-popover mode="right-absolute">
+        <p>The cluster url for your Kusto DB.</p>
+      </info-popover>
+    </div>
+  </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
       <span class="gf-form-label width-9">Subscription Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.subscriptionId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">

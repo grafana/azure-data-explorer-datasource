@@ -28,7 +28,7 @@
     {
       "path": "kustodb",
       "method": "POST",
-      "url": "https://kustopaas2.kusto.windows.net",
+      "url": "{{.JsonData.clusterUrl}}",
       "tokenAuth": {
         "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
         "params": {
