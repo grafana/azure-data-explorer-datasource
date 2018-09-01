@@ -26,6 +26,13 @@ export interface Variable {
   value: string;
 }
 
+export interface AnnotationItem {
+  annotation: any;
+  time: number;
+  text: string;
+  tags: string[];
+}
+
 // API interfaces
 export interface KustoDatabaseList {
   data: {
@@ -177,6 +184,43 @@ export class ResponseParser {
     }
 
     return variables;
+  }
+
+  transformToAnnotations(options: any, result: any) {
+    const queryResult = this.parseQueryResult(result);
+
+    const list: AnnotationItem[] = [];
+
+    for (let result of queryResult.data) {
+      let timeIndex = -1;
+      let textIndex = -1;
+      let tagsIndex = -1;
+
+      for (let i = 0; i < result.columns.length; i++) {
+        if (timeIndex === -1 && result.columns[i].type === 'datetime') {
+          timeIndex = i;
+        }
+
+        if (textIndex === -1 && result.columns[i].text.toLowerCase() === 'text') {
+          textIndex = i;
+        }
+
+        if (tagsIndex === -1 && result.columns[i].text.toLowerCase() === 'tags') {
+          tagsIndex = i;
+        }
+      }
+
+      for (let row of result.rows) {
+        list.push({
+          annotation: options.annotation,
+          time: Math.floor(ResponseParser.dateTimeToEpoch(row[timeIndex])),
+          text: row[textIndex] ? row[textIndex].toString() : '',
+          tags: row[tagsIndex] ? row[tagsIndex].trim().split(/\s*,\s*/) : [],
+        });
+      }
+    }
+
+    return list;
   }
 
   static findOrCreateBucket(data, target): DataTarget {

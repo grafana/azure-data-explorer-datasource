@@ -3,11 +3,10 @@ import q from 'q';
 import moment from 'moment';
 import TemplateSrvStub from '../test/template_srv_stub';
 
-
 describe('KustoDBDatasource', () => {
   let ctx: any = {
     backendSrv: {},
-    templateSrv: new TemplateSrvStub()
+    templateSrv: new TemplateSrvStub(),
   };
 
   beforeEach(() => {
@@ -200,6 +199,95 @@ describe('KustoDBDatasource', () => {
       expect(queryResults[0].value).toBe('Administrative');
       expect(queryResults[1].text).toBe('Policy');
       expect(queryResults[1].value).toBe('Policy');
+    });
+  });
+
+  describe('when performing annotations query', () => {
+    const tableResponse = {
+      Tables: [
+        {
+          TableName: 'Table_0',
+          Columns: [
+            { ColumnName: 'Timestamp', DataType: 'DateTime', ColumnType: 'datetime' },
+            { ColumnName: 'Text', DataType: 'String', ColumnType: 'string' },
+            { ColumnName: 'Tags', DataType: 'String', ColumnType: 'string' },
+          ],
+          Rows: [
+            ['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'],
+            ['2018-06-02T20:28:00Z', 'Computer2', 'tag2'],
+          ],
+        },
+      ],
+    };
+
+    const databasesResponse = {
+      Tables: [
+        {
+          TableName: 'Table_0',
+          Columns: [
+            { ColumnName: 'DatabaseName', DataType: 'String' },
+            { ColumnName: 'PersistentStorage', DataType: 'String' },
+            { ColumnName: 'Version', DataType: 'String' },
+            { ColumnName: 'IsCurrent', DataType: 'Boolean' },
+            { ColumnName: 'DatabaseAccessMode', DataType: 'String' },
+            { ColumnName: 'PrettyName', DataType: 'String' },
+            { ColumnName: 'CurrentUserIsUnrestrictedViewer', DataType: 'Boolean' },
+            { ColumnName: 'DatabaseId', DataType: 'Guid' },
+          ],
+          Rows: [
+            [
+              'Grafana',
+              'https://4bukustoragekus86a3c.blob.core.windows.net/grafanamd201806201624130602',
+              'v5.2',
+              false,
+              'ReadWrite',
+              null,
+              false,
+              'a955a3ed-0668-4d00-a2e5-9c4e610ef057',
+            ],
+          ],
+        },
+      ],
+    };
+
+    let annotationResults;
+
+    beforeEach(async () => {
+      ctx.backendSrv.datasourceRequest = options => {
+        if (options.url.indexOf('rest/mgmt') > -1) {
+          return ctx.$q.when({ data: databasesResponse, status: 200 });
+        } else {
+          return ctx.$q.when({ data: tableResponse, status: 200 });
+        }
+      };
+
+      annotationResults = await ctx.ds.annotationQuery({
+        annotation: {
+          rawQuery: 'Heartbeat | where $__timeFilter()| project TimeGenerated, Text=Computer, tags="test"',
+          database: 'Grafana',
+        },
+        range: {
+          from: moment.utc('2017-08-22T20:00:00Z'),
+          to: moment.utc('2017-08-22T23:59:00Z'),
+        },
+        rangeRaw: {
+          from: 'now-4h',
+          to: 'now',
+        },
+      });
+    });
+
+    it('should return a list of categories in the correct format', () => {
+      expect(annotationResults.length).toBe(2);
+
+      expect(annotationResults[0].time).toBe(1527970800000);
+      expect(annotationResults[0].text).toBe('Computer1');
+      expect(annotationResults[0].tags[0]).toBe('tag1');
+      expect(annotationResults[0].tags[1]).toBe('tag2');
+
+      expect(annotationResults[1].time).toBe(1527971280000);
+      expect(annotationResults[1].text).toBe('Computer2');
+      expect(annotationResults[1].tags[0]).toBe('tag2');
     });
   });
 

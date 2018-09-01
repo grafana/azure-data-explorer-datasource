@@ -1,238 +1,307 @@
+import _ from 'lodash';
+
 export interface SuggestionController {
   _model: any;
 }
 
 export default class KustoCodeEditor {
+  codeEditor: monaco.editor.IStandaloneCodeEditor;
+  completionItemProvider: monaco.IDisposable;
+  signatureHelpProvider: monaco.IDisposable;
+
   splitWithNewLineRegex = /[^\n]+\n?|\n/g;
   newLineRegex = /\r?\n/;
   startsWithKustoPipeRegex = /^\|\s*/g;
   kustoPipeRegexStrict = /^\|\s*$/g;
 
-  constructor(private codeEditor: monaco.editor.IStandaloneCodeEditor) {}
+  constructor(private containerDiv: any, private defaultTimeField: string, private getSchema: () => any, private config: any) {}
 
-  onDidChangeCursorSelection(event) {
-    // Re-trigger the suggestions right after the user selected one of the suggestions
-    const acceptSuggestion = (event.source === 'modelChange' && event.reason === monaco.editor.CursorChangeReason.RecoverFromMarkers);
-    if (!acceptSuggestion) {
-        return;
-    }
-    // Remove auto pipe if necessary
-    const editorTextValue = this.codeEditor.getValue();
-    const autoPipeReplaced =
-      this.removePipeFromSelectedSuggestion(editorTextValue, event.selection.positionLineNumber - 1, event.selection.positionColumn - 1);
+  initMonaco(scope) {
+    const themeName = this.config.bootData.user.lightTheme ? 'grafana-light' : 'vs-dark';
 
-    if (autoPipeReplaced) {
-        this.codeEditor.setValue(autoPipeReplaced);
-        return;
+    monaco.editor.defineTheme('grafana-light', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '008000' },
+        { token: 'variable.predefined', foreground: '800080' },
+        { token: 'function', foreground: '0000FF' },
+        { token: 'operator.sql', foreground: 'FF4500' },
+        { token: 'string', foreground: 'B22222' },
+        { token: 'operator.scss', foreground: '0000FF' },
+        { token: 'variable', foreground: 'C71585' },
+        { token: 'variable.parameter', foreground: '9932CC' },
+        { token: '', foreground: '000000' },
+        { token: 'type', foreground: '0000FF' },
+        { token: 'tag', foreground: '0000FF' },
+        { token: 'annotation', foreground: '2B91AF' },
+        { token: 'keyword', foreground: '0000FF' },
+        { token: 'number', foreground: '191970' },
+        { token: 'annotation', foreground: '9400D3' },
+        { token: 'invalid', background: 'cd3131' },
+      ],
+      colors: {
+        'textCodeBlock.background': '#FFFFFF',
+      },
+    });
+
+    monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
+      includeControlCommands: true,
+      newlineAfterPipe: true,
+      useIntellisenseV2: false,
+    });
+
+    this.codeEditor = monaco.editor.create(this.containerDiv, {
+      value: scope.content || 'Write your query here',
+      language: 'kusto',
+      selectionHighlight: false,
+      theme: themeName,
+      folding: true,
+      lineNumbers: 'off',
+      lineHeight: 16,
+      suggestFontSize: 13,
+      dragAndDrop: false,
+      occurrencesHighlight: false,
+      minimap: {
+        enabled: false,
+      },
+      renderIndentGuides: false,
+      wordWrap: 'on',
+    });
+    this.codeEditor.layout();
+
+    if (monaco.editor.getModels().length === 1) {
+      this.completionItemProvider = monaco.languages.registerCompletionItemProvider('kusto', {
+        triggerCharacters: ['.', ' '],
+        provideCompletionItems: this.getCompletionItems.bind(this),
+      });
+
+      this.signatureHelpProvider = monaco.languages.registerSignatureHelpProvider('kusto', {
+        signatureHelpTriggerCharacters: ['(', ')'],
+        provideSignatureHelp: this.getSignatureHelp.bind(this),
+      });
     }
 
-    // Do not re-trigger the suggestions if the accepted suggestion doesn't end with space.
-    // Otherwise you'll get the same suggestions again.
-    const  lastChar = this.getCharAtPosition(event.selection.positionLineNumber, event.selection.positionColumn - 1);
-    if ((lastChar !== ' ') && (lastChar !== '=') && (lastChar !== '.')) {
+    this.codeEditor.createContextKey('readyToExecute', true);
+
+    this.codeEditor.onDidChangeCursorSelection(event => {
+      this.onDidChangeCursorSelection(event);
+    });
+
+    this.getSchema().then(schema => {
+      if (!schema) {
         return;
+      }
+
+      monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
+        const model = this.codeEditor.getModel();
+        workerAccessor(model.uri).then(worker => {
+          const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
+          worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
+        });
+      });
+    });
+  }
+
+  setOnDidChangeModelContent(listener) {
+    this.codeEditor.onDidChangeModelContent(listener);
+  }
+
+  disposeMonaco() {
+    if (this.completionItemProvider) {
+      try {
+        this.completionItemProvider.dispose();
+      } catch (e) {
+        console.error('Failed to dispose the completion item provider.', e);
+      }
     }
-    this.triggerSuggestions();
+    if (this.signatureHelpProvider) {
+      try {
+        this.signatureHelpProvider.dispose();
+      } catch (e) {
+        console.error('Failed to dispose the signature help provider.', e);
+      }
+    }
+    if (this.codeEditor) {
+      try {
+        this.codeEditor.dispose();
+      } catch (e) {
+        console.error('Failed to dispose the editor component.', e);
+      }
+    }
+  }
+
+  addCommand(keybinding: number, commandFunc: monaco.editor.ICommandHandler) {
+    this.codeEditor.addCommand(keybinding, commandFunc, 'readyToExecute');
+  }
+
+  getValue() {
+    return this.codeEditor.getValue();
   }
 
   toSuggestionController(srv: monaco.editor.IEditorContribution): SuggestionController {
-    return (<any> srv);
+    return <any>srv;
   }
 
   setEditorContent(value) {
     this.codeEditor.setValue(value);
   }
 
+  getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position) {
+    const timeFilterDocs =
+      '##### Macro that uses the selected timerange in Grafana to filter the query.\n\n' +
+      '- `$__timeFilter()` -> Uses the ' + this.defaultTimeField + ' column\n\n' +
+      '- `$__timeFilter(datetimeColumn)` ->  Uses the specified datetime column to build the query.';
+
+    var textUntilPosition = model.getValueInRange({
+      startLineNumber: 1,
+      startColumn: 1,
+      endLineNumber: position.lineNumber,
+      endColumn: position.column,
+    });
+
+    if (!_.includes(textUntilPosition, '|')) {
+      return [];
+    }
+
+    if (!_.includes(textUntilPosition.toLowerCase(), 'where')) {
+      return [
+        {
+          label: 'where $__timeFilter(timeColumn)',
+          kind: monaco.languages.CompletionItemKind.Keyword,
+          insertText: {
+            value: 'where \\$__timeFilter(${0:' + this.defaultTimeField + '})',
+          },
+          documentation: {
+            value: timeFilterDocs,
+          },
+        },
+      ];
+    }
+
+    if (_.includes(model.getLineContent(position.lineNumber).toLowerCase(), 'where')) {
+      return [
+        {
+          label: '$__timeFilter(timeColumn)',
+          kind: monaco.languages.CompletionItemKind.Keyword,
+          insertText: {
+            value: '\\$__timeFilter(${0:' + this.defaultTimeField + '})',
+          },
+          documentation: {
+            value: timeFilterDocs,
+          },
+        },
+        {
+          label: '$__from',
+          kind: monaco.languages.CompletionItemKind.Keyword,
+          insertText: {
+            value: `\\$__from`,
+          },
+          documentation: {
+            value:
+              'Built-in variable that returns the from value of the selected timerange in Grafana.\n\n' +
+              'Example: `where ' + this.defaultTimeField + ' > $__from` ',
+          },
+        },
+        {
+          label: '$__to',
+          kind: monaco.languages.CompletionItemKind.Keyword,
+          insertText: {
+            value: `\\$__to`,
+          },
+          documentation: {
+            value:
+              'Built-in variable that returns the to value of the selected timerange in Grafana.\n\n' +
+              'Example: `where ' + this.defaultTimeField + ' < $__to` ',
+          },
+        },
+        {
+          label: '$__interval',
+          kind: monaco.languages.CompletionItemKind.Keyword,
+          insertText: {
+            value: `\\$__interval`,
+          },
+          documentation: {
+            value:
+              '##### Built-in variable that returns an automatic time grain suitable for the current timerange.\n\n' +
+              'Used with the bin() function - `bin(' + this.defaultTimeField + ', $__interval)` \n\n' +
+              '[Grafana docs](http://docs.grafana.org/reference/templating/#the-interval-variable)',
+          },
+        },
+      ];
+    }
+
+    return [];
+  }
+
+  getSignatureHelp(model: monaco.editor.IReadOnlyModel, position: monaco.Position, token: monaco.CancellationToken) {
+    var textUntilPosition = model.getValueInRange({
+      startLineNumber: position.lineNumber,
+      startColumn: position.column - 14,
+      endLineNumber: position.lineNumber,
+      endColumn: position.column,
+    });
+
+    if (textUntilPosition !== '$__timeFilter(') {
+      return <monaco.languages.SignatureHelp>{};
+    }
+
+    const signature: monaco.languages.SignatureHelp = {
+      activeParameter: 0,
+      activeSignature: 0,
+      signatures: [
+        {
+          label: '$__timeFilter(timeColumn)',
+          parameters: [
+            {
+              label: 'timeColumn',
+              documentation:
+                'Default is ' + this.defaultTimeField + ' column. Datetime column to filter data using the selected date range. ',
+            },
+          ],
+        },
+      ],
+    };
+
+    return signature;
+  }
+
+  onDidChangeCursorSelection(event) {
+    if (event.source !== 'modelChange' || event.reason !== monaco.editor.CursorChangeReason.RecoverFromMarkers) {
+      return;
+    }
+    const lastChar = this.getCharAt(event.selection.positionLineNumber, event.selection.positionColumn - 1);
+
+    if (lastChar !== ' ') {
+      return;
+    }
+
+    this.triggerSuggestions();
+  }
+
   triggerSuggestions() {
-    const suggestController = this.codeEditor.getContribution("editor.contrib.suggestController");
+    const suggestController = this.codeEditor.getContribution('editor.contrib.suggestController');
     if (!suggestController) {
-        return;
+      return;
     }
 
     const convertedController = this.toSuggestionController(suggestController);
 
     convertedController._model.cancel();
-    setTimeout(function () {
+    setTimeout(function() {
       convertedController._model.trigger(true);
     }, 10);
   }
 
-  getAllLines(content?) {
-    content = content || this.codeEditor.getValue();
-    return content.split('\n');
-  }
-
-  getCharAtPosition(lineNumber, column) {
-    const allLines = this.getAllLines() || [];
-    if (allLines.length < lineNumber) {
-        return '';
+  getCharAt(lineNumber: number, column: number) {
+    const model = this.codeEditor.getModel();
+    if (model.getLineCount() === 0 || model.getLineCount() < lineNumber) {
+      return '';
     }
-    const line = allLines[lineNumber - 1];
-    return (line.length < column) || (column < 1) ? '' : line[column - 1];
-  }
-
-  isMatchingRegex(line, regex) {
-    if (line.match(regex) !== null) {
-        return true;
+    const line = model.getLineContent(lineNumber);
+    if (line.length < column || column < 1) {
+      return '';
     }
-    return false;
-  }
-
-  getMultilineSubstringByPositions(editorTextValue, startLineNumber, endLineNumber, startPosition, endPosition) {
-    const textByLines = editorTextValue.match(this.splitWithNewLineRegex);
-    const precedingMultilineSubstringLength = this.calculateLengthByPositions(textByLines, 0, startLineNumber, 0, startPosition);
-    const multilineSubstringLength =
-      this.calculateLengthByPositions(textByLines, startLineNumber, endLineNumber, startPosition, endPosition);
-    return editorTextValue.substring(precedingMultilineSubstringLength, precedingMultilineSubstringLength + multilineSubstringLength);
-  }
-
-  /*
-  * Calculates summary length of the substring from start position to the end position
-  * for multi-line text.
-  *
-  * @param {array<string>} textByLines - editor text splitter by end of line character including end of line character
-  * @param {number} startLineNumber - start line for start position
-  * @param {number} endLineNumber - end line for end position
-  * @param {number} startPosition - position within start line from which start to count length
-  * @param {number} endPosition - position within end line on which stop to count length
-  * @returns {number} length of the sub-string.
-  */
-  calculateLengthByPositions(textByLines, startLineNumber, endLineNumber, startPosition, endPosition) {
-    if (!(Array.isArray(textByLines) && textByLines.length) ||
-        (Array.isArray(textByLines) && textByLines.length === 1 && textByLines[0] === '')) {
-        return 0;
-    }
-    if (startLineNumber === endLineNumber && (Array.isArray(textByLines) && startLineNumber < textByLines.length)) {
-        return endPosition - startPosition;
-    }
-    let lengthByPosition = 0;
-    let currentLine = '';
-    let i;
-    for (i = startLineNumber; i <= endLineNumber; i++) {
-        currentLine = textByLines[i];
-        if (i === startLineNumber) {
-            lengthByPosition = lengthByPosition + (currentLine.length - startPosition);
-        } else if (i === endLineNumber) {
-            lengthByPosition = lengthByPosition + endPosition;
-        } else {
-            lengthByPosition = lengthByPosition + currentLine.length;
-        }
-    }
-    return lengthByPosition;
-  }
-
-  /*
-  * Updates value of the suggestion for the model and removes auto-pipe if
-  * text after suggestion starts with pipe
-  *
-  * @param {string} editorTextValue - string representing editor text including suggested value
-  * @param {number} cursorLinePosition - current cursor line position
-  * @param {number} cursorColumnPosition - current cursor column position
-  * @returns {string} editor text value with auto pipe removed
-  */
-  removePipeFromSelectedSuggestion(editorTextValue, cursorLinePosition, cursorColumnPosition) {
-    // Exclude empty values from processing
-    if (!editorTextValue || cursorLinePosition < 0) {
-        return '';
-    }
-    const textByLines = editorTextValue.match(this.splitWithNewLineRegex);
-    // If cursor line position is out of bounds (shouldn't happen)
-    if (textByLines == null || cursorLinePosition > textByLines.length) {
-        return '';
-    }
-    const autoPipeSuggestionLine = textByLines[cursorLinePosition];
-    // Still if we got incorrect line (shouldn't happen)
-    if (!autoPipeSuggestionLine) {
-        return '';
-    }
-    const isModelSuggestedPipe =
-    this.isMatchingRegex(
-        autoPipeSuggestionLine.substring(0, cursorColumnPosition),
-        this.kustoPipeRegexStrict);
-    // If we have auto pipe added
-    if (isModelSuggestedPipe) {
-        const lineNumberBeforePipe = cursorLinePosition - 1;
-        const isTextAfterAutoPipeOnSameLine =
-          autoPipeSuggestionLine.substring(cursorColumnPosition).replace(this.newLineRegex, '').length > 0;
-        const lineNumberAfterPipe = isTextAfterAutoPipeOnSameLine ? cursorLinePosition : cursorLinePosition + 1;
-        const lineAfterAutoPipeStartPosition = isTextAfterAutoPipeOnSameLine ? cursorColumnPosition : 0;
-        // If we have consecutive - remove one
-        if (lineNumberAfterPipe < textByLines.length
-            && this.isMatchingRegex(
-              textByLines[lineNumberAfterPipe].substring(lineAfterAutoPipeStartPosition).trim(),
-              this.startsWithKustoPipeRegex)) {
-
-            const textBeforeAutoPipe = this.getMultilineSubstringByPositions(
-              editorTextValue, 0, lineNumberBeforePipe, 0, textByLines[lineNumberBeforePipe].length
-            );
-            const textWithAutoPipeShift = isTextAfterAutoPipeOnSameLine ? cursorColumnPosition : autoPipeSuggestionLine.length;
-            const textAfterAutoPipe = editorTextValue.substring(textBeforeAutoPipe.length + textWithAutoPipeShift);
-            const newTextValue = textBeforeAutoPipe + textAfterAutoPipe;
-            return newTextValue;
-        }
-    }
-    return '';
-  }
-
-  getCompletionItems() {
-    const timeFilterDocs = '##### Macro that uses the selected timerange in Grafana to filter the query.\n\n' +
-          '- `$__timeFilter()` -> Uses the TimeGenerated column\n\n' +
-          '- `$__timeFilter(datetimeColumn)` ->  Uses the specified datetime column to build the query.';
-    return [
-      {
-        label: 'where $__timeFilter(timeColumn)',
-        kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: {
-          value: `where \\$__timeFilter($0)`
-        },
-        documentation: {
-          value: timeFilterDocs
-        }
-      },
-      {
-        label: '$__timeFilter(timeColumn)',
-        kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: {
-          value: `\\$__timeFilter($0)`
-        },
-        documentation: {
-          value: timeFilterDocs
-        }
-      },
-      {
-        label: '$__from',
-        kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: {
-          value: `\\$__from`
-        },
-        documentation: {
-          value: 'Built-in variable that returns the from value of the selected timerange in Grafana.\n\n'
-            + 'Example: `where TimeGenerated > $__from` '
-        }
-      },
-      {
-        label: '$__to',
-        kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: {
-          value: `\\$__to`
-        },
-        documentation: {
-          value: 'Built-in variable that returns the to value of the selected timerange in Grafana.\n\n'
-            + 'Example: `where TimeGenerated < $__to` '
-        }
-      },
-      {
-        label: '$__interval',
-        kind: monaco.languages.CompletionItemKind.Keyword,
-        insertText: {
-          value: `\\$__interval`
-        },
-        documentation: {
-          value: '##### Built-in variable that returns an automatic time grain suitable for the current timerange.\n\n' +
-            'Used with the bin() function - `bin(TimeGenerated, $__interval)` \n\n' +
-            '[Grafana docs](http://docs.grafana.org/reference/templating/#the-interval-variable)'
-        }
-      },
-    ];
+    return line[column - 1];
   }
 }

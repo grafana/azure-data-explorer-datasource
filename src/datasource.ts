@@ -54,7 +54,22 @@ export class KustoDBDatasource {
     });
   }
 
-  annotationQuery(options) {}
+  annotationQuery(options) {
+    if (!options.annotation.rawQuery) {
+      return this.$q.reject({
+        message: 'Query missing in annotation definition',
+      });
+    }
+
+    const queries: any[] = this.buildQuery(options.annotation.rawQuery, options, options.annotation.database);
+
+    const promises = this.doQueries(queries);
+
+    return this.$q.all(promises).then(results => {
+      const annotations = new ResponseParser().transformToAnnotations(options, results);
+      return annotations;
+    });
+  }
 
   metricFindQuery(query: string) {
     return this.getDefaultOrFirstDatabase().then(database => {
