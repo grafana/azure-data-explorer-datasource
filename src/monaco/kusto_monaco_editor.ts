@@ -1,8 +1,6 @@
 ///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
 
 import angular from 'angular';
-import '../lib/bridge.js';
-import '../lib/monaco.min.js';
 import KustoCodeEditor from './kusto_code_editor';
 import config from 'grafana/app/core/config';
 
@@ -10,9 +8,17 @@ let editorTemplate = `<div id="content" tabindex="0" style="width: 100%; height:
 
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
-  setTimeout(() => {
-    initMonaco(containerDiv, scope);
-  }, 1);
+  if (!(global as any).monaco) {
+    (global as any).System.import(`/${scope.pluginBaseUrl}/lib/monaco.min.js`).then(() => {
+      setTimeout(() => {
+        initMonaco(containerDiv, scope);
+      }, 1);
+    });
+  } else {
+    setTimeout(() => {
+      initMonaco(containerDiv, scope);
+    }, 1);
+  }
 
   containerDiv.onblur = () => {
     scope.onChange();
@@ -72,6 +78,7 @@ export function kustoMonacoEditorDirective() {
       onChange: '&',
       getSchema: '&',
       defaultTimeField: '@',
+      pluginBaseUrl: '@',
     },
     link: link,
   };

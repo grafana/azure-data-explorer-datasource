@@ -1,5 +1,5 @@
 <div class="gf-form-group">
-  <div >
+  <div>
     <div class="gf-form-inline">
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Database</label>
@@ -17,7 +17,8 @@
         <label class="gf-form-label">(Run Query: Shift+Enter, Trigger Suggestion: Ctrl+Space)</label>
       </div>
     </div>
-    <kusto-monaco-editor content="ctrl.annotation.rawQuery" on-change="ctrl.panelCtrl.refresh()" get-schema="ctrl.datasource.getSchema(ctrl.annotation.database)" default-time-field="Timestamp"></kusto-monaco-editor>
+    <kusto-monaco-editor content="ctrl.annotation.rawQuery" on-change="ctrl.panelCtrl.refresh()" get-schema="ctrl.datasource.getSchema(ctrl.annotation.database)"
+      default-time-field="Timestamp" plugin-base-url={{ctrl.datasource.meta.baseUrl}}></kusto-monaco-editor>
   </div>
 
   <div class="gf-form-inline">

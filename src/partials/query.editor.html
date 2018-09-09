@@ -21,7 +21,8 @@
     </div>
   </div>
 
-  <kusto-monaco-editor content="ctrl.target.query" on-change="ctrl.refresh()" get-schema="ctrl.getSchema(ctrl.target.database)" default-time-field="Timestamp"></kusto-monaco-editor>
+  <kusto-monaco-editor content="ctrl.target.query" on-change="ctrl.refresh()" get-schema="ctrl.getSchema(ctrl.target.database)"
+    default-time-field="Timestamp" plugin-base-url={{ctrl.datasource.meta.baseUrl}}></kusto-monaco-editor>
 
   <div class="gf-form-inline">
     <div class="gf-form">

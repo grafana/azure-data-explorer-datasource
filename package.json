@@ -1,5 +1,5 @@
 {
-  "name": "grafana-kustodb-datasource",
+  "name": "grafana-azure-kusto-datasource",
   "version": "1.0.0",
   "description": "Grafana data source for KustoDB",
   "scripts": {

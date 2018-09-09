@@ -1,7 +1,7 @@
 {
   "type": "datasource",
   "name": "KustoDB",
-  "id": "grafana-kustodb-datasource",
+  "id": "grafana-azure-kusto-datasource",
 
   "info": {
     "description": "Grafana data source for KustoDB",
@@ -9,14 +9,14 @@
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
-    "keywords": ["kusto", "kustodb"],
+    "keywords": ["azure", "kusto", "kustodb"],
     "logos": {
       "small": "img/logo.png",
       "large": "img/logo.png"
     },
     "links": [
-      { "name": "Project site", "url": "https://github.com/grafana/kustodb-datasource" },
-      { "name": "Apache License", "url": "https://github.com/grafana/kustodb-datasource/blob/master/LICENSE" }
+      { "name": "Project site", "url": "https://github.com/grafana/azure-kusto-datasource" },
+      { "name": "Apache License", "url": "https://github.com/grafana/azure-kusto-datasource/blob/master/LICENSE" }
     ],
     "screenshots": [],
     "version": "0.1.0",

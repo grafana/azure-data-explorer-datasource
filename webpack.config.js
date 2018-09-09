@@ -10,6 +10,7 @@ module.exports = {
   context: path.join(__dirname, 'src'),
   entry: {
     'module': './module.ts',
+    'lib/monaco.min': './lib/monaco.min.js',
 	},
   devtool: 'source-map',
   output: {
