@@ -24,6 +24,15 @@ function link(scope, elem, attrs) {
     scope.onChange();
   };
 
+  containerDiv.onkeydown = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.stopPropagation();
+      return true;
+    }
+
+    return undefined;
+  };
+
   function initMonaco(containerDiv, scope) {
     const kustoCodeEditor = new KustoCodeEditor(
       containerDiv,
