@@ -1,10 +1,10 @@
 {
   "type": "datasource",
-  "name": "KustoDB",
+  "name": "Azure Kusto",
   "id": "grafana-azure-kusto-datasource",
 
   "info": {
-    "description": "Grafana data source for KustoDB",
+    "description": "Grafana data source for Azure Kusto",
     "author": {
       "name": "Grafana Labs",
       "url": "https://grafana.com"

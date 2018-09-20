@@ -1,7 +1,7 @@
 {
   "name": "grafana-azure-kusto-datasource",
   "version": "1.0.0",
-  "description": "Grafana data source for KustoDB",
+  "description": "Grafana data source for Azure Kusto",
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/webpack --config webpack.config.prod.js",
     "dev": "webpack --mode development",
