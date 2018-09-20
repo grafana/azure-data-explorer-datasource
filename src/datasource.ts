@@ -80,7 +80,9 @@ export class KustoDBDatasource {
       return this.$q.all(promises).then(results => {
         return new ResponseParser().parseToVariables(results);
       }).catch(err => {
-        throw {message: err.error.data.error['@message']};
+        if (err.error && err.error.data && err.error.data.error) {
+          throw {message: err.error.data.error['@message']};
+        }
       });
     });
   }
