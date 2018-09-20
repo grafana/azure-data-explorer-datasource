@@ -137,8 +137,90 @@ If the command succeeds you should get a result like this:
     - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
 
 5. Paste these four items into the fields in the Azure Kusto API Details section:
-    ![Azure Monitor API Details](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/config_2_azure_kusto_api_details.png)
+    ![Azure Kusto API Details](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/config_2_azure_kusto_api_details.png)
+
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
+
+## Writing Queries
+
+Queries are written in the new [Kusto Query Language](https://kusdoc2.azurewebsites.net/docs/query/index.html).
+
+Queries can be formatted as *Time Series* data or as *Table* data.
+
+*Time Series* queries are for the Graph Panel (and other panels like the Single Stat panel) and must contain a datetime column, a metric name column and a value column. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
+
+```
+AzureActivity
+| where $__timeFilter(TimeGenerated)
+| summarize count() by Category, bin(TimeGenerated, 1h)
+| order by TimeGenerated asc
+```
+
+*Table* queries are mainly used in the Table panel and row a list of columns and rows. This example query returns rows with the 6 specified columns:
+
+```
+AzureActivity
+| where $__timeFilter()
+| project TimeGenerated, ResourceGroup, Category, OperationName, ActivityStatus, Caller
+| order by TimeGenerated desc
+```
+
+### Macros
+
+To make writing queries easier there are two Grafana macros that can be used in the where clause of a query:
+
+- $__timeFilter() - Expands to `TimeGenerated ≥ datetime(2018-06-05T18:09:58.907Z) and TimeGenerated ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
+- $__timeFilter(datetimeColumn) - Expands to `datetimeColumn ≥ datetime(2018-06-05T18:09:58.907Z) and datetimeColumn ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
+
+### Builtin Variables
+
+There are also some Grafana variables that can be used in queries:
+
+- **$__from** - Returns the From datetime from the Grafana picker. Example: datetime(2018-06-05T18:09:58.907Z).
+- **$__to** - Returns the From datetime from the Grafana picker. Example: datetime(2018-06-05T20:09:58.907Z).
+- **$__interval** - Grafana calculates the minimum time grain that can be used to group by time in queries. More details on how it works here. It returns a time grain like 5m or 1h that can be used in the bin function. E.g. `summarize count() by bin(TimeGenerated, $__interval)`
+
+## Templating with Variables
+
+Instead of hard-coding things like server, application and sensor name in you metric queries you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns make it easy to change the data being displayed in your dashboard.
+
+Create the variable in the dashboard settings. Usually you will need to write a query in the Kusto Query Language to get a list of values for the dropdown. It is however also possible to have a list of hardcoded values.
+
+1. Fill in a name for your variable. The `Name` field is the name of the variable. There is also a `Label` field for the friendly name.
+2. In the Query Options section, choose the `Azure Kusto` datasource in the `Data source` dropdown.
+3. Write the query in the `Query` field.
+    ![Template Query](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/templating_1.png)
+4. At the bottom, you will see a preview of the values returned from the query:
+    ![Template Query Preview](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/templating_2.png)
+5. Use the variable in your query (in this case the variable is named `level`):
+
+    ```
+    MyLogs | where Level == '$level'
+    ```
+
+For variables where multiple values are allowed then use the `in` operator instead:
+
+    ```
+    MyLogs | where Level in ($level)
+    ```
+
+Read more about templating and variables in the [Grafana documentation](http://docs.grafana.org/reference/templating/#variables).
+
+## Annotations
+
+An annotation is an event that is overlaid on top of graphs. The query can have up to three columns per row, the datetime column is mandatory. Annotation rendering is expensive so it is important to limit the number of rows returned.
+
+- column with the datetime type.
+- column with alias: Text or text for the annotation text
+- column with alias: Tags or tags for annotation tags. This is should return a comma separated string of tags e.g. 'tag1,tag2'
+
+Example query:
+
+```
+MyLogs
+| where $__timeFilter(Timestamp) 
+| project Timestamp, Text=Message , Tags="tag1,tag2"
+```
 
 ### CHANGELOG
 
