@@ -1,4 +1,4 @@
-# Azure Kusto Data Source For Grafana
+# Azure Kusto Datasource For Grafana
 
 Azure Kusto is a log analytics cloud platform optimized for ad-hoc big data queries.
 
@@ -12,8 +12,7 @@ This plugin requires Grafana 5.3.0 or newer.
 
 If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can sign up for one [here](https://grafana.com/cloud/grafana).
 
-1. Click on the `Install Now` button on the [Azure Kusto page on Grafana.com](https://grafana.com/plugins/grafana-azure-kusto-datasource/installation). This will automatically add the plugin to your Gr$
-fana instance. It might take up to 30 seconds to install.
+1. Click on the `Install Now` button on the [Azure Kusto page on Grafana.com](https://grafana.com/plugins/grafana-azure-kusto-datasource/installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
     ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/dist/img/grafana_cloud_install.png)
 
 2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Kusto datasource will be installed.
@@ -35,7 +34,7 @@ fana instance. It might take up to 30 seconds to install.
     ```
 3. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
 4. Login in with username: `admin` and password: `admin`
-5. To make sure the plugin was installed, check the list of installed data sources. Click the Plugins item in the main menu. Both core data sources and installed data sources will appear.
+5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
 This ia an alternative command if you want to run Grafana on a different port than the default 3000 port:
 
@@ -53,8 +52,8 @@ Grafana comes with a command line tool that can be used to install plugins.
 2. Run this command: `grafana-cli plugins install grafana-azure-kusto-datasource`
 3. Restart the Grafana server.
 4. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
-5. Login in with a user that has admin rights. This is needed to create data sources.
-6. To make sure the plugin was installed, check the list of installed data sources. Click the Plugins item in the main menu. Both core data sources and installed data sources will appear.
+5. Login in with a user that has admin rights. This is needed to create datasources.
+6. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
 ### Installing the Plugin Manually on an Existing Grafana
 
@@ -64,7 +63,7 @@ If the server where Grafana is installed has no access to the Grafana.com server
 2. Get the zip file from Grafana.com: https://grafana.com/plugins/grafana-azure-kusto-datasource/installation and click on the link in step 1 (with this text: "Alternatively, you can manually download the .zip file")
 3. Extract the zip file into the data/plugins subdirectory for Grafana.
 4. Restart the Grafana server
-5. To make sure the plugin was installed, check the list of installed data sources. Click the Plugins item in the main menu. Both core data sources and installed data sources will appear.
+5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
 ## Configuring the datasource in Grafana
 
@@ -124,11 +123,11 @@ If the command succeeds you should get a result like this:
 
 ### Configuring Grafana
 
-1. Accessed from the Grafana main menu, newly installed data sources can be added immediately within the Data Sources section. Next, click the  "Add data source" button in the upper right. The data source will be available for selection in the Type select box.
+1. Accessed from the Grafana main menu, newly installed datasources can be added immediately within the Data Sources section. Next, click the  "Add datasource" button in the upper right. The datasource will be available for selection in the Type select box.
 
 2. Select Azure Kusto from the Type dropdown:
 ![Data Source Type](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/config_1_select_type.png)
-3. In the name field, fill in a name for the data source. It can be anything.
+3. In the name field, fill in a name for the datasource. It can be anything.
 
 4. You need 4 pieces of information from the Azure portal (see link above for detailed instructions):
     - **Tenant Id** (Azure Active Directory -> Properties -> Directory ID)
@@ -172,7 +171,7 @@ To make writing queries easier there are two Grafana macros that can be used in 
 - $__timeFilter() - Expands to `TimeGenerated ≥ datetime(2018-06-05T18:09:58.907Z) and TimeGenerated ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
 - $__timeFilter(datetimeColumn) - Expands to `datetimeColumn ≥ datetime(2018-06-05T18:09:58.907Z) and datetimeColumn ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
 
-### Builtin Variables
+### Built-in Variables
 
 There are also some Grafana variables that can be used in queries:
 
@@ -188,19 +187,23 @@ Create the variable in the dashboard settings. Usually you will need to write a 
 
 1. Fill in a name for your variable. The `Name` field is the name of the variable. There is also a `Label` field for the friendly name.
 2. In the Query Options section, choose the `Azure Kusto` datasource in the `Data source` dropdown.
-3. Write the query in the `Query` field.
+3. Write the query in the `Query` field. Use `project` to specify one column - the result should be a list of string values.
+
     ![Template Query](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/templating_1.png)
+
 4. At the bottom, you will see a preview of the values returned from the query:
+
     ![Template Query Preview](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/templating_2.png)
+
 5. Use the variable in your query (in this case the variable is named `level`):
 
-    ```
+    ```sql
     MyLogs | where Level == '$level'
     ```
 
-For variables where multiple values are allowed then use the `in` operator instead:
+    For variables where multiple values are allowed then use the `in` operator instead:
 
-    ```
+    ```sql
     MyLogs | where Level in ($level)
     ```
 
