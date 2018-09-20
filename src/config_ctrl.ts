@@ -1,4 +1,7 @@
 import { KustoDBDatasource } from './datasource';
+import config from 'grafana/app/core/config';
+import { isVersionGtOrEq } from './version';
+
 export class KustoDBConfigCtrl {
   static templateUrl = 'partials/config.html';
 
@@ -6,9 +9,11 @@ export class KustoDBConfigCtrl {
   suggestUrl: string;
   kustoDbDatasource: any;
   databases: any[];
+  hasRequiredGrafanaVersion: boolean;
 
   /** @ngInject */
   constructor($scope, backendSrv, $q) {
+    this.hasRequiredGrafanaVersion = this.hasMinVersion();
     this.suggestUrl = 'https://yourcluster.kusto.windows.net';
     $scope.getSuggestUrls = () => {
       return [this.suggestUrl];
@@ -28,5 +33,17 @@ export class KustoDBConfigCtrl {
         this.current.jsonData.defaultDatabase = this.current.jsonData.defaultDatabase || this.databases[0].value;
       }
     });
+  }
+
+  hasMinVersion(): boolean {
+    return (
+      isVersionGtOrEq(config.buildInfo.latestVersion, '5.3') ||
+      config.buildInfo.version === '5.3.0-beta1' ||
+      config.buildInfo.version === '5.3.0-pre1'
+    );
+  }
+
+  showMinVersionWarning() {
+    return !this.hasRequiredGrafanaVersion;
   }
 }

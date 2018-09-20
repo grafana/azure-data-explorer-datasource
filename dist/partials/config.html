@@ -1,4 +1,32 @@
 <h3 class="page-heading">Azure Kusto API Details</h3>
+
+<div class="gf-form-group">
+  <div class="grafana-info-box">
+    <h5>Configuring Azure and your Kusto Database</h5>
+    <h5>1. Create an AAD application</h5>
+    <p>Details on how to do create one via the Azure portal or with the Azure CLI can be found <a class="external-link"
+        target="_blank" href="https://github.com/grafana/azure-kusto-datasource#configuring-the-datasource-in-grafana">here.</a></p>
+
+    <h5>2. Connect the AAD Application to a database user</h5>
+    <p>
+      Navigate to the Kusto Web Explorer: http://nameofyourcluster.kusto.windows.net?web=1
+
+      The AAD application that you created in step 1 needs to be given viewer access to your Kusto database. This is
+      done using the dot command <i>add</i>:
+      <pre>.add database your_db_name viewers ('aadapp=your_client_id;your_tenant_id')</pre>
+    </p>
+
+    <h5>3. Configure the connection in Grafana</h5>
+    <p>
+      Use the details from the AAD Service Principle from Step 1 to fill in the field below. Then click the Save & Test
+      button.
+    </p>
+
+    <p>Detailed instructions on all three steps can found in <a class="external-link" target="_blank" href="https://github.com/grafana/azure-kusto-datasource#configuring-the-datasource-in-grafana">in
+        the documentation.</a></p>
+  </div>
+</div>
+
 <div class="gf-form-group">
   <div class="gf-form-inline">
     <div class="gf-form">
@@ -38,7 +66,8 @@
       <span class="gf-form-label width-9">Client Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.clientId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
-        <p>In the Azure Portal, navigate to Azure Active Directory -> App Registrations -> Choose your app -> Application
+        <p>In the Azure Portal, navigate to Azure Active Directory -> App Registrations -> Choose your app ->
+          Application
           ID.</p>
         <a target="_blank" href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal">**Click
           here for detailed instructions on setting up an Azure Active Directory (AD) application.**</a>
@@ -50,7 +79,8 @@
       <span class="gf-form-label width-9">Client Secret</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.secureJsonData.clientSecret' placeholder=""></input>
       <info-popover mode="right-absolute">
-        <p>To create a new key, log in to Azure Portal, navigate to Azure Active Directory -> App Registrations -> Choose
+        <p>To create a new key, log in to Azure Portal, navigate to Azure Active Directory -> App Registrations ->
+          Choose
           your app -> Keys.</p>
         <a target="_blank" href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal">**Click
           here for detailed instructions on setting up an Azure Active Directory (AD) application.**</a>
@@ -72,5 +102,12 @@
         <p>Choose the default/preferred Database for this Azure Kusto Cluster.</p>
       </info-popover>
     </div>
+  </div>
+</div>
+
+<div class="gf-form-group" ng-if="ctrl.showMinVersionWarning()">
+  <div class=" alert alert-error">
+      This datasource requires Grafana 5.3.0 (5.3.0-beta1 or greater). <a class="external-link" target="_blank" href="https://grafana.com/get">Download a new version of
+      Grafana here.</a>
   </div>
 </div>

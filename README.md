@@ -2,8 +2,6 @@
 
 Azure Kusto is a log analytics cloud platform optimized for ad-hoc big data queries.
 
-## Features
-
 ## Installation
 
 This plugin requires Grafana 5.3.0 or newer.
@@ -70,7 +68,7 @@ If the server where Grafana is installed has no access to the Grafana.com server
 The steps for configuring the integration between the Azure Kusto service and Grafana are:
 
 1. Create an Azure Active Directory (AAD) Application and AAD Service Principle.
-2. Log into the Azure Log Analytics Portal and connect the AAD Application to an Azure Kusto database user.
+2. Log into the Kusto WebExplorer and connect the AAD Application to an Azure Kusto database user.
 3. Use the AAD Application to configure the datasource connection in Grafana.
 
 ### Creating an Azure Active Directory Service Principle
