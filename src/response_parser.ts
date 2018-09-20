@@ -91,7 +91,7 @@ export class ResponseParser {
 
     for (let table of results.data.Tables) {
       for (let row of table.Rows) {
-        databases.push({text: row[5] || row[0], value: row[0]});
+        databases.push({ text: row[5] || row[0], value: row[0] });
       }
     }
 
@@ -119,7 +119,7 @@ export class ResponseParser {
         data = _.concat(data, this.parseTableResult(results[i].query, columns, rows));
       }
     }
-    return {data: data};
+    return { data: data };
   }
 
   parseTimeSeriesResult(query, columns, rows): DataTarget[] {
@@ -171,9 +171,10 @@ export class ResponseParser {
   }
 
   parseToVariables(results): Variable[] {
+    const variables: Variable[] = [];
+
     const queryResult = this.parseQueryResult(results);
 
-    const variables: Variable[] = [];
     for (let result of queryResult.data) {
       for (let row of _.flattenDeep(result.rows)) {
         variables.push(<Variable>{

@@ -79,6 +79,8 @@ export class KustoDBDatasource {
 
       return this.$q.all(promises).then(results => {
         return new ResponseParser().parseToVariables(results);
+      }).catch(err => {
+        throw {message: err.error.data.error['@message']};
       });
     });
   }
@@ -173,10 +175,7 @@ export class KustoDBDatasource {
   }
 
   private buildQuery(query: string, options: any, database: string) {
-    const queryBuilder = new QueryBuilder(
-      this.templateSrv.replace(query, {}, this.interpolateVariable),
-      options,
-    );
+    const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, {}, this.interpolateVariable), options);
     const url = `${this.baseUrl}/v1/rest/query`;
 
     const queries: any[] = [];
@@ -187,7 +186,7 @@ export class KustoDBDatasource {
       data: {
         csl: queryBuilder.interpolate().query,
         db: database,
-      }
+      },
     });
     return queries;
   }
