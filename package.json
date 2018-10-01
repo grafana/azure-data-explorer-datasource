@@ -1,7 +1,7 @@
 {
-  "name": "grafana-azure-kusto-datasource",
+  "name": "grafana-azure-data-explorer-datasource",
   "version": "1.0.0",
-  "description": "Grafana data source for Azure Kusto",
+  "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/webpack --config webpack.config.prod.js",
     "dev": "webpack --mode development",

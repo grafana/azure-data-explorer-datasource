@@ -2,6 +2,9 @@ export default class QueryBuilder {
   constructor(public rawQuery, public options) {}
 
   interpolate() {
+    if (!this.rawQuery) {
+      return { query: '' };
+    }
     let query = this.rawQuery;
     const macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\)]*)\)/gi;
     if (this.options) {
@@ -17,7 +20,7 @@ export default class QueryBuilder {
       query = query.replace(/\$__to/gi, this.getUntil(this.options));
     }
 
-    return { query};
+    return { query };
   }
 
   getFrom(options) {
@@ -27,7 +30,7 @@ export default class QueryBuilder {
 
   getUntil(options) {
     if (options.rangeRaw.to === 'now') {
-      return "now()";
+      return 'now()';
     } else {
       var until = options.range.to;
       return `datetime(${until.toISOString()})`;

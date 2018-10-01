@@ -1,6 +1,6 @@
-# Azure Kusto Datasource For Grafana
+# Azure Data Explorer Datasource For Grafana
 
-Azure Kusto is a log analytics cloud platform optimized for ad-hoc big data queries.
+Azure Data Explorer is a log analytics cloud platform optimized for ad-hoc big data queries.
 
 ## Installation
 
@@ -10,10 +10,10 @@ This plugin requires Grafana 5.3.0 or newer.
 
 If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can sign up for one [here](https://grafana.com/cloud/grafana).
 
-1. Click on the `Install Now` button on the [Azure Kusto page on Grafana.com](https://grafana.com/plugins/grafana-azure-kusto-datasource/installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
-    ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/dist/img/grafana_cloud_install.png)
+1. Click on the `Install Now` button on the [Azure Data Explorer page on Grafana.com](https://grafana.com/plugins/grafana-azure-data-explorer-datasource/installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
+    ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/dist/img/grafana_cloud_install.png)
 
-2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Kusto datasource will be installed.
+2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Data Explorer datasource will be installed.
 
 ### Installation Instructions on the Grafana Docs Site
 
@@ -26,9 +26,9 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 
 1. Fetch the latest version of grafana from Docker Hub:
     `docker pull grafana/grafana:latest`
-2. Run Grafana and install the Azure Kusto plugin with this command:
+2. Run Grafana and install the Azure Data Explorer plugin with this command:
     ```bash
-    docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-kusto-datasource" grafana/grafana:latest
+    docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-data-explorer-datasource" grafana/grafana:latest
     ```
 3. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
 4. Login in with username: `admin` and password: `admin`
@@ -37,7 +37,7 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 This ia an alternative command if you want to run Grafana on a different port than the default 3000 port:
 
 ```bash
-docker run -d --name=grafana -p 8081:8081 -e "GF_SERVER_HTTP_PORT=8081" -e "GF_INSTALL_PLUGINS=grafana-azure-kusto-datasource" grafana/grafana:master
+docker run -d --name=grafana -p 8081:8081 -e "GF_SERVER_HTTP_PORT=8081" -e "GF_INSTALL_PLUGINS=grafana-azure-data-explorer-datasource" grafana/grafana:master
 ```
 
 It is recommended that you use a volume to save the Grafana data in. Otherwise if you remove the docker container, you will lose all your Grafana data (dashboards, users etc.). You can create a volume with the [Docker Volume Driver for Azure File Storage](https://github.com/Azure/azurefile-dockervolumedriver).
@@ -47,7 +47,7 @@ It is recommended that you use a volume to save the Grafana data in. Otherwise i
 Grafana comes with a command line tool that can be used to install plugins.
 
 1. Upgrade Grafana to the latest version. Get that [here](https://grafana.com/grafana/download/).
-2. Run this command: `grafana-cli plugins install grafana-azure-kusto-datasource`
+2. Run this command: `grafana-cli plugins install grafana-azure-data-explorer-datasource`
 3. Restart the Grafana server.
 4. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
 5. Login in with a user that has admin rights. This is needed to create datasources.
@@ -58,17 +58,17 @@ Grafana comes with a command line tool that can be used to install plugins.
 If the server where Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded and manually copied to the server.
 
 1. Upgrade Grafana to the latest version. Get that [here](https://grafana.com/grafana/download/).
-2. Get the zip file from Grafana.com: https://grafana.com/plugins/grafana-azure-kusto-datasource/installation and click on the link in step 1 (with this text: "Alternatively, you can manually download the .zip file")
+2. Get the zip file from Grafana.com: https://grafana.com/plugins/grafana-azure-data-explorer-datasource/installation and click on the link in step 1 (with this text: "Alternatively, you can manually download the .zip file")
 3. Extract the zip file into the data/plugins subdirectory for Grafana.
 4. Restart the Grafana server
 5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
 ## Configuring the datasource in Grafana
 
-The steps for configuring the integration between the Azure Kusto service and Grafana are:
+The steps for configuring the integration between the Azure Data Explorer service and Grafana are:
 
 1. Create an Azure Active Directory (AAD) Application and AAD Service Principle.
-2. Log into the Kusto WebExplorer and connect the AAD Application to an Azure Kusto database user.
+2. Log into the Azure Data Explorer WebExplorer and connect the AAD Application to an Azure Data Explorer database user.
 3. Use the AAD Application to configure the datasource connection in Grafana.
 
 ### Creating an Azure Active Directory Service Principle
@@ -100,31 +100,43 @@ az role assignment create --assignee <your appId> --role Reader
 az role assignment delete --assignee <your appId> --role Contributor  
 ```
 
-### Connecting AAD with an Azure Kusto User
+### Connecting AAD with an Azure Data Explorer User
 
-Navigate to the Kusto Web Explorer: http://nameofyourcluster.kusto.windows.net?web=1
+Navigate to the Azure Web UI for Azure Data Explorer: https://dataexplorer.azure.com/clusters/nameofyourcluster/databases/yourdatabasename
 
-The AAD application that you created above needs to be given viewer access to your Kusto database (in this example the database is called Grafana). This is done using the dot command `add`. The argument for `.add` contains both the client and tenant id separated by a semicolon:
+You can find the link to the Web UI in the Azure Portal by navigating to:
+
+1. All services-> [Azure Data Explorer Clusters](https://portal.azure.com/?feature.customportal=false&Microsoft_Azure_Kusto=true#blade/HubsExtension/Resources/resourceType/Microsoft.Kusto%2FClusters) option 
+2. Choose your cluster
+3. Databases -> click on your database
+4. Choose the Query option -> then click on the "Open in web UI" link
+
+To create a cluster and database, follow the instructions [here](https://docs.microsoft.com/en-us/azure/data-explorer/create-cluster-database-portal).
+
+The AAD application that you created above needs to be given viewer access to your Azure Data Explorer database (in this example the database is called Grafana). This is done using the dot command `add`. The argument for `.add` contains both the client and tenant id separated by a semicolon:
 
 ```sql
 .add database Grafana viewers ('aadapp=<your client id>;<your tenantid>')
 ```
 
 A real example with a client/app id and tenant id:
+
 ```sql
 .add database Grafana viewers ('aadapp=377a87d4-2cd3-44c0-b35a-8887a12fxxx;e7f3f661-a933-4b3f-8176-51c4f982exxx')
 ```
 
 If the command succeeds you should get a result like this:
 
- ![Kusto Web Explorer Add result](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/config_3_kusto_web_explorer.png)
+![Azure Data Web Explorer Add result](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_3_web_ui.png)
 
 ### Configuring Grafana
 
 1. Accessed from the Grafana main menu, newly installed datasources can be added immediately within the Data Sources section. Next, click the  "Add datasource" button in the upper right. The datasource will be available for selection in the Type select box.
 
-2. Select Azure Kusto from the Type dropdown:
-![Data Source Type](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/config_1_select_type.png)
+2. Select Azure Data Explorer from the Type dropdown:
+
+    ![Data Source Type](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_1_select_type.png)
+
 3. In the name field, fill in a name for the datasource. It can be anything.
 
 4. You need 4 pieces of information from the Azure portal (see link above for detailed instructions):
@@ -133,8 +145,8 @@ If the command succeeds you should get a result like this:
     - **Client Id** (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
     - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
 
-5. Paste these four items into the fields in the Azure Kusto API Details section:
-    ![Azure Kusto API Details](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/config_2_azure_kusto_api_details.png)
+5. Paste these four items into the fields in the Azure Data Explorer API Details section:
+    ![Azure Data Explorer API Details](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_2_azure_data_explorer_api_details.png)
 
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
 
@@ -184,14 +196,14 @@ Instead of hard-coding things like server, application and sensor name in you me
 Create the variable in the dashboard settings. Usually you will need to write a query in the Kusto Query Language to get a list of values for the dropdown. It is however also possible to have a list of hardcoded values.
 
 1. Fill in a name for your variable. The `Name` field is the name of the variable. There is also a `Label` field for the friendly name.
-2. In the Query Options section, choose the `Azure Kusto` datasource in the `Data source` dropdown.
+2. In the Query Options section, choose the `Azure Data Explorer` datasource in the `Data source` dropdown.
 3. Write the query in the `Query` field. Use `project` to specify one column - the result should be a list of string values.
 
-    ![Template Query](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/templating_1.png)
+    ![Template Query](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/templating_1.png)
 
 4. At the bottom, you will see a preview of the values returned from the query:
 
-    ![Template Query Preview](https://raw.githubusercontent.com/grafana/azure-kusto-datasource/master/src/img/templating_2.png)
+    ![Template Query Preview](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/templating_2.png)
 
 5. Use the variable in your query (in this case the variable is named `level`):
 
@@ -227,4 +239,4 @@ MyLogs
 
 #### v1.0.0
 
-First version of the Azure Kusto Datasource.
+First version of the Azure Data Explorer Datasource.

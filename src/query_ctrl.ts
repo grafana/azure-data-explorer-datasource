@@ -14,10 +14,11 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   defaults = {
     query: [
       '//change this to create your own time series query',
+      '',
       '<table name>',
-      '| where $__timeFilter(TimeGenerated)',
-      '| summarize count() by <group by column>, bin(TimeGenerated, $__interval)',
-      '| order by TimeGenerated asc'].join('\n'),
+      '| where $__timeFilter(Timestamp)',
+      '| summarize count() by <group by column>, bin(Timestamp, $__interval)',
+      '| order by Timestamp asc'].join('\n'),
     resultFormat: 'time_series',
     database: '',
   };
@@ -62,7 +63,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       if (err.error.data.error.innererror.innererror) {
         this.lastQueryError = err.error.data.error.innererror.innererror.message;
       } else {
-        this.lastQueryError = err.error.data.error.innererror.message;
+        this.lastQueryError = err.error.data.error.innererror['@message'];
       }
     } else if (err.error && err.error.data && err.error.data.error) {
       this.lastQueryError = err.error.data.error.message;

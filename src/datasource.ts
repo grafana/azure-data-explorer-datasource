@@ -13,14 +13,14 @@ export class KustoDBDatasource {
   constructor(instanceSettings, private backendSrv, private $q, private templateSrv) {
     this.name = instanceSettings.name;
     this.id = instanceSettings.id;
-    this.baseUrl = `/kustodb`;
+    this.baseUrl = `/azuredataexplorer`;
     this.url = instanceSettings.url;
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
   }
 
   query(options) {
     const queries = _.filter(options.targets, item => {
-      return item.hide !== true;
+      return item.hide !== true && item.query && item.query.indexOf('<table name>') === -1;
     }).map(target => {
       const url = `${this.baseUrl}/v1/rest/query`;
 
@@ -44,7 +44,7 @@ export class KustoDBDatasource {
     });
 
     if (!queries || queries.length === 0) {
-      return;
+      return {data: []};
     }
 
     const promises = this.doQueries(queries);
