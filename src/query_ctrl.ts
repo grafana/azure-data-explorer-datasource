@@ -17,8 +17,8 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       '',
       '<table name>',
       '| where $__timeFilter(Timestamp)',
-      '| summarize count() by <group by column>, bin(Timestamp, $__interval)',
-      '| order by Timestamp asc'].join('\n'),
+      '// | summarize count() by <group by column>, bin(Timestamp, $__interval)',
+      '// | order by Timestamp asc'].join('\n'),
     resultFormat: 'time_series',
     database: '',
   };

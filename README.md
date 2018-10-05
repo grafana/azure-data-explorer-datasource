@@ -1,6 +1,6 @@
 # Azure Data Explorer Datasource For Grafana
 
-Azure Data Explorer is a log analytics cloud platform optimized for ad-hoc big data queries.
+[Azure Data Explorer](https://docs.microsoft.com/sv-se/azure/data-explorer/) is a log analytics cloud platform optimized for ad-hoc big data queries.
 
 ## Installation
 
@@ -193,7 +193,7 @@ There are also some Grafana variables that can be used in queries:
 
 Instead of hard-coding things like server, application and sensor name in you metric queries you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns make it easy to change the data being displayed in your dashboard.
 
-Create the variable in the dashboard settings. Usually you will need to write a query in the Kusto Query Language to get a list of values for the dropdown. It is however also possible to have a list of hardcoded values.
+Create the variable in the dashboard settings. Usually you will need to write a query in the Kusto Query Language to get a list of values for the dropdown. It is however also possible to have a list of hard-coded values.
 
 1. Fill in a name for your variable. The `Name` field is the name of the variable. There is also a `Label` field for the friendly name.
 2. In the Query Options section, choose the `Azure Data Explorer` datasource in the `Data source` dropdown.
@@ -231,7 +231,7 @@ Example query:
 
 ```
 MyLogs
-| where $__timeFilter(Timestamp) 
+| where $__timeFilter(Timestamp)
 | project Timestamp, Text=Message , Tags="tag1,tag2"
 ```
 
