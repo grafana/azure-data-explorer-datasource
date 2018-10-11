@@ -1,6 +1,6 @@
 # Azure Data Explorer Datasource For Grafana
 
-[Azure Data Explorer](https://docs.microsoft.com/sv-se/azure/data-explorer/) is a log analytics cloud platform optimized for ad-hoc big data queries.
+[Azure Data Explorer](https://docs.microsoft.com/en-us/azure/data-explorer/) is a log analytics cloud platform optimized for ad-hoc big data queries.
 
 ## Installation
 

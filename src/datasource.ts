@@ -108,7 +108,7 @@ export class KustoDBDatasource {
         };
       })
       .catch(error => {
-        let message = 'KustoDB: ';
+        let message = 'Azure Data Explorer: ';
         message += error.statusText ? error.statusText + ': ' : '';
 
         if (error.data && error.data.Message) {
