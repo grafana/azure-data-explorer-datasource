@@ -23,6 +23,10 @@ export class KustoDBDatasource {
       return item.hide !== true && item.query && item.query.indexOf('<table name>') === -1;
     }).map(target => {
       const url = `${this.baseUrl}/v1/rest/query`;
+      const interpolatedQuery =  new QueryBuilder(
+        this.templateSrv.replace(target.query, options.scopedVars, this.interpolateVariable),
+        options
+      ).interpolate().query;
 
       return {
         refId: target.refId,
@@ -30,14 +34,11 @@ export class KustoDBDatasource {
         maxDataPoints: options.maxDataPoints,
         datasourceId: this.id,
         url: url,
-        query: target.query,
+        query: interpolatedQuery,
         format: options.format,
         resultFormat: target.resultFormat,
         data: {
-          csl: new QueryBuilder(
-            this.templateSrv.replace(target.query, options.scopedVars, this.interpolateVariable),
-            options
-          ).interpolate().query,
+          csl: interpolatedQuery,
           db: target.database,
         },
       };
@@ -116,7 +117,7 @@ export class KustoDBDatasource {
         } else if (error.data) {
           message += error.data;
         } else {
-          message += 'Cannot connect to the KustoDB REST API.';
+          message += 'Cannot connect to the Azure Data Explorer REST API.';
         }
         return {
           status: 'error',

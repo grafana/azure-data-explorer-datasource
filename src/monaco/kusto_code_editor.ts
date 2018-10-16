@@ -85,7 +85,6 @@ export default class KustoCodeEditor {
     this.codeEditor.createContextKey('readyToExecute', true);
 
     this.codeEditor.onDidChangeCursorSelection(event => {
-      console.log(event);
       this.onDidChangeCursorSelection(event);
     });
 
@@ -268,7 +267,6 @@ export default class KustoCodeEditor {
   }
 
   onDidChangeCursorSelection(event) {
-    console.log(event);
     if (event.source !== 'modelChange' || event.reason !== monaco.editor.CursorChangeReason.RecoverFromMarkers) {
       return;
     }

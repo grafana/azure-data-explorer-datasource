@@ -1,4 +1,4 @@
-import {QueryCtrl} from 'grafana/app/plugins/sdk';
+import { QueryCtrl } from 'grafana/app/plugins/sdk';
 import _ from 'lodash';
 import './monaco/kusto_monaco_editor';
 import { DatabaseItem } from './response_parser';
@@ -18,7 +18,8 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       '<table name>',
       '| where $__timeFilter(Timestamp)',
       '// | summarize count() by <group by column>, bin(Timestamp, $__interval)',
-      '// | order by Timestamp asc'].join('\n'),
+      '// | order by Timestamp asc',
+    ].join('\n'),
     resultFormat: 'time_series',
     database: '',
   };
@@ -40,6 +41,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     this.resultFormats = [{ text: 'Time series', value: 'time_series' }, { text: 'Table', value: 'table' }];
     this.getDatabases();
   }
+
   onDataReceived(dataList) {
     this.lastQueryError = undefined;
     this.lastQuery = '';
@@ -92,5 +94,4 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       return this.datasource.getSchema(this.target.database);
     });
   }
-
 }

@@ -38,7 +38,7 @@ describe('KustoDBDatasource', () => {
       it('should return error status and a detailed error message', () => {
         return ctx.ds.testDatasource().then(results => {
           expect(results.status).toEqual('error');
-          expect(results.message).toEqual('KustoDB: Unauthorized: Authorization has been denied for this request.');
+          expect(results.message).toEqual('Azure Data Explorer: Unauthorized: Authorization has been denied for this request.');
         });
       });
     });
