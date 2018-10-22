@@ -42,5 +42,3 @@ export default class RequestAggregator {
     }
   }
 }
-
-// angular.module('grafana.services').service('requestAggregatorSrv', RequestAggregator);
