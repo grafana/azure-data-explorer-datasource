@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 export default class RequestAggregator {
   ongoingRequests: any;
   constructor(private backendSrv) {
@@ -24,13 +22,11 @@ export default class RequestAggregator {
 
   async dsPost(key, url, payload): Promise<any> {
     if (this.ongoingRequests.hasOwnProperty(key)) {
-      console.log('return existing promise');
       return this.ongoingRequests[key];
     } else {
       this.ongoingRequests[key] = new Promise(async (resolve, reject) => {
         try {
           const response = await this.doRequest(url, payload);
-          console.log('resolve promise', response);
           resolve(response);
         } catch (error) {
           reject(error);
