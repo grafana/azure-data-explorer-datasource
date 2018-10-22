@@ -20,7 +20,7 @@ export class KustoDBDatasource {
     this.baseUrl = `/azuredataexplorer`;
     this.url = instanceSettings.url;
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
-    this.cache = new Cache({ ttl: 15000 });
+    this.cache = new Cache({ ttl: 30000 });
     this.requestAggregatorSrv = new RequestAggregator(backendSrv);
   }
 
