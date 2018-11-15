@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import QueryBuilder from './query_builder';
+import Cache from './cache';
+import RequestAggregator from './request_aggregator';
 
 export class KustoDBDatasource {
   id: number;
@@ -8,6 +10,8 @@ export class KustoDBDatasource {
   baseUrl: string;
   url: string;
   defaultOrFirstDatabase: string;
+  cache: Cache;
+  requestAggregatorSrv: RequestAggregator;
 
   /** @ngInject */
   constructor(instanceSettings, private backendSrv, private $q, private templateSrv) {
@@ -16,6 +20,8 @@ export class KustoDBDatasource {
     this.baseUrl = `/azuredataexplorer`;
     this.url = instanceSettings.url;
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
+    this.cache = new Cache({ ttl: 30000 });
+    this.requestAggregatorSrv = new RequestAggregator(backendSrv);
   }
 
   query(options) {
@@ -23,12 +29,15 @@ export class KustoDBDatasource {
       return item.hide !== true && item.query && item.query.indexOf('<table name>') === -1;
     }).map(target => {
       const url = `${this.baseUrl}/v1/rest/query`;
-      const interpolatedQuery =  new QueryBuilder(
+      const interpolatedQuery = new QueryBuilder(
         this.templateSrv.replace(target.query, options.scopedVars, this.interpolateVariable),
         options
       ).interpolate().query;
 
       return {
+        key: `${url}-${options.intervalMs}-${options.maxDataPoints}-${options.format}-${
+          target.resultFormat
+        }-${interpolatedQuery}`,
         refId: target.refId,
         intervalMs: options.intervalMs,
         maxDataPoints: options.maxDataPoints,
@@ -45,7 +54,7 @@ export class KustoDBDatasource {
     });
 
     if (!queries || queries.length === 0) {
-      return {data: []};
+      return { data: [] };
     }
 
     const promises = this.doQueries(queries);
@@ -78,13 +87,16 @@ export class KustoDBDatasource {
 
       const promises = this.doQueries(queries);
 
-      return this.$q.all(promises).then(results => {
-        return new ResponseParser().parseToVariables(results);
-      }).catch(err => {
-        if (err.error && err.error.data && err.error.data.error) {
-          throw {message: err.error.data.error['@message']};
-        }
-      });
+      return this.$q
+        .all(promises)
+        .then(results => {
+          return new ResponseParser().parseToVariables(results);
+        })
+        .catch(err => {
+          if (err.error && err.error.data && err.error.data.error) {
+            throw { message: err.error.data.error['@message'] };
+          }
+        });
     });
   }
 
@@ -160,34 +172,45 @@ export class KustoDBDatasource {
   }
 
   doQueries(queries) {
-    return _.map(queries, query => {
-      return this.doRequest(query.url, query.data)
-        .then(result => {
-          return {
-            result: result,
-            query: query,
-          };
-        })
-        .catch(err => {
-          throw {
-            error: err,
-            query: query,
-          };
-        });
+    return queries.map(query => {
+      const cacheResponse = this.cache.get(query.key);
+      if (cacheResponse) {
+        return cacheResponse;
+      } else {
+        return this.requestAggregatorSrv
+          .dsPost(query.key, this.url + query.url, query.data)
+          .then(result => {
+            const res = {
+              result: result,
+              query: query,
+            };
+            if (query.key) {
+              this.cache.put(query.key, res);
+            }
+            return res;
+          })
+          .catch(err => {
+            throw {
+              error: err,
+              query: query,
+            };
+          });
+      }
     });
   }
 
   private buildQuery(query: string, options: any, database: string) {
     const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, {}, this.interpolateVariable), options);
     const url = `${this.baseUrl}/v1/rest/query`;
-
+    const csl = queryBuilder.interpolate().query;
     const queries: any[] = [];
     queries.push({
+      key: `${url}-table-${database}-${csl}`,
       datasourceId: this.id,
       url: url,
       resultFormat: 'table',
       data: {
-        csl: queryBuilder.interpolate().query,
+        csl,
         db: database,
       },
     });
@@ -195,6 +218,7 @@ export class KustoDBDatasource {
   }
 
   doRequest(url, data, maxRetries = 1) {
+    // return this.requestAggregatorSrv.dsPost/;
     return this.backendSrv
       .datasourceRequest({
         url: this.url + url,
