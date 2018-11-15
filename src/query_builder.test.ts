@@ -29,6 +29,42 @@ describe('QueryBuilder', () => {
     });
   });
 
+  describe('when $__contains and multi template variable has custom All value', () => {
+    beforeEach(() => {
+      builder.rawQuery = 'query=Tablename | where $__contains(col, all)';
+    });
+
+    it('should generate a where..in clause', () => {
+      const query = builder.interpolate().query;
+
+      expect(query).toContain(`where 1 == 1`);
+    });
+  });
+
+  describe('when $__contains and multi template variable has one selected value', () => {
+    beforeEach(() => {
+      builder.rawQuery = `query=Tablename | where $__contains(col, 'val1')`;
+    });
+
+    it('should generate a where..in clause', () => {
+      const query = builder.interpolate().query;
+
+      expect(query).toContain(`where col in ('val1')`);
+    });
+  });
+
+  describe('when $__contains and multi template variable has multiple selected values', () => {
+    beforeEach(() => {
+      builder.rawQuery = `query=Tablename | where $__contains(col, 'val1','val2')`;
+    });
+
+    it('should generate a where..in clause', () => {
+      const query = builder.interpolate().query;
+
+      expect(query).toContain(`where col in ('val1','val2')`);
+    });
+  });
+
   describe('when $__interval is in the query', () => {
     beforeEach(() => {
       builder.rawQuery = 'query=Tablename | summarize count() by Category, bin(TimeGenerated, $__interval)';
