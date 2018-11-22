@@ -98,6 +98,7 @@ export default class KustoCodeEditor {
         workerAccessor(model.uri).then(worker => {
           const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
           worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
+          this.codeEditor.layout();
         });
       });
     });

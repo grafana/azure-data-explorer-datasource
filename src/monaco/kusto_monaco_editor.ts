@@ -4,7 +4,7 @@ import angular from 'angular';
 import KustoCodeEditor from './kusto_code_editor';
 import config from 'grafana/app/core/config';
 
-let editorTemplate = `<div id="content" tabindex="0" style="width: 100%; height: 250px"></div>`;
+let editorTemplate = `<div id="content" tabindex="0" style="width: 100%; height: 150px"></div>`;
 
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
