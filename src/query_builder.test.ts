@@ -104,4 +104,43 @@ describe('QueryBuilder', () => {
       expect(query).toContain('myTime <= datetime(');
     });
   });
+
+  describe('when using $__escape and multi template variable has one selected value', () => {
+    beforeEach(() => {
+      builder.rawQuery = `$__escapeMulti('\\grafana-vm\Network(eth0)\Total Bytes Received')`;
+    });
+     it('should replace $__escape(val) with KQL style escaped string', () => {
+      const query = builder.interpolate().query;
+      expect(query).toContain(`@'\\grafana-vmNetwork(eth0)Total Bytes Received'`);
+    });
+  });
+   describe('when using $__escape and multi template variable has multiple selected values', () => {
+    beforeEach(() => {
+      builder.rawQuery = `CounterPath in ($__escapeMulti('\\grafana-vm\Network(eth0)\Total','\\grafana-vm\Network(eth0)\Total'))`;
+    });
+     it('should replace $__escape(val) with multiple KQL style escaped string', () => {
+      const query = builder.interpolate().query;
+      expect(query).toContain(
+        `CounterPath in (@'\\grafana-vmNetwork(eth0)Total', @'\\grafana-vmNetwork(eth0)Total')`
+      );
+    });
+  });
+   describe('when using $__escape and multi template variable has one selected value that contains comma', () => {
+    beforeEach(() => {
+      builder.rawQuery = `$__escapeMulti('\\grafana-vm,\Network(eth0)\Total Bytes Received')`;
+    });
+     it('should replace $__escape(val) with KQL style escaped string', () => {
+      const query = builder.interpolate().query;
+      expect(query).toContain(`@'\\grafana-vm,Network(eth0)Total Bytes Received'`);
+    });
+  });
+   describe(`when using $__escape and multi template variable value is not wrapped in single '`, () => {
+    beforeEach(() => {
+      builder.rawQuery = `$__escapeMulti(\\grafana-vm,\Network(eth0)\Total Bytes Received)`;
+    });
+     it('should not replace macro', () => {
+      const query = builder.interpolate().query;
+      expect(query).toContain(`$__escapeMulti(\\grafana-vm,Network(eth0)Total Bytes Received)`);
+    });
+  });
 });

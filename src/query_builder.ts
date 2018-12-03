@@ -17,6 +17,8 @@ export default class QueryBuilder {
       return match;
     });
 
+    query = query.replace(/\$__escapeMulti\(('[^]*')\)/gi, (match, p1) => this.escape(p1));
+
     if (this.options) {
       query = query.replace(macroRegexp, (match, p1, p2) => {
         if (p1 === 'timeFilter') {
@@ -69,5 +71,13 @@ export default class QueryBuilder {
     }
 
     return `${field.trim()} in (${templateVar.trim()})`;
+  }
+
+  escape(inputs: string) {
+    return inputs
+      .substring(1, inputs.length - 1)
+      .split(`','`)
+      .map(v => `@'${v}'`)
+      .join(', ');
   }
 }

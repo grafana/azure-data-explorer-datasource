@@ -74,6 +74,9 @@
   Macros:
   - $__timeFilter() -&gt; TimeGenerated &ge; datetime(2018-06-05T18:09:58.907Z) and TimeGenerated &le; datetime(2018-06-05T20:09:58.907Z)
   - $__timeFilter(datetimeColumn) -&gt;  datetimeColumn  &ge; datetime(2018-06-05T18:09:58.907Z) and datetimeColumn &le; datetime(2018-06-05T20:09:58.907Z)
+  - $__escapeMulti($myTemplateVar) -&gt; $myTemplateVar should be a multi-value template variables that contains illegal characters
+  - $__contains(aColumn, $myTemplateVar) -&gt; aColumn in ($myTemplateVar)
+    If using the All option, then check the Include All Option checkbox and in the Custom all value field type in: all. If All is chosen -&gt; 1 == 1
 
   Or build your own conditionals using these built-in variables which just return the values:
   - $__from -&gt;  datetime(2018-06-05T18:09:58.907Z)
