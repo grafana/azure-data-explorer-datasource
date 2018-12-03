@@ -242,6 +242,10 @@ MyLogs
 
 ### CHANGELOG
 
+#### v1.1.0
+
+Adds $__escapeMulti macro
+
 #### v1.0.0
 
 First version of the Azure Data Explorer Datasource.
