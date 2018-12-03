@@ -110,7 +110,7 @@ export class KustoDBDatasource {
         if (response.status === 200) {
           return {
             status: 'success',
-            message: 'Successfully queried the Kusto database.',
+            message: 'Successfully queried the Azure Data Explorer database.',
             title: 'Success',
           };
         }
