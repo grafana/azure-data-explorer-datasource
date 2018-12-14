@@ -420,4 +420,32 @@ describe('KustoDBDatasource', () => {
       });
     });
   });
+
+  describe('Test cache ttl', () => {
+
+    it('should return 30 seconds when json minimal cache is not set', () => {
+      const ttl = ctx.ds.getCacheTtl(ctx.instanceSettings);
+      expect(ttl).toEqual(30000);
+    });
+
+    it('should return the minimal cache value supplied in the json data', () => {
+      ctx.instanceSettings.jsonData = {
+        minimalCache: 1
+      }
+      const ttl = ctx.ds.getCacheTtl(ctx.instanceSettings);
+      expect(ttl).toEqual(1000);
+    });
+
+    it('should throw an exception when minimun cache is lower than 1', () => {
+      ctx.instanceSettings.jsonData = {
+        minimalCache: -5
+      }
+
+      try {
+        ctx.ds.getCacheTtl(ctx.instanceSettings)
+      } catch(err){
+        expect(err.message).toContain('Minimal cache must be greater than or equal to 1.');
+      }
+    });
+  });
 });

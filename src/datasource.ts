@@ -20,7 +20,7 @@ export class KustoDBDatasource {
     this.baseUrl = `/azuredataexplorer`;
     this.url = instanceSettings.url;
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
-    this.cache = new Cache({ ttl: 30000 });
+    this.cache = new Cache({ ttl: this.getCacheTtl(instanceSettings) });
     this.requestAggregatorSrv = new RequestAggregator(backendSrv);
   }
 
@@ -255,5 +255,18 @@ export class KustoDBDatasource {
       return "'" + val + "'";
     });
     return quotedValues.join(',');
+  }
+
+  getCacheTtl(instanceSettings) {
+    if (instanceSettings.jsonData.minimalCache === undefined) {
+      // default ttl is 30 sec
+      return 30000;
+    }
+
+    if (instanceSettings.jsonData.minimalCache < 1 ) {
+      throw new Error('Minimal cache must be greater than or equal to 1.');
+    }
+    
+    return instanceSettings.jsonData.minimalCache * 1000;
   }
 }
