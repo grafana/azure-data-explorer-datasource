@@ -25,7 +25,7 @@ export default class Cache {
 
   get(key): any {
     var item = this.store[key];
-    if (item && !(item.expire && item.expire > Date.now())) {
+    if (item && !(item.expire && item.expire >= Date.now())) {
       this.del(key);
       item = undefined;
     }
