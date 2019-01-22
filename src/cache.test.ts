@@ -29,7 +29,7 @@ describe('cache', () => {
       cache.put('some-key', 'some-value');
     });
 
-    it('should not contain the value after delete', done => {
+    it('should not contain the value after delete', () => {
       const res = cache.del('some-key');
       expect(res).toBeUndefined();
     });

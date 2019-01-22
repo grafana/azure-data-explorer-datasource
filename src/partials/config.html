@@ -30,7 +30,7 @@
 <div class="gf-form-group">
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-9">Cluster URL</span>
+      <span class="gf-form-label width-11">Cluster URL</span>
       <input class="gf-form-input width-30" type="text" ng-model="ctrl.current.jsonData.clusterUrl" placeholder="{{ctrl.suggestUrl}}"
         bs-typeahead="getSuggestUrls" min-length="0" ng-pattern="/^(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/"
         required/>
@@ -41,7 +41,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-9">Subscription Id</span>
+      <span class="gf-form-label width-11">Subscription Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.subscriptionId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
         <p>In the Azure Portal, navigate to Subscriptions -> Choose subscription -> Overview -> Subscription ID.</p>
@@ -52,7 +52,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-9">Tenant Id</span>
+      <span class="gf-form-label width-11">Tenant Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.tenantId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
         <p>In the Azure Portal, navigate to Azure Active Directory -> Properties -> Directory ID.</p>
@@ -63,7 +63,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-9">Client Id</span>
+      <span class="gf-form-label width-11">Client Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.clientId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
         <p>In the Azure Portal, navigate to Azure Active Directory -> App Registrations -> Choose your app ->
@@ -76,7 +76,7 @@
   </div>
   <div class="gf-form-inline" ng-if="!ctrl.current.secureJsonFields.clientSecret">
     <div class="gf-form">
-      <span class="gf-form-label width-9">Client Secret</span>
+      <span class="gf-form-label width-11">Client Secret</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.secureJsonData.clientSecret' placeholder=""></input>
       <info-popover mode="right-absolute">
         <p>To create a new key, log in to Azure Portal, navigate to Azure Active Directory -> App Registrations ->
@@ -88,18 +88,27 @@
     </div>
   </div>
   <div class="gf-form" ng-if="ctrl.current.secureJsonFields.clientSecret">
-    <span class="gf-form-label width-9">Client Secret</span>
+    <span class="gf-form-label width-11">Client Secret</span>
     <input type="text" class="gf-form-input max-width-12" disabled="disabled" value="configured">
     <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.current.secureJsonFields.clientSecret = false">reset</a>
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-9">Default Database</span>
+      <span class="gf-form-label width-11">Default Database</span>
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
         <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultDatabase" ng-options="f.value as f.text for f in ctrl.databases"></select>
       </div>
       <info-popover mode="right-normal">
         <p>Choose the default/preferred Database for this Azure Data Explorer Cluster.</p>
+      </info-popover>
+    </div>
+  </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-11">Minimal Cache Period</span>
+      <input type="number" min="1" class="gf-form-input width-9" ng-model="ctrl.current.jsonData.minimalCache" spellcheck="false" placeholder="30"></input>
+      <info-popover mode="right-absolute">
+        The default cache period is 30 seconds. If you need a shorter cache period, enter the required value.
       </info-popover>
     </div>
   </div>
