@@ -242,6 +242,10 @@ MyLogs
 
 ### CHANGELOG
 
+#### v1.2.0
+
+Adds a config option for caching. The default in-memory cache period is 30 seconds, the new `Minimal Cache Period` option allows you to change that.
+
 #### v1.1.0
 
 Adds $__escapeMulti macro
