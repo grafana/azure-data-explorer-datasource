@@ -242,6 +242,11 @@ MyLogs
 
 ### CHANGELOG
 
+#### v1.3.0
+
+- Adds an order by clause to the query if there is none specified. It uses the datetime field from the where clause or summarize...bin().
+- Removes the Subscription Id field from the config page as is no longer needed.
+
 #### v1.2.0
 
 Adds a config option for caching. The default in-memory cache period is 30 seconds, the new `Minimal Cache Period` option allows you to change that.

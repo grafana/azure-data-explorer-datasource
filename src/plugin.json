@@ -19,8 +19,8 @@
       { "name": "Apache License", "url": "https://github.com/grafana/azure-data-explorer-datasource/blob/master/LICENSE" }
     ],
     "screenshots": [],
-    "version": "1.2.0",
-    "updated": "2010-01-22"
+    "version": "1.3.0",
+    "updated": "2010-02-12"
   },
 
   "routes": [
