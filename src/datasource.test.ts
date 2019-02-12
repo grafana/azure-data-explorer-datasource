@@ -2,6 +2,7 @@ import { KustoDBDatasource } from './datasource';
 import q from 'q';
 import moment from 'moment';
 import TemplateSrvStub from '../test/template_srv_stub';
+import _ from 'lodash';
 
 describe('KustoDBDatasource', () => {
   let ctx: any = {
@@ -38,7 +39,9 @@ describe('KustoDBDatasource', () => {
       it('should return error status and a detailed error message', () => {
         return ctx.ds.testDatasource().then(results => {
           expect(results.status).toEqual('error');
-          expect(results.message).toEqual('Azure Data Explorer: Unauthorized: Authorization has been denied for this request.');
+          expect(results.message).toEqual(
+            'Azure Data Explorer: Unauthorized: Authorization has been denied for this request.'
+          );
         });
       });
     });
@@ -212,10 +215,7 @@ describe('KustoDBDatasource', () => {
             { ColumnName: 'Text', DataType: 'String', ColumnType: 'string' },
             { ColumnName: 'Tags', DataType: 'String', ColumnType: 'string' },
           ],
-          Rows: [
-            ['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'],
-            ['2018-06-02T20:28:00Z', 'Computer2', 'tag2'],
-          ],
+          Rows: [['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'], ['2018-06-02T20:28:00Z', 'Computer2', 'tag2']],
         },
       ],
     };
@@ -354,6 +354,29 @@ describe('KustoDBDatasource', () => {
         });
       });
 
+      describe('and there is no order by clause', () => {
+        let results;
+
+        beforeEach(async () => {
+          const qo = _.cloneDeep(queryOptions);
+          qo.targets[0].query = [
+            'MyLogs',
+            '| summarize count() by Level, bin(Timestamp, 5min)',
+            '| project Timestamp, Level, count_',
+          ].join();
+
+          ctx.backendSrv.datasourceRequest = options => {
+            expect(options.data.csl).toContain('| order by Timestamp asc');
+            return ctx.$q.when({ data: response, status: 200 });
+          };
+          results = await ctx.ds.query(qo);
+        });
+
+        it('should add an order by clause to the query', () => {
+          expect(results.data.length).toBe(1);
+        });
+      });
+
       describe('and the data has no time column)', () => {
         beforeEach(() => {
           const invalidResponse = {
@@ -422,7 +445,6 @@ describe('KustoDBDatasource', () => {
   });
 
   describe('Test cache ttl', () => {
-
     it('should return 30 seconds when json minimal cache is not set', () => {
       const ttl = ctx.ds.getCacheTtl(ctx.instanceSettings);
       expect(ttl).toEqual(30000);
@@ -430,20 +452,20 @@ describe('KustoDBDatasource', () => {
 
     it('should return the minimal cache value supplied in the json data', () => {
       ctx.instanceSettings.jsonData = {
-        minimalCache: 1
-      }
+        minimalCache: 1,
+      };
       const ttl = ctx.ds.getCacheTtl(ctx.instanceSettings);
       expect(ttl).toEqual(1000);
     });
 
     it('should throw an exception when minimun cache is lower than 1', () => {
       ctx.instanceSettings.jsonData = {
-        minimalCache: -5
-      }
+        minimalCache: -5,
+      };
 
       try {
-        ctx.ds.getCacheTtl(ctx.instanceSettings)
-      } catch(err){
+        ctx.ds.getCacheTtl(ctx.instanceSettings);
+      } catch (err) {
         expect(err.message).toContain('Minimal cache must be greater than or equal to 1.');
       }
     });

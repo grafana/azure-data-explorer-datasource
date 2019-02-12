@@ -218,7 +218,6 @@ export class KustoDBDatasource {
   }
 
   doRequest(url, data, maxRetries = 1) {
-    // return this.requestAggregatorSrv.dsPost/;
     return this.backendSrv
       .datasourceRequest({
         url: this.url + url,
@@ -263,10 +262,10 @@ export class KustoDBDatasource {
       return 30000;
     }
 
-    if (instanceSettings.jsonData.minimalCache < 1 ) {
+    if (instanceSettings.jsonData.minimalCache < 1) {
       throw new Error('Minimal cache must be greater than or equal to 1.');
     }
-    
+
     return instanceSettings.jsonData.minimalCache * 1000;
   }
 }
