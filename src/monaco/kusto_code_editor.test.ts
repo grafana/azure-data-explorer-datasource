@@ -10,7 +10,7 @@ describe('KustoCodeEditor', () => {
     let model;
 
     beforeEach(() => {
-      (global as any).monaco = {
+      (window as any).monaco = {
         languages: {
           CompletionItemKind: {
             Keyword: '',
@@ -118,7 +118,7 @@ describe('KustoCodeEditor', () => {
       let lineContent = '';
 
       beforeEach(() => {
-        (global as any).monaco = {
+        (window as any).monaco = {
           languages: {
             CompletionItemKind: {
               Keyword: '',

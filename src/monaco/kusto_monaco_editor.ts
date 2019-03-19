@@ -8,8 +8,8 @@ let editorTemplate = `<div id="content" tabindex="0" style="width: 100%; height:
 
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
-  if (!(global as any).monaco) {
-    (global as any).System.import(`/${scope.pluginBaseUrl}/lib/monaco.min.js`).then(() => {
+  if (!(<any>window).monaco) {
+    (<any>window).System.import(`/${scope.pluginBaseUrl}/lib/monaco.min.js`).then(() => {
       setTimeout(() => {
         initMonaco(containerDiv, scope);
       }, 1);
