@@ -27,9 +27,11 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 1. Fetch the latest version of grafana from Docker Hub:
     `docker pull grafana/grafana:latest`
 2. Run Grafana and install the Azure Data Explorer plugin with this command:
+
     ```bash
     docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-data-explorer-datasource" grafana/grafana:latest
     ```
+
 3. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
 4. Login in with username: `admin` and password: `admin`
 5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
@@ -131,21 +133,20 @@ If the command succeeds you should get a result like this:
 
 ### Configuring Grafana
 
-1. Accessed from the Grafana main menu, newly installed datasources can be added immediately within the Data Sources section. Next, click the  "Add datasource" button in the upper right. The datasource will be available for selection in the Type select box.
+1. Accessed from the Grafana main menu, newly installed datasources can be added immediately within the Data Sources section. Next, click the  "Add datasource" button in the upper right.
 
-2. Select Azure Data Explorer from the Type dropdown:
+2. Select Azure Data Explorer Datasource from the datasource list:
 
     ![Data Source Type](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_1_select_type.png)
 
-3. In the name field, fill in a name for the datasource. It can be anything.
+3. In the name field, a default name is filled in automatically but it can be changed to anything.
 
-4. You need 4 pieces of information from the Azure portal (see link above for detailed instructions):
+4. You need 3 pieces of information from the Azure portal (see link above for detailed instructions):
     - **Tenant Id** (Azure Active Directory -> Properties -> Directory ID)
-    - **Subscription Id** (Subscriptions -> Choose subscription -> Overview -> Subscription ID)
     - **Client Id** (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
     - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
 
-5. Paste these four items into the fields in the Azure Data Explorer API Details section:
+5. Paste these three items into the fields in the Azure Data Explorer API Details section:
     ![Azure Data Explorer API Details](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_2_azure_data_explorer_api_details.png)
 
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
@@ -184,7 +185,6 @@ To make writing queries easier there are two Grafana macros that can be used in 
 - `$__contains(colName, $myVar)` - is to be used with multi-value template variables. If $myVar has the value `'value1','value2'`, it expands to: `colName in ('value1','value2')`. 
     
      If using the `All` option, then check the `Include All Option` checkbox and in the `Custom all value` field type in the following value: `all`. If $myVar has value `all` then the macro will instead expand to `1 == 1`. For template variables with a lot of options, this will increase the query performance by not building a large where..in clause.
-
 
 ### Built-in Variables
 
