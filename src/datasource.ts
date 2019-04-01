@@ -102,12 +102,13 @@ export class KustoDBDatasource {
 
   testDatasource() {
     return this.testDatasourceConnection()
-      .then(() => this.testDatasourceAccess()
-        .catch(error => ({
+      .then(() => this.testDatasourceAccess())
+      .catch(error => {
+        return {
           status: 'error',
-          message: error.message + ' Connection to database could be established.',
-        }))
-      );
+          message: error.message + ' Connection to database could not be established.',
+        };
+      });
   }
 
   testDatasourceConnection() {
@@ -169,13 +170,13 @@ export class KustoDBDatasource {
         };
       })
       .catch(error => {
-        let message = 'Azure Data Explorer: ';
+        let message = 'Azure Data Explorer: Cannot read database schema from REST API. ';
         message += error.statusText ? error.statusText + ': ' : '';
 
-        if (error.data && error.data.Message) {
-          message += error.data.Message;
+        if (error.data && error.data.error && error.data.error['@message']) {
+          message += error.data.error && error.data.error['@message'];
         } else if (error.data) {
-          message += error.data;
+          message += JSON.stringify(error.data);
         } else {
           message += 'Cannot read database schema from Azure Data Explorer REST API.';
         }
