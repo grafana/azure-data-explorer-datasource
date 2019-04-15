@@ -101,6 +101,17 @@ export class KustoDBDatasource {
   }
 
   testDatasource() {
+    return this.testDatasourceConnection()
+      .then(() => this.testDatasourceAccess())
+      .catch(error => {
+        return {
+          status: 'error',
+          message: error.message + ' Connection to database could not be established.',
+        };
+      });
+  }
+
+  testDatasourceConnection() {
     const url = `${this.baseUrl}/v1/rest/mgmt`;
     const req = {
       csl: '.show databases',
@@ -130,6 +141,44 @@ export class KustoDBDatasource {
           message += error.data;
         } else {
           message += 'Cannot connect to the Azure Data Explorer REST API.';
+        }
+        return {
+          status: 'error',
+          message: message,
+        };
+      });
+  }
+
+  testDatasourceAccess() {
+    const url = `${this.baseUrl}/v1/rest/mgmt`;
+    const req = {
+      csl: '.show databases schema',
+    };
+    return this.doRequest(url, req)
+      .then(response => {
+        if (response.status === 200) {
+          return {
+            status: 'success',
+            message: 'Successfully queried the Azure Data Explorer database.',
+            title: 'Success',
+          };
+        }
+
+        return {
+          status: 'error',
+          message: 'Returned http status code ' + response.status,
+        };
+      })
+      .catch(error => {
+        let message = 'Azure Data Explorer: Cannot read database schema from REST API. ';
+        message += error.statusText ? error.statusText + ': ' : '';
+
+        if (error.data && error.data.error && error.data.error['@message']) {
+          message += error.data.error && error.data.error['@message'];
+        } else if (error.data) {
+          message += JSON.stringify(error.data);
+        } else {
+          message += 'Cannot read database schema from Azure Data Explorer REST API.';
         }
         return {
           status: 'error',
