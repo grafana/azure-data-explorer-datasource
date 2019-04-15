@@ -17,7 +17,12 @@ describe('KustoDBDatasource', () => {
       jsonData: {},
     };
 
-    ctx.ds = new KustoDBDatasource(ctx.instanceSettings, ctx.backendSrv, ctx.$q, ctx.templateSrv);
+    ctx.ds = new KustoDBDatasource(
+      ctx.instanceSettings,
+      ctx.backendSrv,
+      ctx.$q,
+      ctx.templateSrv,
+    );
   });
 
   describe('When performing testDatasource', () => {
@@ -39,8 +44,8 @@ describe('KustoDBDatasource', () => {
       it('should return error status and a detailed error message', () => {
         return ctx.ds.testDatasource().then(results => {
           expect(results.status).toEqual('error');
-          expect(results.message).toEqual(
-            'Azure Data Explorer: Unauthorized: Authorization has been denied for this request.'
+          expect(results.message).toContain(
+            'Azure Data Explorer: Cannot read database schema from REST API. Unauthorized:',
           );
         });
       });
@@ -59,7 +64,10 @@ describe('KustoDBDatasource', () => {
             { ColumnName: 'IsCurrent', DataType: 'Boolean' },
             { ColumnName: 'DatabaseAccessMode', DataType: 'String' },
             { ColumnName: 'PrettyName', DataType: 'String' },
-            { ColumnName: 'CurrentUserIsUnrestrictedViewer', DataType: 'Boolean' },
+            {
+              ColumnName: 'CurrentUserIsUnrestrictedViewer',
+              DataType: 'Boolean',
+            },
             { ColumnName: 'DatabaseId', DataType: 'Guid' },
           ],
           Rows: [
@@ -163,7 +171,10 @@ describe('KustoDBDatasource', () => {
             { ColumnName: 'IsCurrent', DataType: 'Boolean' },
             { ColumnName: 'DatabaseAccessMode', DataType: 'String' },
             { ColumnName: 'PrettyName', DataType: 'String' },
-            { ColumnName: 'CurrentUserIsUnrestrictedViewer', DataType: 'Boolean' },
+            {
+              ColumnName: 'CurrentUserIsUnrestrictedViewer',
+              DataType: 'Boolean',
+            },
             { ColumnName: 'DatabaseId', DataType: 'Guid' },
           ],
           Rows: [
@@ -193,7 +204,9 @@ describe('KustoDBDatasource', () => {
         }
       };
 
-      queryResults = await ctx.ds.metricFindQuery('Activity | distinct Category');
+      queryResults = await ctx.ds.metricFindQuery(
+        'Activity | distinct Category',
+      );
     });
 
     it('should return a list of categories in the correct format', () => {
@@ -211,11 +224,18 @@ describe('KustoDBDatasource', () => {
         {
           TableName: 'Table_0',
           Columns: [
-            { ColumnName: 'Timestamp', DataType: 'DateTime', ColumnType: 'datetime' },
+            {
+              ColumnName: 'Timestamp',
+              DataType: 'DateTime',
+              ColumnType: 'datetime',
+            },
             { ColumnName: 'Text', DataType: 'String', ColumnType: 'string' },
             { ColumnName: 'Tags', DataType: 'String', ColumnType: 'string' },
           ],
-          Rows: [['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'], ['2018-06-02T20:28:00Z', 'Computer2', 'tag2']],
+          Rows: [
+            ['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'],
+            ['2018-06-02T20:28:00Z', 'Computer2', 'tag2'],
+          ],
         },
       ],
     };
@@ -231,7 +251,10 @@ describe('KustoDBDatasource', () => {
             { ColumnName: 'IsCurrent', DataType: 'Boolean' },
             { ColumnName: 'DatabaseAccessMode', DataType: 'String' },
             { ColumnName: 'PrettyName', DataType: 'String' },
-            { ColumnName: 'CurrentUserIsUnrestrictedViewer', DataType: 'Boolean' },
+            {
+              ColumnName: 'CurrentUserIsUnrestrictedViewer',
+              DataType: 'Boolean',
+            },
             { ColumnName: 'DatabaseId', DataType: 'Guid' },
           ],
           Rows: [
@@ -263,7 +286,8 @@ describe('KustoDBDatasource', () => {
 
       annotationResults = await ctx.ds.annotationQuery({
         annotation: {
-          rawQuery: 'Heartbeat | where $__timeFilter()| project TimeGenerated, Text=Computer, tags="test"',
+          rawQuery:
+            'Heartbeat | where $__timeFilter()| project TimeGenerated, Text=Computer, tags="test"',
           database: 'Grafana',
         },
         range: {
@@ -322,7 +346,11 @@ describe('KustoDBDatasource', () => {
         {
           TableName: 'Table_0',
           Columns: [
-            { ColumnName: 'Timestamp', DataType: 'DateTime', ColumnType: 'datetime' },
+            {
+              ColumnName: 'Timestamp',
+              DataType: 'DateTime',
+              ColumnType: 'datetime',
+            },
             { ColumnName: 'Level', DataType: 'String', ColumnType: 'string' },
             { ColumnName: 'count_', DataType: 'Int64', ColumnType: 'long' },
           ],
@@ -407,7 +435,9 @@ describe('KustoDBDatasource', () => {
 
         it('should throw an exception', () => {
           ctx.ds.query(queryOptions).catch(err => {
-            expect(err.message).toContain('The Time Series format requires a time column.');
+            expect(err.message).toContain(
+              'The Time Series format requires a time column.',
+            );
           });
         });
       });
@@ -466,7 +496,9 @@ describe('KustoDBDatasource', () => {
       try {
         ctx.ds.getCacheTtl(ctx.instanceSettings);
       } catch (err) {
-        expect(err.message).toContain('Minimal cache must be greater than or equal to 1.');
+        expect(err.message).toContain(
+          'Minimal cache must be greater than or equal to 1.',
+        );
       }
     });
   });
