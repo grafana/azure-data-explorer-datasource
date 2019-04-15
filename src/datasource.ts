@@ -14,7 +14,12 @@ export class KustoDBDatasource {
   requestAggregatorSrv: RequestAggregator;
 
   /** @ngInject */
-  constructor(instanceSettings, private backendSrv, private $q, private templateSrv) {
+  constructor(
+    instanceSettings,
+    private backendSrv,
+    private $q,
+    private templateSrv,
+  ) {
     this.name = instanceSettings.name;
     this.id = instanceSettings.id;
     this.baseUrl = `/azuredataexplorer`;
@@ -26,18 +31,26 @@ export class KustoDBDatasource {
 
   query(options) {
     const queries = _.filter(options.targets, item => {
-      return item.hide !== true && item.query && item.query.indexOf('<table name>') === -1;
+      return (
+        item.hide !== true &&
+        item.query &&
+        item.query.indexOf('<table name>') === -1
+      );
     }).map(target => {
       const url = `${this.baseUrl}/v1/rest/query`;
       const interpolatedQuery = new QueryBuilder(
-        this.templateSrv.replace(target.query, options.scopedVars, this.interpolateVariable),
-        options
+        this.templateSrv.replace(
+          target.query,
+          options.scopedVars,
+          this.interpolateVariable,
+        ),
+        options,
       ).interpolate().query;
 
       return {
-        key: `${url}-${options.intervalMs}-${options.maxDataPoints}-${options.format}-${
-          target.resultFormat
-        }-${interpolatedQuery}`,
+        key: `${url}-${options.intervalMs}-${options.maxDataPoints}-${
+          options.format
+        }-${target.resultFormat}-${interpolatedQuery}`,
         refId: target.refId,
         intervalMs: options.intervalMs,
         maxDataPoints: options.maxDataPoints,
@@ -71,12 +84,19 @@ export class KustoDBDatasource {
       });
     }
 
-    const queries: any[] = this.buildQuery(options.annotation.rawQuery, options, options.annotation.database);
+    const queries: any[] = this.buildQuery(
+      options.annotation.rawQuery,
+      options,
+      options.annotation.database,
+    );
 
     const promises = this.doQueries(queries);
 
     return this.$q.all(promises).then(results => {
-      const annotations = new ResponseParser().transformToAnnotations(options, results);
+      const annotations = new ResponseParser().transformToAnnotations(
+        options,
+        results,
+      );
       return annotations;
     });
   }
@@ -106,7 +126,8 @@ export class KustoDBDatasource {
       .catch(error => {
         return {
           status: 'error',
-          message: error.message + ' Connection to database could not be established.',
+          message:
+            error.message + ' Connection to database could not be established.',
         };
       });
   }
@@ -170,7 +191,8 @@ export class KustoDBDatasource {
         };
       })
       .catch(error => {
-        let message = 'Azure Data Explorer: Cannot read database schema from REST API. ';
+        let message =
+          'Azure Data Explorer: Cannot read database schema from REST API. ';
         message += error.statusText ? error.statusText + ': ' : '';
 
         if (error.data && error.data.error && error.data.error['@message']) {
@@ -178,7 +200,8 @@ export class KustoDBDatasource {
         } else if (error.data) {
           message += JSON.stringify(error.data);
         } else {
-          message += 'Cannot read database schema from Azure Data Explorer REST API.';
+          message +=
+            'Cannot read database schema from Azure Data Explorer REST API.';
         }
         return {
           status: 'error',
@@ -249,7 +272,10 @@ export class KustoDBDatasource {
   }
 
   private buildQuery(query: string, options: any, database: string) {
-    const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, {}, this.interpolateVariable), options);
+    const queryBuilder = new QueryBuilder(
+      this.templateSrv.replace(query, {}, this.interpolateVariable),
+      options,
+    );
     const url = `${this.baseUrl}/v1/rest/query`;
     const csl = queryBuilder.interpolate().query;
     const queries: any[] = [];

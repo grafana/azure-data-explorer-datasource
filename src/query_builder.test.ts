@@ -11,12 +11,12 @@ describe('QueryBuilder', () => {
         interval: '5m',
         range: {
           from: moment().subtract(24, 'hours'),
-          to: moment()
+          to: moment(),
         },
         rangeRaw: {
           from: 'now-24h',
-          to: 'now'
-        }
+          to: 'now',
+        },
       },
     );
   });
@@ -67,7 +67,8 @@ describe('QueryBuilder', () => {
 
   describe('when $__interval is in the query', () => {
     beforeEach(() => {
-      builder.rawQuery = 'query=Tablename | summarize count() by Category, bin(TimeGenerated, $__interval)';
+      builder.rawQuery =
+        'query=Tablename | summarize count() by Category, bin(TimeGenerated, $__interval)';
     });
 
     it('should replace $__interval with the inbuilt interval option', () => {
@@ -79,7 +80,8 @@ describe('QueryBuilder', () => {
 
   describe('when using $__from and $__to is in the query and range is until now', () => {
     beforeEach(() => {
-      builder.rawQuery = 'query=Tablename | where myTime >= $__from and myTime <= $__to';
+      builder.rawQuery =
+        'query=Tablename | where myTime >= $__from and myTime <= $__to';
     });
 
     it('should replace $__from and $__to with a datetime and the now() function', () => {
@@ -92,7 +94,8 @@ describe('QueryBuilder', () => {
 
   describe('when using $__from and $__to is in the query and range is a specific interval', () => {
     beforeEach(() => {
-      builder.rawQuery = 'query=Tablename | where myTime >= $__from and myTime <= $__to';
+      builder.rawQuery =
+        'query=Tablename | where myTime >= $__from and myTime <= $__to';
       builder.options.range.to = moment().subtract(1, 'hour');
       builder.options.rangeRaw.to = 'now-1h';
     });
@@ -109,38 +112,44 @@ describe('QueryBuilder', () => {
     beforeEach(() => {
       builder.rawQuery = `$__escapeMulti('\\grafana-vm\Network(eth0)\Total Bytes Received')`;
     });
-     it('should replace $__escape(val) with KQL style escaped string', () => {
-      const query = builder.interpolate().query;
-      expect(query).toContain(`@'\\grafana-vmNetwork(eth0)Total Bytes Received'`);
-    });
-  });
-   describe('when using $__escape and multi template variable has multiple selected values', () => {
-    beforeEach(() => {
-      builder.rawQuery = `CounterPath in ($__escapeMulti('\\grafana-vm\Network(eth0)\Total','\\grafana-vm\Network(eth0)\Total'))`;
-    });
-     it('should replace $__escape(val) with multiple KQL style escaped string', () => {
+    it('should replace $__escape(val) with KQL style escaped string', () => {
       const query = builder.interpolate().query;
       expect(query).toContain(
-        `CounterPath in (@'\\grafana-vmNetwork(eth0)Total', @'\\grafana-vmNetwork(eth0)Total')`
+        `@'\\grafana-vmNetwork(eth0)Total Bytes Received'`,
       );
     });
   });
-   describe('when using $__escape and multi template variable has one selected value that contains comma', () => {
+  describe('when using $__escape and multi template variable has multiple selected values', () => {
+    beforeEach(() => {
+      builder.rawQuery = `CounterPath in ($__escapeMulti('\\grafana-vm\Network(eth0)\Total','\\grafana-vm\Network(eth0)\Total'))`;
+    });
+    it('should replace $__escape(val) with multiple KQL style escaped string', () => {
+      const query = builder.interpolate().query;
+      expect(query).toContain(
+        `CounterPath in (@'\\grafana-vmNetwork(eth0)Total', @'\\grafana-vmNetwork(eth0)Total')`,
+      );
+    });
+  });
+  describe('when using $__escape and multi template variable has one selected value that contains comma', () => {
     beforeEach(() => {
       builder.rawQuery = `$__escapeMulti('\\grafana-vm,\Network(eth0)\Total Bytes Received')`;
     });
-     it('should replace $__escape(val) with KQL style escaped string', () => {
+    it('should replace $__escape(val) with KQL style escaped string', () => {
       const query = builder.interpolate().query;
-      expect(query).toContain(`@'\\grafana-vm,Network(eth0)Total Bytes Received'`);
+      expect(query).toContain(
+        `@'\\grafana-vm,Network(eth0)Total Bytes Received'`,
+      );
     });
   });
-   describe(`when using $__escape and multi template variable value is not wrapped in single '`, () => {
+  describe(`when using $__escape and multi template variable value is not wrapped in single '`, () => {
     beforeEach(() => {
       builder.rawQuery = `$__escapeMulti(\\grafana-vm,\Network(eth0)\Total Bytes Received)`;
     });
-     it('should not replace macro', () => {
+    it('should not replace macro', () => {
       const query = builder.interpolate().query;
-      expect(query).toContain(`$__escapeMulti(\\grafana-vm,Network(eth0)Total Bytes Received)`);
+      expect(query).toContain(
+        `$__escapeMulti(\\grafana-vm,Network(eth0)Total Bytes Received)`,
+      );
     });
   });
 });

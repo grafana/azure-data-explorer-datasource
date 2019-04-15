@@ -31,7 +31,7 @@ describe('KustoCodeEditor', () => {
     describe('when no where clause and no | in model text', () => {
       beforeEach(() => {
         lineContent = ' ';
-        const position = {lineNumber: 2, column: 2};
+        const position = { lineNumber: 2, column: 2 };
         completionItems = editor.getCompletionItems(model, position);
       });
 
@@ -43,22 +43,26 @@ describe('KustoCodeEditor', () => {
     describe('when no where clause in model text', () => {
       beforeEach(() => {
         lineContent = '| ';
-        const position = {lineNumber: 2, column: 3};
+        const position = { lineNumber: 2, column: 3 };
         completionItems = editor.getCompletionItems(model, position);
       });
 
       it('should return grafana macros for where and timefilter', () => {
         expect(completionItems.length).toBe(1);
 
-        expect(completionItems[0].label).toBe('where $__timeFilter(timeColumn)');
-        expect(completionItems[0].insertText.value).toBe('where \\$__timeFilter(${0:Timestamp})');
+        expect(completionItems[0].label).toBe(
+          'where $__timeFilter(timeColumn)',
+        );
+        expect(completionItems[0].insertText.value).toBe(
+          'where \\$__timeFilter(${0:Timestamp})',
+        );
       });
     });
 
     describe('when on line with where clause', () => {
       beforeEach(() => {
         lineContent = '| where Test == 2 and ';
-        const position = {lineNumber: 2, column: 23};
+        const position = { lineNumber: 2, column: 23 };
         completionItems = editor.getCompletionItems(model, position);
       });
 
@@ -66,7 +70,9 @@ describe('KustoCodeEditor', () => {
         expect(completionItems.length).toBe(4);
 
         expect(completionItems[0].label).toBe('$__timeFilter(timeColumn)');
-        expect(completionItems[0].insertText.value).toBe('\\$__timeFilter(${0:Timestamp})');
+        expect(completionItems[0].insertText.value).toBe(
+          '\\$__timeFilter(${0:Timestamp})',
+        );
 
         expect(completionItems[1].label).toBe('$__from');
         expect(completionItems[1].insertText.value).toBe('\\$__from');
