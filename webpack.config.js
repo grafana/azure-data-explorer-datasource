@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   node: {
@@ -32,7 +32,7 @@ module.exports = {
     },
   ],
   plugins: [
-    new CleanWebpackPlugin('dist', { allowExternal: true }),
+    new CleanWebpackPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new CopyWebpackPlugin([
       { from: 'plugin.json', to: '.' },
