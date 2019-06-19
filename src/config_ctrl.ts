@@ -20,7 +20,7 @@ export class KustoDBConfigCtrl {
     };
 
     if (this.current.id) {
-      this.current.url = '/api/datasources/proxy/' + this.current.id;
+      this.current.url = 'api/datasources/proxy/' + this.current.id;
       this.kustoDbDatasource = new KustoDBDatasource(this.current, backendSrv, $q, null);
       this.getDatabases();
     }
