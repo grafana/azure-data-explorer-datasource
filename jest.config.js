@@ -1,4 +1,6 @@
 module.exports = {
+  preset: 'ts-jest',
+  "collectCoverage": true,
   verbose: true,
   "globals": {
     "ts-jest": {
@@ -13,9 +15,10 @@ module.exports = {
     "<rootDir>/node_modules/(?!grafana-sdk-mocks)"
   ],
   "transform": {
-    ".(ts|tsx)": "ts-jest"
+    "^.+\\.tsx?$": "ts-jest",
+    "^.+\\.(j|t)sx?$": "ts-jest",
   },
-  "testRegex": "(\\.|/)(test)\\.ts$",
+  "testRegex": "(\\.|/)(spec|jest|test)\\.(jsx?|tsx?)$",
   "moduleFileExtensions": [
     "ts",
     "tsx",
