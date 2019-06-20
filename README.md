@@ -1,4 +1,5 @@
 # Azure Data Explorer Datasource For Grafana
+[![CircleCI](https://circleci.com/gh/grafana/azure-data-explorer-datasource.svg?style=svg)](https://circleci.com/gh/grafana/azure-data-explorer-datasource)
 
 [Azure Data Explorer](https://docs.microsoft.com/en-us/azure/data-explorer/) is a log analytics cloud platform optimized for ad-hoc big data queries.
 
