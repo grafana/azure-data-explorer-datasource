@@ -2,32 +2,49 @@
   "type": "datasource",
   "name": "Azure Data Explorer Datasource",
   "id": "grafana-azure-data-explorer-datasource",
-
   "info": {
     "description": "Grafana data source for Azure Data Explorer",
     "author": {
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
-    "keywords": ["azure", "kusto", "kustodb", "azure data explorer", "data", "explorer"],
+    "keywords": [
+      "azure",
+      "kusto",
+      "kustodb",
+      "azure data explorer",
+      "data",
+      "explorer"
+    ],
     "logos": {
       "small": "img/logo.png",
       "large": "img/logo.png"
     },
     "links": [
-      { "name": "Project site", "url": "https://github.com/grafana/azure-data-explorer-datasource" },
-      { "name": "Apache License", "url": "https://github.com/grafana/azure-data-explorer-datasource/blob/master/LICENSE" }
+      {
+        "name": "Project site",
+        "url": "https://github.com/grafana/azure-data-explorer-datasource"
+      },
+      {
+        "name": "Apache License",
+        "url": "https://github.com/grafana/azure-data-explorer-datasource/blob/master/LICENSE"
+      }
     ],
     "screenshots": [],
-    "version": "1.3.1",
-    "updated": "2010-02-12"
+    "version": "1.3.2",
+    "updated": "2019-06-19"
   },
-
   "routes": [
     {
       "path": "azuredataexplorer",
       "method": "POST",
       "url": "{{.JsonData.clusterUrl}}",
+      "headers": [
+        {
+          "name": "x-ms-app",
+          "content": "Grafana-ADX"
+        }
+      ],
       "tokenAuth": {
         "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
         "params": {
@@ -39,12 +56,10 @@
       }
     }
   ],
-
   "dependencies": {
     "grafanaVersion": "5.3.x",
     "plugins": []
   },
-
   "metrics": true,
   "annotations": true
 }

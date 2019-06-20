@@ -1,16 +1,19 @@
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+
 
 module.exports = {
+  target: 'node',
   node: {
     fs: 'empty',
   },
   context: path.join(__dirname, 'src'),
   entry: {
     module: './module.ts',
-    'lib/monaco.min': './lib/monaco.min.js',
   },
   devtool: 'source-map',
   output: {
@@ -32,14 +35,18 @@ module.exports = {
     },
   ],
   plugins: [
-    new CleanWebpackPlugin('dist', { allowExternal: true }),
+    new CleanWebpackPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
+    new LodashModuleReplacementPlugin(),
+    new HtmlWebpackPlugin(),
     new CopyWebpackPlugin([
       { from: 'plugin.json', to: '.' },
       { from: '../README.md', to: '.' },
+      { from: '../CHANGELOG.md', to: '.' },
       { from: '../LICENSE', to: '.' },
       { from: 'partials/*', to: '.' },
       { from: 'img/*', to: '.' },
+      { from: 'lib/*', to: '.' },
       { from: 'query_help.md', to: '.' },
     ]),
   ],
@@ -50,17 +57,12 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        loaders: [
-          {
-            loader: 'babel-loader',
-            options: { presets: ['env'] },
-          },
-          'ts-loader',
-        ],
-        exclude: /(node_modules)/,
+        loaders: ['ts-loader'],
+        exclude: /node_modules/,
       },
       {
         test: /\.css$/,
+        exclude: /node_modules/,
         use: [
           {
             loader: 'style-loader',

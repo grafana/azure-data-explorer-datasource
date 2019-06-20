@@ -23,7 +23,7 @@ describe('KustoCodeEditor', () => {
         getLineContent: () => lineContent,
       };
 
-      const StandaloneMock = jest.fn<monaco.editor.ICodeEditor>();
+      const StandaloneMock = jest.fn<monaco.editor.ICodeEditor, []>();
       editor = new KustoCodeEditor(null, 'Timestamp', () => {}, {});
       editor.codeEditor = new StandaloneMock();
     });
@@ -142,7 +142,8 @@ describe('KustoCodeEditor', () => {
             },
           },
         };
-        const StandaloneMock = jest.fn<monaco.editor.ICodeEditor>(() => ({
+        //const StandaloneMock = jest.fn<monaco.editor.ICodeEditor>(() => ({
+        const StandaloneMock = jest.fn<any,[]>(() => ({
           getModel: () => {
             return {
               getLineCount: () => 3,
