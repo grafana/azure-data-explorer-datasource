@@ -89,8 +89,8 @@ export class ResponseParser {
       return databases;
     }
 
-    for (let table of results.data.Tables) {
-      for (let row of table.Rows) {
+    for (const table of results.data.Tables) {
+      for (const row of table.Rows) {
         databases.push({ text: row[5] || row[0], value: row[0] });
       }
     }
@@ -145,7 +145,7 @@ export class ResponseParser {
     if (timeIndex === -1) {
       throw new Error('No datetime column found in the result. The Time Series format requires a time column.');
     }
-    for (let row of rows) {
+    for (const row of rows) {
       const epoch = ResponseParser.dateTimeToEpoch(row[timeIndex]);
       const metricName = metricIndex > -1 ? row[metricIndex] : columns[valueIndex].name;
       const bucket = ResponseParser.findOrCreateBucket(data, metricName);
@@ -175,12 +175,12 @@ export class ResponseParser {
 
     const queryResult = this.parseQueryResult(results);
 
-    for (let result of queryResult.data) {
-      for (let row of _.flattenDeep(result.rows)) {
-        variables.push(<Variable>{
+    for (const result of queryResult.data) {
+      for (const row of _.flattenDeep(result.rows)) {
+        variables.push({
           text: row,
           value: row,
-        });
+        } as Variable);
       }
     }
 
@@ -192,7 +192,7 @@ export class ResponseParser {
 
     const list: AnnotationItem[] = [];
 
-    for (let result of queryResult.data) {
+    for (const result of queryResult.data) {
       let timeIndex = -1;
       let textIndex = -1;
       let tagsIndex = -1;
@@ -211,7 +211,7 @@ export class ResponseParser {
         }
       }
 
-      for (let row of result.rows) {
+      for (const row of result.rows) {
         list.push({
           annotation: options.annotation,
           time: Math.floor(ResponseParser.dateTimeToEpoch(row[timeIndex])),

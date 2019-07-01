@@ -52,7 +52,7 @@ export default class QueryBuilder {
   }
 
   getFrom(options) {
-    var from = options.range.from;
+    const from = options.range.from;
     return `datetime(${moment(from)
       .startOf('minute')
       .toISOString()})`;
@@ -62,7 +62,7 @@ export default class QueryBuilder {
     if (options.rangeRaw.to === 'now') {
       return 'now()';
     } else {
-      var until = options.range.to;
+      const until = options.range.to;
       return `datetime(${moment(until)
         .startOf('minute')
         .toISOString()})`;

@@ -321,7 +321,7 @@ export class KustoDBDatasource {
       return value;
     }
 
-    var quotedValues = _.map(value, function(val) {
+    const quotedValues = _.map(value, (val) => {
       if (typeof value === 'number') {
         return value;
       }

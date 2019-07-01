@@ -4,7 +4,7 @@ import moment from 'moment';
 describe('QueryBuilder', () => {
   let builder: QueryBuilder;
 
-  beforeEach(function() {
+  beforeEach(() => {
     builder = new QueryBuilder(
       'query=Tablename | where $__timeFilter(Timestamp)',
       {

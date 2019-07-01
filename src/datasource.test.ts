@@ -5,7 +5,7 @@ import TemplateSrvStub from '../test/template_srv_stub';
 import _ from 'lodash';
 
 describe('KustoDBDatasource', () => {
-  let ctx: any = {
+  const ctx: any = {
     backendSrv: {},
     templateSrv: new TemplateSrvStub(),
   };
@@ -35,7 +35,7 @@ describe('KustoDBDatasource', () => {
         statusText: 'Unauthorized',
       };
 
-      beforeEach(function() {
+      beforeEach(() => {
         ctx.backendSrv.datasourceRequest = options => {
           return ctx.$q.reject(error);
         };
@@ -86,7 +86,7 @@ describe('KustoDBDatasource', () => {
       ],
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       ctx.backendSrv.datasourceRequest = options => {
         expect(options.url).toContain('/v1/rest/mgmt');
         return ctx.$q.when({ data: response, status: 200 });
@@ -129,7 +129,7 @@ describe('KustoDBDatasource', () => {
       ],
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       ctx.backendSrv.datasourceRequest = options => {
         expect(options.url).toContain('/v1/rest/mgmt');
         return ctx.$q.when({ data: response, status: 200 });

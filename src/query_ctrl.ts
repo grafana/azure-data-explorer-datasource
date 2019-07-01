@@ -31,7 +31,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   lastQueryError?: string;
   databases: DatabaseItem[];
 
-  /** @ngInject **/
+  /** @ngInject */
   constructor($scope, $injector) {
     super($scope, $injector);
 
@@ -53,7 +53,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     this.lastQueryError = undefined;
     this.lastQuery = '';
 
-    let anySeriesFromQuery: any = _.find(dataList, {
+    const anySeriesFromQuery: any = _.find(dataList, {
       refId: this.target.refId,
     });
     if (anySeriesFromQuery) {
