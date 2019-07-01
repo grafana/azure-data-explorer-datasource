@@ -1,6 +1,6 @@
-// @ts-ignore
+// tslint:disable-next-line
 export default class kbn {
-  // @ts-ignore
+  // tslint:disable-next-line
   interval_to_ms(interval) {
     if (interval.substring(interval.length-1) === 's') {
       return interval.substring(0, interval.length-1) * 1000;
