@@ -8,7 +8,7 @@ export class KustoDBConfigCtrl {
   current: any;
   suggestUrl: string;
   kustoDbDatasource: any;
-  databases: any[];
+  databases: any[] = [];
   hasRequiredGrafanaVersion: boolean;
 
   /** @ngInject */

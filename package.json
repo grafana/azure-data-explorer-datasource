@@ -6,8 +6,7 @@
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev",
-    "test:coverage": "yarn test --coverage",
-    "test:badges": "yarn test:coverage && jest-coverage-badges"
+    "watch": "grafana-toolkit plugin:dev --watch"
   },
   "author": "Grafana Labs",
   "license": "Apache",
@@ -17,6 +16,7 @@
   },
   "devDependencies": {
     "@grafana/toolkit": "next",
-    "@types/grafana": "github:CorpGlory/types-grafana.git"
+    "@types/grafana": "github:CorpGlory/types-grafana.git",
+    "@types/angular": "1.6.49"
   }
 }

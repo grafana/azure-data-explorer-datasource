@@ -25,11 +25,11 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   };
 
   resultFormats: ResultFormat[];
-  showHelp: boolean;
-  showLastQuery: boolean;
-  lastQuery: string;
+  showHelp = false;
+  showLastQuery = false;
+  lastQuery  = '';
   lastQueryError?: string;
-  databases: DatabaseItem[];
+  databases: DatabaseItem[] = [];
 
   /** @ngInject */
   constructor($scope, $injector) {
