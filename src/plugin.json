@@ -61,5 +61,8 @@
     "plugins": []
   },
   "metrics": true,
-  "annotations": true
+  "annotations": true,
+  "backend": true,
+  "executable": "grafana-azure-data-explorer-datasource",
+  "alerting": true
 }

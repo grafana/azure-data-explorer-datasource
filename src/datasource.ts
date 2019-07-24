@@ -121,6 +121,40 @@ export class KustoDBDatasource {
   }
 
   testDatasource() {
+    return this.backendSrv
+      .datasourceRequest({
+        url: '/api/tsdb/query',
+        method: 'POST',
+        data: {
+          from: '5m',
+          to: 'now',
+          queries: [
+            {
+              refId: 'A',
+              intervalMs: 1,
+              maxDataPoints: 1,
+              datasourceId: this.id,
+              rawQuery: '',
+              format: 'table',
+              queryType: 'test'
+            },
+          ],
+        },
+      })
+      .then((res: any) => {
+        return { status: 'success', message: 'Nutes' };
+      })
+      .catch((err: any) => {
+        console.log(err);
+        if (err.data && err.data.message) {
+          return { status: 'error', message: err.data.message };
+        } else {
+          return { status: 'error', message: err.status };
+        }
+      });
+  }
+
+  testDatasourceX() {
     return this.testDatasourceConnection()
       .then(() => this.testDatasourceAccess())
       .catch(error => {
