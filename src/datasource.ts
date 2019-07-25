@@ -29,7 +29,8 @@ export class KustoDBDatasource {
     this.requestAggregatorSrv = new RequestAggregator(backendSrv);
   }
 
-  query(options) {
+  // TODO(Temp Comment): queryX is previous code using frontend plugin
+  queryX(options) {
     const queries = _.filter(options.targets, item => {
       return (
         item.hide !== true &&
@@ -75,6 +76,42 @@ export class KustoDBDatasource {
     return this.$q.all(promises).then(results => {
       return new ResponseParser().parseQueryResult(results);
     });
+  }
+
+  // TODO(Temp Comment): query uses the backend plugin
+  query(options) {
+    const queries = _.filter(options.targets, item => {
+      return item.hide !== true;
+    }).map(item => {
+      return {
+        refId: item.refId,
+        intervalMs: options.intervalMs,
+        maxDataPoints: options.maxDataPoints,
+        datasourceId: this.id,
+        data: {
+          csl: item.query,
+          db: item.database,
+        },
+        format: item.resultFormat,
+        queryType: item.resultFormat,
+      };
+    });
+
+    if (queries.length === 0) {
+      return this.$q.when({ data: [] });
+    }
+
+    return this.backendSrv
+      .datasourceRequest({
+        url: '/api/tsdb/query',
+        method: 'POST',
+        data: {
+          from: options.range.from.valueOf().toString(),
+          to: options.range.to.valueOf().toString(),
+          queries: queries,
+        },
+      })
+      .then(new ResponseParser().processQueryResult);
   }
 
   annotationQuery(options) {

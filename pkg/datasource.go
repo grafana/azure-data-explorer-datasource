@@ -22,14 +22,10 @@ type GrafanaAzureDXDatasource struct {
 // Query Primary method called by grafana-server
 func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
 	response := &datasource.DatasourceResponse{}
-	// testapi := servicenow.TestServiceNowAPI(nil, plugin.logger)
-	// if !testapi {
-	// 	plugin.logger.Error("Query", "datasource", tsdbReq.Datasource.Name, "Error connecting")
-	// }
 	plugin.logger.Debug("req", spew.Sdump(tsdbReq))
 	plugin.logger.Debug("Query", "datasource", tsdbReq.Datasource.Name, "TimeRange", tsdbReq.TimeRange)
 
-	client, err := azuredx.NewClient(ctx, tsdbReq.GetDatasource())
+	client, err := azuredx.NewClient(ctx, tsdbReq.GetDatasource(), plugin.logger)
 	if err != nil {
 		return nil, err
 	}
@@ -43,22 +39,29 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 
 		switch qm.QueryType {
 		case "test":
-			plugin.logger.Debug("Query Case: Test")
-			tables, err := client.TestRequest()
+			err := client.TestRequest()
+			if err != nil {
+				plugin.logger.Debug("Test Case error", err)
+				return nil, err
+			}
+			return response, nil
+		case "table":
+			plugin.logger.Debug("Query Case: Table")
+			tables, err := client.TableRequest(qm.Query)
 			if err != nil {
 				return nil, err
 			}
-
-			plugin.logger.Debug("Test Response", spew.Sdump(tables))
+			gTables, err := tables.ToTables()
+			if err != nil {
+				return nil, err
+			}
+			if len(gTables) > 0 { // TODO(Not sure how to handle multiple tables yet)
+				response.Results = append(response.Results, &datasource.QueryResult{Tables: []*datasource.Table{gTables[0]}})
+			}
 		default:
 			return nil, fmt.Errorf("unsupported query type: '%v'", qm.QueryType)
 		}
 
 	}
-	simpleQuery()
 	return response, nil
-}
-
-func simpleQuery() {
-	fmt.Println("Hi!")
 }

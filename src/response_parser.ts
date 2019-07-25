@@ -237,4 +237,41 @@ export class ResponseParser {
   static dateTimeToEpoch(dateTime) {
     return moment(dateTime).valueOf();
   }
+
+  // TODO(Temp Comment): processQueryResult is for results using the backend plugin
+  processQueryResult(res) {
+    const data: any[] = [];
+
+    if (!res.data.results) {
+      return { data: data };
+    }
+
+    for (const key in res.data.results) {
+      const queryRes = res.data.results[key];
+
+      if (queryRes.series) {
+        for (const series of queryRes.series) {
+          data.push({
+            target: series.name,
+            datapoints: series.points,
+            refId: queryRes.refId,
+            meta: queryRes.meta,
+          });
+        }
+      }
+
+      if (queryRes.tables) {
+        for (const table of queryRes.tables) {
+          table.type = 'table';
+          table.refId = queryRes.refId;
+          table.meta = queryRes.meta;
+          data.push(table);
+        }
+      }
+    }
+
+    return { data: data };
+  }
+
+
 }
