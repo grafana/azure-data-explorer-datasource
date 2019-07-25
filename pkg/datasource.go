@@ -58,6 +58,17 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			if len(gTables) > 0 { // TODO(Not sure how to handle multiple tables yet)
 				response.Results = append(response.Results, &datasource.QueryResult{Tables: []*datasource.Table{gTables[0]}})
 			}
+		case "time_series":
+			plugin.logger.Debug("Query Case: Time Series")
+			tables, err := client.TableRequest(qm.Query)
+			if err != nil {
+				return nil, err
+			}
+			series, err := tables.ToTimeSeries()
+			if err != nil {
+				return nil, err
+			}
+			response.Results = append(response.Results, &datasource.QueryResult{Series: series})
 		default:
 			return nil, fmt.Errorf("unsupported query type: '%v'", qm.QueryType)
 		}

@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 
 	"golang.org/x/oauth2/microsoft"
 
@@ -152,9 +154,6 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 
 		for colIdx, column := range resTable.Columns { // For column in the table
 			t.Columns[colIdx] = &datasource.TableColumn{Name: column.ColumnName}
-			if column.ColumnType == "" {
-				return nil, fmt.Errorf("column is missing type, has name of '%v', type '%v', datatype '%v'", column.ColumnName, column.ColumnType, column.DataType)
-			}
 			columnTypes[colIdx] = column.ColumnType
 		}
 
@@ -175,6 +174,99 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 
 	}
 	return tables, nil
+}
+
+// ToTimeSeries turns a TableResponse into a slice of Tables appropriate for the plugin model.
+// Number Columns become a "Metric"
+// String, or things that can become strings that are not a number become a tag
+// There must be one and only one time column
+func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
+	series := []*datasource.TimeSeries{}
+
+	for _, resTable := range tr.Tables { // Foreach Table in Response
+
+		if resTable.TableName != "Table_0" {
+			continue
+		}
+
+		seriesMap := make(map[string]map[string]*datasource.TimeSeries) // MetricName (Value Column) -> Tags -> Series
+
+		timeCount := 0
+		timeColumnIdx := 0
+		labelColumnIdxs := []int{} // idx to Label Name
+		valueColumnIdxs := []int{}
+
+		for colIdx, column := range resTable.Columns { // For column in the table
+			switch column.ColumnType {
+			case "datetime":
+				timeColumnIdx = colIdx
+				timeCount++
+			case "int", "long", "real":
+				valueColumnIdxs = append(valueColumnIdxs, colIdx)
+				seriesMap[column.ColumnName] = make(map[string]*datasource.TimeSeries)
+			case "string", "guid":
+				labelColumnIdxs = append(labelColumnIdxs, colIdx)
+			default:
+				return nil, fmt.Errorf("unsupported type '%v' in response for a time series query: must be datetime, int, long, real, guid, or string", column.ColumnType)
+			}
+		}
+
+		if timeCount != 1 {
+			return nil, fmt.Errorf("did not find a column of type datetime in the response")
+		}
+		if len(valueColumnIdxs) < 1 {
+			return nil, fmt.Errorf("did not find a value column, must provide one column of type int, long, or real")
+		}
+
+		for _, row := range resTable.Rows {
+			if len(row) < len(labelColumnIdxs)+len(valueColumnIdxs)+1 {
+				return nil, fmt.Errorf("unexpected number of rows in response")
+			}
+			timeStamp, err := ExtractTimeStamp(row[timeColumnIdx])
+			if err != nil {
+				return nil, err
+			}
+			var labelsSB strings.Builder // This is flawed as could confused values and labels, TODO do something better
+			labels := make(map[string]string, len(labelColumnIdxs))
+			for _, labelIdx := range labelColumnIdxs { // gather labels
+				val, ok := row[labelIdx].(string)
+				if !ok {
+					return nil, fmt.Errorf("failed to get string value for column %v", row[labelIdx])
+				}
+				colName := resTable.Columns[labelIdx].ColumnName
+				if _, err := labelsSB.WriteString(fmt.Sprintf("%v=%v ", colName, val)); err != nil {
+					return nil, err
+				}
+				labels[colName] = val
+			}
+			for _, valueIdx := range valueColumnIdxs {
+				// See if time Series exists
+				colName := resTable.Columns[valueIdx].ColumnName
+				series, ok := seriesMap[colName][labelsSB.String()]
+				if !ok {
+					series = &datasource.TimeSeries{}
+					series.Name = fmt.Sprintf("%v {%v}", colName, labelsSB.String())
+					series.Tags = labels
+					seriesMap[colName][labelsSB.String()] = series
+				}
+				val, ok := row[valueIdx].(float64)
+				if !ok {
+					return nil, fmt.Errorf("failed to extract value from '%v' as float64 in '%v' column", row[valueIdx], colName)
+				}
+				series.Points = append(series.Points, &datasource.Point{Timestamp: timeStamp, Value: val})
+			}
+		}
+
+		// Map Structure to Series
+		for _, sm := range seriesMap {
+			for _, s := range sm {
+				series = append(series, s)
+			}
+		}
+
+	}
+
+	return series, nil
 }
 
 // ExtractValue returns a RowValue suitable for the plugin model based on the ColumnType provided by the TableResponse's Columns.
@@ -218,7 +310,7 @@ func ExtractValue(v interface{}, typ string) (*datasource.RowValue, error) {
 	// 		return nil, fmt.Errorf("failed to extract time for '%v'", nV)
 	// 	}
 	// 	r.Int64Value = t.UnixNano()
-	case "string", "guid", "timespan", "datetime":
+	case "string", "guid", "timespan", "datetime", "":
 		r.Kind = datasource.RowValue_TYPE_STRING
 		r.StringValue, ok = v.(string)
 		if !ok {
@@ -228,4 +320,16 @@ func ExtractValue(v interface{}, typ string) (*datasource.RowValue, error) {
 		return nil, fmt.Errorf("unrecognized type '%v' in table for value '%v'", typ, v)
 	}
 	return r, nil
+}
+
+func ExtractTimeStamp(v interface{}) (i int64, err error) {
+	nV, ok := v.(string)
+	if !ok {
+		return i, fmt.Errorf("expected interface of type string, got type '%T'", v)
+	}
+	t, err := time.Parse(time.RFC3339Nano, nV)
+	if err != nil {
+		return i, fmt.Errorf("failed to parse time for '%v'", nV)
+	}
+	return t.Unix(), nil
 }

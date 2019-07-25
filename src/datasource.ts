@@ -80,16 +80,22 @@ export class KustoDBDatasource {
 
   // TODO(Temp Comment): query uses the backend plugin
   query(options) {
+
+
     const queries = _.filter(options.targets, item => {
       return item.hide !== true;
     }).map(item => {
+      var qb = new QueryBuilder(
+        this.templateSrv.replace(item.query, {}, this.interpolateVariable),
+        options)
+
       return {
         refId: item.refId,
         intervalMs: options.intervalMs,
         maxDataPoints: options.maxDataPoints,
         datasourceId: this.id,
         data: {
-          csl: item.query,
+          csl: qb.interpolate().query,
           db: item.database,
         },
         format: item.resultFormat,
