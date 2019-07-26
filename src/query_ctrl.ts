@@ -45,6 +45,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     this.resultFormats = [
       { text: 'Time series', value: 'time_series' },
       { text: 'Table', value: 'table' },
+      { text: 'ADX Time series', value: 'time_series_adx_series' },
     ];
     this.getDatabases();
   }

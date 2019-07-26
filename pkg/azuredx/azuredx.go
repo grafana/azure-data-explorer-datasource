@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
+	"os"
 	"strings"
 	"time"
 
@@ -110,6 +112,10 @@ func (c *Client) TableRequest(payload RequestPayload) (*TableResponse, error) {
 	}
 
 	resp, err := c.Post(c.ClusterURL+"/v1/rest/query", "application/json", &buf)
+	if err != nil {
+		return nil, err
+	}
+	err = dumpResponseToFile(resp, "/home/kbrandt/tmp/dumps.log") // TODO Remove
 	if err != nil {
 		return nil, err
 	}
@@ -269,6 +275,102 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 	return series, nil
 }
 
+// ToADXTimeSeries returns Time series for a query that returns an ADX series type.
+// This done by having a query with make_series as the returned type
+//
+// Each Row has:
+// - N Columns for group by items, where each Group by item is a column individual string column
+// - An Array of Values per Aggregation Column
+// - The last column is whatever the timestamp is,
+func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
+	seriesCollection := []*datasource.TimeSeries{}
+
+	for _, resTable := range tr.Tables { // Foreach Table in Response
+		if resTable.TableName != "Table_0" {
+			continue
+		}
+
+		labelColumnIdxs := []int{} // idx to Label Name
+		valueColumnIdxs := []int{}
+
+		//TODO check len
+		for colIdx, column := range resTable.Columns[:len(resTable.Columns)-1] { // For column in the table
+			switch column.ColumnType {
+			case "string", "guid":
+				labelColumnIdxs = append(labelColumnIdxs, colIdx)
+			case "dynamic":
+				valueColumnIdxs = append(valueColumnIdxs, colIdx)
+			default:
+				return nil, fmt.Errorf("unsupported type '%v' in response for a ADX time series query: must be object, guid, or string", column.ColumnType)
+			}
+		}
+
+		var times []int64
+		for rowIdx, row := range resTable.Rows {
+			if rowIdx == 0 { // Time values are repeated for every row, so we only need to do this once
+				interfaceSlice, ok := row[len(resTable.Columns)-1].([]interface{})
+				if !ok {
+					return nil, fmt.Errorf("time column was not of expected type, wanted []interface{} got %T", row[len(resTable.Columns)-1])
+				}
+				times = make([]int64, len(interfaceSlice))
+				for i, interfaceVal := range interfaceSlice {
+					var err error
+					rawTimeStamp, ok := interfaceVal.(string)
+					if !ok {
+						return nil, fmt.Errorf("failed to extract timestamp want type string got type %T", interfaceVal)
+					}
+					times[i], err = ExtractTimeStamp(rawTimeStamp)
+					if err != nil {
+						return nil, fmt.Errorf("failed to parse timestamp with raw value of %v", rawTimeStamp)
+					}
+				}
+			}
+
+			var labelsSB strings.Builder // This is flawed as could confused values and labels, TODO do something better
+			labels := make(map[string]string, len(labelColumnIdxs))
+			for _, labelIdx := range labelColumnIdxs { // gather labels
+				val, ok := row[labelIdx].(string)
+				if !ok {
+					return nil, fmt.Errorf("failed to get string value for column %v", row[labelIdx])
+				}
+				colName := resTable.Columns[labelIdx].ColumnName
+				if _, err := labelsSB.WriteString(fmt.Sprintf("%v=%v ", colName, val)); err != nil {
+					return nil, err
+				}
+				labels[colName] = val
+			}
+
+			for _, valueIdx := range valueColumnIdxs {
+				interfaceSlice, ok := row[valueIdx].([]interface{})
+				if !ok {
+					return nil, fmt.Errorf("time column was not of expected type, wanted []interface{} got %T", row[len(resTable.Columns)-1])
+				}
+				series := &datasource.TimeSeries{
+					Name:   fmt.Sprintf("%v {%v}", resTable.Columns[valueIdx].ColumnName, labelsSB.String()),
+					Points: make([]*datasource.Point, len(interfaceSlice)),
+					Tags:   labels,
+				}
+				for idx, interfaceVal := range interfaceSlice {
+					val, ok := interfaceVal.(float64)
+					if !ok {
+						return nil, fmt.Errorf("series value was not of expected type, want float64 got type %T", interfaceVal)
+					}
+					series.Points[idx] = &datasource.Point{
+						Timestamp: times[idx],
+						Value:     val,
+					}
+				}
+
+				seriesCollection = append(seriesCollection, series)
+			}
+
+		}
+
+	}
+
+	return seriesCollection, nil
+}
+
 // ExtractValue returns a RowValue suitable for the plugin model based on the ColumnType provided by the TableResponse's Columns.
 // Available types as per the API are listed in "Scalar data types" https://docs.microsoft.com/en-us/azure/kusto/query/scalar-data-types/index.
 // However, since we get this over JSON the underlying types are not always the type as declared by ColumnType.
@@ -299,17 +401,6 @@ func ExtractValue(v interface{}, typ string) (*datasource.RowValue, error) {
 			return nil, fmt.Errorf("failed to marshall Object type into JSON string '%v': %v", v, err)
 		}
 		r.StringValue = string(b)
-	// case "datetime":
-	// 	r.Kind = datasource.RowValue_TYPE_INT64
-	// 	nV, ok := v.(string)
-	// 	if !ok {
-	// 		return nil, fmt.Errorf("failed to extract datetime as string '%v' ", v)
-	// 	}
-	// 	t, err := time.Parse(time.RFC3339Nano, nV)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("failed to extract time for '%v'", nV)
-	// 	}
-	// 	r.Int64Value = t.UnixNano()
 	case "string", "guid", "timespan", "datetime", "":
 		r.Kind = datasource.RowValue_TYPE_STRING
 		r.StringValue, ok = v.(string)
@@ -327,9 +418,28 @@ func ExtractTimeStamp(v interface{}) (i int64, err error) {
 	if !ok {
 		return i, fmt.Errorf("expected interface of type string, got type '%T'", v)
 	}
-	t, err := time.Parse(time.RFC3339Nano, nV)
+	t, err := time.Parse("2006-01-02T15:04:05.999999Z", nV)
 	if err != nil {
 		return i, fmt.Errorf("failed to parse time for '%v'", nV)
 	}
-	return t.Unix(), nil
+	return t.UnixNano() / 1e6, nil
+}
+
+// TODO Temporary
+func dumpResponseToFile(resp *http.Response, filename string) error {
+	dump, err := httputil.DumpResponse(resp, true)
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	if _, err = f.Write(dump); err != nil {
+		return err
+	}
+	return nil
 }

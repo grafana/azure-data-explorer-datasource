@@ -37,7 +37,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			return nil, err
 		}
 
-		switch qm.QueryType {
+		switch qm.Format {
 		case "test":
 			err := client.TestRequest()
 			if err != nil {
@@ -65,6 +65,17 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 				return nil, err
 			}
 			series, err := tables.ToTimeSeries()
+			if err != nil {
+				return nil, err
+			}
+			response.Results = append(response.Results, &datasource.QueryResult{Series: series})
+		case "time_series_adx_series":
+			plugin.logger.Debug("Query Case: Time Series (ADX Series)")
+			tables, err := client.TableRequest(qm.Query)
+			if err != nil {
+				return nil, err
+			}
+			series, err := tables.ToADXTimeSeries()
 			if err != nil {
 				return nil, err
 			}
