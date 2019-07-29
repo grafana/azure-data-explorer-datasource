@@ -30,6 +30,9 @@ type TableResponse struct {
 
 // ToTables turns a TableResponse into a slice of Tables appropriate for the plugin model.
 func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
+	if tr == nil {
+		return nil, fmt.Errorf("can not convert response to tables, response has no items")
+	}
 	tables := make([]*datasource.Table, len(tr.Tables))
 	for tableIdx, resTable := range tr.Tables { // Foreach Table in Response
 		t := new(datasource.Table) // New API type table
@@ -48,7 +51,7 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 			newRow := &datasource.TableRow{Values: make([]*datasource.RowValue, len(t.Columns))}
 			for recIdx, rec := range row {
 				var err error
-				newRow.Values[recIdx], err = ExtractValue(rec, columnTypes[recIdx])
+				newRow.Values[recIdx], err = ExtractValueForTable(rec, columnTypes[recIdx])
 				if err != nil {
 					return nil, err
 				}
@@ -268,12 +271,13 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 	return seriesCollection, nil
 }
 
-// ExtractValue returns a RowValue suitable for the plugin model based on the ColumnType provided by the TableResponse's Columns.
+// ExtractValueForTable returns a RowValue suitable for the plugin model based on the ColumnType provided by the TableResponse's Columns.
 // Available types as per the API are listed in "Scalar data types" https://docs.microsoft.com/en-us/azure/kusto/query/scalar-data-types/index.
 // However, since we get this over JSON the underlying types are not always the type as declared by ColumnType.
-func ExtractValue(v interface{}, typ string) (*datasource.RowValue, error) {
+func ExtractValueForTable(v interface{}, typ string) (*datasource.RowValue, error) {
 	r := &datasource.RowValue{}
 	var ok bool
+	var err error
 	if interfaceIsNil(v) {
 		r.Kind = datasource.RowValue_TYPE_NULL
 		return r, nil
@@ -285,11 +289,25 @@ func ExtractValue(v interface{}, typ string) (*datasource.RowValue, error) {
 		if !ok {
 			return nil, fmt.Errorf("failed to extract %v '%v' type is %T", typ, v, v)
 		}
-	case "int", "long", "real":
+	case "real":
 		r.Kind = datasource.RowValue_TYPE_DOUBLE
-		r.DoubleValue, ok = v.(float64)
+		jN, ok := v.(json.Number)
 		if !ok {
 			return nil, fmt.Errorf("failed to extract %v '%v' type is %T", typ, v, v)
+		}
+		r.DoubleValue, err = jN.Float64()
+		if err != nil {
+			return nil, fmt.Errorf("failed to extract float64 from json.Number: %v", err)
+		}
+	case "int", "long":
+		r.Kind = datasource.RowValue_TYPE_INT64
+		jN, ok := v.(json.Number)
+		if !ok {
+			return nil, fmt.Errorf("failed to extract %v '%v' type is %T", typ, v, v)
+		}
+		r.Int64Value, err = jN.Int64()
+		if err != nil {
+			return nil, fmt.Errorf("failed to extract int64 from json.Number: %v", err)
 		}
 	case "dynamic":
 		r.Kind = datasource.RowValue_TYPE_STRING
@@ -302,7 +320,7 @@ func ExtractValue(v interface{}, typ string) (*datasource.RowValue, error) {
 		r.Kind = datasource.RowValue_TYPE_STRING
 		r.StringValue, ok = v.(string)
 		if !ok {
-			return nil, fmt.Errorf("failed to extract int/long '%v'", v)
+			return nil, fmt.Errorf(`failed to  "string", "guid", "timespan", or "datetime" '%v'`, v)
 		}
 	default: // documented values not handled: decimal
 		return nil, fmt.Errorf("unrecognized type '%v' in table for value '%v'", typ, v)
@@ -350,11 +368,16 @@ func interfaceIsNil(v interface{}) bool {
 	return v == nil || (reflect.ValueOf(v).Kind() == reflect.Ptr && reflect.ValueOf(v).IsNil())
 }
 
-func tableFromJSON(rc io.Reader) (tr *TableResponse, err error) {
-	tr = &TableResponse{}
-	json.NewDecoder(rc).Decode(tr)
+func tableFromJSON(rc io.Reader) (*TableResponse, error) {
+	tr := &TableResponse{}
+	decoder := json.NewDecoder(rc)
+	decoder.UseNumber()
+	err := decoder.Decode(tr)
 	if err != nil {
-		return
+		return nil, err
 	}
-	return
+	if tr == nil {
+		return nil, fmt.Errorf("unable to parse response, parsed response has no contents")
+	}
+	return tr, nil
 }

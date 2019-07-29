@@ -1,6 +1,7 @@
 package azuredx
 
 import (
+	"encoding/json"
 	"os"
 	"path"
 	"testing"
@@ -60,7 +61,7 @@ type extractValueArgs struct {
 	typ   string
 }
 
-func TestExtractValue(t *testing.T) {
+func TestExtractValueForTable(t *testing.T) {
 	tests := []struct {
 		name         string
 		args         extractValueArgs
@@ -69,8 +70,8 @@ func TestExtractValue(t *testing.T) {
 		rowValKind   datasource.RowValue_Kind
 		rowValIs     assert.ComparisonAssertionFunc
 		rowValField  string
-		doubleVal    float64
-		int64Val     int64
+		DoubleValue  float64
+		Int64Val     int64
 		BoolValue    bool
 		StringValue  string
 		bytesVal     []byte
@@ -100,10 +101,54 @@ func TestExtractValue(t *testing.T) {
 			rowValIs:     assert.Equal,
 			StringValue:  "Grafana <3 Azure",
 		},
+		{
+			name:         "should extract datetime as string",
+			args:         extractValueArgs{"2006-01-02T22:04:05.1Z", "datetime"},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_STRING,
+			rowValField:  "StringValue",
+			rowValIs:     assert.Equal,
+			StringValue:  "2006-01-02T22:04:05.1Z",
+		},
+		{
+			name: "should extract dynamic as string",
+			args: extractValueArgs{[]map[string]interface{}{
+				map[string]interface{}{"person": "Daniel"},
+				map[string]interface{}{"cats": 23},
+				map[string]interface{}{"diagnosis": "cat problem"},
+			}, "dynamic"},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_STRING,
+			rowValField:  "StringValue",
+			rowValIs:     assert.Equal,
+			StringValue:  `[{"person":"Daniel"},{"cats":23},{"diagnosis":"cat problem"}]`,
+		},
+		{
+			name:         "should extract int (32) as int64",
+			args:         extractValueArgs{json.Number("2147483647"), "int"},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_INT64,
+			rowValField:  "Int64Val",
+			rowValIs:     assert.Equal,
+			Int64Val:     2147483647,
+		},
+		{
+			name:         "should extract long as int64",
+			args:         extractValueArgs{json.Number("9223372036854775807"), "long"},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_INT64,
+			rowValField:  "Int64Val",
+			rowValIs:     assert.Equal,
+			Int64Val:     9223372036854775807,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rowValue, err := ExtractValue(tt.args.value, tt.args.typ)
+			rowValue, err := ExtractValueForTable(tt.args.value, tt.args.typ)
 			tt.errorIs(t, err)
 			if err != nil {
 				return
@@ -114,6 +159,10 @@ func TestExtractValue(t *testing.T) {
 				tt.rowValIs(t, tt.BoolValue, rowValue.BoolValue)
 			case "StringValue":
 				tt.rowValIs(t, tt.StringValue, rowValue.StringValue)
+			case "DoubleValue":
+				tt.rowValIs(t, tt.DoubleValue, rowValue.DoubleValue)
+			case "Int64Val":
+				tt.rowValIs(t, tt.Int64Val, rowValue.Int64Value)
 			default:
 				t.Errorf("unexpected rowValField '%v' in test", tt.rowValField)
 			}
@@ -150,15 +199,30 @@ func TestTableResponse_ToTables(t *testing.T) {
 				&datasource.RowValue{Kind: datasource.RowValue_TYPE_BOOL, BoolValue: true},
 			},
 		},
+		{
+			name:     "supported types should load with values",
+			testFile: "supported_types_with_vals.json",
+			errorIs:  assert.NoError,
+			rowIdx:   0,
+			rowIs:    assert.Equal,
+			rowVals: []*datasource.RowValue{
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_BOOL, BoolValue: true},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: "Grafana"},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: "2006-01-02T22:04:05.1Z"},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: `[{"person":"Daniel"},{"cats":23},{"diagnosis":"cat problem"}]`},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: "74be27de-1e4e-49d9-b579-fe0b331d3642"},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_INT64, Int64Value: int64(2147483647)},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_INT64, Int64Value: int64(9223372036854775807)},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_DOUBLE, DoubleValue: float64(1.797693134862315708145274237317043567981e+308)},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: "00:00:00.0000001"},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			respTable, err := tableFromJSONFile(tt.testFile)
 			if err != nil {
 				t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
-			}
-			if len(respTable.Tables) == 0 {
-				t.Errorf("problem loading table, expected one or more tables, got zero.")
 			}
 
 			tables, err := respTable.ToTables()
