@@ -47,7 +47,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			return response, nil
 		case "table":
 			plugin.logger.Debug("Query Case: Table")
-			tables, err := client.TableRequest(qm.Query)
+			tables, err := client.KustoRequest(qm.Query)
 			if err != nil {
 				return nil, err
 			}
@@ -60,7 +60,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			}
 		case "time_series":
 			plugin.logger.Debug("Query Case: Time Series")
-			tables, err := client.TableRequest(qm.Query)
+			tables, err := client.KustoRequest(qm.Query)
 			if err != nil {
 				return nil, err
 			}
@@ -71,7 +71,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			response.Results = append(response.Results, &datasource.QueryResult{Series: series})
 		case "time_series_adx_series":
 			plugin.logger.Debug("Query Case: Time Series (ADX Series)")
-			tables, err := client.TableRequest(qm.Query)
+			tables, err := client.KustoRequest(qm.Query)
 			if err != nil {
 				return nil, err
 			}
