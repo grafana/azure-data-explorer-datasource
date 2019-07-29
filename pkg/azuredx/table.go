@@ -3,6 +3,7 @@ package azuredx
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"net/http"
 	"net/http/httputil"
@@ -294,7 +295,7 @@ func ExtractValue(v interface{}, typ string) (*datasource.RowValue, error) {
 		r.Kind = datasource.RowValue_TYPE_STRING
 		b, err := json.Marshal(v)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshall Object type into JSON string '%v': %v", v, err)
+			return nil, fmt.Errorf("failed to marshal Object type into JSON string '%v': %v", v, err)
 		}
 		r.StringValue = string(b)
 	case "string", "guid", "timespan", "datetime", "":
@@ -347,4 +348,13 @@ func dumpResponseToFile(resp *http.Response, filename string) error {
 // https://stackoverflow.com/questions/13476349/check-for-nil-and-nil-interface-in-go
 func interfaceIsNil(v interface{}) bool {
 	return v == nil || (reflect.ValueOf(v).Kind() == reflect.Ptr && reflect.ValueOf(v).IsNil())
+}
+
+func tableFromJSON(rc io.Reader) (tr *TableResponse, err error) {
+	tr = &TableResponse{}
+	json.NewDecoder(rc).Decode(tr)
+	if err != nil {
+		return
+	}
+	return
 }

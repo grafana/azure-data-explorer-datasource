@@ -131,10 +131,5 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, error) {
 		bodyString := string(bodyBytes)
 		return nil, fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
 	}
-	tr := &TableResponse{}
-	json.NewDecoder(resp.Body).Decode(tr)
-	if err != nil {
-		return nil, err
-	}
-	return tr, nil
+	return tableFromJSON(resp.Body)
 }
