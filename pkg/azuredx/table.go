@@ -17,15 +17,21 @@ import (
 
 // TableResponse represents the response struct from Azure's Data Explorer REST API.
 type TableResponse struct {
-	Tables []struct {
-		TableName string
-		Columns   []struct {
-			ColumnName string
-			DataType   string
-			ColumnType string
-		}
-		Rows [][]interface{}
-	}
+	Tables []Table
+}
+
+type Table struct {
+	TableName string
+	Columns   []Column
+	Rows      []Row
+}
+
+type Row []interface{}
+
+type Column struct {
+	ColumnName string
+	DataType   string
+	ColumnType string
 }
 
 // ToTables turns a TableResponse into a slice of Tables appropriate for the plugin model.
@@ -107,7 +113,7 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 		}
 
 		for _, row := range resTable.Rows {
-			if len(row) < len(labelColumnIdxs)+len(valueColumnIdxs)+1 {
+			if len(row) != len(labelColumnIdxs)+len(valueColumnIdxs)+1 {
 				return nil, fmt.Errorf("unexpected number of rows in response")
 			}
 			timeStamp, err := extractTimeStamp(row[timeColumnIdx])
@@ -376,8 +382,8 @@ func tableFromJSON(rc io.Reader) (*TableResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if tr == nil {
-		return nil, fmt.Errorf("unable to parse response, parsed response has no contents")
+	if tr.Tables == nil || len(tr.Tables) == 0 {
+		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
 	}
 	return tr, nil
 }

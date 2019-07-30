@@ -292,7 +292,8 @@ func TestTableResponse_ToTables(t *testing.T) {
 func TestTableResponse_ToTimeSeries(t *testing.T) {
 	tests := []struct {
 		name                  string
-		testFile              string
+		testFile              string // use either file or table, not both
+		testTable             *TableResponse
 		errorIs               assert.ErrorAssertionFunc
 		seriesCountIs         assert.ComparisonAssertionFunc
 		seriesCount           int
@@ -318,12 +319,45 @@ func TestTableResponse_ToTimeSeries(t *testing.T) {
 			testFile: "timeseries_no_value.json",
 			errorIs:  assert.Error,
 		},
+		{
+			name: "unexpected length of a row should error (and not panic)",
+			testTable: &TableResponse{
+				Tables: []Table{
+					Table{
+						TableName: "Table_0",
+						Columns: []Column{
+							Column{
+								ColumnName: "Time",
+								ColumnType: "datetime",
+							},
+							Column{
+								ColumnName: "Value",
+								ColumnType: "int",
+							},
+						},
+						Rows: []Row{
+							[]interface{}{
+								nil,
+							},
+						},
+					},
+				},
+			},
+			errorIs: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			respTable, err := tableFromJSONFile(tt.testFile)
-			if err != nil {
-				t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
+			if tt.testFile != "" && tt.testTable != nil {
+				t.Errorf("test logic error: test should not have both a testFile and a testTable")
+			}
+			var err error
+			respTable := tt.testTable
+			if tt.testFile != "" {
+				respTable, err = tableFromJSONFile(tt.testFile)
+				if err != nil {
+					t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
+				}
 			}
 
 			series, err := respTable.ToTimeSeries()
