@@ -36,7 +36,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		if err != nil {
 			return nil, err
 		}
-
+		qm.TimeRange = tsdbReq.GetTimeRange()
 		switch qm.Format {
 		case "test":
 			err := client.TestRequest()

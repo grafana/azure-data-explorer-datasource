@@ -19,11 +19,12 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-// QueryModel contains the query information from the API call that we use.
+// QueryModel contains the query information from the API call that we use to make a query.
 type QueryModel struct {
 	Format    string         `json:"format"`
 	QueryType string         `json:"queryType"`
 	Query     RequestPayload `json:"data"`
+	TimeRange *datasource.TimeRange
 }
 
 // dataSourceData holds the datasource configuration information for Azure Data Explorer's API
