@@ -3,7 +3,6 @@ package azuredx
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"math"
 	"reflect"
 	"strings"
@@ -76,9 +75,7 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 // There must be one and only one time column
 func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 	series := []*datasource.TimeSeries{}
-
 	for _, resTable := range tr.Tables { // Foreach Table in Response
-
 		if resTable.TableName != "Table_0" {
 			continue
 		}
@@ -163,7 +160,6 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 // - Timestamp column
 func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 	seriesCollection := []*datasource.TimeSeries{}
-
 	for _, resTable := range tr.Tables { // Foreach Table in Response
 		if resTable.TableName != "Table_0" {
 			continue
@@ -246,14 +242,10 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 						Value:     val,
 					}
 				}
-
 				seriesCollection = append(seriesCollection, series)
 			}
-
 		}
-
 	}
-
 	return seriesCollection, nil
 }
 
@@ -349,21 +341,6 @@ func extractTimeStamp(v interface{}) (i int64, err error) {
 // https://stackoverflow.com/questions/13476349/check-for-nil-and-nil-interface-in-go
 func interfaceIsNil(v interface{}) bool {
 	return v == nil || (reflect.ValueOf(v).Kind() == reflect.Ptr && reflect.ValueOf(v).IsNil())
-}
-
-func tableFromJSON(rc io.Reader) (*TableResponse, error) {
-	tr := &TableResponse{}
-	decoder := json.NewDecoder(rc)
-	// Numbers as string (json.Number) so we can keep types as best we can (since the response has 'type' of column)
-	decoder.UseNumber()
-	err := decoder.Decode(tr)
-	if err != nil {
-		return nil, err
-	}
-	if tr.Tables == nil || len(tr.Tables) == 0 {
-		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
-	}
-	return tr, nil
 }
 
 func extractJSONNumberAsFloat(v interface{}) (f float64, err error) {

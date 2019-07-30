@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -134,6 +135,21 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, error) {
 		return nil, fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
 	}
 	return tableFromJSON(resp.Body)
+}
+
+func tableFromJSON(rc io.Reader) (*TableResponse, error) {
+	tr := &TableResponse{}
+	decoder := json.NewDecoder(rc)
+	// Numbers as string (json.Number) so we can keep types as best we can (since the response has 'type' of column)
+	decoder.UseNumber()
+	err := decoder.Decode(tr)
+	if err != nil {
+		return nil, err
+	}
+	if tr.Tables == nil || len(tr.Tables) == 0 {
+		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
+	}
+	return tr, nil
 }
 
 // TODO Temporary
