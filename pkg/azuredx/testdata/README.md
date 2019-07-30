@@ -23,3 +23,51 @@ print XBool = true,
  XReal      = real(1.797693134862315708145274237317043567981e+308),
  XTimeSpan  = 1tick
  ```
+
+### `nulls_in_table.json`
+
+```kusto
+print XBool = bool(null),
+ XDateTime  = datetime(null),
+ XDynamic   = dynamic(null),
+ XGuid      = guid(null),
+ XInt       = int(null),
+ XLong      = long(null),
+ XReal      = real(null),
+ XTimeSpan  = time(null)
+```
+
+### `multi_label_multi_value_time_table.json`
+
+```kusto
+range Timestamp from datetime(2000-01-01 00:00:00Z) to datetime(2000-01-01 00:02:00Z) step 30s
+  | extend Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
+  | extend Place  = dynamic(["EU",     "EU",     "US",   "EU"])
+  | mvexpand Person, Place
+  | extend HatInventory = rand(5)
+  | extend PetCount     = rand(1)
+  | project Timestamp, tostring(Person), tostring(Place), HatInventory, PetCount;
+```
+
+### `timeseries_too_many_datetime.json`
+
+```kusto
+range Timestamp from datetime(2000-01-01 00:00:00Z) to datetime(2000-01-01 00:02:00Z) step 30s
+  | extend Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
+  | extend Place  = dynamic(["EU",     "EU",     "US",   "EU"])
+  | mvexpand Person, Place
+  | extend HatInventory = rand(5)
+  | extend PetCount     = rand(1)
+  | extend ADate        = datetime(2000-01-01 00:00:00Z)
+  | project Timestamp, tostring(Person), tostring(Place), HatInventory, PetCount, ADate;
+```
+
+### `timeseries_no_value.json`
+
+```kusto
+range Timestamp from datetime(2000-01-01 00:00:00Z) to datetime(2000-01-01 00:02:00Z) step 30s
+  | extend Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"]) 
+  | extend Place  = dynamic(["EU",     "EU",     "US",   "EU"]) 
+  | mvexpand Person, Place
+  | project Timestamp, tostring(Person), tostring(Place);
+```

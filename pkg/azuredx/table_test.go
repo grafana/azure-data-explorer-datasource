@@ -288,3 +288,53 @@ func TestTableResponse_ToTables(t *testing.T) {
 		})
 	}
 }
+
+func TestTableResponse_ToTimeSeries(t *testing.T) {
+	tests := []struct {
+		name                  string
+		testFile              string
+		errorIs               assert.ErrorAssertionFunc
+		seriesCountIs         assert.ComparisonAssertionFunc
+		seriesCount           int
+		perSeriesValueCountIs assert.ComparisonAssertionFunc
+		perSeriesValueCount   int
+	}{
+		{
+			name:                  "should load multiple values and multiple labels",
+			testFile:              "multi_label_multi_value_time_table.json",
+			errorIs:               assert.NoError,
+			seriesCountIs:         assert.Equal,
+			seriesCount:           8,
+			perSeriesValueCountIs: assert.Equal,
+			perSeriesValueCount:   5,
+		},
+		{
+			name:     "more than one datetime should error",
+			testFile: "timeseries_too_many_datetime.json",
+			errorIs:  assert.Error,
+		},
+		{
+			name:     "no value columns should error",
+			testFile: "timeseries_no_value.json",
+			errorIs:  assert.Error,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			respTable, err := tableFromJSONFile(tt.testFile)
+			if err != nil {
+				t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
+			}
+
+			series, err := respTable.ToTimeSeries()
+			tt.errorIs(t, err)
+			if err != nil {
+				return
+			}
+			tt.seriesCountIs(t, tt.seriesCount, len(series))
+			for _, s := range series {
+				tt.perSeriesValueCountIs(t, tt.perSeriesValueCount, len(s.Points))
+			}
+		})
+	}
+}

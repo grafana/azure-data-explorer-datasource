@@ -100,7 +100,7 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 		}
 
 		if timeCount != 1 {
-			return nil, fmt.Errorf("did not find a column of type datetime in the response")
+			return nil, fmt.Errorf("expected exactly one column of type datetime in the response but got %v", timeCount)
 		}
 		if len(valueColumnIdxs) < 1 {
 			return nil, fmt.Errorf("did not find a value column, must provide one column of type int, long, or real")
