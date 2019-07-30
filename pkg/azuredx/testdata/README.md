@@ -66,8 +66,8 @@ range Timestamp from datetime(2000-01-01 00:00:00Z) to datetime(2000-01-01 00:02
 
 ```kusto
 range Timestamp from datetime(2000-01-01 00:00:00Z) to datetime(2000-01-01 00:02:00Z) step 30s
-  | extend Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"]) 
-  | extend Place  = dynamic(["EU",     "EU",     "US",   "EU"]) 
+  | extend Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
+  | extend Place  = dynamic(["EU",     "EU",     "US",   "EU"])
   | mvexpand Person, Place
   | project Timestamp, tostring(Person), tostring(Place);
 ```

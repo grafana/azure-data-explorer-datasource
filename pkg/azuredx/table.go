@@ -20,14 +20,17 @@ type TableResponse struct {
 	Tables []Table
 }
 
+// Table is a member of TableResponse
 type Table struct {
 	TableName string
 	Columns   []Column
 	Rows      []Row
 }
 
+// Row Represents a row within a TableResponse
 type Row []interface{}
 
+// Column is a descriptor within a TableResponse
 type Column struct {
 	ColumnName string
 	DataType   string
@@ -120,28 +123,19 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 			if err != nil {
 				return nil, err
 			}
-			var labelsSB strings.Builder // This is flawed as could confused values and labels, TODO do something better
-			labels := make(map[string]string, len(labelColumnIdxs))
-			for _, labelIdx := range labelColumnIdxs { // gather labels
-				val, ok := row[labelIdx].(string)
-				if !ok {
-					return nil, fmt.Errorf("failed to get string value for column %v", row[labelIdx])
-				}
-				colName := resTable.Columns[labelIdx].ColumnName
-				if _, err := labelsSB.WriteString(fmt.Sprintf("%v=%v ", colName, val)); err != nil {
-					return nil, err
-				}
-				labels[colName] = val
+			labels, labelsString, err := labelMaker(resTable.Columns, row, labelColumnIdxs)
+			if err != nil {
+				return nil, err
 			}
 			for _, valueIdx := range valueColumnIdxs {
 				// See if time Series exists
 				colName := resTable.Columns[valueIdx].ColumnName
-				series, ok := seriesMap[colName][labelsSB.String()]
+				series, ok := seriesMap[colName][labelsString]
 				if !ok {
 					series = &datasource.TimeSeries{}
-					series.Name = fmt.Sprintf("%v {%v}", colName, labelsSB.String())
+					series.Name = fmt.Sprintf("%v {%v}", colName, labelsString)
 					series.Tags = labels
-					seriesMap[colName][labelsSB.String()] = series
+					seriesMap[colName][labelsString] = series
 				}
 				val, err := extractJSONNumberAsFloat(row[valueIdx])
 				if err != nil {
@@ -201,7 +195,10 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 		}
 
 		if timeCount != 1 {
-			return nil, fmt.Errorf("query must contain exactly one datetime column, got %v", timeCount)
+			return nil, fmt.Errorf("query must contain exactly one datetime column named 'Timestamp', got %v", timeCount)
+		}
+		if len(valueColumnIdxs) < 1 {
+			return nil, fmt.Errorf("did not find a value column, expected at least one column of type 'dynamic', got %v", len(valueColumnIdxs))
 		}
 
 		var times []int64
@@ -214,38 +211,24 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 				times = make([]int64, len(interfaceSlice))
 				for i, interfaceVal := range interfaceSlice {
 					var err error
-					rawTimeStamp, ok := interfaceVal.(string)
-					if !ok {
-						return nil, fmt.Errorf("failed to extract timestamp want type string got type %T", interfaceVal)
-					}
-					times[i], err = extractTimeStamp(rawTimeStamp)
+					times[i], err = extractTimeStamp(interfaceVal)
 					if err != nil {
-						return nil, fmt.Errorf("failed to parse timestamp with raw value of %v", rawTimeStamp)
+						return nil, err
 					}
 				}
 			}
 
-			var labelsSB strings.Builder // This is flawed as could confused values and labels, TODO do something better
-			labels := make(map[string]string, len(labelColumnIdxs))
-			for _, labelIdx := range labelColumnIdxs { // gather labels
-				val, ok := row[labelIdx].(string)
-				if !ok {
-					return nil, fmt.Errorf("failed to get string value for column %v", row[labelIdx])
-				}
-				colName := resTable.Columns[labelIdx].ColumnName
-				if _, err := labelsSB.WriteString(fmt.Sprintf("%v=%v ", colName, val)); err != nil {
-					return nil, err
-				}
-				labels[colName] = val
+			labels, labelsString, err := labelMaker(resTable.Columns, row, labelColumnIdxs)
+			if err != nil {
+				return nil, err
 			}
-
 			for _, valueIdx := range valueColumnIdxs {
 				interfaceSlice, ok := row[valueIdx].([]interface{})
 				if !ok {
 					return nil, fmt.Errorf("time column was not of expected type, wanted []interface{} got %T", row[valueIdx])
 				}
 				series := &datasource.TimeSeries{
-					Name:   fmt.Sprintf("%v {%v}", resTable.Columns[valueIdx].ColumnName, labelsSB.String()),
+					Name:   fmt.Sprintf("%v {%v}", resTable.Columns[valueIdx].ColumnName, labelsString),
 					Points: make([]*datasource.Point, len(interfaceSlice)),
 					Tags:   labels,
 				}
@@ -275,6 +258,23 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 	}
 
 	return seriesCollection, nil
+}
+
+func labelMaker(columns []Column, row Row, labelColumnIdxs []int) (map[string]string, string, error) {
+	var labelsSB strings.Builder // This is flawed as could confused values and labels, TODO do something better
+	labels := make(map[string]string, len(labelColumnIdxs))
+	for _, labelIdx := range labelColumnIdxs { // gather labels
+		val, ok := row[labelIdx].(string)
+		if !ok {
+			return nil, "", fmt.Errorf("failed to get string value for column %v", row[labelIdx])
+		}
+		colName := columns[labelIdx].ColumnName
+		if _, err := labelsSB.WriteString(fmt.Sprintf("%v=%v ", colName, val)); err != nil {
+			return nil, "", err
+		}
+		labels[colName] = val
+	}
+	return labels, labelsSB.String(), nil
 }
 
 // extractValueForTable returns a RowValue suitable for the plugin model based on the ColumnType provided by the TableResponse's Columns.
