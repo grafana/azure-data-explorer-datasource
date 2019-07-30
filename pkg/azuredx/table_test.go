@@ -372,3 +372,51 @@ func TestTableResponse_ToTimeSeries(t *testing.T) {
 		})
 	}
 }
+
+func TestTableResponse_ToADXTimeSeries(t *testing.T) {
+	tests := []struct {
+		name                  string
+		testFile              string // use either file or table, not both
+		testTable             *TableResponse
+		errorIs               assert.ErrorAssertionFunc
+		seriesCountIs         assert.ComparisonAssertionFunc
+		seriesCount           int
+		perSeriesValueCountIs assert.ComparisonAssertionFunc
+		perSeriesValueCount   int
+	}{
+		{
+			name:                  "should load series response",
+			testFile:              "adx_timeseries_multi_label_mulit_value.json",
+			errorIs:               assert.NoError,
+			seriesCountIs:         assert.Equal,
+			seriesCount:           8,
+			perSeriesValueCountIs: assert.Equal,
+			perSeriesValueCount:   10,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.testFile != "" && tt.testTable != nil {
+				t.Errorf("test logic error: test should not have both a testFile and a testTable")
+			}
+			var err error
+			respTable := tt.testTable
+			if tt.testFile != "" {
+				respTable, err = tableFromJSONFile(tt.testFile)
+				if err != nil {
+					t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
+				}
+			}
+
+			series, err := respTable.ToADXTimeSeries()
+			tt.errorIs(t, err)
+			if err != nil {
+				return
+			}
+			tt.seriesCountIs(t, tt.seriesCount, len(series))
+			for _, s := range series {
+				tt.perSeriesValueCountIs(t, tt.perSeriesValueCount, len(s.Points))
+			}
+		})
+	}
+}

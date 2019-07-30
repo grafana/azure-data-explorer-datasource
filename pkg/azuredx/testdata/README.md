@@ -71,3 +71,17 @@ range Timestamp from datetime(2000-01-01 00:00:00Z) to datetime(2000-01-01 00:02
   | mvexpand Person, Place
   | project Timestamp, tostring(Person), tostring(Place);
 ```
+
+### `adx_timeseries_multi_label_mulit_value.json`
+
+```let T = range Timestamp from ago(5m) to now() step 30s
+  | extend Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
+  | extend Place  = dynamic(["EU",     "EU",     "US",   "EU"])
+  | mvexpand Person, Place
+  | extend HatInventory = rand(5)
+  | extend PetCount     = rand(1)
+  | project Timestamp, tostring(Person), tostring(Place), HatInventory, PetCount;
+
+let Series = T | make-series avg(HatInventory), avg(PetCount) on Timestamp from ago(5m) to now() step 30s by Person, Place;
+Series
+```

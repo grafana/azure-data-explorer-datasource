@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"net/http"
-	"net/http/httputil"
-	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -346,25 +343,6 @@ func extractTimeStamp(v interface{}) (i int64, err error) {
 		return i, fmt.Errorf("failed to parse time for '%v'", nV)
 	}
 	return t.UnixNano() / 1e6, nil
-}
-
-// TODO Temporary
-func dumpResponseToFile(resp *http.Response, filename string) error {
-	dump, err := httputil.DumpResponse(resp, true)
-	if err != nil {
-		return err
-	}
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	if _, err = f.Write(dump); err != nil {
-		return err
-	}
-	return nil
 }
 
 // interfaceIsNil is used to check if the interface value within a TableResponse is nil.

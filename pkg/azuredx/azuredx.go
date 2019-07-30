@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
+	"os"
 
 	"golang.org/x/oauth2/microsoft"
 
@@ -132,4 +134,23 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, error) {
 		return nil, fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
 	}
 	return tableFromJSON(resp.Body)
+}
+
+// TODO Temporary
+func dumpResponseToFile(resp *http.Response, filename string) error {
+	dump, err := httputil.DumpResponse(resp, true)
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	if _, err = f.Write(dump); err != nil {
+		return err
+	}
+	return nil
 }
