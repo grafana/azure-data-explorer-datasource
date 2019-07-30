@@ -51,7 +51,7 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 			newRow := &datasource.TableRow{Values: make([]*datasource.RowValue, len(t.Columns))}
 			for recIdx, rec := range row {
 				var err error
-				newRow.Values[recIdx], err = ExtractValueForTable(rec, columnTypes[recIdx])
+				newRow.Values[recIdx], err = extractValueForTable(rec, columnTypes[recIdx])
 				if err != nil {
 					return nil, err
 				}
@@ -137,9 +137,9 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 					series.Tags = labels
 					seriesMap[colName][labelsSB.String()] = series
 				}
-				val, ok := row[valueIdx].(float64)
-				if !ok {
-					return nil, fmt.Errorf("failed to extract value from '%v' as float64 in '%v' column", row[valueIdx], colName)
+				val, err := extractJSONNumberAsFloat(row[valueIdx])
+				if err != nil {
+					return nil, err
 				}
 				series.Points = append(series.Points, &datasource.Point{Timestamp: timeStamp, Value: val})
 			}
@@ -251,9 +251,9 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 						}
 						continue
 					}
-					val, ok := interfaceVal.(float64)
-					if !ok {
-						return nil, fmt.Errorf("series value was not of expected type, want float64 got type %T with value of %v", interfaceVal, interfaceVal)
+					val, err := extractJSONNumberAsFloat(interfaceVal)
+					if err != nil {
+						return nil, err
 					}
 					series.Points[idx] = &datasource.Point{
 						Timestamp: times[idx],
@@ -271,14 +271,17 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 	return seriesCollection, nil
 }
 
-// ExtractValueForTable returns a RowValue suitable for the plugin model based on the ColumnType provided by the TableResponse's Columns.
+// extractValueForTable returns a RowValue suitable for the plugin model based on the ColumnType provided by the TableResponse's Columns.
 // Available types as per the API are listed in "Scalar data types" https://docs.microsoft.com/en-us/azure/kusto/query/scalar-data-types/index.
 // However, since we get this over JSON the underlying types are not always the type as declared by ColumnType.
-func ExtractValueForTable(v interface{}, typ string) (*datasource.RowValue, error) {
+func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, error) {
 	r := &datasource.RowValue{}
 	var ok bool
 	var err error
 	if interfaceIsNil(v) {
+		if typ == "string" {
+			return nil, fmt.Errorf("string type field should never be null, but has null value")
+		}
 		r.Kind = datasource.RowValue_TYPE_NULL
 		return r, nil
 	}
@@ -291,13 +294,9 @@ func ExtractValueForTable(v interface{}, typ string) (*datasource.RowValue, erro
 		}
 	case "real":
 		r.Kind = datasource.RowValue_TYPE_DOUBLE
-		jN, ok := v.(json.Number)
-		if !ok {
-			return nil, fmt.Errorf("failed to extract %v '%v' type is %T", typ, v, v)
-		}
-		r.DoubleValue, err = jN.Float64()
+		r.DoubleValue, err = extractJSONNumberAsFloat(v)
 		if err != nil {
-			return nil, fmt.Errorf("failed to extract float64 from json.Number: %v", err)
+			return nil, err
 		}
 	case "int", "long":
 		r.Kind = datasource.RowValue_TYPE_INT64
@@ -371,6 +370,7 @@ func interfaceIsNil(v interface{}) bool {
 func tableFromJSON(rc io.Reader) (*TableResponse, error) {
 	tr := &TableResponse{}
 	decoder := json.NewDecoder(rc)
+	// Numbers as string (json.Number) so we can keep types as best we can (since the response has 'type' of column)
 	decoder.UseNumber()
 	err := decoder.Decode(tr)
 	if err != nil {
@@ -380,4 +380,12 @@ func tableFromJSON(rc io.Reader) (*TableResponse, error) {
 		return nil, fmt.Errorf("unable to parse response, parsed response has no contents")
 	}
 	return tr, nil
+}
+
+func extractJSONNumberAsFloat(v interface{}) (f float64, err error) {
+	jN, ok := v.(json.Number)
+	if !ok {
+		return float64(0), fmt.Errorf("expected json.Number but got type '%T' for '%v'", v, v)
+	}
+	return jN.Float64()
 }

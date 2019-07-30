@@ -61,7 +61,7 @@ type extractValueArgs struct {
 	typ   string
 }
 
-func TestExtractValueForTable(t *testing.T) {
+func Test_extractValueForTable(t *testing.T) {
 	tests := []struct {
 		name         string
 		args         extractValueArgs
@@ -145,10 +145,42 @@ func TestExtractValueForTable(t *testing.T) {
 			rowValIs:     assert.Equal,
 			Int64Val:     9223372036854775807,
 		},
+		{
+			name:         "should extract real as float64",
+			args:         extractValueArgs{json.Number("1.797693134862315708145274237317043567981e+308"), "real"},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_DOUBLE,
+			rowValField:  "DoubleValue",
+			rowValIs:     assert.Equal,
+			DoubleValue:  1.797693134862315708145274237317043567981e+308,
+		},
+		{
+			name:         "should extract timespan as string",
+			args:         extractValueArgs{"00:00:00.0000001", "timespan"},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_STRING,
+			rowValField:  "StringValue",
+			rowValIs:     assert.Equal,
+			StringValue:  "00:00:00.0000001",
+		},
+		{
+			name:         "null bool should be null", // all types should be except string, but only bool and string are tested
+			args:         extractValueArgs{nil, "bool"},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_NULL,
+		},
+		{
+			name:    "null string should be error", // as per documentation, null strings are not supported by Kusto
+			args:    extractValueArgs{nil, "string"},
+			errorIs: assert.Error,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rowValue, err := ExtractValueForTable(tt.args.value, tt.args.typ)
+			rowValue, err := extractValueForTable(tt.args.value, tt.args.typ)
 			tt.errorIs(t, err)
 			if err != nil {
 				return
@@ -163,6 +195,11 @@ func TestExtractValueForTable(t *testing.T) {
 				tt.rowValIs(t, tt.DoubleValue, rowValue.DoubleValue)
 			case "Int64Val":
 				tt.rowValIs(t, tt.Int64Val, rowValue.Int64Value)
+			case "":
+				// case for NULL, no value to test, only Kind
+				if tt.rowValKind != datasource.RowValue_TYPE_NULL {
+					t.Error("test logic error, case should not be null (empty string) if RowValue is not TYPE_NULL")
+				}
 			default:
 				t.Errorf("unexpected rowValField '%v' in test", tt.rowValField)
 			}
@@ -215,6 +252,23 @@ func TestTableResponse_ToTables(t *testing.T) {
 				&datasource.RowValue{Kind: datasource.RowValue_TYPE_INT64, Int64Value: int64(9223372036854775807)},
 				&datasource.RowValue{Kind: datasource.RowValue_TYPE_DOUBLE, DoubleValue: float64(1.797693134862315708145274237317043567981e+308)},
 				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: "00:00:00.0000001"},
+			},
+		},
+		{
+			name:     "supported types should load with null values",
+			testFile: "nulls_in_table.json",
+			errorIs:  assert.NoError,
+			rowIdx:   0,
+			rowIs:    assert.Equal,
+			rowVals: []*datasource.RowValue{
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
+				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
 			},
 		},
 	}
