@@ -24,7 +24,13 @@ type QueryModel struct {
 	Format    string         `json:"format"`
 	QueryType string         `json:"queryType"`
 	Query     RequestPayload `json:"data"`
-	TimeRange *datasource.TimeRange
+	MacroData MacroData
+}
+
+// Interpolate applys macro expansion on the QueryModel's Payload's Query string
+func (qm *QueryModel) Interpolate() (err error) {
+	qm.Query.CSL, err = qm.MacroData.Interpolate(qm.Query.CSL)
+	return
 }
 
 // dataSourceData holds the datasource configuration information for Azure Data Explorer's API

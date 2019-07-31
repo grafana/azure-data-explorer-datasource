@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx"
 	"github.com/grafana/grafana_plugin_model/go/datasource"
 	hclog "github.com/hashicorp/go-hclog"
@@ -22,7 +20,6 @@ type GrafanaAzureDXDatasource struct {
 // Query Primary method called by grafana-server
 func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
 	response := &datasource.DatasourceResponse{}
-	plugin.logger.Debug("req", spew.Sdump(tsdbReq))
 	plugin.logger.Debug("Query", "datasource", tsdbReq.Datasource.Name, "TimeRange", tsdbReq.TimeRange)
 
 	client, err := azuredx.NewClient(ctx, tsdbReq.GetDatasource(), plugin.logger)
@@ -31,12 +28,15 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 	}
 
 	for _, q := range tsdbReq.GetQueries() {
-		qm := azuredx.QueryModel{}
-		err := json.Unmarshal([]byte(q.GetModelJson()), &qm)
+		qm := &azuredx.QueryModel{}
+		err := json.Unmarshal([]byte(q.GetModelJson()), qm)
 		if err != nil {
 			return nil, err
 		}
-		qm.TimeRange = tsdbReq.GetTimeRange()
+		qm.MacroData = azuredx.NewMacroData(tsdbReq.GetTimeRange(), q.GetIntervalMs())
+		if err := qm.Interpolate(); err != nil {
+			return nil, err
+		}
 		switch qm.Format {
 		case "test":
 			err := client.TestRequest()
