@@ -23,40 +23,40 @@ func TestMacroData_Interpolate(t *testing.T) {
 		returnVal string
 	}{
 		{
-			name: "should parse $__from",
+			name: "should parse $__timeFrom",
 			macroData: NewMacroData(&datasource.TimeRange{
 				FromEpochMs: fromEpochMS,
 			}, 0),
 			errorIs:   assert.NoError,
-			query:     "$__from",
+			query:     "$__timeFrom",
 			returnIs:  assert.Equal,
 			returnVal: fromString,
 		},
 		{
-			name: "should parse $__from with spaces",
+			name: "should parse $__timeFrom with spaces",
 			macroData: NewMacroData(&datasource.TimeRange{
 				FromEpochMs: fromEpochMS,
 			}, 0),
 			errorIs:   assert.NoError,
-			query:     " $__from ",
+			query:     " $__timeFrom ",
 			returnIs:  assert.Equal,
 			returnVal: fmt.Sprintf(" %v ", fromString),
 		},
 		{
-			name: "should parse $__to",
+			name: "should parse $__timeTo",
 			macroData: NewMacroData(&datasource.TimeRange{
 				ToEpochMs: toEpochMS,
 			}, 0),
 			errorIs:   assert.NoError,
-			query:     "$__to",
+			query:     "$__timeTo",
 			returnIs:  assert.Equal,
 			returnVal: toString,
 		},
 		{
-			name:      "should parse $__interval",
+			name:      "should parse $__timeInterval",
 			macroData: NewMacroData(nil, 12),
 			errorIs:   assert.NoError,
-			query:     "$__interval",
+			query:     "$__timeInterval",
 			returnIs:  assert.Equal,
 			returnVal: "12ms",
 		},

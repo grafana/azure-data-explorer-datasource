@@ -33,7 +33,7 @@ func NewMacroData(tr *datasource.TimeRange, intervalMS int64) MacroData {
 
 // macroRE is a regular expression to match available macros
 var macroRE = regexp.MustCompile(`\$__` + // Prefix: $__
-	`(timeFilter|from|to|interval)` + // one of macro root names
+	`(timeFilter|timeFrom|timeTo|timeInterval)` + // one of macro root names
 	`(\(\w*?\))?`) // optional () or optional (someArg)
 
 // Interpolate replaces macros with their values for the given query.
@@ -66,23 +66,23 @@ func (md MacroData) Interpolate(query string) (string, error) {
 }
 
 var interpolationFuncs = map[string]func(string, MacroData) string{
-	"$__from":       fromMacro,
-	"$__to":         toMacro,
-	"$__timeFilter": timeFilterMacro,
-	"$__interval":   intervalMacro,
+	"$__timeFrom":     timeFromMacro,
+	"$__timeTo":       timeToMacro,
+	"$__timeFilter":   timeFilterMacro,
+	"$__timeInterval": timeIntervalMacro,
 }
 
-func fromMacro(s string, md MacroData) string {
+func timeFromMacro(s string, md MacroData) string {
 	from := time.Unix(0, md.FromEpochMs*1e6)
 	return fmt.Sprintf("datetime(%v)", from.UTC().Format(time.RFC3339Nano))
 }
 
-func toMacro(s string, md MacroData) string {
+func timeToMacro(s string, md MacroData) string {
 	to := time.Unix(0, md.ToEpochMs*1e6)
 	return fmt.Sprintf("datetime(%v)", to.UTC().Format(time.RFC3339Nano))
 }
 
-func intervalMacro(s string, md MacroData) string {
+func timeIntervalMacro(s string, md MacroData) string {
 	return fmt.Sprintf("%vms", md.intervalMS)
 }
 
