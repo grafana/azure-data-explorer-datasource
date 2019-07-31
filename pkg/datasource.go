@@ -27,7 +27,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		return nil, err
 	}
 
-	for _, q := range tsdbReq.GetQueries() {
+	for idx, q := range tsdbReq.GetQueries() {
 		qm := &azuredx.QueryModel{}
 		err := json.Unmarshal([]byte(q.GetModelJson()), qm)
 		if err != nil {
@@ -83,6 +83,19 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		default:
 			return nil, fmt.Errorf("unsupported query type: '%v'", qm.QueryType)
 		}
+
+		metaData := struct {
+			RawQuery string
+		}{
+			qm.Query.CSL,
+		}
+		if jB, err := json.Marshal(metaData); err != nil {
+			plugin.logger.Debug("could not add metadata") // only log since this is just metadata
+		} else {
+			response.Results[idx].MetaJson = string(jB)
+		}
+
+		response.Results[idx].RefId = q.RefId
 
 	}
 	return response, nil
