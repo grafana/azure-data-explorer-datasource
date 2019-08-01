@@ -58,7 +58,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       refId: this.target.refId,
     });
     if (anySeriesFromQuery) {
-      this.lastQuery = anySeriesFromQuery.query;
+      this.lastQuery = anySeriesFromQuery.meta.RawQuery;
     }
   }
 

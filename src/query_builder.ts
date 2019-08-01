@@ -22,17 +22,18 @@ export default class QueryBuilder {
     // if query or annotation query
     if (this.options) {
       let timeField = '';
-      query = query.replace(macroRegexp, (match, p1, p2) => {
-        if (p1 === 'timeFilter') {
-          timeField = p2.trim();
-          return this.getTimeFilter(p2, this.options);
-        }
+      // TEMP TODO commented out to move timeFilter expansion to backend
+      // query = query.replace(macroRegexp, (match, p1, p2) => {
+      //   if (p1 === 'timeFilter') {
+      //     timeField = p2.trim();
+      //     return this.getTimeFilter(p2, this.options);
+      //   }
 
-        return match;
-      });
-      query = query.replace(/\$__interval/gi, this.options.interval);
-      query = query.replace(/\$__from/gi, this.getFrom(this.options));
-      query = query.replace(/\$__to/gi, this.getUntil(this.options));
+      //   return match;
+      // });
+      // query = query.replace(/\$__interval/gi, this.options.interval);
+      // query = query.replace(/\$__from/gi, this.getFrom(this.options));
+      // query = query.replace(/\$__to/gi, this.getUntil(this.options));
 
       const orderByRegexp = /order\s+by/gi;
       if (!orderByRegexp.test(query)) {

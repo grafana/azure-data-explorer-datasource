@@ -115,7 +115,7 @@ func (c *Client) TestRequest() error {
 }
 
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
-// and returns a TableResposne.
+// and returns a TableResponse.
 func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, error) {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(payload)
