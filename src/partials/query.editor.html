@@ -57,12 +57,13 @@
   <div class="gf-form" ng-show="ctrl.showHelp">
     <pre class="gf-form-pre alert alert-info">
   Format as Table:
-  - return any set of columns
+  - Can return any set of columns.
 
   Format as Time series:
-  - Requires a column of type datetime
-  - returns the first column with a numeric datatype as the value
-  - (Optional: returns the first column with type string to represent the series name. If no column is found the column name of the value column is used as series name)
+  - Requires exactly one column of Kusto type datetime. (tip: can use Kusto's project-away operator to remove columns).
+  - Requires at least one value column of a number type. Each value column is considered a metric.
+  - May optionally have one or more string columns. Each string column is considered as a key=value tag pair (where the key is the column name, and the value is the value of the column for each row).
+  - A time series is returned for each value column + unique set of string column values. Each series has name of valueColumnName { stringColumnName=columnValue, ... }. If there are no string columns in the request, the name will just be valueColumnName.
 
   Example Time Series Query:
 
