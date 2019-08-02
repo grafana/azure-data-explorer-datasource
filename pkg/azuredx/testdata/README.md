@@ -74,7 +74,8 @@ range Timestamp from datetime(2000-01-01 00:00:00Z) to datetime(2000-01-01 00:02
 
 ### `adx_timeseries_multi_label_mulit_value.json`
 
-```let T = range Timestamp from ago(5m) to now() step 30s
+```kusto
+let T = range Timestamp from ago(5m) to now() step 30s
   | extend Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
   | extend Place  = dynamic(["EU",     "EU",     "US",   "EU"])
   | mvexpand Person, Place
@@ -84,4 +85,21 @@ range Timestamp from datetime(2000-01-01 00:00:00Z) to datetime(2000-01-01 00:02
 
 let Series = T | make-series avg(HatInventory), avg(PetCount) on Timestamp from ago(5m) to now() step 30s by Person, Place;
 Series
+```
+
+### `adx_timeseries_null_value_column`
+
+Note: The decompose forecast argument number '1' is too low resulting in a null values. When all the values are null,
+the object is null in the response.
+
+```kusto
+let T = range Timestamp from $__timeFrom to ($__timeTo + -30m) step 1m
+  | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
+  | extend   Place  = dynamic(["EU",     "EU",     "US",   "EU"])
+  | mvexpand Person, Place
+  | extend   HatInventory = rand(5)
+  | project  Timestamp, tostring(Person), tostring(Place), HatInventory;
+
+T | make-series avg(HatInventory) default=double(null) on Timestamp from $__timeFrom to $__timeTo step 1m by Person, Place
+  | extend series_decompose_forecast(avg_HatInventory, 1) | project-away *residual, *baseline, *seasonal
 ```

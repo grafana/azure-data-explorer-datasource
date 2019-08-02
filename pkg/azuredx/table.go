@@ -216,9 +216,23 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 				return nil, err
 			}
 			for _, valueIdx := range valueColumnIdxs {
+				// Handle case where all values are null
+				if interfaceIsNil(row[valueIdx]) {
+					series := &datasource.TimeSeries{
+						Name:   labels.GetName(resTable.Columns[valueIdx].ColumnName),
+						Points: make([]*datasource.Point, len(times)),
+						Tags:   labels.keyVals,
+					}
+					for idx, time := range times {
+						series.Points[idx] = &datasource.Point{Timestamp: time, Value: math.NaN()}
+					}
+					seriesCollection = append(seriesCollection, series)
+					continue
+				}
+
 				interfaceSlice, ok := row[valueIdx].([]interface{})
 				if !ok {
-					return nil, fmt.Errorf("time column was not of expected type, wanted []interface{} got %T", row[valueIdx])
+					return nil, fmt.Errorf("value column was not of expected type, wanted []interface{} got %T", row[valueIdx])
 				}
 				series := &datasource.TimeSeries{
 					Name:   labels.GetName(resTable.Columns[valueIdx].ColumnName),

@@ -393,6 +393,15 @@ func TestTableResponse_ToADXTimeSeries(t *testing.T) {
 			perSeriesValueCountIs: assert.Equal,
 			perSeriesValueCount:   10,
 		},
+		{
+			name:                  "should not err with null valued object column",
+			testFile:              "adx_timeseries_null_value_column.json",
+			errorIs:               assert.NoError,
+			seriesCountIs:         assert.Equal,
+			seriesCount:           8,
+			perSeriesValueCountIs: assert.Equal,
+			perSeriesValueCount:   216,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
