@@ -35,9 +35,6 @@ type Column struct {
 
 // ToTables turns a TableResponse into a slice of Tables appropriate for the plugin model.
 func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
-	if tr == nil {
-		return nil, fmt.Errorf("can not convert response to tables, response has no items")
-	}
 	tables := make([]*datasource.Table, len(tr.Tables))
 	for tableIdx, resTable := range tr.Tables { // Foreach Table in Response
 		t := new(datasource.Table) // New API type table
@@ -95,7 +92,7 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 			case "int", "long", "real":
 				valueColumnIdxs = append(valueColumnIdxs, colIdx)
 				seriesMap[column.ColumnName] = make(map[string]*datasource.TimeSeries)
-			case "string", "guid":
+			case kustoTypeString, kustoTypeGUID:
 				labelColumnIdxs = append(labelColumnIdxs, colIdx)
 			default:
 				return nil, fmt.Errorf("unsupported type '%v' in response for a time series query: must be datetime, int, long, real, guid, or string", column.ColumnType)
@@ -173,9 +170,9 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 		//TODO check len
 		for colIdx, column := range resTable.Columns { // For column in the table
 			switch column.ColumnType {
-			case "string", "guid":
+			case kustoTypeString, kustoTypeGUID:
 				labelColumnIdxs = append(labelColumnIdxs, colIdx)
-			case "dynamic":
+			case kustoTypeDynamic:
 				if column.ColumnName == "Timestamp" {
 					timeColumnIdx = colIdx
 					timeCount++
@@ -183,7 +180,7 @@ func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
 				}
 				valueColumnIdxs = append(valueColumnIdxs, colIdx)
 			default:
-				return nil, fmt.Errorf("unsupported type '%v' in response for a ADX time series query: must be object, guid, or string", column.ColumnType)
+				return nil, fmt.Errorf("unsupported type '%v' in response for a ADX time series query: must be dynamic, guid, or string", column.ColumnType)
 			}
 		}
 
@@ -308,53 +305,55 @@ func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, erro
 	var ok bool
 	var err error
 	if interfaceIsNil(v) {
-		if typ == "string" {
+		if typ == kustoTypeString {
 			return nil, fmt.Errorf("string type field should never be null, but has null value")
 		}
 		r.Kind = datasource.RowValue_TYPE_NULL
 		return r, nil
 	}
 	switch typ {
-	case "bool":
+	case kustoTypeBool:
 		r.Kind = datasource.RowValue_TYPE_BOOL
 		r.BoolValue, ok = v.(bool)
 		if !ok {
-			return nil, fmt.Errorf("failed to extract %v '%v' type is %T", typ, v, v)
+			return nil, fmt.Errorf(extractFailFmt, v, "bool", typ, v)
 		}
-	case "real":
+	case kustoTypeReal:
 		r.Kind = datasource.RowValue_TYPE_DOUBLE
 		r.DoubleValue, err = extractJSONNumberAsFloat(v)
 		if err != nil {
 			return nil, err
 		}
-	case "int", "long":
+	case kustoTypeInt, kustoTypeLong:
 		r.Kind = datasource.RowValue_TYPE_INT64
 		jN, ok := v.(json.Number)
 		if !ok {
-			return nil, fmt.Errorf("failed to extract %v '%v' type is %T", typ, v, v)
+			return nil, fmt.Errorf(extractFailFmt, v, "json.Number", typ, v)
 		}
 		r.Int64Value, err = jN.Int64()
 		if err != nil {
 			return nil, fmt.Errorf("failed to extract int64 from json.Number: %v", err)
 		}
-	case "dynamic":
+	case kustoTypeDynamic:
 		r.Kind = datasource.RowValue_TYPE_STRING
 		b, err := json.Marshal(v)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal Object type into JSON string '%v': %v", v, err)
+			return nil, fmt.Errorf("failed to marshal dynamic type into JSON string '%v': %v", v, err)
 		}
 		r.StringValue = string(b)
-	case "string", "guid", "timespan", "datetime", "":
+	case kustoTypeString, kustoTypeGUID, kustoTypeTimespan, kustoTypeDatetime, "":
 		r.Kind = datasource.RowValue_TYPE_STRING
 		r.StringValue, ok = v.(string)
 		if !ok {
-			return nil, fmt.Errorf(`failed to  "string", "guid", "timespan", or "datetime" '%v'`, v)
+			return nil, fmt.Errorf(extractFailFmt, v, "string", typ, v)
 		}
 	default: // documented values not handled: decimal
 		return nil, fmt.Errorf("unrecognized type '%v' in table for value '%v'", typ, v)
 	}
 	return r, nil
 }
+
+const extractFailFmt = "failed to extract value '%v' as a go of type %v, column type is %v and a go type of %T" // value, assertionType, columnType, value
 
 // extractTimeStamp extracts a Unix Timestamp in MS (suitable for the plugin) from an Azure Data Explorer Timestamp contained in an interface.
 // The interface comes from within an ADX TableResponse. It is either the value of a record, or a within a
@@ -384,3 +383,16 @@ func extractJSONNumberAsFloat(v interface{}) (f float64, err error) {
 	}
 	return jN.Float64()
 }
+
+const (
+	kustoTypeBool     = "bool"
+	kustoTypeDatetime = "datetime"
+	kustoTypeDynamic  = "dynamic"
+	kustoTypeGUID     = "guid"
+	kustoTypeInt      = "int"
+	kustoTypeLong     = "long"
+	kustoTypeReal     = "real"
+	kustoTypeString   = "string"
+	kustoTypeTimespan = "timespan"
+	kustoTypeDecimal  = "decimal"
+)

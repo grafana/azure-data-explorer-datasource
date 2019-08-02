@@ -83,7 +83,7 @@ func Test_extractValueForTable(t *testing.T) {
 		},
 		{
 			name:         "should extract bool as bool",
-			args:         extractValueArgs{true, "bool"},
+			args:         extractValueArgs{true, kustoTypeBool},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
 			rowValKind:   datasource.RowValue_TYPE_BOOL,
@@ -93,7 +93,7 @@ func Test_extractValueForTable(t *testing.T) {
 		},
 		{
 			name:         "should extract string as string",
-			args:         extractValueArgs{"Grafana <3 Azure", "string"},
+			args:         extractValueArgs{"Grafana <3 Azure", kustoTypeString},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
 			rowValKind:   datasource.RowValue_TYPE_STRING,
@@ -103,7 +103,7 @@ func Test_extractValueForTable(t *testing.T) {
 		},
 		{
 			name:         "should extract datetime as string",
-			args:         extractValueArgs{"2006-01-02T22:04:05.1Z", "datetime"},
+			args:         extractValueArgs{"2006-01-02T22:04:05.1Z", kustoTypeDatetime},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
 			rowValKind:   datasource.RowValue_TYPE_STRING,
@@ -117,7 +117,7 @@ func Test_extractValueForTable(t *testing.T) {
 				map[string]interface{}{"person": "Daniel"},
 				map[string]interface{}{"cats": 23},
 				map[string]interface{}{"diagnosis": "cat problem"},
-			}, "dynamic"},
+			}, kustoTypeDynamic},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
 			rowValKind:   datasource.RowValue_TYPE_STRING,
@@ -127,7 +127,7 @@ func Test_extractValueForTable(t *testing.T) {
 		},
 		{
 			name:         "should extract int (32) as int64",
-			args:         extractValueArgs{json.Number("2147483647"), "int"},
+			args:         extractValueArgs{json.Number("2147483647"), kustoTypeInt},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
 			rowValKind:   datasource.RowValue_TYPE_INT64,
@@ -137,7 +137,7 @@ func Test_extractValueForTable(t *testing.T) {
 		},
 		{
 			name:         "should extract long as int64",
-			args:         extractValueArgs{json.Number("9223372036854775807"), "long"},
+			args:         extractValueArgs{json.Number("9223372036854775807"), kustoTypeLong},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
 			rowValKind:   datasource.RowValue_TYPE_INT64,
@@ -147,7 +147,7 @@ func Test_extractValueForTable(t *testing.T) {
 		},
 		{
 			name:         "should extract real as float64",
-			args:         extractValueArgs{json.Number("1.797693134862315708145274237317043567981e+308"), "real"},
+			args:         extractValueArgs{json.Number("1.797693134862315708145274237317043567981e+308"), kustoTypeReal},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
 			rowValKind:   datasource.RowValue_TYPE_DOUBLE,
@@ -157,7 +157,7 @@ func Test_extractValueForTable(t *testing.T) {
 		},
 		{
 			name:         "should extract timespan as string",
-			args:         extractValueArgs{"00:00:00.0000001", "timespan"},
+			args:         extractValueArgs{"00:00:00.0000001", kustoTypeTimespan},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
 			rowValKind:   datasource.RowValue_TYPE_STRING,
@@ -167,14 +167,14 @@ func Test_extractValueForTable(t *testing.T) {
 		},
 		{
 			name:         "null bool should be null", // all types should be except string, but only bool and string are tested
-			args:         extractValueArgs{nil, "bool"},
+			args:         extractValueArgs{nil, kustoTypeBool},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
 			rowValKind:   datasource.RowValue_TYPE_NULL,
 		},
 		{
 			name:    "null string should be error", // as per documentation, null strings are not supported by Kusto
-			args:    extractValueArgs{nil, "string"},
+			args:    extractValueArgs{nil, kustoTypeString},
 			errorIs: assert.Error,
 		},
 	}
@@ -328,11 +328,11 @@ func TestTableResponse_ToTimeSeries(t *testing.T) {
 						Columns: []Column{
 							Column{
 								ColumnName: "Time",
-								ColumnType: "datetime",
+								ColumnType: kustoTypeDatetime,
 							},
 							Column{
 								ColumnName: "Value",
-								ColumnType: "int",
+								ColumnType: kustoTypeInt,
 							},
 						},
 						Rows: []Row{

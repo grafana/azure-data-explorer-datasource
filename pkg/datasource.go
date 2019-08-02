@@ -17,7 +17,7 @@ type GrafanaAzureDXDatasource struct {
 	logger hclog.Logger
 }
 
-// Query Primary method called by grafana-server
+// Query is the primary method called by grafana-server
 func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
 	response := &datasource.DatasourceResponse{}
 	plugin.logger.Debug("Query", "datasource", tsdbReq.Datasource.Name, "TimeRange", tsdbReq.TimeRange)
@@ -83,7 +83,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			response.Results[idx].MetaJson = string(jB)
 		}
 
-		response.Results[idx].RefId = q.RefId
+		response.Results[idx].RefId = q.GetRefId()
 
 	}
 	return response, nil
