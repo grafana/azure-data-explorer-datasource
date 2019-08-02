@@ -37,21 +37,19 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		if err := qm.Interpolate(); err != nil {
 			return nil, err
 		}
+		tableRes, err := client.KustoRequest(qm.Query)
+		if err != nil {
+			return nil, err
+		}
 		switch qm.Format {
 		case "test":
 			err := client.TestRequest()
 			if err != nil {
-				plugin.logger.Debug("Test Case error", err)
 				return nil, err
 			}
 			return response, nil
 		case "table":
-			plugin.logger.Debug("Query Case: Table")
-			tables, err := client.KustoRequest(qm.Query)
-			if err != nil {
-				return nil, err
-			}
-			gTables, err := tables.ToTables()
+			gTables, err := tableRes.ToTables()
 			if err != nil {
 				return nil, err
 			}
@@ -59,23 +57,13 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 				response.Results = append(response.Results, &datasource.QueryResult{Tables: []*datasource.Table{gTables[0]}})
 			}
 		case "time_series":
-			plugin.logger.Debug("Query Case: Time Series")
-			tables, err := client.KustoRequest(qm.Query)
-			if err != nil {
-				return nil, err
-			}
-			series, err := tables.ToTimeSeries()
+			series, err := tableRes.ToTimeSeries()
 			if err != nil {
 				return nil, err
 			}
 			response.Results = append(response.Results, &datasource.QueryResult{Series: series})
 		case "time_series_adx_series":
-			plugin.logger.Debug("Query Case: Time Series (ADX Series)")
-			tables, err := client.KustoRequest(qm.Query)
-			if err != nil {
-				return nil, err
-			}
-			series, err := tables.ToADXTimeSeries()
+			series, err := tableRes.ToADXTimeSeries()
 			if err != nil {
 				return nil, err
 			}
