@@ -73,7 +73,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		}
 
 		metaData := struct {
-			RawQuery string
+			RawQuery string // RawQuery contains the query after backend query interpolation
 		}{
 			qm.Query.CSL,
 		}

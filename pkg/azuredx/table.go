@@ -86,10 +86,10 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 
 		for colIdx, column := range resTable.Columns { // For column in the table
 			switch column.ColumnType {
-			case "datetime":
+			case kustoTypeDatetime:
 				timeColumnIdx = colIdx
 				timeCount++
-			case "int", "long", "real":
+			case kustoTypeInt, kustoTypeLong, kustoTypeBool:
 				valueColumnIdxs = append(valueColumnIdxs, colIdx)
 				seriesMap[column.ColumnName] = make(map[string]*datasource.TimeSeries)
 			case kustoTypeString, kustoTypeGUID:
@@ -150,7 +150,7 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 
 // ToADXTimeSeries returns Time series for a query that returns an ADX series type.
 // This done by having a query with make_series as the returned type.
-// The time column must be named "Timestamp"
+// The time column must be named "Timestamp".
 // Each Row has:
 // - N Columns for group by items, where each Group by item is a column individual string column
 // - An Array of Values per Aggregation Column
