@@ -57,7 +57,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     let anySeriesFromQuery: any = _.find(dataList, {
       refId: this.target.refId,
     });
-    if (anySeriesFromQuery) {
+    if (anySeriesFromQuery && anySeriesFromQuery.meta) {
       this.lastQuery = anySeriesFromQuery.meta.RawQuery;
     }
   }
@@ -70,6 +70,18 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     if (err.query && err.query.refId && err.query.refId !== this.target.refId) {
       return;
     }
+
+    if ( // Get Kusto Error from Backend
+      err.data &&
+      err.data.results &&
+      err.data.results &&
+      err.data.results[this.target.refId] &&
+      err.data.results[this.target.refId].meta &&
+      err.data.results[this.target.refId].meta.KustoError != "") {
+        this.lastQueryError = err.data.results[this.target.refId].meta.KustoError;
+        return;
+    }
+
 
     if (
       err.error &&

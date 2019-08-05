@@ -19,7 +19,10 @@ type GrafanaAzureDXDatasource struct {
 
 // Query is the primary method called by grafana-server
 func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
-	response := &datasource.DatasourceResponse{}
+	response := &datasource.DatasourceResponse{
+		Results: make([]*datasource.QueryResult, len(tsdbReq.Queries)),
+	}
+
 	plugin.logger.Debug("Query", "datasource", tsdbReq.Datasource.Name, "TimeRange", tsdbReq.TimeRange)
 
 	client, err := azuredx.NewClient(ctx, tsdbReq.GetDatasource(), plugin.logger)
@@ -37,9 +40,23 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		if err := qm.Interpolate(); err != nil {
 			return nil, err
 		}
-		tableRes, err := client.KustoRequest(qm.Query)
+		md := &Metadata{
+			RawQuery: qm.Query.CSL,
+		}
+		qr := &datasource.QueryResult{
+			RefId: q.GetRefId(),
+		}
+		response.Results[idx] = qr
+		var tableRes *azuredx.TableResponse
+		tableRes, md.KustoError, err = client.KustoRequest(qm.Query)
 		if err != nil {
-			return nil, err
+			qr.Error = err.Error()
+			if mdString, jsonErr := md.JSONString(); jsonErr != nil {
+				plugin.logger.Debug("failed to marshal metadata: %v", jsonErr)
+			} else {
+				qr.MetaJson = mdString
+			}
+			continue
 		}
 		switch qm.Format {
 		case "test":
@@ -54,37 +71,45 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 				return nil, err
 			}
 			if len(gTables) > 0 { // TODO(Not sure how to handle multiple tables yet)
-				response.Results = append(response.Results, &datasource.QueryResult{Tables: []*datasource.Table{gTables[0]}})
+				qr.Tables = []*datasource.Table{gTables[0]}
 			}
 		case "time_series":
 			series, err := tableRes.ToTimeSeries()
 			if err != nil {
 				return nil, err
 			}
-			response.Results = append(response.Results, &datasource.QueryResult{Series: series})
+			qr.Series = series
 		case "time_series_adx_series":
 			series, err := tableRes.ToADXTimeSeries()
 			if err != nil {
 				return nil, err
 			}
-			response.Results = append(response.Results, &datasource.QueryResult{Series: series})
+			qr.Series = series
 		default:
 			return nil, fmt.Errorf("unsupported query type: '%v'", qm.QueryType)
 		}
 
-		metaData := struct {
-			RawQuery string // RawQuery contains the query after backend query interpolation
-		}{
-			qm.Query.CSL,
-		}
-		if jB, err := json.Marshal(metaData); err != nil {
+		if mdString, err := md.JSONString(); err != nil {
 			plugin.logger.Debug("could not add metadata") // only log since this is just metadata
 		} else {
-			response.Results[idx].MetaJson = string(jB)
+			if qr.Error == "" {
+				qr.MetaJson = mdString
+			}
 		}
-
-		response.Results[idx].RefId = q.GetRefId()
-
 	}
 	return response, nil
+}
+
+// Metadata holds datasource metadata to send to the frontend
+type Metadata struct {
+	RawQuery   string
+	KustoError string
+}
+
+func (md *Metadata) JSONString() (string, error) {
+	b, err := json.Marshal(md)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }

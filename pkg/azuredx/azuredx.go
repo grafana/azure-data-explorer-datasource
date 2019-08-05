@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -115,33 +114,50 @@ func (c *Client) TestRequest() error {
 }
 
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
-// and returns a TableResponse.
-func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, error) {
+// and returns a TableResponse. If there is a query syntax error, the error message inside
+// the API's JSON error response is returned as well (if available).
+func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, error) {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(payload)
 	c.Log.Debug("Table Request Payload", fmt.Sprintf("%v", payload))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	resp, err := c.Post(c.ClusterURL+"/v1/rest/query", "application/json", &buf)
+	req, err := http.NewRequest(http.MethodPost, c.ClusterURL+"/v1/rest/query", &buf)
 	if err != nil {
-		return nil, err
+		return nil, "", err
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-ms-app", "Grafana ADX Plugin")
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, "", err
 	}
 	err = dumpResponseToFile(resp, "/home/kbrandt/tmp/dumps.log") // TODO Remove
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode > 299 {
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Fatal(err)
+			return nil, "", err
 		}
 		bodyString := string(bodyBytes)
-		return nil, fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
+		if resp.StatusCode == 401 { // 401 does not have a JSON body
+			return nil, "", fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
+		}
+		errorData := &errorResponse{}
+		err = json.Unmarshal(bodyBytes, errorData)
+		if err != nil {
+			c.Log.Debug("failed to unmarshal error body from response: %v", err)
+		}
+		return nil, errorData.Error.Message, fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
 	}
-	return tableFromJSON(resp.Body)
+	tr, err := tableFromJSON(resp.Body)
+	return tr, "", err
 }
 
 func tableFromJSON(rc io.Reader) (*TableResponse, error) {
@@ -157,6 +173,14 @@ func tableFromJSON(rc io.Reader) (*TableResponse, error) {
 		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
 	}
 	return tr, nil
+}
+
+// errorResponse is a minimal structure of Azure Data Explorer's JSON
+// error body,
+type errorResponse struct {
+	Error struct {
+		Message string `json:"@message"`
+	} `json:"error"`
 }
 
 // TODO Temporary
