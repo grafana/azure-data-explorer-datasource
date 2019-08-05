@@ -89,7 +89,7 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 			case kustoTypeDatetime:
 				timeColumnIdx = colIdx
 				timeCount++
-			case kustoTypeInt, kustoTypeLong, kustoTypeBool:
+			case kustoTypeInt, kustoTypeLong, kustoTypeReal:
 				valueColumnIdxs = append(valueColumnIdxs, colIdx)
 				seriesMap[column.ColumnName] = make(map[string]*datasource.TimeSeries)
 			case kustoTypeString, kustoTypeGUID:
