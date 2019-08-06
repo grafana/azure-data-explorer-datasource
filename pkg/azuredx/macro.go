@@ -83,6 +83,9 @@ func timeToMacro(s string, md MacroData) string {
 }
 
 func timeIntervalMacro(s string, md MacroData) string {
+	if md.intervalMS == 0 {
+		md.intervalMS = 1000 // Default of 1000 (millisecond)
+	}
 	return fmt.Sprintf("%vms", md.intervalMS)
 }
 
