@@ -35,8 +35,11 @@ type Column struct {
 
 // ToTables turns a TableResponse into a slice of Tables appropriate for the plugin model.
 func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
-	tables := make([]*datasource.Table, len(tr.Tables))
-	for tableIdx, resTable := range tr.Tables { // Foreach Table in Response
+	tables := []*datasource.Table{}
+	for _, resTable := range tr.Tables { // Foreach Table in Response
+		if resTable.TableName != "Table_0" {
+			continue
+		}
 		t := new(datasource.Table) // New API type table
 		columnTypes := make([]string, len(resTable.Columns))
 
@@ -60,7 +63,7 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 			}
 			t.Rows[rowIdx] = newRow
 		}
-		tables[tableIdx] = t
+		tables = append(tables, t)
 
 	}
 	return tables, nil

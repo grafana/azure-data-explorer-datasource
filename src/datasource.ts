@@ -92,11 +92,9 @@ export class KustoDBDatasource {
         intervalMs: options.intervalMs,
         maxDataPoints: options.maxDataPoints,
         datasourceId: this.id,
-        data: {
-          csl: interpolatedQuery,
-          db: item.database,
-        },
-        format: item.resultFormat,
+        query: interpolatedQuery,
+        database: item.database,
+        resultFormat: item.resultFormat,
         queryType: item.resultFormat,
       };
     });

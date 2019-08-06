@@ -16,7 +16,7 @@ import (
 //   - $__to -> datetime(2018-06-05T20:09:58.907Z)
 //   - $__interval -> 5m
 
-// MacroData contains the information needed
+// MacroData contains the information needed for macro expansion.
 type MacroData struct {
 	*datasource.TimeRange
 	intervalMS int64

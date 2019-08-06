@@ -41,14 +41,17 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			return nil, err
 		}
 		md := &Metadata{
-			RawQuery: qm.Query.CSL,
+			RawQuery: qm.Query,
 		}
 		qr := &datasource.QueryResult{
 			RefId: q.GetRefId(),
 		}
 		response.Results[idx] = qr
 		var tableRes *azuredx.TableResponse
-		tableRes, md.KustoError, err = client.KustoRequest(qm.Query)
+		tableRes, md.KustoError, err = client.KustoRequest(azuredx.RequestPayload{
+			CSL: qm.Query,
+			DB:  qm.Database,
+		})
 		if err != nil {
 			qr.Error = err.Error()
 			mdString, jsonErr := md.JSONString()
@@ -72,9 +75,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 				qr.Error = err.Error()
 				break
 			}
-			if len(gTables) > 0 { // TODO(Not sure how to handle multiple tables yet)
-				qr.Tables = []*datasource.Table{gTables[0]}
-			}
+			qr.Tables = gTables
 		case "time_series":
 			series, err := tableRes.ToTimeSeries()
 			if err != nil {
@@ -90,7 +91,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			}
 			qr.Series = series
 		default:
-			return nil, fmt.Errorf("unsupported query type: '%v'", qm.QueryType)
+			return nil, fmt.Errorf("unsupported query type: '%v'", qm.Format)
 		}
 
 		if qr.MetaJson == "" {

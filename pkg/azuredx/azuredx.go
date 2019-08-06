@@ -20,15 +20,16 @@ import (
 
 // QueryModel contains the query information from the API call that we use to make a query.
 type QueryModel struct {
-	Format    string         `json:"format"`
-	QueryType string         `json:"queryType"`
-	Query     RequestPayload `json:"data"`
+	Format    string `json:"resultFormat"`
+	QueryType string `json:"queryType"`
+	Query     string `json:"query"`
+	Database  string `json:"database"`
 	MacroData MacroData
 }
 
 // Interpolate applys macro expansion on the QueryModel's Payload's Query string
 func (qm *QueryModel) Interpolate() (err error) {
-	qm.Query.CSL, err = qm.MacroData.Interpolate(qm.Query.CSL)
+	qm.Query, err = qm.MacroData.Interpolate(qm.Query)
 	return
 }
 
