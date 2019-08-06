@@ -7,6 +7,7 @@
 - The Kusto "time series" type created with the Kusto `make-series` operator is now supported.
 - Macros have been added so as not to conflict with Grafana's built-in query Macros: `$__timeFrom`, `$__timeTo`, and `$__timeInterval`.
 - Caching of Table and Time Series queries has been removed until backend plugins support caching.
+- Queries no longer have an ORDER by clause appended when there is not one, however if time series is unsorted there will be a warning in the query editor.
 
 ## [1.3.2] - 2019-06-19
 

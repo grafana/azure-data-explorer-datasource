@@ -77,11 +77,12 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			}
 			qr.Tables = gTables
 		case "time_series":
-			series, err := tableRes.ToTimeSeries()
+			series, timeNotASC, err := tableRes.ToTimeSeries()
 			if err != nil {
 				qr.Error = err.Error()
 				break
 			}
+			md.TimeNotASC = timeNotASC
 			qr.Series = series
 		case "time_series_adx_series":
 			series, err := tableRes.ToADXTimeSeries()
@@ -110,6 +111,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 type Metadata struct {
 	RawQuery   string
 	KustoError string
+	TimeNotASC bool
 }
 
 // JSONString performs a json.Marshal on the metadata object and returns the JSON as a string.

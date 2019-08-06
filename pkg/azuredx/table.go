@@ -70,11 +70,13 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 }
 
 // ToTimeSeries turns a TableResponse into a slice of Tables appropriate for the plugin model.
-// Number Columns become a "Metric"
-// String, or things that can become strings that are not a number become a tag
-// There must be one and only one time column
-func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
+// Number Columns become a "Metric".
+// String, or things that can become strings that are not a number become a Tags/Labels.
+// There must be one and only one time column.
+func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, bool, error) {
 	series := []*datasource.TimeSeries{}
+	timeNotASC := false
+
 	for _, resTable := range tr.Tables { // Foreach Table in Response
 		if resTable.TableName != "Table_0" {
 			continue
@@ -84,7 +86,7 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 
 		timeCount := 0
 		timeColumnIdx := 0
-		labelColumnIdxs := []int{} // idx to Label Name
+		labelColumnIdxs := []int{}
 		valueColumnIdxs := []int{}
 
 		for colIdx, column := range resTable.Columns { // For column in the table
@@ -98,28 +100,34 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 			case kustoTypeString, kustoTypeGUID:
 				labelColumnIdxs = append(labelColumnIdxs, colIdx)
 			default:
-				return nil, fmt.Errorf("unsupported type '%v' in response for a time series query: must be datetime, int, long, real, guid, or string", column.ColumnType)
+				return nil, timeNotASC, fmt.Errorf("unsupported type '%v' in response for a time series query: must be datetime, int, long, real, guid, or string", column.ColumnType)
 			}
 		}
 
 		if timeCount != 1 {
-			return nil, fmt.Errorf("expected exactly one column of type datetime in the response but got %v", timeCount)
+			return nil, timeNotASC, fmt.Errorf("expected exactly one column of type datetime in the response but got %v", timeCount)
 		}
 		if len(valueColumnIdxs) < 1 {
-			return nil, fmt.Errorf("did not find a value column, must provide one column of type int, long, or real")
+			return nil, timeNotASC, fmt.Errorf("did not find a value column, must provide one column of type int, long, or real")
 		}
 
-		for _, row := range resTable.Rows {
+		var lastTimeStamp int64
+		for rowIdx, row := range resTable.Rows {
 			if len(row) != len(labelColumnIdxs)+len(valueColumnIdxs)+1 {
-				return nil, fmt.Errorf("unexpected number of rows in response")
+				return nil, timeNotASC, fmt.Errorf("unexpected number of rows in response")
 			}
 			timeStamp, err := extractTimeStamp(row[timeColumnIdx])
 			if err != nil {
-				return nil, err
+				return nil, timeNotASC, err
+			}
+			if rowIdx == 0 {
+				lastTimeStamp = timeStamp
+			} else if lastTimeStamp > timeStamp {
+				timeNotASC = true
 			}
 			labels, err := labelMaker(resTable.Columns, row, labelColumnIdxs)
 			if err != nil {
-				return nil, err
+				return nil, false, err
 			}
 			for _, valueIdx := range valueColumnIdxs {
 				colName := resTable.Columns[valueIdx].ColumnName
@@ -133,7 +141,7 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 				}
 				val, err := extractJSONNumberAsFloat(row[valueIdx])
 				if err != nil {
-					return nil, err
+					return nil, false, err
 				}
 				series.Points = append(series.Points, &datasource.Point{Timestamp: timeStamp, Value: val})
 			}
@@ -148,7 +156,7 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, error) {
 
 	}
 
-	return series, nil
+	return series, timeNotASC, nil
 }
 
 // ToADXTimeSeries returns Time series for a query that returns an ADX series type.

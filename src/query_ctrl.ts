@@ -29,6 +29,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   showLastQuery: boolean;
   lastQuery: string;
   lastQueryError?: string;
+  timeNotASC: boolean;
   databases: DatabaseItem[];
 
   /** @ngInject **/
@@ -53,12 +54,14 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   onDataReceived(dataList) {
     this.lastQueryError = undefined;
     this.lastQuery = '';
+    this.timeNotASC = false;
 
     let anySeriesFromQuery: any = _.find(dataList, {
       refId: this.target.refId,
     });
     if (anySeriesFromQuery && anySeriesFromQuery.meta) {
       this.lastQuery = anySeriesFromQuery.meta.RawQuery;
+      this.timeNotASC = anySeriesFromQuery.meta.TimeNotASC;
     }
   }
 

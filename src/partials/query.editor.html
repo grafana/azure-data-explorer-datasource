@@ -107,4 +107,8 @@
   <div class="gf-form" ng-show="ctrl.lastQueryError">
     <pre class="gf-form-pre alert alert-error">{{ctrl.lastQueryError}}</pre>
   </div>
+
+  <div class="gf-form" ng-show="ctrl.timeNotASC">
+    <pre class="gf-form-pre alert alert-warning">Data is not sorted ascending by Time. Recommend adding an order by clause.</pre>
+  </div>
 </query-editor-row>
