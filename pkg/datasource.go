@@ -51,11 +51,12 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		tableRes, md.KustoError, err = client.KustoRequest(qm.Query)
 		if err != nil {
 			qr.Error = err.Error()
-			if mdString, jsonErr := md.JSONString(); jsonErr != nil {
-				plugin.logger.Debug("failed to marshal metadata: %v", jsonErr)
-			} else {
-				qr.MetaJson = mdString
+			mdString, jsonErr := md.JSONString()
+			if jsonErr != nil {
+				plugin.logger.Debug("failed to marshal metadata", jsonErr)
+				continue
 			}
+			qr.MetaJson = mdString
 			continue
 		}
 		switch qm.Format {
@@ -68,7 +69,8 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		case "table":
 			gTables, err := tableRes.ToTables()
 			if err != nil {
-				return nil, err
+				qr.Error = err.Error()
+				break
 			}
 			if len(gTables) > 0 { // TODO(Not sure how to handle multiple tables yet)
 				qr.Tables = []*datasource.Table{gTables[0]}
@@ -76,25 +78,28 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		case "time_series":
 			series, err := tableRes.ToTimeSeries()
 			if err != nil {
-				return nil, err
+				qr.Error = err.Error()
+				break
 			}
 			qr.Series = series
 		case "time_series_adx_series":
 			series, err := tableRes.ToADXTimeSeries()
 			if err != nil {
-				return nil, err
+				qr.Error = err.Error()
+				break
 			}
 			qr.Series = series
 		default:
 			return nil, fmt.Errorf("unsupported query type: '%v'", qm.QueryType)
 		}
 
-		if mdString, err := md.JSONString(); err != nil {
-			plugin.logger.Debug("could not add metadata") // only log since this is just metadata
-		} else {
-			if qr.Error == "" {
-				qr.MetaJson = mdString
+		if qr.MetaJson == "" {
+			mdString, err := md.JSONString()
+			if err != nil {
+				plugin.logger.Debug("could not add metadata", err) // only log since this is just metadata
+				continue
 			}
+			qr.MetaJson = mdString
 		}
 	}
 	return response, nil
@@ -106,6 +111,7 @@ type Metadata struct {
 	KustoError string
 }
 
+// JSONString performs a json.Marshal on the metadata object and returns the JSON as a string.
 func (md *Metadata) JSONString() (string, error) {
 	b, err := json.Marshal(md)
 	if err != nil {

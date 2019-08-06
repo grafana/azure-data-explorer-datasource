@@ -119,7 +119,6 @@ func (c *Client) TestRequest() error {
 func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, error) {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(payload)
-	c.Log.Debug("Table Request Payload", fmt.Sprintf("%v", payload))
 	if err != nil {
 		return nil, "", err
 	}
