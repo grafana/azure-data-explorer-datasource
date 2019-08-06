@@ -295,6 +295,8 @@ func TestTableResponse_ToTimeSeries(t *testing.T) {
 		testFile              string // use either file or table, not both
 		testTable             *TableResponse
 		errorIs               assert.ErrorAssertionFunc
+		unsortedIs            assert.ComparisonAssertionFunc
+		unsorted              bool
 		seriesCountIs         assert.ComparisonAssertionFunc
 		seriesCount           int
 		perSeriesValueCountIs assert.ComparisonAssertionFunc
@@ -304,6 +306,8 @@ func TestTableResponse_ToTimeSeries(t *testing.T) {
 			name:                  "should load multiple values and multiple labels",
 			testFile:              "multi_label_multi_value_time_table.json",
 			errorIs:               assert.NoError,
+			unsortedIs:            assert.Equal,
+			unsorted:              false,
 			seriesCountIs:         assert.Equal,
 			seriesCount:           8,
 			perSeriesValueCountIs: assert.Equal,
@@ -360,11 +364,12 @@ func TestTableResponse_ToTimeSeries(t *testing.T) {
 				}
 			}
 
-			series, err := respTable.ToTimeSeries()
+			series, sorted, err := respTable.ToTimeSeries()
 			tt.errorIs(t, err)
 			if err != nil {
 				return
 			}
+			tt.unsortedIs(t, sorted, tt.unsorted)
 			tt.seriesCountIs(t, tt.seriesCount, len(series))
 			for _, s := range series {
 				tt.perSeriesValueCountIs(t, tt.perSeriesValueCount, len(s.Points))
