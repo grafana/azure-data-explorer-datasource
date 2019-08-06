@@ -95,7 +95,6 @@ export class KustoDBDatasource {
         query: interpolatedQuery,
         database: item.database,
         resultFormat: item.resultFormat,
-        queryType: item.resultFormat,
       };
     });
 
@@ -173,15 +172,14 @@ export class KustoDBDatasource {
               intervalMs: 1,
               maxDataPoints: 1,
               datasourceId: this.id,
-              rawQuery: '',
-              format: 'table',
-              queryType: 'test'
+              query: '.show databases',
+              resultFormat: 'test',
             },
           ],
         },
       })
       .then((res: any) => {
-        return { status: 'success', message: 'Nutes' };
+        return { status: 'success', message: 'Connection Successful' };
       })
       .catch((err: any) => {
         console.log(err);

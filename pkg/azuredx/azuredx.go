@@ -8,8 +8,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"net/http/httputil"
-	"os"
 
 	"golang.org/x/oauth2/microsoft"
 
@@ -135,10 +133,6 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, e
 	if err != nil {
 		return nil, "", err
 	}
-	err = dumpResponseToFile(resp, "/home/kbrandt/tmp/dumps.log") // TODO Remove
-	if err != nil {
-		return nil, "", err
-	}
 	defer resp.Body.Close()
 	if resp.StatusCode > 299 {
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -181,23 +175,4 @@ type errorResponse struct {
 	Error struct {
 		Message string `json:"@message"`
 	} `json:"error"`
-}
-
-// TODO Temporary
-func dumpResponseToFile(resp *http.Response, filename string) error {
-	dump, err := httputil.DumpResponse(resp, true)
-	if err != nil {
-		return err
-	}
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	if _, err = f.Write(dump); err != nil {
-		return err
-	}
-	return nil
 }
