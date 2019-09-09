@@ -31,7 +31,7 @@
       }
     ],
     "screenshots": [],
-    "version": "1.3.2",
+    "version": "2.0.0",
     "updated": "2019-06-19"
   },
   "routes": [
@@ -61,5 +61,8 @@
     "plugins": []
   },
   "metrics": true,
-  "annotations": true
+  "annotations": true,
+  "backend": true,
+  "executable": "grafana-azure-data-explorer-datasource",
+  "alerting": true
 }

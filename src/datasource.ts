@@ -29,52 +29,41 @@ export class KustoDBDatasource {
     this.requestAggregatorSrv = new RequestAggregator(backendSrv);
   }
 
+  // query uses the backend plugin route.
   query(options) {
     const queries = _.filter(options.targets, item => {
-      return (
-        item.hide !== true &&
-        item.query &&
-        item.query.indexOf('<table name>') === -1
-      );
-    }).map(target => {
-      const url = `${this.baseUrl}/v1/rest/query`;
-      const interpolatedQuery = new QueryBuilder(
-        this.templateSrv.replace(
-          target.query,
-          options.scopedVars,
-          this.interpolateVariable,
-        ),
-        options,
-      ).interpolate().query;
+      return item.hide !== true;
+    }).map(item => {
+      var interpolatedQuery = new QueryBuilder(
+        this.templateSrv.replace(item.query, options.scopedVars, this.interpolateVariable),
+        options).interpolate().query;
 
       return {
-        key: `${url}-${options.intervalMs}-${options.maxDataPoints}-${
-          options.format
-        }-${target.resultFormat}-${interpolatedQuery}`,
-        refId: target.refId,
+        refId: item.refId,
         intervalMs: options.intervalMs,
         maxDataPoints: options.maxDataPoints,
         datasourceId: this.id,
-        url: url,
         query: interpolatedQuery,
-        format: options.format,
-        resultFormat: target.resultFormat,
-        data: {
-          csl: interpolatedQuery,
-          db: target.database,
-        },
+        database: item.database,
+        resultFormat: item.resultFormat,
       };
     });
 
-    if (!queries || queries.length === 0) {
-      return { data: [] };
+    if (queries.length === 0) {
+      return this.$q.when({ data: [] });
     }
 
-    const promises = this.doQueries(queries);
-
-    return this.$q.all(promises).then(results => {
-      return new ResponseParser().parseQueryResult(results);
-    });
+    return this.backendSrv
+      .datasourceRequest({
+        url: '/api/tsdb/query',
+        method: 'POST',
+        data: {
+          from: options.range.from.valueOf().toString(),
+          to: options.range.to.valueOf().toString(),
+          queries: queries,
+        },
+      })
+      .then(new ResponseParser().processQueryResult);
   }
 
   annotationQuery(options) {
@@ -121,92 +110,35 @@ export class KustoDBDatasource {
   }
 
   testDatasource() {
-    return this.testDatasourceConnection()
-      .then(() => this.testDatasourceAccess())
-      .catch(error => {
-        return {
-          status: 'error',
-          message:
-            error.message + ' Connection to database could not be established.',
-        };
-      });
-  }
-
-  testDatasourceConnection() {
-    const url = `${this.baseUrl}/v1/rest/mgmt`;
-    const req = {
-      csl: '.show databases',
-    };
-    return this.doRequest(url, req)
-      .then(response => {
-        if (response.status === 200) {
-          return {
-            status: 'success',
-            message: 'Successfully queried the Azure Data Explorer database.',
-            title: 'Success',
-          };
-        }
-
-        return {
-          status: 'error',
-          message: 'Returned http status code ' + response.status,
-        };
+    return this.backendSrv
+      .datasourceRequest({
+        url: '/api/tsdb/query',
+        method: 'POST',
+        data: {
+          from: '5m',
+          to: 'now',
+          queries: [
+            {
+              refId: 'A',
+              intervalMs: 1,
+              maxDataPoints: 1,
+              datasourceId: this.id,
+              query: '.show databases',
+              resultFormat: 'test',
+            },
+          ],
+        },
       })
-      .catch(error => {
-        let message = 'Azure Data Explorer: ';
-        message += error.statusText ? error.statusText + ': ' : '';
-
-        if (error.data && error.data.Message) {
-          message += error.data.Message;
-        } else if (error.data) {
-          message += error.data;
-        } else {
-          message += 'Cannot connect to the Azure Data Explorer REST API.';
-        }
-        return {
-          status: 'error',
-          message: message,
-        };
-      });
-  }
-
-  testDatasourceAccess() {
-    const url = `${this.baseUrl}/v1/rest/mgmt`;
-    const req = {
-      csl: '.show databases schema',
-    };
-    return this.doRequest(url, req)
-      .then(response => {
-        if (response.status === 200) {
-          return {
-            status: 'success',
-            message: 'Successfully queried the Azure Data Explorer database.',
-            title: 'Success',
-          };
-        }
-
-        return {
-          status: 'error',
-          message: 'Returned http status code ' + response.status,
-        };
+      .then((res: any) => {
+        return { status: 'success', message: 'Connection Successful' };
       })
-      .catch(error => {
-        let message =
-          'Azure Data Explorer: Cannot read database schema from REST API. ';
-        message += error.statusText ? error.statusText + ': ' : '';
-
-        if (error.data && error.data.error && error.data.error['@message']) {
-          message += error.data.error && error.data.error['@message'];
-        } else if (error.data) {
-          message += JSON.stringify(error.data);
+      .catch((err: any) => {
+        console.log(err);
+        if (err.data && err.data.message) {
+          return { status: 'error', message: err.data.message };
         } else {
-          message +=
-            'Cannot read database schema from Azure Data Explorer REST API.';
+          return { status: 'error', message: err.status };
         }
-        return {
-          status: 'error',
-          message: message,
-        };
       });
   }
 

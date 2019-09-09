@@ -21,31 +21,32 @@ export default class QueryBuilder {
 
     // if query or annotation query
     if (this.options) {
-      let timeField = '';
-      query = query.replace(macroRegexp, (match, p1, p2) => {
-        if (p1 === 'timeFilter') {
-          timeField = p2.trim();
-          return this.getTimeFilter(p2, this.options);
-        }
+      //let timeField = '';
+      // TEMP TODO commented out to move timeFilter expansion to backend
+      // query = query.replace(macroRegexp, (match, p1, p2) => {
+      //   if (p1 === 'timeFilter') {
+      //     timeField = p2.trim();
+      //     return this.getTimeFilter(p2, this.options);
+      //   }
 
-        return match;
-      });
-      query = query.replace(/\$__interval/gi, this.options.interval);
-      query = query.replace(/\$__from/gi, this.getFrom(this.options));
-      query = query.replace(/\$__to/gi, this.getUntil(this.options));
+      //   return match;
+      // });
+      // query = query.replace(/\$__interval/gi, this.options.interval);
+      // query = query.replace(/\$__from/gi, this.getFrom(this.options));
+      // query = query.replace(/\$__to/gi, this.getUntil(this.options));
 
-      const orderByRegexp = /order\s+by/gi;
-      if (!orderByRegexp.test(query)) {
-        if (!timeField) {
-          const binRegex = /bin\(([_a-zA-Z0-9]+),/;
-          const match = binRegex.exec(query);
-          timeField = match? match[1]: '';
-        }
+      // const orderByRegexp = /order\s+by/gi;
+      // if (!orderByRegexp.test(query)) {
+      //   if (!timeField) {
+      //     const binRegex = /bin\(([_a-zA-Z0-9]+),/;
+      //     const match = binRegex.exec(query);
+      //     timeField = match? match[1]: '';
+      //   }
 
-        if (timeField) {
-          query += `\n| order by ${timeField} asc`;
-        }
-      }
+      //   if (timeField) {
+      //     query += `\n| order by ${timeField} asc`;
+      //   }
+      // }
     }
 
     return { query };

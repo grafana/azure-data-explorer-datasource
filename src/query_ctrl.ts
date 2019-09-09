@@ -29,6 +29,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   showLastQuery: boolean;
   lastQuery: string;
   lastQueryError?: string;
+  timeNotASC: boolean;
   databases: DatabaseItem[];
 
   /** @ngInject **/
@@ -45,6 +46,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     this.resultFormats = [
       { text: 'Time series', value: 'time_series' },
       { text: 'Table', value: 'table' },
+      { text: 'ADX Time series', value: 'time_series_adx_series' },
     ];
     this.getDatabases();
   }
@@ -52,12 +54,14 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   onDataReceived(dataList) {
     this.lastQueryError = undefined;
     this.lastQuery = '';
+    this.timeNotASC = false;
 
     let anySeriesFromQuery: any = _.find(dataList, {
       refId: this.target.refId,
     });
-    if (anySeriesFromQuery) {
-      this.lastQuery = anySeriesFromQuery.query;
+    if (anySeriesFromQuery && anySeriesFromQuery.meta) {
+      this.lastQuery = anySeriesFromQuery.meta.RawQuery;
+      this.timeNotASC = anySeriesFromQuery.meta.TimeNotASC;
     }
   }
 
@@ -69,6 +73,18 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     if (err.query && err.query.refId && err.query.refId !== this.target.refId) {
       return;
     }
+
+    if ( // Get Kusto Error from Backend
+      err.data &&
+      err.data.results &&
+      err.data.results &&
+      err.data.results[this.target.refId] &&
+      err.data.results[this.target.refId].meta &&
+      err.data.results[this.target.refId].meta.KustoError != "") {
+        this.lastQueryError = err.data.results[this.target.refId].meta.KustoError;
+        return;
+    }
+
 
     if (
       err.error &&

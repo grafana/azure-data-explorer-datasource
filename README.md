@@ -156,46 +156,77 @@ If the command succeeds you should get a result like this:
 
 ## Writing Queries
 
-Queries are written in the new [Kusto Query Language](https://kusdoc2.azurewebsites.net/docs/query/index.html).
+Queries are written in the new [Kusto Query Language](https://docs.microsoft.com/en-us/azure/kusto/query/).
 
-Queries can be formatted as *Time Series* data or as *Table* data.
+Queries can be formatted as *Table*, *Time Series*, or *ADX Time Series* data.
 
-*Time Series* queries are for the Graph Panel (and other panels like the Single Stat panel) and must contain a datetime column, a metric name column and a value column. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
-
-```
-AzureActivity
-| where $__timeFilter(TimeGenerated)
-| summarize count() by Category, bin(TimeGenerated, 1h)
-| order by TimeGenerated asc
-```
+### Table Queries
 
 *Table* queries are mainly used in the Table panel and row a list of columns and rows. This example query returns rows with the 6 specified columns:
 
-```
+```kusto
 AzureActivity
 | where $__timeFilter()
 | project TimeGenerated, ResourceGroup, Category, OperationName, ActivityStatus, Caller
 | order by TimeGenerated desc
 ```
 
-### Macros
+### Time Series Queries
+
+*Time Series* queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
+
+```kusto
+AzureActivity
+| where $__timeFilter(TimeGenerated)
+| summarize count() by Category, bin(TimeGenerated, 1h)
+| order by TimeGenerated asc
+```
+
+The number valued columns are considered metrics and the optional string columns are treated as tags. A time series is returned for each value column + unique set of string column values. Each series has name of valueColumnName {stringColumnName=columnValue, ... }.
+
+For example, the following query will produce series like `AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY}`:
+
+```kusto
+StormEvents
+| where $__timeFilter(StartTime)
+| summarize EventCount=count(), AvgDirectDeaths=avg(DeathsDirect) by EventType, State, bin(StartTime, $__timeInterval)
+| order by StartTime asc
+```
+
+### ADX Time Series Queries
+
+*ADX Time Series* are for queries that use the [Kusto `make-series` operator](https://docs.microsoft.com/en-us/azure/kusto/query/make-seriesoperator). The query must have exactly one datetime column named `Timestamp` and at least one value column. There may also optionally be string columns that will be labels.
+
+Example:
+
+```kusto
+let T = range Timestamp from $__timeFrom to ($__timeTo + -30m) step 1m
+  | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"]) 
+  | extend   Place  = dynamic(["EU",     "EU",     "US",   "EU"]) 
+  | mvexpand Person, Place
+  | extend   HatInventory = rand(5) 
+  | project  Timestamp, tostring(Person), tostring(Place), HatInventory;
+
+T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timestamp from $__timeFrom to $__timeTo step 1m by Person, Place
+  | extend series_decompose_forecast(AvgHatInventory, 30) | project-away *residual, *baseline, *seasonal
+```
+
+### Time Macros
 
 To make writing queries easier there are two Grafana macros that can be used in the where clause of a query:
 
-- $__timeFilter() - Expands to `TimeGenerated ≥ datetime(2018-06-05T18:09:58.907Z) and TimeGenerated ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
-- $__timeFilter(datetimeColumn) - Expands to `datetimeColumn ≥ datetime(2018-06-05T18:09:58.907Z) and datetimeColumn ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
+- `$__timeFilter()` - Expands to `TimeGenerated ≥ datetime(2018-06-05T18:09:58.907Z) and TimeGenerated ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
+- `$__timeFilter(datetimeColumn)` - Expands to `datetimeColumn ≥ datetime(2018-06-05T18:09:58.907Z) and datetimeColumn ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
+- `$__timeFrom` - Expands to `datetime(2018-06-05T18:09:58.907Z)`, the start time of the query.
+- `$__timeTo` - expands to `datetime(2018-06-05T20:09:58.907Z)`, the end time of the query.
+- `$__timeInterval` - expands to `5000ms`, Grafana's recommended bin size based on the timespan of the query, in milliseconds. In alerting this will always be `1000ms`, it is recommended not to use this macro in alert queries.
+
+### Templating Macros
+
 - `$__escapeMulti($myVar)` - is to be used with multi-value template variables that contains illegal characters. If $myVar has the value  `'\\grafana-vm\Network(eth0)\Total','\\hello!'`, it expands to: `@'\\grafana-vm\Network(eth0)\Total', @'\\hello!'`. If using single value variables there no need for this macro, simply escape the variable inline instead - `@'\$myVar'`
-- `$__contains(colName, $myVar)` - is to be used with multi-value template variables. If $myVar has the value `'value1','value2'`, it expands to: `colName in ('value1','value2')`. 
-    
+- `$__contains(colName, $myVar)` - is to be used with multi-value template variables. If $myVar has the value `'value1','value2'`, it expands to: `colName in ('value1','value2')`.
+
      If using the `All` option, then check the `Include All Option` checkbox and in the `Custom all value` field type in the following value: `all`. If $myVar has value `all` then the macro will instead expand to `1 == 1`. For template variables with a lot of options, this will increase the query performance by not building a large where..in clause.
-
-### Built-in Variables
-
-There are also some Grafana variables that can be used in queries:
-
-- **$__from** - Returns the From datetime from the Grafana picker. Example: datetime(2018-06-05T18:09:58.907Z).
-- **$__to** - Returns the From datetime from the Grafana picker. Example: datetime(2018-06-05T20:09:58.907Z).
-- **$__interval** - Grafana calculates the minimum time grain that can be used to group by time in queries. More details on how it works here. It returns a time grain like 5m or 1h that can be used in the bin function. E.g. `summarize count() by bin(TimeGenerated, $__interval)`
 
 ## Templating with Variables
 
@@ -243,21 +274,6 @@ MyLogs
 | project Timestamp, Text=Message , Tags="tag1,tag2"
 ```
 
-### CHANGELOG
+## CHANGELOG
 
-#### v1.3.0
-
-- Adds an order by clause to the query if there is none specified. It uses the datetime field from the where clause or summarize...bin().
-- Removes the Subscription Id field from the config page as is no longer needed.
-
-#### v1.2.0
-
-Adds a config option for caching. The default in-memory cache period is 30 seconds, the new `Minimal Cache Period` option allows you to change that.
-
-#### v1.1.0
-
-Adds $__escapeMulti macro
-
-#### v1.0.0
-
-First version of the Azure Data Explorer Datasource.
+See the [Changelog](./CHANGELOG.md).
