@@ -156,7 +156,7 @@ If the command succeeds you should get a result like this:
 
 ## Writing Queries
 
-Queries are written in the new [Kusto Query Language](https://kusdoc2.azurewebsites.net/docs/query/index.html).
+Queries are written in the new [Kusto Query Language](https://docs.microsoft.com/en-us/azure/kusto/query/).
 
 Queries can be formatted as *Table*, *Time Series*, or *ADX Time Series* data.
 
