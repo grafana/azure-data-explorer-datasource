@@ -7,7 +7,7 @@ test:
 	go tool cover -html=coverage/cover.out -o coverage/coverage.html
 
 vendor:
-	go mod vendor
+	GO111MODULE=on go mod vendor
 
 test-in-docker: build-container
 	docker run --rm \
@@ -57,3 +57,5 @@ build-container:
 
 build-container-rebuild:
 	docker build --tag plugin-builder --no-cache=true .
+
+.PHONY: vendor
