@@ -73,6 +73,7 @@ export default class KustoCodeEditor {
     if (monaco.editor.getModels().length === 1) {
       this.completionItemProvider = monaco.languages.registerCompletionItemProvider('kusto', {
         triggerCharacters: ['.', ' '],
+        // @ts-ignore
         provideCompletionItems: this.getCompletionItems.bind(this),
       });
 
