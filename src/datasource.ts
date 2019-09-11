@@ -14,12 +14,7 @@ export class KustoDBDatasource {
   requestAggregatorSrv: RequestAggregator;
 
   /** @ngInject */
-  constructor(
-    instanceSettings,
-    private backendSrv,
-    private $q,
-    private templateSrv,
-  ) {
+  constructor(instanceSettings, private backendSrv, private $q, private templateSrv) {
     this.name = instanceSettings.name;
     this.id = instanceSettings.id;
     this.baseUrl = `/azuredataexplorer`;
@@ -36,7 +31,8 @@ export class KustoDBDatasource {
     }).map(item => {
       var interpolatedQuery = new QueryBuilder(
         this.templateSrv.replace(item.query, options.scopedVars, this.interpolateVariable),
-        options).interpolate().query;
+        options
+      ).interpolate().query;
 
       return {
         refId: item.refId,
@@ -73,19 +69,12 @@ export class KustoDBDatasource {
       });
     }
 
-    const queries: any[] = this.buildQuery(
-      options.annotation.rawQuery,
-      options,
-      options.annotation.database,
-    );
+    const queries: any[] = this.buildQuery(options.annotation.rawQuery, options, options.annotation.database);
 
     const promises = this.doQueries(queries);
 
     return this.$q.all(promises).then(results => {
-      const annotations = new ResponseParser().transformToAnnotations(
-        options,
-        results,
-      );
+      const annotations = new ResponseParser().transformToAnnotations(options, results);
       return annotations;
     });
   }
@@ -204,10 +193,7 @@ export class KustoDBDatasource {
   }
 
   private buildQuery(query: string, options: any, database: string) {
-    const queryBuilder = new QueryBuilder(
-      this.templateSrv.replace(query, {}, this.interpolateVariable),
-      options,
-    );
+    const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, {}, this.interpolateVariable), options);
     const url = `${this.baseUrl}/v1/rest/query`;
     const csl = queryBuilder.interpolate().query;
     const queries: any[] = [];
