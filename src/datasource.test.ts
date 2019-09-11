@@ -17,12 +17,7 @@ describe('KustoDBDatasource', () => {
       jsonData: {},
     };
 
-    ctx.ds = new KustoDBDatasource(
-      ctx.instanceSettings,
-      ctx.backendSrv,
-      ctx.$q,
-      ctx.templateSrv,
-    );
+    ctx.ds = new KustoDBDatasource(ctx.instanceSettings, ctx.backendSrv, ctx.$q, ctx.templateSrv);
   });
 
   describe('when performing getDatabases', () => {
@@ -177,9 +172,7 @@ describe('KustoDBDatasource', () => {
         }
       };
 
-      queryResults = await ctx.ds.metricFindQuery(
-        'Activity | distinct Category',
-      );
+      queryResults = await ctx.ds.metricFindQuery('Activity | distinct Category');
     });
 
     it('should return a list of categories in the correct format', () => {
@@ -205,10 +198,7 @@ describe('KustoDBDatasource', () => {
             { ColumnName: 'Text', DataType: 'String', ColumnType: 'string' },
             { ColumnName: 'Tags', DataType: 'String', ColumnType: 'string' },
           ],
-          Rows: [
-            ['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'],
-            ['2018-06-02T20:28:00Z', 'Computer2', 'tag2'],
-          ],
+          Rows: [['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'], ['2018-06-02T20:28:00Z', 'Computer2', 'tag2']],
         },
       ],
     };
@@ -259,8 +249,7 @@ describe('KustoDBDatasource', () => {
 
       annotationResults = await ctx.ds.annotationQuery({
         annotation: {
-          rawQuery:
-            'Heartbeat | where $__timeFilter()| project TimeGenerated, Text=Computer, tags="test"',
+          rawQuery: 'Heartbeat | where $__timeFilter()| project TimeGenerated, Text=Computer, tags="test"',
           database: 'Grafana',
         },
         range: {
@@ -310,9 +299,7 @@ describe('KustoDBDatasource', () => {
       try {
         ctx.ds.getCacheTtl(ctx.instanceSettings);
       } catch (err) {
-        expect(err.message).toContain(
-          'Minimal cache must be greater than or equal to 1.',
-        );
+        expect(err.message).toContain('Minimal cache must be greater than or equal to 1.');
       }
     });
   });

@@ -1,24 +1,11 @@
 {
-  "compileOnSave": false,
+  "extends": "./node_modules/@grafana/toolkit/src/config/tsconfig.plugin.json",
+  "include": ["src", "types"],
   "compilerOptions": {
-    "target": "es5",
-    "module": "esnext",
-    "rootDir": "./src",
-    "lib": ["dom", "es6"],
-    "declaration": false,
-    "allowSyntheticDefaultImports": true,
-    "inlineSourceMap": false,
-    "sourceMap": true,
-    "noEmitOnError": false,
-    "emitDecoratorMetadata": false,
-    "experimentalDecorators": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": false,
-    "noImplicitUseStrict": false,
     "noImplicitAny": false,
-    "noUnusedLocals": true,
-    "strictNullChecks": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-  },
+    "strictPropertyInitialization": false,
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "typeRoots": ["./node_modules/@types"]
+  }
 }

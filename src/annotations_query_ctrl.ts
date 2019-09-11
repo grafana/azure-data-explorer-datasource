@@ -18,12 +18,15 @@ export class KustoDBAnnotationsQueryCtrl {
       return this.databases;
     }
 
-    return this.datasource.getDatabases().then(list => {
-      this.databases = list;
-      if (list.length > 0 && !this.annotation.database) {
-        this.annotation.database = list[0].value;
-      }
-      return this.databases;
-    }).catch(() => {});
+    return this.datasource
+      .getDatabases()
+      .then(list => {
+        this.databases = list;
+        if (list.length > 0 && !this.annotation.database) {
+          this.annotation.database = list[0].value;
+        }
+        return this.databases;
+      })
+      .catch(() => {});
   }
 }

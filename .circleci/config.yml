@@ -2,91 +2,214 @@ version: 2
 
 aliases:
   # Workflow filters
-  - &filter-only-release
-    branches:
-      ignore: /.*/
-    tags:
-      only: /^v[0-9]+(\.[0-9]+){2}(-.+|[^-.]*)$/
-  - &filter-not-release-or-master
-    tags:
-      ignore: /^v[0-9]+(\.[0-9]+){2}(-.+|[^-.]*)$/
-    branches:
-      ignore: master
   - &filter-only-master
     branches:
       only: master
 
 defaults: &defaults
-  working_directory: ~/azure-data-explorer-datasource
+  working_directory: ~/plugin
   docker:
     - image: circleci/node:10.16.0-stretch
 
 jobs:
-  build:
+  build_plugin:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
-      - run:
-          name: Build
-          command: |
-            yarn install --pure-lockfile --no-progress
-            yarn build
-            sudo apt-get install jq
-            VERSION=`cat src/plugin.json|jq '.info.version'| sed s/\"//g`
-            # create zip file
-            cd ~
-            echo "Creating ZIP"
-            zip \
-              -x azure-data-explorer-datasource/.git/**\* \
-              -x azure-data-explorer-datasource/node_modules/**\* \
-              -r /tmp/azure-data-explorer-datasource-${VERSION}.zip \
-              azure-data-explorer-datasource
-            # create tar file
-            echo "Creating TAR"
-            tar \
-              --exclude .git \
-              --exclude azure-data-explorer-datasource/node_modules \
-              -cvf /tmp/azure-data-explorer-datasource-${VERSION}.tar \
-              azure-data-explorer-datasource
-            gzip /tmp/azure-data-explorer-datasource-${VERSION}.tar
-            # create artifacts
-            mkdir -p ~/azure-data-explorer-datasource/artifacts
-            mv /tmp/azure-data-explorer-datasource-${VERSION}.zip ~/azure-data-explorer-datasource/artifacts/
-            mv /tmp/azure-data-explorer-datasource-${VERSION}.tar.gz ~/azure-data-explorer-datasource/artifacts/
-          no_output_timeout: 5m
-      - save_cache:
-          name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
-      - persist_to_workspace:
-          root: .
-          paths:
-            - artifacts
-            - dist
-      - store_artifacts:
-          path: artifacts
-      - store_artifacts:
-          path: dist
+    - checkout
+    - restore_cache:
+        keys:
+        - yarn-packages-{{ checksum "yarn.lock" }}
+    - run:
+        name: Install yarn
+        command: |
+          sudo npm install -g yarn --quiet
+          yarn install --pure-lockfile
+    - run:
+        name: Run Toolkit Build
+        command: npx grafana-toolkit plugin:ci-build
+    - save_cache:
+        paths:
+        - node_modules
+        key: yarn-packages-{{ checksum "yarn.lock" }}
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci
 
-  test:
+  build_docs:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
-      - run:
-          name: Test
-          command: |
-            yarn install --pure-lockfile --no-progress
-            sudo npm install -g jest
-            yarn test
-      - store_artifacts:
-          path: coverage
+    - checkout
+    - restore_cache:
+        keys:
+        - yarn-packages-{{ checksum "yarn.lock" }}
+    - run:
+        name: Install yarn
+        command: |
+          sudo npm install -g yarn --quiet
+          yarn install --pure-lockfile
+          mkdir ci # Avoid error if not exists
+    - run:
+        name: Build Docs
+        command: npx grafana-toolkit plugin:ci-docs
+    - save_cache:
+        paths:
+        - node_modules
+        key: yarn-packages-{{ checksum "yarn.lock" }}
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci
+
+  build_linux:
+    <<: *defaults
+    docker:
+      - image: circleci/golang:1.12.9-buster
+    steps:
+    - checkout
+    - run:
+        name: Build Linux
+        command: |
+          mkdir -p ./ci/jobs/build_linux
+          go build \
+            -o ./ci/jobs/build_linux/grafana-azure-data-explorer-datasource_linux_amd64 \
+            -a -tags netgo -ldflags '-w' \
+            ./pkg
+          ls -l ./ci/jobs/build_linux/
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/build_linux
+
+  build_osx:
+    <<: *defaults
+    docker:
+      - image: circleci/golang:1.12.9-buster
+    steps:
+    - checkout
+    - run:
+        name: Build OSX
+        command: |
+          mkdir -p ./ci/jobs/build_osx
+          GOOS=darwin GOARCH=amd64 \
+            go build \
+            -o ./ci/jobs/build_osx/grafana-azure-data-explorer-datasource_darwin_amd64 \
+            -a -tags netgo -ldflags '-w' \
+            ./pkg
+          ls -l ./ci/jobs/build_osx/
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/build_osx
+
+  build_win64:
+    <<: *defaults
+    docker:
+      - image: circleci/golang:1.12.9-buster
+    steps:
+    - checkout
+    - run:
+        name: Build Windows
+        command: |
+          mkdir -p ./ci/jobs/build_win64
+          CGO_ENABLED=1 GOOS=windows \
+          go build \
+            -o ./ci/jobs/build_win64/grafana-azure-data-explorer-datasource_windows_amd64.exe \
+            -a -tags netgo -ldflags '-w' \
+            ./pkg
+          ls -l ./ci/jobs/build_win64/
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/build_win64
+
+  package:
+    <<: *defaults
+    steps:
+    - checkout
+    - attach_workspace:
+        at: .
+    - restore_cache:
+        keys:
+        - yarn-packages-{{ checksum "yarn.lock" }}
+    - run:
+        name: Package Distribution
+        command: |
+          ls -l ci
+          ls -l ci/jobs
+          ls -l ci/jobs/build_linux
+          ls -l ci/jobs/build_osx
+          ls -l ci/jobs/build_win64
+          ls -l ci/jobs/build_plugin
+          ls -l ci/jobs/build_plugin/dist
+          cp ci/jobs/build_linux/* ci/jobs/build_plugin/dist
+          cp ci/jobs/build_osx/* ci/jobs/build_plugin/dist
+          cp ci/jobs/build_win64/* ci/jobs/build_plugin/dist
+          ls -l ci/jobs/build_plugin/dist
+          npx grafana-toolkit plugin:ci-package
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci
+    - store_artifacts:
+        path: ci/packages
+
+  test_integration:
+    <<: *defaults
+    docker:
+    - image: circleci/node:10-browsers
+    steps:
+    - checkout
+    - attach_workspace:
+        at: .
+    - restore_cache:
+        keys:
+        - yarn-packages-{{ checksum "yarn.lock" }}
+    - run:
+        name: Setup Grafana (local install)
+        command: |
+          wget https://dl.grafana.com/oss/release/grafana_6.3.4_amd64.deb
+          sudo apt-get install -y adduser libfontconfig1
+          sudo dpkg -i grafana_6.3.4_amd64.deb
+          sudo apt-get install locate
+          sudo updatedb
+          sudo locate grafana
+          sudo cat /etc/grafana/grafana.ini
+          sudo echo ------------------------
+          sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
+          sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
+          sudo service grafana-server start
+          sudo grafana-cli --version
+    - run:
+        name: Run e2e tests
+        command: |
+          npx grafana-toolkit plugin:ci-test
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/test_integration
+    - store_test_results:
+        path: ci/jobs/test_integration
+    - store_artifacts:
+        path: ci/jobs/test_integration
+
+  report:
+    <<: *defaults
+    steps:
+    - checkout
+    - attach_workspace:
+        at: .
+    - restore_cache:
+        keys:
+        - yarn-packages-{{ checksum "yarn.lock" }}
+    - run:
+        name: Toolkit Report
+        command: |
+          # skipped - S3 permission issue
+          # npx grafana-toolkit plugin:ci-report
+    - store_artifacts:
+        path: ci
+
 
   publish-github-release:
     working_directory: ~/azure-data-explorer-datasource
@@ -96,15 +219,16 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "8b:32:8f:12:97:64:cc:a9:43:9c:5b:c2:9f:66:bd:55"
+            - "2b:a0:7a:01:46:fe:ff:e3:c0:e5:87:4a:d3:7a:fa:a4"
       - attach_workspace:
           at: .
       - run:
           name: "Publish Release on GitHub"
           command: |
+            DATASOURCE_NAME=azure-data-explorer-datasource
             apk add --update --no-cache jq
             RELEASE_NOTES=`awk 'BEGIN {FS="##"; RS=""} FNR==3 {print; exit}' CHANGELOG.md`
-            VERSION=`cat src/plugin.json|jq '.info.version'| sed s/\"//g`
+            VERSION=`cat dist/plugin.json|jq '.info.version'| sed s/\"//g`
             ls -al
             ls -al ./artifacts
             git config user.email "eng@grafana.com"
@@ -121,38 +245,41 @@ jobs:
               -u ${CIRCLE_PROJECT_USERNAME} \
               -r ${CIRCLE_PROJECT_REPONAME} \
               -c ${CIRCLE_SHA1} \
-              -n "azure-data-explorer-datasource v${VERSION}" \
+              -n "${DATASOURCE_NAME} v${VERSION}" \
               -b "${RELEASE_NOTES}" \
               -delete \
               v${VERSION} \
               ./artifacts/
 
+
 workflows:
   version: 2
-  build-master:
+  plugin_workflow:
     jobs:
-      - build:
-          filters: *filter-only-master
-      - test:
-          requires:
-            - build
-          filters: *filter-only-master
-      - approve-release:
-          type: approval
-          requires:
-            - build
-            - test
-          filters: *filter-only-master
-      - publish-github-release:
-          requires:
-            - approve-release
-          filters: *filter-only-master
-
-  build-branches-and-prs:
-    jobs:
-      - build:
-          filters: *filter-not-release-or-master
-      - test:
-          requires:
-            - build
-          filters: *filter-not-release-or-master
+    - build_plugin
+    - build_linux
+    - build_osx
+    - build_win64
+    - build_docs
+    - package:
+        requires:
+        - build_plugin
+        - build_linux
+        - build_osx
+        - build_win64
+        - build_docs
+    - test_integration:
+        requires:
+        - package
+    - report:
+        requires:
+        - test_integration
+    - approve_release:
+        type: approval
+        requires:
+          - report
+        filters: *filter-only-master
+    - publish_github_release:
+        requires:
+          - approve_release
+        filters: *filter-only-master

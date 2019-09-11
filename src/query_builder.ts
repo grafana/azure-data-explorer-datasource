@@ -28,13 +28,11 @@ export default class QueryBuilder {
       //     timeField = p2.trim();
       //     return this.getTimeFilter(p2, this.options);
       //   }
-
       //   return match;
       // });
       // query = query.replace(/\$__interval/gi, this.options.interval);
       // query = query.replace(/\$__from/gi, this.getFrom(this.options));
       // query = query.replace(/\$__to/gi, this.getUntil(this.options));
-
       // const orderByRegexp = /order\s+by/gi;
       // if (!orderByRegexp.test(query)) {
       //   if (!timeField) {
@@ -42,7 +40,6 @@ export default class QueryBuilder {
       //     const match = binRegex.exec(query);
       //     timeField = match? match[1]: '';
       //   }
-
       //   if (timeField) {
       //     query += `\n| order by ${timeField} asc`;
       //   }

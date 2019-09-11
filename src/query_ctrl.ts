@@ -37,11 +37,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     super($scope, $injector);
 
     _.defaultsDeep(this.target, this.defaults);
-    this.panelCtrl.events.on(
-      'data-received',
-      this.onDataReceived.bind(this),
-      $scope,
-    );
+    this.panelCtrl.events.on('data-received', this.onDataReceived.bind(this), $scope);
     this.panelCtrl.events.on('data-error', this.onDataError.bind(this), $scope);
     this.resultFormats = [
       { text: 'Time series', value: 'time_series' },
@@ -74,27 +70,22 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       return;
     }
 
-    if ( // Get Kusto Error from Backend
+    if (
+      // Get Kusto Error from Backend
       err.data &&
       err.data.results &&
       err.data.results &&
       err.data.results[this.target.refId] &&
       err.data.results[this.target.refId].meta &&
-      err.data.results[this.target.refId].meta.KustoError != "") {
-        this.lastQueryError = err.data.results[this.target.refId].meta.KustoError;
-        return;
+      err.data.results[this.target.refId].meta.KustoError !== ''
+    ) {
+      this.lastQueryError = err.data.results[this.target.refId].meta.KustoError;
+      return;
     }
 
-
-    if (
-      err.error &&
-      err.error.data &&
-      err.error.data.error &&
-      err.error.data.error.innererror
-    ) {
+    if (err.error && err.error.data && err.error.data.error && err.error.data.error.innererror) {
       if (err.error.data.error.innererror.innererror) {
-        this.lastQueryError =
-          err.error.data.error.innererror.innererror.message;
+        this.lastQueryError = err.error.data.error.innererror.innererror.message;
       } else {
         this.lastQueryError = err.error.data.error.innererror['@message'];
       }
@@ -115,8 +106,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     return this.datasource.getDatabases().then(dbs => {
       this.databases = dbs;
       if (dbs.length > 0 && !this.target.database) {
-        this.target.database =
-          this.datasource.defaultOrFirstDatabase || dbs[0].value;
+        this.target.database = this.datasource.defaultOrFirstDatabase || dbs[0].value;
       }
     });
   }

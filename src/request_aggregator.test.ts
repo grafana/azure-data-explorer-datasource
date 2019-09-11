@@ -14,17 +14,14 @@ describe('RequestAggregator', () => {
   describe('when ds request is successful', () => {
     beforeEach(() => {
       requestAggregator = new RequestAggregator({
-        datasourceRequest: async () =>
-          new Promise(resolve => setTimeout(() => resolve(), 100)),
+        datasourceRequest: async () => new Promise(resolve => setTimeout(() => resolve(), 100)),
       });
     });
 
     describe('and many requests are made', () => {
       let res;
       beforeEach(() => {
-        res = requestData.map(r =>
-          requestAggregator.dsPost(r.key, r.url, r.payload),
-        );
+        res = requestData.map(r => requestAggregator.dsPost(r.key, r.url, r.payload));
       });
 
       it('should aggregate requests where the keys are equal', () => {
@@ -42,19 +39,14 @@ describe('RequestAggregator', () => {
     const error = 'there was an error';
     beforeEach(() => {
       requestAggregator = new RequestAggregator({
-        datasourceRequest: async () =>
-          new Promise((resolve, reject) =>
-            setTimeout(() => reject(error), 100),
-          ),
+        datasourceRequest: async () => new Promise((resolve, reject) => setTimeout(() => reject(error), 100)),
       });
     });
 
     describe('and many requests are made', () => {
       let res;
       beforeEach(() => {
-        res = requestData.map(r =>
-          requestAggregator.dsPost(r.key, r.url, r.payload),
-        );
+        res = requestData.map(r => requestAggregator.dsPost(r.key, r.url, r.payload));
       });
 
       it('should aggregate requests where the keys are equal', () => {
@@ -66,9 +58,7 @@ describe('RequestAggregator', () => {
       });
 
       it('should remove the ongoing requests when backend request was rejected', async () => {
-        Promise.all(res).then(() =>
-          expect(Object.keys(requestAggregator.ongoingRequests).length).toBe(0),
-        );
+        Promise.all(res).then(() => expect(Object.keys(requestAggregator.ongoingRequests).length).toBe(0));
       });
     });
   });
