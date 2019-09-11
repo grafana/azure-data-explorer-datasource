@@ -127,7 +127,8 @@ jobs:
           ls -l ci/jobs/build_osx
           ls -l ci/jobs/build_win64
           ls -l ci/jobs/build_plugin
-          ls -l dist
+          ls -l ci/jobs/build_plugin/dist
+          mv ci/jobs/build_plugin/dist ci/dist
           npx grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
@@ -136,6 +137,10 @@ jobs:
         - ci/packages
         - ci/dist
         - ci/grafana-test-env
+    - store_artifacts:
+        path: ci/jobs/package
+    - store_artifacts:
+        path: ci/packages
 
   test_integration:
     <<: *defaults
