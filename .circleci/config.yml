@@ -86,6 +86,9 @@ jobs:
     - run:
         name: Build OSX
         command: |
+          #apk update
+          #apk upgrade
+          apk add --no-cache git
           mkdir -p ./ci/jobs/build_osx
           CGO_CFLAGS=-mmacosx-version-min=10.10 \
           CGO_LDFLAGS=-mmacosx-version-min=10.10 \
