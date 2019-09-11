@@ -64,7 +64,7 @@ jobs:
   build_linux:
     <<: *defaults
     docker:
-      - image: golang:1.12.5-stretch
+      - image: golang:1.12.9-buster
     steps:
     - checkout
     - run:
@@ -80,15 +80,15 @@ jobs:
   build_osx:
     <<: *defaults
     docker:
-      - image: golang:1.12.5-stretch
+      - image: golang:1.12.9-buster
     steps:
     - checkout
     - run:
         name: Build OSX
         command: |
           mkdir -p ./ci/jobs/build_osx
-          CGO_CFLAGS=-mmacosx-version-min=10.8 \
-          CGO_LDFLAGS=-mmacosx-version-min=10.8 \
+          CGO_CFLAGS=-mmacosx-version-min=10.10 \
+          CGO_LDFLAGS=-mmacosx-version-min=10.10 \
           CGO_ENABLED=1 GOOS=darwin \
             go build \
             -installsuffix qt \
@@ -103,7 +103,7 @@ jobs:
   build_win64:
     <<: *defaults
     docker:
-      - image: golang:1.12.5-stretch
+      - image: golang:1.12.9-buster
     steps:
     - checkout
     - run:
