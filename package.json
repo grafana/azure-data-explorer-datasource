@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.6.0",
     "@grafana/toolkit": "next",
     "@grafana/ui": "latest",
     "@types/angular": "^1.6.56",
