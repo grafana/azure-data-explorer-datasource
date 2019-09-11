@@ -122,6 +122,7 @@ jobs:
         name: Package Distribution
         command: |
           ls -l ci
+          ls -l ci/jobs
           ls -l ci/jobs/build_linux
           ls -l ci/jobs/build_osx
           ls -l ci/jobs/build_win64
