@@ -47,9 +47,7 @@ describe('SemVersion', () => {
         { values: ['6.0.0', '5.2.0'], expected: true },
       ];
       cases.forEach(testCase => {
-        expect(isVersionGtOrEq(testCase.values[0], testCase.values[1])).toBe(
-          testCase.expected,
-        );
+        expect(isVersionGtOrEq(testCase.values[0], testCase.values[1])).toBe(testCase.expected);
       });
     });
   });

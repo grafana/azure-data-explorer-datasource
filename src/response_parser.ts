@@ -272,6 +272,4 @@ export class ResponseParser {
 
     return { data: data };
   }
-
-
 }
