@@ -213,7 +213,7 @@ jobs:
         path: ci
 
 
-  publish-github-release:
+  publish_github_release:
     working_directory: ~/azure-data-explorer-datasource
     docker:
       - image: cibuilds/github:0.12
