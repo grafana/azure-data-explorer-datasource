@@ -88,10 +88,9 @@ jobs:
         command: |
           #apk update
           #apk upgrade
+          go tool dist list
           apk add --no-cache build-base git
           mkdir -p ./ci/jobs/build_osx
-          CGO_CFLAGS=-mmacosx-version-min=10.10 \
-          CGO_LDFLAGS=-mmacosx-version-min=10.10 \
           CGO_ENABLED=1 GOOS=darwin \
             go build \
             -installsuffix qt \
