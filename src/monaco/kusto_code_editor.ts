@@ -70,6 +70,7 @@ export default class KustoCodeEditor {
     });
     this.codeEditor.layout();
 
+    // TODO: fix ts-ignore
     if (monaco.editor.getModels().length === 1) {
       this.completionItemProvider = monaco.languages.registerCompletionItemProvider('kusto', {
         triggerCharacters: ['.', ' '],
