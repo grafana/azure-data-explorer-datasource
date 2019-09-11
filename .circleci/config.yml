@@ -80,7 +80,7 @@ jobs:
   build_osx:
     <<: *defaults
     docker:
-      - image: golang:1.12.9-buster
+      - image: golang:1.12.9-alpine
     steps:
     - checkout
     - run:
