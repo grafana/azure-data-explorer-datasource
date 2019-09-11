@@ -77,7 +77,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       err.data.results &&
       err.data.results[this.target.refId] &&
       err.data.results[this.target.refId].meta &&
-      err.data.results[this.target.refId].meta.KustoError != ''
+      err.data.results[this.target.refId].meta.KustoError !== ''
     ) {
       this.lastQueryError = err.data.results[this.target.refId].meta.KustoError;
       return;

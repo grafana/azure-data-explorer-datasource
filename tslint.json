@@ -1,13 +1,13 @@
 {
   "rules": {
-    "class-name": true,
+    "class-name": false,
     "comment-format": [false, "check-space"],
     "curly": true,
     "eofline": true,
     "forin": false,
     "indent": [true, "spaces"],
     "label-position": true,
-    "max-line-length": [true, 140],
+    "max-line-length": [false, 140],
     "member-access": false,
     "no-arg": true,
     "no-bitwise": true,
@@ -30,7 +30,6 @@
     "no-trailing-whitespace": true,
     "no-unused-expression": false,
     "no-unused-variable": false,
-    "no-use-before-declare": true,
     "no-var-keyword": false,
     "object-literal-sort-keys": false,
     "one-line": [true,
