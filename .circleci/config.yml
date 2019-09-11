@@ -71,7 +71,11 @@ jobs:
         name: Build Linux
         command: |
           mkdir -p ./ci/jobs/build_linux
-          go build -o ./ci/jobs/build_linux/grafana-azure-data-explorer-datasource_linux_amd64 -a -tags netgo -ldflags '-w' ./pkg
+          go build \
+            -o ./ci/jobs/build_linux/grafana-azure-data-explorer-datasource_linux_amd64 \
+            -a -tags netgo -ldflags '-w' \
+            ./pkg
+          ls -l ./ci/jobs/build_linux/
     - persist_to_workspace:
         root: .
         paths:
@@ -86,17 +90,13 @@ jobs:
     - run:
         name: Build OSX
         command: |
-          #apk update
-          #apk upgrade
-          go tool dist list
-          #apk add --no-cache build-base git
           mkdir -p ./ci/jobs/build_osx
           GOOS=darwin GOARCH=amd64 \
             go build \
-            -installsuffix qt \
             -o ./ci/jobs/build_osx/grafana-azure-data-explorer-datasource_darwin_amd64 \
             -a -tags netgo -ldflags '-w' \
             ./pkg
+          ls -l ./ci/jobs/build_osx/
     - persist_to_workspace:
         root: .
         paths:
@@ -112,7 +112,12 @@ jobs:
         name: Build Windows
         command: |
           mkdir -p ./ci/jobs/build_win64
-          CGO_ENABLED=1 GOOS=windows go build -o ./ci/jobs/build_win64/grafana-azure-data-explorer-datasource_windows_amd64.exe -a -tags netgo -ldflags '-w' ./pkg
+          CGO_ENABLED=1 GOOS=windows \
+          go build \
+            -o ./ci/jobs/build_win64/grafana-azure-data-explorer-datasource_windows_amd64.exe \
+            -a -tags netgo -ldflags '-w' \
+            ./pkg
+          ls -l ./ci/jobs/build_win64/
     - persist_to_workspace:
         root: .
         paths:
