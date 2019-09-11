@@ -1,5 +1,3 @@
-import {QueryCtrl} from './query_ctrl';
+import { QueryCtrl } from './query_ctrl';
 
-export {
-  QueryCtrl,
-};
+export { QueryCtrl };

@@ -7,10 +7,9 @@ export class QueryCtrl {
   error: string;
 
   constructor(public $scope, _$injector) {
-    this.panelCtrl = this.panelCtrl || {panel: {}};
-    this.target = this.target || {target: ''};
+    this.panelCtrl = this.panelCtrl || { panel: {} };
+    this.target = this.target || { target: '' };
     this.panel = this.panelCtrl.panel;
-
   }
 
   refresh() {}
