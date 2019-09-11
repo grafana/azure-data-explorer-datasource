@@ -5,20 +5,17 @@ describe('QueryBuilder', () => {
   let builder: QueryBuilder;
 
   beforeEach(function() {
-    builder = new QueryBuilder(
-      'query=Tablename | where $__timeFilter(Timestamp)',
-      {
-        interval: '5m',
-        range: {
-          from: moment().subtract(24, 'hours'),
-          to: moment(),
-        },
-        rangeRaw: {
-          from: 'now-24h',
-          to: 'now',
-        },
+    builder = new QueryBuilder('query=Tablename | where $__timeFilter(Timestamp)', {
+      interval: '5m',
+      range: {
+        from: moment().subtract(24, 'hours'),
+        to: moment(),
       },
-    );
+      rangeRaw: {
+        from: 'now-24h',
+        to: 'now',
+      },
+    });
   });
 
   describe('when $__contains and multi template variable has custom All value', () => {
@@ -63,9 +60,7 @@ describe('QueryBuilder', () => {
     });
     it('should replace $__escape(val) with KQL style escaped string', () => {
       const query = builder.interpolate().query;
-      expect(query).toContain(
-        `@'\\grafana-vmNetwork(eth0)Total Bytes Received'`,
-      );
+      expect(query).toContain(`@'\\grafana-vmNetwork(eth0)Total Bytes Received'`);
     });
   });
   describe('when using $__escape and multi template variable has multiple selected values', () => {
@@ -74,9 +69,7 @@ describe('QueryBuilder', () => {
     });
     it('should replace $__escape(val) with multiple KQL style escaped string', () => {
       const query = builder.interpolate().query;
-      expect(query).toContain(
-        `CounterPath in (@'\\grafana-vmNetwork(eth0)Total', @'\\grafana-vmNetwork(eth0)Total')`,
-      );
+      expect(query).toContain(`CounterPath in (@'\\grafana-vmNetwork(eth0)Total', @'\\grafana-vmNetwork(eth0)Total')`);
     });
   });
   describe('when using $__escape and multi template variable has one selected value that contains comma', () => {
@@ -85,9 +78,7 @@ describe('QueryBuilder', () => {
     });
     it('should replace $__escape(val) with KQL style escaped string', () => {
       const query = builder.interpolate().query;
-      expect(query).toContain(
-        `@'\\grafana-vm,Network(eth0)Total Bytes Received'`,
-      );
+      expect(query).toContain(`@'\\grafana-vm,Network(eth0)Total Bytes Received'`);
     });
   });
   describe(`when using $__escape and multi template variable value is not wrapped in single '`, () => {
@@ -96,9 +87,7 @@ describe('QueryBuilder', () => {
     });
     it('should not replace macro', () => {
       const query = builder.interpolate().query;
-      expect(query).toContain(
-        `$__escapeMulti(\\grafana-vm,Network(eth0)Total Bytes Received)`,
-      );
+      expect(query).toContain(`$__escapeMulti(\\grafana-vm,Network(eth0)Total Bytes Received)`);
     });
   });
 });
