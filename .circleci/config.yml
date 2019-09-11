@@ -61,25 +61,33 @@ jobs:
         paths:
         - ci
 
-  build_osx:
+  build_linux:
     <<: *defaults
+    docker:
+      - image: golang:1.12.5-stretch
     steps:
     - checkout
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
-        name: Install yarn
+        name: Build Linux
         command: |
-          sudo npm install -g yarn --quiet
-          yarn install --pure-lockfile
-    - run:
-        name: Run Toolkit CI
-        command: npx grafana-toolkit plugin:ci-build --backend osx
-    - save_cache:
+          mkdir -p ./ci/jobs/build_linux
+          go build -o ./ci/jobs/build_linux/grafana-azure-data-explorer-datasource_linux_amd64 -a -tags netgo -ldflags '-w' ./pkg
+    - persist_to_workspace:
+        root: .
         paths:
-        - node_modules
-        key: yarn-packages-{{ checksum "yarn.lock" }}
+        - ci/jobs/build_linux
+
+  build_osx:
+    <<: *defaults
+    docker:
+      - image: golang:1.12.5-stretch
+    steps:
+    - checkout
+    - run:
+        name: Build OSX
+        command: |
+          mkdir -p ./ci/jobs/build_osx
+          go build -o ./ci/jobs/build_osx/grafana-azure-data-explorer-datasource_darwin_amd64 -a -tags netgo -ldflags '-w' ./pkg
     - persist_to_workspace:
         root: .
         paths:
@@ -87,23 +95,15 @@ jobs:
 
   build_win64:
     <<: *defaults
+    docker:
+      - image: golang:1.12.5-stretch
     steps:
     - checkout
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
-        name: Install yarn
+        name: Build Windows
         command: |
-          sudo npm install -g yarn --quiet
-          yarn install --pure-lockfile
-    - run:
-        name: Run Toolkit CI
-        command: npx grafana-toolkit plugin:ci-build --backend win64
-    - save_cache:
-        paths:
-        - node_modules
-        key: yarn-packages-{{ checksum "yarn.lock" }}
+          mkdir -p ./ci/jobs/build_win64
+          go build -o ./ci/jobs/build_win64/grafana-azure-data-explorer-datasource_windows_amd64.exe -a -tags netgo -ldflags '-w' ./pkg
     - persist_to_workspace:
         root: .
         paths:
