@@ -18,7 +18,9 @@
     "typescript": "^3.5.2"
   },
   "devDependencies": {
-    "@types/angular": "^1.6.54",
+    "@grafana/toolkit": "next",
+    "@grafana/ui": "latest",
+    "@types/angular": "^1.6.56",
     "@types/grafana": "https://git@github.com/CorpGlory/types-grafana.git",
     "@types/jest": "24.0.15",
     "@types/lodash": "^4.14.134",
