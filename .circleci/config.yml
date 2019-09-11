@@ -145,6 +145,7 @@ jobs:
           cp ci/jobs/build_linux/* ci/jobs/build_plugin/dist
           cp ci/jobs/build_osx/* ci/jobs/build_plugin/dist
           cp ci/jobs/build_win64/* ci/jobs/build_plugin/dist
+          ls -l ci/jobs/build_plugin/dist
           npx grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
