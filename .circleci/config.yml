@@ -87,7 +87,14 @@ jobs:
         name: Build OSX
         command: |
           mkdir -p ./ci/jobs/build_osx
-          CGO_ENABLED=1 GOOS=darwin go build -o ./ci/jobs/build_osx/grafana-azure-data-explorer-datasource_darwin_amd64 -a -tags netgo -ldflags '-w' ./pkg
+          CGO_CFLAGS=-mmacosx-version-min=10.8 \
+          CGO_LDFLAGS=-mmacosx-version-min=10.8 \
+          CGO_ENABLED=1 GOOS=darwin \
+            go build \
+            -installsuffix qt \
+            -o ./ci/jobs/build_osx/grafana-azure-data-explorer-datasource_darwin_amd64 \
+            -a -tags netgo -ldflags '-w' \
+            ./pkg
     - persist_to_workspace:
         root: .
         paths:
