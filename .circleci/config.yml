@@ -204,7 +204,9 @@ jobs:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
         name: Toolkit Report
-        command: npx grafana-toolkit plugin:ci-report
+        command: |
+          # skipped - S3 permission issue
+          # npx grafana-toolkit plugin:ci-report
     - store_artifacts:
         path: ci
 
