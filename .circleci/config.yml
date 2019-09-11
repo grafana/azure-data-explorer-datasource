@@ -87,7 +87,7 @@ jobs:
         name: Build OSX
         command: |
           mkdir -p ./ci/jobs/build_osx
-          go build -o ./ci/jobs/build_osx/grafana-azure-data-explorer-datasource_darwin_amd64 -a -tags netgo -ldflags '-w' ./pkg
+          CGO_ENABLED=1 GOOS=darwin go build -o ./ci/jobs/build_osx/grafana-azure-data-explorer-datasource_darwin_amd64 -a -tags netgo -ldflags '-w' ./pkg
     - persist_to_workspace:
         root: .
         paths:
@@ -103,7 +103,7 @@ jobs:
         name: Build Windows
         command: |
           mkdir -p ./ci/jobs/build_win64
-          go build -o ./ci/jobs/build_win64/grafana-azure-data-explorer-datasource_windows_amd64.exe -a -tags netgo -ldflags '-w' ./pkg
+          CGO_ENABLED=1 GOOS=windows go build -o ./ci/jobs/build_win64/grafana-azure-data-explorer-datasource_windows_amd64.exe -a -tags netgo -ldflags '-w' ./pkg
     - persist_to_workspace:
         root: .
         paths:
