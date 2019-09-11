@@ -89,7 +89,7 @@ jobs:
           #apk update
           #apk upgrade
           go tool dist list
-          apk add --no-cache build-base git
+          #apk add --no-cache build-base git
           mkdir -p ./ci/jobs/build_osx
           CGO_ENABLED=1 GOOS=darwin \
             go build \
