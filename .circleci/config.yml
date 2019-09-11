@@ -120,7 +120,13 @@ jobs:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
         name: Package Distribution
-        command: npx grafana-toolkit plugin:ci-package
+        command: |
+          ls -l ci
+          ls -l ci/jobs/build_linux
+          ls -l ci/jobs/build_osx
+          ls -l ci/jobs/build_win64
+          ls -l dist
+          npx grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
         paths:
