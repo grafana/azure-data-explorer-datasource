@@ -64,7 +64,7 @@ jobs:
   build_linux:
     <<: *defaults
     docker:
-      - image: golang:1.12.9-buster
+      - image: circleci/1.12.9-buster
     steps:
     - checkout
     - run:
@@ -80,7 +80,7 @@ jobs:
   build_osx:
     <<: *defaults
     docker:
-      - image: golang:1.12.9-alpine
+      - image: circleci/1.12.9-buster
     steps:
     - checkout
     - run:
@@ -105,7 +105,7 @@ jobs:
   build_win64:
     <<: *defaults
     docker:
-      - image: golang:1.12.9-buster
+      - image: circleci/1.12.9-buster
     steps:
     - checkout
     - run:
