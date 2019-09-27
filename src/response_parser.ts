@@ -86,12 +86,12 @@ export interface DatabaseItem {
 type TextValueItem = {
   text: string;
   value: string;
-}
+};
 
 // Text type (simple)
 type TextItem = {
   text: string;
-}
+};
 
 export class ResponseParser {
   parseDatabases(results: KustoDatabaseList): DatabaseItem[] {
@@ -186,14 +186,14 @@ export class ResponseParser {
     const variables: TextValueItem[] = [];
 
     const queryResult = this.parseQueryResult(results);
-    console.log("parseToVariables", results, queryResult);
+    console.log('parseToVariables', results, queryResult);
     for (let result of queryResult.data) {
       var row: any;
       for (row of _.flattenDeep(result.rows)) {
         let item: TextValueItem = {
           text: row,
-          value: row
-        }
+          value: row,
+        };
         variables.push(item);
       }
     }
@@ -203,7 +203,7 @@ export class ResponseParser {
 
   parseMetricFindQueryResult(refId, results) {
     //if (!results || results.data.length === 0 || results.data.results[refId].meta.rowCount === 0) {
-     // return [];
+    // return [];
     //}
 
     debugger;
@@ -247,7 +247,7 @@ export class ResponseParser {
     }
 
     return _.map(res, value => {
-      let item: TextItem = { text: value }
+      let item: TextItem = { text: value };
       return item;
     });
   }
