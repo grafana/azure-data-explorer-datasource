@@ -82,17 +82,6 @@ export interface DatabaseItem {
   value: string;
 }
 
-// Text Value type for parsing with __text and __value
-type TextValueItem = {
-  text: string;
-  value: string;
-};
-
-// Text type (simple) for traditional parsing
-type TextItem = {
-  text: string;
-};
-
 export class ResponseParser {
   parseDatabases(results: KustoDatabaseList): DatabaseItem[] {
     const databases: DatabaseItem[] = [];
@@ -167,7 +156,7 @@ export class ResponseParser {
     return data;
   }
 
-  parseTableResult(query, columns, rows) {
+  parseTableResult(query, columns, rows) : TableResult {
     const tableResult = {
       type: 'table',
       columns: _.map(columns, col => {
@@ -181,42 +170,23 @@ export class ResponseParser {
     return tableResult;
   }
 
-  parseToVariables(results) {
-    const variables: TextValueItem[] = [];
-
+  parseToVariables(results): Variable[] {
+    var variables: Variable[] = [];
     const queryResult = this.parseQueryResult(results);
-    for (let result of queryResult.data) {
-      var row: any;
-      for (row of _.flattenDeep(result.rows)) {
-        let item: TextValueItem = {
-          text: row,
-          value: row,
-        };
-        variables.push(item);
-      }
-    }
-
-    return variables;
-  }
-
-  parseMetricFindQueryResult(result) {
-    // If we don't have valid data, don't parse.
-    if (!(result && result.data.Tables && result.data.Tables.length > 0)) {
-      return [];
-    }
-
-    const columns = result.data.Tables[0].Columns;
-    const rows = result.data.Tables[0].Rows;
-    const textColIndex = this.findColIndex(columns, '__text');
-    const valueColIndex = this.findColIndex(columns, '__value');
 
     // Issue 7: If we have a __text and __value column as checked above,
     // Use the __value column to match but the __text column to display.
-    if (columns.length === 2 && textColIndex !== -1 && valueColIndex !== -1) {
-      return this.transformToKeyValueList(rows, textColIndex, valueColIndex);
+    for (let result of queryResult.data) {
+      const textColIndex = this.findColIndex(result, '__text');
+      const valueColIndex = this.findColIndex(result, '__value');
+      
+      if (textColIndex !== -1 && valueColIndex !== -1)
+        variables = variables.concat(this.transformToKeyValueList(result.rows, textColIndex, valueColIndex));
+      else
+        variables = variables.concat(this.transformToSimpleList(result.rows));
     }
-
-    return this.transformToSimpleList(rows);
+    
+    return variables;
   }
 
   transformToKeyValueList(rows, textColIndex, valueColIndex): Variable[] {
@@ -224,7 +194,7 @@ export class ResponseParser {
 
     for (let i = 0; i < rows.length; i++) {
       if (!this.containsKey(res, rows[i][textColIndex])) {
-        res.push({
+        res.push(<Variable>{
           text: rows[i][textColIndex],
           value: rows[i][valueColIndex],
         });
@@ -234,28 +204,26 @@ export class ResponseParser {
     return res;
   }
 
-  transformToSimpleList(rows): TextItem[] {
-    const res: any[] = [];
+  transformToSimpleList(rows): Variable[] {
+    const res: Variable[] = [];
 
-    for (var i = 0; i < rows.length; i++) {
-      for (var j = 0; j < rows[i].length; j++) {
-        const value: any = rows[i][j];
-        if (res.indexOf(value) === -1) {
-          res.push(value);
-        }
-      }
+    for (var row of _.flattenDeep(rows)) {
+      res.push(<Variable>{
+        text: row,
+        value: row,
+      });
     }
 
-    return _.map(res, value => {
-      let item: TextItem = { text: value };
-      return item;
-    });
+    return res;
   }
 
-  findColIndex(columns, colName) {
-    for (let i = 0; i < columns.length; i++) {
-      if (columns[i].ColumnName === colName) {
-        return i;
+  findColIndex(colObj, colName) {
+    if ('columns' in colObj) {
+      let columns = colObj.columns;
+      for (let i = 0; i < columns.length; i++) {
+        if (columns[i].text === colName) {
+          return i;
+        }
       }
     }
 

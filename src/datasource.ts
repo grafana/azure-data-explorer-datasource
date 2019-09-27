@@ -88,13 +88,7 @@ export class KustoDBDatasource {
       return this.$q
         .all(promises)
         .then(results => {
-          let parsedResults: any[] = [];
-          let responseParser = new ResponseParser();
-
-          results.forEach(result => {
-            parsedResults.push(responseParser.parseMetricFindQueryResult(result));
-          });
-          return results;
+          return new ResponseParser().parseToVariables(results);
         })
         .catch(err => {
           if (err.error && err.error.data && err.error.data.error) {
