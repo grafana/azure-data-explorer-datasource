@@ -82,13 +82,13 @@ export interface DatabaseItem {
   value: string;
 }
 
-// Text Value type
+// Text Value type for parsing with __text and __value
 type TextValueItem = {
   text: string;
   value: string;
 };
 
-// Text type (simple)
+// Text type (simple) for traditional parsing
 type TextItem = {
   text: string;
 };
@@ -117,7 +117,6 @@ export class ResponseParser {
   parseQueryResult(results: any) {
     let data: any[] = [];
     let columns: any[] = [];
-    debugger;
     for (let i = 0; i < results.length; i++) {
       if (results[i].result.data.Tables.length === 0) {
         continue;
@@ -186,7 +185,6 @@ export class ResponseParser {
     const variables: TextValueItem[] = [];
 
     const queryResult = this.parseQueryResult(results);
-    console.log('parseToVariables', results, queryResult);
     for (let result of queryResult.data) {
       var row: any;
       for (row of _.flattenDeep(result.rows)) {
@@ -201,17 +199,19 @@ export class ResponseParser {
     return variables;
   }
 
-  parseMetricFindQueryResult(refId, results) {
-    //if (!results || results.data.length === 0 || results.data.results[refId].meta.rowCount === 0) {
-    // return [];
-    //}
+  parseMetricFindQueryResult(result) {
+    // If we don't have valid data, don't parse.
+    if (!(result && result.data.Tables && result.data.Tables.length > 0)) {
+      return [];
+    }
 
-    debugger;
-    const columns = results[refId].result.data.Tables[0].Columns;
-    const rows = results[refId].result.data.Tables[0].Rows;
+    const columns = result.data.Tables[0].Columns;
+    const rows = result.data.Tables[0].Rows;
     const textColIndex = this.findColIndex(columns, '__text');
     const valueColIndex = this.findColIndex(columns, '__value');
 
+    // Issue 7: If we have a __text and __value column as checked above,
+    // Use the __value column to match but the __text column to display.
     if (columns.length === 2 && textColIndex !== -1 && valueColIndex !== -1) {
       return this.transformToKeyValueList(rows, textColIndex, valueColIndex);
     }
@@ -264,7 +264,6 @@ export class ResponseParser {
 
   containsKey(res, key) {
     for (let i = 0; i < res.length; i++) {
-      debugger;
       if (res[i].text === key) {
         return true;
       }

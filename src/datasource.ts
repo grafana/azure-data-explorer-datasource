@@ -29,7 +29,6 @@ export class KustoDBDatasource {
     const queries = _.filter(options.targets, item => {
       return item.hide !== true;
     }).map(item => {
-      console.log('query template', options, item);
       var interpolatedQuery = new QueryBuilder(
         this.templateSrv.replace(item.query, options.scopedVars, this.interpolateVariable),
         options
@@ -60,12 +59,7 @@ export class KustoDBDatasource {
           queries: queries,
         },
       })
-      .then(res => {
-        console.log('res', res);
-        let resultSet = new ResponseParser().processQueryResult(res);
-        //let resultSet = new ResponseParser().parseToVariables(res);
-        return resultSet;
-      });
+      .then(new ResponseParser().processQueryResult);
   }
 
   annotationQuery(options) {
@@ -91,16 +85,22 @@ export class KustoDBDatasource {
 
       const promises = this.doQueries(queries);
 
-      return this.$q.all(promises).then(results => {
-        console.log('we got results', results);
-        return new ResponseParser().parseMetricFindQueryResult(0, results);
-      });
-      // .catch(err => {
-      //   console.log("we go an error", err);
-      //   if (err.error && err.error.data && err.error.data.error) {
-      //     throw { message: err.error.data.error['@message'] };
-      //   }
-      // });
+      return this.$q
+        .all(promises)
+        .then(results => {
+          let parsedResults: any[] = [];
+          let responseParser = new ResponseParser();
+
+          results.forEach(result => {
+            parsedResults.push(responseParser.parseMetricFindQueryResult(result));
+          });
+          return results;
+        })
+        .catch(err => {
+          if (err.error && err.error.data && err.error.data.error) {
+            throw { message: err.error.data.error['@message'] };
+          }
+        });
     });
   }
 
@@ -128,7 +128,6 @@ export class KustoDBDatasource {
         return { status: 'success', message: 'Connection Successful' };
       })
       .catch((err: any) => {
-        console.log(err);
         if (err.data && err.data.message) {
           return { status: 'error', message: err.data.message };
         } else {
@@ -199,7 +198,6 @@ export class KustoDBDatasource {
   }
 
   private buildQuery(query: string, options: any, database: string) {
-    console.log('buildQuery', query, this, options);
     const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, {}, this.interpolateVariable), options);
     const url = `${this.baseUrl}/v1/rest/query`;
     const csl = queryBuilder.interpolate().query;
