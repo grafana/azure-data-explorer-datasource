@@ -82,6 +82,17 @@ export interface DatabaseItem {
   value: string;
 }
 
+// Text Value type
+type TextValueItem = {
+  text: string;
+  value: string;
+}
+
+// Text type (simple)
+type TextItem = {
+  text: string;
+}
+
 export class ResponseParser {
   parseDatabases(results: KustoDatabaseList): DatabaseItem[] {
     const databases: DatabaseItem[] = [];
@@ -106,6 +117,7 @@ export class ResponseParser {
   parseQueryResult(results: any) {
     let data: any[] = [];
     let columns: any[] = [];
+    debugger;
     for (let i = 0; i < results.length; i++) {
       if (results[i].result.data.Tables.length === 0) {
         continue;
@@ -156,8 +168,8 @@ export class ResponseParser {
     return data;
   }
 
-  parseTableResult(query, columns, rows): TableResult {
-    const tableResult: TableResult = {
+  parseTableResult(query, columns, rows) {
+    const tableResult = {
       type: 'table',
       columns: _.map(columns, col => {
         return { text: col.ColumnName, type: col.ColumnType };
@@ -170,21 +182,94 @@ export class ResponseParser {
     return tableResult;
   }
 
-  parseToVariables(results): Variable[] {
-    const variables: Variable[] = [];
+  parseToVariables(results) {
+    const variables: TextValueItem[] = [];
 
     const queryResult = this.parseQueryResult(results);
-
+    console.log("parseToVariables", results, queryResult);
     for (let result of queryResult.data) {
-      for (let row of _.flattenDeep(result.rows)) {
-        variables.push(<Variable>{
+      var row: any;
+      for (row of _.flattenDeep(result.rows)) {
+        let item: TextValueItem = {
           text: row,
-          value: row,
-        });
+          value: row
+        }
+        variables.push(item);
       }
     }
 
     return variables;
+  }
+
+  parseMetricFindQueryResult(refId, results) {
+    //if (!results || results.data.length === 0 || results.data.results[refId].meta.rowCount === 0) {
+     // return [];
+    //}
+
+    debugger;
+    const columns = results[refId].result.data.Tables[0].Columns;
+    const rows = results[refId].result.data.Tables[0].Rows;
+    const textColIndex = this.findColIndex(columns, '__text');
+    const valueColIndex = this.findColIndex(columns, '__value');
+
+    if (columns.length === 2 && textColIndex !== -1 && valueColIndex !== -1) {
+      return this.transformToKeyValueList(rows, textColIndex, valueColIndex);
+    }
+
+    return this.transformToSimpleList(rows);
+  }
+
+  transformToKeyValueList(rows, textColIndex, valueColIndex): Variable[] {
+    const res: Variable[] = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      if (!this.containsKey(res, rows[i][textColIndex])) {
+        res.push({
+          text: rows[i][textColIndex],
+          value: rows[i][valueColIndex],
+        });
+      }
+    }
+
+    return res;
+  }
+
+  transformToSimpleList(rows): TextItem[] {
+    const res: any[] = [];
+
+    for (var i: number = 0; i < rows.length; i++) {
+      for (var j: number = 0; j < rows[i].length; j++) {
+        const value: any = rows[i][j];
+        if (res.indexOf(value) === -1) {
+          res.push(value);
+        }
+      }
+    }
+
+    return _.map(res, value => {
+      let item: TextItem = { text: value }
+      return item;
+    });
+  }
+
+  findColIndex(columns, colName) {
+    for (let i = 0; i < columns.length; i++) {
+      if (columns[i].ColumnName === colName) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  containsKey(res, key) {
+    for (let i = 0; i < res.length; i++) {
+      debugger;
+      if (res[i].text === key) {
+        return true;
+      }
+    }
+    return false;
   }
 
   transformToAnnotations(options: any, result: any) {
