@@ -237,8 +237,8 @@ export class ResponseParser {
   transformToSimpleList(rows): TextItem[] {
     const res: any[] = [];
 
-    for (var i: number = 0; i < rows.length; i++) {
-      for (var j: number = 0; j < rows[i].length; j++) {
+    for (var i = 0; i < rows.length; i++) {
+      for (var j = 0; j < rows[i].length; j++) {
         const value: any = rows[i][j];
         if (res.indexOf(value) === -1) {
           res.push(value);
