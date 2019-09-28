@@ -180,9 +180,11 @@ export class ResponseParser {
       const textColIndex = this.findColIndex(result, '__text');
       const valueColIndex = this.findColIndex(result, '__value');
 
-      if (textColIndex !== -1 && valueColIndex !== -1)
+      if (textColIndex !== -1 && valueColIndex !== -1) {
         variables = variables.concat(this.transformToKeyValueList(result.rows, textColIndex, valueColIndex));
-      else variables = variables.concat(this.transformToSimpleList(result.rows));
+      } else {
+        variables = variables.concat(this.transformToSimpleList(result.rows));
+      }
     }
 
     return variables;
