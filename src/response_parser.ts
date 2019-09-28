@@ -156,7 +156,7 @@ export class ResponseParser {
     return data;
   }
 
-  parseTableResult(query, columns, rows) : TableResult {
+  parseTableResult(query, columns, rows): TableResult {
     const tableResult = {
       type: 'table',
       columns: _.map(columns, col => {
@@ -179,13 +179,12 @@ export class ResponseParser {
     for (let result of queryResult.data) {
       const textColIndex = this.findColIndex(result, '__text');
       const valueColIndex = this.findColIndex(result, '__value');
-      
+
       if (textColIndex !== -1 && valueColIndex !== -1)
         variables = variables.concat(this.transformToKeyValueList(result.rows, textColIndex, valueColIndex));
-      else
-        variables = variables.concat(this.transformToSimpleList(result.rows));
+      else variables = variables.concat(this.transformToSimpleList(result.rows));
     }
-    
+
     return variables;
   }
 
