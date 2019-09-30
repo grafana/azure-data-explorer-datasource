@@ -184,6 +184,89 @@ describe('KustoDBDatasource', () => {
     });
   });
 
+  describe('When performing metricFindQuery (two columns)', () => {
+    const tableResponseWithTwoColumns = {
+      Tables: [
+        {
+          TableName: 'Table_1',
+          Columns: [
+            {
+              ColumnName: 'CatagoryId',
+              ColumnType: 'int',
+            },
+            {
+              ColumnName: 'CategoryName',
+              ColumnType: 'string',
+            }
+          ],
+          Rows: [
+            [12], ['Titanic'],
+            [13], ['Titanic'],
+          ],
+        },
+      ],
+    };
+
+    const databasesResponse = {
+      Tables: [
+        {
+          TableName: 'Table_0',
+          Columns: [
+            { ColumnName: 'DatabaseName', DataType: 'String' },
+            { ColumnName: 'PersistentStorage', DataType: 'String' },
+            { ColumnName: 'Version', DataType: 'String' },
+            { ColumnName: 'IsCurrent', DataType: 'Boolean' },
+            { ColumnName: 'DatabaseAccessMode', DataType: 'String' },
+            { ColumnName: 'PrettyName', DataType: 'String' },
+            {
+              ColumnName: 'CurrentUserIsUnrestrictedViewer',
+              DataType: 'Boolean',
+            },
+            { ColumnName: 'DatabaseId', DataType: 'Guid' },
+          ],
+          Rows: [
+            [
+              'Grafana',
+              'https://4bukustoragekus86a3c.blob.core.windows.net/grafanamd201806201624130602',
+              'v5.2',
+              false,
+              'ReadWrite',
+              null,
+              false,
+              'a955a3ed-0668-4d00-a2e5-9c4e610ef057',
+            ],
+          ],
+        },
+      ],
+    };
+
+    let queryResults;
+
+    beforeEach(async () => {
+      ctx.backendSrv.datasourceRequest = options => {
+        if (options.url.indexOf('rest/mgmt') > -1) {
+          return ctx.$q.when({ data: databasesResponse, status: 200 });
+        } else {
+          return ctx.$q.when({ data: tableResponseWithTwoColumns, status: 200 });
+        }
+      };
+
+      queryResults = await ctx.ds.metricFindQuery('Activity | project __value = CategoryId, __text = CategoryName');
+    });
+
+    it('should return a list of categories in the correct format', () => {
+      expect(queryResults.length).toBe(4);
+      expect(queryResults[0].text).toBe(12);
+      expect(queryResults[0].value).toBe(12);
+      expect(queryResults[1].text).toBe('Titanic');
+      expect(queryResults[1].value).toBe('Titanic');
+      expect(queryResults[2].text).toBe(13);
+      expect(queryResults[2].value).toBe(13);
+      expect(queryResults[3].text).toBe('Titanic');
+      expect(queryResults[3].value).toBe('Titanic');
+    });
+  });
+
   describe('when performing annotations query', () => {
     const tableResponse = {
       Tables: [
