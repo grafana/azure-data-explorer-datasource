@@ -197,12 +197,9 @@ describe('KustoDBDatasource', () => {
             {
               ColumnName: 'CategoryName',
               ColumnType: 'string',
-            }
+            },
           ],
-          Rows: [
-            [12], ['Titanic'],
-            [13], ['Titanic'],
-          ],
+          Rows: [[12], ['Titanic'], [13], ['Titanic']],
         },
       ],
     };
