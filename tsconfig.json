@@ -1,8 +1,7 @@
 {
-  "__extends": "./node_modules/@grafana/toolkit/src/config/tsconfig.plugin.json",
+  "extends": "./node_modules/@grafana/toolkit/src/config/tsconfig.plugin.json",
   "include": ["src", "types"],
   "compilerOptions": {
-    "esModuleInterop": true,
     "noImplicitAny": false,
     "strictPropertyInitialization": false,
     "rootDir": "./src",
