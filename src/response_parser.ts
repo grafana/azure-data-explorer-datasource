@@ -157,7 +157,7 @@ export class ResponseParser {
   }
 
   parseTableResult(query, columns, rows): TableResult {
-    const tableResult: TableResult = {
+    const tableResult = {
       type: 'table',
       columns: _.map(columns, col => {
         return { text: col.ColumnName, type: col.ColumnType };
@@ -171,20 +171,73 @@ export class ResponseParser {
   }
 
   parseToVariables(results): Variable[] {
-    const variables: Variable[] = [];
-
+    var variables: Variable[] = [];
     const queryResult = this.parseQueryResult(results);
 
+    // Issue 7: If we have a __text and __value column as checked above,
+    // Use the __value column to match but the __text column to display.
     for (let result of queryResult.data) {
-      for (let row of _.flattenDeep(result.rows)) {
-        variables.push(<Variable>{
-          text: row,
-          value: row,
-        });
+      const textColIndex = this.findColIndex(result, '__text');
+      const valueColIndex = this.findColIndex(result, '__value');
+
+      if (textColIndex !== -1 && valueColIndex !== -1) {
+        variables = variables.concat(this.transformToKeyValueList(result.rows, textColIndex, valueColIndex));
+      } else {
+        variables = variables.concat(this.transformToSimpleList(result.rows));
       }
     }
 
     return variables;
+  }
+
+  transformToKeyValueList(rows, textColIndex, valueColIndex): Variable[] {
+    const res: Variable[] = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      if (!this.containsKey(res, rows[i][textColIndex])) {
+        res.push(<Variable>{
+          text: rows[i][textColIndex],
+          value: rows[i][valueColIndex],
+        });
+      }
+    }
+
+    return res;
+  }
+
+  transformToSimpleList(rows): Variable[] {
+    const res: Variable[] = [];
+
+    for (var row of _.flattenDeep(rows)) {
+      res.push(<Variable>{
+        text: row,
+        value: row,
+      });
+    }
+
+    return res;
+  }
+
+  findColIndex(colObj, colName) {
+    if ('columns' in colObj) {
+      let columns = colObj.columns;
+      for (let i = 0; i < columns.length; i++) {
+        if (columns[i].text === colName) {
+          return i;
+        }
+      }
+    }
+
+    return -1;
+  }
+
+  containsKey(res, key) {
+    for (let i = 0; i < res.length; i++) {
+      if (res[i].text === key) {
+        return true;
+      }
+    }
+    return false;
   }
 
   transformToAnnotations(options: any, result: any) {

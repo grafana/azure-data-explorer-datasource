@@ -15,6 +15,7 @@
     "moment": "^2.24.0",
     "monaco-editor": "0.17.0",
     "q": "^1.5.1",
+    "tslint": "^5.20.0",
     "typescript": "^3.5.2"
   },
   "devDependencies": {

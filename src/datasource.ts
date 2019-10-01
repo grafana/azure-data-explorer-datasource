@@ -79,7 +79,7 @@ export class KustoDBDatasource {
     });
   }
 
-  metricFindQuery(query: string) {
+  metricFindQuery(query: string, optionalOptions: any) {
     return this.getDefaultOrFirstDatabase().then(database => {
       const queries: any[] = this.buildQuery(query, null, database);
 
@@ -122,7 +122,6 @@ export class KustoDBDatasource {
         return { status: 'success', message: 'Connection Successful' };
       })
       .catch((err: any) => {
-        console.log(err);
         if (err.data && err.data.message) {
           return { status: 'error', message: err.data.message };
         } else {
