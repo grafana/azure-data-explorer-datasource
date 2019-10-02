@@ -280,7 +280,14 @@ func (r *rowLabels) GetName(colName string) string {
 	if len(r.keyVals) == 0 {
 		return colName
 	}
-	return fmt.Sprintf("%v {%v}", colName, r.str)
+
+	//var names []string
+	//for _, val := range r.keyVals {
+	//	names = append(names, val)
+	//}
+
+	return fmt.Sprintf("{ \"%v\": {%v} }", colName, r.str)
+	//return strings.Join(names, "|")
 }
 
 func labelMaker(columns []Column, row Row, labelColumnIdxs []int) (*rowLabels, error) {
@@ -294,7 +301,7 @@ func labelMaker(columns []Column, row Row, labelColumnIdxs []int) (*rowLabels, e
 			return nil, fmt.Errorf("failed to get string value for column %v", row[labelIdx])
 		}
 		colName := columns[labelIdx].ColumnName
-		if _, err := labelsSB.WriteString(fmt.Sprintf("%v=%v", colName, val)); err != nil {
+		if _, err := labelsSB.WriteString(fmt.Sprintf("\"%v\":\"%v\"", colName, val)); err != nil {
 			return nil, err
 		}
 		if len(labelColumnIdxs) > 1 && idx != len(labelColumnIdxs)-1 {

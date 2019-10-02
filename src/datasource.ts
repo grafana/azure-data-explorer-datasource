@@ -26,7 +26,10 @@ export class KustoDBDatasource {
 
   // query uses the backend plugin route.
   query(options) {
+    const queryTargets = {};
+
     const queries = _.filter(options.targets, item => {
+      queryTargets[item.refId] = item;
       return item.hide !== true;
     }).map(item => {
       var interpolatedQuery = new QueryBuilder(
@@ -59,7 +62,27 @@ export class KustoDBDatasource {
           queries: queries,
         },
       })
-      .then(new ResponseParser().processQueryResult);
+      .then(results => {
+        let ret = new ResponseParser().processQueryResult(results);
+        ret.data.forEach(r => {
+          let templateVars = {};
+          let target = queryTargets[r.refId];
+          let alias = target.alias;
+          let meta = JSON.parse(r.target);
+          let value = Object.keys(meta)[0];
+          templateVars['value'] = { text: value, value: value };
+          Object.keys(meta[value]).forEach(t => {
+            templateVars[t] = { text: meta[value][t], value: meta[value][t] };
+          });
+          if (!alias) {
+            alias = '$metricname';
+          }
+
+          r.target = this.templateSrv.replace(alias, templateVars);
+        });
+
+        return ret;
+      });
   }
 
   annotationQuery(options) {
