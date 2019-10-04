@@ -47,7 +47,38 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 
 		for colIdx, column := range resTable.Columns { // For column in the table
 			t.Columns[colIdx] = &datasource.TableColumn{Name: column.ColumnName}
-			columnTypes[colIdx] = column.ColumnType
+			if column.ColumnType == "" && column.DataType != "" {
+				switch column.DataType {
+				case "String":
+					columnTypes[colIdx] = kustoTypeString
+					break
+				case "Boolean":
+					columnTypes[colIdx] = kustoTypeBool
+					break
+				case "Guid":
+					columnTypes[colIdx] = kustoTypeGUID
+					break
+				case "DateTime":
+					columnTypes[colIdx] = kustoTypeDatetime
+					break
+				case "Int":
+					columnTypes[colIdx] = kustoTypeInt
+					break
+				case "Float":
+					columnTypes[colIdx] = kustoTypeReal
+					break
+				case "Long":
+				case "Decimal":
+					columnTypes[colIdx] = kustoTypeLong
+					break
+				case "Dynamic":
+					columnTypes[colIdx] = kustoTypeDynamic
+					break
+				}
+			} else {
+				columnTypes[colIdx] = column.ColumnType
+			}
+
 		}
 
 		t.Rows = make([]*datasource.TableRow, len(resTable.Rows))
@@ -316,9 +347,8 @@ func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, erro
 	var ok bool
 	var err error
 	if interfaceIsNil(v) {
-		if typ == kustoTypeString {
-			return nil, fmt.Errorf("string type field should never be null, but has null value")
-		}
+		// It's okay if the string value is null sometimes.
+		// Queries like .show databases will do this.
 		r.Kind = datasource.RowValue_TYPE_NULL
 		return r, nil
 	}
