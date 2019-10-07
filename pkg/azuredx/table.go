@@ -352,6 +352,36 @@ func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, erro
 		r.Kind = datasource.RowValue_TYPE_NULL
 		return r, nil
 	}
+
+	// Sometimes Kusto will not return a proper type, or an empty type.
+	// In this case, try to interpolate the type.
+	if typ == "" {
+		switch v.(type) {
+		case int:
+			typ = kustoTypeInt
+			break
+		case float64:
+			typ = kustoTypeReal
+			break
+		case string:
+			typ = kustoTypeString
+			break
+		case json.Number:
+			// For json.Number's we could have either a float or an int.
+			// Numbers can be either float or int. If there is a "."
+			// return float, otherwise return int.
+			sv := fmt.Sprintf("%v", v)
+			if strings.Contains(sv, ".") {
+				typ = kustoTypeReal
+			} else {
+				typ = kustoTypeInt
+			}
+			break
+		default:
+			return nil, fmt.Errorf("unsupplied type '%v' in table for value '%v'", typ, v)
+		}
+	}
+
 	switch typ {
 	case kustoTypeBool:
 		r.Kind = datasource.RowValue_TYPE_BOOL
