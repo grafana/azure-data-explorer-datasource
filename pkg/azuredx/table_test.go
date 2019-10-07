@@ -166,6 +166,26 @@ func Test_extractValueForTable(t *testing.T) {
 			StringValue:  "00:00:00.0000001",
 		},
 		{
+			name:         "should handle empty string types (json float)",
+			args:         extractValueArgs{json.Number("3.14159265"), ""},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_DOUBLE,
+			rowValField:  "DoubleValue",
+			rowValIs:     assert.Equal,
+			DoubleValue:  3.14159265,
+		},
+		{
+			name:         "should handle empty string types (json int)",
+			args:         extractValueArgs{json.Number("314"), ""},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_INT64,
+			rowValField:  "Int64Val",
+			rowValIs:     assert.Equal,
+			Int64Val:     314,
+		},
+		{
 			name:         "null bool should be null", // all types should be except string, but only bool and string are tested
 			args:         extractValueArgs{nil, kustoTypeBool},
 			errorIs:      assert.NoError,
@@ -173,9 +193,11 @@ func Test_extractValueForTable(t *testing.T) {
 			rowValKind:   datasource.RowValue_TYPE_NULL,
 		},
 		{
-			name:    "null string should be error", // as per documentation, null strings are not supported by Kusto
-			args:    extractValueArgs{nil, kustoTypeString},
-			errorIs: assert.Error,
+			name:         "null string should be type null",
+			args:         extractValueArgs{nil, kustoTypeString},
+			errorIs:      assert.NoError,
+			rowValKindIs: assert.Equal,
+			rowValKind:   datasource.RowValue_TYPE_NULL,
 		},
 	}
 	for _, tt := range tests {

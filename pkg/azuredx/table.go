@@ -412,7 +412,7 @@ func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, erro
 			return nil, fmt.Errorf("failed to marshal dynamic type into JSON string '%v': %v", v, err)
 		}
 		r.StringValue = string(b)
-	case kustoTypeString, kustoTypeGUID, kustoTypeTimespan, kustoTypeDatetime, "":
+	case kustoTypeString, kustoTypeGUID, kustoTypeTimespan, kustoTypeDatetime:
 		r.Kind = datasource.RowValue_TYPE_STRING
 		r.StringValue, ok = v.(string)
 		if !ok {
