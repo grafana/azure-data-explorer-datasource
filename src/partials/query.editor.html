@@ -26,6 +26,15 @@
 
   <div class="gf-form-inline">
     <div class="gf-form">
+      <label class="gf-form-label query-keyword">ALIAS BY</label>
+      <input
+        type="text"
+        class="gf-form-input"
+        ng-model="ctrl.target.alias"
+        spellcheck="false"
+        placeholder="Naming pattern"
+        ng-blur="ctrl.refresh()"
+      /> 
       <label class="gf-form-label query-keyword width-7">Format As</label>
       <div class="gf-form-select-wrapper">
         <select class="gf-form-input gf-size-auto" ng-model="ctrl.target.resultFormat" ng-options="f.value as f.text for f in ctrl.resultFormats"
