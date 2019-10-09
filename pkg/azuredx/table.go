@@ -47,7 +47,38 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 
 		for colIdx, column := range resTable.Columns { // For column in the table
 			t.Columns[colIdx] = &datasource.TableColumn{Name: column.ColumnName}
-			columnTypes[colIdx] = column.ColumnType
+			if column.ColumnType == "" && column.DataType != "" {
+				switch column.DataType {
+				case "String":
+					columnTypes[colIdx] = kustoTypeString
+					break
+				case "Boolean":
+					columnTypes[colIdx] = kustoTypeBool
+					break
+				case "Guid":
+					columnTypes[colIdx] = kustoTypeGUID
+					break
+				case "DateTime":
+					columnTypes[colIdx] = kustoTypeDatetime
+					break
+				case "Int":
+					columnTypes[colIdx] = kustoTypeInt
+					break
+				case "Float":
+					columnTypes[colIdx] = kustoTypeReal
+					break
+				case "Long":
+				case "Decimal":
+					columnTypes[colIdx] = kustoTypeLong
+					break
+				case "Dynamic":
+					columnTypes[colIdx] = kustoTypeDynamic
+					break
+				}
+			} else {
+				columnTypes[colIdx] = column.ColumnType
+			}
+
 		}
 
 		t.Rows = make([]*datasource.TableRow, len(resTable.Rows))
@@ -316,12 +347,41 @@ func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, erro
 	var ok bool
 	var err error
 	if interfaceIsNil(v) {
-		if typ == kustoTypeString {
-			return nil, fmt.Errorf("string type field should never be null, but has null value")
-		}
+		// It's okay if the string value is null sometimes.
+		// Queries like .show databases will do this.
 		r.Kind = datasource.RowValue_TYPE_NULL
 		return r, nil
 	}
+
+	// Sometimes Kusto will not return a proper type, or an empty type.
+	// In this case, try to interpolate the type.
+	if typ == "" {
+		switch v.(type) {
+		case int:
+			typ = kustoTypeInt
+			break
+		case float64:
+			typ = kustoTypeReal
+			break
+		case string:
+			typ = kustoTypeString
+			break
+		case json.Number:
+			// For json.Number's we could have either a float or an int.
+			// Numbers can be either float or int. If there is a "."
+			// return float, otherwise return int.
+			sv := fmt.Sprintf("%v", v)
+			if strings.Contains(sv, ".") {
+				typ = kustoTypeReal
+			} else {
+				typ = kustoTypeInt
+			}
+			break
+		default:
+			return nil, fmt.Errorf("unsupplied type '%v' in table for value '%v'", typ, v)
+		}
+	}
+
 	switch typ {
 	case kustoTypeBool:
 		r.Kind = datasource.RowValue_TYPE_BOOL
@@ -352,7 +412,7 @@ func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, erro
 			return nil, fmt.Errorf("failed to marshal dynamic type into JSON string '%v': %v", v, err)
 		}
 		r.StringValue = string(b)
-	case kustoTypeString, kustoTypeGUID, kustoTypeTimespan, kustoTypeDatetime, "":
+	case kustoTypeString, kustoTypeGUID, kustoTypeTimespan, kustoTypeDatetime:
 		r.Kind = datasource.RowValue_TYPE_STRING
 		r.StringValue, ok = v.(string)
 		if !ok {
