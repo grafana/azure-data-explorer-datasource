@@ -101,14 +101,14 @@ export class ResponseParser {
               tags: [],
             };
             table.columns.forEach((column, idx) => {
-              switch(column.text) {
-                case "StartTime":
+              switch (column.text) {
+                case 'StartTime':
                   entry.time = Math.floor(ResponseParser.dateTimeToEpoch(row[idx]));
                   break;
-                case "Text":
+                case 'Text':
                   entry.text = row[idx];
                   break;
-                case "Tags":
+                case 'Tags':
                   entry.tags = row[idx].trim().split(/\s*,\s*/);
                   break;
               }
@@ -143,7 +143,7 @@ export class ResponseParser {
   }
 
   parseQueryResult(results: any) {
-    console.log("Parsing", results);
+    console.log('Parsing', results);
     let data: any[] = Object.keys(results.data.results).map(resultKey => {
       let result = results.data.results[resultKey];
       var ret;
@@ -292,7 +292,7 @@ export class ResponseParser {
 
   transformToAnnotations(options: any, result: any) {
     const queryResult = this.parseQueryResult(result);
-    console.log("Query result", queryResult);
+    console.log('Query result', queryResult);
     const list: AnnotationItem[] = [];
 
     for (let result of queryResult.data) {
