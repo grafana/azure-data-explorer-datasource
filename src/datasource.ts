@@ -63,22 +63,42 @@ export class KustoDBDatasource {
         },
       })
       .then(results => {
-        let ret = new ResponseParser().processQueryResult(results);
+        let responseParser = new ResponseParser();
+        let ret = responseParser.processQueryResult(results);
+
         ret.data.forEach(r => {
           let templateVars = {};
-          let target = queryTargets[r.refId];
-          let alias = target.alias;
-          let meta = JSON.parse(r.target);
-          let value = Object.keys(meta)[0];
-          templateVars['value'] = { text: value, value: value };
-          Object.keys(meta[value]).forEach(t => {
-            templateVars[t] = { text: meta[value][t], value: meta[value][t] };
-          });
-          if (!alias) {
-            alias = '$metricname';
+          let query = queryTargets[r.refId];
+          // Table format does not use aliases yet. The user could
+          // control the table format using aliases in the query itself
+          // ex: data | project NewColumnName=ColumnName
+          if (query.resultFormat === "time_series") {
+            let alias = query.alias;
+            try {
+              let key = Object.keys(r.target)[0];
+              let meta = r.target[key];
+              let full = JSON.stringify(r.target).replace(/"/g,'').replace(/^\{(.*?)\}$/,'$1');
+              // Generating a default time series metric name requires both the metricname
+              // and the value, but only if multiple values were requested.
+              // By default, and for backwards compatibility, if there is only one metric
+              // in the alias values, use that one.
+              let defaultAlias = meta[Object.keys(meta)[0]];
+              if (typeof ret.valueCount !== "undefined" && ret.valueCount > 1) {
+                defaultAlias = Object.keys(meta).map(key => '$' + key).join('.') + '.$value';
+              }
+              templateVars['value'] = { text: key, value: key };
+              templateVars['full'] = { text: full, value: full };
+              Object.keys(meta).forEach(t => {
+                templateVars[t] = { text: meta[t], value: meta[t] };
+              });
+              if (!alias) {
+                alias = defaultAlias;
+              }
+              r.target = this.templateSrv.replace(alias, templateVars);
+            } catch (ex) {
+              console.log("Error generating time series alias", ex);
+            }
           }
-
-          r.target = this.templateSrv.replace(alias, templateVars);
         });
 
         return ret;
