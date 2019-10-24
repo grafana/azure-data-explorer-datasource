@@ -25,8 +25,7 @@ export default class QueryBuilder {
       // TEMP TODO commented out to move timeFilter expansion to backend
       // query = query.replace(macroRegexp, (match, p1, p2) => {
       //   if (p1 === 'timeFilter') {
-      //     timeField = p2.trim();
-      //     return this.getTimeFilter(p2, this.options);
+      //     return this.getTimeFilter(p2.trim(), this.options);
       //   }
       //   return match;
       // });

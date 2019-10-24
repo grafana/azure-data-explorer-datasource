@@ -3,6 +3,7 @@ import { ResponseParser, DatabaseItem } from './response_parser';
 import QueryBuilder from './query_builder';
 import Cache from './cache';
 import RequestAggregator from './request_aggregator';
+//import { isTemplateElement } from '@babel/types';
 
 export class KustoDBDatasource {
   id: number;
@@ -63,22 +64,40 @@ export class KustoDBDatasource {
         },
       })
       .then(results => {
-        let ret = new ResponseParser().processQueryResult(results);
+        let responseParser = new ResponseParser();
+        let ret = responseParser.processQueryResult(results);
+
         ret.data.forEach(r => {
           let templateVars = {};
-          let target = queryTargets[r.refId];
-          let alias = target.alias;
-          let meta = JSON.parse(r.target);
-          let value = Object.keys(meta)[0];
-          templateVars['value'] = { text: value, value: value };
-          Object.keys(meta[value]).forEach(t => {
-            templateVars[t] = { text: meta[value][t], value: meta[value][t] };
-          });
-          if (!alias) {
-            alias = '$metricname';
+          let query = queryTargets[r.refId];
+          // Table format does not use aliases yet. The user could
+          // control the table format using aliases in the query itself
+          // ex: data | project NewColumnName=ColumnName
+          if (query.resultFormat === "time_series") {
+            let alias = query.alias;
+            try {
+              let key = Object.keys(r.target)[0];
+              let meta = r.target[key];
+              // Generating a default time series metric name requires both the metricname
+              // and the value, but only if multiple values were requested.
+              // By default, and for backwards compatibility, if there is only one metric
+              // in the alias values, use that one.
+              let defaultAlias = meta[Object.keys(meta)[0]];
+              if (typeof ret.valueCount !== "undefined" && ret.valueCount > 1) {
+                defaultAlias = Object.keys(meta).map(key => '$' + key).join('.') + '.$value';
+              }
+              templateVars['value'] = { text: key, value: key };
+              Object.keys(meta).forEach(t => {
+                templateVars[t] = { text: meta[t], value: meta[t] };
+              });
+              if (!alias) {
+                alias = defaultAlias;
+              }
+              r.target = this.templateSrv.replace(alias, templateVars);
+            } catch (ex) {
+              console.log("Error generating time series alias", ex);
+            }
           }
-
-          r.target = this.templateSrv.replace(alias, templateVars);
         });
 
         return ret;
@@ -93,13 +112,31 @@ export class KustoDBDatasource {
     }
 
     const queries: any[] = this.buildQuery(options.annotation.rawQuery, options, options.annotation.database);
+    return this.backendSrv
+      .datasourceRequest({
+        url: '/api/tsdb/query',
+        method: 'POST',
+        data: {
+          from: options.range.from.valueOf().toString(),
+          to: options.range.to.valueOf().toString(),
+          queries: queries,
+        },
+      })
+      .then(results => {
+        console.log("resuts are", results, options);
+        return new ResponseParser().parseAnnotations(results, options);
+      });
+    // const promises = this.doQueries(queries);
+    // console.log("We got this far...", queries);
 
-    const promises = this.doQueries(queries);
-
-    return this.$q.all(promises).then(results => {
-      const annotations = new ResponseParser().transformToAnnotations(options, results);
-      return annotations;
-    });
+    // return Promise.all(promises).then(results => {
+    //   console.log("We got results", results);
+    // });
+    // return this.$q.all(promises).then(results => {
+    //   console.log("How about now?");
+    //   const annotations = new ResponseParser().
+    //   return annotations;
+    // });
   }
 
   metricFindQuery(query: string, optionalOptions: any) {
@@ -108,6 +145,7 @@ export class KustoDBDatasource {
 
       const promises = this.doQueries(queries);
 
+      console.log("These work", promises);
       return this.$q
         .all(promises)
         .then(results => {
@@ -215,22 +253,30 @@ export class KustoDBDatasource {
   }
 
   private buildQuery(query: string, options: any, database: string) {
-    const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, {}, this.interpolateVariable), options);
+    const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable), options);
     const url = `${this.baseUrl}/v1/rest/query`;
-    const csl = queryBuilder.interpolate().query;
+    const interpolatedQuery = queryBuilder.interpolate().query;
     const queries: any[] = [];
+    console.log("Query", query, "options", options, "database", database);
     queries.push({
-      key: `${url}-table-${database}-${csl}`,
+      key: `${url}-table-${database}-${interpolatedQuery}`,
+      refId: options.annotation.name,
       datasourceId: this.id,
       url: url,
       resultFormat: 'table',
-      data: {
-        csl,
-        db: database,
-      },
+      query: interpolatedQuery,
+      database: options.annotation.database
     });
     return queries;
   }
+
+  // refId: item.refId,
+  // intervalMs: options.intervalMs,
+  // maxDataPoints: options.maxDataPoints,
+  // datasourceId: this.id,
+  // query: interpolatedQuery,
+  // database: item.database,
+  // resultFormat: item.resultFormat,
 
   doRequest(url, data, maxRetries = 1) {
     return this.backendSrv

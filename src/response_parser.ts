@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
+//import { AnnotationsQueryCtrl } from 'module';
+//import { nullLiteral } from '@babel/types';
 
 export interface DataTarget {
   target: string;
@@ -83,6 +85,43 @@ export interface DatabaseItem {
 }
 
 export class ResponseParser {
+  parseAnnotations(results, options): Array<AnnotationItem> {
+    let annotations: Array<AnnotationItem> = [];
+
+    Object.keys(results.data.results).forEach(resultKey => {
+      let result = results.data.results[resultKey];
+
+      if (result.tables.length > 0) {
+        result.tables.forEach(table => {
+          table.rows.forEach(row => {
+            let entry: AnnotationItem = {
+              annotation: options.annotation,
+              time: 0,
+              text: '',
+              tags: [],
+            };
+            table.columns.forEach((column, idx) => {
+              switch(column.text) {
+                case "StartTime":
+                  entry.time = Math.floor(ResponseParser.dateTimeToEpoch(row[idx]));
+                  break;
+                case "Text":
+                  entry.text = row[idx];
+                  break;
+                case "Tags":
+                  entry.tags = row[idx].trim().split(/\s*,\s*/);
+                  break;
+              }
+            });
+            annotations.push(entry);
+          });
+        });
+      }
+    });
+
+    return annotations;
+  }
+
   parseDatabases(results: KustoDatabaseList): DatabaseItem[] {
     const databases: DatabaseItem[] = [];
     if (!results || !results.data || !results.data.Tables || results.data.Tables.length === 0) {
@@ -104,21 +143,32 @@ export class ResponseParser {
   }
 
   parseQueryResult(results: any) {
-    let data: any[] = [];
-    let columns: any[] = [];
-    for (let i = 0; i < results.length; i++) {
-      if (results[i].result.data.Tables.length === 0) {
-        continue;
+    console.log("Parsing", results);
+    let data: any[] = Object.keys(results.data.results).map(resultKey => {
+      let result = results.data.results[resultKey];
+      var ret;
+      if (result.series.length > 0) {
+        ret = this.parseTimeSeriesResult(result, result.series[0].columns, result.series[0].rows);
       }
-      columns = results[i].result.data.Tables[0].Columns;
-      const rows = results[i].result.data.Tables[0].Rows;
+      if (result.tables.length > 0) {
+        ret = this.parseTableResult(result, result.tables[0].columns, result.tables[0].rows);
+      }
 
-      if (results[i].query.resultFormat === 'time_series') {
-        data = _.concat(data, this.parseTimeSeriesResult(results[i].query, columns, rows));
-      } else {
-        data = _.concat(data, this.parseTableResult(results[i].query, columns, rows));
-      }
-    }
+      return ret;
+    });
+    // for (let i = 0; i < results.length; i++) {
+    //   if (results[i].result.data.Tables.length === 0) {
+    //     continue;
+    //   }
+    //   columns = results[i].result.data.Tables[0].Columns;
+    //   const rows = results[i].result.data.Tables[0].Rows;
+
+    //   if (results[i].query.resultFormat === 'time_series') {
+    //     data = _.concat(data, this.parseTimeSeriesResult(, columns, rows));
+    //   } else {
+    //     data = _.concat(data, this.parseTableResult(results[i].query, columns, rows));
+    //   }
+    // }
     return { data: data };
   }
 
@@ -242,7 +292,7 @@ export class ResponseParser {
 
   transformToAnnotations(options: any, result: any) {
     const queryResult = this.parseQueryResult(result);
-
+    console.log("Query result", queryResult);
     const list: AnnotationItem[] = [];
 
     for (let result of queryResult.data) {
@@ -299,13 +349,20 @@ export class ResponseParser {
       return { data: data };
     }
 
+    let valueMap = {};
+
     for (const key in res.data.results) {
       const queryRes = res.data.results[key];
 
       if (queryRes.series) {
         for (const series of queryRes.series) {
+          let target = JSON.parse(series.name);
+          let val = Object.keys(target)[0];
+          // We are just counting the unique values in this response
+          // so that later we can use it to determine the best alias name
+          valueMap[val] = 0;
           data.push({
-            target: series.name,
+            target,
             datapoints: series.points,
             refId: queryRes.refId,
             meta: queryRes.meta,
@@ -323,6 +380,9 @@ export class ResponseParser {
       }
     }
 
-    return { data: data };
+    return {
+      data: data,
+      valueCount: Object.keys(valueMap).length,
+    };
   }
 }

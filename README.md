@@ -42,11 +42,11 @@ Given a table with the following columns:
 
 | Query | Template | Results |
 |-------|----------|---------|
-| `data | project metric, value, timestamp` | $metric | cpu_usage,mem_percent_used|
-| `data | project metric, value, timestamp, location` | \$metric.$location | cpu_usage.server1, mem_percent_used.server2 |
-| `data | project name=metric, val=value, time=timestamp` | $name | cpu_usage,mem_percent_used |
-| `data | project timestamp, metric, value, state` | \$metric.$value | cpu_usage.value, cpu_usage.state, mem_percent_used.value, mem_percent_used.state |
-| `data | project timestamp, metric, value, state, server, importance` | [$importance]: \$metric.\$server.\$value | [low]: cpu_usage.server1.value, [med]: cpu_usage.server1.state, [high]: mem_percent_used.server2.value, [high]: mem_percent_used.server2.state
+| `data \| project metric, value, timestamp` | $metric | cpu_usage,mem_percent_used|
+| `data \| project metric, value, timestamp, location` | \$metric.$location | cpu_usage.server1, mem_percent_used.server2 |
+| `data \| project name=metric, val=value, time=timestamp` | $name | cpu_usage,mem_percent_used |
+| `data \| project timestamp, metric, value, state` | \$metric.$value | cpu_usage.value, cpu_usage.state, mem_percent_used.value, mem_percent_used.state |
+| `data \| project timestamp, metric, value, state, server, importance` | [$importance]: \$metric.\$server.\$value | [low]: cpu_usage.server1.value, [med]: cpu_usage.server1.state, [high]: mem_percent_used.server2.value, [high]: mem_percent_used.server2.state
 
 ### Docker
 

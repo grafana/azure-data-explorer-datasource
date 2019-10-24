@@ -6,17 +6,13 @@ import (
 	"net/http"
 	"net/http/pprof"
 
-	"github.com/hashicorp/go-hclog"
 	"google.golang.org/grpc"
 
+	l "github.com/grafana/azure-data-explorer-datasource/pkg/log"
 	"github.com/grafana/grafana_plugin_model/go/datasource"
+
 	plugin "github.com/hashicorp/go-plugin"
 )
-
-var pluginLogger = hclog.New(&hclog.LoggerOptions{
-	Name:  "azuredx-datasource",
-	Level: hclog.LevelFromString("DEBUG"),
-})
 
 func healthcheckHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
@@ -52,7 +48,7 @@ func main() {
 	}()
 
 	// log.SetOutput(os.Stderr) // the plugin sends logs to the host process on strErr
-	pluginLogger.Debug("Running GRPC server")
+	l.Print.Debug("Running GRPC server")
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: plugin.HandshakeConfig{
 			ProtocolVersion:  1,
@@ -60,7 +56,7 @@ func main() {
 			MagicCookieValue: "datasource",
 		},
 		Plugins: map[string]plugin.Plugin{
-			"grafana-azure-data-explorer-datasource": &datasource.DatasourcePluginImpl{Plugin: &GrafanaAzureDXDatasource{logger: pluginLogger}},
+			"grafana-azure-data-explorer-datasource": &datasource.DatasourcePluginImpl{Plugin: &GrafanaAzureDXDatasource{}},
 		},
 		GRPCServer: pluginGRPCServer,
 	})

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
 	"github.com/grafana/grafana_plugin_model/go/datasource"
 )
 
@@ -96,5 +97,7 @@ func timeFilterMacro(s string, md MacroData) string {
 	from := time.Unix(0, md.FromEpochMs*1e6)
 	to := time.Unix(0, md.ToEpochMs*1e6)
 	fmtString := "%v >= datetime(%v) and %v <= datetime(%v)"
-	return fmt.Sprintf(fmtString, s, from.UTC().Format(time.RFC3339Nano), s, to.UTC().Format(time.RFC3339Nano))
+	timeString := fmt.Sprintf(fmtString, s, from.UTC().Format(time.RFC3339Nano), s, to.UTC().Format(time.RFC3339Nano))
+	log.Print.Debug("Time String: %s", timeString)
+	return timeString
 }
