@@ -329,7 +329,7 @@ describe('KustoDBDatasource', () => {
 
       annotationResults = await ctx.ds.annotationQuery({
         annotation: {
-          rawQuery: 'Heartbeat | where $__timeFilter()| project TimeGenerated, Text=Computer, tags="test"',
+          rawQuery: 'Heartbeat | where $__timeFilter(TimeGenerated)| project TimeGenerated, Text=Computer, tags="test"',
           database: 'Grafana',
         },
         range: {

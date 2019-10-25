@@ -126,40 +126,25 @@ export class KustoDBDatasource {
         },
       })
       .then(results => {
-        console.log('resuts are', results, options);
         return new ResponseParser().parseAnnotations(results, options);
       });
-    // const promises = this.doQueries(queries);
-    // console.log("We got this far...", queries);
-
-    // return Promise.all(promises).then(results => {
-    //   console.log("We got results", results);
-    // });
-    // return this.$q.all(promises).then(results => {
-    //   console.log("How about now?");
-    //   const annotations = new ResponseParser().
-    //   return annotations;
-    // });
   }
 
   metricFindQuery(query: string, optionalOptions: any) {
-    return this.getDefaultOrFirstDatabase().then(database => {
-      const queries: any[] = this.buildQuery(query, null, database);
-
-      const promises = this.doQueries(queries);
-
-      console.log('These work', promises);
-      return this.$q
-        .all(promises)
-        .then(results => {
-          return new ResponseParser().parseToVariables(results);
+    return this.getDefaultOrFirstDatabase()
+      .then(database => this.buildQuery(query, optionalOptions, database))
+      .then(queries =>
+        this.backendSrv.datasourceRequest({
+          url: '/api/tsdb/query',
+          method: 'POST',
+          queries,
         })
-        .catch(err => {
-          if (err.error && err.error.data && err.error.data.error) {
-            throw { message: err.error.data.error['@message'] };
-          }
-        });
-    });
+      )
+      .then(response => new ResponseParser().parseToVariables(response))
+      .catch(err => {
+        console.log('There was an error', err);
+        throw err;
+      });
   }
 
   testDatasource() {
@@ -256,19 +241,23 @@ export class KustoDBDatasource {
   }
 
   private buildQuery(query: string, options: any, database: string) {
+    if (typeof options === 'undefined') {
+      options = {};
+    }
+    if (typeof options.scopedVars === 'undefined') {
+      options['scopedVars'] = {};
+    }
     const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable), options);
     const url = `${this.baseUrl}/v1/rest/query`;
     const interpolatedQuery = queryBuilder.interpolate().query;
     const queries: any[] = [];
-    console.log('Query', query, 'options', options, 'database', database);
     queries.push({
       key: `${url}-table-${database}-${interpolatedQuery}`,
-      refId: options.annotation.name,
       datasourceId: this.id,
       url: url,
       resultFormat: 'table',
       query: interpolatedQuery,
-      database: options.annotation.database,
+      database,
     });
     return queries;
   }

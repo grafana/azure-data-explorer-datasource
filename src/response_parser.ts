@@ -88,36 +88,40 @@ export class ResponseParser {
   parseAnnotations(results, options): Array<AnnotationItem> {
     let annotations: Array<AnnotationItem> = [];
 
-    Object.keys(results.data.results).forEach(resultKey => {
-      let result = results.data.results[resultKey];
+    if (results.data.hasOwnProperty('results')) {
+      Object.keys(results.data.results).forEach(resultKey => {
+        let result = results.data.results[resultKey];
 
-      if (result.tables.length > 0) {
-        result.tables.forEach(table => {
-          table.rows.forEach(row => {
-            let entry: AnnotationItem = {
-              annotation: options.annotation,
-              time: 0,
-              text: '',
-              tags: [],
-            };
-            table.columns.forEach((column, idx) => {
-              switch (column.text) {
-                case 'StartTime':
-                  entry.time = Math.floor(ResponseParser.dateTimeToEpoch(row[idx]));
-                  break;
-                case 'Text':
-                  entry.text = row[idx];
-                  break;
-                case 'Tags':
-                  entry.tags = row[idx].trim().split(/\s*,\s*/);
-                  break;
-              }
+        if (result.tables.length > 0) {
+          result.tables.forEach(table => {
+            table.rows.forEach(row => {
+              let entry: AnnotationItem = {
+                annotation: options.annotation,
+                time: 0,
+                text: '',
+                tags: [],
+              };
+              table.columns.forEach((column, idx) => {
+                switch (column.text) {
+                  case 'StartTime':
+                    entry.time = Math.floor(ResponseParser.dateTimeToEpoch(row[idx]));
+                    break;
+                  case 'Text':
+                    entry.text = row[idx];
+                    break;
+                  case 'Tags':
+                    entry.tags = row[idx].trim().split(/\s*,\s*/);
+                    break;
+                }
+              });
+              annotations.push(entry);
             });
-            annotations.push(entry);
           });
-        });
-      }
-    });
+        }
+      });
+    } else {
+      annotations = this.transformToAnnotations(options, results);
+    }
 
     return annotations;
   }
@@ -142,34 +146,20 @@ export class ResponseParser {
     return JSON.parse(schemaJson);
   }
 
+  hasPropertyOfArray(obj: Object, key: string): Boolean {
+    return typeof obj !== 'undefined' && obj.hasOwnProperty(key) && Array.isArray(obj[key]);
+  }
+
   parseQueryResult(results: any) {
-    console.log('Parsing', results);
-    let data: any[] = Object.keys(results.data.results).map(resultKey => {
-      let result = results.data.results[resultKey];
-      var ret;
-      if (result.series.length > 0) {
-        ret = this.parseTimeSeriesResult(result, result.series[0].columns, result.series[0].rows);
-      }
-      if (result.tables.length > 0) {
-        ret = this.parseTableResult(result, result.tables[0].columns, result.tables[0].rows);
-      }
+    var ret: any;
+    if (this.hasPropertyOfArray(results.data, 'Series')) {
+      ret = this.parseTimeSeriesResult(results, results.data.Series[0].Columns, results.data.Series[0].Rows);
+    }
+    if (this.hasPropertyOfArray(results.data, 'Tables')) {
+      ret = this.parseTableResult(results, results.data.Tables[0].Columns, results.data.Tables[0].Rows);
+    }
 
-      return ret;
-    });
-    // for (let i = 0; i < results.length; i++) {
-    //   if (results[i].result.data.Tables.length === 0) {
-    //     continue;
-    //   }
-    //   columns = results[i].result.data.Tables[0].Columns;
-    //   const rows = results[i].result.data.Tables[0].Rows;
-
-    //   if (results[i].query.resultFormat === 'time_series') {
-    //     data = _.concat(data, this.parseTimeSeriesResult(, columns, rows));
-    //   } else {
-    //     data = _.concat(data, this.parseTableResult(results[i].query, columns, rows));
-    //   }
-    // }
-    return { data: data };
+    return { data: [ret] };
   }
 
   parseTimeSeriesResult(query, columns, rows): DataTarget[] {
@@ -223,7 +213,6 @@ export class ResponseParser {
   parseToVariables(results): Variable[] {
     var variables: Variable[] = [];
     const queryResult = this.parseQueryResult(results);
-
     // Issue 7: If we have a __text and __value column as checked above,
     // Use the __value column to match but the __text column to display.
     for (let result of queryResult.data) {
@@ -292,7 +281,6 @@ export class ResponseParser {
 
   transformToAnnotations(options: any, result: any) {
     const queryResult = this.parseQueryResult(result);
-    console.log('Query result', queryResult);
     const list: AnnotationItem[] = [];
 
     for (let result of queryResult.data) {
