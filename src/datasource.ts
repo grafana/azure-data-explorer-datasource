@@ -78,6 +78,9 @@ export class KustoDBDatasource {
             try {
               let key = Object.keys(r.target)[0];
               let meta = r.target[key];
+              let full = JSON.stringify(r.target)
+                .replace(/"/g, '')
+                .replace(/^\{(.*?)\}$/, '$1');
               // Generating a default time series metric name requires both the metricname
               // and the value, but only if multiple values were requested.
               // By default, and for backwards compatibility, if there is only one metric
@@ -90,6 +93,7 @@ export class KustoDBDatasource {
                     .join('.') + '.$value';
               }
               templateVars['value'] = { text: key, value: key };
+              templateVars['full'] = { text: full, value: full };
               Object.keys(meta).forEach(t => {
                 templateVars[t] = { text: meta[t], value: meta[t] };
               });
