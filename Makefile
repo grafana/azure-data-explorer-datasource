@@ -23,7 +23,7 @@ build-darwin:
 	go build -o ./dist/${DSNAME}_darwin_amd64 -a -tags netgo -ldflags '-w' ./pkg
 
 build-dev:
-	go build -o ./dist/${DSNAME}_linux_amd64 -a ./pkg
+	go build -o ./dist/${DSNAME}_linux_amd64 ./pkg
 
 build-win:
 	go build -o ./dist/${DSNAME}_windows_amd64.exe -a -tags netgo -ldflags '-w' ./pkg

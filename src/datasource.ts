@@ -3,6 +3,7 @@ import { ResponseParser, DatabaseItem } from './response_parser';
 import QueryBuilder from './query_builder';
 import Cache from './cache';
 import RequestAggregator from './request_aggregator';
+//import { isTemplateElement } from '@babel/types';
 
 export class KustoDBDatasource {
   id: number;
@@ -118,32 +119,36 @@ export class KustoDBDatasource {
     }
 
     const queries: any[] = this.buildQuery(options.annotation.rawQuery, options, options.annotation.database);
-
-    const promises = this.doQueries(queries);
-
-    return this.$q.all(promises).then(results => {
-      const annotations = new ResponseParser().transformToAnnotations(options, results);
-      return annotations;
-    });
+    return this.backendSrv
+      .datasourceRequest({
+        url: '/api/tsdb/query',
+        method: 'POST',
+        data: {
+          from: options.range.from.valueOf().toString(),
+          to: options.range.to.valueOf().toString(),
+          queries: queries,
+        },
+      })
+      .then(results => {
+        return new ResponseParser().parseAnnotations(results, options);
+      });
   }
 
   metricFindQuery(query: string, optionalOptions: any) {
-    return this.getDefaultOrFirstDatabase().then(database => {
-      const queries: any[] = this.buildQuery(query, null, database);
-
-      const promises = this.doQueries(queries);
-
-      return this.$q
-        .all(promises)
-        .then(results => {
-          return new ResponseParser().parseToVariables(results);
+    return this.getDefaultOrFirstDatabase()
+      .then(database => this.buildQuery(query, optionalOptions, database))
+      .then(queries =>
+        this.backendSrv.datasourceRequest({
+          url: '/api/tsdb/query',
+          method: 'POST',
+          queries,
         })
-        .catch(err => {
-          if (err.error && err.error.data && err.error.data.error) {
-            throw { message: err.error.data.error['@message'] };
-          }
-        });
-    });
+      )
+      .then(response => new ResponseParser().parseToVariables(response))
+      .catch(err => {
+        console.log('There was an error', err);
+        throw err;
+      });
   }
 
   testDatasource() {
@@ -240,22 +245,34 @@ export class KustoDBDatasource {
   }
 
   private buildQuery(query: string, options: any, database: string) {
-    const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, {}, this.interpolateVariable), options);
+    if (typeof options === 'undefined') {
+      options = {};
+    }
+    if (typeof options.scopedVars === 'undefined') {
+      options['scopedVars'] = {};
+    }
+    const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable), options);
     const url = `${this.baseUrl}/v1/rest/query`;
-    const csl = queryBuilder.interpolate().query;
+    const interpolatedQuery = queryBuilder.interpolate().query;
     const queries: any[] = [];
     queries.push({
-      key: `${url}-table-${database}-${csl}`,
+      key: `${url}-table-${database}-${interpolatedQuery}`,
       datasourceId: this.id,
       url: url,
       resultFormat: 'table',
-      data: {
-        csl,
-        db: database,
-      },
+      query: interpolatedQuery,
+      database,
     });
     return queries;
   }
+
+  // refId: item.refId,
+  // intervalMs: options.intervalMs,
+  // maxDataPoints: options.maxDataPoints,
+  // datasourceId: this.id,
+  // query: interpolatedQuery,
+  // database: item.database,
+  // resultFormat: item.resultFormat,
 
   doRequest(url, data, maxRetries = 1) {
     return this.backendSrv

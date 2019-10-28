@@ -13,6 +13,7 @@ import (
 
 	"golang.org/x/oauth2/microsoft"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
 	"github.com/grafana/grafana_plugin_model/go/datasource"
 	"github.com/hashicorp/go-hclog"
 	"golang.org/x/oauth2/clientcredentials"
@@ -72,9 +73,8 @@ func newDataSourceData(dInfo *datasource.DatasourceInfo) (*dataSourceData, error
 
 // NewClient creates a new Azure Data Explorer http client from the DatasourceInfo.
 // AAD OAuth authentication is setup for the client.
-func NewClient(ctx context.Context, dInfo *datasource.DatasourceInfo, logger hclog.Logger) (*Client, error) {
+func NewClient(ctx context.Context, dInfo *datasource.DatasourceInfo) (*Client, error) {
 	c := Client{}
-	c.Log = logger
 	var err error
 	c.dataSourceData, err = newDataSourceData(dInfo)
 	if err != nil {
@@ -149,7 +149,7 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, e
 		errorData := &errorResponse{}
 		err = json.Unmarshal(bodyBytes, errorData)
 		if err != nil {
-			c.Log.Debug("failed to unmarshal error body from response: %v", err)
+			log.Print.Debug("failed to unmarshal error body from response: %v", err)
 		}
 		return nil, errorData.Error.Message, fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
 	}

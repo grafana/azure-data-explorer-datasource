@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
 	"github.com/grafana/grafana_plugin_model/go/datasource"
-	hclog "github.com/hashicorp/go-hclog"
 	plugin "github.com/hashicorp/go-plugin"
 	"golang.org/x/net/context"
 )
@@ -14,7 +14,6 @@ import (
 // GrafanaAzureDXDatasource stores reference to plugin and logger
 type GrafanaAzureDXDatasource struct {
 	plugin.NetRPCUnsupportedPlugin
-	logger hclog.Logger
 }
 
 // Query is the primary method called by grafana-server
@@ -23,9 +22,9 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		Results: make([]*datasource.QueryResult, len(tsdbReq.Queries)),
 	}
 
-	plugin.logger.Debug("Query", "datasource", tsdbReq.Datasource.Name, "TimeRange", tsdbReq.TimeRange)
+	log.Print.Debug("Query", "datasource", tsdbReq.Datasource.Name, "TimeRange", tsdbReq.TimeRange)
 
-	client, err := azuredx.NewClient(ctx, tsdbReq.GetDatasource(), plugin.logger)
+	client, err := azuredx.NewClient(ctx, tsdbReq.GetDatasource())
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +35,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		if err != nil {
 			return nil, err
 		}
+		log.Print.Debug(fmt.Sprintf("Query ---> %v", q))
 		qm.MacroData = azuredx.NewMacroData(tsdbReq.GetTimeRange(), q.GetIntervalMs())
 		if err := qm.Interpolate(); err != nil {
 			return nil, err
@@ -56,7 +56,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 			qr.Error = err.Error()
 			mdString, jsonErr := md.JSONString()
 			if jsonErr != nil {
-				plugin.logger.Debug("failed to marshal metadata", jsonErr)
+				log.Print.Debug("failed to marshal metadata", jsonErr)
 				continue
 			}
 			qr.MetaJson = mdString
@@ -98,7 +98,7 @@ func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *data
 		if qr.MetaJson == "" {
 			mdString, err := md.JSONString()
 			if err != nil {
-				plugin.logger.Debug("could not add metadata", err) // only log since this is just metadata
+				log.Print.Debug("could not add metadata", err) // only log since this is just metadata
 				continue
 			}
 			qr.MetaJson = mdString
