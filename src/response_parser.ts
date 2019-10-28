@@ -299,13 +299,20 @@ export class ResponseParser {
       return { data: data };
     }
 
+    let valueMap = {};
+
     for (const key in res.data.results) {
       const queryRes = res.data.results[key];
 
       if (queryRes.series) {
         for (const series of queryRes.series) {
+          let target = JSON.parse(series.name);
+          let val = Object.keys(target)[0];
+          // We are just counting the unique values in this response
+          // so that later we can use it to determine the best alias name
+          valueMap[val] = 0;
           data.push({
-            target: series.name,
+            target,
             datapoints: series.points,
             refId: queryRes.refId,
             meta: queryRes.meta,
@@ -323,6 +330,9 @@ export class ResponseParser {
       }
     }
 
-    return { data: data };
+    return {
+      data: data,
+      valueCount: Object.keys(valueMap).length,
+    };
   }
 }

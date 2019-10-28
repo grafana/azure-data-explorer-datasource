@@ -29,7 +29,14 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 
 Metrics are displayed using an "ALIAS BY" field displayed when in edit mode. The display uses the grafana templating system to address columns in the query, with one default.
 
- * `$metricname`: By default, when no alias is present, the template $metricname is used. 
+#### Defaults
+When specifying no alias, the following defaults will be taken into account
+1. When querying a simple timestamp, value, and metric, only the metric will be displayed. (`metric`)
+2. When querying a timestamp, metric, and multiple values, the metric name plus names of other columns will be displayed with periods.
+   - Examples
+     - `metric1.value1, metric2.value1, metric2.value2`
+     - `metric1.column1.value1, metric3.column2.value1`
+3. Use the `$full` alias to specify JSON like formattting of the alias. (`value2: {metric:metric1,column:column2}`)
 
 #### Examples of metric naming
 Given a table with the following columns:
@@ -42,11 +49,11 @@ Given a table with the following columns:
 
 | Query | Template | Results |
 |-------|----------|---------|
-| `data | project metric, value, timestamp` | $metric | cpu_usage,mem_percent_used|
-| `data | project metric, value, timestamp, location` | \$metric.$location | cpu_usage.server1, mem_percent_used.server2 |
-| `data | project name=metric, val=value, time=timestamp` | $name | cpu_usage,mem_percent_used |
-| `data | project timestamp, metric, value, state` | \$metric.$value | cpu_usage.value, cpu_usage.state, mem_percent_used.value, mem_percent_used.state |
-| `data | project timestamp, metric, value, state, server, importance` | [$importance]: \$metric.\$server.\$value | [low]: cpu_usage.server1.value, [med]: cpu_usage.server1.state, [high]: mem_percent_used.server2.value, [high]: mem_percent_used.server2.state
+| `data \| project metric, value, timestamp` | $metric | cpu_usage,mem_percent_used|
+| `data \| project metric, value, timestamp, location` | \$metric.$location | cpu_usage.server1, mem_percent_used.server2 |
+| `data \| project name=metric, val=value, time=timestamp` | $name | cpu_usage,mem_percent_used |
+| `data \| project timestamp, metric, value, state` | \$metric.$value | cpu_usage.value, cpu_usage.state, mem_percent_used.value, mem_percent_used.state |
+| `data \| project timestamp, metric, value, state, server, importance` | [$importance]: \$metric.\$server.\$value | [low]: cpu_usage.server1.value, [med]: cpu_usage.server1.state, [high]: mem_percent_used.server2.value, [high]: mem_percent_used.server2.state
 
 ### Docker
 
