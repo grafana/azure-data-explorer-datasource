@@ -17,26 +17,26 @@ test-in-docker: build-container
 		plugin-builder make test
 
 build:
-	go build -o ./dist/${DSNAME}_linux_amd64 -a -tags netgo -ldflags '-w' ./pkg
+	GOOS=linux GOARCH=amd64 go build -o ./dist/${DSNAME}_linux_amd64 -a -tags netgo -ldflags '-w' ./pkg
 
 build-darwin:
-	go build -o ./dist/${DSNAME}_darwin_amd64 -a -tags netgo -ldflags '-w' ./pkg
+	GOOS=darwin GOARCH=amd64 go build -o ./dist/${DSNAME}_darwin_amd64 -a -tags netgo -ldflags '-w' ./pkg
 
 build-dev:
-	go build -o ./dist/${DSNAME}_linux_amd64 ./pkg
+	GOOS=linux GOARCH=amd64 go build -o ./dist/${DSNAME}_linux_amd64 ./pkg
 
 build-win:
-	go build -o ./dist/${DSNAME}_windows_amd64.exe -a -tags netgo -ldflags '-w' ./pkg
+	GOOS=windows GOARCH=amd64 go build -o ./dist/${DSNAME}_windows_amd64.exe -a -tags netgo -ldflags '-w' ./pkg
 
 build-in-circleci: build-in-circleci-linux build-in-circleci-windows
 
 build-in-circleci-linux:
-	go build -o /output/${DSNAME}_linux_amd64 -a -tags netgo -ldflags '-w' ./pkg
+	GOOS=linux GOARCH=amd64 go build -o /output/${DSNAME}_linux_amd64 -a -tags netgo -ldflags '-w' ./pkg
 
 build-in-circleci-windows:
 	CGO_ENABLED=1 GOOS=windows CC=/usr/bin/x86_64-w64-mingw32-gcc \
 	PKG_CONFIG_PATH=/usr/lib/pkgconfig_win \
-	go build -o /output/${DSNAME}_windows_amd64.exe -a -tags netgo -ldflags '-w' ./pkg
+	GOOS=windows GOARCH=amd64 go build -o /output/${DSNAME}_windows_amd64.exe -a -tags netgo -ldflags '-w' ./pkg
 
 build-in-docker: build-container
 	docker run --rm \
