@@ -46,12 +46,12 @@
         }
       ],
       "tokenAuth": {
-        "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
+        "url": "{{.JsonData.azureADAuthEndpoint}}/{{.JsonData.tenantId}}/oauth2/token",
         "params": {
           "grant_type": "client_credentials",
           "client_id": "{{.JsonData.clientId}}",
           "client_secret": "{{.SecureJsonData.clientSecret}}",
-          "resource": "https://kusto.kusto.windows.net"
+          "resource": "{{.JsonData.adxResourceEndpoint}}"
         }
       }
     }

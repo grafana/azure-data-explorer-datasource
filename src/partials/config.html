@@ -76,6 +76,29 @@
       </info-popover>
     </div>
   </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-11">Azure AD Endpoint</span>
+      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.azureADAuthEndpoint' placeholder="https://login.microsoftonline.com"></input>
+      <info-popover mode="right-absolute">
+        <p>Azure AD Authentication Endpoint for the Azure cloud you are connecting to.  For the global Azure cloud https://login.microsoftonline.com
+          should be used.
+        <a target="_blank" href="https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-national-cloud">**Click
+          here for the most up to date list of endpoints for national clouds.**</a>
+      </info-popover>
+    </div>
+  </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-11">ADX Resource Endpoint</span>
+      <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.adxResourceEndpoint' placeholder="https://kusto.kusto.windows.net"></input>
+      <info-popover mode="right-absolute">
+        <p>ADX resource endpoint used to identify resource request against ADX.  For the global Azure cloud https://kusto.kusto.windows.net
+          should be used.
+        <p>For non-global Azure clouds, consult the developer guide for your respective cloud environment.</p>
+      </info-popover>
+    </div>
+  </div>
   <div class="gf-form" ng-if="ctrl.current.secureJsonFields.clientSecret">
     <span class="gf-form-label width-11">Client Secret</span>
     <input type="text" class="gf-form-input max-width-12" disabled="disabled" value="configured">
