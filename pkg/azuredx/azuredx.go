@@ -130,7 +130,7 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, e
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-ms-app", "Grafana ADX Plugin")
+	req.Header.Set("x-ms-app", "Grafana-ADX")
 	req.Header.Set("x-ms-client-request-id", "KGC.execute;"+uuid.Must(uuid.NewRandom()).String())
 	resp, err := c.Do(req)
 	if err != nil {
