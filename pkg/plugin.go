@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/pprof"
+	"os"
 
 	"google.golang.org/grpc"
 
@@ -34,14 +35,27 @@ func pluginGRPCServer(opts []grpc.ServerOption) *grpc.Server {
 }
 
 func main() {
-	m := http.NewServeMux()
-	m.HandleFunc("/healthz", healthcheckHandler)
-	registerPProfHandlers(m)
-	go func() {
-		if err := http.ListenAndServe(":6060", m); err != nil {
-			log.Fatal(err)
+	// check if pprof should be started
+	// GF_PLUGIN_PROFILER=pluginname
+	profilerEnabled := false
+	if value, ok := os.LookupEnv("GF_PLUGIN_PROFILER"); ok {
+		// compare value to plugin name
+		if value == "grafana-azure-data-explorer-datasource" {
+			profilerEnabled = true
 		}
-	}()
+	}
+
+	if profilerEnabled {
+		m := http.NewServeMux()
+		m.HandleFunc("/healthz", healthcheckHandler)
+		registerPProfHandlers(m)
+		go func() {
+			if err := http.ListenAndServe(":6060", m); err != nil {
+				log.Fatal(err)
+			}
+		}()
+	}
+
 	// background pruning of column cache
 	go func() {
 
