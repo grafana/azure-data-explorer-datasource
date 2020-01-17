@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.0.1]
+- Add key value support to plugin (based off of mysql plugin)
+- New feature for metric naming and aliasing
+
 ## [2.0.0]
 
 - Time series queries now support alerting.
