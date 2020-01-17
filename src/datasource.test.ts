@@ -278,7 +278,10 @@ describe('KustoDBDatasource', () => {
             { ColumnName: 'Text', DataType: 'String', ColumnType: 'string' },
             { ColumnName: 'Tags', DataType: 'String', ColumnType: 'string' },
           ],
-          Rows: [['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'], ['2018-06-02T20:28:00Z', 'Computer2', 'tag2']],
+          Rows: [
+            ['2018-06-02T20:20:00Z', 'Computer1', 'tag1,tag2'],
+            ['2018-06-02T20:28:00Z', 'Computer2', 'tag2'],
+          ],
         },
       ],
     };
