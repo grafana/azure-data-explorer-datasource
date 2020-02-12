@@ -1,7 +1,5 @@
 import _ from 'lodash';
-import moment from 'moment';
-//import { AnnotationsQueryCtrl } from 'module';
-//import { nullLiteral } from '@babel/types';
+import { dateTime } from '@grafana/data';
 
 export interface DataTarget {
   target: string;
@@ -151,7 +149,7 @@ export class ResponseParser {
   }
 
   parseQueryResult(results: any) {
-    var ret: any;
+    let ret: any;
     if (this.hasPropertyOfArray(results.data, 'Series')) {
       ret = this.parseTimeSeriesResult(results, results.data.Series[0].Columns, results.data.Series[0].Rows);
     }
@@ -211,7 +209,7 @@ export class ResponseParser {
   }
 
   parseToVariables(results): Variable[] {
-    var variables: Variable[] = [];
+    let variables: Variable[] = [];
     const queryResult = this.parseQueryResult(results);
     // Issue 7: If we have a __text and __value column as checked above,
     // Use the __value column to match but the __text column to display.
@@ -325,8 +323,8 @@ export class ResponseParser {
     return dataTarget;
   }
 
-  static dateTimeToEpoch(dateTime) {
-    return moment(dateTime).valueOf();
+  static dateTimeToEpoch(dt: any) {
+    return dateTime(dt).valueOf();
   }
 
   // TODO(Temp Comment): processQueryResult is for results using the backend plugin

@@ -1,5 +1,4 @@
 import KustoCodeEditor from './kusto_code_editor';
-import monaco from 'monaco-editor';
 import _ from 'lodash';
 
 describe('KustoCodeEditor', () => {

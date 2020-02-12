@@ -3,18 +3,15 @@
   "version": "2.0.1",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
-    "build": "grafana-toolkit plugin:build",
+    "build": "grafana-toolkit plugin:build && find src | grep '\\.d\\.ts$' | xargs rm -fv",
     "test": "grafana-toolkit plugin:test",
-    "dev": "grafana-toolkit plugin:dev",
+    "dev": "grafana-toolkit plugin:dev && find src | grep '\\.d\\.ts$' | xargs rm -fv",
     "watch": "grafana-toolkit plugin:dev --watch"
   },
   "author": "Grafana Labs",
   "license": "Apache",
-  "dependencies": {
-    "moment": "2.24.0",
-    "monaco-editor": "0.17.0"
-  },
   "devDependencies": {
+    "monaco-editor": "^0.20.0",
     "@grafana/toolkit": "canary",
     "@types/angular": "1.6.49",
     "@types/grafana": "github:CorpGlory/types-grafana.git"
@@ -22,8 +19,7 @@
   "jest": {
     "moduleNameMapper": {
       "app/core/utils/kbn": "<rootDir>/src/__mocks__/kbn.ts",
-      "app/plugins/sdk": "<rootDir>/src/__mocks__/sdk.ts",
-      "monaco-editor": "<rootDir>/node_modules/monaco-editor/monaco.d.ts"
+      "app/plugins/sdk": "<rootDir>/src/__mocks__/sdk.ts"
     }
   }
 }

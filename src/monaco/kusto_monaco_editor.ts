@@ -1,5 +1,6 @@
-// tslint:disable-next-line
+/* eslint-disable */
 ///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
+/* eslint-enable */
 
 import angular from 'angular';
 import KustoCodeEditor from './kusto_code_editor';

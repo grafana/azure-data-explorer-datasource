@@ -80,7 +80,7 @@ export default class KustoCodeEditor {
 
       this.signatureHelpProvider = monaco.languages.registerSignatureHelpProvider('kusto', {
         signatureHelpTriggerCharacters: ['(', ')'],
-        provideSignatureHelp: this.getSignatureHelp.bind(this),
+        provideSignatureHelp: this.getSignatureHelp.bind(this) as any,
       });
     }
 
@@ -153,7 +153,7 @@ export default class KustoCodeEditor {
     this.codeEditor?.setValue(value);
   }
 
-  getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position) {
+  getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position): any {
     const timeFilterDocs =
       '##### Macro that uses the selected timerange in Grafana to filter the query.\n\n' +
       '- `$__timeFilter()` -> Uses the ' +

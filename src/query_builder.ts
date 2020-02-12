@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 export default class QueryBuilder {
   constructor(public rawQuery, public options) {}
 
@@ -50,9 +48,7 @@ export default class QueryBuilder {
 
   getFrom(options) {
     const from = options.range.from;
-    return `datetime(${moment(from)
-      .startOf('minute')
-      .toISOString()})`;
+    return `datetime(${from.toISOString()}`;
   }
 
   getUntil(options) {
@@ -60,9 +56,7 @@ export default class QueryBuilder {
       return 'now()';
     } else {
       const until = options.range.to;
-      return `datetime(${moment(until)
-        .startOf('minute')
-        .toISOString()})`;
+      return `datetime(${until.toISOString()})`;
     }
   }
 
