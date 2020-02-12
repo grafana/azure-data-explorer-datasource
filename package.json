@@ -11,14 +11,13 @@
   "author": "Grafana Labs",
   "license": "Apache",
   "dependencies": {
-    "moment": "^2.24.0",
+    "moment": "2.24.0",
     "monaco-editor": "0.17.0"
   },
   "devDependencies": {
     "@grafana/toolkit": "next",
-    "@grafana/ui": "next",
-    "@types/angular": "^1.6.56",
-    "@types/grafana": "https://git@github.com/CorpGlory/types-grafana.git"
+    "@types/angular": "1.6.49",
+    "@types/grafana": "github:CorpGlory/types-grafana.git"
   },
   "jest": {
     "moduleNameMapper": {

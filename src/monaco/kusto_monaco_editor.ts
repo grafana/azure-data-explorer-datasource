@@ -1,4 +1,6 @@
-import monaco from 'monaco-editor';
+// tslint:disable-next-line
+///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
+
 import angular from 'angular';
 import KustoCodeEditor from './kusto_code_editor';
 import config from 'grafana/app/core/config';

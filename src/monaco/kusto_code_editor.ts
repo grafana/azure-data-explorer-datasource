@@ -1,14 +1,13 @@
 import _ from 'lodash';
-import monaco from 'monaco-editor';
 
 export interface SuggestionController {
   _model: any;
 }
 
 export default class KustoCodeEditor {
-  codeEditor: monaco.editor.IStandaloneCodeEditor;
-  completionItemProvider: monaco.IDisposable;
-  signatureHelpProvider: monaco.IDisposable;
+  codeEditor?: monaco.editor.IStandaloneCodeEditor;
+  completionItemProvider?: monaco.IDisposable;
+  signatureHelpProvider?: monaco.IDisposable;
 
   splitWithNewLineRegex = /[^\n]+\n?|\n/g;
   newLineRegex = /\r?\n/;
@@ -97,21 +96,21 @@ export default class KustoCodeEditor {
       }
 
       monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
-        const model = this.codeEditor.getModel();
+        const model = this.codeEditor?.getModel();
         if (!model) {
           return;
         }
         workerAccessor(model.uri).then(worker => {
           const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
           worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
-          this.codeEditor.layout();
+          this.codeEditor?.layout();
         });
       });
     });
   }
 
   setOnDidChangeModelContent(listener) {
-    this.codeEditor.onDidChangeModelContent(listener);
+    this.codeEditor?.onDidChangeModelContent(listener);
   }
 
   disposeMonaco() {
@@ -139,11 +138,11 @@ export default class KustoCodeEditor {
   }
 
   addCommand(keybinding: number, commandFunc: monaco.editor.ICommandHandler) {
-    this.codeEditor.addCommand(keybinding, commandFunc, 'readyToExecute');
+    this.codeEditor?.addCommand(keybinding, commandFunc, 'readyToExecute');
   }
 
   getValue() {
-    return this.codeEditor.getValue();
+    return this.codeEditor?.getValue();
   }
 
   toSuggestionController(srv: monaco.editor.IEditorContribution): SuggestionController {
@@ -151,7 +150,7 @@ export default class KustoCodeEditor {
   }
 
   setEditorContent(value) {
-    this.codeEditor.setValue(value);
+    this.codeEditor?.setValue(value);
   }
 
   getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position) {
@@ -294,7 +293,7 @@ export default class KustoCodeEditor {
   }
 
   triggerSuggestions() {
-    const suggestController = this.codeEditor.getContribution('editor.contrib.suggestController');
+    const suggestController = this.codeEditor?.getContribution('editor.contrib.suggestController');
     if (!suggestController) {
       return;
     }
@@ -308,7 +307,7 @@ export default class KustoCodeEditor {
   }
 
   getCharAt(lineNumber: number, column: number) {
-    const model = this.codeEditor.getModel();
+    const model = this.codeEditor?.getModel();
     if (!model) {
       return '';
     }

@@ -44,6 +44,12 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       { text: 'Table', value: 'table' },
       { text: 'ADX Time series', value: 'time_series_adx_series' },
     ];
+    // Defaults
+    this.showHelp = true;
+    this.showLastQuery = true;
+    this.lastQuery = '';
+    this.timeNotASC = false;
+    this.databases = [];
     this.getDatabases();
   }
 
