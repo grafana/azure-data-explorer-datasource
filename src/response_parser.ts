@@ -85,17 +85,17 @@ export interface DatabaseItem {
 }
 
 export class ResponseParser {
-  parseAnnotations(results, options): Array<AnnotationItem> {
-    let annotations: Array<AnnotationItem> = [];
+  parseAnnotations(results, options): AnnotationItem[] {
+    let annotations: AnnotationItem[] = [];
 
     if (results.data.hasOwnProperty('results')) {
       Object.keys(results.data.results).forEach(resultKey => {
-        let result = results.data.results[resultKey];
+        const result = results.data.results[resultKey];
 
         if (result.tables.length > 0) {
           result.tables.forEach(table => {
             table.rows.forEach(row => {
-              let entry: AnnotationItem = {
+              const entry: AnnotationItem = {
                 annotation: options.annotation,
                 time: 0,
                 text: '',
@@ -132,8 +132,8 @@ export class ResponseParser {
       return databases;
     }
 
-    for (let table of results.data.Tables) {
-      for (let row of table.Rows) {
+    for (const table of results.data.Tables) {
+      for (const row of table.Rows) {
         databases.push({ text: row[5] || row[0], value: row[0] });
       }
     }
@@ -146,7 +146,7 @@ export class ResponseParser {
     return JSON.parse(schemaJson);
   }
 
-  hasPropertyOfArray(obj: Object, key: string): Boolean {
+  hasPropertyOfArray(obj: {}, key: string): boolean {
     return typeof obj !== 'undefined' && obj.hasOwnProperty(key) && Array.isArray(obj[key]);
   }
 
@@ -162,7 +162,7 @@ export class ResponseParser {
     return { data: [ret] };
   }
 
-  parseTimeSeriesResult(query, columns, rows): DataTarget[] {
+  parseTimeSeriesResult(query: any, columns: any, rows: any): DataTarget[] {
     const data: DataTarget[] = [];
     let timeIndex = -1;
     let metricIndex = -1;
@@ -185,7 +185,7 @@ export class ResponseParser {
     if (timeIndex === -1) {
       throw new Error('No datetime column found in the result. The Time Series format requires a time column.');
     }
-    for (let row of rows) {
+    for (const row of rows) {
       const epoch = ResponseParser.dateTimeToEpoch(row[timeIndex]);
       const metricName = metricIndex > -1 ? row[metricIndex] : columns[valueIndex].name;
       const bucket = ResponseParser.findOrCreateBucket(data, metricName);
@@ -215,7 +215,7 @@ export class ResponseParser {
     const queryResult = this.parseQueryResult(results);
     // Issue 7: If we have a __text and __value column as checked above,
     // Use the __value column to match but the __text column to display.
-    for (let result of queryResult.data) {
+    for (const result of queryResult.data) {
       const textColIndex = this.findColIndex(result, '__text');
       const valueColIndex = this.findColIndex(result, '__value');
 
@@ -234,10 +234,10 @@ export class ResponseParser {
 
     for (let i = 0; i < rows.length; i++) {
       if (!this.containsKey(res, rows[i][textColIndex])) {
-        res.push(<Variable>{
+        res.push({
           text: rows[i][textColIndex],
           value: rows[i][valueColIndex],
-        });
+        } as Variable);
       }
     }
 
@@ -247,11 +247,11 @@ export class ResponseParser {
   transformToSimpleList(rows): Variable[] {
     const res: Variable[] = [];
 
-    for (var row of _.flattenDeep(rows)) {
-      res.push(<Variable>{
+    for (const row of _.flattenDeep(rows)) {
+      res.push({
         text: row,
         value: row,
-      });
+      } as Variable);
     }
 
     return res;
@@ -259,7 +259,7 @@ export class ResponseParser {
 
   findColIndex(colObj, colName) {
     if ('columns' in colObj) {
-      let columns = colObj.columns;
+      const columns = colObj.columns;
       for (let i = 0; i < columns.length; i++) {
         if (columns[i].text === colName) {
           return i;
@@ -283,7 +283,7 @@ export class ResponseParser {
     const queryResult = this.parseQueryResult(result);
     const list: AnnotationItem[] = [];
 
-    for (let result of queryResult.data) {
+    for (const result of queryResult.data) {
       let timeIndex = -1;
       let textIndex = -1;
       let tagsIndex = -1;
@@ -302,7 +302,7 @@ export class ResponseParser {
         }
       }
 
-      for (let row of result.rows) {
+      for (const row of result.rows) {
         list.push({
           annotation: options.annotation,
           time: Math.floor(ResponseParser.dateTimeToEpoch(row[timeIndex])),
@@ -315,7 +315,7 @@ export class ResponseParser {
     return list;
   }
 
-  static findOrCreateBucket(data, target): DataTarget {
+  static findOrCreateBucket(data: any, target: any): DataTarget {
     let dataTarget = _.find(data, ['target', target]);
     if (!dataTarget) {
       dataTarget = { target: target, datapoints: [], refId: '', query: '' };
@@ -337,15 +337,15 @@ export class ResponseParser {
       return { data: data };
     }
 
-    let valueMap = {};
+    const valueMap = {};
 
     for (const key in res.data.results) {
       const queryRes = res.data.results[key];
 
       if (queryRes.series) {
         for (const series of queryRes.series) {
-          let target = JSON.parse(series.name);
-          let val = Object.keys(target)[0];
+          const target = JSON.parse(series.name);
+          const val = Object.keys(target)[0];
           // We are just counting the unique values in this response
           // so that later we can use it to determine the best alias name
           valueMap[val] = 0;

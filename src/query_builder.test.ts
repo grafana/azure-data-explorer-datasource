@@ -2,9 +2,9 @@ import QueryBuilder from './query_builder';
 import moment from 'moment';
 
 describe('QueryBuilder', () => {
-  let builder: QueryBuilder;
+  let builder: QueryBuilder; // tslint:disable-line
 
-  beforeEach(function() {
+  beforeEach(() => {
     builder = new QueryBuilder('query=Tablename | where $__timeFilter(Timestamp)', {
       interval: '5m',
       range: {

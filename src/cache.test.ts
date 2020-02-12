@@ -1,7 +1,7 @@
 import Cache from './cache';
 
 describe('cache', () => {
-  let cache;
+  let cache; // tslint:disable-line
   beforeEach(() => {
     cache = new Cache({ ttl: 100 });
   });

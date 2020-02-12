@@ -1,4 +1,5 @@
 {
+  "extends": "./node_modules/@grafana/toolkit/src/config/tslint.plugin.json",
   "rules": {
     "class-name": false,
     "comment-format": [false, "check-space"],

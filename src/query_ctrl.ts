@@ -32,7 +32,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   timeNotASC: boolean;
   databases: DatabaseItem[];
 
-  /** @ngInject **/
+  /** @ngInject */
   constructor($scope, $injector) {
     super($scope, $injector);
 
@@ -52,7 +52,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     this.lastQuery = '';
     this.timeNotASC = false;
 
-    let anySeriesFromQuery: any = _.find(dataList, {
+    const anySeriesFromQuery: any = _.find(dataList, {
       refId: this.target.refId,
     });
     if (anySeriesFromQuery && anySeriesFromQuery.meta) {
