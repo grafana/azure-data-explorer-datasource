@@ -12,22 +12,19 @@
   "license": "Apache",
   "dependencies": {
     "moment": "^2.24.0",
-    "monaco-editor": "0.17.0",
-    "q": "^1.5.1"
+    "monaco-editor": "0.17.0"
   },
   "devDependencies": {
     "@grafana/toolkit": "next",
-    "@grafana/ui": "latest",
+    "@grafana/ui": "next",
     "@types/angular": "^1.6.56",
-    "@types/grafana": "https://git@github.com/CorpGlory/types-grafana.git",
-    "@types/jest": "24.0.15",
-    "@types/lodash": "^4.14.134",
-    "@types/q": "^1.5.2",
-    "css-loader": "^3.0.0",
-    "jest": "24.8.0",
-    "lodash": "^4.17.13",
-    "style-loader": "^0.23.1",
-    "ts-jest": "24.0.2",
-    "ts-loader": "^6.0.3"
+    "@types/grafana": "https://git@github.com/CorpGlory/types-grafana.git"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "app/core/utils/kbn": "<rootDir>/src/__mocks__/kbn.ts",
+      "app/plugins/sdk": "<rootDir>/src/__mocks__/sdk.ts",
+      "monaco-editor": "<rootDir>/node_modules/monaco-editor/monaco.d.ts"
+    }
   }
 }
