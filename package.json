@@ -15,7 +15,7 @@
     "monaco-editor": "0.17.0"
   },
   "devDependencies": {
-    "@grafana/toolkit": "next",
+    "@grafana/toolkit": "canary",
     "@types/angular": "1.6.49",
     "@types/grafana": "github:CorpGlory/types-grafana.git"
   },
