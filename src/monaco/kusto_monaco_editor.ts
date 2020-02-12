@@ -1,3 +1,6 @@
+// tslint:disable-next-line
+///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
+
 import angular from 'angular';
 import KustoCodeEditor from './kusto_code_editor';
 import config from 'grafana/app/core/config';
@@ -22,7 +25,7 @@ function link(scope, elem, attrs) {
     scope.onChange();
   };
 
-  containerDiv.onkeydown = (evt) => {
+  containerDiv.onkeydown = evt => {
     if (evt.key === 'Escape') {
       evt.stopPropagation();
       return true;
@@ -32,24 +35,16 @@ function link(scope, elem, attrs) {
   };
 
   function initMonaco(containerDiv, scope) {
-    const kustoCodeEditor = new KustoCodeEditor(
-      containerDiv,
-      scope.defaultTimeField,
-      scope.getSchema,
-      config
-    );
+    const kustoCodeEditor = new KustoCodeEditor(containerDiv, scope.defaultTimeField, scope.getSchema, config);
 
     kustoCodeEditor.initMonaco(scope);
 
     /* tslint:disable:no-bitwise */
-    kustoCodeEditor.addCommand(
-      monaco.KeyMod.Shift | monaco.KeyCode.Enter,
-      () => {
-        const newValue = kustoCodeEditor.getValue();
-        scope.content = newValue;
-        scope.onChange();
-      },
-    );
+    kustoCodeEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
+      const newValue = kustoCodeEditor.getValue();
+      scope.content = newValue;
+      scope.onChange();
+    });
     /* tslint:enable:no-bitwise */
 
     // Sync with outer scope - update editor content if model has been changed from outside of directive.

@@ -5,9 +5,9 @@ export interface SuggestionController {
 }
 
 export default class KustoCodeEditor {
-  codeEditor: monaco.editor.IStandaloneCodeEditor;
-  completionItemProvider: monaco.IDisposable;
-  signatureHelpProvider: monaco.IDisposable;
+  codeEditor: monaco.editor.IStandaloneCodeEditor | undefined;
+  completionItemProvider: monaco.IDisposable | undefined;
+  signatureHelpProvider: monaco.IDisposable | undefined;
 
   splitWithNewLineRegex = /[^\n]+\n?|\n/g;
   newLineRegex = /\r?\n/;
@@ -94,21 +94,21 @@ export default class KustoCodeEditor {
       }
 
       monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
-        const model = this.codeEditor.getModel();
+        const model = this.codeEditor?.getModel();
         if (!model) {
           return;
         }
         workerAccessor(model.uri).then(worker => {
           const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
           worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
-          this.codeEditor.layout();
+          this.codeEditor?.layout();
         });
       });
     });
   }
 
   setOnDidChangeModelContent(listener) {
-    this.codeEditor.onDidChangeModelContent(listener);
+    this.codeEditor?.onDidChangeModelContent(listener);
   }
 
   disposeMonaco() {
@@ -136,11 +136,11 @@ export default class KustoCodeEditor {
   }
 
   addCommand(keybinding: number, commandFunc: monaco.editor.ICommandHandler) {
-    this.codeEditor.addCommand(keybinding, commandFunc, 'readyToExecute');
+    this.codeEditor?.addCommand(keybinding, commandFunc, 'readyToExecute');
   }
 
   getValue() {
-    return this.codeEditor.getValue();
+    return this.codeEditor?.getValue();
   }
 
   toSuggestionController(srv: monaco.editor.IEditorContribution): SuggestionController {
@@ -148,13 +148,15 @@ export default class KustoCodeEditor {
   }
 
   setEditorContent(value) {
-    this.codeEditor.setValue(value);
+    this.codeEditor?.setValue(value);
   }
 
-  getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position) {
+  getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position): any {
     const timeFilterDocs =
       '##### Macro that uses the selected timerange in Grafana to filter the query.\n\n' +
-      '- `$__timeFilter()` -> Uses the ' + this.defaultTimeField + ' column\n\n' +
+      '- `$__timeFilter()` -> Uses the ' +
+      this.defaultTimeField +
+      ' column\n\n' +
       '- `$__timeFilter(datetimeColumn)` ->  Uses the specified datetime column to build the query.';
 
     const textUntilPosition = model.getValueInRange({
@@ -194,6 +196,7 @@ export default class KustoCodeEditor {
           documentation: {
             value: timeFilterDocs,
           },
+          then: '',
         },
         {
           label: '$__from',
@@ -204,7 +207,9 @@ export default class KustoCodeEditor {
           documentation: {
             value:
               'Built-in variable that returns the from value of the selected timerange in Grafana.\n\n' +
-              'Example: `where ' + this.defaultTimeField + ' > $__from` ',
+              'Example: `where ' +
+              this.defaultTimeField +
+              ' > $__from` ',
           },
         },
         {
@@ -216,7 +221,9 @@ export default class KustoCodeEditor {
           documentation: {
             value:
               'Built-in variable that returns the to value of the selected timerange in Grafana.\n\n' +
-              'Example: `where ' + this.defaultTimeField + ' < $__to` ',
+              'Example: `where ' +
+              this.defaultTimeField +
+              ' < $__to` ',
           },
         },
         {
@@ -228,7 +235,9 @@ export default class KustoCodeEditor {
           documentation: {
             value:
               '##### Built-in variable that returns an automatic time grain suitable for the current timerange.\n\n' +
-              'Used with the bin() function - `bin(' + this.defaultTimeField + ', $__interval)` \n\n' +
+              'Used with the bin() function - `bin(' +
+              this.defaultTimeField +
+              ', $__interval)` \n\n' +
               '[Grafana docs](http://docs.grafana.org/reference/templating/#the-interval-variable)',
           },
         },
@@ -259,8 +268,7 @@ export default class KustoCodeEditor {
           parameters: [
             {
               label: 'timeColumn',
-              documentation:
-                'Default is ' + this.defaultTimeField + ' column. Datetime column to filter data using the selected date range. ',
+              documentation: 'Default is ' + this.defaultTimeField + ' column. Datetime column to filter data using the selected date range. ',
             },
           ],
         },
@@ -284,7 +292,7 @@ export default class KustoCodeEditor {
   }
 
   triggerSuggestions() {
-    const suggestController = this.codeEditor.getContribution('editor.contrib.suggestController');
+    const suggestController = this.codeEditor?.getContribution('editor.contrib.suggestController');
     if (!suggestController) {
       return;
     }
@@ -298,7 +306,7 @@ export default class KustoCodeEditor {
   }
 
   getCharAt(lineNumber: number, column: number) {
-    const model = this.codeEditor.getModel();
+    const model = this.codeEditor ? this.codeEditor.getModel() : undefined;
     if (!model) {
       return '';
     }

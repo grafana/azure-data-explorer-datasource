@@ -11,12 +11,12 @@
   "author": "Grafana Labs",
   "license": "Apache",
   "dependencies": {
-    "monaco-editor": "0.17.0",
-    "moment": "2.24.0"
+    "moment": "2.24.0",
+    "monaco-editor": "0.17.0"
   },
   "devDependencies": {
-    "@grafana/toolkit": "next",
-    "@types/grafana": "github:CorpGlory/types-grafana.git",
-    "@types/angular": "1.6.49"
+    "@grafana/toolkit": "^6.6.1",
+    "@types/angular": "1.6.49",
+    "@types/grafana": "github:CorpGlory/types-grafana.git"
   }
 }

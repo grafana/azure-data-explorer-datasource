@@ -1,4 +1,5 @@
 import KustoCodeEditor from './kusto_code_editor';
+import monaco from 'monaco-editor';
 import _ from 'lodash';
 
 describe('KustoCodeEditor', () => {
@@ -23,7 +24,7 @@ describe('KustoCodeEditor', () => {
         getLineContent: () => lineContent,
       };
 
-      const StandaloneMock = jest.fn<monaco.editor.ICodeEditor, []>();
+      const StandaloneMock = jest.fn() as jest.Mock<monaco.editor.ICodeEditor, []>;
       editor = new KustoCodeEditor(null, 'Timestamp', () => {}, {});
       editor.codeEditor = new StandaloneMock();
     });
@@ -50,12 +51,8 @@ describe('KustoCodeEditor', () => {
       it('should return grafana macros for where and timefilter', () => {
         expect(completionItems.length).toBe(1);
 
-        expect(completionItems[0].label).toBe(
-          'where $__timeFilter(timeColumn)',
-        );
-        expect(completionItems[0].insertText.value).toBe(
-          'where \\$__timeFilter(${0:Timestamp})',
-        );
+        expect(completionItems[0].label).toBe('where $__timeFilter(timeColumn)');
+        expect(completionItems[0].insertText.value).toBe('where \\$__timeFilter(${0:Timestamp})');
       });
     });
 
@@ -70,9 +67,7 @@ describe('KustoCodeEditor', () => {
         expect(completionItems.length).toBe(4);
 
         expect(completionItems[0].label).toBe('$__timeFilter(timeColumn)');
-        expect(completionItems[0].insertText.value).toBe(
-          '\\$__timeFilter(${0:Timestamp})',
-        );
+        expect(completionItems[0].insertText.value).toBe('\\$__timeFilter(${0:Timestamp})');
 
         expect(completionItems[1].label).toBe('$__from');
         expect(completionItems[1].insertText.value).toBe('\\$__from');
@@ -143,7 +138,7 @@ describe('KustoCodeEditor', () => {
           },
         };
         //const StandaloneMock = jest.fn<monaco.editor.ICodeEditor>(() => ({
-        const StandaloneMock = jest.fn<any,[]>(() => ({
+        const StandaloneMock = jest.fn<any, []>(() => ({
           getModel: () => {
             return {
               getLineCount: () => 3,

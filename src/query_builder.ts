@@ -39,7 +39,7 @@ export default class QueryBuilder {
         if (!timeField) {
           const binRegex = /bin\(([_a-zA-Z0-9]+),/;
           const match = binRegex.exec(query);
-          timeField = match? match[1]: '';
+          timeField = match ? match[1] : '';
         }
 
         if (timeField) {

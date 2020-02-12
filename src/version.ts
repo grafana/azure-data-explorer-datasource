@@ -15,7 +15,7 @@ export class SemVersion {
       this.minor = Number(match[2] || 0);
       this.patch = Number(match[3] || 0);
       this.meta = match[4];
-    }else {
+    } else {
       this.major = 1;
       this.minor = 0;
       this.patch = 0;

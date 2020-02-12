@@ -17,12 +17,7 @@ describe('KustoDBDatasource', () => {
       jsonData: {},
     };
 
-    ctx.ds = new KustoDBDatasource(
-      ctx.instanceSettings,
-      ctx.backendSrv,
-      ctx.$q,
-      ctx.templateSrv,
-    );
+    ctx.ds = new KustoDBDatasource(ctx.instanceSettings, ctx.backendSrv, ctx.$q, ctx.templateSrv);
   });
 
   describe('When performing testDatasource', () => {
@@ -44,9 +39,7 @@ describe('KustoDBDatasource', () => {
       it('should return error status and a detailed error message', () => {
         return ctx.ds.testDatasource().then(results => {
           expect(results.status).toEqual('error');
-          expect(results.message).toContain(
-            'Azure Data Explorer: Cannot read database schema from REST API. Unauthorized:',
-          );
+          expect(results.message).toContain('Azure Data Explorer: Cannot read database schema from REST API. Unauthorized:');
         });
       });
     });
@@ -204,9 +197,7 @@ describe('KustoDBDatasource', () => {
         }
       };
 
-      queryResults = await ctx.ds.metricFindQuery(
-        'Activity | distinct Category',
-      );
+      queryResults = await ctx.ds.metricFindQuery('Activity | distinct Category');
     });
 
     it('should return a list of categories in the correct format', () => {
@@ -286,8 +277,7 @@ describe('KustoDBDatasource', () => {
 
       annotationResults = await ctx.ds.annotationQuery({
         annotation: {
-          rawQuery:
-            'Heartbeat | where $__timeFilter()| project TimeGenerated, Text=Computer, tags="test"',
+          rawQuery: 'Heartbeat | where $__timeFilter()| project TimeGenerated, Text=Computer, tags="test"',
           database: 'Grafana',
         },
         range: {
@@ -387,11 +377,7 @@ describe('KustoDBDatasource', () => {
 
         beforeEach(async () => {
           const qo = _.cloneDeep(queryOptions);
-          qo.targets[0].query = [
-            'MyLogs',
-            '| summarize count() by Level, bin(Timestamp, 5min)',
-            '| project Timestamp, Level, count_',
-          ].join();
+          qo.targets[0].query = ['MyLogs', '| summarize count() by Level, bin(Timestamp, 5min)', '| project Timestamp, Level, count_'].join();
 
           ctx.backendSrv.datasourceRequest = options => {
             expect(options.data.csl).toContain('| order by Timestamp asc');
@@ -435,9 +421,7 @@ describe('KustoDBDatasource', () => {
 
         it('should throw an exception', () => {
           ctx.ds.query(queryOptions).catch(err => {
-            expect(err.message).toContain(
-              'The Time Series format requires a time column.',
-            );
+            expect(err.message).toContain('The Time Series format requires a time column.');
           });
         });
       });
@@ -496,9 +480,7 @@ describe('KustoDBDatasource', () => {
       try {
         ctx.ds.getCacheTtl(ctx.instanceSettings);
       } catch (err) {
-        expect(err.message).toContain(
-          'Minimal cache must be greater than or equal to 1.',
-        );
+        expect(err.message).toContain('Minimal cache must be greater than or equal to 1.');
       }
     });
   });
