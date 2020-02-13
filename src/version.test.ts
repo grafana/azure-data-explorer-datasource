@@ -1,7 +1,7 @@
 import { SemVersion, isVersionGtOrEq } from './version';
 
 describe('SemVersion', () => {
-  let version = '1.0.0-alpha.1'; // tslint:disable-line
+  let version = '1.0.0-alpha.1';
 
   describe('parsing', () => {
     it('should parse version properly', () => {

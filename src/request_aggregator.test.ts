@@ -1,7 +1,7 @@
 import RequestAggregator from './request_aggregator';
 
 describe('RequestAggregator', () => {
-  let requestAggregator: RequestAggregator; // tslint:disable-line
+  let requestAggregator: RequestAggregator;
   const requestData = [
     { key: 'key1', url: 'url1', payload: {} },
     { key: 'key2', url: 'url2', payload: {} },
@@ -19,7 +19,7 @@ describe('RequestAggregator', () => {
     });
 
     describe('and many requests are made', () => {
-      let res; // tslint:disable-line
+      let res;
       beforeEach(() => {
         res = requestData.map(r => requestAggregator.dsPost(r.key, r.url, r.payload));
       });
@@ -44,7 +44,7 @@ describe('RequestAggregator', () => {
     });
 
     describe('and many requests are made', () => {
-      let res; // tslint:disable-line
+      let res;
       beforeEach(() => {
         res = requestData.map(r => requestAggregator.dsPost(r.key, r.url, r.payload));
       });

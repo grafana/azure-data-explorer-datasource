@@ -1,7 +1,7 @@
 import QueryBuilder from './query_builder';
 
 describe('QueryBuilder', () => {
-  let builder: QueryBuilder; // tslint:disable-line
+  let builder: QueryBuilder;
 
   beforeEach(() => {
     const now = Math.round(new Date().getTime() / 1000);
