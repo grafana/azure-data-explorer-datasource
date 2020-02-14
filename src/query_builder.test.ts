@@ -1,15 +1,15 @@
 import QueryBuilder from './query_builder';
-import moment from 'moment';
 
 describe('QueryBuilder', () => {
   let builder: QueryBuilder;
 
-  beforeEach(function() {
+  beforeEach(() => {
+    const now = Math.round(new Date().getTime() / 1000);
     builder = new QueryBuilder('query=Tablename | where $__timeFilter(Timestamp)', {
       interval: '5m',
       range: {
-        from: moment().subtract(24, 'hours'),
-        to: moment(),
+        from: now,
+        to: now - 24 * 60 * 60,
       },
       rangeRaw: {
         from: 'now-24h',

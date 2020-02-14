@@ -1,11 +1,11 @@
 import { KustoDBDatasource } from './datasource';
 import q from 'q';
-import moment from 'moment';
+import { dateTime } from '@grafana/data';
 import TemplateSrvStub from '../test/template_srv_stub';
 import _ from 'lodash';
 
 describe('KustoDBDatasource', () => {
-  let ctx: any = {
+  const ctx: any = {
     backendSrv: {},
     templateSrv: new TemplateSrvStub(),
   };
@@ -54,7 +54,7 @@ describe('KustoDBDatasource', () => {
       ],
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       ctx.backendSrv.datasourceRequest = options => {
         expect(options.url).toContain('/v1/rest/mgmt');
         return ctx.$q.when({ data: response, status: 200 });
@@ -97,7 +97,7 @@ describe('KustoDBDatasource', () => {
       ],
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       ctx.backendSrv.datasourceRequest = options => {
         expect(options.url).toContain('/v1/rest/mgmt');
         return ctx.$q.when({ data: response, status: 200 });
@@ -336,8 +336,8 @@ describe('KustoDBDatasource', () => {
           database: 'Grafana',
         },
         range: {
-          from: moment.utc('2017-08-22T20:00:00Z'),
-          to: moment.utc('2017-08-22T23:59:00Z'),
+          from: dateTime([2017, 8, 11, 20, 0]),
+          to: dateTime([2017, 8, 11, 23, 59]),
         },
         rangeRaw: {
           from: 'now-4h',

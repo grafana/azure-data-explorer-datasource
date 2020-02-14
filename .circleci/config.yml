@@ -9,7 +9,7 @@ aliases:
 defaults: &defaults
   working_directory: ~/plugin
   docker:
-    - image: circleci/node:10.16.0-stretch
+    - image: circleci/node:12.15.0-stretch
 
 jobs:
   build_plugin:
@@ -19,11 +19,6 @@ jobs:
     - restore_cache:
         keys:
         - yarn-packages-{{ checksum "yarn.lock" }}
-    - run:
-        name: Install yarn
-        command: |
-          sudo npm install -g yarn --quiet
-          yarn install --pure-lockfile
     - run:
         name: Run Toolkit Build
         command: npx grafana-toolkit plugin:ci-build
@@ -44,9 +39,8 @@ jobs:
         keys:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
-        name: Install yarn
+        name: yarn install
         command: |
-          sudo npm install -g yarn --quiet
           yarn install --pure-lockfile
           mkdir ci # Avoid error if not exists
     - run:

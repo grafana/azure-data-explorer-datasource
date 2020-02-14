@@ -7,6 +7,8 @@ export class QueryCtrl {
   error: string;
 
   constructor(public $scope, _$injector) {
+    this.hasRawMode = false;
+    this.error = '';
     this.panelCtrl = this.panelCtrl || { panel: {} };
     this.target = this.target || { target: '' };
     this.panel = this.panelCtrl.panel;

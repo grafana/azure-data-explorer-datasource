@@ -32,7 +32,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
   timeNotASC: boolean;
   databases: DatabaseItem[];
 
-  /** @ngInject **/
+  /** @ngInject */
   constructor($scope, $injector) {
     super($scope, $injector);
 
@@ -44,6 +44,12 @@ export class KustoDBQueryCtrl extends QueryCtrl {
       { text: 'Table', value: 'table' },
       { text: 'ADX Time series', value: 'time_series_adx_series' },
     ];
+    // Defaults
+    this.showHelp = true;
+    this.showLastQuery = true;
+    this.lastQuery = '';
+    this.timeNotASC = false;
+    this.databases = [];
     this.getDatabases();
   }
 
@@ -52,7 +58,7 @@ export class KustoDBQueryCtrl extends QueryCtrl {
     this.lastQuery = '';
     this.timeNotASC = false;
 
-    let anySeriesFromQuery: any = _.find(dataList, {
+    const anySeriesFromQuery: any = _.find(dataList, {
       refId: this.target.refId,
     });
     if (anySeriesFromQuery && anySeriesFromQuery.meta) {

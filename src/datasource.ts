@@ -33,7 +33,7 @@ export class KustoDBDatasource {
       queryTargets[item.refId] = item;
       return item.hide !== true;
     }).map(item => {
-      var interpolatedQuery = new QueryBuilder(
+      const interpolatedQuery = new QueryBuilder(
         this.templateSrv.replace(item.query, options.scopedVars, this.interpolateVariable),
         options
       ).interpolate().query;
@@ -64,21 +64,21 @@ export class KustoDBDatasource {
         },
       })
       .then(results => {
-        let responseParser = new ResponseParser();
-        let ret = responseParser.processQueryResult(results);
+        const responseParser = new ResponseParser();
+        const ret = responseParser.processQueryResult(results);
 
         ret.data.forEach(r => {
-          let templateVars = {};
-          let query = queryTargets[r.refId];
+          const templateVars = {};
+          const query = queryTargets[r.refId];
           // Table format does not use aliases yet. The user could
           // control the table format using aliases in the query itself
           // ex: data | project NewColumnName=ColumnName
           if (query.resultFormat === 'time_series') {
             let alias = query.alias;
             try {
-              let key = Object.keys(r.target)[0];
-              let meta = r.target[key];
-              let full = JSON.stringify(r.target)
+              const key = Object.keys(r.target)[0];
+              const meta = r.target[key];
+              const full = JSON.stringify(r.target)
                 .replace(/"/g, '')
                 .replace(/^\{(.*?)\}$/, '$1');
               // Generating a default time series metric name requires both the metricname
@@ -303,7 +303,7 @@ export class KustoDBDatasource {
       return value;
     }
 
-    var quotedValues = _.map(value, function(val) {
+    const quotedValues = _.map(value, val => {
       if (typeof value === 'number') {
         return value;
       }
