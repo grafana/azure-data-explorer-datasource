@@ -39,6 +39,11 @@ jobs:
         keys:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
+        name: yarn install
+        command: |
+          yarn install --pure-lockfile
+          mkdir ci # Avoid error if not exists
+    - run:
         name: Build Docs
         command: npx grafana-toolkit plugin:ci-docs
     - save_cache:
