@@ -11,8 +11,8 @@
   "author": "Grafana Labs",
   "license": "Apache",
   "devDependencies": {
-    "monaco-editor": "^0.20.0",
-    "@grafana/toolkit": "canary",
+    "monaco-editor": "^0.17.0",
+    "@grafana/toolkit": "next",
     "@types/angular": "1.6.49",
     "@types/grafana": "github:CorpGlory/types-grafana.git"
   },

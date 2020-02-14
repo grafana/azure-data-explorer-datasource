@@ -1,5 +1,7 @@
 /* eslint-disable */
+/* tslint:disable */
 ///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
+/* tslint:enable */
 /* eslint-enable */
 
 import angular from 'angular';
@@ -10,8 +12,9 @@ const editorTemplate = `<div id="content" tabindex="0" style="width: 100%; heigh
 
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
-  if (!(window as any).monaco) {
-    (window as any).System.import(`/${scope.pluginBaseUrl}/lib/monaco.min.js`).then(() => {
+  if (!window.hasOwnProperty('monaco')) {
+    //(window as any).System.import(`/${scope.pluginBaseUrl}/lib/monaco.min.js`).then(() => {
+    (window as any).monaco = import(/* webpackChunkName: "/monaco.min" */ '../lib/monaco.min.js').then(() => {
       setTimeout(() => {
         initMonaco(containerDiv, scope);
       }, 1);
