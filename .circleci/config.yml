@@ -20,11 +20,6 @@ jobs:
         keys:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
-        name: Install yarn
-        command: |
-          sudo npm install -g yarn --quiet
-          yarn install --pure-lockfile
-    - run:
         name: Run Toolkit Build
         command: npx grafana-toolkit plugin:ci-build
     - save_cache:
