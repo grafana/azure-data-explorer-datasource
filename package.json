@@ -3,9 +3,9 @@
   "version": "2.0.1",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
-    "build": "grafana-toolkit plugin:build && find src | grep '\\.d\\.ts$' | xargs rm -fv",
+    "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
-    "dev": "grafana-toolkit plugin:dev && find src | grep '\\.d\\.ts$' | xargs rm -fv",
+    "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch"
   },
   "author": "Grafana Labs",
