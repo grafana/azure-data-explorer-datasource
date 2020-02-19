@@ -228,7 +228,7 @@ jobs:
             mkdir -p artifacts
             cp -r ci/packages/* artifacts
             apk add --update --no-cache jq
-            RELEASE_NOTES=`awk 'BEGIN {FS="##"; RS=""} FNR==3 {print; exit}' CHANGELOG.md`
+            RELEASE_NOTES=`awk 'BEGIN {FS="##"; RS=""} FNR==4 {print; exit}' CHANGELOG.md`
             VERSION=`cat dist/plugin.json|jq '.info.version'| sed s/\"//g`
             ls -al
             ls -al ./artifacts
