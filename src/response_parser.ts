@@ -331,7 +331,6 @@ export class ResponseParser {
   processQueryResult(res) {
     const data: any[] = [];
 
-
     if (!res.data.results) {
       return { data: data };
     }
@@ -345,16 +344,16 @@ export class ResponseParser {
         for (const series of queryRes.series) {
           let target = series.name;
           try {
-            target = JSON.parse(series.name)
+            target = JSON.parse(series.name);
           } catch {
             // If the backend does not return a JSON query, mimic it for alias parsing
             target = {
               value: {
-                metricname: series.name
-              }
-            }
+                metricname: series.name,
+              },
+            };
           }
-          
+
           const val = Object.keys(target)[0];
           // We are just counting the unique values in this response
           // so that later we can use it to determine the best alias name

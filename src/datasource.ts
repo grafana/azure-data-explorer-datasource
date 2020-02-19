@@ -78,9 +78,9 @@ export class KustoDBDatasource {
             try {
               const key = Object.keys(r.target)[0];
               let meta = r.target;
-              if (key !== "0") {
+              if (key !== '0') {
                 meta = r.target[key];
-              } 
+              }
               const full = JSON.stringify(r.target)
                 .replace(/"/g, '')
                 .replace(/^\{(.*?)\}$/, '$1');
