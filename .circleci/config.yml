@@ -58,7 +58,7 @@ jobs:
   build_linux:
     <<: *defaults
     docker:
-      - image: circleci/golang:1.13.17
+      - image: circleci/golang:1.13.7
     steps:
     - checkout
     - run:
@@ -78,7 +78,7 @@ jobs:
   build_osx:
     <<: *defaults
     docker:
-      - image: circleci/golang:1.13.17
+      - image: circleci/golang:1.13.7
     steps:
     - checkout
     - run:
@@ -99,7 +99,7 @@ jobs:
   build_win64:
     <<: *defaults
     docker:
-      - image: circleci/golang:1.13.17
+      - image: circleci/golang:1.13.7
     steps:
     - checkout
     - run:
