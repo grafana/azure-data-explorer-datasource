@@ -260,7 +260,7 @@ To make writing queries easier there are two Grafana macros that can be used in 
 
 ## Templating with Variables
 
-Instead of hard-coding things like server, application and sensor name in you metric queries you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns make it easy to change the data being displayed in your dashboard.
+Instead of hard-coding things like server, application and sensor name in your metric queries you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns make it easy to change the data being displayed in your dashboard.
 
 Create the variable in the dashboard settings. Usually you will need to write a query in the Kusto Query Language to get a list of values for the dropdown. It is however also possible to have a list of hard-coded values.
 
@@ -294,7 +294,7 @@ An annotation is an event that is overlaid on top of graphs. The query can have 
 
 - column with the datetime type.
 - column with alias: Text or text for the annotation text
-- column with alias: Tags or tags for annotation tags. This is should return a comma separated string of tags e.g. 'tag1,tag2'
+- column with alias: Tags or tags for annotation tags. This should return a comma separated string of tags e.g. 'tag1,tag2'
 
 Example query:
 
