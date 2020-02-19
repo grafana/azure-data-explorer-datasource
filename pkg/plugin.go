@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 
 	l "github.com/grafana/azure-data-explorer-datasource/pkg/log"
-	"github.com/grafana/grafana_plugin_model/go/datasource"
+	"github.com/grafana/grafana-plugin-model/go/datasource"
 
 	plugin "github.com/hashicorp/go-plugin"
 )
