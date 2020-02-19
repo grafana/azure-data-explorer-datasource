@@ -9,7 +9,7 @@ aliases:
 defaults: &defaults
   working_directory: ~/plugin
   docker:
-    - image: circleci/node:12.15.0-stretch
+    - image: circleci/node:12
 
 jobs:
   build_plugin:
@@ -58,7 +58,7 @@ jobs:
   build_linux:
     <<: *defaults
     docker:
-      - image: circleci/golang:1.12.9-buster
+      - image: circleci/golang:1.13.17
     steps:
     - checkout
     - run:
@@ -78,7 +78,7 @@ jobs:
   build_osx:
     <<: *defaults
     docker:
-      - image: circleci/golang:1.12.9-buster
+      - image: circleci/golang:1.13.17
     steps:
     - checkout
     - run:
@@ -99,7 +99,7 @@ jobs:
   build_win64:
     <<: *defaults
     docker:
-      - image: circleci/golang:1.12.9-buster
+      - image: circleci/golang:1.13.17
     steps:
     - checkout
     - run:
@@ -153,7 +153,7 @@ jobs:
   test_integration:
     <<: *defaults
     docker:
-    - image: circleci/node:10-browsers
+    - image: circleci/node:12-browsers
     steps:
     - checkout
     - attach_workspace:
@@ -210,7 +210,7 @@ jobs:
   publish_github_release:
     working_directory: ~/azure-data-explorer-datasource
     docker:
-      - image: cibuilds/github:0.12
+      - image: cibuilds/github:0.13
     steps:
       - checkout
       - add_ssh_keys:
