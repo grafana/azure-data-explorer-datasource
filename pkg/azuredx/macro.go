@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
-	"github.com/grafana/grafana_plugin_model/go/datasource"
+	"github.com/grafana/grafana-plugin-model/go/datasource"
 )
 
 //  Macros:
