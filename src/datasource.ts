@@ -77,7 +77,10 @@ export class KustoDBDatasource {
             let alias = query.alias;
             try {
               const key = Object.keys(r.target)[0];
-              const meta = r.target[key];
+              let meta = r.target;
+              if (key !== "0") {
+                meta = r.target[key];
+              } 
               const full = JSON.stringify(r.target)
                 .replace(/"/g, '')
                 .replace(/^\{(.*?)\}$/, '$1');
