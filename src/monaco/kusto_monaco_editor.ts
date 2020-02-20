@@ -13,8 +13,8 @@ const editorTemplate = `<div id="content" tabindex="0" style="width: 100%; heigh
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
   if (!window.hasOwnProperty('monaco')) {
-    //(window as any).System.import(`/${scope.pluginBaseUrl}/lib/monaco.min.js`).then(() => {
-    (window as any).monaco = import(/* webpackChunkName: "/monaco.min" */ '../lib/monaco.min.js').then(() => {
+    //(window as any).monaco = import(/* webpackChunkName: "/monaco.min" */ '../lib/monaco.min.js').then(() => {
+    (window as any).System.import(`/${scope.pluginBaseUrl}/libs/monaco.min.js`).then(() => {
       setTimeout(() => {
         initMonaco(containerDiv, scope);
       }, 1);
