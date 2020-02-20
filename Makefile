@@ -1,4 +1,5 @@
 DSNAME=grafana-azure-data-explorer-datasource
+GO = GO111MODULE=on go
 OS=$(shell go env GOHOSTOS)
 ARCH=$(shell go env GOHOSTARCH)
 ifeq ($(OS),windows)
@@ -14,7 +15,11 @@ test:
 	go tool cover -html=coverage/cover.out -o coverage/coverage.html
 
 vendor:
-	GO111MODULE=on go mod vendor
+	$(GO) get -u .../pkg
+	$(GO) mod vendor
+
+fmt:
+	$(GO) fmt .../pkg
 
 test-in-docker: build-container
 	docker run --rm \
