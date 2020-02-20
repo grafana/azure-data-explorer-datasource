@@ -195,7 +195,7 @@ jobs:
 
   code_coverage_backend:
     <<: *defaults
-    working_directory: /go/src/github.com/briangann/grafana-github-datasource
+    working_directory: /go/src/github.com/grafana/azure-data-explorer-datasource
     environment:
       GOPATH: /go
     docker:
