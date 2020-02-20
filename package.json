@@ -12,7 +12,7 @@
   "license": "Apache",
   "devDependencies": {
     "monaco-editor": "0.17.0",
-    "@grafana/toolkit": "latest",
+    "@grafana/toolkit": "6.6.1",
     "@types/angular": "1.6.49",
     "@types/grafana": "github:CorpGlory/types-grafana.git"
   },
