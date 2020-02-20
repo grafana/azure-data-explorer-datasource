@@ -1,0 +1,14 @@
+{
+  "plugin": {
+    "name": "grafana-azure-data-explorer-datasource-2.0.4.zip",
+    "size": 16625901,
+    "contents": {
+      "json": {
+        "bytes": 1920,
+        "count": 1
+      }
+    },
+    "sha1": "523609ed9c30370650470cc45a3a77c09f373685",
+    "md5": "7a2fc10b5c9c7564a43689f477b64ede"
+  }
+}
