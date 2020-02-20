@@ -472,5 +472,5 @@ const (
 	kustoTypeReal     = "real"
 	kustoTypeString   = "string"
 	kustoTypeTimespan = "timespan"
-	kustoTypeDecimal  = "decimal"
+	//kustoTypeDecimal  = "decimal"
 )

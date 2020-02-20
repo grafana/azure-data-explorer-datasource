@@ -114,9 +114,9 @@ func Test_extractValueForTable(t *testing.T) {
 		{
 			name: "should extract dynamic as string",
 			args: extractValueArgs{[]map[string]interface{}{
-				map[string]interface{}{"person": "Daniel"},
-				map[string]interface{}{"cats": 23},
-				map[string]interface{}{"diagnosis": "cat problem"},
+				{"person": "Daniel"},
+				{"cats": 23},
+				{"diagnosis": "cat problem"},
 			}, kustoTypeDynamic},
 			errorIs:      assert.NoError,
 			rowValKindIs: assert.Equal,
@@ -255,7 +255,7 @@ func TestTableResponse_ToTables(t *testing.T) {
 			rowIdx:   0,
 			rowIs:    assert.Equal,
 			rowVals: []*datasource.RowValue{
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_BOOL, BoolValue: true},
+				{Kind: datasource.RowValue_TYPE_BOOL, BoolValue: true},
 			},
 		},
 		{
@@ -265,15 +265,15 @@ func TestTableResponse_ToTables(t *testing.T) {
 			rowIdx:   0,
 			rowIs:    assert.Equal,
 			rowVals: []*datasource.RowValue{
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_BOOL, BoolValue: true},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: "Grafana"},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: "2006-01-02T22:04:05.1Z"},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: `[{"person":"Daniel"},{"cats":23},{"diagnosis":"cat problem"}]`},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: "74be27de-1e4e-49d9-b579-fe0b331d3642"},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_INT64, Int64Value: int64(2147483647)},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_INT64, Int64Value: int64(9223372036854775807)},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_DOUBLE, DoubleValue: float64(1.797693134862315708145274237317043567981e+308)},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_STRING, StringValue: "00:00:00.0000001"},
+				{Kind: datasource.RowValue_TYPE_BOOL, BoolValue: true},
+				{Kind: datasource.RowValue_TYPE_STRING, StringValue: "Grafana"},
+				{Kind: datasource.RowValue_TYPE_STRING, StringValue: "2006-01-02T22:04:05.1Z"},
+				{Kind: datasource.RowValue_TYPE_STRING, StringValue: `[{"person":"Daniel"},{"cats":23},{"diagnosis":"cat problem"}]`},
+				{Kind: datasource.RowValue_TYPE_STRING, StringValue: "74be27de-1e4e-49d9-b579-fe0b331d3642"},
+				{Kind: datasource.RowValue_TYPE_INT64, Int64Value: int64(2147483647)},
+				{Kind: datasource.RowValue_TYPE_INT64, Int64Value: int64(9223372036854775807)},
+				{Kind: datasource.RowValue_TYPE_DOUBLE, DoubleValue: float64(1.797693134862315708145274237317043567981e+308)},
+				{Kind: datasource.RowValue_TYPE_STRING, StringValue: "00:00:00.0000001"},
 			},
 		},
 		{
@@ -283,14 +283,14 @@ func TestTableResponse_ToTables(t *testing.T) {
 			rowIdx:   0,
 			rowIs:    assert.Equal,
 			rowVals: []*datasource.RowValue{
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
-				&datasource.RowValue{Kind: datasource.RowValue_TYPE_NULL},
+				{Kind: datasource.RowValue_TYPE_NULL},
+				{Kind: datasource.RowValue_TYPE_NULL},
+				{Kind: datasource.RowValue_TYPE_NULL},
+				{Kind: datasource.RowValue_TYPE_NULL},
+				{Kind: datasource.RowValue_TYPE_NULL},
+				{Kind: datasource.RowValue_TYPE_NULL},
+				{Kind: datasource.RowValue_TYPE_NULL},
+				{Kind: datasource.RowValue_TYPE_NULL},
 			},
 		},
 	}
@@ -349,14 +349,14 @@ func TestTableResponse_ToTimeSeries(t *testing.T) {
 			name: "unexpected length of a row should error (and not panic)",
 			testTable: &TableResponse{
 				Tables: []Table{
-					Table{
+					{
 						TableName: "Table_0",
 						Columns: []Column{
-							Column{
+							{
 								ColumnName: "Time",
 								ColumnType: kustoTypeDatetime,
 							},
-							Column{
+							{
 								ColumnName: "Value",
 								ColumnType: kustoTypeInt,
 							},

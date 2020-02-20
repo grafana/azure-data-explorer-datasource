@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.4]
+
+- Bugfix for issue #73
+
+## [2.0.3]
+
+- Bugfix for monaco loader
+
 ## [2.0.2]
 
 - Bugfix for issue #60

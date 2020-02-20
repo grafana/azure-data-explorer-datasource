@@ -1,7 +1,12 @@
 # Azure Data Explorer Datasource For Grafana
+
 [![CircleCI](https://circleci.com/gh/grafana/azure-data-explorer-datasource.svg?style=svg)](https://circleci.com/gh/grafana/azure-data-explorer-datasource)
+[![Go Report Card](https://goreportcard.com/badge/github.com/grafana/azure-data-explorer-datasource)](https://goreportcard.com/report/github.com/grafana/azure-data-explorer-datasource)
 [![David Dependancy Status](https://david-dm.org/grafana/azure-data-explorer-datasource.svg)](https://david-dm.org/grafana/azure-data-explorer-datasource)
 [![David Dev Dependency Status](https://david-dm.org/grafana/azure-data-explorer-datasource/dev-status.svg)](https://david-dm.org/grafana/azure-data-explorer-datasource/?type=dev)
+[![Known Vulnerabilities](https://snyk.io/test/github/grafana/azure-data-explorer-datasource/badge.svg)](https://snyk.io/test/github/grafana/azure-data-explorer-datasource)
+[![Maintainability](https://api.codeclimate.com/v1/badges/9b1dad4f06230140f3a7/maintainability)](https://codeclimate.com/github/grafana/azure-data-explorer-datasource/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/9b1dad4f06230140f3a7/test_coverage)](https://codeclimate.com/github/grafana/azure-data-explorer-datasource/test_coverage)
 
 [Azure Data Explorer](https://docs.microsoft.com/en-us/azure/data-explorer/) is a log analytics cloud platform optimized for ad-hoc big data queries.
 
@@ -30,7 +35,9 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 Metrics are displayed using an "ALIAS BY" field displayed when in edit mode. The display uses the grafana templating system to address columns in the query, with one default.
 
 #### Defaults
+
 When specifying no alias, the following defaults will be taken into account
+
 1. When querying a simple timestamp, value, and metric, only the metric will be displayed. (`metric`)
 2. When querying a timestamp, metric, and multiple values, the metric name plus names of other columns will be displayed with periods.
    - Examples
@@ -39,9 +46,11 @@ When specifying no alias, the following defaults will be taken into account
 3. Use the `$full` alias to specify JSON like formattting of the alias. (`value2: {metric:metric1,column:column2}`)
 
 #### Examples of metric naming
+
 Given a table with the following columns:
+
 1. **timestamp**: The time of the reading
-2. **metric**: The name of the metric recorded 
+2. **metric**: The name of the metric recorded
 3. **value**: The value of the metric recorded
 4. **state**: Boolean representation of an alarm state (1=in alarm state, 0=normal)
 5. **server**: The server name
@@ -65,7 +74,7 @@ Given a table with the following columns:
     docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-data-explorer-datasource" grafana/grafana:latest
     ```
 
-3. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
+3. Open the browser at: <http://localhost:3000> or <http://your-domain-name:3000>
 4. Login in with username: `admin` and password: `admin`
 5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
@@ -84,7 +93,7 @@ Grafana comes with a command line tool that can be used to install plugins.
 1. Upgrade Grafana to the latest version. Get that [here](https://grafana.com/grafana/download/).
 2. Run this command: `grafana-cli plugins install grafana-azure-data-explorer-datasource`
 3. Restart the Grafana server.
-4. Open the browser at: http://localhost:3000 or http://your-domain-name:3000
+4. Open the browser at: <http://localhost:3000> or <http://your-domain-name:3000>
 5. Login in with a user that has admin rights. This is needed to create datasources.
 6. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
 
@@ -93,7 +102,7 @@ Grafana comes with a command line tool that can be used to install plugins.
 If the server where Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded and manually copied to the server.
 
 1. Upgrade Grafana to the latest version. Get that [here](https://grafana.com/grafana/download/).
-2. Get the zip file from Grafana.com: https://grafana.com/plugins/grafana-azure-data-explorer-datasource/installation and click on the link in step 1 (with this text: "Alternatively, you can manually download the .zip file")
+2. Get the zip file from Grafana.com: <https://grafana.com/plugins/grafana-azure-data-explorer-datasource/installation> and click on the link in step 1 (with this text: "Alternatively, you can manually download the .zip file")
 3. Extract the zip file into the data/plugins subdirectory for Grafana.
 4. Restart the Grafana server
 5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
@@ -132,16 +141,16 @@ Assign the Reader role to the Service Principal and remove the Contributor role:
 
 ```bash
 az role assignment create --assignee <your appId> --role Reader
-az role assignment delete --assignee <your appId> --role Contributor  
+az role assignment delete --assignee <your appId> --role Contributor
 ```
 
 ### Connecting AAD with an Azure Data Explorer User
 
-Navigate to the Azure Web UI for Azure Data Explorer: https://dataexplorer.azure.com/clusters/nameofyourcluster/databases/yourdatabasename
+Navigate to the Azure Web UI for Azure Data Explorer: <https://dataexplorer.azure.com/clusters/nameofyourcluster/databases/yourdatabasename>
 
 You can find the link to the Web UI in the Azure Portal by navigating to:
 
-1. All services-> [Azure Data Explorer Clusters](https://portal.azure.com/?feature.customportal=false&Microsoft_Azure_Kusto=true#blade/HubsExtension/Resources/resourceType/Microsoft.Kusto%2FClusters) option 
+1. All services-> [Azure Data Explorer Clusters](https://portal.azure.com/?feature.customportal=false&Microsoft_Azure_Kusto=true#blade/HubsExtension/Resources/resourceType/Microsoft.Kusto%2FClusters) option
 2. Choose your cluster
 3. Databases -> click on your database
 4. Choose the Query option -> then click on the "Open in web UI" link
@@ -231,10 +240,10 @@ Example:
 
 ```kusto
 let T = range Timestamp from $__timeFrom to ($__timeTo + -30m) step 1m
-  | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"]) 
-  | extend   Place  = dynamic(["EU",     "EU",     "US",   "EU"]) 
+  | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
+  | extend   Place  = dynamic(["EU",     "EU",     "US",   "EU"])
   | mvexpand Person, Place
-  | extend   HatInventory = rand(5) 
+  | extend   HatInventory = rand(5)
   | project  Timestamp, tostring(Person), tostring(Place), HatInventory;
 
 T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timestamp from $__timeFrom to $__timeTo step 1m by Person, Place
