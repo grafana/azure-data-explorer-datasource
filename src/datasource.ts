@@ -73,7 +73,7 @@ export class KustoDBDatasource {
           // Table format does not use aliases yet. The user could
           // control the table format using aliases in the query itself
           // ex: data | project NewColumnName=ColumnName
-          if (query.resultFormat === 'time_series') {
+          if (query.resultFormat !== 'table') {
             let alias = query.alias;
             try {
               const key = Object.keys(r.target)[0];
