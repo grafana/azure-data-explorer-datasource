@@ -20,6 +20,10 @@ jobs:
         keys:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
+        name: yarn install
+        command: |
+          yarn install --pure-lockfile
+    - run:
         name: Run Toolkit Build
         command: npx grafana-toolkit plugin:ci-build
     - save_cache:
@@ -129,19 +133,9 @@ jobs:
     - run:
         name: Package Distribution
         command: |
-          ls -l ci
-          ls -l ci/jobs
-          ls -l ci/jobs/build_linux
-          ls -l ci/jobs/build_osx
-          ls -l ci/jobs/build_win64
-          ls -l ci/jobs/build_plugin
-          ls -l ci/jobs/build_plugin/dist
           cp ci/jobs/build_linux/* ci/jobs/build_plugin/dist
           cp ci/jobs/build_osx/* ci/jobs/build_plugin/dist
           cp ci/jobs/build_win64/* ci/jobs/build_plugin/dist
-          # skip - toolkit now does this
-          # copy external libraries
-          # cp -r src/libs ci/jobs/build_plugin/dist
           ls -l ci/jobs/build_plugin/dist
           npx grafana-toolkit plugin:ci-package
     - persist_to_workspace:
@@ -202,8 +196,7 @@ jobs:
     - run:
         name: Toolkit Report
         command: |
-          # skipped - S3 permission issue
-          # npx grafana-toolkit plugin:ci-report
+          npx grafana-toolkit plugin:ci-report
     - store_artifacts:
         path: ci
 
