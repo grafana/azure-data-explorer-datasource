@@ -66,52 +66,58 @@ export class KustoDBDatasource {
       .then(results => {
         const responseParser = new ResponseParser();
         const ret = responseParser.processQueryResult(results);
-
-        ret.data.forEach(r => {
-          const templateVars = {};
-          const query = queryTargets[r.refId];
-          // Table format does not use aliases yet. The user could
-          // control the table format using aliases in the query itself
-          // ex: data | project NewColumnName=ColumnName
-          if (query.resultFormat !== 'table') {
-            let alias = query.alias;
-            try {
-              const key = Object.keys(r.target)[0];
-              let meta = r.target;
-              if (key !== '0') {
-                meta = r.target[key];
-              }
-              const full = JSON.stringify(r.target)
-                .replace(/"/g, '')
-                .replace(/^\{(.*?)\}$/, '$1');
-              // Generating a default time series metric name requires both the metricname
-              // and the value, but only if multiple values were requested.
-              // By default, and for backwards compatibility, if there is only one metric
-              // in the alias values, use that one.
-              let defaultAlias = meta[Object.keys(meta)[0]];
-              if (typeof ret.valueCount !== 'undefined' && ret.valueCount > 1) {
-                defaultAlias =
-                  Object.keys(meta)
-                    .map(key => '$' + key)
-                    .join('.') + '.$value';
-              }
-              templateVars['value'] = { text: key, value: key };
-              templateVars['full'] = { text: full, value: full };
-              Object.keys(meta).forEach(t => {
-                templateVars[t] = { text: meta[t], value: meta[t] };
-              });
-              if (!alias) {
-                alias = defaultAlias;
-              }
-              r.target = this.templateSrv.replace(alias, templateVars);
-            } catch (ex) {
-              console.log('Error generating time series alias', ex);
-            }
-          }
-        });
-
-        return ret;
+        return this.processAlias(queryTargets, ret);
       });
+  }
+
+  processAlias(queryTargets: {}, response: any) {
+    return {
+      ...response,
+      data: response.data.map(r => {
+        const templateVars = {};
+        const query = queryTargets[r.refId];
+        // Table format does not use aliases yet. The user could
+        // control the table format using aliases in the query itself
+        // ex: data | project NewColumnName=ColumnName
+        if (query.resultFormat !== 'table') {
+          let alias = query.alias;
+          try {
+            const key = Object.keys(r.target)[0];
+            let meta = r.target;
+            if (key !== '0') {
+              meta = r.target[key];
+            }
+            const full = JSON.stringify(r.target)
+              .replace(/"/g, '')
+              .replace(/^\{(.*?)\}$/, '$1');
+            // Generating a default time series metric name requires both the metricname
+            // and the value, but only if multiple values were requested.
+            // By default, and for backwards compatibility, if there is only one metric
+            // in the alias values, use that one.
+            let defaultAlias = meta[Object.keys(meta)[0]];
+            if (typeof response.valueCount !== 'undefined' && response.valueCount > 1) {
+              defaultAlias =
+                Object.keys(meta)
+                  .map(key => '$' + key)
+                  .join('.') + '.$value';
+            }
+            templateVars['value'] = { text: key, value: key };
+            templateVars['full'] = { text: full, value: full };
+            Object.keys(meta).forEach(t => {
+              templateVars[t] = { text: meta[t], value: meta[t] };
+            });
+            if (!alias) {
+              alias = defaultAlias;
+            }
+            r.target = this.templateSrv.replace(alias, templateVars);
+          } catch (ex) {
+            console.log('Error generating time series alias', ex);
+          }
+        }
+
+        return r;
+      }),
+    };
   }
 
   annotationQuery(options) {

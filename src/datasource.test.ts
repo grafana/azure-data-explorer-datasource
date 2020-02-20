@@ -1,13 +1,13 @@
 import { KustoDBDatasource } from './datasource';
 import q from 'q';
 import { dateTime } from '@grafana/data';
-import TemplateSrvStub from '../test/template_srv_stub';
+import { TemplateSrv } from '../test/template_srv';
 import _ from 'lodash';
 
 describe('KustoDBDatasource', () => {
   const ctx: any = {
     backendSrv: {},
-    templateSrv: new TemplateSrvStub(),
+    templateSrv: new TemplateSrv(),
   };
 
   beforeEach(() => {
@@ -384,6 +384,78 @@ describe('KustoDBDatasource', () => {
       } catch (err) {
         expect(err.message).toContain('Minimal cache must be greater than or equal to 1.');
       }
+    });
+  });
+
+  describe('test alias parsing', () => {
+    it('Should parse adx timeseries data responses with default alias', () => {
+      const result = ctx.ds.processAlias(
+        {
+          A: {
+            alias: '',
+            database: 'Grafana',
+            query: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+            refId: 'A',
+            resultFormat: 'time_series_adx_series',
+            datasource: 'ADX',
+          },
+        },
+        {
+          data: [
+            {
+              target: {
+                y: {
+                  id: 'abc',
+                },
+              },
+              datapoints: [[2, 1582171200000]],
+              refId: 'A',
+              meta: {
+                KustoError: '',
+                RawQuery: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+                TimeNotASC: false,
+              },
+            },
+          ],
+          valueCount: 1,
+        }
+      );
+      expect(result.data[0].target).toEqual('abc');
+    });
+
+    it('Should parse adx timeseries data responses with custom alias', () => {
+      const result = ctx.ds.processAlias(
+        {
+          A: {
+            alias: '$value',
+            database: 'Grafana',
+            query: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+            refId: 'A',
+            resultFormat: 'time_series_adx_series',
+            datasource: 'ADX',
+          },
+        },
+        {
+          data: [
+            {
+              target: {
+                y: {
+                  id: 'abc',
+                },
+              },
+              datapoints: [[2, 1582171200000]],
+              refId: 'A',
+              meta: {
+                KustoError: '',
+                RawQuery: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+                TimeNotASC: false,
+              },
+            },
+          ],
+          valueCount: 1,
+        }
+      );
+      expect(result.data[0].target).toEqual('y');
     });
   });
 });
