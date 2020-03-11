@@ -401,11 +401,11 @@ export class ResponseParser {
           const rArray: string[] = r;
           rArray.forEach((item: string) => ret.push({ text: item }));
         } else {
-          ret.push({ text: (r as unknown as string) });
+          ret.push({ text: (r as unknown) as string });
         }
       });
     });
-    
+
     return ret;
   }
 }
