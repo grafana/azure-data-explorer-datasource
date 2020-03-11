@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { dateTime } from '@grafana/data';
+import { dateTime, MetricFindValue } from '@grafana/data';
 
 export interface DataTarget {
   target: string;
@@ -327,7 +327,11 @@ export class ResponseParser {
     return dateTime(dt).valueOf();
   }
 
-  // TODO(Temp Comment): processQueryResult is for results using the backend plugin
+  /**
+   * Translates the response from the backend plugin into a different format
+   * @todo figure out what that format is? Is it a documented standard?
+   * @param res The response from the backend plugin
+   */
   processQueryResult(res) {
     const data: any[] = [];
 
@@ -381,5 +385,27 @@ export class ResponseParser {
       data: data,
       valueCount: Object.keys(valueMap).length,
     };
+  }
+
+  /**
+   * Processes the response further for MetricFindValues
+   * @todo Get rid of all the any's! We need to be strongly typing everything.
+   * @param res The return value from processQueryResult
+   * @returns An array of MetricFindValues
+   */
+  processVariableQueryResult(res: any): MetricFindValue[] {
+    const ret: MetricFindValue[] = [];
+    res.data.forEach(dataEntry => {
+      dataEntry.rows.forEach((r: string[] | string) => {
+        if (Array.isArray(r)) {
+          const rArray: string[] = r;
+          rArray.forEach((item: string) => ret.push({ text: item }));
+        } else {
+          ret.push({ text: (r as unknown as string) });
+        }
+      });
+    });
+    
+    return ret;
   }
 }

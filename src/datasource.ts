@@ -160,20 +160,8 @@ export class KustoDBDatasource {
       )
       .then(response => {
         const responseParser = new ResponseParser();
-        const processedResponse = responseParser.processQueryResult(response);
-        const ret: MetricFindValue[] = [];
-        processedResponse.data.forEach(dataEntry => {
-          dataEntry.rows.forEach((r: string[] | string) => {
-            if (Array.isArray(r)) {
-              const rArray: string[] = r;
-              rArray.forEach((item: string) => ret.push({ text: item }));
-            } else {
-              ret.push({ text: (r as unknown as string) });
-            }
-          });
-        });
-        
-        return ret;
+        const processedResposne = responseParser.processQueryResult(response);
+        return responseParser.processVariableQueryResult(processedResposne);
       })
       .catch(err => {
         console.log('There was an error', err);
@@ -281,7 +269,6 @@ export class KustoDBDatasource {
     if (!options.hasOwnProperty('scopedVars')) {
       options['scopedVars'] = {};
     }
-    console.log("options", options);
     const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable), options);
     const url = `${this.baseUrl}/v1/rest/query`;
     const interpolatedQuery = queryBuilder.interpolate().query;
@@ -294,7 +281,6 @@ export class KustoDBDatasource {
       query: interpolatedQuery,
       database,
     });
-    console.log("buildQuery returns", queries);
     return queries;
   }
 
