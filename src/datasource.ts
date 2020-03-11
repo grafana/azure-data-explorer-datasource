@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { MetricFindValue } from '@grafana/data';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import QueryBuilder from './query_builder';
 import Cache from './cache';
@@ -143,17 +144,25 @@ export class KustoDBDatasource {
       });
   }
 
-  metricFindQuery(query: string, optionalOptions: any) {
+  metricFindQuery(query: string, optionalOptions: any): Promise<MetricFindValue[]> {
     return this.getDefaultOrFirstDatabase()
       .then(database => this.buildQuery(query, optionalOptions, database))
       .then(queries =>
         this.backendSrv.datasourceRequest({
           url: '/api/tsdb/query',
           method: 'POST',
-          queries,
+          data: {
+            from: '5m',
+            to: 'now',
+            queries,
+          },
         })
       )
-      .then(response => new ResponseParser().parseToVariables(response))
+      .then(response => {
+        const responseParser = new ResponseParser();
+        const processedResposne = responseParser.processQueryResult(response);
+        return responseParser.processVariableQueryResult(processedResposne);
+      })
       .catch(err => {
         console.log('There was an error', err);
         throw err;
@@ -254,10 +263,10 @@ export class KustoDBDatasource {
   }
 
   private buildQuery(query: string, options: any, database: string) {
-    if (typeof options === 'undefined') {
+    if (!options) {
       options = {};
     }
-    if (typeof options.scopedVars === 'undefined') {
+    if (!options.hasOwnProperty('scopedVars')) {
       options['scopedVars'] = {};
     }
     const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable), options);
