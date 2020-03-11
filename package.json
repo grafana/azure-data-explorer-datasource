@@ -1,6 +1,6 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "grafana-toolkit plugin:build && find src | grep '\\.d\\.ts$' | xargs rm -fv",
