@@ -31,6 +31,9 @@ test-in-docker: build-container
 build:
 	go build -o ./dist/${DSNAME}_${OS}_${ARCH}${EXT} -a -tags netgo -ldflags '-w' ./pkg
 
+build-dev:
+	go build -o ./dist/${DSNAME}_${OS}_${ARCH}${EXT} -a -tags netgo -ldflags ./pkg
+
 build-linux:
 	GOOS=linux go build -o ./dist/${DSNAME}_linux_${ARCH}${EXT} -a -tags netgo -ldflags '-w' ./pkg
 
