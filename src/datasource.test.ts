@@ -112,56 +112,6 @@ describe('KustoDBDatasource', () => {
     });
   });
 
-  describe('When performing metricFindQuery', () => {
-    const tableResponseWithOneColumn = {
-      Tables: [
-        {
-          TableName: 'Table_0',
-          Columns: [
-            {
-              ColumnName: 'Category',
-              ColumnType: 'string',
-            },
-          ],
-          Rows: [['Administrative'], ['Policy']],
-        },
-      ],
-    };
-
-    const databasesResponse = {
-      Tables: [
-        {
-          TableName: 'Table_0',
-          Columns: [
-            { ColumnName: 'DatabaseName', DataType: 'String' },
-            { ColumnName: 'PersistentStorage', DataType: 'String' },
-            { ColumnName: 'Version', DataType: 'String' },
-            { ColumnName: 'IsCurrent', DataType: 'Boolean' },
-            { ColumnName: 'DatabaseAccessMode', DataType: 'String' },
-            { ColumnName: 'PrettyName', DataType: 'String' },
-            {
-              ColumnName: 'CurrentUserIsUnrestrictedViewer',
-              DataType: 'Boolean',
-            },
-            { ColumnName: 'DatabaseId', DataType: 'Guid' },
-          ],
-          Rows: [
-            [
-              'Grafana',
-              'https://4bukustoragekus86a3c.blob.core.windows.net/grafanamd201806201624130602',
-              'v5.2',
-              false,
-              'ReadWrite',
-              null,
-              false,
-              'a955a3ed-0668-4d00-a2e5-9c4e610ef057',
-            ],
-          ],
-        },
-      ],
-    };
-  });
-
   describe('when performing annotations query', () => {
     const tableResponse = {
       Tables: [
