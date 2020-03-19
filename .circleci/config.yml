@@ -7,231 +7,90 @@ aliases:
       only: master
 
 defaults: &defaults
-  working_directory: ~/plugin
   docker:
-    - image: circleci/node:12
+    - image: srclosson/grafana-plugin-ci:latest
 
 jobs:
   build_plugin:
     <<: *defaults
     steps:
-    - checkout
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
-    - run:
-        name: Pull Packages
-        command: |
-          yarn install --pure-lockfile --no-progress
-    - run:
-        name: Run Toolkit Build
-        command: npx grafana-toolkit plugin:ci-build
-    - save_cache:
-        paths:
-        - node_modules
-        key: yarn-packages-{{ checksum "yarn.lock" }}
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci
-
+      - checkout
+      - restore_cache:
+          keys:
+          - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install dependencies
+          command: |
+            yarn install --frozen-lockfile
+      - run:
+          name: Build and test frontend
+          command:  |
+            npx grafana-toolkit plugin:ci-build
+            npx grafana-toolkit plugin:ci-build --finish
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci
+  build_backend:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Build Backend
+          command: |
+            [ -f "Magefile.go" ] && mage -v buildAll || circleci-agent step halt
+      - run:
+          name: Test Backend
+          command: |
+            mage -v lint
+            mage -v coverage
+      - run:
+          name: Install dependencies
+          command: |
+            yarn install --frozen-lockfile
+      - run:
+          name: Move results to ci folder
+          command:  |
+            npx grafana-toolkit plugin:ci-build --finish
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci
   build_docs:
     <<: *defaults
     steps:
     - checkout
     - restore_cache:
         keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
+        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
-        name: yarn install
+        name: Install dependencies
         command: |
-          yarn install --pure-lockfile
-          mkdir ci # Avoid error if not exists
+          yarn install --frozen-lockfile
     - run:
         name: Build Docs
-        command: npx grafana-toolkit plugin:ci-docs
+        command: |
+          mkdir ci # Avoid error if not exists
+          npx grafana-toolkit plugin:ci-docs
     - save_cache:
         paths:
-        - node_modules
-        key: yarn-packages-{{ checksum "yarn.lock" }}
+        - ~/.cache
+        key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - persist_to_workspace:
         root: .
         paths:
-        - ci
-
-  build_linux:
-    <<: *defaults
-    docker:
-      - image: circleci/golang:1.13.7
-    steps:
-    - checkout
-    - run:
-        name: Build Linux
-        command: |
-          mkdir -p ./ci/jobs/build_linux
-          go build \
-            -o ./ci/jobs/build_linux/grafana-azure-data-explorer-datasource_linux_amd64 \
-            -a -tags netgo -ldflags '-w' \
-            ./pkg
-          ls -l ./ci/jobs/build_linux/
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/build_linux
-
-  build_osx:
-    <<: *defaults
-    docker:
-      - image: circleci/golang:1.13.7
-    steps:
-    - checkout
-    - run:
-        name: Build OSX
-        command: |
-          mkdir -p ./ci/jobs/build_osx
-          GOOS=darwin GOARCH=amd64 \
-            go build \
-            -o ./ci/jobs/build_osx/grafana-azure-data-explorer-datasource_darwin_amd64 \
-            -a -tags netgo -ldflags '-w' \
-            ./pkg
-          ls -l ./ci/jobs/build_osx/
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/build_osx
-
-  build_win64:
-    <<: *defaults
-    docker:
-      - image: circleci/golang:1.13.7
-    steps:
-    - checkout
-    - run:
-        name: Build Windows
-        command: |
-          mkdir -p ./ci/jobs/build_win64
-          CGO_ENABLED=1 GOOS=windows \
-          go build \
-            -o ./ci/jobs/build_win64/grafana-azure-data-explorer-datasource_windows_amd64.exe \
-            -a -tags netgo -ldflags '-w' \
-            ./pkg
-          ls -l ./ci/jobs/build_win64/
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/build_win64
-
-  lint_backend:
-    <<: *defaults
-    docker:
-      - image: circleci/golang:1.13.7
-    steps:
-      - checkout
-      - run:
-          name: backend lint
-          command: ./scripts/circle-cmd-lint.sh
-
-  test_backend:
-    <<: *defaults
-    docker:
-      - image: circleci/golang:1.13.7
-    steps:
-      - checkout
-      - run:
-          name: backend test
-          command: |
-            go test -covermode=count -coverprofile=count.out fmt ./...
-            go test -v -coverpkg=./... --coverprofile=coverage.out ./...
-            go test ./... -coverprofile cover.out; go tool cover -func cover.out
-
-  code_coverage_setup:
-    <<: *defaults
-    docker:
-    - image:  circleci/circleci-cli:alpine
-    steps:
-    - run:
-        name:  Download cc-test-reporter
-        command: |
-          apk --no-cache add curl
-          mkdir -p ccbin/
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./ccbin/cc-test-reporter
-          chmod +x ./ccbin/cc-test-reporter
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ccbin
-        - ci/jobs/code_coverage_setup
-
-  code_coverage_frontend:
-    <<: *defaults
-    steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - restore_cache:
-        keys:
-          - yarn-packages-{{ checksum "yarn.lock" }}
-    - run:
-        name: Run coverage report
-        command: |
-          ls -l ci/jobs/build_plugin
-          ls -l ci/jobs/build_plugin/coverage
-          ./ccbin/cc-test-reporter format-coverage -t lcov -o out/codeclimate.frontend.json ci/jobs/build_plugin/coverage/lcov.info
-    - run:
-        name: Install jest and jest-junit
-        command: sudo yarn global add jest jest-junit
-    - run:
-        name: Run tests with JUnit as reporter
-        command: jest --ci --runInBand --reporters=default --reporters=jest-junit
-        environment:
-          JEST_JUNIT_OUTPUT_DIR: "test-results/jest/results.xml"
-    - persist_to_workspace:
-        root: .
-        paths:
-        - out
-        - ci/jobs/code_coverage_frontend
-    - store_test_results:
-        path: test-results
-
-  code_coverage_backend:
-    <<: *defaults
-    working_directory: /go/src/github.com/grafana/azure-data-explorer-datasource
-    environment:
-      GOPATH: /go
-    docker:
-      - image: circleci/golang:1.13.7
-    steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - run:
-        name: Run coverage report
-        command: |
-          #./ccbin/cc-test-reporter before-build
-          go test ./... -coverprofile c.out; go tool cover -func c.out
-          ./ccbin/cc-test-reporter format-coverage -t gocov -o out/codeclimate.backend.json ci/jobs/build_plugin/coverage/gocov.info
-    - persist_to_workspace:
-        root: .
-        paths:
-        - out
-        - ci/jobs/code_coverage_backend
-    - store_test_results:
-        path: test-results
-
-  upload_coverage:
-    docker:
-    - image:  circleci/circleci-cli:alpine
-    #  environment:
-    #    CC_TEST_REPORTER_ID: add_this_to_circleci_config
-    working_directory: ~/plugin
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Upload coverage results to Code Climate
-          command: |
-            ./ccbin/cc-test-reporter sum-coverage out/codeclimate.*.json -d -p 2 -o out/codeclimate.total.json
-            ./ccbin/cc-test-reporter upload-coverage -i out/codeclimate.total.json
+          - ci
 
   package:
     <<: *defaults
@@ -241,52 +100,57 @@ jobs:
         at: .
     - restore_cache:
         keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
+        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Package Distribution
         command: |
-          cp ci/jobs/build_linux/* ci/jobs/build_plugin/dist
-          cp ci/jobs/build_osx/* ci/jobs/build_plugin/dist
-          cp ci/jobs/build_win64/* ci/jobs/build_plugin/dist
-          ls -l ci/jobs/build_plugin/dist
+          yarn install --frozen-lockfile
           npx grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
         paths:
-        - ci
-    - store_artifacts:
-        path: ci/packages
+        - ci/jobs/package
+        - ci/packages
+        - ci/dist
+        - ci/grafana-test-env
 
   test_integration:
     <<: *defaults
-    docker:
-    - image: circleci/node:12-browsers
     steps:
     - checkout
     - attach_workspace:
         at: .
     - restore_cache:
         keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
+        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Setup Grafana (local install)
         command: |
-          wget https://dl.grafana.com/oss/release/grafana_6.6.1_amd64.deb
-          sudo apt-get install -y adduser libfontconfig1
-          sudo dpkg -i grafana_6.6.1_amd64.deb
-          sudo apt-get install locate
+          sudo dpkg -i /usr/local/grafana/deb/grafana_6.6.2_amd64.deb
           sudo updatedb
           sudo locate grafana
-          sudo cat /etc/grafana/grafana.ini
-          sudo echo ------------------------
           sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
           sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
           sudo service grafana-server start
           sudo grafana-cli --version
     - run:
+        name: Install dependencies
+        command: yarn install --frozen-lockfile
+    - save_cache:
+          paths:
+            - ~/.cache
+          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+    - run:
         name: Run e2e tests
+        command: npx grafana-e2e run
+    - run:
+        name: Prepare task output dir
         command: |
-          npx grafana-toolkit plugin:ci-test
+          # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
+          mkdir ci/jobs/test_integration
+          # only copy if they exist
+          cp cypress/screenshots/*.* ci/jobs/test_integration 2>/dev/null || :
+          cp cypress/videos/*.* ci/jobs/test_integration 2>/dev/null || :
     - persist_to_workspace:
         root: .
         paths:
@@ -304,111 +168,62 @@ jobs:
         at: .
     - restore_cache:
         keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
+        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
-        name: Toolkit Report
+        name: Toolkit report
         command: |
+          yarn install --frozen-lockfile
           npx grafana-toolkit plugin:ci-report
+          yarn install --frozen-lockfile
     - store_artifacts:
         path: ci
 
-
   publish_github_release:
-    working_directory: ~/azure-data-explorer-datasource
-    docker:
-      - image: cibuilds/github:0.13
+    <<: *defaults
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "2b:a0:7a:01:46:fe:ff:e3:c0:e5:87:4a:d3:7a:fa:a4"
+            - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: "Publish Release on GitHub"
           command: |
-            # copy ci dist
-            cp -r ci/jobs/build_plugin/dist .
-            # copy ci artifacts
-            mkdir -p artifacts
-            cp -r ci/packages/* artifacts
-            apk add --update --no-cache jq
-            PLUGIN_NAME=`cat src/plugin.json|jq '.id'| sed s/\"//g`
-            RELEASE_NOTES=`awk 'BEGIN {FS="##"; RS=""} FNR==4 {print; exit}' CHANGELOG.md`
-            VERSION=`cat dist/plugin.json|jq '.info.version'| sed s/\"//g`
-            ls -al
-            ls -al ./artifacts
-            git config user.email "eng@grafana.com"
-            git config user.name "CircleCI Automation"
-            git checkout -b release-${VERSION}
-            git add --force dist/
-            git add artifacts/
-            git commit -m "automated release $VERSION [skip ci]"
-            git push -f origin release-${VERSION}
-            git tag -f v${VERSION}
-            git push -f origin v${VERSION}
-            ghr \
-              -t ${GITHUB_TOKEN} \
-              -u ${CIRCLE_PROJECT_USERNAME} \
-              -r ${CIRCLE_PROJECT_REPONAME} \
-              -c ${CIRCLE_SHA1} \
-              -n "${PLUGIN_NAME} v${VERSION}" \
-              -b "${RELEASE_NOTES}" \
-              -delete \
-              v${VERSION} \
-              ./artifacts/
-
+            yarn install --frozen-lockfile
+            if [ "$(curl -s https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/releases/latest | jq -r '.tag_name')" = "v$(cat ci/dist/plugin.json | jq -r '.info.version')" ]; then
+              npx grafana-toolkit plugin:github-publish --recreate
+            else
+              npx grafana-toolkit plugin:github-publish
+            fi
 
 workflows:
   version: 2
   plugin_workflow:
     jobs:
-    - lint_backend
-    - build_plugin
-    - build_docs
-    - code_coverage_setup
-    - code_coverage_frontend:
-        requires:
-        - build_plugin
-        - code_coverage_setup
-    - build_linux:
-        requires:
-        - lint_backend
-    - build_osx:
-        requires:
-        - lint_backend
-    - build_win64:
-        requires:
-        - lint_backend
-    - test_backend:
-        requires:
-        - build_linux
-        - build_osx
-        - build_win64
-    - code_coverage_backend:
-        requires:
-        - test_backend
-        - code_coverage_setup
-    - upload_coverage:
-        requires:
-        - code_coverage_frontend
-        - code_coverage_backend
-    - package:
-        requires:
-        - build_docs
-        - upload_coverage
-    - test_integration:
-        requires:
-        - package
-    - report:
-        requires:
-        - test_integration
-    - approve_release:
-        type: approval
-        requires:
-          - report
-        filters: *filter-only-master
-    - publish_github_release:
-        requires:
-          - approve_release
-        filters: *filter-only-master
+      - build_plugin
+      - build_docs
+      - build_backend
+      - package:
+          requires:
+            - build_plugin
+            - build_backend
+            - build_docs
+      - test_integration:
+          requires:
+            - package
+      - report:
+          requires:
+            - test_integration
+      - approve_release:
+          type: approval
+          requires:
+            - report
+          filters: *filter-only-master
+      - publish_github_release:
+          requires:
+            - approve_release
+          filters: *filter-only-master
