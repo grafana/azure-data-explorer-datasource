@@ -6,7 +6,7 @@ import (
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
-	"github.com/grafana/grafana-plugin-model/go/datasource"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	plugin "github.com/hashicorp/go-plugin"
 	"golang.org/x/net/context"
 )
@@ -17,34 +17,32 @@ type GrafanaAzureDXDatasource struct {
 }
 
 // Query is the primary method called by grafana-server
-func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
-	response := &datasource.DatasourceResponse{
-		Results: make([]*datasource.QueryResult, len(tsdbReq.Queries)),
-	}
+func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+	response := &backend.QueryDataResponse{}
 
-	log.Print.Debug("Query", "datasource", tsdbReq.Datasource.Name, "TimeRange", tsdbReq.TimeRange)
+	log.Print.Debug("Query", "datasource", req.PluginConfig.DataSourceConfig.Name)
 
-	client, err := azuredx.NewClient(ctx, tsdbReq.GetDatasource())
+	client, err := azuredx.NewClient(ctx, req.PluginConfig.DataSourceConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	for idx, q := range tsdbReq.GetQueries() {
+	for idx, q := range req.Queries {
 		qm := &azuredx.QueryModel{}
-		err := json.Unmarshal([]byte(q.GetModelJson()), qm)
+		err := json.Unmarshal(q.JSON, qm)
 		if err != nil {
 			return nil, err
 		}
 		log.Print.Debug(fmt.Sprintf("Query ---> %v", q))
-		qm.MacroData = azuredx.NewMacroData(tsdbReq.GetTimeRange(), q.GetIntervalMs())
+		qm.MacroData = azuredx.NewMacroData(&q.TimeRange, q.Interval.Microseconds())
 		if err := qm.Interpolate(); err != nil {
 			return nil, err
 		}
 		md := &Metadata{
 			RawQuery: qm.Query,
 		}
-		qr := &datasource.QueryResult{
-			RefId: q.GetRefId(),
+		qr := &backend.QueryResult{
+			RefId: q.RefID,
 		}
 		response.Results[idx] = qr
 		var tableRes *azuredx.TableResponse

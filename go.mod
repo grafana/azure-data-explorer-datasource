@@ -7,6 +7,7 @@ require (
 	github.com/golang/mock v1.4.0 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/grafana/grafana-plugin-model v0.0.0-20190930120109-1fc953a61fb4
+	github.com/grafana/grafana-plugin-sdk-go v0.33.0
 	github.com/hashicorp/go-hclog v0.12.0
 	github.com/hashicorp/go-plugin v1.0.1
 	github.com/hashicorp/yamux v0.0.0-20190923154419-df201c70410d // indirect

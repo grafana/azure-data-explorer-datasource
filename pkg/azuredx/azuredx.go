@@ -14,7 +14,7 @@ import (
 	"golang.org/x/oauth2/microsoft"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
-	"github.com/grafana/grafana-plugin-model/go/datasource"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/hashicorp/go-hclog"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -61,19 +61,19 @@ type RequestPayload struct {
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's
 // JSONData and Encrypted JSONData which contains the information needed to connected to
 // the datasource.
-func newDataSourceData(dInfo *datasource.DatasourceInfo) (*dataSourceData, error) {
+func newDataSourceData(dInfo *backend.DataSourceConfig) (*dataSourceData, error) {
 	d := dataSourceData{}
-	err := json.Unmarshal([]byte(dInfo.GetJsonData()), &d)
+	err := json.Unmarshal(dInfo.JSONData, &d)
 	if err != nil {
 		return nil, err
 	}
-	d.Secret = dInfo.GetDecryptedSecureJsonData()["clientSecret"]
+	d.Secret = dInfo.DecryptedSecureJSONData["clientSecret"]
 	return &d, nil
 }
 
 // NewClient creates a new Azure Data Explorer http client from the DatasourceInfo.
 // AAD OAuth authentication is setup for the client.
-func NewClient(ctx context.Context, dInfo *datasource.DatasourceInfo) (*Client, error) {
+func NewClient(ctx context.Context, dInfo *backend.DataSourceConfig) (*Client, error) {
 	c := Client{}
 	var err error
 	c.dataSourceData, err = newDataSourceData(dInfo)
