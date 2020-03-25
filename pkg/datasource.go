@@ -17,7 +17,7 @@ type GrafanaAzureDXDatasource struct {
 	plugin.NetRPCUnsupportedPlugin
 }
 
-// Query is the primary method called by grafana-server
+// QueryData is the primary method called by grafana-server
 func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	response := &backend.QueryDataResponse{}
 
@@ -59,19 +59,30 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 			}
 			return response, nil
 		case "table":
-			backend.Logger.Debug("here")
-			frames, err := tableRes.ToFrames(q.RefID, md.CustomObject())
+			frames, err := tableRes.ToDataFrames(q.RefID, md.CustomObject())
 			if err != nil {
 				return nil, err
 			}
 			response.Frames = append(response.Frames, frames...)
-			// gTables, err := tableRes.ToTables()
-			// if err != nil {
-			// 	qr.Error = err.Error()
-			// 	break
-			// }
-			// qr.Tables = gTables
-		// case "time_series":
+		case "time_series":
+			frames, err := tableRes.ToDataFrames(q.RefID, md.CustomObject())
+			if err != nil {
+				return nil, err
+			}
+			for _, f := range frames {
+				tsSchema := f.TimeSeriesSchema()
+				if tsSchema.Type == data.TimeSeriesTypeNot {
+					return nil, fmt.Errorf("returned frame is not a series")
+				}
+				if tsSchema.Type == data.TimeSeriesTypeLong {
+					wideFrame, err := data.LongToWide(f)
+					if err != nil {
+						return nil, err
+					}
+					f = wideFrame
+				}
+				response.Frames = append(response.Frames, f)
+			}
 		// 	series, timeNotASC, err := tableRes.ToTimeSeries()
 		// 	if err != nil {
 		// 		qr.Error = err.Error()
@@ -91,7 +102,7 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 		}
 	}
 	for _, frame := range response.Frames {
-		backend.Logger.Debug(fmt.Sprintf("%s", frame))
+		backend.Logger.Debug(frame.String())
 	}
 	return response, nil
 }
@@ -101,15 +112,6 @@ type Metadata struct {
 	RawQuery   string
 	KustoError string
 	TimeNotASC bool
-}
-
-// JSONString performs a json.Marshal on the metadata object and returns the JSON as a string.
-func (md *Metadata) JSONString() (string, error) {
-	b, err := json.Marshal(md)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
 }
 
 func (md *Metadata) CustomObject() map[string]interface{} {
