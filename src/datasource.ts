@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { MetricFindValue } from '@grafana/data';
+import { MetricFindValue, resultsToDataFrames } from '@grafana/data';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import QueryBuilder from './query_builder';
 import Cache from './cache';
@@ -44,6 +44,7 @@ export class KustoDBDatasource {
         intervalMs: options.intervalMs,
         maxDataPoints: options.maxDataPoints,
         datasourceId: this.id,
+        datasource: this.name,
         query: interpolatedQuery,
         database: item.database,
         resultFormat: item.resultFormat,
@@ -65,9 +66,10 @@ export class KustoDBDatasource {
         },
       })
       .then(results => {
-        const responseParser = new ResponseParser();
-        const ret = responseParser.processQueryResult(results);
-        return this.processAlias(queryTargets, ret);
+        // const responseParser = new ResponseParser();
+        // const ret = responseParser.processQueryResult(results);
+        // return this.processAlias(queryTargets, ret);
+        return { data: resultsToDataFrames(results?.data) };
       });
   }
 
@@ -183,6 +185,7 @@ export class KustoDBDatasource {
               intervalMs: 1,
               maxDataPoints: 1,
               datasourceId: this.id,
+              datasource: this.name,
               query: '.show databases',
               resultFormat: 'test',
             },

@@ -3,6 +3,7 @@ module github.com/grafana/azure-data-explorer-datasource
 go 1.13
 
 require (
+	github.com/davecgh/go-spew v1.1.1
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/golang/mock v1.4.0 // indirect
 	github.com/google/uuid v1.1.1

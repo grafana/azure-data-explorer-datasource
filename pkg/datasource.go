@@ -59,10 +59,12 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 			}
 			return response, nil
 		case "table":
+			backend.Logger.Debug("here")
 			frames, err := tableRes.ToFrames(q.RefID, md.CustomObject())
 			if err != nil {
-				response.Frames = append(response.Frames, frames...)
+				return nil, err
 			}
+			response.Frames = append(response.Frames, frames...)
 			// gTables, err := tableRes.ToTables()
 			// if err != nil {
 			// 	qr.Error = err.Error()
@@ -87,6 +89,9 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 		default:
 			return nil, fmt.Errorf("unsupported query type: '%v'", qm.Format)
 		}
+	}
+	for _, frame := range response.Frames {
+		backend.Logger.Debug(fmt.Sprintf("%s", frame))
 	}
 	return response, nil
 }
