@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/grafana/grafana-plugin-model/go/datasource"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 )
 
 // TableResponse represents the response struct from Azure's Data Explorer REST API.
@@ -31,6 +32,68 @@ type Column struct {
 	ColumnName string
 	DataType   string
 	ColumnType string
+}
+
+func (tr *TableResponse) ToFrames(refID string, customMD map[string]interface{}) ([]*data.Frame, error) {
+	frames := make([]*data.Frame, len(tr.Tables))
+	for i, table := range tr.Tables {
+		frame, err := table.ToDataFrame()
+		if err != nil {
+			return nil, err
+		}
+		frame.RefID = refID
+		frame.Meta = &data.QueryResultMeta{
+			Custom: customMD,
+		}
+		frames[i] = frame
+	}
+	return frames, nil
+}
+
+func (t *Table) ToDataFrame() (*data.Frame, error) {
+	frame, err := emptyFrameForTable(t)
+	if err != nil {
+		return nil, err
+	}
+	return frame, nil
+}
+
+func emptyFrameForTable(t *Table) (*data.Frame, error) {
+	fields := make([]*data.Field, len(t.Columns))
+	rowLen := len(t.Rows)
+	for i, col := range t.Columns {
+		fType, ok := fieldTypeForKustoType(col.ColumnType)
+		if !ok {
+			// TODO maybe remove this error
+			return nil, fmt.Errorf("unsupported kusto column type %v", col.ColumnName)
+		}
+		field := data.NewFieldFromFieldType(fType, rowLen)
+		field.Name = col.ColumnName
+		fields[i] = field
+	}
+	return data.NewFrame(t.TableName, fields...), nil
+}
+
+// return data Field type for kustoType, if no match, will return assume nullabe string vector and return false.
+func fieldTypeForKustoType(kustoType string) (data.FieldType, bool) {
+	d := data.FieldTypeNullableString
+	switch strings.ToLower(kustoType) {
+	case "string", "guid", "timespan", "dynamic":
+		d = data.FieldTypeNullableString
+	case "bool":
+		d = data.FieldTypeNullableBool
+	case "int":
+		d = data.FieldTypeNullableInt32
+	case "long":
+		d = data.FieldTypeNullableInt64
+	case "real":
+		d = data.FieldTypeNullableFloat64
+	case "datatime":
+		d = data.FieldTypeNullableTime
+	default:
+		return d, false
+	}
+	return d, true
 }
 
 // ToTables turns a TableResponse into a slice of Tables appropriate for the plugin model.

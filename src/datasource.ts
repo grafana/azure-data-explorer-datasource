@@ -56,7 +56,7 @@ export class KustoDBDatasource {
 
     return this.backendSrv
       .datasourceRequest({
-        url: '/api/tsdb/query',
+        url: '/api/ds/query',
         method: 'POST',
         data: {
           from: options.range.from.valueOf().toString(),
@@ -172,7 +172,7 @@ export class KustoDBDatasource {
   testDatasource() {
     return this.backendSrv
       .datasourceRequest({
-        url: '/api/tsdb/query',
+        url: '/api/ds/query',
         method: 'POST',
         data: {
           from: '5m',

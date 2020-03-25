@@ -7,6 +7,7 @@ import (
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	plugin "github.com/hashicorp/go-plugin"
 	"golang.org/x/net/context"
 )
@@ -27,7 +28,7 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 		return nil, err
 	}
 
-	for idx, q := range req.Queries {
+	for _, q := range req.Queries {
 		qm := &azuredx.QueryModel{}
 		err := json.Unmarshal(q.JSON, qm)
 		if err != nil {
@@ -41,23 +42,13 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 		md := &Metadata{
 			RawQuery: qm.Query,
 		}
-		qr := &backend.QueryResult{
-			RefId: q.RefID,
-		}
-		response.Results[idx] = qr
 		var tableRes *azuredx.TableResponse
 		tableRes, md.KustoError, err = client.KustoRequest(azuredx.RequestPayload{
 			CSL: qm.Query,
 			DB:  qm.Database,
 		})
 		if err != nil {
-			qr.Error = err.Error()
-			mdString, jsonErr := md.JSONString()
-			if jsonErr != nil {
-				log.Print.Debug("failed to marshal metadata", jsonErr)
-				continue
-			}
-			qr.MetaJson = mdString
+			response.Frames = append(response.Frames, errorDF(err.Error(), q.RefID, md.CustomObject()))
 			continue
 		}
 		switch qm.Format {
@@ -68,38 +59,33 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 			}
 			return response, nil
 		case "table":
-			gTables, err := tableRes.ToTables()
+			frames, err := tableRes.ToFrames(q.RefID, md.CustomObject())
 			if err != nil {
-				qr.Error = err.Error()
-				break
+				response.Frames = append(response.Frames, frames...)
 			}
-			qr.Tables = gTables
-		case "time_series":
-			series, timeNotASC, err := tableRes.ToTimeSeries()
-			if err != nil {
-				qr.Error = err.Error()
-				break
-			}
-			md.TimeNotASC = timeNotASC
-			qr.Series = series
-		case "time_series_adx_series":
-			series, err := tableRes.ToADXTimeSeries()
-			if err != nil {
-				qr.Error = err.Error()
-				break
-			}
-			qr.Series = series
+			// gTables, err := tableRes.ToTables()
+			// if err != nil {
+			// 	qr.Error = err.Error()
+			// 	break
+			// }
+			// qr.Tables = gTables
+		// case "time_series":
+		// 	series, timeNotASC, err := tableRes.ToTimeSeries()
+		// 	if err != nil {
+		// 		qr.Error = err.Error()
+		// 		break
+		// 	}
+		// 	md.TimeNotASC = timeNotASC
+		// 	qr.Series = series
+		// case "time_series_adx_series":
+		// 	series, err := tableRes.ToADXTimeSeries()
+		// 	if err != nil {
+		// 		qr.Error = err.Error()
+		// 		break
+		// 	}
+		// 	qr.Series = series
 		default:
 			return nil, fmt.Errorf("unsupported query type: '%v'", qm.Format)
-		}
-
-		if qr.MetaJson == "" {
-			mdString, err := md.JSONString()
-			if err != nil {
-				log.Print.Debug("could not add metadata", err) // only log since this is just metadata
-				continue
-			}
-			qr.MetaJson = mdString
 		}
 	}
 	return response, nil
@@ -119,4 +105,25 @@ func (md *Metadata) JSONString() (string, error) {
 		return "", err
 	}
 	return string(b), nil
+}
+
+func (md *Metadata) CustomObject() map[string]interface{} {
+	m := make(map[string]interface{}, 3)
+	m["RawQuery"] = md.RawQuery
+	m["KustoError"] = md.KustoError
+	m["TimeNotASC"] = md.TimeNotASC
+	return m
+}
+
+// Make a dataframe for an error, sdk needs some love here.
+func errorDF(msg, refID string, customMD map[string]interface{}) *data.Frame {
+	f := &data.Frame{
+		Name:  "error",
+		RefID: refID,
+		Meta: &data.QueryResultMeta{
+			Custom: customMD,
+		},
+	}
+	f.AppendWarning(msg, "")
+	return f
 }
