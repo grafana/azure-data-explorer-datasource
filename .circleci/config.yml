@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 aliases:
   # Workflow filters
@@ -6,180 +6,89 @@ aliases:
     branches:
       only: master
 
-defaults: &defaults
-  docker:
-    - image: srclosson/grafana-plugin-ci:latest
+executors:
+  default_exec: # declares a reusable executor
+    docker:
+      - image: srclosson/grafana-plugin-ci:latest
 
 jobs:
   build_plugin:
-    <<: *defaults
+    executor: default_exec
     steps:
       - checkout
       - restore_cache:
           keys:
-          - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Install dependencies
           command: |
-            yarn install --frozen-lockfile
+            mkdir ci
+            [ -L ~/project/node_modules/.bin/grafana-toolkit ] || yarn install --frozen-lockfile
       - run:
-          name: Build and test frontend
-          command:  |
-            npx grafana-toolkit plugin:ci-build
-            npx grafana-toolkit plugin:ci-build --finish
-      - save_cache:
-          paths:
-            - ~/.cache
-          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ci
-  build_backend:
-    <<: *defaults
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-          - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+          name: Build docs
+          command: npx grafana-toolkit plugin:ci-docs
+      - run:
+          name: Build plugin
+          command: npx grafana-toolkit plugin:ci-build
       - run:
           name: Build Backend
           command: |
-            [ -f "Magefile.go" ] && mage -v buildAll || circleci-agent step halt
+            [ -f "Magefile.go" ] && mage -v buildAll || echo "No backend found. Skipping."
       - run:
           name: Test Backend
           command: |
-            mage -v lint
-            mage -v coverage
-      - run:
-          name: Install dependencies
-          command: |
-            yarn install --frozen-lockfile
+            [ -f "Magefile.go" ] && (mage -v lint; mage -v coverage) || echo "No backend found. Skipping."
       - run:
           name: Move results to ci folder
-          command:  |
-            npx grafana-toolkit plugin:ci-build --finish
+          command:  npx grafana-toolkit plugin:ci-build --finish
+      - run:
+          name: Package distribution
+          command: npx grafana-toolkit plugin:ci-package
+      - run:
+          name: Toolkit report
+          command: npx grafana-toolkit plugin:ci-report
+      - run:
+          name: Setup Grafana (local install)
+          command: |
+            gget latest
+            sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
+            sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
+            sudo service grafana-server start
+            sudo grafana-cli --version
+      - run:
+          name: Run e2e tests
+          command: |
+            [ -d "cypress" ] && npx grafana-e2e run || echo "skipping e2e"
+      - run:
+          name: Prepare task output dir
+          command: |
+            # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
+            mkdir ci/jobs/test_integration
+            # only copy if they exist
+            cp cypress/screenshots/*.* ci/jobs/test_integration 2>/dev/null || :
+            cp cypress/videos/*.* ci/jobs/test_integration 2>/dev/null || :
       - save_cache:
           paths:
             - ~/.cache
-          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+            - ~/project/node_modules
+          key: build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: .
           paths:
-            - ci
-  build_docs:
-    <<: *defaults
-    steps:
-    - checkout
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Install dependencies
-        command: |
-          yarn install --frozen-lockfile
-    - run:
-        name: Build Docs
-        command: |
-          mkdir ci # Avoid error if not exists
-          npx grafana-toolkit plugin:ci-docs
-    - save_cache:
-        paths:
-        - ~/.cache
-        key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - persist_to_workspace:
-        root: .
-        paths:
-          - ci
-
-  package:
-    <<: *defaults
-    steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Package Distribution
-        command: |
-          yarn install --frozen-lockfile
-          npx grafana-toolkit plugin:ci-package
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/package
-        - ci/packages
-        - ci/dist
-        - ci/grafana-test-env
-
-  test_integration:
-    <<: *defaults
-    steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Setup Grafana (local install)
-        command: |
-          sudo dpkg -i /usr/local/grafana/deb/grafana_6.6.2_amd64.deb
-          sudo updatedb
-          sudo locate grafana
-          sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
-          sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
-          sudo service grafana-server start
-          sudo grafana-cli --version
-    - run:
-        name: Install dependencies
-        command: yarn install --frozen-lockfile
-    - save_cache:
-          paths:
-            - ~/.cache
-          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Run e2e tests
-        command: npx grafana-e2e run
-    - run:
-        name: Prepare task output dir
-        command: |
-          # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
-          mkdir ci/jobs/test_integration
-          # only copy if they exist
-          cp cypress/screenshots/*.* ci/jobs/test_integration 2>/dev/null || :
-          cp cypress/videos/*.* ci/jobs/test_integration 2>/dev/null || :
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/test_integration
-    - store_test_results:
-        path: ci/jobs/test_integration
-    - store_artifacts:
-        path: ci/jobs/test_integration
-
-  report:
-    <<: *defaults
-    steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Toolkit report
-        command: |
-          yarn install --frozen-lockfile
-          npx grafana-toolkit plugin:ci-report
-          yarn install --frozen-lockfile
-    - store_artifacts:
-        path: ci
-
+          - ci/jobs/package
+          - ci/jobs/test_integration
+          - ci/packages
+          - ci/dist
+          - ci/grafana-test-env
+      - store_artifacts:
+          path: ci
+      - store_test_results:
+          path: ci/jobs/test_integration
+      - store_artifacts:
+          path: ci/jobs/test_integration
+  
   publish_github_release:
-    <<: *defaults
+    executor: default_exec
     steps:
       - checkout
       - add_ssh_keys:
@@ -189,39 +98,21 @@ jobs:
           at: .
       - restore_cache:
           keys:
-            - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: "Publish Release on GitHub"
           command: |
-            yarn install --frozen-lockfile
-            if [ "$(curl -s https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/releases/latest | jq -r '.tag_name')" = "v$(cat ci/dist/plugin.json | jq -r '.info.version')" ]; then
-              npx grafana-toolkit plugin:github-publish --recreate
-            else
-              npx grafana-toolkit plugin:github-publish
-            fi
+            npx grafana-toolkit plugin:github-publish
 
 workflows:
   version: 2
   plugin_workflow:
     jobs:
       - build_plugin
-      - build_docs
-      - build_backend
-      - package:
-          requires:
-            - build_plugin
-            - build_backend
-            - build_docs
-      - test_integration:
-          requires:
-            - package
-      - report:
-          requires:
-            - test_integration
       - approve_release:
           type: approval
           requires:
-            - report
+            - build_plugin
           filters: *filter-only-master
       - publish_github_release:
           requires:
