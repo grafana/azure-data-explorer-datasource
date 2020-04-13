@@ -6,13 +6,41 @@ aliases:
     branches:
       only: master
 
+workflows:
+  version: 2
+  plugin_workflow:
+    jobs:
+      - compile_dependencies
+      - build_plugin:
+          requires: 
+            - compile_dependencies
+      - build_backend:
+          requires: 
+            - compile_dependencies
+      - package_and_report:
+          requires:
+            - build_plugin
+            - build_backend
+      - test_integration:
+          requires:
+            - package_and_report
+      - approve_release:
+          type: approval
+          requires:
+            - test_integration
+          filters: *filter-only-master
+      - publish_github_release:
+          requires:
+            - approve_release
+          filters: *filter-only-master
+
 executors:
   default_exec: # declares a reusable executor
     docker:
-      - image: srclosson/grafana-plugin-ci:latest
+      - image: srclosson/grafana-plugin-ci-alpine:latest
 
 jobs:
-  build_plugin:
+  compile_dependencies:
     executor: default_exec
     steps:
       - checkout
@@ -24,69 +52,117 @@ jobs:
           command: |
             mkdir ci
             [ -L ~/project/node_modules/.bin/grafana-toolkit ] || yarn install --frozen-lockfile
-      - run:
-          name: Build docs
-          command: npx grafana-toolkit plugin:ci-docs
-      - run:
-          name: Build plugin
-          command: npx grafana-toolkit plugin:ci-build
-      - run:
-          name: Build Backend
-          command: |
-            [ -f "Magefile.go" ] && mage -v buildAll || echo "No backend found. Skipping."
-      - run:
-          name: Test Backend
-          command: |
-            [ -f "Magefile.go" ] && (mage -v lint; mage -v coverage) || echo "No backend found. Skipping."
-      - run:
-          name: Move results to ci folder
-          command:  npx grafana-toolkit plugin:ci-build --finish
-      - run:
-          name: Package distribution
-          command: npx grafana-toolkit plugin:ci-package
-      - run:
-          name: Toolkit report
-          command: npx grafana-toolkit plugin:ci-report
-      - run:
-          name: Setup Grafana (local install)
-          command: |
-            gget latest
-            sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
-            sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
-            sudo service grafana-server start
-            sudo grafana-cli --version
-      - run:
-          name: Run e2e tests
-          command: |
-            [ -d "cypress" ] && npx grafana-e2e run || echo "skipping e2e"
-      - run:
-          name: Prepare task output dir
-          command: |
-            # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
-            mkdir ci/jobs/test_integration
-            # only copy if they exist
-            cp cypress/screenshots/*.* ci/jobs/test_integration 2>/dev/null || :
-            cp cypress/videos/*.* ci/jobs/test_integration 2>/dev/null || :
       - save_cache:
           paths:
-            - ~/.cache
             - ~/project/node_modules
           key: build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      
+  build_plugin:
+    executor: default_exec
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Build and test frontend and docs
+          command:  |
+            npx grafana-toolkit plugin:ci-docs
+            npx grafana-toolkit plugin:ci-build
+            npx grafana-toolkit plugin:ci-build --finish
       - persist_to_workspace:
           root: .
           paths:
-          - ci/jobs/package
-          - ci/jobs/test_integration
-          - ci/packages
-          - ci/dist
-          - ci/grafana-test-env
-      - store_artifacts:
-          path: ci
-      - store_test_results:
-          path: ci/jobs/test_integration
-      - store_artifacts:
-          path: ci/jobs/test_integration
+            - ci
+
+  build_backend:
+    executor: default_exec
+    steps:
+      - checkout
+      - run:
+          name: Build Backend
+          command: |
+            [ -f "Magefile.go" ] && mage -v buildAll || circleci-agent step halt
+      - run:
+          name: Test Backend
+          command: |
+            mage -v lint
+            mage -v coverage
+      - run:
+          name: Move results to ci folder
+          command:  |
+            npx grafana-toolkit plugin:ci-build --finish
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci
   
+  package_and_report:
+    executor: default_exec
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+    - attach_workspace:
+        at: .
+    - run:
+        name: Package distribution
+        command: |
+          npx grafana-toolkit plugin:ci-package
+    - run:
+        name: Toolkit report
+        command: |
+          npx grafana-toolkit plugin:ci-report
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/package
+        - ci/packages
+        - ci/dist
+        - ci/grafana-test-env
+    - store_artifacts:
+        path: ci
+
+  test_integration:
+    executor: default_exec
+    steps:
+    - checkout
+    - attach_workspace:
+        at: .
+    - restore_cache:
+        keys:
+        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+    - run:
+        name: Setup Grafana (local install)
+        command: |
+          gget latest
+          /opt/grafana/bin/grafana-server -config ci/grafana-test-env/custom.ini -homepath /opt/grafana &
+          /opt/grafana/bin/grafana-cli --version
+    - run:
+        name: Run e2e tests
+        command: |
+          [ -d cypress ] && npx grafana-e2e run || echo "skipping e2e"
+    - run:
+        name: Prepare task output dir
+        command: |
+          # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
+          mkdir -m 0755 -p ci/jobs/test_integration
+          # only copy if they exist
+          if [ -d cypress ]; then 
+            [ -d cypress/screenshots ] && cp cypress/screenshots/ ci/jobs/test_integration 
+            [ -d cypress/videos ] && cp cypress/videos/ ci/jobs/test_integration
+          fi
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/test_integration
+    - store_test_results:
+        path: ci/jobs/test_integration
+    - store_artifacts:
+        path: ci/jobs/test_integration
+
+
   publish_github_release:
     executor: default_exec
     steps:
@@ -104,17 +180,3 @@ jobs:
           command: |
             npx grafana-toolkit plugin:github-publish
 
-workflows:
-  version: 2
-  plugin_workflow:
-    jobs:
-      - build_plugin
-      - approve_release:
-          type: approval
-          requires:
-            - build_plugin
-          filters: *filter-only-master
-      - publish_github_release:
-          requires:
-            - approve_release
-          filters: *filter-only-master
