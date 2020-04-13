@@ -69,6 +69,17 @@ jobs:
           command:  |
             npx grafana-toolkit plugin:ci-docs
             npx grafana-toolkit plugin:ci-build
+      - run:
+          name: Build and test Backend
+          command: |
+            if [ -f "Magefile.go" ]; then
+              mage -v buildAll
+              mage -v lint
+              mage -v coverage
+            fi
+      - run:
+          name: Move results to ci folder
+          command:  |
             npx grafana-toolkit plugin:ci-build --finish
       - persist_to_workspace:
           root: .
@@ -79,19 +90,8 @@ jobs:
     executor: default_exec
     steps:
       - checkout
-      - run:
-          name: Build Backend
-          command: |
-            [ -f "Magefile.go" ] && mage -v buildAll || circleci-agent step halt
-      - run:
-          name: Test Backend
-          command: |
-            mage -v lint
-            mage -v coverage
-      - run:
-          name: Move results to ci folder
-          command:  |
-            npx grafana-toolkit plugin:ci-build --finish
+      
+      
       - persist_to_workspace:
           root: .
           paths:
