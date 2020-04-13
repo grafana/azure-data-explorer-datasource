@@ -86,17 +86,6 @@ jobs:
           paths:
             - ci
 
-  build_backend:
-    executor: default_exec
-    steps:
-      - checkout
-      
-      
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ci
-  
   package_and_report:
     executor: default_exec
     steps:
