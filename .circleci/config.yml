@@ -20,7 +20,6 @@ workflows:
       - package_and_report:
           requires:
             - build_plugin
-            - build_backend
       - test_integration:
           requires:
             - package_and_report
