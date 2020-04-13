@@ -14,9 +14,6 @@ workflows:
       - build_plugin:
           requires: 
             - compile_dependencies
-      - build_backend:
-          requires: 
-            - compile_dependencies
       - package_and_report:
           requires:
             - build_plugin
