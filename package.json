@@ -6,14 +6,16 @@
     "build": "grafana-toolkit plugin:build && find src | grep '\\.d\\.ts$' | xargs rm -fv",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev && find src | grep '\\.d\\.ts$' | xargs rm -fv",
-    "watch": "grafana-toolkit plugin:dev --watch"
+    "watch": "grafana-toolkit plugin:dev --watch",
+    "postinstall": "grafana-toolkit plugin:update-circleci"
+
   },
   "author": "Grafana Labs",
   "license": "Apache",
   "devDependencies": {
     "monaco-editor": "0.17.0",
     "@grafana/runtime": "next",
-    "@grafana/toolkit": "next",
+    "@grafana/toolkit": "canary",
     "@grafana/e2e": "next",
     "@types/angular": "1.6.49",
     "@types/grafana": "github:CorpGlory/types-grafana.git"
