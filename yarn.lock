@@ -1016,7 +1016,7 @@
     lodash "4.17.15"
     rxjs "6.5.4"
 
-"@grafana/data@7.0.0-pre.ryan-7b33e46c54", "@grafana/data@^7.0.0-pre.0-52575ff03f":
+"@grafana/data@7.0.0-pre.ryan-7b33e46c54", "@grafana/data@^7.0.0-pre.0-010c67cc71":
   version "7.0.0-pre.ryan-7b33e46c54"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-7.0.0-pre.ryan-7b33e46c54.tgz#ce85ee8bf2db693c44422836505c6b23b43949f8"
   integrity sha512-toFZeXFrRilHJY2klmcJ4IrOwXIgktw/MWBNi3/jKtl9iUjmBGEn8Slud3/qlRVGqV6jPLieVjKXbGHBh5GlpA==
@@ -1077,16 +1077,16 @@
     tiny-warning "^0.0.3"
 
 "@grafana/toolkit@canary":
-  version "7.0.0-pre.0-52575ff03f"
-  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-7.0.0-pre.0-52575ff03f.tgz#df394a041ced609fa67c00185d15ad23beb2f351"
-  integrity sha512-b3IIfGX2gXP42np87EzVtt5tpsXJJWMUQKpfgiPJsFnC3PwtnkDmYbuNJ1YJH8GeczF3QmNGcYcQ23aEU3hLqA==
+  version "7.0.0-pre.0-010c67cc71"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-7.0.0-pre.0-010c67cc71.tgz#c34b61392a1216c1b25121909f0ce1694c27008f"
+  integrity sha512-fSu48FhRs+Mfc//Nx3E/lo9PXFWomlQKDlxrGxCnqLOZkb4et4P5NvpK2mzYbn75AOCWzIxiUXaenbGIjznQPw==
   dependencies:
     "@babel/core" "7.9.0"
     "@babel/preset-env" "7.9.0"
-    "@grafana/data" "^7.0.0-pre.0-52575ff03f"
+    "@grafana/data" "^7.0.0-pre.0-010c67cc71"
     "@grafana/eslint-config" "^1.0.0-rc1"
     "@grafana/tsconfig" "^1.0.0-rc1"
-    "@grafana/ui" "^7.0.0-pre.0-52575ff03f"
+    "@grafana/ui" "^7.0.0-pre.0-010c67cc71"
     "@types/command-exists" "^1.2.0"
     "@types/execa" "^0.9.0"
     "@types/expect-puppeteer" "3.3.1"
@@ -1211,7 +1211,7 @@
     slate "0.47.8"
     tinycolor2 "1.4.1"
 
-"@grafana/ui@^7.0.0-pre.0-52575ff03f":
+"@grafana/ui@^7.0.0-pre.0-010c67cc71":
   version "7.0.0-pre.ryan-7b33e46c54"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-7.0.0-pre.ryan-7b33e46c54.tgz#823f1980fcf8b71756a1ef91d5cbfefdd88b35fc"
   integrity sha512-MSaDDSt2nkrrza7bzmxaBCZSCH0N9PqzRbC2uHEM/X80Aw14njToj4ZLIk6l43X0BEYzMm/v8qHeo5qUK4qQgw==
@@ -5044,9 +5044,9 @@ esprima@~3.1.0:
   integrity sha1-/cpRzuYTOJXjyI1TXOSdv/YqRjM=
 
 esquery@^1.0.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/esquery/-/esquery-1.2.1.tgz#105239e215c5aa480369c7794d74b8b5914c19d4"
-  integrity sha512-/IcAXa9GWOX9BUIb/Tz2QrrAWFWzWGrFIeLeMRwtiuwg9qTFhSYemsi9DixwrFFqVbhBZ47vGcxEnu5mbPqbig==
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/esquery/-/esquery-1.3.0.tgz#e5e29a6f66a837840d34f68cb9ce355260d1128b"
+  integrity sha512-/5qB+Mb0m2bh86tjGbA8pB0qBfdmCIK6ZNPjcw4/TtEH0+tTf0wLA5HK4KMTweSMwLGHwBDWCBV+6+2+EuHmgg==
   dependencies:
     estraverse "^5.0.0"
 
