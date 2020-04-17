@@ -6,9 +6,7 @@
     "build": "grafana-toolkit plugin:build && find src | grep '\\.d\\.ts$' | xargs rm -fv",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev && find src | grep '\\.d\\.ts$' | xargs rm -fv",
-    "watch": "grafana-toolkit plugin:dev --watch",
-    "postinstall": "grafana-toolkit plugin:update-circleci"
-
+    "watch": "grafana-toolkit plugin:dev --watch"
   },
   "author": "Grafana Labs",
   "license": "Apache",
