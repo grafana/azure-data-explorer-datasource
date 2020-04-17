@@ -41,6 +41,7 @@ workflows:
       - e2e_canary:
           requires:
             - provisioning
+            - package
       - report:
           requires:
             - package
@@ -247,8 +248,7 @@ jobs:
     - run:
         name: Toolkit report
         command: |
-          yarn install --frozen-lockfile
-          npx grafana-toolkit plugin:ci-report
+          ./node_modules/.bin/grafana-toolkit plugin:ci-report
     - store_artifacts:
         path: ci
 
@@ -268,5 +268,5 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            npx grafana-toolkit plugin:github-publish
+            ./node_modules/.bin/grafana-toolkit plugin:github-publish
 
