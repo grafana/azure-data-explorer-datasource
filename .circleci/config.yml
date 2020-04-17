@@ -76,7 +76,7 @@ jobs:
           name: Install dependencies
           command: |
             mkdir ci
-            [ -L ~/project/node_modules/.bin/grafana-toolkit ] || yarn install --frozen-lockfile
+            [ -f ~/project/node_modules/.bin/grafana-toolkit ] || yarn install --frozen-lockfile
       - save_cache:
           name: save node_modules
           paths:
@@ -93,7 +93,7 @@ jobs:
           - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build docs
-          command: ./node_modules/.bin/grafana-toolkit.js grafana-toolkit plugin:ci-docs
+          command: ./node_modules/.bin/grafana-toolkit grafana-toolkit plugin:ci-docs
       - persist_to_workspace:
           root: .
           paths:
@@ -109,7 +109,7 @@ jobs:
           - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build and test frontend and docs
-          command: ./node_modules/.bin/grafana-toolkit.js grafana-toolkit plugin:ci-build
+          command: ./node_modules/.bin/grafana-toolkit grafana-toolkit plugin:ci-build
       - persist_to_workspace:
           root: .
           paths:
@@ -126,7 +126,7 @@ jobs:
       - run:
           name: Exit if no backend
           command: |
-            [ -f "Magefile.go" ] && circleci-agent step halt
+            [ -f "Magefile.go" ] || circleci-agent step halt
       - run:
           name: Build backend
           command: mage -v buildAll
@@ -152,11 +152,11 @@ jobs:
         at: .
     - run:
         name: Move results to ci folder
-        command: ./node_modules/.bin/grafana-toolkit.js plugin:ci-build --finish
+        command: ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
     - run:
         name: Package distribution
         command: |
-          ./node_modules/.bin/grafana-toolkit.js plugin:ci-package
+          ./node_modules/.bin/grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
         paths:
