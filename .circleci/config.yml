@@ -93,7 +93,7 @@ jobs:
           - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build docs
-          command: ./node_modules/.bin/grafana-toolkit plugin:ci-docs
+          command: (./node_modules/.bin/grafana-toolkit plugin:ci-docs | grep "No docs src") && circleci-agent step halt
       - persist_to_workspace:
           root: .
           paths:
@@ -108,7 +108,7 @@ jobs:
           keys:
           - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
-          name: Build and test frontend and docs
+          name: Build and test frontend
           command: ./node_modules/.bin/grafana-toolkit plugin:ci-build
       - persist_to_workspace:
           root: .
