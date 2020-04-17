@@ -8,7 +8,6 @@
     "dev": "grafana-toolkit plugin:dev && find src | grep '\\.d\\.ts$' | xargs rm -fv",
     "watch": "grafana-toolkit plugin:dev --watch",
     "postinstall": "grafana-toolkit plugin:update-circleci"
-
   },
   "author": "Grafana Labs",
   "license": "Apache",
