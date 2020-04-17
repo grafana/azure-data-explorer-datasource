@@ -83,6 +83,11 @@ jobs:
           paths:
             - ~/project/node_modules
           key: build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - save_cache:
+          name: save cypress cache
+          paths:
+            - ~/.cache/Cypress
+          key: cypress-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
 
   build_docs:
     executor: default_exec
@@ -199,8 +204,13 @@ jobs:
     - attach_workspace:
         at: .
     - restore_cache:
+        name: Restore node_modules
         keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+    - restore_cache:
+        name: Restore cypress cache
+        keys:
+        - cypress-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Exit if no e2e tests configured
         command: |
@@ -210,13 +220,21 @@ jobs:
         command: |
           ginstall canary
           /opt/grafana/bin/grafana-server -config ci/grafana-test-env/custom.ini -homepath /opt/grafana &
+          ## To make sure grafana has started up
+          while ! $(netstat -tulpn | grep 3000 >/dev/null 2>&1); do sleep 1; done 
           /opt/grafana/bin/grafana-cli --version
+
     - run:
         name: Copy provisioning files
         command: cp -r ci/jobs/provisioning provisioning/
     - run:
         name: Run e2e tests
-        command: ./node_modules/.bin/grafana-e2e.js run
+        command: |
+          # If the tests fail, but GRAFANACI_STRICT_E2E=0, don't worry about it
+          ./node_modules/.bin/grafana-e2e run \
+          || (
+            [ "$GRAFANACI_STRICT_E2E" -eq 0 ] && echo "Bypassing fail. ci-nostrict enabled"
+          )
     - run:
         when: always
         name: Prepare task output dir
