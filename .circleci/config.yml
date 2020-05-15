@@ -117,8 +117,7 @@ jobs:
       - run:
           name: Build and test frontend
           command:  |
-            ./node_modules/.bin/grafana-toolkit plugin:ci-build
-            ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
+            /usr/local/bin/grafana-toolkit plugin:ci-build
       - persist_to_workspace:
           root: .
           paths:
@@ -144,10 +143,6 @@ jobs:
           command: |
             mage -v lint
             mage -v coverage
-      - run:
-          name: Move results to ci folder
-          command:  |
-            /usr/local/bin/grafana-toolkit plugin:ci-build --finish
       - persist_to_workspace:
           root: .
           paths:
@@ -163,6 +158,10 @@ jobs:
         - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - attach_workspace:
         at: .
+    - run:
+        name: Move results to ci folder
+        command:  |
+          /usr/local/bin/grafana-toolkit plugin:ci-build --finish
     - run:
         name: Package distribution
         command: |
@@ -288,4 +287,4 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            /usr/local/bin/bin/grafana-toolkit plugin:github-publish
+            /usr/local/bin/grafana-toolkit plugin:github-publish
