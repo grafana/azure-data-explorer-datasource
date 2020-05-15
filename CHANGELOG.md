@@ -2,8 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.6]
+
+- Signed Plugin for v7
+
 ## [2.0.5]
- - Bugfix for issue #61. This is a temp fix, as a proper fix requires refactoring some of the backend.
+
+- Bugfix for issue #61. This is a temp fix, as a proper fix requires refactoring some of the backend.
 
 ## [2.0.4]
 

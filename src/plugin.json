@@ -57,7 +57,7 @@
     }
   ],
   "dependencies": {
-    "grafanaVersion": "5.3.x",
+    "grafanaVersion": "6.3.x",
     "plugins": []
   },
   "metrics": true,
