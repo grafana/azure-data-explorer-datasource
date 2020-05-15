@@ -116,7 +116,9 @@ jobs:
           - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build and test frontend
-          command: /usr/local/bin/grafana-toolkit plugin:ci-build
+          command:  |
+            ./node_modules/.bin/grafana-toolkit plugin:ci-build
+            ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
       - persist_to_workspace:
           root: .
           paths:
@@ -142,6 +144,10 @@ jobs:
           command: |
             mage -v lint
             mage -v coverage
+      - run:
+          name: Move results to ci folder
+          command:  |
+            /usr/local/bin/grafana-toolkit plugin:ci-build --finish
       - persist_to_workspace:
           root: .
           paths:
@@ -157,9 +163,6 @@ jobs:
         - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - attach_workspace:
         at: .
-    - run:
-        name: Move results to ci folder
-        command: /usr/local/bin/grafana-toolkit plugin:ci-build --finish
     - run:
         name: Package distribution
         command: |
