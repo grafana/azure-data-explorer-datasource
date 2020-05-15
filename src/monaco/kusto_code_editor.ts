@@ -14,7 +14,12 @@ export default class KustoCodeEditor {
   startsWithKustoPipeRegex = /^\|\s*/g;
   kustoPipeRegexStrict = /^\|\s*$/g;
 
-  constructor(private containerDiv: any, private defaultTimeField: string, private getSchema: () => any, private config: any) {}
+  constructor(
+    private containerDiv: any,
+    private defaultTimeField: string,
+    private getSchema: () => any,
+    private config: any
+  ) {}
 
   initMonaco(scope) {
     const themeName = this.config.bootData.user.lightTheme ? 'grafana-light' : 'vs-dark';
@@ -269,7 +274,10 @@ export default class KustoCodeEditor {
           parameters: [
             {
               label: 'timeColumn',
-              documentation: 'Default is ' + this.defaultTimeField + ' column. Datetime column to filter data using the selected date range. ',
+              documentation:
+                'Default is ' +
+                this.defaultTimeField +
+                ' column. Datetime column to filter data using the selected date range. ',
             },
           ],
         },

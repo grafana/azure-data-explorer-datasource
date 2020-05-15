@@ -269,7 +269,10 @@ export class KustoDBDatasource {
     if (!options.hasOwnProperty('scopedVars')) {
       options['scopedVars'] = {};
     }
-    const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable), options);
+    const queryBuilder = new QueryBuilder(
+      this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable),
+      options
+    );
     const url = `${this.baseUrl}/v1/rest/query`;
     const interpolatedQuery = queryBuilder.interpolate().query;
     const queries: any[] = [];

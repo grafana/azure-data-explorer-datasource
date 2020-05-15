@@ -242,7 +242,8 @@ describe('KustoDBDatasource', () => {
           A: {
             alias: '',
             database: 'Grafana',
-            query: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+            query:
+              "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
             refId: 'A',
             resultFormat: 'time_series_adx_series',
             datasource: 'ADX',
@@ -260,7 +261,8 @@ describe('KustoDBDatasource', () => {
               refId: 'A',
               meta: {
                 KustoError: '',
-                RawQuery: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+                RawQuery:
+                  "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
                 TimeNotASC: false,
               },
             },
@@ -277,7 +279,8 @@ describe('KustoDBDatasource', () => {
           A: {
             alias: '$value',
             database: 'Grafana',
-            query: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+            query:
+              "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
             refId: 'A',
             resultFormat: 'time_series_adx_series',
             datasource: 'ADX',
@@ -295,7 +298,8 @@ describe('KustoDBDatasource', () => {
               refId: 'A',
               meta: {
                 KustoError: '',
-                RawQuery: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+                RawQuery:
+                  "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
                 TimeNotASC: false,
               },
             },
