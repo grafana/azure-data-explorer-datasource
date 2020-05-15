@@ -1,6 +1,6 @@
 module github.com/grafana/azure-data-explorer-datasource
 
-go 1.13
+go 1.14
 
 require (
 	github.com/fatih/color v1.9.0 // indirect

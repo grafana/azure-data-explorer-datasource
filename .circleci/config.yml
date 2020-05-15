@@ -99,7 +99,7 @@ jobs:
       - run:
           name: Build docs
           command: |
-            ./node_modules/.bin/grafana-toolkit plugin:ci-docs
+            /usr/local/bin/grafana-toolkit plugin:ci-docs
             [ -d "dist" ] || circleci-agent step halt
       - persist_to_workspace:
           root: .
@@ -116,7 +116,7 @@ jobs:
           - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build and test frontend
-          command: ./node_modules/.bin/grafana-toolkit plugin:ci-build
+          command: /usr/local/bin/grafana-toolkit plugin:ci-build
       - persist_to_workspace:
           root: .
           paths:
@@ -159,11 +159,11 @@ jobs:
         at: .
     - run:
         name: Move results to ci folder
-        command: ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
+        command: /usr/local/bin/grafana-toolkit plugin:ci-build --finish
     - run:
         name: Package distribution
         command: |
-          ./node_modules/.bin/grafana-toolkit plugin:ci-package
+          /usr/local/bin/grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
         paths:
@@ -265,7 +265,7 @@ jobs:
     - run:
         name: Toolkit report
         command: |
-          ./node_modules/.bin/grafana-toolkit plugin:ci-report
+          /usr/local/bin/grafana-toolkit plugin:ci-report
     - store_artifacts:
         path: ci
 
@@ -285,5 +285,4 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ./node_modules/.bin/grafana-toolkit plugin:github-publish
-
+            /usr/local/bin/bin/grafana-toolkit plugin:github-publish
