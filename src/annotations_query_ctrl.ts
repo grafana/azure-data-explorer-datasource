@@ -5,7 +5,8 @@ export class KustoDBAnnotationsQueryCtrl {
   databases: any[];
   showHelp = false;
 
-  defaultQuery = '<your table>\n| where $__timeFilter() \n| project TimeGenerated, Text=YourTitleColumn, Tags="tag1,tag2"';
+  defaultQuery =
+    '<your table>\n| where $__timeFilter() \n| project TimeGenerated, Text=YourTitleColumn, Tags="tag1,tag2"';
 
   /** @ngInject */
   constructor() {
