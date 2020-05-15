@@ -1,6 +1,6 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
@@ -12,7 +12,9 @@
   "license": "Apache",
   "devDependencies": {
     "monaco-editor": "0.17.0",
-    "@grafana/toolkit": "next",
+    "@grafana/runtime": "next",
+    "@grafana/toolkit": "canary",
+    "@grafana/e2e": "next",
     "@types/angular": "1.6.49",
     "@types/grafana": "github:CorpGlory/types-grafana.git"
   }

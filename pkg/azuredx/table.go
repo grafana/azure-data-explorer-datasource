@@ -51,29 +51,21 @@ func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
 				switch column.DataType {
 				case "String":
 					columnTypes[colIdx] = kustoTypeString
-					break
 				case "Boolean":
 					columnTypes[colIdx] = kustoTypeBool
-					break
 				case "Guid":
 					columnTypes[colIdx] = kustoTypeGUID
-					break
 				case "DateTime":
 					columnTypes[colIdx] = kustoTypeDatetime
-					break
 				case "Int":
 					columnTypes[colIdx] = kustoTypeInt
-					break
 				case "Float":
 					columnTypes[colIdx] = kustoTypeReal
-					break
 				case "Long":
 				case "Decimal":
 					columnTypes[colIdx] = kustoTypeLong
-					break
 				case "Dynamic":
 					columnTypes[colIdx] = kustoTypeDynamic
-					break
 				}
 			} else {
 				columnTypes[colIdx] = column.ColumnType
@@ -366,13 +358,10 @@ func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, erro
 		switch v.(type) {
 		case int:
 			typ = kustoTypeInt
-			break
 		case float64:
 			typ = kustoTypeReal
-			break
 		case string:
 			typ = kustoTypeString
-			break
 		case json.Number:
 			// For json.Number's we could have either a float or an int.
 			// Numbers can be either float or int. If there is a "."
@@ -383,7 +372,6 @@ func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, erro
 			} else {
 				typ = kustoTypeInt
 			}
-			break
 		default:
 			return nil, fmt.Errorf("unsupplied type '%v' in table for value '%v'", typ, v)
 		}
