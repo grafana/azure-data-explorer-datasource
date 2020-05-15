@@ -1,0 +1,37 @@
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+{
+  "plugin": "grafana-azure-data-explorer-datasource",
+  "version": "2.0.6",
+  "files": {
+    "LICENSE": "7bb89d164c87a5f4655d9c5e70c7496d4bce9b77957504d1c9fbd7cc528ab010",
+    "README.md": "6370af5175d82c25580453b6294e7004c9941c9ab2f99d830941bf5eaf91d26a",
+    "grafana-azure-data-explorer-datasource_darwin_amd64": "21caccad682a5e0a1aaf07f0b86dfeb2365ea33e4136515cb192dcc1a6de086a",
+    "grafana-azure-data-explorer-datasource_linux_amd64": "d9d7d948e1561dc91e5e9fdb0e6099d95cbb05bcb98d797867ea99f046bdd04a",
+    "grafana-azure-data-explorer-datasource_windows_amd64.exe": "beed710fa459b920d8d70a2e4d9ded2007860f43d97a5db5980c9bba98457098",
+    "libs/bridge.js": "33697e03f8ec6e9ce98b6f835c95b483b6b6565b93cd396af405bd583dae02fe",
+    "libs/monaco.min.js": "aa6c19ebb6161153289218fecfe2a711f79b7d35267e6a3f12c2ce86140ca205",
+    "libs/monaco.min.js.map": "16810fde2b9edec4616ec662f192f59b81ada58b2807658a1b651230345eb6d8",
+    "module.js": "ab99a98f6749347d8d1268fee0142aa24bb96b132ace8fcbc3734bdd8b028ee5",
+    "module.js.LICENSE.txt": "0d8f66cd4afb566cb5b7e1540c68f43b939d3eba12ace290f18abc4f4cb53ed0",
+    "module.js.map": "123257eff99afb32749def2e3f17d1a669ecbbcb619b01ddf2575366295deb5f",
+    "partials/annotations.editor.html": "c9d857d344773a811ddf4d50ffd24537c77b8c8ee3a7482eedc09a02070c0434",
+    "partials/config.html": "24ff01cc7efd592614574e02dd6aa37e94f759c0cb1438a99797c07a3f63b225",
+    "partials/query.editor.html": "855997090199cb732a8ad4385a367dfb3472e33cc228653cff1158b27febe191",
+    "plugin.json": "7d1a7f4768db60a5c561fe8541475f4b96a54bf1eaa7a1d1264c16584dd3bacc"
+  },
+  "time": 1589564643013,
+  "keyId": "7e4d0c6a708866e7"
+}
+-----BEGIN PGP SIGNATURE-----
+Version: OpenPGP.js v4.10.1
+Comment: https://openpgpjs.org
+
+wqIEARMKAAYFAl6+1OMACgkQfk0ManCIZucYcgIJAXkexpi77sqAu9ftmNHA
+3NjKQTJQZ2pJsUGyTBUIs16uVCItxfWsNq+zxPPZ8mg7NBnUK4t1vgMtu4xQ
+uR9PBxt8AgkBo3fs34QnfWpMMILfbStgBU2nuoPDzRwianYNfgSej+SgNl1A
+oB+AxPstIXhyHUgxLY9ipgFcfsrv+sv6ljUDmBU=
+=BaCJ
+-----END PGP SIGNATURE-----
