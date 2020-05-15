@@ -171,8 +171,6 @@ jobs:
     - run:
         name: Package distribution
         command: |
-          # needed for shasum command
-          apk --update-cache add perl-utils
           /usr/local/bin/grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
