@@ -4,7 +4,6 @@ import { QueryEditorExpressionType, QueryEditorOperatorExpression } from './type
 import { QueryEditorOperatorDefinition } from '../types';
 
 interface Props {
-  id: string;
   value: string | undefined;
   onChange: (expression: QueryEditorSingleOperatorExpression) => void;
   operator: QueryEditorOperatorDefinition;
@@ -29,7 +28,6 @@ export const QueryEditorSingleOperator: React.FC<Props> = props => {
 
   const onBlur = useCallback(() => {
     props.onChange({
-      id: props.id,
       type: QueryEditorExpressionType.Operator,
       value: value,
       operator: props.operator,

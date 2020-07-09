@@ -21,6 +21,6 @@ export interface QueryEditorOperatorDefinition {
 
 export interface QueryEditorFieldDefinition {
   value: string;
-  fieldType: QueryEditorFieldType;
+  type: QueryEditorFieldType;
   label?: string;
 }

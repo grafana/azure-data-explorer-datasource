@@ -9,7 +9,7 @@ import { isSingleOperator, QueryEditorSingleOperator } from './QueryEditorSingle
 import { QueryEditorBoolOperator, isBoolOperator } from './QueryEditorBoolOperator';
 
 interface Props {
-  id: string;
+  value?: QueryEditorOperatorExpression;
   operators: QueryEditorOperatorDefinition[];
   onChange: (expression: QueryEditorOperatorExpression) => void;
 }
@@ -17,7 +17,7 @@ interface Props {
 export const QueryEditorOperator: React.FC<Props> = props => {
   const styles = getStyles();
   const [operator, setOperator] = useState<QueryEditorOperatorDefinition | undefined>(props.operators[0]);
-  const [value, setValue] = useState<QueryEditorOperatorExpression>();
+  const [value, setValue] = useState(props.value);
   const operators = useOperatorOptions(props.operators ?? []);
 
   const onChangeOperator = useCallback(
@@ -54,7 +54,7 @@ export const QueryEditorOperator: React.FC<Props> = props => {
           })}
         />
       </div>
-      {renderOperatorInput(operator, value, onChangeValue, props.id)}
+      {renderOperatorInput(operator, value, onChangeValue)}
     </>
   );
 };
@@ -66,26 +66,22 @@ export const isOperator = (expression: QueryEditorExpression): expression is Que
 const renderOperatorInput = (
   operator: QueryEditorOperatorDefinition | undefined,
   value: QueryEditorOperatorExpression | undefined,
-  onChangeValue: (expression: QueryEditorOperatorExpression) => void,
-  id: string
+  onChangeValue: (expression: QueryEditorOperatorExpression) => void
 ) => {
   if (!operator) {
     return null;
   }
 
   if (operator.multipleValues && (isMultiOperator(value) || !value)) {
-    return (
-      <QueryEditorMultiOperator id={id} operator={operator} values={value?.values ?? []} onChange={onChangeValue} />
-    );
+    return <QueryEditorMultiOperator operator={operator} values={value?.values ?? []} onChange={onChangeValue} />;
   }
 
-  console.log('operator.booleanValues', operator.booleanValues);
   if (operator.booleanValues && (isBoolOperator(value) || !value)) {
-    return <QueryEditorBoolOperator id={id} operator={operator} value={value?.value} onChange={onChangeValue} />;
+    return <QueryEditorBoolOperator operator={operator} value={value?.value} onChange={onChangeValue} />;
   }
 
   if (!operator.multipleValues && (isSingleOperator(value) || !value)) {
-    return <QueryEditorSingleOperator id={id} operator={operator} value={value?.value} onChange={onChangeValue} />;
+    return <QueryEditorSingleOperator operator={operator} value={value?.value} onChange={onChangeValue} />;
   }
 
   return null;
@@ -104,7 +100,6 @@ const useOperatorOptions = (options: QueryEditorOperatorDefinition[]): Array<Sel
 const getStyles = stylesFactory(() => {
   return {
     container: css`
-      width: !auto;
       margin-left: 4px;
       margin-right: 4px;
     `,

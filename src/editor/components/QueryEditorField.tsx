@@ -1,25 +1,26 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorExpression, QueryEditorExpressionType } from './types';
-import { QueryEditorFieldDefinition } from '../types';
+import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../types';
 
 interface Props {
-  id: string;
-  options: QueryEditorFieldDefinition[];
+  fields: QueryEditorFieldDefinition[];
+  value?: QueryEditorFieldExpression;
   onChange: (expression: QueryEditorFieldExpression) => void;
 }
 
 export interface QueryEditorFieldExpression extends QueryEditorExpression {
-  field: QueryEditorFieldDefinition;
+  value: string;
+  fieldType: QueryEditorFieldType;
 }
 
 export const QueryEditorField: React.FC<Props> = props => {
-  const [field, setField] = useState(props.options[0]?.value || '');
-  const onChange = useOnChange(props, setField);
-  const options = useOptions(props.options);
+  const onChange = useOnChange(props);
+  const options = useOptions(props.fields);
+  const value = props.value?.value ?? props.fields[0].value;
 
-  return <Select width={30} onChange={onChange} value={field} options={options} />;
+  return <Select width={30} onChange={onChange} value={value} options={options} />;
 };
 
 // Should remove this when I have fixed the underlying issue in the select component
@@ -30,31 +31,31 @@ const useOptions = (options: QueryEditorFieldDefinition[]): Array<SelectableValu
       return {
         label: option.label ?? option.value,
         value: option.value,
-        type: option.fieldType,
+        type: option.type,
       };
     });
   }, [options]);
 };
 
-const useOnChange = (props: Props, setField: React.Dispatch<React.SetStateAction<string>>) => {
+const useOnChange = (props: Props) => {
   return useCallback(
     (selectable: SelectableValue<string>) => {
       if (!selectable || typeof selectable.value !== 'string') {
         return;
       }
 
-      setField(selectable.value);
-      const option = props.options.find(option => option.value === selectable.value);
+      const { value } = selectable;
+      const field = props.fields.find(o => o.value === value);
 
-      if (option) {
+      if (field) {
         props.onChange({
           type: QueryEditorExpressionType.Field,
-          field: option,
-          id: props.id,
+          value: field.value,
+          fieldType: field.type,
         });
       }
     },
-    [props.onChange, props.id, setField, props.options]
+    [props]
   );
 };
 

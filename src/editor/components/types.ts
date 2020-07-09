@@ -1,13 +1,13 @@
 import { QueryEditorOperatorDefinition } from 'editor/types';
 
 export enum QueryEditorExpressionType {
-  Field = 'value',
+  Field = 'field',
   Conditional = 'conditional',
   Operator = 'operator',
+  FieldAndOperator = 'fieldAndOperator',
 }
 
 export interface QueryEditorExpression {
-  id: string;
   type: QueryEditorExpressionType;
 }
 

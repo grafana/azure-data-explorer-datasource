@@ -1,16 +1,16 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { css } from 'emotion';
+import { stylesFactory, Button } from '@grafana/ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorOperatorExpression } from './types';
 import { QueryEditorOperatorDefinition, QueryEditorFieldDefinition } from '../types';
 import { QueryEditorField, QueryEditorFieldExpression, isField } from './QueryEditorField';
 import { QueryEditorOperator, isOperator } from './QueryEditorOperator';
-import { stylesFactory } from '@grafana/ui';
 
 interface Props {
-  id: string;
-  options: QueryEditorFieldDefinition[];
+  value?: QueryEditorFieldAndOperatorExpression;
+  fields: QueryEditorFieldDefinition[];
   operators: QueryEditorOperatorDefinition[];
-  onChange: (expression: QueryEditorFieldAndOperatorExpression) => void;
+  onChange: (expression: QueryEditorFieldAndOperatorExpression | undefined) => void;
 }
 
 export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpression {
@@ -19,38 +19,64 @@ export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpres
 }
 
 export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
-  const styles = getStyles();
-  const [field, setField] = useState<QueryEditorFieldExpression>();
-  const [operator, setOperator] = useState<QueryEditorOperatorExpression>();
+  const [showEditor, setShowEditor] = useState(false);
+  const [field, setField] = useState(defaultField(props));
+  const [operator, setOperator] = useState(props.value?.operator);
   const operatorsByType = useOperatorByType(props.operators);
-  const operators = getOperatorsForField(operatorsByType, field, props.options);
+  const operators = operatorsByType[field?.fieldType.toString() ?? ''] ?? [];
+  const styles = getStyles();
 
   const onChange = useCallback(
     (expression: QueryEditorFieldExpression | QueryEditorOperatorExpression) => {
       if (isField(expression)) {
         setField(expression);
+
+        if (operator) {
+          props.onChange({
+            type: QueryEditorExpressionType.FieldAndOperator,
+            field: expression,
+            operator,
+          });
+        }
       }
 
       if (isOperator(expression)) {
         setOperator(expression);
-      }
 
-      if (field && operator) {
-        props.onChange({
-          id: props.id,
-          type: QueryEditorExpressionType.Operator,
-          field: field,
-          operator,
-        });
+        if (field) {
+          props.onChange({
+            type: QueryEditorExpressionType.FieldAndOperator,
+            field: field,
+            operator: expression,
+          });
+        }
       }
     },
-    [setField, setOperator, props.onChange, props.id]
+    [setField, setOperator, props.onChange]
   );
+
+  const onShowEditor = useCallback(() => {
+    setShowEditor(true);
+  }, [setShowEditor]);
+
+  const onClearEditor = useCallback(() => {
+    setShowEditor(false);
+    props.onChange(undefined);
+  }, [setShowEditor]);
+
+  if (!props.value && !showEditor) {
+    return (
+      <div className={styles.container}>
+        <Button variant="secondary" onClick={onShowEditor} icon="plus" />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
-      <QueryEditorField id={props.id} options={props.options} onChange={onChange} />
-      <QueryEditorOperator id={props.id} operators={operators} onChange={onChange} />
+      <QueryEditorField value={props.value?.field} fields={props.fields} onChange={onChange} />
+      <QueryEditorOperator value={props.value?.operator} operators={operators} onChange={onChange} />
+      <Button variant="secondary" onClick={onClearEditor} className={styles.clearButton} icon="minus" />
     </div>
   );
 };
@@ -76,16 +102,16 @@ const useOperatorByType = (
   }, [operators]);
 };
 
-const getOperatorsForField = (
-  groups: Record<string, QueryEditorOperatorDefinition[]>,
-  expression: QueryEditorFieldExpression | undefined,
-  fields: QueryEditorFieldDefinition[]
-) => {
-  if (!expression) {
-    const fieldType = fields[0]?.fieldType.toString() ?? '';
-    return groups[fieldType] ?? [];
+const defaultField = (props: Props): QueryEditorFieldExpression | undefined => {
+  if (props.value?.field) {
+    return props.value?.field;
   }
-  return groups[expression?.field.fieldType.toString() ?? ''] ?? [];
+
+  return {
+    type: QueryEditorExpressionType.Field,
+    value: props.fields[0]?.value,
+    fieldType: props.fields[0]?.type,
+  };
 };
 
 const getStyles = stylesFactory(() => {
@@ -93,6 +119,9 @@ const getStyles = stylesFactory(() => {
     container: css`
       display: flex;
       flex-direction: row;
+    `,
+    clearButton: css`
+      margin-left: 4px;
     `,
   };
 });

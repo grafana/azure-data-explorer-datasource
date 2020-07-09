@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorSection, QueryEditorPartProps } from '../components/QueryEditorSection';
+import { QueryEditorSection, QueryEditorSectionProps } from '../components/QueryEditorSection';
 import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
 import { QueryEditorOperatorDefinition, QueryEditorCondition } from '../types';
 
@@ -19,7 +19,7 @@ export class QueryEditorSectionBuilder {
     return this;
   }
 
-  build(id: string): React.FC<QueryEditorPartProps> {
+  build(id: string): React.FC<QueryEditorSectionProps> {
     return QueryEditorSection({
       id,
       operators: this.operators,

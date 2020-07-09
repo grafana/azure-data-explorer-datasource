@@ -5,7 +5,6 @@ import { QueryEditorOperatorDefinition } from '../types';
 import { SelectableValue } from '@grafana/data';
 
 interface Props {
-  id: string;
   value: boolean | undefined;
   onChange: (expression: QueryEditorBoolOperatorExpression) => void;
   operator: QueryEditorOperatorDefinition;
@@ -28,7 +27,6 @@ export const QueryEditorBoolOperator: React.FC<Props> = props => {
       }
 
       props.onChange({
-        id: props.id,
         type: QueryEditorExpressionType.Operator,
         operator: props.operator,
         value: selectable.value,

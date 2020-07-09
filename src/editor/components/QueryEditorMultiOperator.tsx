@@ -5,7 +5,6 @@ import { QueryEditorExpressionType, QueryEditorOperatorExpression } from './type
 import { QueryEditorOperatorDefinition } from '../types';
 
 interface Props {
-  id: string;
   values: string[] | undefined;
   onChange: (expression: QueryEditorMultiOperatorExpression) => void;
   operator: QueryEditorOperatorDefinition;
@@ -26,7 +25,6 @@ export const QueryEditorMultiOperator: React.FC<Props> = props => {
       setOptions([...options, { value, label: value }]);
 
       props.onChange({
-        id: props.id,
         type: QueryEditorExpressionType.Operator,
         values: [...props.values, value],
         operator: props.operator,
@@ -42,7 +40,6 @@ export const QueryEditorMultiOperator: React.FC<Props> = props => {
       }
 
       props.onChange({
-        id: props.id,
         type: QueryEditorExpressionType.Operator,
         values: selectable.map(s => s.value),
         operator: props.operator,
