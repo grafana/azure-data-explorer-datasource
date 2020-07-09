@@ -1,8 +1,8 @@
 import React from 'react';
-import { QueryEditorPartBuilder } from './builders/QueryEditorPartBuilder';
+import { QueryEditorSectionBuilder } from './builders/QueryEditorSectionBuilder';
 import { QueryEditorPartProps } from './components/QueryEditorSection';
 export { QueryEditorFieldDefinition, QueryEditorFieldType } from './types';
 
-export const buildQueryEditorPart = (
-  builder: (builder: QueryEditorPartBuilder) => React.FC<QueryEditorPartProps>
-): React.FC<QueryEditorPartProps> => builder(new QueryEditorPartBuilder());
+export const buildQueryEditorSection = (
+  builder: (builder: QueryEditorSectionBuilder) => React.FC<QueryEditorPartProps>
+): React.FC<QueryEditorPartProps> => builder(new QueryEditorSectionBuilder());

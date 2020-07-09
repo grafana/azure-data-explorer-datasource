@@ -3,7 +3,7 @@ import { QueryEditorSection, QueryEditorPartProps } from '../components/QueryEdi
 import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
 import { QueryEditorOperatorDefinition, QueryEditorCondition } from '../types';
 
-export class QueryEditorPartBuilder {
+export class QueryEditorSectionBuilder {
   private operators: QueryEditorOperatorDefinition[];
   private conditionals: QueryEditorCondition[];
   private multipleRows: boolean;

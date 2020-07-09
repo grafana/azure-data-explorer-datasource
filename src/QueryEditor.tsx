@@ -3,10 +3,10 @@ import { InlineFormLabel, Select } from '@grafana/ui';
 import { QueryEditorProps } from '@grafana/data';
 import { DataSource } from './datasource';
 import { MyDataSourceOptions, MyQuery } from './types';
-import { buildQueryEditorPart, QueryEditorFieldDefinition, QueryEditorFieldType } from './editor';
+import { buildQueryEditorSection, QueryEditorFieldDefinition, QueryEditorFieldType } from './editor';
 
-const KustoFromEditorPart = buildQueryEditorPart(builder => builder.build('from'));
-const KustoWhereEditorPart = buildQueryEditorPart(builder =>
+const KustoFromEditorSection = buildQueryEditorSection(builder => builder.build('from'));
+const KustoWhereEditorSection = buildQueryEditorSection(builder =>
   builder
     .withOperators(operator => {
       operator('in')
@@ -86,8 +86,8 @@ export class QueryEditor extends PureComponent<Props> {
 
     return (
       <>
-        <KustoFromEditorPart label="From" options={options} onChange={() => {}} />
-        <KustoWhereEditorPart label="Where (filter)" options={options} onChange={() => {}} />
+        <KustoFromEditorSection label="From" options={options} onChange={() => {}} />
+        <KustoWhereEditorSection label="Where (filter)" options={options} onChange={() => {}} />
         <div className="gf-form">
           <InlineFormLabel width={12}>Value columns</InlineFormLabel>
           <Select width={30} onChange={() => {}} value={'StormEvents'} options={options} />
