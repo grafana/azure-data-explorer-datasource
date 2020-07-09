@@ -4,7 +4,16 @@ import { ResponseParser, DatabaseItem } from './response_parser';
 import QueryBuilder from './query_builder';
 import Cache from './cache';
 import RequestAggregator from './request_aggregator';
+import { DataSourceInstanceSettings } from '@grafana/data';
+import { DataSourceWithBackend } from '@grafana/runtime';
+import { MyDataSourceOptions, MyQuery } from './types';
 //import { isTemplateElement } from '@babel/types';
+
+export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptions> {
+  constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
+    super(instanceSettings);
+  }
+}
 
 export class KustoDBDatasource {
   id: number;
