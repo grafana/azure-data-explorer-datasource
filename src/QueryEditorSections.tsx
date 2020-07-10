@@ -41,5 +41,6 @@ export const KustoWhereEditorSection = buildQueryEditorSection(builder =>
         .booleanValues(true)
         .add();
     })
+    .withMultipleRows(true)
     .build('where')
 );

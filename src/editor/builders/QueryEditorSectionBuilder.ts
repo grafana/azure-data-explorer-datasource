@@ -3,7 +3,7 @@ import { QueryEditorSection, QueryEditorSectionProps } from '../components/Query
 import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
 import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldType } from '../types';
 import { QueryEditorExpression, QueryEditorExpressionType } from 'editor/components/types';
-import { QueryEditorOperatorRepeaterExpression } from 'editor/components/QueryEditorOperatorRepeater';
+import { QueryEditorRepeaterExpression } from 'editor/components/QueryEditorRepeater';
 import { QueryEditorFieldAndOperatorExpression } from 'editor/components/QueryEditorFieldAndOperator';
 import { QueryEditorFieldExpression } from 'editor/components/QueryEditorField';
 
@@ -20,6 +20,11 @@ export class QueryEditorSectionBuilder {
 
   withOperators(operators: (builder: (value: string) => QueyEditorOperatorBuilder) => void) {
     operators(value => new QueyEditorOperatorBuilder(value, this.operators));
+    return this;
+  }
+
+  withMultipleRows(value: boolean) {
+    this.multipleRows = value;
     return this;
   }
 
@@ -58,7 +63,7 @@ export class QueryEditorSectionBuilder {
     };
   }
 
-  private buildRepeaterExpression(expressions: QueryEditorExpression[]): QueryEditorOperatorRepeaterExpression {
+  private buildRepeaterExpression(expressions: QueryEditorExpression[]): QueryEditorRepeaterExpression {
     return {
       type: QueryEditorExpressionType.OperatorRepeater,
       expressions: expressions,
