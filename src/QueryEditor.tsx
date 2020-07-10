@@ -73,7 +73,7 @@ export const QueryEditor: React.FC<Props> = props => {
           props.onChange({
             refId: `table-Samples-${query}`,
             resultFormat: 'table',
-            datasource: 'adx',
+            datasource: props.datasource.name,
             database: 'Samples',
             queryType: 'time_series',
             query: query,
