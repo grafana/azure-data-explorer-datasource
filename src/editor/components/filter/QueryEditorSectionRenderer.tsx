@@ -1,7 +1,6 @@
 import React from 'react';
 import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition, QueryEditorCondition } from '../../types';
 import { QueryEditorExpression } from '../types';
-import { QueryEditorField, isField } from '../field/QueryEditorField';
 import { isFieldAndOperator, QueryEditorFieldAndOperator } from '../filter/QueryEditorFieldAndOperator';
 import { isRepeater, QueryEditorRepeater } from '../QueryEditorRepeater';
 

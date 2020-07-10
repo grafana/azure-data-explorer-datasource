@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { InlineFormLabel, Select } from '@grafana/ui';
 import { QueryEditorProps } from '@grafana/data';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from './editor';
 import { KustoFromEditorSection, KustoWhereEditorSection, KustoValueColumnEditorSection } from 'QueryEditorSections';
@@ -7,15 +6,21 @@ import { AdxDataSource } from 'datasource';
 import { KustoQuery, AdxDataSourceOptions } from 'types';
 import { QueryEditorSectionExpression } from './editor/components/QueryEditorSection';
 import { KustoExpressionParser } from 'KustoExpressionParser';
+import { Button } from '@grafana/ui';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 const kustoExpressionParser = new KustoExpressionParser();
 
 export const QueryEditor: React.FC<Props> = props => {
   const [from, setFrom] = useState<QueryEditorSectionExpression | undefined>();
+  const [where, setWhere] = useState<QueryEditorSectionExpression | undefined>();
+  const [reduce, setReduce] = useState<QueryEditorSectionExpression | undefined>();
   const [tables, setTables] = useState<QueryEditorFieldDefinition[]>([]);
   const [columnsByTable, setColumnsByTable] = useState<Record<string, QueryEditorFieldDefinition[]>>({});
   const columns = columnsByTable[kustoExpressionParser.fromTable(from)];
+
+  console.log('where', where);
+  console.log('query', kustoExpressionParser.query({ from, where, reduce }));
 
   useEffect(() => {
     (async () => {
@@ -58,64 +63,44 @@ export const QueryEditor: React.FC<Props> = props => {
 
   return (
     <>
-      <KustoFromEditorSection value={from} label="From" fields={tables} onChange={expression => setFrom(expression)} />
-      <KustoWhereEditorSection label="Where (filter)" fields={columns} onChange={e => console.log('e', e)} />
-      <KustoValueColumnEditorSection label="Value columns" fields={aggregatable} onChange={e => console.log('e', e)} />
+      <KustoFromEditorSection value={from} label="From" fields={tables} onChange={exp => setFrom(exp)} />
+      <KustoWhereEditorSection label="Where (filter)" fields={columns} onChange={exp => setWhere(exp)} />
+      <KustoValueColumnEditorSection label="Value columns" fields={aggregatable} onChange={exp => setReduce(exp)} />
+      <Button
+        onClick={() => {
+          const query = kustoExpressionParser.query({ from, where, reduce });
+
+          props.onChange({
+            refId: `table-Samples-${query}`,
+            resultFormat: 'table',
+            datasource: 'adx',
+            database: 'Samples',
+            queryType: 'time_series',
+            query: query,
+          });
+
+          props.onRunQuery();
+        }}
+      >
+        Run Query (testing button)
+      </Button>
     </>
   );
 };
 
 const toExpressionType = (kustoType: string): QueryEditorFieldType => {
+  // System.Object -> should do a lookup on those fields to flatten out their schema.
+
   switch (kustoType) {
+    case 'System.Double':
+    case 'System.Int32':
+    case 'System.Int64':
+      return QueryEditorFieldType.Number;
+    case 'System.DateTime':
+      return QueryEditorFieldType.DateTime;
+    case 'System.Boolean':
+      return QueryEditorFieldType.Boolean;
     default:
       return QueryEditorFieldType.String;
   }
 };
-
-// export class QueryEditor extends PureComponent<Props> {
-//   onQueryTextChange = (event: ChangeEvent<HTMLInputElement>) => {
-//     const { onChange, query } = this.props;
-//     onChange({ ...query, queryText: event.target.value });
-//   };
-
-//   onConstantChange = (event: ChangeEvent<HTMLInputElement>) => {
-//     const { onChange, query, onRunQuery } = this.props;
-//     onChange({ ...query, constant: parseFloat(event.target.value) });
-//     // executes the query
-//     onRunQuery();
-//   };
-
-//   render() {
-//     //const query = defaults(this.props.query, defaultQuery);
-//     const options: QueryEditorFieldDefinition[] = [
-//       {
-//         value: 'StormEvents',
-//         type: QueryEditorFieldType.String,
-//       },
-//       {
-//         value: 'ConferenceSessions',
-//         type: QueryEditorFieldType.String,
-//       },
-//       {
-//         value: 'StormIsComing',
-//         type: QueryEditorFieldType.Boolean,
-//       },
-//       {
-//         value: 'Lightning count',
-//         type: QueryEditorFieldType.Number,
-//       },
-//     ];
-
-//     return (
-//       <>
-//         <KustoFromEditorSection label="From" fields={options} onChange={() => {}} />
-//         <KustoWhereEditorSection label="Where (filter)" fields={options} onChange={e => console.log('e', e)} />
-//         <KustoValueColumnEditorSection label="Value columns" fields={options} onChange={e => console.log('e', e)} />
-//         <div className="gf-form">
-//           <InlineFormLabel width={12}>Group by (summarize)</InlineFormLabel>
-//           <Select width={30} onChange={() => {}} value={'StormEvents'} options={options} />
-//         </div>
-//       </>
-//     );
-//   }
-// }

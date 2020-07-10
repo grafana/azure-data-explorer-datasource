@@ -27,16 +27,28 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
       }
       values.splice(index, 1, expression);
       setValues([...values]);
+
+      props.onChange({
+        typeToRepeate: props.value.typeToRepeate,
+        type: QueryEditorExpressionType.OperatorRepeater,
+        expressions: values,
+      });
     },
-    [setValues]
+    [setValues, props]
   );
 
   const onRemoveValue = useCallback(
     (index: number) => {
       values.splice(index, 1);
       setValues([...values]);
+
+      props.onChange({
+        typeToRepeate: props.value.typeToRepeate,
+        type: QueryEditorExpressionType.OperatorRepeater,
+        expressions: values,
+      });
     },
-    [setValues]
+    [setValues, props]
   );
 
   const styles = getStyles();
