@@ -1,24 +1,36 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
-export interface MyQuery extends DataQuery {
-  queryText?: string;
-  constant: number;
+export interface KustoQuery extends DataQuery {
+  query: string;
+  database: string;
+  resultFormat: string;
 }
 
-export const defaultQuery: Partial<MyQuery> = {
-  constant: 6.5,
+export const defaultQuery: Partial<KustoQuery> = {
+  query: '',
 };
 
-/**
- * These are options configured for each DataSource instance
- */
-export interface MyDataSourceOptions extends DataSourceJsonData {
-  path?: string;
+export interface AdxDataSourceOptions extends DataSourceJsonData {
+  defaultDatabase: string;
+  minimalCache: number;
 }
 
-/**
- * Value that is used in the backend, but never sent over HTTP to the frontend
- */
-export interface MySecureJsonData {
-  apiKey?: string;
+export interface AdxSchema {
+  Databases: Record<string, AdxDatabaseSchema>;
+}
+
+export interface AdxDatabaseSchema {
+  Name: string;
+  Tables: Record<string, AdxTableSchema>;
+  ExternalTables: Record<string, AdxTableSchema>;
+}
+
+export interface AdxTableSchema {
+  Name: string;
+  OrderedColumns: AdxColumnSchema[];
+}
+
+export interface AdxColumnSchema {
+  Name: string;
+  Type: string;
 }

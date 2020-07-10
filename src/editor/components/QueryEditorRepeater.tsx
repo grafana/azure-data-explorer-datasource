@@ -11,7 +11,6 @@ interface Props {
 interface ChildProps {
   value: QueryEditorExpression | undefined;
   onChange: (expression: QueryEditorExpression | undefined) => void;
-  key: string;
 }
 
 export interface QueryEditorRepeaterExpression extends QueryEditorExpression {
@@ -45,7 +44,7 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
   if (values.length === 0) {
     return (
       <div className={styles.container}>
-        <AddQueryEditor index={0} onChange={onChangeValue} typeToAdd={props.value.typeToRepeate} />
+        <AddButton index={0} onChange={onChangeValue} typeToAdd={props.value.typeToRepeate} />
       </div>
     );
   }
@@ -57,11 +56,11 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
         const containerStyles = !isFirstRow(index, values.length) ? styles.containerWithSpacing : styles.container;
 
         return (
-          <div className={containerStyles}>
-            {props.children({ value, onChange, key: `rptr-${index}` })}
-            <RemoveQueryEditor index={index} onRemove={onRemoveValue} />
+          <div className={containerStyles} key={`rptr-${index}`}>
+            {props.children({ value, onChange })}
+            <RemoveButton index={index} onRemove={onRemoveValue} />
             {index !== 0 ? null : (
-              <AddQueryEditor index={values.length} onChange={onChangeValue} typeToAdd={props.value.typeToRepeate} />
+              <AddButton index={values.length} onChange={onChangeValue} typeToAdd={props.value.typeToRepeate} />
             )}
           </div>
         );
@@ -84,7 +83,7 @@ interface AddQueryEditorProps {
   typeToAdd: QueryEditorExpressionType;
 }
 
-const AddQueryEditor: React.FC<AddQueryEditorProps> = props => {
+const AddButton: React.FC<AddQueryEditorProps> = props => {
   const styles = getStyles();
   const onAddEditor = useCallback(() => props.onChange({ type: props.typeToAdd }, props.index), [props]);
   return <Button className={styles.addButton} variant="secondary" onClick={onAddEditor} icon="plus" />;
@@ -95,7 +94,7 @@ interface RemoveQueryEditorProps {
   onRemove: (index: number) => void;
 }
 
-const RemoveQueryEditor: React.FC<RemoveQueryEditorProps> = props => {
+const RemoveButton: React.FC<RemoveQueryEditorProps> = props => {
   const styles = getStyles();
   const onRemoveEditor = useCallback(() => props.onRemove(props.index), [props]);
   return <Button className={styles.removeButton} variant="secondary" onClick={onRemoveEditor} icon="minus" />;

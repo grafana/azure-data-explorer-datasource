@@ -3,6 +3,7 @@ export enum QueryEditorFieldType {
   String = 'string',
   Boolean = 'boolean',
   DateTime = 'dateTime',
+  Function = 'function',
 }
 
 export enum QueryEditorCondition {

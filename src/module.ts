@@ -1,11 +1,11 @@
 import { DataSourcePlugin } from '@grafana/data';
-import { DataSource } from './datasource';
+import { AdxDataSource } from './datasource';
 import { QueryEditor } from './QueryEditor';
-import { MyQuery, MyDataSourceOptions } from './types';
 import { KustoDBConfigCtrl } from 'config_ctrl';
 import { KustoDBAnnotationsQueryCtrl } from 'annotations_query_ctrl';
+import { AdxDataSourceOptions, KustoQuery } from './types';
 
-export const plugin = new DataSourcePlugin<DataSource, MyQuery, MyDataSourceOptions>(DataSource)
+export const plugin = new DataSourcePlugin<AdxDataSource, KustoQuery, AdxDataSourceOptions>(AdxDataSource)
   .setConfigCtrl(KustoDBConfigCtrl)
   .setAnnotationQueryCtrl(KustoDBAnnotationsQueryCtrl)
   .setQueryEditor(QueryEditor);

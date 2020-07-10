@@ -1,4 +1,9 @@
-import { QueryEditorFieldType, buildFieldQueryEditorSection, buildFilterQueryEditorSection } from './editor';
+import {
+  QueryEditorFieldType,
+  buildFieldQueryEditorSection,
+  buildFilterQueryEditorSection,
+  buildReduceQueryEditorSection,
+} from './editor';
 
 export const KustoFromEditorSection = buildFieldQueryEditorSection(fieldSection => fieldSection.build('from'));
 
@@ -14,7 +19,6 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
       operator('in~')
         .supportTypes([QueryEditorFieldType.String, QueryEditorFieldType.Number])
         .withDescription('in (case-insensitive)')
-        .multipleValues(true)
         .add();
 
       operator('!in')
@@ -43,4 +47,30 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
     })
     .withMultipleRows(true)
     .build('where')
+);
+
+export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduceSection =>
+  reduceSection
+    .withFunctions(functions => {
+      functions('sum')
+        .withLabel('Sum')
+        .add();
+
+      functions('avg')
+        .withLabel('Avg')
+        .add();
+
+      functions('count')
+        .withLabel('Count')
+        .add();
+
+      functions('max')
+        .withLabel('Max')
+        .add();
+
+      functions('min')
+        .withLabel('Min')
+        .add();
+    })
+    .build('value-column')
 );

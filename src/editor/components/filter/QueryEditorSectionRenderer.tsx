@@ -2,7 +2,7 @@ import React from 'react';
 import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition, QueryEditorCondition } from '../../types';
 import { QueryEditorExpression } from '../types';
 import { QueryEditorField, isField } from '../field/QueryEditorField';
-import { isFieldAndOperator, QueryEditorFieldAndOperator } from './QueryEditorFieldAndOperator';
+import { isFieldAndOperator, QueryEditorFieldAndOperator } from '../filter/QueryEditorFieldAndOperator';
 import { isRepeater, QueryEditorRepeater } from '../QueryEditorRepeater';
 
 interface Props {
@@ -20,10 +20,6 @@ export const QueryEditorSectionRenderer: React.FC<Props> = props => {
     return null;
   }
 
-  if (isField(expression)) {
-    return <QueryEditorField fields={fields} onChange={onChange} />;
-  }
-
   if (isFieldAndOperator(expression)) {
     return <QueryEditorFieldAndOperator operators={operators} fields={fields} onChange={onChange} />;
   }
@@ -34,7 +30,6 @@ export const QueryEditorSectionRenderer: React.FC<Props> = props => {
         {childProps => (
           <QueryEditorSectionRenderer
             {...props}
-            key={childProps.key}
             fields={fields}
             onChange={childProps.onChange}
             expression={childProps.value}
