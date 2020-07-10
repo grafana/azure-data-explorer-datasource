@@ -81,6 +81,12 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
   );
 };
 
+export const isFieldAndOperator = (
+  expression: QueryEditorExpression
+): expression is QueryEditorFieldAndOperatorExpression => {
+  return (expression as QueryEditorFieldAndOperatorExpression)?.type === QueryEditorExpressionType.FieldAndOperator;
+};
+
 const useOperatorByType = (
   operators: QueryEditorOperatorDefinition[]
 ): Record<string, QueryEditorOperatorDefinition[]> => {

@@ -1,21 +1,23 @@
 import React, { useCallback } from 'react';
 import { InlineFormLabel } from '@grafana/ui';
 import { QueryEditorExpression } from './types';
-import { QueryEditorField } from './QueryEditorField';
+import { QueryEditorField, isField } from './QueryEditorField';
 import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldDefinition } from '../types';
-import { QueryEditorFieldAndOperator } from './QueryEditorFieldAndOperator';
+import { QueryEditorFieldAndOperator, isFieldAndOperator } from './QueryEditorFieldAndOperator';
+import { QueryEditorOperatorRepeater, isRepeater } from './QueryEditorOperatorRepeater';
 
-interface QueryEditorInternalProps {
+interface QueryEditorDefaultProps {
   id: string;
   operators: QueryEditorOperatorDefinition[];
   conditionals: QueryEditorCondition[];
-  multipleRows: boolean;
+  expression: QueryEditorExpression;
 }
 
 export interface QueryEditorSectionProps {
   label: string;
   options: QueryEditorFieldDefinition[];
   onChange: (expression: QueryEditorSectionExpression) => void;
+  value?: QueryEditorSectionExpression;
 }
 
 export interface QueryEditorSectionExpression {
@@ -25,10 +27,10 @@ export interface QueryEditorSectionExpression {
 
 export interface QueryEditorConditionalExpression extends QueryEditorExpression {}
 
-export const QueryEditorSection = (internalProps: QueryEditorInternalProps): React.FC<QueryEditorSectionProps> => {
+export const QueryEditorSection = (internalProps: QueryEditorDefaultProps): React.FC<QueryEditorSectionProps> => {
   return props => {
     const onChange = useCallback(
-      (expression: QueryEditorExpression) => {
+      (expression: QueryEditorExpression | undefined) => {
         props.onChange({
           id: internalProps.id,
           expression,
@@ -37,29 +39,50 @@ export const QueryEditorSection = (internalProps: QueryEditorInternalProps): Rea
       [props.onChange]
     );
 
+    console.log('internalProps', internalProps);
+
     return (
       <div className="gf-form">
         <InlineFormLabel className="query-keyword" width={12}>
           {props.label}
         </InlineFormLabel>
-        {renderEditor(internalProps, props, onChange)}
+        <QueryEditorRenderer
+          value={props.value?.expression}
+          options={props.options}
+          onChange={onChange}
+          defaults={internalProps}
+        />
       </div>
     );
   };
 };
 
-const renderEditor = (
-  intrenalProps: QueryEditorInternalProps,
-  props: QueryEditorSectionProps,
-  onChange: (expression: QueryEditorExpression) => void
-) => {
-  if (intrenalProps.conditionals.length === 0 && intrenalProps.operators.length === 0) {
-    return <QueryEditorField fields={props.options} onChange={onChange} />;
+interface Props {
+  options: QueryEditorFieldDefinition[];
+  defaults: QueryEditorDefaultProps;
+  value?: QueryEditorExpression;
+  onChange: (expression: QueryEditorExpression | undefined) => void;
+}
+
+const QueryEditorRenderer: React.FC<Props> = props => {
+  const { value, defaults, onChange, options } = props;
+  const expression = value ?? defaults.expression;
+
+  if (isField(expression)) {
+    return <QueryEditorField fields={options} onChange={onChange} />;
   }
 
-  if (intrenalProps.conditionals.length === 0 && intrenalProps.operators.length > 0) {
+  if (isFieldAndOperator(expression)) {
+    return <QueryEditorFieldAndOperator operators={defaults.operators} fields={options} onChange={onChange} />;
+  }
+
+  if (isRepeater(expression)) {
     return (
-      <QueryEditorFieldAndOperator operators={intrenalProps.operators} fields={props.options} onChange={onChange} />
+      <QueryEditorOperatorRepeater onChange={onChange} value={expression}>
+        {(value, onChange) => (
+          <QueryEditorRenderer options={options} onChange={onChange} value={value} defaults={defaults} />
+        )}
+      </QueryEditorOperatorRepeater>
     );
   }
 

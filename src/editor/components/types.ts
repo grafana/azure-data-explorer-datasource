@@ -5,6 +5,7 @@ export enum QueryEditorExpressionType {
   Conditional = 'conditional',
   Operator = 'operator',
   FieldAndOperator = 'fieldAndOperator',
+  OperatorRepeater = 'operatorRepeater',
 }
 
 export interface QueryEditorExpression {
