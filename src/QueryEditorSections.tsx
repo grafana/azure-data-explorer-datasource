@@ -1,9 +1,9 @@
-import { buildQueryEditorSection, QueryEditorFieldType } from './editor';
+import { QueryEditorFieldType, buildFieldQueryEditorSection, buildFilterQueryEditorSection } from './editor';
 
-export const KustoFromEditorSection = buildQueryEditorSection(builder => builder.build('from'));
+export const KustoFromEditorSection = buildFieldQueryEditorSection(fieldSection => fieldSection.build('from'));
 
-export const KustoWhereEditorSection = buildQueryEditorSection(builder =>
-  builder
+export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSection =>
+  filterSection
     .withOperators(operator => {
       operator('in')
         .supportTypes([QueryEditorFieldType.String, QueryEditorFieldType.Number])

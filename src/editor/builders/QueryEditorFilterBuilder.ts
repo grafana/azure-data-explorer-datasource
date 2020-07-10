@@ -1,20 +1,20 @@
 import React from 'react';
-import { QueryEditorSection, QueryEditorSectionProps } from '../components/QueryEditorSection';
-import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
+import { QueryEditorFilterSectionProps, QueryEditorFilterSection } from '../components/QueryEditorFilterSection';
 import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldType } from '../types';
-import { QueryEditorExpression, QueryEditorExpressionType } from 'editor/components/types';
-import { QueryEditorRepeaterExpression } from 'editor/components/QueryEditorRepeater';
-import { QueryEditorFieldAndOperatorExpression } from 'editor/components/QueryEditorFieldAndOperator';
-import { QueryEditorFieldExpression } from 'editor/components/QueryEditorField';
+import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../components/types';
+import { QueryEditorFieldAndOperatorExpression } from '../components/QueryEditorFieldAndOperator';
+import { QueryEditorRepeaterExpression } from '../components/QueryEditorRepeater';
+import { QueryEditorFieldExpression } from '../components/QueryEditorField';
 
-export class QueryEditorSectionBuilder {
+export class QueryEditorFilterBuilder {
   private operators: QueryEditorOperatorDefinition[];
   private conditionals: QueryEditorCondition[];
   private multipleRows: boolean;
 
   constructor() {
-    this.operators = [];
     this.conditionals = [];
+    this.operators = [];
     this.multipleRows = false;
   }
 
@@ -28,16 +28,16 @@ export class QueryEditorSectionBuilder {
     return this;
   }
 
-  build(id: string): React.FC<QueryEditorSectionProps> {
-    return QueryEditorSection({
+  build(id: string): React.FC<QueryEditorFilterSectionProps> {
+    return QueryEditorFilterSection({
       id,
       operators: this.operators,
       conditionals: this.conditionals,
-      expression: this.buildExpression(),
+      expression: this.buildFilterExpression(),
     });
   }
 
-  private buildExpression(): QueryEditorExpression {
+  protected buildFilterExpression(): QueryEditorExpression {
     if (this.multipleRows) {
       if (this.operators.length > 0) {
         return this.buildRepeaterExpression(QueryEditorExpressionType.FieldAndOperator);

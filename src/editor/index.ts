@@ -1,8 +1,14 @@
 import React from 'react';
-import { QueryEditorSectionBuilder } from './builders/QueryEditorSectionBuilder';
-import { QueryEditorSectionProps } from './components/QueryEditorSection';
+import { QueryEditorFilterSectionProps } from './components/QueryEditorFilterSection';
+import { QueryEditorFieldSectionProps } from './components/QueryEditorFieldSection';
+import { QueryEditorFieldBuilder } from './builders/QueryEditorFieldBuilder';
+import { QueryEditorFilterBuilder } from './builders/QueryEditorFilterBuilder';
 export { QueryEditorFieldDefinition, QueryEditorFieldType } from './types';
 
-export const buildQueryEditorSection = (
-  builder: (builder: QueryEditorSectionBuilder) => React.FC<QueryEditorSectionProps>
-): React.FC<QueryEditorSectionProps> => builder(new QueryEditorSectionBuilder());
+export const buildFieldQueryEditorSection = (
+  builder: (builder: QueryEditorFieldBuilder) => React.FC<QueryEditorFieldSectionProps>
+): React.FC<QueryEditorFieldSectionProps> => builder(new QueryEditorFieldBuilder());
+
+export const buildFilterQueryEditorSection = (
+  builder: (builder: QueryEditorFilterBuilder) => React.FC<QueryEditorFilterSectionProps>
+): React.FC<QueryEditorFilterSectionProps> => builder(new QueryEditorFilterBuilder());

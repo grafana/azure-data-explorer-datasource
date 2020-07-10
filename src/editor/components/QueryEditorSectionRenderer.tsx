@@ -8,24 +8,24 @@ import { isRepeater, QueryEditorRepeater } from './QueryEditorRepeater';
 interface Props {
   operators: QueryEditorOperatorDefinition[];
   conditionals: QueryEditorCondition[];
-  options: QueryEditorFieldDefinition[];
+  fields: QueryEditorFieldDefinition[];
   expression: QueryEditorExpression | undefined;
   onChange: (expression: QueryEditorExpression | undefined) => void;
 }
 
 export const QueryEditorSectionRenderer: React.FC<Props> = props => {
-  const { expression, operators, onChange, options } = props;
+  const { expression, operators, onChange, fields } = props;
 
   if (!expression) {
     return null;
   }
 
   if (isField(expression)) {
-    return <QueryEditorField fields={options} onChange={onChange} />;
+    return <QueryEditorField fields={fields} onChange={onChange} />;
   }
 
   if (isFieldAndOperator(expression)) {
-    return <QueryEditorFieldAndOperator operators={operators} fields={options} onChange={onChange} />;
+    return <QueryEditorFieldAndOperator operators={operators} fields={fields} onChange={onChange} />;
   }
 
   if (isRepeater(expression)) {
@@ -35,7 +35,7 @@ export const QueryEditorSectionRenderer: React.FC<Props> = props => {
           <QueryEditorSectionRenderer
             {...props}
             key={childProps.key}
-            options={options}
+            fields={fields}
             onChange={childProps.onChange}
             expression={childProps.value}
           />

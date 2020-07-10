@@ -44,8 +44,8 @@ export class QueryEditor extends PureComponent<Props> {
 
     return (
       <>
-        <KustoFromEditorSection label="From" options={options} onChange={() => {}} />
-        <KustoWhereEditorSection label="Where (filter)" options={options} onChange={e => console.log('e', e)} />
+        <KustoFromEditorSection label="From" fields={options} onChange={() => {}} />
+        <KustoWhereEditorSection label="Where (filter)" fields={options} onChange={e => console.log('e', e)} />
         <div className="gf-form">
           <InlineFormLabel width={12}>Value columns</InlineFormLabel>
           <Select width={30} onChange={() => {}} value={'StormEvents'} options={options} />
