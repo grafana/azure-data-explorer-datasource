@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
-import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorOperatorExpression } from './types';
-import { QueryEditorOperatorDefinition, QueryEditorFieldDefinition } from '../types';
-import { QueryEditorField, QueryEditorFieldExpression, isField } from './QueryEditorField';
-import { QueryEditorOperator, isOperator } from './QueryEditorOperator';
+import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorOperatorExpression } from '../types';
+import { QueryEditorOperatorDefinition, QueryEditorFieldDefinition } from '../../types';
+import { QueryEditorField, QueryEditorFieldExpression, isField } from '../field/QueryEditorField';
+import { QueryEditorOperator, isOperator } from '../operators/QueryEditorOperator';
 
 interface Props {
   value?: QueryEditorFieldAndOperatorExpression;
@@ -58,7 +58,6 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
     <div className={styles.container}>
       <QueryEditorField value={props.value?.field} fields={props.fields} onChange={onChange} />
       <QueryEditorOperator value={props.value?.operator} operators={operators} onChange={onChange} />
-      {/* <Button variant="secondary" onClick={onClearEditor} className={styles.clearButton} icon="minus" /> */}
     </div>
   );
 };
@@ -107,9 +106,6 @@ const getStyles = stylesFactory(() => {
     container: css`
       display: flex;
       flex-direction: row;
-    `,
-    clearButton: css`
-      margin-left: 4px;
     `,
   };
 });

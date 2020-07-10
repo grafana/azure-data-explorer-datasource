@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorExpression, QueryEditorExpressionType } from './types';
-import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../types';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../types';
+import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../../types';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];

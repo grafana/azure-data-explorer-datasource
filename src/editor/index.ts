@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryEditorFilterSectionProps } from './components/QueryEditorFilterSection';
-import { QueryEditorFieldSectionProps } from './components/QueryEditorFieldSection';
+import { QueryEditorFieldSectionProps } from './components/field/QueryEditorFieldSection';
 import { QueryEditorFieldBuilder } from './builders/QueryEditorFieldBuilder';
 import { QueryEditorFilterBuilder } from './builders/QueryEditorFilterBuilder';
 export { QueryEditorFieldDefinition, QueryEditorFieldType } from './types';

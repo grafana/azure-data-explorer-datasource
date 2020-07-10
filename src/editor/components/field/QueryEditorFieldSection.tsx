@@ -1,7 +1,7 @@
 import React from 'react';
-import { QueryEditorExpression } from './types';
-import { QueryEditorFieldDefinition } from '../types';
-import { QueryEditorSection, QueryEditorSectionExpression, QueryEditorSectionBaseProps } from './QueryEditorSection';
+import { QueryEditorExpression } from '../types';
+import { QueryEditorFieldDefinition } from '../../types';
+import { QueryEditorSection, QueryEditorSectionExpression, QueryEditorSectionBaseProps } from '../QueryEditorSection';
 import { QueryEditorField, isField } from './QueryEditorField';
 
 interface FieldSectionConfiguration {

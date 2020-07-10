@@ -1,9 +1,9 @@
 import React from 'react';
-import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition, QueryEditorCondition } from '../types';
-import { QueryEditorExpression } from './types';
-import { QueryEditorField, isField } from './QueryEditorField';
+import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition, QueryEditorCondition } from '../../types';
+import { QueryEditorExpression } from '../types';
+import { QueryEditorField, isField } from '../field/QueryEditorField';
 import { isFieldAndOperator, QueryEditorFieldAndOperator } from './QueryEditorFieldAndOperator';
-import { isRepeater, QueryEditorRepeater } from './QueryEditorRepeater';
+import { isRepeater, QueryEditorRepeater } from '../QueryEditorRepeater';
 
 interface Props {
   operators: QueryEditorOperatorDefinition[];
