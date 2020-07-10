@@ -31,8 +31,14 @@ export const QueryEditorSectionRenderer: React.FC<Props> = props => {
   if (isRepeater(expression)) {
     return (
       <QueryEditorRepeater onChange={onChange} value={expression}>
-        {(value, onChange, key) => (
-          <QueryEditorSectionRenderer {...props} key={key} options={options} onChange={onChange} expression={value} />
+        {childProps => (
+          <QueryEditorSectionRenderer
+            {...props}
+            key={childProps.key}
+            options={options}
+            onChange={childProps.onChange}
+            expression={childProps.value}
+          />
         )}
       </QueryEditorRepeater>
     );

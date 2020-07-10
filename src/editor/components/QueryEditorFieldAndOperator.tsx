@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { css } from 'emotion';
-import { stylesFactory, Button } from '@grafana/ui';
+import { stylesFactory } from '@grafana/ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorOperatorExpression } from './types';
 import { QueryEditorOperatorDefinition, QueryEditorFieldDefinition } from '../types';
 import { QueryEditorField, QueryEditorFieldExpression, isField } from './QueryEditorField';
@@ -19,7 +19,6 @@ export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpres
 }
 
 export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
-  const [showEditor, setShowEditor] = useState(false);
   const [field, setField] = useState(defaultField(props));
   const [operator, setOperator] = useState(props.value?.operator);
   const operatorsByType = useOperatorByType(props.operators);
@@ -55,28 +54,11 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
     [setField, setOperator, props.onChange]
   );
 
-  const onShowEditor = useCallback(() => {
-    setShowEditor(true);
-  }, [setShowEditor]);
-
-  const onClearEditor = useCallback(() => {
-    setShowEditor(false);
-    props.onChange(undefined);
-  }, [setShowEditor]);
-
-  if (!props.value && !showEditor) {
-    return (
-      <div className={styles.container}>
-        <Button variant="secondary" onClick={onShowEditor} icon="plus" />
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
       <QueryEditorField value={props.value?.field} fields={props.fields} onChange={onChange} />
       <QueryEditorOperator value={props.value?.operator} operators={operators} onChange={onChange} />
-      <Button variant="secondary" onClick={onClearEditor} className={styles.clearButton} icon="minus" />
+      {/* <Button variant="secondary" onClick={onClearEditor} className={styles.clearButton} icon="minus" /> */}
     </div>
   );
 };

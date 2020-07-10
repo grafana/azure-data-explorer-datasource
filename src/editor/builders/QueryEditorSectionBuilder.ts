@@ -40,9 +40,9 @@ export class QueryEditorSectionBuilder {
   private buildExpression(): QueryEditorExpression {
     if (this.multipleRows) {
       if (this.operators.length > 0) {
-        return this.buildRepeaterExpression([this.buildOperatorExpression()]);
+        return this.buildRepeaterExpression(QueryEditorExpressionType.FieldAndOperator);
       }
-      return this.buildRepeaterExpression([this.buildFieldExpression()]);
+      return this.buildRepeaterExpression(QueryEditorExpressionType.Field);
     }
 
     if (this.operators.length > 0) {
@@ -63,10 +63,11 @@ export class QueryEditorSectionBuilder {
     };
   }
 
-  private buildRepeaterExpression(expressions: QueryEditorExpression[]): QueryEditorRepeaterExpression {
+  private buildRepeaterExpression(typeToRepeate: QueryEditorExpressionType): QueryEditorRepeaterExpression {
     return {
       type: QueryEditorExpressionType.OperatorRepeater,
-      expressions: expressions,
+      typeToRepeate: typeToRepeate,
+      expressions: [],
     };
   }
 
