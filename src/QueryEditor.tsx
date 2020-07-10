@@ -54,7 +54,7 @@ export const QueryEditor: React.FC<Props> = props => {
     })();
   }, []);
 
-  const aggregatable = columns?.filter(column => column.type === QueryEditorFieldType.String) ?? [];
+  const aggregatable = columns?.filter(column => column.type === QueryEditorFieldType.Number) ?? [];
 
   return (
     <>
