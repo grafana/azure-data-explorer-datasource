@@ -2,10 +2,10 @@ import React from 'react';
 import { QueryEditorFilterSectionProps, QueryEditorFilterSection } from '../components/filter/QueryEditorFilterSection';
 import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldType } from '../types';
 import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../components/types';
 import { QueryEditorFieldAndOperatorExpression } from '../components/filter/QueryEditorFieldAndOperator';
 import { QueryEditorRepeaterExpression } from '../components/QueryEditorRepeater';
 import { QueryEditorFieldExpression } from '../components/field/QueryEditorField';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
 
 export class QueryEditorFilterBuilder {
   private operators: QueryEditorOperatorDefinition[];

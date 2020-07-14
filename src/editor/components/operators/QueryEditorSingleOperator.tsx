@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Input } from '@grafana/ui';
-import { QueryEditorExpressionType, QueryEditorOperatorExpression } from '../types';
+import { QueryEditorOperatorExpression } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
+import { QueryEditorExpressionType } from '../../../types';
 
 interface Props {
   value: string | undefined;

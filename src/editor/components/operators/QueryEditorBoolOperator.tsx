@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
 import { Select } from '@grafana/ui';
-import { QueryEditorExpressionType, QueryEditorOperatorExpression } from '../types';
+import { QueryEditorOperatorExpression } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
 import { SelectableValue } from '@grafana/data';
+import { QueryEditorExpressionType } from '../../../types';
 
 interface Props {
   value: boolean | undefined;
@@ -14,7 +15,7 @@ export interface QueryEditorBoolOperatorExpression extends QueryEditorOperatorEx
   value: boolean;
 }
 
-const options: SelectableValue<boolean>[] = [
+const options: Array<SelectableValue<boolean>> = [
   { value: true, label: 'True' },
   { value: false, label: 'False' },
 ];

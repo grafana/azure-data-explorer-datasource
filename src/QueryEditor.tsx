@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { QueryEditorFieldDefinition, QueryEditorFieldType } from './editor';
 import { KustoFromEditorSection, KustoWhereEditorSection, KustoValueColumnEditorSection } from 'QueryEditorSections';
 import { AdxDataSource } from 'datasource';
-import { KustoQuery, AdxDataSourceOptions } from 'types';
-import { QueryEditorSectionExpression } from './editor/components/QueryEditorSection';
+import { KustoQuery, AdxDataSourceOptions, QueryEditorSectionExpression } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button } from '@grafana/ui';
+import { QueryEditorFieldDefinition, QueryEditorFieldType } from './editor/types';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 const kustoExpressionParser = new KustoExpressionParser();
 
 export const QueryEditor: React.FC<Props> = props => {
-  const [from, setFrom] = useState<QueryEditorSectionExpression | undefined>();
-  const [where, setWhere] = useState<QueryEditorSectionExpression | undefined>();
-  const [reduce, setReduce] = useState<QueryEditorSectionExpression | undefined>();
+  const [from, setFrom] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.from);
+  const [where, setWhere] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.where);
+  const [reduce, setReduce] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.reduce);
   const [tables, setTables] = useState<QueryEditorFieldDefinition[]>([]);
+  const [isSchemaLoaded, setIsSchemaLoaded] = useState(false);
+
   const [columnsByTable, setColumnsByTable] = useState<Record<string, QueryEditorFieldDefinition[]>>({});
   const columns = columnsByTable[kustoExpressionParser.fromTable(from)];
 
-  console.log('where', where);
+  console.log('Expression', props.query.expression);
   console.log('query', kustoExpressionParser.query({ from, where, reduce }));
 
   useEffect(() => {
@@ -53,6 +54,7 @@ export const QueryEditor: React.FC<Props> = props => {
 
         setTables(tables);
         setColumnsByTable(columns);
+        setIsSchemaLoaded(true);
       } catch (error) {
         console.log('error', error);
       }
@@ -61,10 +63,14 @@ export const QueryEditor: React.FC<Props> = props => {
 
   const aggregatable = columns?.filter(column => column.type === QueryEditorFieldType.Number) ?? [];
 
+  if (!isSchemaLoaded) {
+    return <>'Loading schema...'</>;
+  }
+
   return (
     <>
       <KustoFromEditorSection value={from} label="From" fields={tables} onChange={exp => setFrom(exp)} />
-      <KustoWhereEditorSection label="Where (filter)" fields={columns} onChange={exp => setWhere(exp)} />
+      <KustoWhereEditorSection value={where} label="Where (filter)" fields={columns} onChange={exp => setWhere(exp)} />
       <KustoValueColumnEditorSection label="Value columns" fields={aggregatable} onChange={exp => setReduce(exp)} />
       <Button
         onClick={() => {
@@ -77,6 +83,11 @@ export const QueryEditor: React.FC<Props> = props => {
             database: 'Samples',
             queryType: 'time_series',
             query: query,
+            expression: {
+              from,
+              where,
+              reduce,
+            },
           });
 
           props.onRunQuery();

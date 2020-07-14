@@ -1,18 +1,18 @@
 import React from 'react';
 import { QueryEditorFieldType, QueryEditorFieldDefinition } from '../types';
-import { QueryEditorExpressionType } from '../components/types';
 import { QueryEditorFieldExpression } from '../components/field/QueryEditorField';
 import { QueryEditorReduceSectionProps, QueryEditorReduceSection } from '../components/reduce/QueryEditorReduceSection';
 import { QueryEditorReduceExpression } from 'editor/components/reduce/QueryEditorReduce';
 import { QueryEditorFunctionBuilder } from './QueryEditorFunctionBuilder';
+import { QueryEditorExpressionType } from '../../types';
 
 export class QueryEditorReduceBuilder {
   private functions: QueryEditorFieldDefinition[];
-  private multipleRows: boolean;
+  // private multipleRows: boolean = false;
 
   constructor() {
     this.functions = [];
-    this.multipleRows = false;
+    // this.multipleRows = false;
   }
 
   withFunctions(functions: (builder: (value: string) => QueryEditorFunctionBuilder) => void) {

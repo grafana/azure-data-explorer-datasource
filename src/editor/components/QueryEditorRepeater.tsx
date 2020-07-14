@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { css } from 'emotion';
 import { Button, stylesFactory } from '@grafana/ui';
-import { QueryEditorExpression, QueryEditorExpressionType } from './types';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
+
 interface Props {
   children: (props: ChildProps) => React.ReactElement;
   value: QueryEditorRepeaterExpression;

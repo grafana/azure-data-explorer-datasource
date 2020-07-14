@@ -1,9 +1,6 @@
-import {
-  QueryEditorFieldType,
-  buildFieldQueryEditorSection,
-  buildFilterQueryEditorSection,
-  buildReduceQueryEditorSection,
-} from './editor';
+import { buildFieldQueryEditorSection, buildFilterQueryEditorSection, buildReduceQueryEditorSection } from './editor';
+
+import { QueryEditorFieldType } from './editor/types';
 
 export const KustoFromEditorSection = buildFieldQueryEditorSection(fieldSection => fieldSection.build('from'));
 

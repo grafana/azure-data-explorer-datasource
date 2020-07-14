@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorExpressionType, QueryEditorOperatorExpression } from '../types';
+import { QueryEditorOperatorExpression } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
+import { QueryEditorExpressionType } from '../../../types';
 
 interface Props {
   values: string[] | undefined;
@@ -15,7 +16,9 @@ export interface QueryEditorMultiOperatorExpression extends QueryEditorOperatorE
 }
 
 export const QueryEditorMultiOperator: React.FC<Props> = props => {
-  const [options, setOptions] = useState<SelectableValue<string>[]>([]);
+  // Hack: prepareOptions called to create the default options from persisted values, as currently the ADX query editor
+  // do not have dynamic options enabled as there might be loads of such
+  const [options, setOptions] = useState<Array<SelectableValue<string>>>(prepareOptions(props.values || []));
   const onCreate = useCallback(
     (value: string) => {
       if (!value) {
@@ -57,10 +60,14 @@ export const QueryEditorMultiOperator: React.FC<Props> = props => {
       onChange={onChange}
       onCreateOption={onCreate}
       allowCustomValue={true}
+      noOptionsMessage={'Start typing to add filters...'}
     />
   );
 };
 
+const prepareOptions = (values: string[]) => {
+  return values.map<SelectableValue<string>>(v => ({ label: v, value: v }));
+};
 export const isMultiOperator = (
   expression: QueryEditorOperatorExpression | undefined
 ): expression is QueryEditorMultiOperatorExpression => {

@@ -1,7 +1,8 @@
 import React from 'react';
 import { QueryEditorFieldDefinition } from '../../types';
-import { QueryEditorSection, QueryEditorSectionExpression, QueryEditorSectionBaseProps } from '../QueryEditorSection';
+import { QueryEditorSection, QueryEditorSectionBaseProps } from '../QueryEditorSection';
 import { isReduce, QueryEditorReduce, QueryEditorReduceExpression } from './QueryEditorReduce';
+import { QueryEditorSectionExpression } from '../../../types';
 
 interface ReduceSectionConfiguration {
   id: string;

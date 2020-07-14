@@ -1,15 +1,9 @@
-import { QueryEditorSectionExpression } from 'editor/components/QueryEditorSection';
 import { isField } from 'editor/components/field/QueryEditorField';
 import { isRepeater } from 'editor/components/QueryEditorRepeater';
-import { QueryEditorExpression } from 'editor/components/types';
-import { isFieldAndOperator } from 'editor/components/filter/QueryEditorFieldAndOperator';
 import { isMultiOperator } from 'editor/components/operators/QueryEditorMultiOperator';
+import { QueryEditorExpression, QueryEditorSectionExpression, QueryExpression } from './types';
+import { isFieldAndOperator } from './editor/components/filter/QueryEditorFieldAndOperator';
 
-interface QuerySections {
-  from?: QueryEditorSectionExpression;
-  where?: QueryEditorSectionExpression;
-  reduce?: QueryEditorSectionExpression;
-}
 export class KustoExpressionParser {
   fromTable(section?: QueryEditorSectionExpression): string {
     if (section && section.expression && isField(section.expression)) {
@@ -20,8 +14,8 @@ export class KustoExpressionParser {
 
   // we need to write tests for thise one but I would like to have one expression tree
   // that is the entry before doing that.
-  query(sections: QuerySections): string {
-    const { from, where, reduce } = sections;
+  query(sections: QueryExpression): string {
+    const { from, where } = sections;
     const table = this.fromTable(from);
 
     if (!table) {

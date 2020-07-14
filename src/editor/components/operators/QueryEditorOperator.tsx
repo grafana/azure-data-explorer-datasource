@@ -2,11 +2,12 @@ import React, { useState, useCallback } from 'react';
 import { css } from 'emotion';
 import { Select, Button, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorOperatorExpression, QueryEditorExpressionType, QueryEditorExpression } from '../types';
+import { QueryEditorOperatorExpression } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
 import { QueryEditorMultiOperator, isMultiOperator } from './QueryEditorMultiOperator';
 import { isSingleOperator, QueryEditorSingleOperator } from './QueryEditorSingleOperator';
 import { QueryEditorBoolOperator, isBoolOperator } from './QueryEditorBoolOperator';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 
 interface Props {
   value?: QueryEditorOperatorExpression;

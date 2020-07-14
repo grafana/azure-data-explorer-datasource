@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { InlineFormLabel } from '@grafana/ui';
-import { QueryEditorExpression } from './types';
+import { QueryEditorExpression, QueryEditorSectionExpression } from '../../types';
+
 interface QueryEditorSectionProps {
   id: string;
   label: string;
@@ -12,10 +13,6 @@ interface ChildProps {
 }
 
 export interface QueryEditorSectionBaseProps extends Omit<QueryEditorSectionProps, 'id' | 'children'> {}
-export interface QueryEditorSectionExpression {
-  id: string;
-  expression?: QueryEditorExpression;
-}
 
 export const QueryEditorSection: React.FC<QueryEditorSectionProps> = props => {
   const onChange = useCallback(

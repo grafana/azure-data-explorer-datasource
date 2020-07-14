@@ -5,7 +5,6 @@ import { QueryEditorFieldBuilder } from './builders/QueryEditorFieldBuilder';
 import { QueryEditorFilterBuilder } from './builders/QueryEditorFilterBuilder';
 import { QueryEditorReduceSectionProps } from './components/reduce/QueryEditorReduceSection';
 import { QueryEditorReduceBuilder } from './builders/QueryEditorReduceBuilder';
-export { QueryEditorFieldDefinition, QueryEditorFieldType } from './types';
 
 export const buildFieldQueryEditorSection = (
   builder: (builder: QueryEditorFieldBuilder) => React.FC<QueryEditorFieldSectionProps>

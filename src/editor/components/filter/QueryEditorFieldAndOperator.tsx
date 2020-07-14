@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
-import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorOperatorExpression } from '../types';
-import { QueryEditorOperatorDefinition, QueryEditorFieldDefinition } from '../../types';
-import { QueryEditorField, QueryEditorFieldExpression, isField } from '../field/QueryEditorField';
-import { QueryEditorOperator, isOperator } from '../operators/QueryEditorOperator';
+import { QueryEditorOperatorExpression } from '../types';
+import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition } from '../../types';
+import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
+import { QueryEditorOperator } from '../operators/QueryEditorOperator';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 
 interface Props {
   value?: QueryEditorFieldAndOperatorExpression;
@@ -22,42 +23,41 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
   const [field, setField] = useState(defaultField(props));
   const [operator, setOperator] = useState(props.value?.operator);
   const operatorsByType = useOperatorByType(props.operators);
+
+  const onFieldChange = useCallback(
+    (expression: QueryEditorFieldExpression) => {
+      setField(expression);
+    },
+    [setField, props.value]
+  );
+
+  const onOperatorChange = useCallback(
+    (op: QueryEditorOperatorExpression) => {
+      setOperator(op);
+    },
+    [setField, props.value]
+  );
+
+  useEffect(() => {
+    if (operator && field) {
+      const payload = {
+        type: QueryEditorExpressionType.FieldAndOperator,
+        field: field!,
+        operator,
+      };
+
+      console.log('Calling FiedAndOperator onChange with: ', payload);
+      props.onChange(payload);
+    }
+  }, [field, operator]);
+
   const operators = operatorsByType[field?.fieldType.toString() ?? ''] ?? [];
   const styles = getStyles();
 
-  const onChange = useCallback(
-    (expression: QueryEditorFieldExpression | QueryEditorOperatorExpression) => {
-      if (isField(expression)) {
-        setField(expression);
-
-        if (operator) {
-          props.onChange({
-            type: QueryEditorExpressionType.FieldAndOperator,
-            field: expression,
-            operator,
-          });
-        }
-      }
-
-      if (isOperator(expression)) {
-        setOperator(expression);
-
-        if (field) {
-          props.onChange({
-            type: QueryEditorExpressionType.FieldAndOperator,
-            field: field,
-            operator: expression,
-          });
-        }
-      }
-    },
-    [setField, setOperator, props.onChange]
-  );
-
   return (
     <div className={styles.container}>
-      <QueryEditorField value={props.value?.field} fields={props.fields} onChange={onChange} />
-      <QueryEditorOperator value={props.value?.operator} operators={operators} onChange={onChange} />
+      <QueryEditorField value={field} fields={props.fields} onChange={onFieldChange} />
+      <QueryEditorOperator value={operator} operators={operators} onChange={onOperatorChange} />
     </div>
   );
 };

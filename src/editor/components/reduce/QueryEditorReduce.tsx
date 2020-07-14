@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { css } from 'emotion';
 import { InlineFormLabel, stylesFactory } from '@grafana/ui';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../types';
 import { QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];

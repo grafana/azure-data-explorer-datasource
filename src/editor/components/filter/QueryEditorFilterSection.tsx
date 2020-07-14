@@ -1,8 +1,8 @@
 import React from 'react';
-import { QueryEditorExpression } from '../types';
 import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSectionRenderer } from './QueryEditorSectionRenderer';
-import { QueryEditorSectionBaseProps, QueryEditorSectionExpression, QueryEditorSection } from '../QueryEditorSection';
+import { QueryEditorSectionBaseProps, QueryEditorSection } from '../QueryEditorSection';
+import { QueryEditorExpression, QueryEditorSectionExpression } from '../../../types';
 
 interface FilterSectionConfiguration {
   id: string;

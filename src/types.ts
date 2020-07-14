@@ -1,9 +1,34 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
+export enum QueryEditorExpressionType {
+  Field = 'field',
+  Conditional = 'conditional',
+  Operator = 'operator',
+  FieldAndOperator = 'fieldAndOperator',
+  OperatorRepeater = 'operatorRepeater',
+  Reduce = 'reduce',
+}
+
+export interface QueryEditorExpression {
+  type: QueryEditorExpressionType;
+}
+
+export interface QueryEditorSectionExpression {
+  id: string;
+  expression?: QueryEditorExpression;
+}
+
+export interface QueryExpression {
+  from?: QueryEditorSectionExpression;
+  where?: QueryEditorSectionExpression;
+  reduce?: QueryEditorSectionExpression;
+}
+
 export interface KustoQuery extends DataQuery {
   query: string;
   database: string;
   resultFormat: string;
+  expression?: QueryExpression;
 }
 
 export const defaultQuery: Partial<KustoQuery> = {

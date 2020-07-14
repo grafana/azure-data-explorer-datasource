@@ -1,8 +1,8 @@
 import React from 'react';
 import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition, QueryEditorCondition } from '../../types';
-import { QueryEditorExpression } from '../types';
 import { isFieldAndOperator, QueryEditorFieldAndOperator } from '../filter/QueryEditorFieldAndOperator';
 import { isRepeater, QueryEditorRepeater } from '../QueryEditorRepeater';
+import { QueryEditorExpression } from '../../../types';
 
 interface Props {
   operators: QueryEditorOperatorDefinition[];
@@ -20,7 +20,7 @@ export const QueryEditorSectionRenderer: React.FC<Props> = props => {
   }
 
   if (isFieldAndOperator(expression)) {
-    return <QueryEditorFieldAndOperator operators={operators} fields={fields} onChange={onChange} />;
+    return <QueryEditorFieldAndOperator value={expression} operators={operators} fields={fields} onChange={onChange} />;
   }
 
   if (isRepeater(expression)) {
