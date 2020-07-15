@@ -15,7 +15,7 @@ interface ChildProps {
 }
 
 export interface QueryEditorRepeaterExpression extends QueryEditorExpression {
-  typeToRepeate: QueryEditorExpressionType;
+  typeToRepeat: QueryEditorExpressionType;
   expressions: QueryEditorExpression[];
 }
 
@@ -30,7 +30,7 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
       setValues([...values]);
 
       props.onChange({
-        typeToRepeate: props.value.typeToRepeate,
+        typeToRepeat: props.value.typeToRepeat,
         type: QueryEditorExpressionType.OperatorRepeater,
         expressions: values,
       });
@@ -44,7 +44,7 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
       setValues([...values]);
 
       props.onChange({
-        typeToRepeate: props.value.typeToRepeate,
+        typeToRepeat: props.value.typeToRepeat,
         type: QueryEditorExpressionType.OperatorRepeater,
         expressions: values,
       });
@@ -57,7 +57,7 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
   if (values.length === 0) {
     return (
       <div className={styles.container}>
-        <AddButton index={0} onChange={onChangeValue} typeToAdd={props.value.typeToRepeate} />
+        <AddButton index={0} onChange={onChangeValue} typeToAdd={props.value.typeToRepeat} />
       </div>
     );
   }
@@ -73,7 +73,7 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
             {props.children({ value, onChange })}
             <RemoveButton index={index} onRemove={onRemoveValue} />
             {index !== 0 ? null : (
-              <AddButton index={values.length} onChange={onChangeValue} typeToAdd={props.value.typeToRepeate} />
+              <AddButton index={values.length} onChange={onChangeValue} typeToAdd={props.value.typeToRepeat} />
             )}
           </div>
         );

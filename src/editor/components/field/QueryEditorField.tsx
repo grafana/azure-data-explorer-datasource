@@ -18,7 +18,7 @@ export interface QueryEditorFieldExpression extends QueryEditorExpression {
 export const QueryEditorField: React.FC<Props> = props => {
   const onChange = useOnChange(props);
   const options = useOptions(props.fields);
-  const value = props.value?.value ?? props.fields[0].value;
+  const value = props.value?.value ?? (props.fields ? props.fields[0].value : '');
 
   return <Select width={30} onChange={onChange} value={value} options={options} />;
 };

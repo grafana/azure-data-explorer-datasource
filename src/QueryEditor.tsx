@@ -71,13 +71,18 @@ export const QueryEditor: React.FC<Props> = props => {
     <>
       <KustoFromEditorSection value={from} label="From" fields={tables} onChange={exp => setFrom(exp)} />
       <KustoWhereEditorSection value={where} label="Where (filter)" fields={columns} onChange={exp => setWhere(exp)} />
-      <KustoValueColumnEditorSection label="Value columns" fields={aggregatable} onChange={exp => setReduce(exp)} />
+      <KustoValueColumnEditorSection
+        value={reduce}
+        label="Value columns"
+        fields={aggregatable}
+        onChange={exp => setReduce(exp)}
+      />
       <Button
         onClick={() => {
           const query = kustoExpressionParser.query({ from, where, reduce });
 
           props.onChange({
-            refId: `table-Samples-${query}`,
+            ...props.query,
             resultFormat: 'table',
             datasource: props.datasource.name,
             database: 'Samples',

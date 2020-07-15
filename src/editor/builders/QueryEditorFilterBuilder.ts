@@ -63,10 +63,10 @@ export class QueryEditorFilterBuilder {
     };
   }
 
-  private buildRepeaterExpression(typeToRepeate: QueryEditorExpressionType): QueryEditorRepeaterExpression {
+  private buildRepeaterExpression(typeToRepeat: QueryEditorExpressionType): QueryEditorRepeaterExpression {
     return {
       type: QueryEditorExpressionType.OperatorRepeater,
-      typeToRepeate: typeToRepeate,
+      typeToRepeat: typeToRepeat,
       expressions: [],
     };
   }
