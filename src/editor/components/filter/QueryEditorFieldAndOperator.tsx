@@ -1,11 +1,11 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
-import { css } from 'emotion';
-import { stylesFactory } from '@grafana/ui';
-import { QueryEditorOperatorExpression } from '../types';
-import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition } from '../../types';
-import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
-import { QueryEditorOperator } from '../operators/QueryEditorOperator';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
+import React, {useCallback, useMemo, useState, useEffect} from 'react';
+import {css} from 'emotion';
+import {stylesFactory} from '@grafana/ui';
+import {QueryEditorOperatorExpression} from '../types';
+import {QueryEditorFieldDefinition, QueryEditorOperatorDefinition} from '../../types';
+import {QueryEditorField, QueryEditorFieldExpression} from '../field/QueryEditorField';
+import {QueryEditorOperator} from '../operators/QueryEditorOperator';
+import {QueryEditorExpression, QueryEditorExpressionType} from '../../../types';
 
 interface Props {
   value?: QueryEditorFieldAndOperatorExpression;
@@ -20,7 +20,7 @@ export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpres
 }
 
 export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
-  const [field, setField] = useState(defaultField(props));
+  const [field, setField] = useState(props.value?.field);
   const [operator, setOperator] = useState(props.value?.operator);
   const operatorsByType = useOperatorByType(props.operators);
 
@@ -42,7 +42,7 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
     if (operator && field) {
       const payload = {
         type: QueryEditorExpressionType.FieldAndOperator,
-        field: field!,
+        field,
         operator,
       };
 
@@ -56,8 +56,8 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
 
   return (
     <div className={styles.container}>
-      <QueryEditorField value={field} fields={props.fields} onChange={onFieldChange} />
-      <QueryEditorOperator value={operator} operators={operators} onChange={onOperatorChange} />
+      <QueryEditorField value={field} fields={props.fields} onChange={onFieldChange} placeholder="Choose column..."/>
+      <QueryEditorOperator value={operator} operators={operators} onChange={onOperatorChange}/>
     </div>
   );
 };
@@ -89,17 +89,6 @@ const useOperatorByType = (
   }, [operators]);
 };
 
-const defaultField = (props: Props): QueryEditorFieldExpression | undefined => {
-  if (props.value?.field) {
-    return props.value?.field;
-  }
-
-  return {
-    type: QueryEditorExpressionType.Field,
-    value: props.fields[0]?.value,
-    fieldType: props.fields[0]?.type,
-  };
-};
 
 const getStyles = stylesFactory(() => {
   return {

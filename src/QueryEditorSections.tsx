@@ -69,5 +69,6 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
         .withLabel('Min')
         .add();
     })
+    .withMultipleRows(true)
     .build('value-column')
 );

@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
 import { css } from 'emotion';
+import React, { useState, useCallback } from 'react';
 import { Button, stylesFactory } from '@grafana/ui';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
 

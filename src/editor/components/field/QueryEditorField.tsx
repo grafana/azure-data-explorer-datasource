@@ -8,6 +8,7 @@ interface Props {
   fields: QueryEditorFieldDefinition[];
   value?: QueryEditorFieldExpression;
   onChange: (expression: QueryEditorFieldExpression) => void;
+  placeholder?: string;
 }
 
 export interface QueryEditorFieldExpression extends QueryEditorExpression {
@@ -18,9 +19,9 @@ export interface QueryEditorFieldExpression extends QueryEditorExpression {
 export const QueryEditorField: React.FC<Props> = props => {
   const onChange = useOnChange(props);
   const options = useOptions(props.fields);
-  const value = props.value?.value ?? (props.fields ? props.fields[0].value : '');
+  const value = props.value?.value;
 
-  return <Select width={30} onChange={onChange} value={value} options={options} />;
+  return <Select width={30} onChange={onChange} value={value} options={options} placeholder={props.placeholder} />;
 };
 
 // Should remove this when I have fixed the underlying issue in the select component

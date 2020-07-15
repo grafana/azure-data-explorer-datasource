@@ -1,26 +1,32 @@
 import React from 'react';
-import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition, QueryEditorCondition } from '../../types';
-import { isFieldAndOperator, QueryEditorFieldAndOperator } from '../filter/QueryEditorFieldAndOperator';
-import { isRepeater, QueryEditorRepeater } from '../QueryEditorRepeater';
-import { QueryEditorExpression } from '../../../types';
+import {QueryEditorFieldDefinition} from '../../types';
+import {isFieldAndOperator, QueryEditorFieldAndOperator} from '../filter/QueryEditorFieldAndOperator';
+import {isRepeater, QueryEditorRepeater} from '../QueryEditorRepeater';
+import {QueryEditorExpression} from '../../../types';
+import {isReduce, QueryEditorReduce} from "../reduce/QueryEditorReduce";
 
-interface Props {
-  operators: QueryEditorOperatorDefinition[];
-  conditionals: QueryEditorCondition[];
+interface Props<TConfig> {
+  config: TConfig;
   fields: QueryEditorFieldDefinition[];
   expression: QueryEditorExpression | undefined;
   onChange: (expression: QueryEditorExpression | undefined) => void;
 }
 
-export const QueryEditorSectionRenderer: React.FC<Props> = props => {
-  const { expression, operators, onChange, fields } = props;
+export function QueryEditorSectionRenderer<T>(props: Props<T>)  {
+  const {expression, config, onChange, fields} = props;
 
   if (!expression) {
     return null;
   }
 
   if (isFieldAndOperator(expression)) {
-    return <QueryEditorFieldAndOperator value={expression} operators={operators} fields={fields} onChange={onChange} />;
+    // TODO: fix any
+    return <QueryEditorFieldAndOperator value={expression} operators={(config as any).operators} fields={fields} onChange={onChange}/>;
+  }
+
+  if (isReduce(expression)) {
+    // TODO: fix any
+    return <QueryEditorReduce value={expression} fields={fields} functions={(config as any).functions} onChange={onChange}/>
   }
 
   if (isRepeater(expression)) {

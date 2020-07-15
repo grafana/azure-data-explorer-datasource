@@ -25,12 +25,11 @@ export const QueryEditorFilterSection = (
     return (
       <QueryEditorSection id={config.id} label={props.label} onChange={props.onChange}>
         {({ onChange }) => (
-          <QueryEditorSectionRenderer
+          <QueryEditorSectionRenderer<FilterSectionConfiguration>
             expression={expression}
             fields={props.fields}
             onChange={onChange}
-            operators={config.operators}
-            conditionals={config.conditionals}
+            config={config}
           />
         )}
       </QueryEditorSection>

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { QueryEditorProps } from '@grafana/data';
-import { KustoFromEditorSection, KustoWhereEditorSection, KustoValueColumnEditorSection } from 'QueryEditorSections';
-import { AdxDataSource } from 'datasource';
-import { KustoQuery, AdxDataSourceOptions, QueryEditorSectionExpression } from 'types';
-import { KustoExpressionParser } from 'KustoExpressionParser';
-import { Button } from '@grafana/ui';
-import { QueryEditorFieldDefinition, QueryEditorFieldType } from './editor/types';
+import React, {useEffect, useState} from 'react';
+import {QueryEditorProps} from '@grafana/data';
+import {KustoFromEditorSection, KustoWhereEditorSection, KustoValueColumnEditorSection} from 'QueryEditorSections';
+import {AdxDataSource} from 'datasource';
+import {KustoQuery, AdxDataSourceOptions, QueryEditorSectionExpression} from 'types';
+import {KustoExpressionParser} from 'KustoExpressionParser';
+import {Button} from '@grafana/ui';
+import {QueryEditorFieldDefinition, QueryEditorFieldType} from './editor/types';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 const kustoExpressionParser = new KustoExpressionParser();
@@ -20,8 +20,9 @@ export const QueryEditor: React.FC<Props> = props => {
   const [columnsByTable, setColumnsByTable] = useState<Record<string, QueryEditorFieldDefinition[]>>({});
   const columns = columnsByTable[kustoExpressionParser.fromTable(from)];
 
-  console.log('Expression', props.query.expression);
-  console.log('query', kustoExpressionParser.query({ from, where, reduce }));
+  console.log('Persisted expression', props.query.expression);
+  console.log('Expression to save', {from, where, reduce});
+  console.log('query', kustoExpressionParser.query({from, where, reduce}));
 
   useEffect(() => {
     (async () => {
@@ -61,25 +62,31 @@ export const QueryEditor: React.FC<Props> = props => {
     })();
   }, []);
 
+  // TODO: aggregatable columns doesn't have to be numeric. I.e. count function can performed on any column type
   const aggregatable = columns?.filter(column => column.type === QueryEditorFieldType.Number) ?? [];
 
   if (!isSchemaLoaded) {
-    return <>'Loading schema...'</>;
+    return <>Loading schema...</>;
   }
 
   return (
     <>
-      <KustoFromEditorSection value={from} label="From" fields={tables} onChange={exp => setFrom(exp)} />
-      <KustoWhereEditorSection value={where} label="Where (filter)" fields={columns} onChange={exp => setWhere(exp)} />
+      <KustoFromEditorSection value={from} label="From" fields={tables} onChange={exp => setFrom(exp)}/>
+      <KustoWhereEditorSection value={where} label="Where (filter)" fields={columns} onChange={exp => {
+        debugger
+        setWhere(exp)
+      }}/>
       <KustoValueColumnEditorSection
         value={reduce}
         label="Value columns"
         fields={aggregatable}
-        onChange={exp => setReduce(exp)}
+        onChange={exp => {
+          setReduce(exp)
+        }}
       />
       <Button
         onClick={() => {
-          const query = kustoExpressionParser.query({ from, where, reduce });
+          const query = kustoExpressionParser.query({from, where, reduce});
 
           props.onChange({
             ...props.query,

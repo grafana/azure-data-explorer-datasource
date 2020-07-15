@@ -1,12 +1,12 @@
 import React from 'react';
 import { QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionBaseProps } from '../QueryEditorSection';
-import { isReduce, QueryEditorReduce, QueryEditorReduceExpression } from './QueryEditorReduce';
-import { QueryEditorSectionExpression } from '../../../types';
+import {QueryEditorExpression, QueryEditorSectionExpression} from '../../../types';
+import {QueryEditorSectionRenderer} from "../filter/QueryEditorSectionRenderer";
 
 interface ReduceSectionConfiguration {
   id: string;
-  defaultValue: QueryEditorReduceExpression;
+  defaultValue: QueryEditorExpression;
   functions: QueryEditorFieldDefinition[];
 }
 
@@ -21,20 +21,15 @@ export const QueryEditorReduceSection = (
 ): React.FC<QueryEditorReduceSectionProps> => {
   return props => {
     const expression = props.value?.expression ?? config.defaultValue;
-
-    if (!isReduce(expression)) {
-      return null;
-    }
-
+    
     return (
       <QueryEditorSection id={config.id} label={props.label} onChange={props.onChange}>
         {({ onChange }) => (
-          <QueryEditorReduce
-            label={props.reduceLabel}
-            functions={config.functions}
+          <QueryEditorSectionRenderer<ReduceSectionConfiguration>
+            expression={expression}
             fields={props.fields}
             onChange={onChange}
-            value={expression}
+            config={config}
           />
         )}
       </QueryEditorSection>
