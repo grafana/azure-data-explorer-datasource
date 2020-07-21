@@ -1,11 +1,12 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryEditor } from './QueryEditor';
-import { KustoQuery, AdxSchema, QueryEditorExpressionType } from './types';
+import { KustoQuery, AdxSchema, QueryEditorExpressionType, QueryEditorSectionExpression } from './types';
 import { QueryEditorFieldType } from './editor/types';
 import { QueryEditorFieldExpression } from './editor/components/field/QueryEditorField';
 import { QueryEditorRepeaterExpression } from './editor/components/QueryEditorRepeater';
 import { QueryEditorReduceExpression } from './editor/components/reduce/QueryEditorReduce';
+import { QueryEditorGroupByExpression } from './editor/components/groupBy/QueryEditorGroupBy';
 import { QueryEditorFieldAndOperatorExpression } from './editor/components/filter/QueryEditorFieldAndOperator';
 import { QueryEditorMultiOperatorExpression } from './editor/components/operators/QueryEditorMultiOperator';
 
@@ -32,50 +33,76 @@ function renderWithQuery(query: KustoQuery) {
 
 describe('QueryEditor', () => {
   it('should load saved query fields', async () => {
-    const fromFieldExpression: QueryEditorFieldExpression = {
-      type: QueryEditorExpressionType.Field,
-      fieldType: QueryEditorFieldType.String,
-      value: 'StormEvents',
+    const from: QueryEditorSectionExpression = {
+      id: 'from',
+      expression: {
+        type: QueryEditorExpressionType.Field,
+        fieldType: QueryEditorFieldType.String,
+        value: 'StormEvents',
+      } as QueryEditorFieldExpression,
     };
 
-    const whereFieldExpression: QueryEditorRepeaterExpression = {
-      type: QueryEditorExpressionType.OperatorRepeater,
-      typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
-      expressions: [
-        {
-          type: QueryEditorExpressionType.FieldAndOperator,
-          field: {
-            type: QueryEditorExpressionType.Field,
-            fieldType: QueryEditorFieldType.String,
-            value: 'StateCode',
-          },
-          operator: {
-            type: QueryEditorExpressionType.Operator,
-            operator: {
-              value: '!in',
-              multipleValues: true,
-              booleanValues: false,
-              description: 'not in (case-sensitive)',
-              label: '!in',
+    const where: QueryEditorSectionExpression = {
+      id: 'where',
+      expression: {
+        type: QueryEditorExpressionType.OperatorRepeater,
+        typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+        expressions: [
+          {
+            type: QueryEditorExpressionType.FieldAndOperator,
+            field: {
+              type: QueryEditorExpressionType.Field,
+              fieldType: QueryEditorFieldType.String,
+              value: 'StateCode',
             },
-            values: ['NY'],
-          } as QueryEditorMultiOperatorExpression,
-        } as QueryEditorFieldAndOperatorExpression,
-      ],
+            operator: {
+              type: QueryEditorExpressionType.Operator,
+              operator: {
+                value: '!in',
+                multipleValues: true,
+                booleanValues: false,
+                description: 'not in (case-sensitive)',
+                label: '!in',
+              },
+              values: ['NY'],
+            } as QueryEditorMultiOperatorExpression,
+          } as QueryEditorFieldAndOperatorExpression,
+        ],
+      } as QueryEditorRepeaterExpression,
     };
 
-    const reduceFieldExpression: QueryEditorReduceExpression = {
-      type: QueryEditorExpressionType.Reduce,
-      field: {
-        type: QueryEditorExpressionType.Field,
-        fieldType: QueryEditorFieldType.Number,
-        value: 'Deaths',
-      },
-      reduce: {
-        type: QueryEditorExpressionType.Field,
-        fieldType: QueryEditorFieldType.Function,
-        value: 'sum',
-      },
+    const reduce: QueryEditorSectionExpression = {
+      id: 'reduce',
+      expression: {
+        type: QueryEditorExpressionType.Reduce,
+        field: {
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.Number,
+          value: 'Deaths',
+        },
+        reduce: {
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.Function,
+          value: 'sum',
+        },
+      } as QueryEditorReduceExpression,
+    };
+
+    const groupBy: QueryEditorSectionExpression = {
+      id: 'groupBy',
+      expression: {
+        type: QueryEditorExpressionType.GroupBy,
+        field: {
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.DateTime,
+          value: 'StartTime',
+        },
+        interval: {
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.Interval,
+          value: '1h',
+        },
+      } as QueryEditorGroupByExpression,
     };
 
     const query: KustoQuery = {
@@ -84,26 +111,27 @@ describe('QueryEditor', () => {
       resultFormat: '',
       query: '',
       expression: {
-        from: {
-          id: 'from',
-          expression: fromFieldExpression,
-        },
-        where: {
-          id: 'where',
-          expression: whereFieldExpression,
-        },
-        reduce: {
-          id: 'reduce',
-          expression: reduceFieldExpression,
-        },
+        from,
+        where,
+        reduce,
+        groupBy,
       },
     };
     renderWithQuery(query);
     await waitFor(() => {
+      //from
       expect(screen.getByText('Samples / StormEvents')).not.toBeNull();
+
+      //value field
       expect(screen.getByText('Deaths')).not.toBeNull();
       expect(screen.getByText('Sum')).not.toBeNull();
+
+      // //filter
       expect(screen.getByText('StateCode')).not.toBeNull();
+
+      // //group by
+      expect(screen.getByText('StartTime')).not.toBeNull();
+      expect(screen.getByText('1 hour')).not.toBeNull();
     });
   });
 });

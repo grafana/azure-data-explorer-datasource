@@ -7,6 +7,7 @@ export enum QueryEditorExpressionType {
   FieldAndOperator = 'fieldAndOperator',
   OperatorRepeater = 'operatorRepeater',
   Reduce = 'reduce',
+  GroupBy = 'groupBy',
 }
 
 export interface QueryEditorExpression {
@@ -22,6 +23,7 @@ export interface QueryExpression {
   from?: QueryEditorSectionExpression;
   where?: QueryEditorSectionExpression;
   reduce?: QueryEditorSectionExpression;
+  groupBy?: QueryEditorSectionExpression;
 }
 
 export interface KustoQuery extends DataQuery {

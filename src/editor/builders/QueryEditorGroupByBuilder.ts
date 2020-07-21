@@ -1,18 +1,21 @@
 import React from 'react';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../types';
 import { QueryEditorFieldExpression } from '../components/field/QueryEditorField';
-import { QueryEditorReduceSection, QueryEditorReduceSectionProps } from '../components/reduce/QueryEditorReduceSection';
-import { QueryEditorFunctionBuilder } from './QueryEditorFunctionBuilder';
+import {
+  QueryEditorGroupBySection,
+  QueryEditorGroupBySectionProps,
+} from '../components/groupBy/QueryEditorGroupBySection';
+import { QueryEditorIntervalBuilder } from './QueryEditorIntervalBuilder';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
 import { QueryEditorRepeaterExpression } from '../components/QueryEditorRepeater';
-import { QueryEditorReduceExpression } from '../components/reduce/QueryEditorReduce';
+import { QueryEditorGroupByExpression } from '../components/groupBy/QueryEditorGroupBy';
 
-export class QueryEditorReduceBuilder {
-  private functions: QueryEditorFieldDefinition[];
+export class QueryEditorGroupByBuilder {
+  private intervals: QueryEditorFieldDefinition[];
   private multipleRows = false;
 
   constructor() {
-    this.functions = [];
+    this.intervals = [];
     this.multipleRows = false;
   }
 
@@ -21,29 +24,29 @@ export class QueryEditorReduceBuilder {
     return this;
   }
 
-  withFunctions(functions: (builder: (value: string) => QueryEditorFunctionBuilder) => void) {
-    functions(value => new QueryEditorFunctionBuilder(value, this.functions));
+  withIntervals(intervals: (builder: (value: string) => QueryEditorIntervalBuilder) => void) {
+    intervals(value => new QueryEditorIntervalBuilder(value, this.intervals));
     return this;
   }
 
-  build(id: string): React.FC<QueryEditorReduceSectionProps> {
-    return QueryEditorReduceSection({
+  build(id: string): React.FC<QueryEditorGroupBySectionProps> {
+    return QueryEditorGroupBySection({
       id,
-      functions: this.functions,
-      defaultValue: this.buildReduceExpression(),
+      intervals: this.intervals,
+      defaultValue: this.buildGroupByExpression(),
     });
   }
 
-  private buildReduceExpression(): QueryEditorExpression {
+  private buildGroupByExpression(): QueryEditorExpression {
     if (this.multipleRows) {
-      if (this.functions.length > 0) {
-        return this.buildRepeaterExpression(QueryEditorExpressionType.Reduce);
+      if (this.intervals.length > 0) {
+        return this.buildRepeaterExpression(QueryEditorExpressionType.GroupBy);
       }
       return this.buildRepeaterExpression(QueryEditorExpressionType.Field);
     }
 
-    if (this.functions.length > 0) {
-      return this.buildReduceFnExpression();
+    if (this.intervals.length > 0) {
+      return this.buildIntervalExpression();
     }
 
     return this.buildFieldExpression(QueryEditorFieldType.String);
@@ -57,11 +60,11 @@ export class QueryEditorReduceBuilder {
     };
   }
 
-  private buildReduceFnExpression(): QueryEditorReduceExpression {
+  private buildIntervalExpression(): QueryEditorGroupByExpression {
     return {
-      type: QueryEditorExpressionType.Reduce,
+      type: QueryEditorExpressionType.GroupBy,
       field: this.buildFieldExpression(QueryEditorFieldType.String),
-      reduce: this.buildFieldExpression(QueryEditorFieldType.Function),
+      interval: this.buildFieldExpression(QueryEditorFieldType.Interval),
     };
   }
 

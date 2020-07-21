@@ -4,27 +4,27 @@ import { QueryEditorSection, QueryEditorSectionBaseProps } from '../QueryEditorS
 import { QueryEditorExpression, QueryEditorSectionExpression } from '../../../types';
 import { QueryEditorSectionRenderer } from '../filter/QueryEditorSectionRenderer';
 
-interface ReduceSectionConfiguration {
+interface GroupBySectionConfiguration {
   id: string;
   defaultValue: QueryEditorExpression;
-  functions: QueryEditorFieldDefinition[];
+  intervals: QueryEditorFieldDefinition[];
 }
 
-export interface QueryEditorReduceSectionProps extends QueryEditorSectionBaseProps {
+export interface QueryEditorGroupBySectionProps extends QueryEditorSectionBaseProps {
   fields: QueryEditorFieldDefinition[];
   value?: QueryEditorSectionExpression;
 }
 
-export const QueryEditorReduceSection = (
-  config: ReduceSectionConfiguration
-): React.FC<QueryEditorReduceSectionProps> => {
+export const QueryEditorGroupBySection = (
+  config: GroupBySectionConfiguration
+): React.FC<QueryEditorGroupBySectionProps> => {
   return props => {
     const expression = props.value?.expression ?? config.defaultValue;
 
     return (
       <QueryEditorSection id={config.id} label={props.label} onChange={props.onChange}>
         {({ onChange }) => (
-          <QueryEditorSectionRenderer<ReduceSectionConfiguration>
+          <QueryEditorSectionRenderer<GroupBySectionConfiguration>
             expression={expression}
             fields={props.fields}
             onChange={onChange}

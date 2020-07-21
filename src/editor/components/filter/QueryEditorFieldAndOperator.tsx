@@ -1,11 +1,11 @@
-import React, {useCallback, useMemo, useState, useEffect} from 'react';
-import {css} from 'emotion';
-import {stylesFactory} from '@grafana/ui';
-import {QueryEditorOperatorExpression} from '../types';
-import {QueryEditorFieldDefinition, QueryEditorOperatorDefinition} from '../../types';
-import {QueryEditorField, QueryEditorFieldExpression} from '../field/QueryEditorField';
-import {QueryEditorOperator} from '../operators/QueryEditorOperator';
-import {QueryEditorExpression, QueryEditorExpressionType} from '../../../types';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { css } from 'emotion';
+import { stylesFactory } from '@grafana/ui';
+import { QueryEditorOperatorExpression } from '../types';
+import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition } from '../../types';
+import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
+import { QueryEditorOperator } from '../operators/QueryEditorOperator';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 
 interface Props {
   value?: QueryEditorFieldAndOperatorExpression;
@@ -56,8 +56,8 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
 
   return (
     <div className={styles.container}>
-      <QueryEditorField value={field} fields={props.fields} onChange={onFieldChange} placeholder="Choose column..."/>
-      <QueryEditorOperator value={operator} operators={operators} onChange={onOperatorChange}/>
+      <QueryEditorField value={field} fields={props.fields} onChange={onFieldChange} placeholder="Choose column..." />
+      <QueryEditorOperator value={operator} operators={operators} onChange={onOperatorChange} />
     </div>
   );
 };
@@ -88,7 +88,6 @@ const useOperatorByType = (
     return groups;
   }, [operators]);
 };
-
 
 const getStyles = stylesFactory(() => {
   return {

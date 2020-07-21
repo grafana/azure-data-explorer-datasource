@@ -1,4 +1,9 @@
-import { buildFieldQueryEditorSection, buildFilterQueryEditorSection, buildReduceQueryEditorSection } from './editor';
+import {
+  buildFieldQueryEditorSection,
+  buildFilterQueryEditorSection,
+  buildReduceQueryEditorSection,
+  buildGroupByQueryEditorSection,
+} from './editor';
 
 import { QueryEditorFieldType } from './editor/types';
 
@@ -68,7 +73,53 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
       functions('min')
         .withLabel('Min')
         .add();
+
+      functions('none')
+        .withLabel('None')
+        .add();
     })
     .withMultipleRows(true)
     .build('value-column')
+);
+
+export const KustoGroupByEditorSection = buildGroupByQueryEditorSection(groupBySection =>
+  groupBySection
+    .withIntervals(intervals => {
+      intervals('$__interval')
+        .withLabel('auto')
+        .add();
+      intervals('1m')
+        .withLabel('1 minute')
+        .add();
+
+      intervals('5m')
+        .withLabel('5 minutes')
+        .add();
+
+      intervals('15m')
+        .withLabel('15 minutes')
+        .add();
+
+      intervals('30m')
+        .withLabel('30 minutes')
+        .add();
+
+      intervals('1h')
+        .withLabel('1 hour')
+        .add();
+
+      intervals('6h')
+        .withLabel('6 hours')
+        .add();
+
+      intervals('12h')
+        .withLabel('12 hours')
+        .add();
+
+      intervals('1d')
+        .withLabel('1 day')
+        .add();
+    })
+    .withMultipleRows(true)
+    .build('group-by')
 );

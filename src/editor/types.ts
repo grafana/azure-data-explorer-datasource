@@ -4,6 +4,7 @@ export enum QueryEditorFieldType {
   Boolean = 'boolean',
   DateTime = 'dateTime',
   Function = 'function',
+  Interval = 'interval',
 }
 
 export enum QueryEditorCondition {

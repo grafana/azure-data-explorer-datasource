@@ -1,9 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {css} from 'emotion';
-import {InlineFormLabel, stylesFactory} from '@grafana/ui';
-import {QueryEditorFieldDefinition} from '../../types';
-import {QueryEditorField, QueryEditorFieldExpression} from '../field/QueryEditorField';
-import {QueryEditorExpression, QueryEditorExpressionType} from '../../../types';
+import React, { useCallback, useEffect, useState } from 'react';
+import { css } from 'emotion';
+import { InlineFormLabel, stylesFactory } from '@grafana/ui';
+import { QueryEditorFieldDefinition } from '../../types';
+import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];
@@ -51,10 +51,14 @@ export const QueryEditorReduce: React.FC<Props> = props => {
 
   return (
     <div className={styles.container}>
-      <QueryEditorField value={field} fields={props.fields} onChange={onChangeField} placeholder="Choose column..."/>
+      <QueryEditorField value={field} fields={props.fields} onChange={onChangeField} placeholder="Choose column..." />
       <InlineFormLabel className="query-keyword">{props.label ?? 'aggregate by'}</InlineFormLabel>
-      <QueryEditorField value={reduce} fields={props.functions} onChange={onChangeReduce}
-                        placeholder="Choose aggregation function..."/>
+      <QueryEditorField
+        value={reduce}
+        fields={props.functions}
+        onChange={onChangeReduce}
+        placeholder="Choose aggregation function..."
+      />
     </div>
   );
 };
