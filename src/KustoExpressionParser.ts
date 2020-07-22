@@ -6,6 +6,7 @@ import { isFieldAndOperator } from './editor/components/filter/QueryEditorFieldA
 import { isGroupBy, isDateGroupBy } from 'editor/components/groupBy/QueryEditorGroupBy';
 import { isReduce } from 'editor/components/reduce/QueryEditorReduce';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from 'editor/types';
+import { isSingleOperator } from 'editor/components/operators/QueryEditorSingleOperator';
 
 export class KustoExpressionParser {
   fromTable(section?: QueryEditorSectionExpression): string {
@@ -48,10 +49,6 @@ export class KustoExpressionParser {
     }
 
     return parts.join('\n| ');
-  }
-
-  isAggregated(exp: QueryEditorExpression): boolean {
-    return isRepeater(exp) && exp.expressions.length > 0;
   }
 
   appendTimeFilter(reduceExpression: QueryEditorExpression, groupByExpression: QueryEditorExpression, parts: string[]) {
@@ -111,6 +108,15 @@ export class KustoExpressionParser {
         where += '(';
         where += expression.operator.values.map(value => `'${value}'`).join(',');
         where += ')';
+      } else if (isSingleOperator(expression.operator)) {
+        if (
+          expression.field.fieldType == QueryEditorFieldType.String &&
+          !this.isQuotedString(expression.operator.value)
+        ) {
+          where += `'${expression.operator.value}'`;
+        } else {
+          where += expression.operator.value;
+        }
       }
 
       parts.push(where);
@@ -170,6 +176,16 @@ export class KustoExpressionParser {
     }
 
     return { dateTimeField, interval, groupByFields };
+  }
+
+  private isAggregated(exp: QueryEditorExpression): boolean {
+    return isRepeater(exp) && exp.expressions.length > 0;
+  }
+
+  private isQuotedString(value: string): boolean {
+    return (
+      (value[0] === "'" || value[0] === '"') && (value[value.length - 1] === "'" || value[value.length - 1] === '"')
+    );
   }
 }
 

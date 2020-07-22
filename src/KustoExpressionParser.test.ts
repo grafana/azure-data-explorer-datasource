@@ -7,103 +7,35 @@ import { QueryEditorMultiOperatorExpression } from './editor/components/operator
 import { QueryEditorFieldAndOperatorExpression } from './editor/components/filter/QueryEditorFieldAndOperator';
 import { QueryEditorReduceExpression } from './editor/components/reduce/QueryEditorReduce';
 import { QueryEditorGroupByExpression } from './editor/components/groupBy/QueryEditorGroupBy';
+import { QueryEditorSingleOperatorExpression } from 'editor/components/operators/QueryEditorSingleOperator';
 
 describe('KustoExpressionParser', () => {
   let kustoExpressionParser: KustoExpressionParser;
+  let from: QueryEditorSectionExpression;
+  let where: QueryEditorSectionExpression;
+  let reduce: QueryEditorSectionExpression;
+  let groupBy: QueryEditorSectionExpression;
+
   beforeEach(() => {
     kustoExpressionParser = new KustoExpressionParser();
+
+    from = {
+      id: 'from',
+      expression: {
+        type: QueryEditorExpressionType.Field,
+        fieldType: QueryEditorFieldType.String,
+        value: 'StormEvents',
+      } as QueryEditorFieldExpression,
+    };
   });
 
   describe('simple query with group by', () => {
-    let from: QueryEditorSectionExpression;
-    let where: QueryEditorSectionExpression;
-    let reduce: QueryEditorSectionExpression;
-    let groupBy: QueryEditorSectionExpression;
-
     beforeEach(() => {
-      from = {
-        id: 'from',
-        expression: {
-          type: QueryEditorExpressionType.Field,
-          fieldType: QueryEditorFieldType.String,
-          value: 'StormEvents',
-        } as QueryEditorFieldExpression,
-      };
+      where = buildWhereWithMultiOperator();
 
-      where = {
-        id: 'where',
-        expression: {
-          type: QueryEditorExpressionType.OperatorRepeater,
-          typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
-          expressions: [
-            {
-              type: QueryEditorExpressionType.FieldAndOperator,
-              field: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.String,
-                value: 'StateCode',
-              },
-              operator: {
-                type: QueryEditorExpressionType.Operator,
-                operator: {
-                  value: '!in',
-                  multipleValues: true,
-                  booleanValues: false,
-                  description: 'not in (case-sensitive)',
-                  label: '!in',
-                },
-                values: ['NY'],
-              } as QueryEditorMultiOperatorExpression,
-            } as QueryEditorFieldAndOperatorExpression,
-          ],
-        } as QueryEditorRepeaterExpression,
-      };
+      reduce = buildReduce(['DamageProperty'], ['sum']);
 
-      reduce = {
-        id: 'reduce',
-        expression: {
-          type: QueryEditorExpressionType.OperatorRepeater,
-          typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
-          expressions: [
-            {
-              type: QueryEditorExpressionType.Reduce,
-              field: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.Number,
-                value: 'DamageProperty',
-              },
-              reduce: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.Function,
-                value: 'sum',
-              },
-            } as QueryEditorReduceExpression,
-          ],
-        } as QueryEditorRepeaterExpression,
-      };
-
-      groupBy = {
-        id: 'groupBy',
-        expression: {
-          type: QueryEditorExpressionType.OperatorRepeater,
-          typeToRepeat: QueryEditorExpressionType.GroupBy,
-          expressions: [
-            {
-              type: QueryEditorExpressionType.GroupBy,
-              field: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.DateTime,
-                value: 'StartTime',
-              },
-              interval: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.Interval,
-                value: '1h',
-              },
-            } as QueryEditorGroupByExpression,
-          ],
-        } as QueryEditorRepeaterExpression,
-      };
+      groupBy = buildGroupBy();
     });
 
     it('should generate a valid query', () => {
@@ -118,84 +50,10 @@ describe('KustoExpressionParser', () => {
   });
 
   describe('simple query with no group by', () => {
-    let from: QueryEditorSectionExpression;
-    let where: QueryEditorSectionExpression;
-    let reduce: QueryEditorSectionExpression;
-
     beforeEach(() => {
-      from = {
-        id: 'from',
-        expression: {
-          type: QueryEditorExpressionType.Field,
-          fieldType: QueryEditorFieldType.String,
-          value: 'StormEvents',
-        } as QueryEditorFieldExpression,
-      };
+      where = buildWhereWithMultiOperator();
 
-      where = {
-        id: 'where',
-        expression: {
-          type: QueryEditorExpressionType.OperatorRepeater,
-          typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
-          expressions: [
-            {
-              type: QueryEditorExpressionType.FieldAndOperator,
-              field: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.String,
-                value: 'StateCode',
-              },
-              operator: {
-                type: QueryEditorExpressionType.Operator,
-                operator: {
-                  value: '!in',
-                  multipleValues: true,
-                  booleanValues: false,
-                  description: 'not in (case-sensitive)',
-                  label: '!in',
-                },
-                values: ['NY'],
-              } as QueryEditorMultiOperatorExpression,
-            } as QueryEditorFieldAndOperatorExpression,
-          ],
-        } as QueryEditorRepeaterExpression,
-      };
-
-      reduce = {
-        id: 'reduce',
-        expression: {
-          type: QueryEditorExpressionType.OperatorRepeater,
-          typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
-          expressions: [
-            {
-              type: QueryEditorExpressionType.Reduce,
-              field: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.Number,
-                value: 'State',
-              },
-              reduce: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.Function,
-                value: 'none',
-              },
-            } as QueryEditorReduceExpression,
-            {
-              type: QueryEditorExpressionType.Reduce,
-              field: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.Number,
-                value: 'DamageProperty',
-              },
-              reduce: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.Function,
-                value: 'none',
-              },
-            } as QueryEditorReduceExpression,
-          ],
-        } as QueryEditorRepeaterExpression,
-      };
+      reduce = buildReduce(['State', 'DamageProperty'], ['none', 'none']);
     });
 
     it('should generate a valid query', () => {
@@ -214,4 +72,141 @@ describe('KustoExpressionParser', () => {
       );
     });
   });
+
+  describe('query with filter with single value operator', () => {
+    beforeEach(() => {
+      where = buildWhereWithSingleOperator();
+
+      reduce = buildReduce(['DamageProperty'], ['sum']);
+
+      groupBy = buildGroupBy();
+    });
+
+    it('should generate a valid query', () => {
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
+      expect(query).toBe(
+        'StormEvents' +
+          "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
+          '\n| summarize sum(DamageProperty) by bin(StartTime, 1h)' +
+          '\n| order by StartTime asc'
+      );
+    });
+  });
 });
+
+// Setup functions
+function buildWhereWithMultiOperator(): QueryEditorSectionExpression {
+  return {
+    id: 'where',
+    expression: {
+      type: QueryEditorExpressionType.OperatorRepeater,
+      typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+      expressions: [
+        {
+          type: QueryEditorExpressionType.FieldAndOperator,
+          field: {
+            type: QueryEditorExpressionType.Field,
+            fieldType: QueryEditorFieldType.String,
+            value: 'StateCode',
+          },
+          operator: {
+            type: QueryEditorExpressionType.Operator,
+            operator: {
+              value: '!in',
+              multipleValues: true,
+              booleanValues: false,
+              description: 'not in (case-sensitive)',
+              label: '!in',
+            },
+            values: ['NY'],
+          } as QueryEditorMultiOperatorExpression,
+        } as QueryEditorFieldAndOperatorExpression,
+      ],
+    } as QueryEditorRepeaterExpression,
+  };
+}
+
+function buildWhereWithSingleOperator(): QueryEditorSectionExpression {
+  return {
+    id: 'where',
+    expression: {
+      type: QueryEditorExpressionType.OperatorRepeater,
+      typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+      expressions: [
+        {
+          type: QueryEditorExpressionType.FieldAndOperator,
+          field: {
+            type: QueryEditorExpressionType.Field,
+            fieldType: QueryEditorFieldType.String,
+            value: 'StateCode',
+          },
+          operator: {
+            type: QueryEditorExpressionType.Operator,
+            operator: {
+              value: '==',
+              multipleValues: true,
+              booleanValues: false,
+              description: 'not in (case-sensitive)',
+              label: '==',
+            },
+            value: 'NY',
+          } as QueryEditorSingleOperatorExpression,
+        } as QueryEditorFieldAndOperatorExpression,
+      ],
+    } as QueryEditorRepeaterExpression,
+  };
+}
+
+function buildReduce(fields: string[], functions: string[]): QueryEditorSectionExpression {
+  let expressions: QueryEditorReduceExpression[] = [];
+
+  fields.forEach((field, i) => {
+    expressions.push({
+      type: QueryEditorExpressionType.Reduce,
+      field: {
+        type: QueryEditorExpressionType.Field,
+        fieldType: QueryEditorFieldType.Number,
+        value: field,
+      },
+      reduce: {
+        type: QueryEditorExpressionType.Field,
+        fieldType: QueryEditorFieldType.Function,
+        value: functions[i],
+      },
+    } as QueryEditorReduceExpression);
+  });
+
+  return {
+    id: 'reduce',
+    expression: {
+      type: QueryEditorExpressionType.OperatorRepeater,
+      typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+      expressions: expressions,
+    } as QueryEditorRepeaterExpression,
+  };
+}
+
+function buildGroupBy() {
+  return {
+    id: 'groupBy',
+    expression: {
+      type: QueryEditorExpressionType.OperatorRepeater,
+      typeToRepeat: QueryEditorExpressionType.GroupBy,
+      expressions: [
+        {
+          type: QueryEditorExpressionType.GroupBy,
+          field: {
+            type: QueryEditorExpressionType.Field,
+            fieldType: QueryEditorFieldType.DateTime,
+            value: 'StartTime',
+          },
+          interval: {
+            type: QueryEditorExpressionType.Field,
+            fieldType: QueryEditorFieldType.Interval,
+            value: '1h',
+          },
+        } as QueryEditorGroupByExpression,
+      ],
+    } as QueryEditorRepeaterExpression,
+  };
+}

@@ -17,7 +17,7 @@ interface Props {
 
 export const QueryEditorOperator: React.FC<Props> = props => {
   const styles = getStyles();
-  const [operator, setOperator] = useState<QueryEditorOperatorDefinition | undefined>(props.operators[0]);
+  const [operator, setOperator] = useState<QueryEditorOperatorDefinition | undefined>(props.value?.operator);
   const [value, setValue] = useState(props.value);
   const operators = useOperatorOptions(props.operators ?? []);
 
