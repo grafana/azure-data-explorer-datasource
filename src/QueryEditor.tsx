@@ -68,9 +68,6 @@ export const QueryEditor: React.FC<Props> = props => {
     })();
   }, []);
 
-  // TODO: aggregatable columns doesn't have to be numeric. I.e. count function can performed on any column type
-  // const aggregatable = columns?.filter(column => column.type === QueryEditorFieldType.Number) ?? [];
-
   const groupable =
     columns?.filter(
       column => column.type === QueryEditorFieldType.DateTime || column.type === QueryEditorFieldType.String

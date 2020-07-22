@@ -126,6 +126,12 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
         .withDescription('does not start with (case-sensitive)')
         .multipleValues(false)
         .add();
+
+      operator('matches regex')
+        .supportTypes([QueryEditorFieldType.String])
+        .withDescription('regex string matching')
+        .multipleValues(false)
+        .add();
     })
     .withMultipleRows(true)
     .build('where')
