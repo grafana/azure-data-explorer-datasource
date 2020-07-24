@@ -9,7 +9,7 @@ export class TemplateSrv {
   private index = {};
   private grafanaVariables = {};
 
-  constructor() { }
+  constructor() {}
 
   init(variables, timeRange?: TimeRange) {
     this.variables = variables;
@@ -17,9 +17,7 @@ export class TemplateSrv {
     this.timeRange = timeRange;
   }
 
-  highlightVariablesAsHtml() {
-
-  }
+  highlightVariablesAsHtml() {}
   updateTemplateData() {
     this.index = {};
 
