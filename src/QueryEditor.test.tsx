@@ -110,6 +110,8 @@ describe('QueryEditor', () => {
       database: 'Samples',
       resultFormat: '',
       query: '',
+      rawMode: false,
+      alias: '',
       expression: {
         from,
         where,

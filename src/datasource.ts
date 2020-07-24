@@ -7,6 +7,8 @@ import Cache from './cache';
 import RequestAggregator from './request_aggregator';
 import { AdxDataSourceOptions, KustoQuery, AdxSchema } from './types';
 import { Observable, from } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import Emitter from './emitter';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -67,10 +69,18 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
           },
         })
         .then(results => {
+          Emitter.emit('ds-request-response', results);
+
           const responseParser = new ResponseParser();
           const ret = responseParser.processQueryResult(results);
+
           return this.processAlias(queryTargets, ret);
         })
+    ).pipe(
+      catchError(error => {
+        Emitter.emit('ds-request-error', error);
+        return from(Promise.resolve({ data: [] }));
+      })
     );
   }
 

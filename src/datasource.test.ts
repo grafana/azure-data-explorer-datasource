@@ -1,7 +1,7 @@
 import { KustoDBDatasource } from './datasource';
 import q from 'q';
 import { dateTime } from '@grafana/data';
-import { TemplateSrv } from '../test/template_srv';
+import { TemplateSrv } from './test/template_srv';
 import _ from 'lodash';
 
 describe('KustoDBDatasource', () => {

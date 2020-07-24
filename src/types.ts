@@ -29,8 +29,10 @@ export interface QueryExpression {
 export interface KustoQuery extends DataQuery {
   query: string;
   database: string;
+  alias: string;
   resultFormat: string;
   expression?: QueryExpression;
+  rawMode: boolean;
 }
 
 export const defaultQuery: Partial<KustoQuery> = {
