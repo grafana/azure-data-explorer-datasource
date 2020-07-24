@@ -19,7 +19,7 @@ This plugin requires Grafana 6.3.6 or newer.
 If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can sign up for one [here](https://grafana.com/cloud/grafana).
 
 1. Click on the `Install Now` button on the [Azure Data Explorer page on Grafana.com](https://grafana.com/plugins/grafana-azure-data-explorer-datasource/installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
-    ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/grafana_cloud_install.png)
+   ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/grafana_cloud_install.png)
 
 2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Data Explorer datasource will be installed.
 
@@ -56,23 +56,23 @@ Given a table with the following columns:
 5. **server**: The server name
 6. **importance**: The importance of the reading to operations (low|med|high)
 
-| Query | Template | Results |
-|-------|----------|---------|
-| `data \| project metric, value, timestamp` | $metric | cpu_usage,mem_percent_used|
-| `data \| project metric, value, timestamp, location` | \$metric.$location | cpu_usage.server1, mem_percent_used.server2 |
-| `data \| project name=metric, val=value, time=timestamp` | $name | cpu_usage,mem_percent_used |
-| `data \| project timestamp, metric, value, state` | \$metric.$value | cpu_usage.value, cpu_usage.state, mem_percent_used.value, mem_percent_used.state |
-| `data \| project timestamp, metric, value, state, server, importance` | [$importance]: \$metric.\$server.\$value | [low]: cpu_usage.server1.value, [med]: cpu_usage.server1.state, [high]: mem_percent_used.server2.value, [high]: mem_percent_used.server2.state
+| Query                                                                 | Template                                 | Results                                                                                                                                        |
+| --------------------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data \| project metric, value, timestamp`                            | \$metric                                 | cpu_usage,mem_percent_used                                                                                                                     |
+| `data \| project metric, value, timestamp, location`                  | \$metric.\$location                      | cpu_usage.server1, mem_percent_used.server2                                                                                                    |
+| `data \| project name=metric, val=value, time=timestamp`              | \$name                                   | cpu_usage,mem_percent_used                                                                                                                     |
+| `data \| project timestamp, metric, value, state`                     | \$metric.\$value                         | cpu_usage.value, cpu_usage.state, mem_percent_used.value, mem_percent_used.state                                                               |
+| `data \| project timestamp, metric, value, state, server, importance` | [$importance]: \$metric.\$server.\$value | [low]: cpu_usage.server1.value, [med]: cpu_usage.server1.state, [high]: mem_percent_used.server2.value, [high]: mem_percent_used.server2.state |
 
 ### Docker
 
 1. Fetch the latest version of grafana from Docker Hub:
-    `docker pull grafana/grafana:latest`
+   `docker pull grafana/grafana:latest`
 2. Run Grafana and install the Azure Data Explorer plugin with this command:
 
-    ```bash
-    docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-data-explorer-datasource" grafana/grafana:latest
-    ```
+   ```bash
+   docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-data-explorer-datasource" grafana/grafana:latest
+   ```
 
 3. Open the browser at: <http://localhost:3000> or <http://your-domain-name:3000>
 4. Login in with username: `admin` and password: `admin`
@@ -175,21 +175,22 @@ If the command succeeds you should get a result like this:
 
 ### Configuring Grafana
 
-1. Accessed from the Grafana main menu, newly installed datasources can be added immediately within the Data Sources section. Next, click the  "Add datasource" button in the upper right.
+1. Accessed from the Grafana main menu, newly installed datasources can be added immediately within the Data Sources section. Next, click the "Add datasource" button in the upper right.
 
 2. Select Azure Data Explorer Datasource from the datasource list:
 
-    ![Data Source Type](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_1_select_type.png)
+   ![Data Source Type](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_1_select_type.png)
 
 3. In the name field, a default name is filled in automatically but it can be changed to anything.
 
 4. You need 3 pieces of information from the Azure portal (see link above for detailed instructions):
-    - **Tenant Id** (Azure Active Directory -> Properties -> Directory ID)
-    - **Client Id** (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
-    - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
+
+   - **Tenant Id** (Azure Active Directory -> Properties -> Directory ID)
+   - **Client Id** (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
+   - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
 
 5. Paste these three items into the fields in the Azure Data Explorer API Details section:
-    ![Azure Data Explorer API Details](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_2_azure_data_explorer_api_details.png)
+   ![Azure Data Explorer API Details](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_2_azure_data_explorer_api_details.png)
 
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
 
@@ -197,11 +198,11 @@ If the command succeeds you should get a result like this:
 
 Queries are written in the new [Kusto Query Language](https://docs.microsoft.com/en-us/azure/kusto/query/).
 
-Queries can be formatted as *Table*, *Time Series*, or *ADX Time Series* data.
+Queries can be formatted as _Table_, _Time Series_, or _ADX Time Series_ data.
 
 ### Table Queries
 
-*Table* queries are mainly used in the Table panel and row a list of columns and rows. This example query returns rows with the 6 specified columns:
+_Table_ queries are mainly used in the Table panel and row a list of columns and rows. This example query returns rows with the 6 specified columns:
 
 ```kusto
 AzureActivity
@@ -212,7 +213,7 @@ AzureActivity
 
 ### Time Series Queries
 
-*Time Series* queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
+_Time Series_ queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
 
 ```kusto
 AzureActivity
@@ -223,7 +224,7 @@ AzureActivity
 
 The number valued columns are considered metrics and the optional string columns are treated as tags. A time series is returned for each value column + unique set of string column values. Each series has name of valueColumnName {stringColumnName=columnValue, ... }.
 
-For example, the following query will produce series like `AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY}`:
+For example, the following query will produce series like ` AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY} `:
 
 ```kusto
 StormEvents
@@ -234,7 +235,7 @@ StormEvents
 
 ### ADX Time Series Queries
 
-*ADX Time Series* are for queries that use the [Kusto `make-series` operator](https://docs.microsoft.com/en-us/azure/kusto/query/make-seriesoperator). The query must have exactly one datetime column named `Timestamp` and at least one value column. There may also optionally be string columns that will be labels.
+_ADX Time Series_ are for queries that use the [Kusto `make-series` operator](https://docs.microsoft.com/en-us/azure/kusto/query/make-seriesoperator). The query must have exactly one datetime column named `Timestamp` and at least one value column. There may also optionally be string columns that will be labels.
 
 Example:
 
@@ -262,10 +263,10 @@ To make writing queries easier there are two Grafana macros that can be used in 
 
 ### Templating Macros
 
-- `$__escapeMulti($myVar)` - is to be used with multi-value template variables that contains illegal characters. If $myVar has the value  `'\\grafana-vm\Network(eth0)\Total','\\hello!'`, it expands to: `@'\\grafana-vm\Network(eth0)\Total', @'\\hello!'`. If using single value variables there no need for this macro, simply escape the variable inline instead - `@'\$myVar'`
-- `$__contains(colName, $myVar)` - is to be used with multi-value template variables. If $myVar has the value `'value1','value2'`, it expands to: `colName in ('value1','value2')`.
+- `$__escapeMulti($myVar)` - is to be used with multi-value template variables that contains illegal characters. If \$myVar has the value `'\\grafana-vm\Network(eth0)\Total','\\hello!'`, it expands to: `@'\\grafana-vm\Network(eth0)\Total', @'\\hello!'`. If using single value variables there no need for this macro, simply escape the variable inline instead - `@'\$myVar'`
+- `$__contains(colName, $myVar)` - is to be used with multi-value template variables. If \$myVar has the value `'value1','value2'`, it expands to: `colName in ('value1','value2')`.
 
-     If using the `All` option, then check the `Include All Option` checkbox and in the `Custom all value` field type in the following value: `all`. If $myVar has value `all` then the macro will instead expand to `1 == 1`. For template variables with a lot of options, this will increase the query performance by not building a large where..in clause.
+  If using the `All` option, then check the `Include All Option` checkbox and in the `Custom all value` field type in the following value: `all`. If \$myVar has value `all` then the macro will instead expand to `1 == 1`. For template variables with a lot of options, this will increase the query performance by not building a large where..in clause.
 
 ## Templating with Variables
 
@@ -277,25 +278,37 @@ Create the variable in the dashboard settings. Usually you will need to write a 
 2. In the Query Options section, choose the `Azure Data Explorer` datasource in the `Data source` dropdown.
 3. Write the query in the `Query` field. Use `project` to specify one column - the result should be a list of string values.
 
-    ![Template Query](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/templating_1.png)
+   ![Template Query](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/templating_1.png)
 
 4. At the bottom, you will see a preview of the values returned from the query:
 
-    ![Template Query Preview](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/templating_2.png)
+   ![Template Query Preview](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/templating_2.png)
 
 5. Use the variable in your query (in this case the variable is named `level`):
 
-    ```sql
-    MyLogs | where Level == '$level'
-    ```
+   ```sql
+   MyLogs | where Level == '$level'
+   ```
 
-    For variables where multiple values are allowed then use the `in` operator instead:
+   For variables where multiple values are allowed then use the `in` operator instead:
 
-    ```sql
-    MyLogs | where Level in ($level)
-    ```
+   ```sql
+   MyLogs | where Level in ($level)
+   ```
 
 Read more about templating and variables in the [Grafana documentation](http://docs.grafana.org/reference/templating/#variables).
+
+## Databases Variable
+
+There is no way to fetch a list of databases with the Kusto query language. When creating a template variable as described in the `Templating with variables` section, use the following function in the `Query` field to return a list of databases:
+
+```sql
+databases()
+```
+
+This variable can be used in the databases dropdown. This gives you the ability to switch databases without editing the query in the panel.
+
+To use the variable, type the name of your variable into the dropdown. For example, if the name of your variable is `database`, then type `$database`.
 
 ## Annotations
 
