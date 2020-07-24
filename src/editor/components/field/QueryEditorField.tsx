@@ -28,6 +28,10 @@ export const QueryEditorField: React.FC<Props> = props => {
 // it should use value as label if label is missing.
 const useOptions = (options: QueryEditorFieldDefinition[]): Array<SelectableValue<string>> => {
   return useMemo(() => {
+    if (!options) {
+      return [];
+    }
+
     return options.map(option => {
       return {
         label: option.label ?? option.value,

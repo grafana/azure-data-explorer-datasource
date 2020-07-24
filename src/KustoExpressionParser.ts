@@ -36,11 +36,9 @@ export class KustoExpressionParser {
       parts.push(`where $__timeFilter(${defaultTimeColumn})`);
     }
 
-    if (!where || !where.expression) {
-      return parts.join('\n| ');
+    if (where && where.expression) {
+      this.appendWhere(where.expression, parts);
     }
-
-    this.appendWhere(where.expression, parts);
 
     if (reduce && reduce.expression && groupBy && groupBy.expression && this.isAggregated(groupBy.expression)) {
       this.appendSummarize(reduce.expression, groupBy.expression, parts);
@@ -63,22 +61,30 @@ export class KustoExpressionParser {
 
   appendProject(expression: QueryEditorExpression, defaultTimeColumn: string, parts: string[]) {
     let project = 'project ';
-    const fields: string[] = [defaultTimeColumn];
+    let timeCol = defaultTimeColumn;
+
+    const fields: string[] = [];
 
     if (isRepeater(expression)) {
       for (const exp of expression.expressions) {
         if (isReduce(exp) && exp.field?.value) {
-          fields.push(exp.field.value);
+          if (exp.field.fieldType === QueryEditorFieldType.DateTime) {
+            timeCol = exp.field.value;
+          } else {
+            fields.push(exp.field.value);
+          }
         }
       }
     } else if (isReduce(expression)) {
       fields.push(expression.field.value);
     }
 
-    project += fields.join(', ');
-    parts.push(project);
+    if (fields.length > 0) {
+      project += [timeCol].concat(fields).join(', ');
+      parts.push(project);
+    }
 
-    const orderBy = `order by ${defaultTimeColumn} asc`;
+    const orderBy = `order by ${timeCol} asc`;
     parts.push(orderBy);
   }
 
@@ -106,11 +112,11 @@ export class KustoExpressionParser {
       // can be reused in the parser.
       if (isMultiOperator(expression.operator)) {
         where += '(';
-        where += expression.operator.values.map(value => `'${value}'`).join(',');
+        where += expression.operator.values.map(value => `'${value}'`).join(', ');
         where += ')';
       } else if (isSingleOperator(expression.operator)) {
         if (
-          expression.field.fieldType == QueryEditorFieldType.String &&
+          expression.field.fieldType === QueryEditorFieldType.String &&
           !this.isQuotedString(expression.operator.value)
         ) {
           where += `'${expression.operator.value}'`;

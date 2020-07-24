@@ -13,13 +13,35 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
   filterSection
     .withOperators(operator => {
       operator('==')
-        .supportTypes([QueryEditorFieldType.Boolean, QueryEditorFieldType.String, QueryEditorFieldType.Number])
+        .supportTypes([QueryEditorFieldType.String, QueryEditorFieldType.Number])
         .withDescription('equal to')
         .add();
 
+      operator('==')
+        .supportTypes([QueryEditorFieldType.Boolean])
+        .withDescription('equal to')
+        .booleanValues(true)
+        .add();
+
       operator('!=')
-        .supportTypes([QueryEditorFieldType.Boolean, QueryEditorFieldType.String, QueryEditorFieldType.Number])
+        .supportTypes([QueryEditorFieldType.String, QueryEditorFieldType.Number])
         .withDescription('not equal to')
+        .add();
+
+      operator('!=')
+        .supportTypes([QueryEditorFieldType.Boolean])
+        .withDescription('not equal to')
+        .booleanValues(true)
+        .add();
+
+      operator('>')
+        .supportTypes([QueryEditorFieldType.Number])
+        .withDescription('greater than')
+        .add();
+
+      operator('<')
+        .supportTypes([QueryEditorFieldType.Number])
+        .withDescription('less than')
         .add();
 
       operator('=~')

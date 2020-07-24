@@ -33,11 +33,11 @@ export class QueryEditorGroupByBuilder {
     return QueryEditorGroupBySection({
       id,
       intervals: this.intervals,
-      defaultValue: this.buildGroupByExpression(),
+      defaultValue: this.buildGroupByExpressions(),
     });
   }
 
-  private buildGroupByExpression(): QueryEditorExpression {
+  private buildGroupByExpressions(): QueryEditorExpression {
     if (this.multipleRows) {
       if (this.intervals.length > 0) {
         return this.buildRepeaterExpression(QueryEditorExpressionType.GroupBy);
@@ -46,7 +46,7 @@ export class QueryEditorGroupByBuilder {
     }
 
     if (this.intervals.length > 0) {
-      return this.buildIntervalExpression();
+      return this.buildGroupByExpression();
     }
 
     return this.buildFieldExpression(QueryEditorFieldType.String);
@@ -60,7 +60,7 @@ export class QueryEditorGroupByBuilder {
     };
   }
 
-  private buildIntervalExpression(): QueryEditorGroupByExpression {
+  private buildGroupByExpression(): QueryEditorGroupByExpression {
     return {
       type: QueryEditorExpressionType.GroupBy,
       field: this.buildFieldExpression(QueryEditorFieldType.String),

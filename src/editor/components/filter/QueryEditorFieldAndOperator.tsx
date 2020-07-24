@@ -46,7 +46,6 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
         operator,
       };
 
-      console.log('Calling FiedAndOperator onChange with: ', payload);
       props.onChange(payload);
     }
   }, [field, operator]);
