@@ -15,7 +15,7 @@ import { RawQueryEditor } from './RawQueryEditor';
 import { css } from 'emotion';
 
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
-import '@emotion/core';
+import {} from '@emotion/core';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 const kustoExpressionParser = new KustoExpressionParser();
