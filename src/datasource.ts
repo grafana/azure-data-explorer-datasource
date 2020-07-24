@@ -145,6 +145,11 @@ export class KustoDBDatasource {
   }
 
   metricFindQuery(query: string, optionalOptions: any): Promise<MetricFindValue[]> {
+    const databasesQuery = query.match(/^databases\(\)/i);
+    if (databasesQuery) {
+      return this.getDatabases();
+    }
+
     return this.getDefaultOrFirstDatabase()
       .then(database => this.buildQuery(query, optionalOptions, database))
       .then(queries =>
