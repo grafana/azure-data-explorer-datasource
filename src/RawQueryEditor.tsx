@@ -281,6 +281,8 @@ function onDataError(
     return;
   }
 
+  setLastQuery(err?.query?.query || '');
+
   if (
     // Get Kusto Error from Backend
     err.data &&
