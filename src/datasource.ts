@@ -45,7 +45,7 @@ export class KustoDBDatasource {
         maxDataPoints: options.maxDataPoints,
         datasourceId: this.id,
         query: interpolatedQuery,
-        database: item.database,
+        database: this.templateSrv.replace(item.database, options.scopedVars),
         resultFormat: item.resultFormat,
       };
     });
