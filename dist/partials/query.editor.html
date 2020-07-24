@@ -1,0 +1,129 @@
+<query-editor-row query-ctrl="ctrl" can-collapse="false">
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <label class="gf-form-label query-keyword width-9">Database</label>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <gf-form-dropdown 
+        model="ctrl.target.database"
+        allow-custom="true"
+        lookup-text="true"
+        get-options="ctrl.databases"
+        on-change="ctrl.refresh()"
+        css-class="min-width-12"
+        ></gf-form-dropdown >
+      </div>
+    </div>
+    <div class="gf-form">
+      <div class="width-1"></div>
+    </div>
+    <div class="gf-form">
+      <button class="btn btn-primary width-10" ng-click="ctrl.refresh()">Run</button>
+    </div>
+    <div class="gf-form">
+      <label class="gf-form-label">(Run Query: Shift+Enter, Trigger Suggestion: Ctrl+Space)</label>
+    </div>
+    <div class="gf-form gf-form--grow">
+      <div class="gf-form-label gf-form-label--grow"></div>
+    </div>
+  </div>
+
+  <kusto-monaco-editor content="ctrl.target.query" on-change="ctrl.refresh()" get-schema="ctrl.getSchema(ctrl.target.database)"
+    default-time-field="Timestamp" plugin-base-url={{ctrl.datasource.meta.baseUrl}}></kusto-monaco-editor>
+
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <label class="gf-form-label query-keyword">ALIAS BY</label>
+      <input
+        type="text"
+        class="gf-form-input"
+        ng-model="ctrl.target.alias"
+        spellcheck="false"
+        placeholder="Naming pattern"
+        ng-blur="ctrl.refresh()"
+      /> 
+      <label class="gf-form-label query-keyword width-7">Format As</label>
+      <div class="gf-form-select-wrapper">
+        <select class="gf-form-input gf-size-auto" ng-model="ctrl.target.resultFormat" ng-options="f.value as f.text for f in ctrl.resultFormats"
+          ng-change="ctrl.refresh()"></select>
+      </div>
+    </div>
+    <div class="gf-form">
+      <label class="gf-form-label query-keyword" ng-click="ctrl.showHelp = !ctrl.showHelp">
+        Show Help
+        <i class="fa fa-caret-down" ng-show="ctrl.showHelp"></i>
+        <i class="fa fa-caret-right" ng-hide="ctrl.showHelp"></i>
+      </label>
+    </div>
+    <div class="gf-form" ng-show="ctrl.lastQuery">
+      <label class="gf-form-label query-keyword" ng-click="ctrl.showLastQuery = !ctrl.showLastQuery">
+        Raw Query
+        <i class="fa fa-caret-down" ng-show="ctrl.showLastQuery"></i>
+        <i class="fa fa-caret-right" ng-hide="ctrl.showLastQuery"></i>
+      </label>
+    </div>
+    <div class="gf-form gf-form--grow">
+      <div class="gf-form-label gf-form-label--grow"></div>
+    </div>
+  </div>
+
+  <div class="gf-form" ng-show="ctrl.showLastQuery">
+    <pre class="gf-form-pre">{{ctrl.lastQuery}}</pre>
+  </div>
+  <div class="gf-form" ng-show="ctrl.showHelp">
+    <pre class="gf-form-pre alert alert-info">
+  Format as Table:
+  - Can return any set of columns.
+
+  Format as Time series:
+  - Requires exactly one column of Kusto type datetime. (tip: can use Kusto's project-away operator to remove columns).
+  - Requires at least one value column of a number type. Each value column is considered a metric.
+  - May optionally have one or more string columns. Each string column is considered as a key=value tag pair (where the key is the column name, and the value is the value of the column for each row).
+  - A time series is returned for each value column + unique set of string column values. Each series has name of valueColumnName { stringColumnName=columnValue, ... }. If there are no string columns in the request, the name will just be valueColumnName.
+  - Example Time Series Query:
+    AzureActivity
+      | where $__timeFilter()
+      | summarize count() by Category, bin(TimeGenerated, 60min)
+      | order by TimeGenerated asc
+
+  Format as ADX Time series:
+   - Used for queries that return Kusto's "time series" type, such as the make-series operator
+   - Must have a datetime column named "Timestamp"
+   - Example ADX Time series query:
+    let T = range Timestamp from $__timeFrom to $__timeTo step $__timeInterval * 4
+      | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"]) 
+      | extend   Place  = dynamic(["EU",     "EU",     "US",   "EU"]) 
+      | mvexpand Person, Place
+      | extend   HatInventory = rand(5) 
+      | project  Timestamp, tostring(Person), tostring(Place), HatInventory;
+    T | make-series avg(HatInventory) on Timestamp from $__timeFrom to $__timeTo step $__timeInterval * 4 by Person, Place;
+
+
+  Time Macros:
+  - $__timeFilter -&gt; TimeGenerated &ge; datetime(2018-06-05T18:09:58.907Z) and TimeGenerated &le; datetime(2018-06-05T20:09:58.907Z)
+  - $__timeFilter(datetimeColumn) -&gt;  datetimeColumn  &ge; datetime(2018-06-05T18:09:58.907Z) and datetimeColumn &le; datetime(2018-06-05T20:09:58.907Z)
+  - $__timeFrom -&gt;  datetime(2018-06-05T18:09:58.907Z) [the start time of the query]
+  - $__timeTo -&gt; datetime(2018-06-05T20:09:58.907Z) [the end time of the query]
+  - $__timeInterval -&gt; 5000ms [Grafana's recommended bin size based on the timespan of the query, in ms]
+
+  Templating Macros:
+  - $__escapeMulti($myTemplateVar) -&gt; $myTemplateVar should be a multi-value template variables that contains illegal characters
+  - $__contains(aColumn, $myTemplateVar) -&gt; aColumn in ($myTemplateVar)
+    If using the All option, then check the Include All Option checkbox and in the Custom all value field type in: all. If All is chosen -&gt; 1 == 1
+
+  Macro Examples:
+  - ¡ where $__timeFilter()
+  - | where TimeGenerated &ge; $__timeFrom() and TimeGenerated &le; $__timeTo()
+  - | summarize count() by Category, bin(TimeGenerated, $__timeInterval)
+    </pre>
+  </div>
+
+  </div>
+
+  <div class="gf-form" ng-show="ctrl.lastQueryError">
+    <pre class="gf-form-pre alert alert-error">{{ctrl.lastQueryError}}</pre>
+  </div>
+
+  <div class="gf-form" ng-show="ctrl.timeNotASC">
+    <pre class="gf-form-pre alert alert-warning">Data is not sorted ascending by Time. Recommend adding an order by clause.</pre>
+  </div>
+</query-editor-row>
