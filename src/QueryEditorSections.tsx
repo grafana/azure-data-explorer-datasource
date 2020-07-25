@@ -7,6 +7,7 @@ import {
 
 import { QueryEditorFieldType } from './editor/types';
 
+export const KustoDatabaseEditorSection = buildFieldQueryEditorSection(fieldSection => fieldSection.build('database'));
 export const KustoFromEditorSection = buildFieldQueryEditorSection(fieldSection => fieldSection.build('from'));
 
 export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSection =>

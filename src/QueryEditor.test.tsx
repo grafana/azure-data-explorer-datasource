@@ -9,6 +9,8 @@ import { QueryEditorReduceExpression } from './editor/components/reduce/QueryEdi
 import { QueryEditorGroupByExpression } from './editor/components/groupBy/QueryEditorGroupBy';
 import { QueryEditorFieldAndOperatorExpression } from './editor/components/filter/QueryEditorFieldAndOperator';
 import { QueryEditorMultiOperatorExpression } from './editor/components/operators/QueryEditorMultiOperator';
+import { TemplateSrv } from './test/template_srv';
+import { setTemplateSrv } from '@grafana/runtime';
 
 const defaultProps = {
   onChange: () => {},
@@ -32,6 +34,10 @@ function renderWithQuery(query: KustoQuery) {
 }
 
 describe('QueryEditor', () => {
+  beforeEach(() => {
+    setTemplateSrv(new TemplateSrv());
+  });
+
   it('should load saved query fields', async () => {
     const from: QueryEditorSectionExpression = {
       id: 'from',
@@ -121,8 +127,11 @@ describe('QueryEditor', () => {
     };
     renderWithQuery(query);
     await waitFor(() => {
+      //db
+      expect(screen.getByText('Samples')).not.toBeNull();
+
       //from
-      expect(screen.getByText('Samples / StormEvents')).not.toBeNull();
+      expect(screen.getByText('StormEvents')).not.toBeNull();
 
       //value field
       expect(screen.getByText('Deaths')).not.toBeNull();

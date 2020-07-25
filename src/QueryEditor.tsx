@@ -6,6 +6,7 @@ import {
   KustoValueColumnEditorSection,
   KustoGroupByEditorSection,
 } from 'QueryEditorSections';
+import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
 import { AdxDataSource } from 'datasource';
 import { KustoQuery, AdxDataSourceOptions, QueryEditorSectionExpression } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
@@ -18,13 +19,14 @@ import { css } from 'emotion';
 import {} from '@emotion/core';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
-const kustoExpressionParser = new KustoExpressionParser();
 
 export const QueryEditor: React.FC<Props> = props => {
+  const [database, setDatabase] = useState<string>(props.query.database);
   const [from, setFrom] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.from);
   const [where, setWhere] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.where);
   const [reduce, setReduce] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.reduce);
   const [groupBy, setGroupBy] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.groupBy);
+  const [databases, setDatabases] = useState<QueryEditorFieldDefinition[]>([]);
   const [tables, setTables] = useState<QueryEditorFieldDefinition[]>([]);
   const [isSchemaLoaded, setIsSchemaLoaded] = useState(false);
   const [query, setQuery] = useState<string>(props.query.query);
@@ -37,7 +39,13 @@ export const QueryEditor: React.FC<Props> = props => {
     { label: 'Table', value: 'table' },
   ];
   const [columnsByTable, setColumnsByTable] = useState<Record<string, QueryEditorFieldDefinition[]>>({});
-  const columns = columnsByTable[kustoExpressionParser.fromTable(from)];
+  const kustoExpressionParser = new KustoExpressionParser();
+  const columns = columnsByTable[kustoExpressionParser.fromTable(from, true)];
+  const templateVariableOptions = {
+    label: 'Template Variables',
+    expanded: false,
+    options: props.datasource?.variables?.map(toOption) || [],
+  };
 
   // console.log('Persisted expression', props.query.expression);
   // console.log('Expression to save', { from, where, reduce, groupBy });
@@ -47,11 +55,17 @@ export const QueryEditor: React.FC<Props> = props => {
     (async () => {
       try {
         const schema = await props.datasource.getSchema();
+        const dbs: QueryEditorFieldDefinition[] = [];
         const tables: QueryEditorFieldDefinition[] = [];
         const columns: Record<string, QueryEditorFieldDefinition[]> = {};
 
         for (const dbName of Object.keys(schema.Databases)) {
           const db = schema.Databases[dbName];
+          dbs.push({
+            type: QueryEditorFieldType.String,
+            value: dbName,
+            label: dbName,
+          });
 
           for (const tableName of Object.keys(db.Tables)) {
             const table = db.Tables[tableName];
@@ -59,7 +73,7 @@ export const QueryEditor: React.FC<Props> = props => {
             tables.push({
               type: QueryEditorFieldType.String,
               value: tableName,
-              label: `${dbName} / ${tableName}`,
+              label: tableName,
             });
 
             for (const column of table.OrderedColumns) {
@@ -72,6 +86,7 @@ export const QueryEditor: React.FC<Props> = props => {
           }
         }
 
+        setDatabases(dbs);
         setTables(tables);
         setColumnsByTable(columns);
         setIsSchemaLoaded(true);
@@ -103,11 +118,25 @@ export const QueryEditor: React.FC<Props> = props => {
     <>
       {!rawMode && (
         <>
-          <KustoFromEditorSection value={from} label="From" fields={tables} onChange={exp => setFrom(exp)} />
+          <DatabaseSelect
+            labelWidth={12}
+            databases={databases}
+            templateVariableOptions={templateVariableOptions}
+            database={database}
+            onChange={exp => setDatabase(exp)}
+          />
+          <KustoFromEditorSection
+            value={from}
+            label="From"
+            fields={tables}
+            templateVariableOptions={templateVariableOptions}
+            onChange={exp => setFrom(exp)}
+          />
           <KustoWhereEditorSection
             value={where}
             label="Where (filter)"
             fields={columns}
+            templateVariableOptions={templateVariableOptions}
             onChange={exp => {
               setWhere(exp);
             }}
@@ -116,6 +145,7 @@ export const QueryEditor: React.FC<Props> = props => {
             value={reduce}
             label="Value columns"
             fields={columns}
+            templateVariableOptions={templateVariableOptions}
             onChange={exp => {
               setReduce(exp);
             }}
@@ -124,6 +154,7 @@ export const QueryEditor: React.FC<Props> = props => {
             value={groupBy}
             label="Group by (summarize)"
             fields={groupable}
+            templateVariableOptions={templateVariableOptions}
             onChange={exp => {
               setGroupBy(exp);
             }}
@@ -185,8 +216,7 @@ export const QueryEditor: React.FC<Props> = props => {
                   props.onChange({
                     ...props.query,
                     resultFormat: resultFormat,
-                    datasource: props.datasource.name,
-                    database: 'Samples',
+                    database: database,
                     query: query,
                     expression: {
                       from,
@@ -207,7 +237,13 @@ export const QueryEditor: React.FC<Props> = props => {
         </>
       )}
 
-      {rawMode && <RawQueryEditor {...props} onRawModeChange={onRawModeChange} />}
+      {rawMode && (
+        <RawQueryEditor
+          {...props}
+          onRawModeChange={onRawModeChange}
+          templateVariableOptions={templateVariableOptions}
+        />
+      )}
     </>
   );
 };
@@ -234,3 +270,5 @@ const toExpressionType = (kustoType: string): QueryEditorFieldType => {
       return QueryEditorFieldType.String;
   }
 };
+
+const toOption = (value: string) => ({ label: value, value } as SelectableValue<string>);

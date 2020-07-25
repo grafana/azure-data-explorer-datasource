@@ -5,10 +5,12 @@ import { isRepeater, QueryEditorRepeater } from '../QueryEditorRepeater';
 import { QueryEditorExpression } from '../../../types';
 import { isReduce, QueryEditorReduce } from '../reduce/QueryEditorReduce';
 import { isGroupBy, QueryEditorGroupBy } from '../groupBy/QueryEditorGroupBy';
+import { SelectableValue } from '@grafana/data';
 
 interface Props<TConfig> {
   config: TConfig;
   fields: QueryEditorFieldDefinition[];
+  templateVariableOptions: SelectableValue<string>;
   expression: QueryEditorExpression | undefined;
   onChange: (expression: QueryEditorExpression | undefined) => void;
 }
@@ -27,6 +29,7 @@ export function QueryEditorSectionRenderer<T>(props: Props<T>) {
         value={expression}
         operators={(config as any).operators}
         fields={fields}
+        templateVariableOptions={props.templateVariableOptions}
         onChange={onChange}
       />
     );
@@ -35,7 +38,13 @@ export function QueryEditorSectionRenderer<T>(props: Props<T>) {
   if (isReduce(expression)) {
     // TODO: fix any
     return (
-      <QueryEditorReduce value={expression} fields={fields} functions={(config as any).functions} onChange={onChange} />
+      <QueryEditorReduce
+        value={expression}
+        fields={fields}
+        templateVariableOptions={props.templateVariableOptions}
+        functions={(config as any).functions}
+        onChange={onChange}
+      />
     );
   }
 
@@ -45,6 +54,7 @@ export function QueryEditorSectionRenderer<T>(props: Props<T>) {
       <QueryEditorGroupBy
         value={expression}
         fields={fields}
+        templateVariableOptions={props.templateVariableOptions}
         intervals={(config as any).intervals}
         onChange={onChange}
       />
@@ -58,6 +68,7 @@ export function QueryEditorSectionRenderer<T>(props: Props<T>) {
           <QueryEditorSectionRenderer
             {...props}
             fields={fields}
+            templateVariableOptions={props.templateVariableOptions}
             onChange={childProps.onChange}
             expression={childProps.value}
           />

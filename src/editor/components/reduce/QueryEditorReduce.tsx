@@ -4,9 +4,11 @@ import { InlineFormLabel, stylesFactory } from '@grafana/ui';
 import { QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
+import { SelectableValue } from '@grafana/data';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];
+  templateVariableOptions: SelectableValue<string>;
   functions: QueryEditorFieldDefinition[];
   value?: QueryEditorReduceExpression;
   label?: string;
@@ -51,11 +53,18 @@ export const QueryEditorReduce: React.FC<Props> = props => {
 
   return (
     <div className={styles.container}>
-      <QueryEditorField value={field} fields={props.fields} onChange={onChangeField} placeholder="Choose column..." />
+      <QueryEditorField
+        value={field}
+        fields={props.fields}
+        templateVariableOptions={props.templateVariableOptions}
+        onChange={onChangeField}
+        placeholder="Choose column..."
+      />
       <InlineFormLabel className="query-keyword">{props.label ?? 'aggregate by'}</InlineFormLabel>
       <QueryEditorField
         value={reduce}
         fields={props.functions}
+        templateVariableOptions={props.templateVariableOptions}
         onChange={onChangeReduce}
         placeholder="Choose aggregation function..."
       />

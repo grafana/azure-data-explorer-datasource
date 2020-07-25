@@ -4,6 +4,7 @@ import { QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionBaseProps } from '../QueryEditorSection';
 import { QueryEditorField, isField } from './QueryEditorField';
 import { QueryEditorExpression, QueryEditorSectionExpression } from '../../../types';
+import { SelectableValue } from '@grafana/data';
 
 interface FieldSectionConfiguration {
   id: string;
@@ -12,6 +13,7 @@ interface FieldSectionConfiguration {
 
 export interface QueryEditorFieldSectionProps extends QueryEditorSectionBaseProps {
   fields: QueryEditorFieldDefinition[];
+  templateVariableOptions: SelectableValue<string>;
   value?: QueryEditorSectionExpression;
 }
 
@@ -25,7 +27,14 @@ export const QueryEditorFieldSection = (config: FieldSectionConfiguration): Reac
 
     return (
       <QueryEditorSection id={config.id} label={props.label} onChange={props.onChange}>
-        {({ onChange }) => <QueryEditorField fields={props.fields} onChange={onChange} value={expression} />}
+        {({ onChange }) => (
+          <QueryEditorField
+            fields={props.fields}
+            templateVariableOptions={props.templateVariableOptions}
+            onChange={onChange}
+            value={expression}
+          />
+        )}
       </QueryEditorSection>
     );
   };

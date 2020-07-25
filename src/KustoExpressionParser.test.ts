@@ -8,6 +8,8 @@ import { QueryEditorFieldAndOperatorExpression } from './editor/components/filte
 import { QueryEditorReduceExpression } from './editor/components/reduce/QueryEditorReduce';
 import { QueryEditorGroupByExpression } from './editor/components/groupBy/QueryEditorGroupBy';
 import { QueryEditorSingleOperatorExpression } from 'editor/components/operators/QueryEditorSingleOperator';
+import { TemplateSrv } from './test/template_srv';
+import { setTemplateSrv } from '@grafana/runtime';
 
 describe('KustoExpressionParser', () => {
   let kustoExpressionParser: KustoExpressionParser;
@@ -17,6 +19,7 @@ describe('KustoExpressionParser', () => {
   let groupBy: QueryEditorSectionExpression;
 
   beforeEach(() => {
+    setupTemplateSrv();
     kustoExpressionParser = new KustoExpressionParser();
 
     from = {
@@ -31,7 +34,7 @@ describe('KustoExpressionParser', () => {
 
   describe('simple query with group by', () => {
     beforeEach(() => {
-      where = buildWhereWithMultiOperator();
+      where = buildWhereWithMultiOperator(['NY', 'TX']);
 
       reduce = buildReduce(['DamageProperty'], ['sum']);
 
@@ -42,7 +45,7 @@ describe('KustoExpressionParser', () => {
       const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
       expect(query).toBe(
         'StormEvents' +
-          "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY')" +
+          "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY', 'TX')" +
           '\n| summarize sum(DamageProperty) by bin(StartTime, 1h)' +
           '\n| order by StartTime asc'
       );
@@ -51,7 +54,7 @@ describe('KustoExpressionParser', () => {
 
   describe('simple query with no group by', () => {
     beforeEach(() => {
-      where = buildWhereWithMultiOperator();
+      where = buildWhereWithMultiOperator(['NY']);
 
       reduce = buildReduce(['State', 'DamageProperty'], ['none', 'none']);
     });
@@ -92,10 +95,55 @@ describe('KustoExpressionParser', () => {
       );
     });
   });
+
+  describe('query with filter with multi value operator and template variable', () => {
+    beforeEach(() => {
+      where = buildWhereWithMultiOperator(['$state']);
+
+      reduce = buildReduce(['DamageProperty'], ['sum']);
+
+      groupBy = buildGroupBy();
+    });
+
+    it('should not put quotes around a variable', () => {
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
+      expect(query).toBe(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
+          '\n| summarize sum(DamageProperty) by bin(StartTime, 1h)' +
+          '\n| order by StartTime asc'
+      );
+    });
+  });
 });
 
+function setupTemplateSrv() {
+  const variable: any = {
+    id: 'state',
+    index: 0,
+    name: 'state',
+    options: [
+      { selected: true, value: 'NY', text: 'NY' },
+      { selected: false, value: 'CA', text: 'CA' },
+      { selected: true, value: 'TX', text: 'TX' },
+    ],
+    current: { selected: true, value: ['NY', 'TX'], text: 'NY + TX' },
+    multi: true,
+    includeAll: false,
+    query: '',
+    // hide: VariableHide.dontHide,
+    type: 'custom',
+    label: null,
+    skipUrlSync: false,
+    global: false,
+  };
+  const templateSrv = new TemplateSrv();
+  templateSrv.init([variable]);
+  setTemplateSrv(templateSrv);
+}
+
 // Setup functions
-function buildWhereWithMultiOperator(): QueryEditorSectionExpression {
+function buildWhereWithMultiOperator(values: string[]): QueryEditorSectionExpression {
   return {
     id: 'where',
     expression: {
@@ -118,7 +166,7 @@ function buildWhereWithMultiOperator(): QueryEditorSectionExpression {
               description: 'not in (case-sensitive)',
               label: '!in',
             },
-            values: ['NY'],
+            values: values,
           } as QueryEditorMultiOperatorExpression,
         } as QueryEditorFieldAndOperatorExpression,
       ],

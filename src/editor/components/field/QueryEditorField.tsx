@@ -6,6 +6,7 @@ import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types
 
 interface Props {
   fields: QueryEditorFieldDefinition[];
+  templateVariableOptions: SelectableValue<string>;
   value?: QueryEditorFieldExpression;
   onChange: (expression: QueryEditorFieldExpression) => void;
   placeholder?: string;
@@ -21,7 +22,15 @@ export const QueryEditorField: React.FC<Props> = props => {
   const options = useOptions(props.fields);
   const value = props.value?.value;
 
-  return <Select width={30} onChange={onChange} value={value} options={options} placeholder={props.placeholder} />;
+  return (
+    <Select
+      width={30}
+      onChange={onChange}
+      value={value}
+      options={[props.templateVariableOptions, ...options]}
+      placeholder={props.placeholder}
+    />
+  );
 };
 
 // Should remove this when I have fixed the underlying issue in the select component
@@ -50,7 +59,10 @@ const useOnChange = (props: Props) => {
       }
 
       const { value } = selectable;
-      const field = props.fields.find(o => o.value === value);
+      let field = props.fields.find(o => o.value === value);
+      if (!field) {
+        field = props.templateVariableOptions.options.find(o => o.value === value);
+      }
 
       if (field) {
         props.onChange({

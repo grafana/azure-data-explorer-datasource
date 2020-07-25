@@ -3,6 +3,7 @@ import { QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionBaseProps } from '../QueryEditorSection';
 import { QueryEditorExpression, QueryEditorSectionExpression } from '../../../types';
 import { QueryEditorSectionRenderer } from '../filter/QueryEditorSectionRenderer';
+import { SelectableValue } from '@grafana/data';
 
 interface GroupBySectionConfiguration {
   id: string;
@@ -12,6 +13,7 @@ interface GroupBySectionConfiguration {
 
 export interface QueryEditorGroupBySectionProps extends QueryEditorSectionBaseProps {
   fields: QueryEditorFieldDefinition[];
+  templateVariableOptions: SelectableValue<string>;
   value?: QueryEditorSectionExpression;
 }
 
@@ -27,6 +29,7 @@ export const QueryEditorGroupBySection = (
           <QueryEditorSectionRenderer<GroupBySectionConfiguration>
             expression={expression}
             fields={props.fields}
+            templateVariableOptions={props.templateVariableOptions}
             onChange={onChange}
             config={config}
           />

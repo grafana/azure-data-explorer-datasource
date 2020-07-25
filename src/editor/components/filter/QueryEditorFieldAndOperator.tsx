@@ -6,10 +6,12 @@ import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition } from '../..
 import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
 import { QueryEditorOperator } from '../operators/QueryEditorOperator';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
+import { SelectableValue } from '@grafana/data';
 
 interface Props {
   value?: QueryEditorFieldAndOperatorExpression;
   fields: QueryEditorFieldDefinition[];
+  templateVariableOptions: SelectableValue<string>;
   operators: QueryEditorOperatorDefinition[];
   onChange: (expression: QueryEditorFieldAndOperatorExpression | undefined) => void;
 }
@@ -55,7 +57,13 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
 
   return (
     <div className={styles.container}>
-      <QueryEditorField value={field} fields={props.fields} onChange={onFieldChange} placeholder="Choose column..." />
+      <QueryEditorField
+        value={field}
+        fields={props.fields}
+        templateVariableOptions={props.templateVariableOptions}
+        onChange={onFieldChange}
+        placeholder="Choose column..."
+      />
       <QueryEditorOperator value={operator} operators={operators} onChange={onOperatorChange} />
     </div>
   );

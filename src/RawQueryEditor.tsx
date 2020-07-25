@@ -5,11 +5,13 @@ import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import Emitter from './emitter';
 import { KustoMonacoEditor } from './monaco/KustoMonacoEditor';
+import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface RawQueryEditorProps extends Props {
   onRawModeChange: () => void;
+  templateVariableOptions: SelectableValue<string>;
 }
 
 export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
@@ -88,21 +90,15 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
   return (
     <div>
       <div className="gf-form-inline">
-        <div className="gf-form">
-          <InlineFormLabel className="query-keyword" width={7}>
-            Database
-          </InlineFormLabel>
-          <Select
-            width={30}
-            options={databases}
-            value={database}
-            onChange={db => {
-              setDatabase(db.value || '');
-              onChange();
-            }}
-            allowCustomValue={true}
-          />
-        </div>
+        <DatabaseSelect
+          databases={databases}
+          templateVariableOptions={props.templateVariableOptions}
+          database={database}
+          onChange={val => {
+            setDatabase(val);
+            onChange();
+          }}
+        />
         <div className="gf-form">
           <div className="width-1"></div>
         </div>

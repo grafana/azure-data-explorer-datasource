@@ -40,7 +40,7 @@ export class TemplateSrv {
     if (_.isString(value)) {
       return value;
     }
-    return '{' + value.join(',') + '}';
+    return value.join(',');
   }
 
   replace(target: string, scopedVars?: any, format?: string | Function) {
@@ -93,6 +93,6 @@ export class TemplateSrv {
   }
 
   getVariables(): VariableModel[] {
-    return [];
+    return this.variables;
   }
 }

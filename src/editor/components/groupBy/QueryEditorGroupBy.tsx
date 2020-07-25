@@ -4,9 +4,11 @@ import { stylesFactory } from '@grafana/ui';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../../types';
 import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
+import { SelectableValue } from '@grafana/data';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];
+  templateVariableOptions: SelectableValue<string>;
   intervals: QueryEditorFieldDefinition[];
   value?: QueryEditorGroupByExpression;
   label?: string;
@@ -51,11 +53,18 @@ export const QueryEditorGroupBy: React.FC<Props> = props => {
 
   return (
     <div className={styles.container}>
-      <QueryEditorField value={field} fields={props.fields} onChange={onChangeField} placeholder="Choose column..." />
+      <QueryEditorField
+        value={field}
+        fields={props.fields}
+        templateVariableOptions={props.templateVariableOptions}
+        onChange={onChangeField}
+        placeholder="Choose column..."
+      />
       {field?.fieldType === QueryEditorFieldType.DateTime && (
         <QueryEditorField
           value={interval}
           fields={props.intervals}
+          templateVariableOptions={props.templateVariableOptions}
           onChange={onChangeInterval}
           placeholder="Choose interval"
         />

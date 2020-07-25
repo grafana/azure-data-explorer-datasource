@@ -7,11 +7,22 @@ import { isGroupBy, isDateGroupBy } from 'editor/components/groupBy/QueryEditorG
 import { isReduce } from 'editor/components/reduce/QueryEditorReduce';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from 'editor/types';
 import { isSingleOperator } from 'editor/components/operators/QueryEditorSingleOperator';
+import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 
 export class KustoExpressionParser {
-  fromTable(section?: QueryEditorSectionExpression): string {
+  templateSrv: TemplateSrv;
+
+  constructor() {
+    this.templateSrv = getTemplateSrv();
+  }
+
+  fromTable(section?: QueryEditorSectionExpression, interpolate = false): string {
     if (section && section.expression && isField(section.expression)) {
-      return section.expression.value;
+      if (interpolate) {
+        return this.templateSrv.replace(section.expression.value);
+      } else {
+        return section.expression.value;
+      }
     }
     return '';
   }
@@ -31,7 +42,7 @@ export class KustoExpressionParser {
     const parts: string[] = [table];
 
     if (reduce && reduce.expression && groupBy && groupBy.expression && this.isAggregated(groupBy.expression)) {
-      this.appendTimeFilter(reduce.expression, groupBy.expression, parts);
+      this.appendTimeFilter(groupBy.expression, parts);
     } else {
       parts.push(`where $__timeFilter(${defaultTimeColumn})`);
     }
@@ -49,7 +60,7 @@ export class KustoExpressionParser {
     return parts.join('\n| ');
   }
 
-  appendTimeFilter(reduceExpression: QueryEditorExpression, groupByExpression: QueryEditorExpression, parts: string[]) {
+  appendTimeFilter(groupByExpression: QueryEditorExpression, parts: string[]) {
     let dateTimeField = 'Timestamp';
 
     if (groupByExpression) {
@@ -112,7 +123,15 @@ export class KustoExpressionParser {
       // can be reused in the parser.
       if (isMultiOperator(expression.operator)) {
         where += '(';
-        where += expression.operator.values.map(value => `'${value}'`).join(', ');
+        where += expression.operator.values
+          .map(value => {
+            if (this.isVariable(value)) {
+              return value;
+            } else {
+              return `'${value}'`;
+            }
+          })
+          .join(', ');
         where += ')';
       } else if (isSingleOperator(expression.operator)) {
         if (
@@ -192,6 +211,17 @@ export class KustoExpressionParser {
     return (
       (value[0] === "'" || value[0] === '"') && (value[value.length - 1] === "'" || value[value.length - 1] === '"')
     );
+  }
+
+  private isVariable(value: string): boolean {
+    const variables = this.templateSrv.getVariables();
+    for (const variable of variables) {
+      if ('$' + variable.name === value) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 

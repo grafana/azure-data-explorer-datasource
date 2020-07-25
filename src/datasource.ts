@@ -252,6 +252,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
+  get variables() {
+    return this.templateSrv.getVariables().map(v => `$${v.name}`);
+  }
+
   doQueries(queries) {
     return queries.map(query => {
       const cacheResponse = this.cache.get(query.key);
