@@ -9,7 +9,7 @@ import {
 import { AdxDataSource } from 'datasource';
 import { KustoQuery, AdxDataSourceOptions, QueryEditorSectionExpression } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
-import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel } from '@grafana/ui';
+import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from './editor/types';
 import { RawQueryEditor } from './RawQueryEditor';
 import { css } from 'emotion';
@@ -30,6 +30,7 @@ export const QueryEditor: React.FC<Props> = props => {
   const [query, setQuery] = useState<string>(props.query.query);
   const [rawMode, setRawMode] = useState<boolean>(props.query.rawMode);
   const [resultFormat, setResultFormat] = useState<string>(props.query.resultFormat || 'time_series');
+  const [alias, setAlias] = useState<string>(props.query.alias || '');
 
   const resultFormats: Array<SelectableValue<string>> = [
     { label: 'Time series', value: 'time_series' },
@@ -131,7 +132,7 @@ export const QueryEditor: React.FC<Props> = props => {
             <HorizontalGroup>
               <div className="gf-form">
                 <InlineFormLabel className="query-keyword" width={12}>
-                  Format As
+                  Format as
                 </InlineFormLabel>
                 <Select
                   options={resultFormats}
@@ -141,6 +142,34 @@ export const QueryEditor: React.FC<Props> = props => {
                   }}
                 />
               </div>
+              {resultFormat === 'time_series' && (
+                <>
+                  <InlineFormLabel className="query-keyword" width={7}>
+                    Alias by
+                  </InlineFormLabel>
+                  <Input
+                    width={30}
+                    type="text"
+                    value={alias}
+                    placeholder="Naming pattern"
+                    onChange={val => {
+                      setAlias(val.currentTarget.value);
+                      props.onChange({
+                        ...props.query,
+                        alias: val.currentTarget.value,
+                      });
+                    }}
+                    onBlur={() => {
+                      props.onChange({
+                        ...props.query,
+                        alias: alias,
+                      });
+                      props.onRunQuery();
+                    }}
+                  />
+                </>
+              )}
+
               <Button
                 onClick={() => {
                   onRawModeChange();

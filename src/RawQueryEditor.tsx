@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, SetStateAction, Dispatch } from 'react';
-import { Button, Select, Input } from '@grafana/ui';
+import { Button, Select, Input, InlineFormLabel, Icon } from '@grafana/ui';
 import { KustoQuery, AdxDataSourceOptions, AdxDatabaseSchema } from 'types';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
@@ -60,6 +60,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
 
     return function cleanup() {
       Emitter.off('ds-request-error', onDataError);
+      Emitter.off('ds-request-response', onDataReceived);
     };
   }, []);
 
@@ -88,19 +89,19 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
     <div>
       <div className="gf-form-inline">
         <div className="gf-form">
-          <label className="gf-form-label query-keyword width-9">Database</label>
-          <div className="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
-            <Select
-              width={30}
-              options={databases}
-              value={database}
-              onChange={db => {
-                setDatabase(db.value || '');
-                onChange();
-              }}
-              allowCustomValue={true}
-            />
-          </div>
+          <InlineFormLabel className="query-keyword" width={7}>
+            Database
+          </InlineFormLabel>
+          <Select
+            width={30}
+            options={databases}
+            value={database}
+            onChange={db => {
+              setDatabase(db.value || '');
+              onChange();
+            }}
+            allowCustomValue={true}
+          />
         </div>
         <div className="gf-form">
           <div className="width-1"></div>
@@ -141,11 +142,12 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
 
       <div className="gf-form-inline">
         <div className="gf-form">
-          <label className="gf-form-label query-keyword">ALIAS BY</label>
+          <InlineFormLabel className="query-keyword" width={7}>
+            ALIAS BY
+          </InlineFormLabel>
           <Input
             width={30}
             type="text"
-            className="gf-form-input"
             value={alias}
             placeholder="Naming pattern"
             onChange={val => {
@@ -154,30 +156,27 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
             }}
             onBlur={onBlur}
           />
-          <label className="gf-form-label query-keyword width-7">Format As</label>
-          <div className="gf-form-select-wrapper">
-            <Select
-              options={resultFormats}
-              value={resultFormat}
-              onChange={format => {
-                setResultFormat(format.value || 'time_series');
-                onChange();
-              }}
-            />
-          </div>
+          <InlineFormLabel className="query-keyword" width={7}>
+            Format As
+          </InlineFormLabel>
+          <Select
+            options={resultFormats}
+            value={resultFormat}
+            width={14}
+            onChange={format => {
+              setResultFormat(format.value || 'time_series');
+              onChange();
+            }}
+          />
         </div>
         <div className="gf-form">
           <label className="gf-form-label query-keyword" onClick={() => setShowHelp(!showHelp)}>
-            Show Help
-            {showHelp && <i className="fa fa-caret-down" />}
-            {!showHelp && <i className="fa fa-caret-right" />}
+            Show Help <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
           </label>
         </div>
         <div className="gf-form" ng-show="ctrl.lastQuery">
           <label className="gf-form-label query-keyword" onClick={() => setShowLastQuery(!showLastQuery)}>
-            Raw Query
-            {showLastQuery && <i className="fa fa-caret-down"></i>}
-            {!showLastQuery && <i className="fa fa-caret-right"></i>}
+            Raw Query <Icon name={showLastQuery ? 'angle-down' : 'angle-right'} />
           </label>
         </div>
         <Button
@@ -195,6 +194,20 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
       {showLastQuery && (
         <div className="gf-form">
           <pre className="gf-form-pre">{lastQuery}</pre>
+        </div>
+      )}
+
+      {lastQueryError && (
+        <div className="gf-form">
+          <pre className="gf-form-pre alert alert-error">{lastQueryError}</pre>
+        </div>
+      )}
+
+      {timeNotASC && (
+        <div className="gf-form">
+          <pre className="gf-form-pre alert alert-warning">
+            Data is not sorted ascending by Time. Recommend adding an order by clause.
+          </pre>
         </div>
       )}
 
@@ -245,20 +258,6 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
   - ¡ where $__timeFilter()
   - | where TimeGenerated &ge; $__timeFrom() and TimeGenerated &le; $__timeTo()
   - | summarize count() by Category, bin(TimeGenerated, $__timeInterval)`}
-          </pre>
-        </div>
-      )}
-
-      {lastQueryError && (
-        <div className="gf-form">
-          <pre className="gf-form-pre alert alert-error">{lastQueryError}</pre>
-        </div>
-      )}
-
-      {timeNotASC && (
-        <div className="gf-form">
-          <pre className="gf-form-pre alert alert-warning">
-            Data is not sorted ascending by Time. Recommend adding an order by clause.
           </pre>
         </div>
       )}
