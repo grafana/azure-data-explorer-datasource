@@ -21,7 +21,7 @@ export default class KustoCodeEditor {
     private config: any
   ) {}
 
-  initMonaco(scope) {
+  initMonaco(content: string) {
     const themeName = this.config.bootData.user.lightTheme ? 'grafana-light' : 'vs-dark';
 
     monaco.editor.defineTheme('grafana-light', {
@@ -57,7 +57,7 @@ export default class KustoCodeEditor {
     });
 
     this.codeEditor = monaco.editor.create(this.containerDiv, {
-      value: scope.content || 'Write your query here',
+      value: content || 'Write your query here',
       language: 'kusto',
       selectionHighlight: false,
       theme: themeName,

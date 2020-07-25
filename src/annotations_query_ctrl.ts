@@ -1,3 +1,5 @@
+import './monaco/kusto_monaco_editor';
+
 export class KustoDBAnnotationsQueryCtrl {
   static templateUrl = 'partials/annotations.editor.html';
   datasource: any;

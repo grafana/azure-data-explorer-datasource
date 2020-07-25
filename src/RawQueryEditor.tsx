@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState, SetStateAction, Dispatch } from 'react';
-import { Button, Select, Input, TextArea } from '@grafana/ui';
+import { Button, Select, Input } from '@grafana/ui';
 import { KustoQuery, AdxDataSourceOptions, AdxDatabaseSchema } from 'types';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import Emitter from './emitter';
+import { KustoMonacoEditor } from './monaco/KustoMonacoEditor';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -21,14 +22,14 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
     '// | order by Timestamp asc',
   ].join('\n');
 
-  const [resultFormat, setResultFormat] = useState<string>(props.query.resultFormat);
+  const [resultFormat, setResultFormat] = useState<string>(props.query.resultFormat || 'time_series');
   const [database, setDatabase] = useState<string>(props.query.database);
-  const [databases, setDatabases] = useState<Array<SelectableValue<string>>>();
+  const [databases, setDatabases] = useState<Array<SelectableValue<string>>>([]);
   const [showHelp, setShowHelp] = useState<boolean>(false);
   const [query, setQuery] = useState<string>(props.query.query ?? defaultQuery);
   const [alias, setAlias] = useState<string>(props.query.alias);
   const [showLastQuery, setShowLastQuery] = useState<boolean>(true);
-  const [lastQueryError, setLastQueryError] = useState<string>();
+  const [lastQueryError, setLastQueryError] = useState<string>('');
   const [lastQuery, setLastQuery] = useState<string>('');
   const [timeNotASC, setTimeNotASC] = useState<boolean>(false);
 
@@ -48,6 +49,9 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
       try {
         const schema = await props.datasource.getSchema();
         setDatabases(prepareDatabaseOptions(schema.Databases));
+        if (!database) {
+          setDatabase(databases[0].value || '');
+        }
       } catch (error) {
         console.log('error', error);
       }
@@ -58,10 +62,16 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
     };
   }, []);
 
-  const onChange = useCallback(() => {
+  const onQueryChange = useCallback(() => {
     props.onChange({
       ...props.query,
       query: query,
+    });
+  }, [props]);
+
+  const onChange = useCallback(() => {
+    props.onChange({
+      ...props.query,
       resultFormat: resultFormat,
       alias: alias,
       database: database,
@@ -98,7 +108,8 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
           <Button
             className="btn btn-primary width-10"
             onClick={() => {
-              onChange();
+              onQueryChange();
+              props.onRunQuery();
             }}
           >
             Run
@@ -112,16 +123,18 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
         </div>
       </div>
 
-      <TextArea
-        cols={80}
-        rows={5}
-        value={query}
+      <KustoMonacoEditor
+        defaultTimeField="Timestamp"
+        pluginBaseUrl={props.datasource.meta.baseUrl}
+        content={query}
+        getSchema={props.datasource.getSchema.bind(props.datasource)}
         onChange={val => {
-          setQuery(val.currentTarget.value);
+          setQuery(val);
+          onQueryChange();
         }}
-        onBlur={val => {
-          setQuery(val.currentTarget.value);
-          onChange();
+        onExecute={() => {
+          onQueryChange();
+          props.onRunQuery();
         }}
       />
 
@@ -255,11 +268,11 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
 function onDataReceived(
   data: any,
   props: QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>,
-  setLastQueryError: Dispatch<SetStateAction<string | undefined>>,
+  setLastQueryError: Dispatch<SetStateAction<string>>,
   setLastQuery: Dispatch<SetStateAction<string>>,
   setTimeNotASC: Dispatch<SetStateAction<boolean>>
 ) {
-  setLastQueryError(undefined);
+  setLastQueryError('');
   setLastQuery('');
   setTimeNotASC(false);
 
@@ -274,7 +287,7 @@ function onDataReceived(
 function onDataError(
   err: any,
   props: QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>,
-  setLastQueryError: Dispatch<SetStateAction<string | undefined>>,
+  setLastQueryError: Dispatch<SetStateAction<string>>,
   setLastQuery: Dispatch<SetStateAction<string>>
 ) {
   if (err.query && err.query.refId && err.query.refId !== props.query.refId) {

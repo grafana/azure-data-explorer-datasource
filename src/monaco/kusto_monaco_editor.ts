@@ -41,7 +41,7 @@ function link(scope, elem, attrs) {
   function initMonaco(containerDiv, scope) {
     const kustoCodeEditor = new KustoCodeEditor(containerDiv, scope.defaultTimeField, scope.getSchema, config);
 
-    kustoCodeEditor.initMonaco(scope);
+    kustoCodeEditor.initMonaco(scope.content);
 
     /* tslint:disable:no-bitwise */
     kustoCodeEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
