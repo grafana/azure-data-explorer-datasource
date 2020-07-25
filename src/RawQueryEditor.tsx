@@ -49,8 +49,9 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
       try {
         const schema = await props.datasource.getSchema();
         setDatabases(prepareDatabaseOptions(schema.Databases));
-        if (!database) {
-          setDatabase(databases[0].value || '');
+        if (!database && Object.keys(schema.Databases).length > 0) {
+          const firstDatabase = schema.Databases[Object.keys(schema.Databases)[0]];
+          setDatabase(firstDatabase.Name || '');
         }
       } catch (error) {
         console.log('error', error);

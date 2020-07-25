@@ -75,6 +75,7 @@ export class KustoMonacoEditor extends React.Component<Props, MonacoState> {
 
   componentWillUnmount() {
     if (this.kustoCodeEditor) {
+      console.log('disposed');
       this.kustoCodeEditor.disposeMonaco();
     }
   }
