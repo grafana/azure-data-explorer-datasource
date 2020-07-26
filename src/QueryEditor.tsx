@@ -87,6 +87,10 @@ export const QueryEditor: React.FC<Props> = props => {
         }
 
         setDatabases(dbs);
+        if (!database && Object.keys(schema.Databases).length > 0) {
+          const firstDatabase = schema.Databases[Object.keys(schema.Databases)[0]];
+          setDatabase(firstDatabase.Name || '');
+        }
         setTables(tables);
         setColumnsByTable(columns);
         setIsSchemaLoaded(true);
