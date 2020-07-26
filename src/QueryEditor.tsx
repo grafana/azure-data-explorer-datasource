@@ -30,7 +30,7 @@ export const QueryEditor: React.FC<Props> = props => {
   const [tables, setTables] = useState<QueryEditorFieldDefinition[]>([]);
   const [isSchemaLoaded, setIsSchemaLoaded] = useState(false);
   const [query, setQuery] = useState<string>(props.query.query);
-  const [rawMode, setRawMode] = useState<boolean>(props.query.rawMode);
+  const [rawMode, setRawMode] = useState<boolean>(setInitialRawMode(props));
   const [resultFormat, setResultFormat] = useState<string>(props.query.resultFormat || 'time_series');
   const [alias, setAlias] = useState<string>(props.query.alias || '');
 
@@ -222,6 +222,7 @@ export const QueryEditor: React.FC<Props> = props => {
                     resultFormat: resultFormat,
                     database: database,
                     query: query,
+                    rawMode: rawMode,
                     expression: {
                       from,
                       where,
@@ -276,3 +277,11 @@ const toExpressionType = (kustoType: string): QueryEditorFieldType => {
 };
 
 const toOption = (value: string) => ({ label: value, value } as SelectableValue<string>);
+
+function setInitialRawMode(props: React.PropsWithChildren<Props>): boolean | (() => boolean) {
+  if (props.query.rawMode === undefined && props.query.query && !props.query.expression?.from) {
+    return true;
+  }
+
+  return props.query.rawMode || false;
+}

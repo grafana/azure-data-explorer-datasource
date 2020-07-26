@@ -33,7 +33,7 @@ export interface KustoQuery extends DataQuery {
   alias: string;
   resultFormat: string;
   expression?: QueryExpression;
-  rawMode: boolean;
+  rawMode?: boolean;
 }
 
 export const defaultQuery: Partial<KustoQuery> = {
