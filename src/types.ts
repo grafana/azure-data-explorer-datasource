@@ -7,6 +7,7 @@ export enum QueryEditorExpressionType {
   FieldAndOperator = 'fieldAndOperator',
   OperatorRepeater = 'operatorRepeater',
   Reduce = 'reduce',
+  FunctionParameter = 'functionParameter',
   GroupBy = 'groupBy',
 }
 

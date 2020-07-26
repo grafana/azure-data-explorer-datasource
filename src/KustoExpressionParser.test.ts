@@ -141,6 +141,26 @@ describe('KustoExpressionParser', () => {
       );
     });
   });
+
+  describe('query with reduce function and a parameter', () => {
+    beforeEach(() => {
+      where = buildWhereWithSingleOperator();
+
+      reduce = buildReduce(['DamageProperty'], ['percentile'], '95');
+
+      groupBy = buildGroupBy();
+    });
+
+    it('should generate a valid query', () => {
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
+      expect(query).toBe(
+        'StormEvents' +
+          "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
+          '\n| summarize percentile(DamageProperty, 95) by bin(StartTime, 1h)' +
+          '\n| order by StartTime asc'
+      );
+    });
+  });
 });
 
 function setupTemplateSrv() {
@@ -231,11 +251,11 @@ function buildWhereWithSingleOperator(): QueryEditorSectionExpression {
   };
 }
 
-function buildReduce(fields: string[], functions: string[]): QueryEditorSectionExpression {
+function buildReduce(fields: string[], functions: string[], parameter = ''): QueryEditorSectionExpression {
   let expressions: QueryEditorReduceExpression[] = [];
 
   fields.forEach((field, i) => {
-    expressions.push({
+    const expr = {
       type: QueryEditorExpressionType.Reduce,
       field: {
         type: QueryEditorExpressionType.Field,
@@ -247,7 +267,19 @@ function buildReduce(fields: string[], functions: string[]): QueryEditorSectionE
         fieldType: QueryEditorFieldType.Function,
         value: functions[i],
       },
-    } as QueryEditorReduceExpression);
+    } as QueryEditorReduceExpression;
+    if (parameter) {
+      expr.parameters = [
+        {
+          name: 'aParam',
+          fieldType: QueryEditorFieldType.Number,
+          value: parameter,
+          type: QueryEditorExpressionType.FunctionParameter,
+        },
+      ];
+    }
+
+    expressions.push(expr);
   });
 
   return {

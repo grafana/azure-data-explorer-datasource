@@ -26,3 +26,14 @@ export interface QueryEditorFieldDefinition {
   type: QueryEditorFieldType;
   label?: string;
 }
+
+export interface QueryEditorFunctionDefinition extends QueryEditorFieldDefinition {
+  parameters?: QueryEditorFunctionParameter[];
+}
+
+export interface QueryEditorFunctionParameter {
+  name: string;
+  type: QueryEditorFieldType;
+  description: string;
+  value?: string;
+}

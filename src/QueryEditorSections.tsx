@@ -186,6 +186,11 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
       functions('min')
         .withLabel('Min')
         .add();
+
+      functions('percentile')
+        .withLabel('Percentile')
+        .withParameter('percentileParam', QueryEditorFieldType.Number, 'percentile constant')
+        .add();
     })
     .withMultipleRows(true)
     .build('value-column')

@@ -164,7 +164,13 @@ export class KustoExpressionParser {
 
       for (const exp of reduceExpression.expressions) {
         if (isReduce(exp) && exp?.reduce?.value !== 'none' && exp?.field?.value) {
-          reduceExpressions.push(`${exp.reduce.value}(${exp.field.value})`);
+          if (exp?.parameters && exp?.parameters.length > 0) {
+            reduceExpressions.push(
+              `${exp.reduce.value}(${exp.field.value}, ${exp.parameters.map(p => p.value).join(', ')})`
+            );
+          } else {
+            reduceExpressions.push(`${exp.reduce.value}(${exp.field.value})`);
+          }
         }
       }
 

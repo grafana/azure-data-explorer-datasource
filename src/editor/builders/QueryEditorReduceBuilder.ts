@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../types';
+import { QueryEditorFunctionDefinition, QueryEditorFieldType } from '../types';
 import { QueryEditorFieldExpression } from '../components/field/QueryEditorField';
 import { QueryEditorReduceSection, QueryEditorReduceSectionProps } from '../components/reduce/QueryEditorReduceSection';
 import { QueryEditorFunctionBuilder } from './QueryEditorFunctionBuilder';
@@ -8,7 +8,7 @@ import { QueryEditorRepeaterExpression } from '../components/QueryEditorRepeater
 import { QueryEditorReduceExpression } from '../components/reduce/QueryEditorReduce';
 
 export class QueryEditorReduceBuilder {
-  private functions: QueryEditorFieldDefinition[];
+  private functions: QueryEditorFunctionDefinition[];
   private multipleRows = false;
 
   constructor() {
