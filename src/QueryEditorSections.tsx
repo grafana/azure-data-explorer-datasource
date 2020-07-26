@@ -163,6 +163,10 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
 export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduceSection =>
   reduceSection
     .withFunctions(functions => {
+      functions('none')
+        .withLabel('None')
+        .add();
+
       functions('sum')
         .withLabel('Sum')
         .add();
@@ -181,10 +185,6 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
 
       functions('min')
         .withLabel('Min')
-        .add();
-
-      functions('none')
-        .withLabel('None')
         .add();
     })
     .withMultipleRows(true)

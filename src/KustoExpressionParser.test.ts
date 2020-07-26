@@ -115,6 +115,32 @@ describe('KustoExpressionParser', () => {
       );
     });
   });
+
+  describe('table query with no time column', () => {
+    let columns: QueryEditorFieldDefinition[];
+    beforeEach(() => {
+      columns = [
+        {
+          type: QueryEditorFieldType.DateTime,
+          value: 'StartTime',
+        },
+      ];
+      where = buildWhereWithMultiOperator(['$state']);
+
+      reduce = buildReduce(['DamageProperty'], ['sum']);
+
+      groupBy = buildGroupByWithNoTimeColumn();
+    });
+
+    it('should build a valid summarize and exclude the order by', () => {
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns);
+      expect(query).toBe(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
+          '\n| summarize sum(DamageProperty) by State'
+      );
+    });
+  });
 });
 
 function setupTemplateSrv() {
@@ -252,6 +278,26 @@ function buildGroupBy() {
             type: QueryEditorExpressionType.Field,
             fieldType: QueryEditorFieldType.Interval,
             value: '1h',
+          },
+        } as QueryEditorGroupByExpression,
+      ],
+    } as QueryEditorRepeaterExpression,
+  };
+}
+
+function buildGroupByWithNoTimeColumn() {
+  return {
+    id: 'groupBy',
+    expression: {
+      type: QueryEditorExpressionType.OperatorRepeater,
+      typeToRepeat: QueryEditorExpressionType.GroupBy,
+      expressions: [
+        {
+          type: QueryEditorExpressionType.GroupBy,
+          field: {
+            type: QueryEditorExpressionType.Field,
+            fieldType: QueryEditorFieldType.String,
+            value: 'State',
           },
         } as QueryEditorGroupByExpression,
       ],

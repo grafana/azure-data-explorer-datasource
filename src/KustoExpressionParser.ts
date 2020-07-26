@@ -38,11 +38,10 @@ export class KustoExpressionParser {
     }
 
     const defaultTimeColumn = columns?.find(col => col.type === QueryEditorFieldType.DateTime)?.value ?? 'Timestamp';
-
     const parts: string[] = [table];
 
     if (reduce && reduce.expression && groupBy && groupBy.expression && this.isAggregated(groupBy.expression)) {
-      this.appendTimeFilter(groupBy.expression, parts);
+      this.appendTimeFilter(groupBy.expression, defaultTimeColumn, parts);
     } else {
       parts.push(`where $__timeFilter(${defaultTimeColumn})`);
     }
@@ -60,11 +59,11 @@ export class KustoExpressionParser {
     return parts.join('\n| ');
   }
 
-  appendTimeFilter(groupByExpression: QueryEditorExpression, parts: string[]) {
-    let dateTimeField = 'Timestamp';
+  appendTimeFilter(groupByExpression: QueryEditorExpression, defaultTimeColumn: string, parts: string[]) {
+    let dateTimeField = defaultTimeColumn;
 
     if (groupByExpression) {
-      dateTimeField = this.getGroupByFields(groupByExpression).dateTimeField;
+      dateTimeField = this.getGroupByFields(groupByExpression).dateTimeField || defaultTimeColumn;
     }
 
     parts.push(`where $__timeFilter(${dateTimeField})`);
@@ -164,7 +163,7 @@ export class KustoExpressionParser {
       let reduceExpressions: string[] = [];
 
       for (const exp of reduceExpression.expressions) {
-        if (isReduce(exp) && exp?.reduce?.value && exp?.field?.value) {
+        if (isReduce(exp) && exp?.reduce?.value !== 'none' && exp?.field?.value) {
           reduceExpressions.push(`${exp.reduce.value}(${exp.field.value})`);
         }
       }
@@ -172,15 +171,24 @@ export class KustoExpressionParser {
       summarize += reduceExpressions.join(', ');
 
       const fields = this.getGroupByFields(groupByExpression);
-      summarize += ` by bin(${fields.dateTimeField}, ${fields.interval})`;
+      if (fields.dateTimeField) {
+        summarize += ` by bin(${fields.dateTimeField}, ${fields.interval})`;
+      }
       if (fields.groupByFields.length > 0) {
-        summarize += `,` + fields.groupByFields.join(', ');
+        if (fields.dateTimeField) {
+          summarize += `,`;
+        } else {
+          summarize += ' by ';
+        }
+        summarize += fields.groupByFields.join(', ');
       }
 
       parts.push(summarize);
 
-      const orderBy = `order by ${fields.dateTimeField} asc`;
-      parts.push(orderBy);
+      if (fields.dateTimeField) {
+        const orderBy = `order by ${fields.dateTimeField} asc`;
+        parts.push(orderBy);
+      }
     }
   }
 
