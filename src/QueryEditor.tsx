@@ -36,10 +36,10 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   async componentDidMount() {
     try {
-      let { query } = this.props;
-      let updateTheQuery = false;
+      const { datasource } = this.props;
+      let query = { ...this.props.query }; // mutable query
 
-      const schema = await this.props.datasource.getSchema();
+      const schema = await datasource.getSchema();
       const dbs: QueryEditorFieldDefinition[] = [];
       const tables: QueryEditorFieldDefinition[] = [];
       const columns: Record<string, QueryEditorFieldDefinition[]> = {};
@@ -75,26 +75,18 @@ export class QueryEditor extends PureComponent<Props, State> {
       if (!query.database && dbs.length) {
         const firstDatabase = schema.Databases[Object.keys(schema.Databases)[0]];
         if (firstDatabase && firstDatabase.Name) {
-          updateTheQuery = true;
-          query = {
-            ...query,
-            database: firstDatabase.Name,
-          };
+          query.database = firstDatabase.Name;
         }
       }
 
       // Set the raw mode
       if (isInitialRawMode(this.props) && !query.rawMode) {
-        updateTheQuery = true;
-        query = {
-          ...query,
-          rawMode: true,
-        };
+        query.rawMode = true;
       }
-
-      if (updateTheQuery) {
-        this.onUpdateQuery(query);
+      if (!query.resultFormat) {
+        query.resultFormat = 'time_series';
       }
+      this.onUpdateQuery(query);
 
       this.templateVariableOptions = {
         label: 'Template Variables',
@@ -213,53 +205,6 @@ export class QueryEditor extends PureComponent<Props, State> {
       false
     );
   };
-
-  // const onRawModeChange = useCallback(() => {
-  //   setRawMode(!props.query.rawMode);
-  //   props.onChange({
-  //     ...props.query,
-  //     rawMode: !props.query.rawMode,
-  //   });
-  // }, [props, setRawMode]);
-
-  // const [database, setDatabase] = useState<string>(props.query.database);
-  // const [from, setFrom] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.from);
-  // const [where, setWhere] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.where);
-  // const [reduce, setReduce] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.reduce);
-  // const [groupBy, setGroupBy] = useState<QueryEditorSectionExpression | undefined>(props.query.expression?.groupBy);
-  // const [databases, setDatabases] = useState<QueryEditorFieldDefinition[]>([]);
-  // const [tables, setTables] = useState<QueryEditorFieldDefinition[]>([]);
-  // const [isSchemaLoaded, setIsSchemaLoaded] = useState(false);
-  // const [query, setQuery] = useState<string>(props.query.query);
-  // const [rawMode, setRawMode] = useState<boolean>(setInitialRawMode(props));
-  // const [resultFormat, setResultFormat] = useState<string>(props.query.resultFormat || 'time_series');
-  // const [alias, setAlias] = useState<string>(props.query.alias || '');
-
-  // const [columnsByTable, setColumnsByTable] = useState<Record<string, QueryEditorFieldDefinition[]>>({});
-  // const kustoExpressionParser = new KustoExpressionParser();
-  // const columns = columnsByTable[kustoExpressionParser.fromTable(from, true)];
-  // const templateVariableOptions = {
-  //   label: 'Template Variables',
-  //   expanded: false,
-  //   options: props.datasource?.variables?.map(toOption) || [],
-  // };
-
-  // // console.log('Persisted expression', props.query.expression);
-  // // console.log('Expression to save', { from, where, reduce, groupBy });
-  // // console.log('query', kustoExpressionParser.query({ from, where, reduce, groupBy }, columns));
-
-  // useEffect(() => {
-  //   (async () => {
-  //   })();
-  // }, []);
-
-  // const onRawModeChange = useCallback(() => {
-  //   setRawMode(!props.query.rawMode);
-  //   props.onChange({
-  //     ...props.query,
-  //     rawMode: !props.query.rawMode,
-  //   });
-  // }, [props, setRawMode]);
 
   render() {
     if (!this.state.schema) {
