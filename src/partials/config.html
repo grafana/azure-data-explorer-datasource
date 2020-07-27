@@ -87,6 +87,8 @@
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
         <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultDatabase" ng-options="f.value as f.text for f in ctrl.databases"></select>
       </div>
+      <i ng-if="ctrl.loading" class="fa fa-spinner fa-pulse"></i>
+      
       <info-popover mode="right-normal">
         <p>Choose the default/preferred Database for this Azure Data Explorer Cluster.</p>
       </info-popover>

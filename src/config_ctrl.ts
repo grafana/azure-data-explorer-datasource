@@ -10,9 +10,10 @@ export class KustoDBConfigCtrl {
   datasource: AdxDataSource | undefined;
   databases: any[];
   hasRequiredGrafanaVersion: boolean;
+  loading = false;
 
   /** @ngInject */
-  constructor($scope) {
+  constructor(private $scope) {
     this.hasRequiredGrafanaVersion = this.hasMinVersion();
     this.suggestUrl = 'https://yourcluster.kusto.windows.net';
     $scope.getSuggestUrls = () => {
@@ -32,11 +33,15 @@ export class KustoDBConfigCtrl {
       return [];
     }
 
+    this.loading = true;
     return this.datasource.getDatabases().then(dbs => {
+      this.loading = false;
       this.databases = dbs;
-      if (this.databases.length > 0) {
-        this.current.jsonData.defaultDatabase = this.current.jsonData.defaultDatabase || this.databases[0].value;
+      if(!this.current.jsonData.defaultDatabase && dbs.length) {
+        this.current.jsonData.defaultDatabase =  dbs[0].value;
       }
+      console.log( 'Databaes loaded', this.databases);
+      this.$scope.$digest();
     });
   }
 
