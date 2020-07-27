@@ -40,8 +40,7 @@ export class KustoDBConfigCtrl {
       if(!this.current.jsonData.defaultDatabase && dbs.length) {
         this.current.jsonData.defaultDatabase =  dbs[0].value;
       }
-      console.log( 'Databaes loaded', this.databases);
-      this.$scope.$digest();
+      this.$scope.$digest(); // force thigns to re-render
     });
   }
 
