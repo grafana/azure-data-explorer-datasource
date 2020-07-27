@@ -37,8 +37,8 @@ export class KustoDBConfigCtrl {
     return this.datasource.getDatabases().then(dbs => {
       this.loading = false;
       this.databases = dbs;
-      if(!this.current.jsonData.defaultDatabase && dbs.length) {
-        this.current.jsonData.defaultDatabase =  dbs[0].value;
+      if (!this.current.jsonData.defaultDatabase && dbs.length) {
+        this.current.jsonData.defaultDatabase = dbs[0].value;
       }
       this.$scope.$digest(); // force thigns to re-render
     });
