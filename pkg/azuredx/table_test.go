@@ -73,7 +73,7 @@ func TestResponseToFrames(t *testing.T) {
 				t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
 			}
 
-			frames, err := respTable.ToDataFrames(nil)
+			frames, err := respTable.ToDataFrames("")
 			tt.errorIs(t, err)
 			if err != nil {
 				return

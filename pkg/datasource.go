@@ -32,29 +32,24 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 		resp.Error = err
 		return resp
 	}
-	md := &Metadata{
-		RawQuery: qm.Query,
-	}
+
+	interpolatedQuery := qm.Query
 
 	errorWithFrame := func(err error) {
-		resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{Custom: md.CustomObject()}})
+		resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{ExecutedQueryString: interpolatedQuery}})
 		resp.Error = err
 	}
 
 	var tableRes *azuredx.TableResponse
-	tableRes, md.KustoError, err = client.KustoRequest(azuredx.RequestPayload{
+	var kustoError string
+	tableRes, kustoError, err = client.KustoRequest(azuredx.RequestPayload{
 		CSL: qm.Query,
 		DB:  qm.Database,
 	})
 
 	if err != nil {
-		errorWithFrame(err)
-		return resp
-	}
-
-	if err != nil {
 		log.Print.Debug("error building kusto request", err.Error())
-		errorWithFrame(fmt.Errorf("%s: %s", err, md.KustoError))
+		errorWithFrame(fmt.Errorf("%s: %s", err, kustoError))
 		return resp
 	}
 	switch qm.Format {
@@ -65,14 +60,14 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 			return resp
 		}
 	case "table":
-		resp.Frames, err = tableRes.ToDataFrames(md.CustomObject())
+		resp.Frames, err = tableRes.ToDataFrames(interpolatedQuery)
 		if err != nil {
 			log.Print.Debug("error converting response to data frames", err.Error())
 			errorWithFrame(fmt.Errorf("error converting response to data frames: %w", err))
 			return resp
 		}
 	case "time_series":
-		frames, err := tableRes.ToDataFrames(md.CustomObject())
+		frames, err := tableRes.ToDataFrames(interpolatedQuery)
 		if err != nil {
 			errorWithFrame(err)
 			return resp

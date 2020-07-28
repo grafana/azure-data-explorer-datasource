@@ -41,12 +41,12 @@ func (ar *TableResponse) getTableByName(name string) (Table, error) {
 	return Table{}, fmt.Errorf("no data as %v table is missing from the the response", name)
 }
 
-func (tables *TableResponse) ToDataFrames(customMD map[string]interface{}) (data.Frames, error) {
+func (tables *TableResponse) ToDataFrames(executedQueryString string) (data.Frames, error) {
 	table, err := tables.getTableByName("Table_0")
 	if err != nil {
 		return nil, err
 	}
-	converterFrame, err := converterFrameForTable(table, customMD)
+	converterFrame, err := converterFrameForTable(table, executedQueryString)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (tables *TableResponse) ToDataFrames(customMD map[string]interface{}) (data
 	return data.Frames{converterFrame.Frame}, nil
 }
 
-func converterFrameForTable(t Table, customMD map[string]interface{}) (*data.FrameInputConverter, error) {
+func converterFrameForTable(t Table, executedQueryString string) (*data.FrameInputConverter, error) {
 	converters := []data.FieldConverter{}
 	colNames := make([]string, len(t.Columns))
 
@@ -83,9 +83,9 @@ func converterFrameForTable(t Table, customMD map[string]interface{}) (*data.Fra
 	if err != nil {
 		return nil, err
 	}
-	if customMD != nil {
+	if executedQueryString != "" {
 		fic.Frame.Meta = &data.FrameMeta{
-			Custom: customMD,
+			ExecutedQueryString: executedQueryString,
 		}
 	}
 
