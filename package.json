@@ -21,8 +21,5 @@
     "@types/grafana": "github:CorpGlory/types-grafana.git",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "monaco-editor": "0.17.0"
-  },
-  "dependencies": {
-    "eventemitter3": "^4.0.4"
   }
 }

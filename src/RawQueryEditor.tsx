@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useState, SetStateAction, Dispatch } fro
 import { Button, Select, Input, InlineFormLabel, Icon } from '@grafana/ui';
 import { KustoQuery, AdxDataSourceOptions, AdxDatabaseSchema } from 'types';
 import { AdxDataSource } from 'datasource';
-import { QueryEditorProps, SelectableValue } from '@grafana/data';
-import Emitter from './emitter';
+import { QueryEditorProps, SelectableValue, PanelData } from '@grafana/data';
 import { KustoMonacoEditor } from './monaco/KustoMonacoEditor';
 import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
 
@@ -42,11 +41,10 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
   ];
 
   useEffect(() => {
-    Emitter.on('ds-request-error', err => onDataError(err, props, setLastQueryError, setLastQuery));
-    Emitter.on('ds-request-response', data =>
-      onDataReceived(data, props, setLastQueryError, setLastQuery, setTimeNotASC)
-    );
+    onDataReceived(props.data, props, setLastQueryError, setLastQuery, setTimeNotASC);
+  }, [props.data]);
 
+  useEffect(() => {
     (async () => {
       try {
         const schema = await props.datasource.getSchema();
@@ -59,11 +57,6 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
         console.log('error', error);
       }
     })();
-
-    return function cleanup() {
-      Emitter.off('ds-request-error', onDataError);
-      Emitter.off('ds-request-response', onDataReceived);
-    };
   }, []);
 
   const onQueryChange = useCallback(() => {
@@ -262,7 +255,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
 };
 
 function onDataReceived(
-  data: any,
+  data: PanelData | undefined,
   props: QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>,
   setLastQueryError: Dispatch<SetStateAction<string>>,
   setLastQuery: Dispatch<SetStateAction<string>>,
@@ -271,12 +264,25 @@ function onDataReceived(
   setLastQueryError('');
   setLastQuery('');
   setTimeNotASC(false);
+  if (!data) {
+    return;
+  }
 
-  const anySeriesFromQuery: any = data.data.results[props.query.refId];
+  if (data.series && data.series.length) {
+    const fristSeriesMeta = data.series[0].meta;
+    if (fristSeriesMeta) {
+      setLastQuery(fristSeriesMeta.executedQueryString as any);
+      setTimeNotASC(fristSeriesMeta.custom?.TimeNotASC);
 
-  if (anySeriesFromQuery && anySeriesFromQuery.meta) {
-    setLastQuery(anySeriesFromQuery.meta.RawQuery);
-    setTimeNotASC(anySeriesFromQuery.meta.TimeNotASC);
+      const err = fristSeriesMeta.custom?.KustoError;
+      if(err) {
+        setLastQueryError(err)
+      }
+    }
+  }
+  
+  if (data.error) {
+    onDataError(data.error, props, setLastQueryError, setLastQuery);
   }
 }
 
