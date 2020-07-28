@@ -3,8 +3,14 @@
     <div class="gf-form">
       <label class="gf-form-label query-keyword width-9">Database</label>
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
-        <select class="gf-form-input min-width-12" ng-model="ctrl.target.database" ng-options="f.value as f.text for f in ctrl.databases"
-          ng-change="ctrl.refresh()"></select>
+        <gf-form-dropdown 
+        model="ctrl.target.database"
+        allow-custom="true"
+        lookup-text="true"
+        get-options="ctrl.databases"
+        on-change="ctrl.refresh()"
+        css-class="min-width-12"
+        ></gf-form-dropdown >
       </div>
     </div>
     <div class="gf-form">

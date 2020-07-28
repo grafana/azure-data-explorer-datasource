@@ -46,7 +46,7 @@ export class KustoDBDatasource {
         datasourceId: this.id,
         datasource: this.name,
         query: interpolatedQuery,
-        database: item.database,
+        database: this.templateSrv.replace(item.database, options.scopedVars),
         resultFormat: item.resultFormat,
       };
     });
@@ -147,6 +147,11 @@ export class KustoDBDatasource {
   }
 
   metricFindQuery(query: string, optionalOptions: any): Promise<MetricFindValue[]> {
+    const databasesQuery = query.match(/^databases\(\)/i);
+    if (databasesQuery) {
+      return this.getDatabases();
+    }
+
     return this.getDefaultOrFirstDatabase()
       .then(database => this.buildQuery(query, optionalOptions, database))
       .then(queries =>
@@ -272,7 +277,10 @@ export class KustoDBDatasource {
     if (!options.hasOwnProperty('scopedVars')) {
       options['scopedVars'] = {};
     }
-    const queryBuilder = new QueryBuilder(this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable), options);
+    const queryBuilder = new QueryBuilder(
+      this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable),
+      options
+    );
     const url = `${this.baseUrl}/v1/rest/query`;
     const interpolatedQuery = queryBuilder.interpolate().query;
     const queries: any[] = [];

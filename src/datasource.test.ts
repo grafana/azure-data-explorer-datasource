@@ -1,7 +1,7 @@
 import { KustoDBDatasource } from './datasource';
 import q from 'q';
 import { dateTime } from '@grafana/data';
-import { TemplateSrv } from '../test/template_srv';
+import { TemplateSrv } from './test/template_srv';
 import _ from 'lodash';
 
 describe('KustoDBDatasource', () => {
@@ -21,38 +21,7 @@ describe('KustoDBDatasource', () => {
   });
 
   describe('when performing getDatabases', () => {
-    const response = {
-      Tables: [
-        {
-          TableName: 'Table_0',
-          Columns: [
-            { ColumnName: 'DatabaseName', DataType: 'String' },
-            { ColumnName: 'PersistentStorage', DataType: 'String' },
-            { ColumnName: 'Version', DataType: 'String' },
-            { ColumnName: 'IsCurrent', DataType: 'Boolean' },
-            { ColumnName: 'DatabaseAccessMode', DataType: 'String' },
-            { ColumnName: 'PrettyName', DataType: 'String' },
-            {
-              ColumnName: 'CurrentUserIsUnrestrictedViewer',
-              DataType: 'Boolean',
-            },
-            { ColumnName: 'DatabaseId', DataType: 'Guid' },
-          ],
-          Rows: [
-            [
-              'Grafana',
-              'https://4bukustoragekus86a3c.blob.core.windows.net/grafanamd201806201624130602',
-              'v5.2',
-              false,
-              'ReadWrite',
-              null,
-              false,
-              'a955a3ed-0668-4d00-a2e5-9c4e610ef057',
-            ],
-          ],
-        },
-      ],
-    };
+    const response = setupTableResponse();
 
     beforeEach(() => {
       ctx.backendSrv.datasourceRequest = options => {
@@ -65,6 +34,27 @@ describe('KustoDBDatasource', () => {
       return ctx.ds.getDatabases().then(results => {
         expect(results[0].text).toBe('Grafana');
         expect(results[0].value).toBe('Grafana');
+      });
+    });
+  });
+
+  describe('When performing metricFindQuery', () => {
+    describe('and is the databases() macro', () => {
+      let queryResults;
+
+      beforeEach(async () => {
+        ctx.backendSrv.datasourceRequest = options => {
+          expect(options.url).toContain('/v1/rest/mgmt');
+          return Promise.resolve({ data: setupTableResponse(), status: 200 });
+        };
+
+        queryResults = await ctx.ds.metricFindQuery('databases()');
+      });
+
+      it('should return a list of databases', () => {
+        expect(queryResults.length).toBe(2);
+        expect(queryResults[0].text).toBe('Grafana');
+        expect(queryResults[0].value).toBe('Grafana');
       });
     });
   });
@@ -242,7 +232,8 @@ describe('KustoDBDatasource', () => {
           A: {
             alias: '',
             database: 'Grafana',
-            query: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+            query:
+              "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
             refId: 'A',
             resultFormat: 'time_series_adx_series',
             datasource: 'ADX',
@@ -260,7 +251,8 @@ describe('KustoDBDatasource', () => {
               refId: 'A',
               meta: {
                 KustoError: '',
-                RawQuery: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+                RawQuery:
+                  "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
                 TimeNotASC: false,
               },
             },
@@ -277,7 +269,8 @@ describe('KustoDBDatasource', () => {
           A: {
             alias: '$value',
             database: 'Grafana',
-            query: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+            query:
+              "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
             refId: 'A',
             resultFormat: 'time_series_adx_series',
             datasource: 'ADX',
@@ -295,7 +288,8 @@ describe('KustoDBDatasource', () => {
               refId: 'A',
               meta: {
                 KustoError: '',
-                RawQuery: "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
+                RawQuery:
+                  "print id='abc', Timestamp=range(bin(now(), 1h)-11h, bin(now(), 1h), 1h), y=dynamic([2,5,6,8,11,15,17,18,25,26,30,30])",
                 TimeNotASC: false,
               },
             },
@@ -307,3 +301,48 @@ describe('KustoDBDatasource', () => {
     });
   });
 });
+
+function setupTableResponse() {
+  return {
+    Tables: [
+      {
+        TableName: 'Table_0',
+        Columns: [
+          { ColumnName: 'DatabaseName', DataType: 'String' },
+          { ColumnName: 'PersistentStorage', DataType: 'String' },
+          { ColumnName: 'Version', DataType: 'String' },
+          { ColumnName: 'IsCurrent', DataType: 'Boolean' },
+          { ColumnName: 'DatabaseAccessMode', DataType: 'String' },
+          { ColumnName: 'PrettyName', DataType: 'String' },
+          {
+            ColumnName: 'CurrentUserIsUnrestrictedViewer',
+            DataType: 'Boolean',
+          },
+          { ColumnName: 'DatabaseId', DataType: 'Guid' },
+        ],
+        Rows: [
+          [
+            'Grafana',
+            'https://4bukustoragekus86a3c.blob.core.windows.net/grafanamd201806201624130602',
+            'v5.2',
+            false,
+            'ReadWrite',
+            null,
+            false,
+            '1955a3ed-0668-4d00-a2e5-9c4e610ef057',
+          ],
+          [
+            'Sample',
+            'https://4bukustoragekus86a3c.blob.core.windows.net/grafanamd201806201624130602',
+            'v5.2',
+            false,
+            'ReadWrite',
+            null,
+            false,
+            '2955a3ed-0668-4d00-a2e5-9c4e610ef057',
+          ],
+        ],
+      },
+    ],
+  };
+}

@@ -2,8 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0]
+
+- Adds support for the databases() macro for template variable queries and the database variable can then be used in the databases dropdown in the query editor. This allows the user to switch databases for a query without editing it.
+
+## [2.0.6]
+
+- Signed Plugin for v7
+
 ## [2.0.5]
- - Bugfix for issue #61. This is a temp fix, as a proper fix requires refactoring some of the backend.
+
+- Bugfix for issue #61. This is a temp fix, as a proper fix requires refactoring some of the backend.
 
 ## [2.0.4]
 
@@ -49,7 +58,7 @@ All notable changes to this project will be documented in this file.
 
 ## v1.1.0
 
-- Adds $__escapeMulti macro
+- Adds \$\_\_escapeMulti macro
 
 ## v1.0.0
 

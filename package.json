@@ -1,11 +1,11 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
-    "build": "grafana-toolkit plugin:build && find src | grep '\\.d\\.ts$' | xargs rm -fv",
+    "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
-    "dev": "grafana-toolkit plugin:dev && find src | grep '\\.d\\.ts$' | xargs rm -fv",
+    "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch"
   },
   "author": "Grafana Labs",
@@ -17,11 +17,5 @@
     "@grafana/e2e": "next",
     "@types/angular": "1.6.49",
     "@types/grafana": "github:CorpGlory/types-grafana.git"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "app/core/utils/kbn": "<rootDir>/src/__mocks__/kbn.ts",
-      "app/plugins/sdk": "<rootDir>/src/__mocks__/sdk.ts"
-    }
   }
 }
