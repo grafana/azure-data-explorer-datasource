@@ -34,14 +34,21 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	}
 
 	interpolatedQuery := qm.Query
-
+	var kustoError string
 	errorWithFrame := func(err error) {
-		resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{ExecutedQueryString: interpolatedQuery}})
+		fm := &data.FrameMeta{ExecutedQueryString: interpolatedQuery}
+		if kustoError != "" {
+			fm.Custom = struct {
+				KustoError string
+			}{
+				kustoError,
+			}
+		}
+		resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: fm})
 		resp.Error = err
 	}
 
 	var tableRes *azuredx.TableResponse
-	var kustoError string
 	tableRes, kustoError, err = client.KustoRequest(azuredx.RequestPayload{
 		CSL: qm.Query,
 		DB:  qm.Database,
@@ -49,7 +56,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 
 	if err != nil {
 		log.Print.Debug("error building kusto request", err.Error())
-		errorWithFrame(fmt.Errorf("%s: %s", err, kustoError))
+		errorWithFrame(err)
 		return resp
 	}
 	switch qm.Format {
@@ -125,19 +132,4 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 	}
 
 	return res, nil
-}
-
-// Metadata holds datasource metadata to send to the frontend
-type Metadata struct {
-	RawQuery   string
-	KustoError string
-	TimeNotASC bool
-}
-
-func (md *Metadata) CustomObject() map[string]interface{} {
-	m := make(map[string]interface{}, 3)
-	m["RawQuery"] = md.RawQuery
-	m["KustoError"] = md.KustoError
-	m["TimeNotASC"] = md.TimeNotASC
-	return m
 }
