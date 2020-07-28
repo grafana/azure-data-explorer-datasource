@@ -44,12 +44,13 @@ func (tr *TableResponse) ToDataFrames(refID string, customMD map[string]interfac
 		}
 		frame.RefID = refID
 		if customMD != nil {
-			frame.Meta = &data.QueryResultMeta{
+			frame.Meta = &data.FrameMeta{
 				Custom: customMD,
 			}
 		}
 		frames[0] = frame
 	}
+
 	return frames, nil
 }
 

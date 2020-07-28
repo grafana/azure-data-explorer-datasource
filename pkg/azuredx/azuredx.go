@@ -61,7 +61,7 @@ type RequestPayload struct {
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's
 // JSONData and Encrypted JSONData which contains the information needed to connected to
 // the datasource.
-func newDataSourceData(dInfo *backend.DataSourceConfig) (*dataSourceData, error) {
+func newDataSourceData(dInfo *backend.DataSourceInstanceSettings) (*dataSourceData, error) {
 	d := dataSourceData{}
 	err := json.Unmarshal(dInfo.JSONData, &d)
 	if err != nil {
@@ -73,7 +73,7 @@ func newDataSourceData(dInfo *backend.DataSourceConfig) (*dataSourceData, error)
 
 // NewClient creates a new Azure Data Explorer http client from the DatasourceInfo.
 // AAD OAuth authentication is setup for the client.
-func NewClient(ctx context.Context, dInfo *backend.DataSourceConfig) (*Client, error) {
+func NewClient(ctx context.Context, dInfo *backend.DataSourceInstanceSettings) (*Client, error) {
 	c := Client{}
 	var err error
 	c.dataSourceData, err = newDataSourceData(dInfo)
