@@ -60,12 +60,6 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 		return resp
 	}
 	switch qm.Format {
-	case "test":
-		err := client.TestRequest()
-		if err != nil {
-			resp.Error = err
-			return resp
-		}
 	case "table":
 		resp.Frames, err = tableRes.ToDataFrames(interpolatedQuery)
 		if err != nil {
@@ -132,4 +126,29 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 	}
 
 	return res, nil
+}
+
+// CheckHealth handles health checks
+func (plugin *GrafanaAzureDXDatasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
+
+	client, err := azuredx.NewClient(ctx, req.PluginContext.DataSourceInstanceSettings)
+	if err != nil {
+		return &backend.CheckHealthResult{
+			Status:  backend.HealthStatusError,
+			Message: err.Error(),
+		}, nil
+	}
+
+	err = client.TestRequest()
+	if err != nil {
+		return &backend.CheckHealthResult{
+			Status:  backend.HealthStatusError,
+			Message: err.Error(),
+		}, nil
+	}
+
+	return &backend.CheckHealthResult{
+		Status:  backend.HealthStatusOk,
+		Message: fmt.Sprintf("Success"),
+	}, nil
 }

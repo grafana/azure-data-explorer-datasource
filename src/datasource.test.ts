@@ -227,7 +227,7 @@ describe('AdxDataSource', () => {
     });
   });
 
-  describe('test alias parsing', () => {
+  it.skip('test alias parsing', () => {
     it('Should parse adx timeseries data responses with default alias', () => {
       const result = ctx.ds.processAlias(
         {

@@ -9,8 +9,10 @@ import (
 func main() {
 	backend.SetupPluginEnvironment("grafana-azure-data-explorer-datasource")
 
+	adx := &GrafanaAzureDXDatasource{}
 	err := backend.Serve(backend.ServeOpts{
-		QueryDataHandler: &GrafanaAzureDXDatasource{},
+		QueryDataHandler:   adx,
+		CheckHealthHandler: adx,
 	})
 
 	if err != nil {

@@ -5,6 +5,8 @@ import {
   DataQueryRequest,
   ScopedVar,
   TimeRange,
+  KeyValue,
+  DataFrame,
 } from '@grafana/data';
 import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
@@ -37,12 +39,24 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   query(request: DataQueryRequest<KustoQuery>): Observable<DataQueryResponse> {
-    return super.query(request).pipe(
-      mergeMap((res: DataQueryResponse) => {
-        console.log('TODO... process results');
-        return of(res); //from(this.processResponse(res));
-      })
-    );
+    let hasAlias = false;
+    for (const q of request.targets) {
+      if (q.alias && q.resultFormat !== 'table') {
+        hasAlias = true;
+        break;
+      }
+    }
+
+    if (hasAlias) {
+      return super.query(request).pipe(
+        mergeMap((res: DataQueryResponse) => {
+          return of(this.processAlias(request, res));
+        })
+      );
+    }
+
+    // simple query
+    return super.query(request);
   }
 
   filterQuery(item: KustoQuery): boolean {
@@ -58,126 +72,58 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     };
   }
 
-  //   query(request: DataQueryRequest<KustoQuery>): Observable<DataQueryResponse> {
-  //     const queryTargets = {};
+  processAlias(request: DataQueryRequest<KustoQuery>, res: DataQueryResponse): DataQueryResponse {
+    if (!res.data || !res.data.length) {
+      return res;
+    }
 
-  //     const queries = _.filter(request.targets, item => {
-  //       queryTargets[item.refId] = item;
-  //       return item.hide !== true;
-  //     }).map(item => {
-  //       const interpolatedQuery = new QueryBuilder(
-  //         this.templateSrv.replace(item.query, request.scopedVars, this.interpolateVariable),
-  //         request
-  //       ).interpolate().query;
+    const byRefId: KeyValue<KustoQuery> = {};
+    for (const target of request.targets) {
+      if (target.alias && target.resultFormat !== 'table') {
+        byRefId[target.refId] = target;
+      }
+    }
 
-  //       return {
-  //         refId: item.refId,
-  //         intervalMs: request.intervalMs,
-  //         maxDataPoints: request.maxDataPoints,
-  //         datasourceId: this.id,
-  //         datasource: this.name,
-  //         query: interpolatedQuery,
-  //         ,
-  //         resultFormat: item.resultFormat,
-  //       };
-  //     });
-
-  //     if (queries.length === 0) {
-  //       return from(Promise.resolve({ data: [] }));
-  //     }
-
-  // <<<<<<< HEAD
-  //     return from(
-  //       this.backendSrv
-  //         .datasourceRequest({
-  //           url: '/api/tsdb/query',
-  //           method: 'POST',
-  //           data: {
-  //             from: request.range.from.valueOf().toString(),
-  //             to: request.range.to.valueOf().toString(),
-  //             queries: queries,
-  //           },
-  //         })
-  //         .then(results => {
-  //           Emitter.emit('ds-request-response', results);
-
-  //           const responseParser = new ResponseParser();
-  //           const ret = responseParser.processQueryResult(results);
-
-  //           return this.processAlias(queryTargets, ret);
-  //         })
-  //     ).pipe(
-  //       catchError(error => {
-  //         Emitter.emit('ds-request-error', error);
-  //         return from(Promise.resolve({ data: [] }));
-  //       })
-  //     );
-  // =======
-  //     return this.backendSrv
-  //       .datasourceRequest({
-  //         url: '/api/ds/query',
-  //         method: 'POST',
-  //         data: {
-  //           from: options.range.from.valueOf().toString(),
-  //           to: options.range.to.valueOf().toString(),
-  //           queries: queries,
-  //         },
-  //       })
-  //       .then(results => {
-  //         // const responseParser = new ResponseParser();
-  //         // const ret = responseParser.processQueryResult(results);
-  //         // return this.processAlias(queryTargets, ret);
-  //         return { data: resultsToDataFrames(results?.data) };
-  //       });
-  // >>>>>>> origin/sdk
-  //   }
-
-  processAlias(queryTargets: {}, response: any) {
     return {
-      ...response,
-      data: response.data.map(r => {
-        const templateVars = {};
-        const query = queryTargets[r.refId];
-        // Table format does not use aliases yet. The user could
-        // control the table format using aliases in the query itself
-        // ex: data | project NewColumnName=ColumnName
-        if (query.resultFormat !== 'table') {
-          let alias = query.alias;
-          try {
-            const key = Object.keys(r.target)[0];
-            let meta = r.target;
-            if (key !== '0') {
-              meta = r.target[key];
-            }
-            const full = JSON.stringify(r.target)
-              .replace(/"/g, '')
-              .replace(/^\{(.*?)\}$/, '$1');
-            // Generating a default time series metric name requires both the metricname
-            // and the value, but only if multiple values were requested.
-            // By default, and for backwards compatibility, if there is only one metric
-            // in the alias values, use that one.
-            let defaultAlias = meta[Object.keys(meta)[0]];
-            if (typeof response.valueCount !== 'undefined' && response.valueCount > 1) {
-              defaultAlias =
-                Object.keys(meta)
-                  .map(key => '$' + key)
-                  .join('.') + '.$value';
-            }
-            templateVars['value'] = { text: key, value: key };
-            templateVars['full'] = { text: full, value: full };
-            Object.keys(meta).forEach(t => {
-              templateVars[t] = { text: meta[t], value: meta[t] };
-            });
-            if (!alias) {
-              alias = defaultAlias;
-            }
-            r.target = this.templateSrv.replace(alias, templateVars);
-          } catch (ex) {
-            console.log('Error generating time series alias', ex);
-          }
+      ...res,
+      data: res.data.map((frame: DataFrame) => {
+        const query = byRefId[frame.refId!];
+        if (query && query.alias) {
+          console.log('TODO, alias', query.alias);
+          // try {
+          //   const key = Object.keys(r.target)[0];
+          //   let meta = r.target;
+          //   if (key !== '0') {
+          //     meta = r.target[key];
+          //   }
+          //   const full = JSON.stringify(r.target)
+          //     .replace(/"/g, '')
+          //     .replace(/^\{(.*?)\}$/, '$1');
+          //   // Generating a default time series metric name requires both the metricname
+          //   // and the value, but only if multiple values were requested.
+          //   // By default, and for backwards compatibility, if there is only one metric
+          //   // in the alias values, use that one.
+          //   let defaultAlias = meta[Object.keys(meta)[0]];
+          //   if (typeof response.valueCount !== 'undefined' && response.valueCount > 1) {
+          //     defaultAlias =
+          //       Object.keys(meta)
+          //         .map(key => '$' + key)
+          //         .join('.') + '.$value';
+          //   }
+          //   templateVars['value'] = { text: key, value: key };
+          //   templateVars['full'] = { text: full, value: full };
+          //   Object.keys(meta).forEach(t => {
+          //     templateVars[t] = { text: meta[t], value: meta[t] };
+          //   });
+          //   if (!alias) {
+          //     alias = defaultAlias;
+          //   }
+          //   r.target = this.templateSrv.replace(alias, templateVars);
+          // } catch (ex) {
+          //   console.log('Error generating time series alias', ex);
+          // }
         }
-
-        return r;
+        return frame;
       }),
     };
   }
@@ -232,40 +178,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       });
   }
 
-  testDatasource(): Promise<any> {
-    return this.backendSrv
-      .datasourceRequest({
-        url: '/api/ds/query',
-        method: 'POST',
-        data: {
-          from: '5m',
-          to: 'now',
-          queries: [
-            {
-              refId: 'A',
-              intervalMs: 1,
-              maxDataPoints: 1,
-              datasourceId: this.id,
-              datasource: this.name,
-              query: '.show databases',
-              resultFormat: 'test',
-            },
-          ],
-        },
-      })
-      .then((res: any) => {
-        return { status: 'success', message: 'Connection Successful' };
-      })
-      .catch((err: any) => {
-        if (err.data && err.data.message) {
-          return { status: 'error', message: err.data.message };
-        } else {
-          return { status: 'error', message: err.status };
-        }
-      });
-  }
-
-  getDatabases(): Promise<DatabaseItem[]> {
+  async getDatabases(): Promise<DatabaseItem[]> {
     const url = `${this.baseUrl}/v1/rest/mgmt`;
     const req = {
       csl: '.show databases',
