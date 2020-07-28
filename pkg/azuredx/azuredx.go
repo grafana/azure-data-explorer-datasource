@@ -11,12 +11,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"golang.org/x/oauth2/microsoft"
-
-	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/hashicorp/go-hclog"
 	"golang.org/x/oauth2/clientcredentials"
+	"golang.org/x/oauth2/microsoft"
 )
 
 // QueryModel contains the query information from the API call that we use to make a query.
@@ -149,7 +147,7 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, e
 		errorData := &errorResponse{}
 		err = json.Unmarshal(bodyBytes, errorData)
 		if err != nil {
-			log.Print.Debug("failed to unmarshal error body from response: %v", err)
+			backend.Logger.Debug("failed to unmarshal error body from response", "error", err)
 		}
 		return nil, errorData.Error.Message, fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
 	}

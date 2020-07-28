@@ -5,17 +5,13 @@ import (
 	"fmt"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx"
-	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
-	plugin "github.com/hashicorp/go-plugin"
 	"golang.org/x/net/context"
 )
 
 // GrafanaAzureDXDatasource stores reference to plugin and logger
-type GrafanaAzureDXDatasource struct {
-	plugin.NetRPCUnsupportedPlugin
-}
+type GrafanaAzureDXDatasource struct{}
 
 func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q backend.DataQuery) backend.DataResponse {
 	resp := backend.DataResponse{}
@@ -55,7 +51,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	})
 
 	if err != nil {
-		log.Print.Debug("error building kusto request", err.Error())
+		backend.Logger.Debug("error building kusto request", "error", err.Error())
 		errorWithFrame(err)
 		return resp
 	}
@@ -63,7 +59,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	case "table":
 		resp.Frames, err = tableRes.ToDataFrames(interpolatedQuery)
 		if err != nil {
-			log.Print.Debug("error converting response to data frames", err.Error())
+			backend.Logger.Debug("error converting response to data frames", "error", err.Error())
 			errorWithFrame(fmt.Errorf("error converting response to data frames: %w", err))
 			return resp
 		}
@@ -114,7 +110,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	res := backend.NewQueryDataResponse()
 
-	log.Print.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
+	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
 
 	client, err := azuredx.NewClient(ctx, req.PluginContext.DataSourceInstanceSettings)
 	if err != nil {

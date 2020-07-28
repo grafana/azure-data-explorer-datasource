@@ -40,14 +40,17 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
 
   const onRemoveValue = useCallback(
     (index: number) => {
-      values.splice(index, 1);
-      setValues([...values]);
+      const copy = [...values];
+      copy.splice(index, 1);
+      setValues(copy);
 
       props.onChange({
         typeToRepeat: props.value.typeToRepeat,
         type: QueryEditorExpressionType.OperatorRepeater,
-        expressions: values,
+        expressions: copy,
       });
+
+      console.log( 'remove  INDEX', index, copy );
     },
     [setValues, props]
   );
