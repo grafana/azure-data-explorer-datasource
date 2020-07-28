@@ -40,10 +40,15 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 		CSL: qm.Query,
 		DB:  qm.Database,
 	})
-	if err != nil {
-		log.Print.Debug("error building kusto request", err.Error())
+
+	errorWithFrame := func(err error) {
 		resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{Custom: md.CustomObject()}})
 		resp.Error = err
+	}
+
+	if err != nil {
+		log.Print.Debug("error building kusto request", err.Error())
+		errorWithFrame(fmt.Errorf("%s: %s", err, md.KustoError))
 		return resp
 	}
 	switch qm.Format {
@@ -57,30 +62,25 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 		resp.Frames, err = tableRes.ToDataFrames(q.RefID, md.CustomObject())
 		if err != nil {
 			log.Print.Debug("error converting response to data frames", err.Error())
-			resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{Custom: md.CustomObject()}})
-			resp.Error = err
+			errorWithFrame(fmt.Errorf("error converting response to data frames: %w", err))
 			return resp
 		}
 	case "time_series":
 		frames, err := tableRes.ToDataFrames(q.RefID, md.CustomObject())
 		if err != nil {
-			resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{Custom: md.CustomObject()}})
-			resp.Error = err
+			errorWithFrame(err)
 			return resp
 		}
 		for _, f := range frames {
 			tsSchema := f.TimeSeriesSchema()
 			if tsSchema.Type == data.TimeSeriesTypeNot {
-				resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{Custom: md.CustomObject()}})
-				resp.Error = fmt.Errorf("returned frame is not a series")
+				errorWithFrame(fmt.Errorf("returned frame is not a series"))
 				return resp
 			}
 			if tsSchema.Type == data.TimeSeriesTypeLong {
 				wideFrame, err := data.LongToWide(f, nil)
 				if err != nil {
-					resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{Custom: md.CustomObject()}})
-					resp.Error = err
-					return resp
+					errorWithFrame(err)
 				}
 				f = wideFrame
 			}
