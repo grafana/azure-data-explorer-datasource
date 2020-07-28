@@ -32,17 +32,17 @@ func TestResponseToFrames(t *testing.T) {
 			name:     "single bool should have extracted value",
 			testFile: "print_true.json",
 			errorIs:  assert.NoError,
-			frame:    data.NewFrame("Table_0", data.NewField("print_0", nil, []*bool{pointer.Bool(true)})),
+			frame:    data.NewFrame("", data.NewField("print_0", nil, []*bool{pointer.Bool(true)})),
 		},
 		{
 			name:     "supported types should load with values",
 			testFile: "supported_types_with_vals.json",
 			errorIs:  assert.NoError,
-			frame: data.NewFrame("Table_0",
+			frame: data.NewFrame("",
 				data.NewField("XBool", nil, []*bool{pointer.Bool(true)}),
 				data.NewField("XString", nil, []*string{pointer.String("Grafana")}),
 				data.NewField("XDateTime", nil, []*time.Time{pointer.Time(time.Date(2006, 1, 2, 22, 4, 5, 1*1e8, time.UTC))}),
-				data.NewField("XDynamic", nil, []*string{pointer.String(`[{"person":"Daniel"},{"cats":23},{"diagnosis":"cat problem"}]`)}),
+				data.NewField("XDynamic", nil, []string{`[{"person":"Daniel"},{"cats":23},{"diagnosis":"cat problem"}]`}),
 				data.NewField("XGuid", nil, []*string{pointer.String("74be27de-1e4e-49d9-b579-fe0b331d3642")}),
 				data.NewField("XInt", nil, []*int32{pointer.Int32(2147483647)}),
 				data.NewField("XLong", nil, []*int64{pointer.Int64(9223372036854775807)}),
@@ -54,10 +54,10 @@ func TestResponseToFrames(t *testing.T) {
 			name:     "supported types should load with null values",
 			testFile: "nulls_in_table.json",
 			errorIs:  assert.NoError,
-			frame: data.NewFrame("Table_0",
+			frame: data.NewFrame("",
 				data.NewField("XBool", nil, []*bool{nil}),
 				data.NewField("XDateTime", nil, []*time.Time{nil}),
-				data.NewField("XDynamic", nil, []*string{nil}),
+				data.NewField("XDynamic", nil, []string{"null"}),
 				data.NewField("XGuid", nil, []*string{nil}),
 				data.NewField("XInt", nil, []*int32{nil}),
 				data.NewField("XLong", nil, []*int64{nil}),
@@ -73,7 +73,7 @@ func TestResponseToFrames(t *testing.T) {
 				t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
 			}
 
-			frames, err := respTable.ToDataFrames("", nil)
+			frames, err := respTable.ToDataFrames(nil)
 			tt.errorIs(t, err)
 			if err != nil {
 				return
@@ -124,7 +124,7 @@ func TestResponseToFrames(t *testing.T) {
 // 			testTable: &TableResponse{
 // 				Tables: []Table{
 // 					{
-// 						TableName: "Table_0",
+// 						TableName: "",
 // 						Columns: []Column{
 // 							{
 // 								ColumnName: "Time",

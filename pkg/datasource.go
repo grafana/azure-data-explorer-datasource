@@ -59,14 +59,14 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 			return resp
 		}
 	case "table":
-		resp.Frames, err = tableRes.ToDataFrames(q.RefID, md.CustomObject())
+		resp.Frames, err = tableRes.ToDataFrames(md.CustomObject())
 		if err != nil {
 			log.Print.Debug("error converting response to data frames", err.Error())
 			errorWithFrame(fmt.Errorf("error converting response to data frames: %w", err))
 			return resp
 		}
 	case "time_series":
-		frames, err := tableRes.ToDataFrames(q.RefID, md.CustomObject())
+		frames, err := tableRes.ToDataFrames(md.CustomObject())
 		if err != nil {
 			errorWithFrame(err)
 			return resp

@@ -3,8 +3,8 @@ package azuredx
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/data"
@@ -32,218 +32,211 @@ type Column struct {
 	ColumnType string
 }
 
-func (tr *TableResponse) ToDataFrames(refID string, customMD map[string]interface{}) ([]*data.Frame, error) {
-	frames := make([]*data.Frame, 1)
-	for _, table := range tr.Tables {
-		if table.TableName != "Table_0" {
-			continue
+func (ar *TableResponse) getTableByName(name string) (Table, error) {
+	for _, t := range ar.Tables {
+		if t.TableName == name {
+			return t, nil
 		}
-		frame, err := table.ToDataFrame()
-		if err != nil {
-			return nil, err
-		}
-		frame.RefID = refID
-		if customMD != nil {
-			frame.Meta = &data.FrameMeta{
-				Custom: customMD,
-			}
-		}
-		frames[0] = frame
 	}
-
-	return frames, nil
+	return Table{}, fmt.Errorf("no data as %v table is missing from the the response", name)
 }
 
-func (t *Table) ToDataFrame() (*data.Frame, error) {
-	frame, converters, err := emptyFrameForTable(t)
+func (tables *TableResponse) ToDataFrames(customMD map[string]interface{}) (data.Frames, error) {
+	table, err := tables.getTableByName("Table_0")
 	if err != nil {
 		return nil, err
 	}
-	for rowIdx, row := range t.Rows {
-		for colIdx, cell := range row {
-			v, err := converters[colIdx](cell)
+	converterFrame, err := converterFrameForTable(table, customMD)
+	if err != nil {
+		return nil, err
+	}
+	for rowIdx, row := range table.Rows {
+		for fieldIdx, field := range row {
+			err = converterFrame.Set(fieldIdx, rowIdx, field)
 			if err != nil {
 				return nil, err
 			}
-			frame.Set(colIdx, rowIdx, v)
 		}
 	}
-	return frame, nil
+	return data.Frames{converterFrame.Frame}, nil
 }
 
-func emptyFrameForTable(t *Table) (*data.Frame, []converter, error) {
-	fields := make([]*data.Field, len(t.Columns))
-	rowLen := len(t.Rows)
-
-	converters := make([]converter, len(t.Columns))
+func converterFrameForTable(t Table, customMD map[string]interface{}) (*data.FrameInputConverter, error) {
+	converters := []data.FieldConverter{}
+	colNames := make([]string, len(t.Columns))
 
 	for i, col := range t.Columns {
-		fType, ok := fieldTypeForKustoType(col.ColumnType)
+		colNames[i] = col.ColumnName
+		converter, ok := converterMap[col.ColumnType]
 		if !ok {
-			// TODO maybe remove this error
-			return nil, nil, fmt.Errorf("unsupported kusto column type %v", col.ColumnType)
+			return nil, fmt.Errorf("unsupported analytics column type %v", col.ColumnType)
 		}
-		converters[i] = converterForKustoType(col.ColumnType)
-		field := data.NewFieldFromFieldType(fType, rowLen)
-		field.Name = col.ColumnName
-		fields[i] = field
+		converters = append(converters, converter)
 	}
-	return data.NewFrame(t.TableName, fields...), converters, nil
-}
 
-// return data Field type for kustoType, if no match, will return assume nullabe string vector and return false.
-func fieldTypeForKustoType(kustoType string) (data.FieldType, bool) {
-	d := data.FieldTypeNullableString
-	switch strings.ToLower(kustoType) {
-	case "string", "guid", "timespan", "dynamic":
-		d = data.FieldTypeNullableString
-	case "bool":
-		d = data.FieldTypeNullableBool
-	case "int":
-		d = data.FieldTypeNullableInt32
-	case "long":
-		d = data.FieldTypeNullableInt64
-	case "real":
-		d = data.FieldTypeNullableFloat64
-	case "datetime":
-		d = data.FieldTypeNullableTime
-	default:
-		return d, false
-	}
-	return d, true
-}
-
-func converterForKustoType(kustoType string) converter {
-	var converter converter
-	switch strings.ToLower(kustoType) {
-	case "string", "guid", "timespan":
-		converter = stringConverter
-	case "bool":
-		converter = boolConverter
-	case "int":
-		converter = intConverter
-	case "long":
-		converter = longConverter
-	case "real":
-		converter = realConverter
-	case "datetime":
-		converter = timeConverter
-	case "dynamic":
-		converter = dynamicConverter
-	default:
-		converter = noConverter
-	}
-	return converter
-}
-
-type converter func(v interface{}) (interface{}, error)
-
-func longConverter(v interface{}) (interface{}, error) {
-	var ai *int64
-	if v == nil {
-		return ai, nil
-	}
-	jN, ok := v.(json.Number)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type, expected json.Number got %T", v)
-	}
-	out, err := jN.Int64()
+	fic, err := data.NewFrameInputConverter(converters, len(t.Rows))
 	if err != nil {
 		return nil, err
 	}
-	return &out, err
-}
 
-func realConverter(v interface{}) (interface{}, error) {
-	var af *float64
-	if v == nil {
-		return af, nil
-	}
-	jN, ok := v.(json.Number)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type, expected json.Number got %T", v)
-	}
-	f, err := jN.Float64()
+	err = fic.Frame.SetFieldNames(colNames...)
 	if err != nil {
 		return nil, err
 	}
-	return &f, err
+	if customMD != nil {
+		fic.Frame.Meta = &data.FrameMeta{
+			Custom: customMD,
+		}
+	}
+
+	return fic, nil
 }
 
-func intConverter(v interface{}) (interface{}, error) {
-	var ai *int32
-	if v == nil {
-		return ai, nil
-	}
-	jN, ok := v.(json.Number)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type, expected json.Number got %T", v)
-	}
-	var err error
-	iv, err := strconv.ParseInt(jN.String(), 10, 32)
-	if err != nil {
-		return nil, err
-	}
-	aInt := int32(iv)
-	return &aInt, nil
+var converterMap = map[string]data.FieldConverter{
+	"string":   stringConverter,
+	"guid":     stringConverter,
+	"timespan": stringConverter,
+	"dynamic":  dynamicConverter,
+	"datetime": timeConverter,
+	"int":      intConverter,
+	"long":     longConverter,
+	"real":     realConverter,
+	"bool":     boolConverter,
 }
 
-func noConverter(v interface{}) (interface{}, error) {
-	return v, nil
+var dynamicConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeString,
+	Converter: func(v interface{}) (interface{}, error) {
+		b, err := json.Marshal(v)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal dynamic type into JSON string '%v': %v", v, err)
+		}
+		return string(b), nil
+	},
 }
 
-func stringConverter(v interface{}) (interface{}, error) {
-	var as *string
-	if v == nil {
+var stringConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableString,
+	Converter: func(v interface{}) (interface{}, error) {
+		var as *string
+		if v == nil {
+			return as, nil
+		}
+		s, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected string but got type %T with a value of %v", v, v)
+		}
+		as = &s
 		return as, nil
-	}
-	s, ok := v.(string)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type, expected string got %T", v)
-	}
-	return &s, nil
+	},
 }
 
-func boolConverter(v interface{}) (interface{}, error) {
-	var ab *bool
-	if v == nil {
-		return ab, nil
-	}
-	b, ok := v.(bool)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type, expected bool got %T", v)
-	}
-	return &b, nil
+var timeConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableTime,
+	Converter: func(v interface{}) (interface{}, error) {
+		var at *time.Time
+		if v == nil {
+			return at, nil
+		}
+		s, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected string but got type %T with a value of %v", v, v)
+		}
+		t, err := time.Parse(time.RFC3339Nano, s)
+		if err != nil {
+			return nil, err
+		}
+
+		return &t, nil
+	},
 }
 
-func timeConverter(v interface{}) (interface{}, error) {
-	var at *time.Time
-	if v == nil {
-		return at, nil
-	}
-	s, ok := v.(string)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type, expected string got %T", v)
-	}
-	t, err := time.Parse(time.RFC3339Nano, s)
-	if err != nil {
-		return nil, err
-	}
-
-	return &t, nil
+var realConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableFloat64,
+	Converter: func(v interface{}) (interface{}, error) {
+		var af *float64
+		if v == nil {
+			return af, nil
+		}
+		jN, ok := v.(json.Number)
+		if !ok {
+			s, sOk := v.(string)
+			if sOk {
+				switch s {
+				case "Infinity":
+					f := math.Inf(0)
+					return &f, nil
+				case "-Infinity":
+					f := math.Inf(-1)
+					return &f, nil
+				case "NaN":
+					f := math.NaN()
+					return &f, nil
+				}
+			}
+			return nil, fmt.Errorf("unexpected type, expected json.Number but got type %T for value %v", v, v)
+		}
+		f, err := jN.Float64()
+		if err != nil {
+			return nil, err
+		}
+		return &f, err
+	},
 }
 
-func dynamicConverter(v interface{}) (interface{}, error) {
-	var as *string
-	if v == nil {
-		return as, nil
-	}
-	b, err := json.Marshal(v)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal dynamic type into JSON string '%v': %v", v, err)
-	}
-	s := string(b)
-	return &s, nil
+var boolConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableBool,
+	Converter: func(v interface{}) (interface{}, error) {
+		var ab *bool
+		if v == nil {
+			return ab, nil
+		}
+		b, ok := v.(bool)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected bool but got got type %T with a value of %v", v, v)
+		}
+		return &b, nil
+	},
+}
+
+var intConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableInt32,
+	Converter: func(v interface{}) (interface{}, error) {
+		var ai *int32
+		if v == nil {
+			return ai, nil
+		}
+		jN, ok := v.(json.Number)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected json.Number but got type %T with a value of %v", v, v)
+		}
+		var err error
+		iv, err := strconv.ParseInt(jN.String(), 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		aInt := int32(iv)
+		return &aInt, nil
+	},
+}
+
+var longConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableInt64,
+	Converter: func(v interface{}) (interface{}, error) {
+		var ai *int64
+		if v == nil {
+			return ai, nil
+		}
+		jN, ok := v.(json.Number)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected json.Number but got type %T with a value of %v", v, v)
+		}
+		out, err := jN.Int64()
+		if err != nil {
+			return nil, err
+		}
+		return &out, err
+	},
 }
 
 // ToADXTimeSeries returns Time series for a query that returns an ADX series type.
