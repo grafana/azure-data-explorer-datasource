@@ -22,6 +22,7 @@ type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface State {
   schema?: AdxSchema;
+  dirty?: boolean;
 
   databases?: QueryEditorFieldDefinition[];
   tables?: QueryEditorFieldDefinition[];
@@ -33,6 +34,13 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   kustoExpressionParser = new KustoExpressionParser();
   templateVariableOptions: any;
+
+  // Check when the query has changed, but not yet run
+  componentDidUpdate(oldProps: Props) {
+    if (oldProps.data !== this.props.data && this.state.dirty) {
+      this.setState({ dirty: false });
+    }
+  }
 
   async componentDidMount() {
     try {
@@ -122,6 +130,8 @@ export class QueryEditor extends PureComponent<Props, State> {
     this.props.onChange(q);
     if (run) {
       this.props.onRunQuery();
+    } else {
+      this.setState({ dirty: true });
     }
   };
 
@@ -303,6 +313,7 @@ export class QueryEditor extends PureComponent<Props, State> {
 
             <Button onClick={this.onToggleRawMode}>Edit KQL</Button>
             <Button
+              variant={this.state.dirty ? 'primary' : 'secondary'}
               onClick={() => {
                 this.props.onRunQuery();
               }}

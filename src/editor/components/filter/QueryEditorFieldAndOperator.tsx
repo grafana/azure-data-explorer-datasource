@@ -49,6 +49,8 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
       };
 
       props.onChange(payload);
+    } else {
+      console.log( 'NO operator and field????', props );
     }
   }, [field, operator]);
 
