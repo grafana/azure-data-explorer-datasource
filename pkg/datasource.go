@@ -35,15 +35,21 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	md := &Metadata{
 		RawQuery: qm.Query,
 	}
+
+	errorWithFrame := func(err error) {
+		resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{Custom: md.CustomObject()}})
+		resp.Error = err
+	}
+
 	var tableRes *azuredx.TableResponse
 	tableRes, md.KustoError, err = client.KustoRequest(azuredx.RequestPayload{
 		CSL: qm.Query,
 		DB:  qm.Database,
 	})
 
-	errorWithFrame := func(err error) {
-		resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{Custom: md.CustomObject()}})
-		resp.Error = err
+	if err != nil {
+		errorWithFrame(err)
+		return resp
 	}
 
 	if err != nil {
@@ -81,6 +87,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 				wideFrame, err := data.LongToWide(f, nil)
 				if err != nil {
 					errorWithFrame(err)
+					return resp
 				}
 				f = wideFrame
 			}
@@ -103,6 +110,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	default:
 		resp.Error = fmt.Errorf("unsupported query type: '%v'", qm.Format)
 	}
+
 	return resp
 }
 
