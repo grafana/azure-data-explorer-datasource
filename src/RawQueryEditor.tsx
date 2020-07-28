@@ -277,56 +277,29 @@ function onDataReceived(
       const err = fristSeriesMeta.custom?.KustoError;
       if (err) {
         setLastQueryError(err);
+        return;
       }
     }
   }
 
   if (data.error) {
-    onDataError(data.error, props, setLastQueryError, setLastQuery);
+    onDataError(data.error, props, setLastQueryError);
   }
 }
 
 function onDataError(
   err: any,
   props: QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>,
-  setLastQueryError: Dispatch<SetStateAction<string>>,
-  setLastQuery: Dispatch<SetStateAction<string>>
+  setLastQueryError: Dispatch<SetStateAction<string>>
 ) {
-  if (err.query && err.query.refId && err.query.refId !== props.query.refId) {
+  if (!err) {
     return;
   }
 
-  setLastQuery(err?.query?.query || '');
-
-  if (
-    // Get Kusto Error from Backend
-    err.data &&
-    err.data.results &&
-    err.data.results &&
-    err.data.results[props.query.refId] &&
-    err.data.results[props.query.refId].meta &&
-    err.data.results[props.query.refId].meta.KustoError !== ''
-  ) {
-    setLastQueryError(err.data.results[props.query.refId].meta.KustoError);
-    return;
-  }
-
-  if (err.error && err.error.data && err.error.data.error && err.error.data.error.innererror) {
-    if (err.error.data.error.innererror.innererror) {
-      setLastQueryError(err.error.data.error.innererror.innererror.message);
-    } else {
-      setLastQueryError(err.error.data.error.innererror['@message']);
-    }
-  } else if (err.error && err.error.data && err.error.data.error) {
-    setLastQueryError(err.error.data.error.message);
-  } else if (err.error && err.error.data) {
-    setLastQueryError(err.error.data.message);
-  } else if (err.data && err.data.error) {
-    setLastQueryError(err.data.error.message);
-  } else if (err.data && err.data.message) {
-    setLastQueryError(err.data.message);
+  if (err.message) {
+    setLastQueryError(`${err.message}`);
   } else {
-    setLastQueryError(err);
+    setLastQueryError(`${err}`);
   }
 }
 
