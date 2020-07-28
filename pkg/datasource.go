@@ -6,7 +6,8 @@ import (
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
-	"github.com/grafana/grafana-plugin-model/go/datasource"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	plugin "github.com/hashicorp/go-plugin"
 	"golang.org/x/net/context"
 )
@@ -16,95 +17,111 @@ type GrafanaAzureDXDatasource struct {
 	plugin.NetRPCUnsupportedPlugin
 }
 
-// Query is the primary method called by grafana-server
-func (plugin *GrafanaAzureDXDatasource) Query(ctx context.Context, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
-	response := &datasource.DatasourceResponse{
-		Results: make([]*datasource.QueryResult, len(tsdbReq.Queries)),
+func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q backend.DataQuery) backend.DataResponse {
+	resp := backend.DataResponse{}
+	qm := &azuredx.QueryModel{}
+
+	err := json.Unmarshal(q.JSON, qm)
+	if err != nil {
+		resp.Error = err
+		return resp
 	}
 
-	log.Print.Debug("Query", "datasource", tsdbReq.Datasource.Name, "TimeRange", tsdbReq.TimeRange)
+	qm.MacroData = azuredx.NewMacroData(&q.TimeRange, q.Interval.Microseconds())
+	if err := qm.Interpolate(); err != nil {
+		resp.Error = err
+		return resp
+	}
+	md := &Metadata{
+		RawQuery: qm.Query,
+	}
+	var tableRes *azuredx.TableResponse
+	tableRes, md.KustoError, err = client.KustoRequest(azuredx.RequestPayload{
+		CSL: qm.Query,
+		DB:  qm.Database,
+	})
 
-	client, err := azuredx.NewClient(ctx, tsdbReq.GetDatasource())
+	errorWithFrame := func(err error) {
+		resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: &data.FrameMeta{Custom: md.CustomObject()}})
+		resp.Error = err
+	}
+
+	if err != nil {
+		log.Print.Debug("error building kusto request", err.Error())
+		errorWithFrame(fmt.Errorf("%s: %s", err, md.KustoError))
+		return resp
+	}
+	switch qm.Format {
+	case "test":
+		err := client.TestRequest()
+		if err != nil {
+			resp.Error = err
+			return resp
+		}
+	case "table":
+		resp.Frames, err = tableRes.ToDataFrames(q.RefID, md.CustomObject())
+		if err != nil {
+			log.Print.Debug("error converting response to data frames", err.Error())
+			errorWithFrame(fmt.Errorf("error converting response to data frames: %w", err))
+			return resp
+		}
+	case "time_series":
+		frames, err := tableRes.ToDataFrames(q.RefID, md.CustomObject())
+		if err != nil {
+			errorWithFrame(err)
+			return resp
+		}
+		for _, f := range frames {
+			tsSchema := f.TimeSeriesSchema()
+			if tsSchema.Type == data.TimeSeriesTypeNot {
+				errorWithFrame(fmt.Errorf("returned frame is not a series"))
+				return resp
+			}
+			if tsSchema.Type == data.TimeSeriesTypeLong {
+				wideFrame, err := data.LongToWide(f, nil)
+				if err != nil {
+					errorWithFrame(err)
+				}
+				f = wideFrame
+			}
+			resp.Frames = append(resp.Frames, f)
+		}
+	// 	series, timeNotASC, err := tableRes.ToTimeSeries()
+	// 	if err != nil {
+	// 		qr.Error = err.Error()
+	// 		break
+	// 	}
+	// 	md.TimeNotASC = timeNotASC
+	// 	qr.Series = series
+	// case "time_series_adx_series":
+	// 	series, err := tableRes.ToADXTimeSeries()
+	// 	if err != nil {
+	// 		qr.Error = err.Error()
+	// 		break
+	// 	}
+	// 	qr.Series = series
+	default:
+		resp.Error = fmt.Errorf("unsupported query type: '%v'", qm.Format)
+	}
+	return resp
+}
+
+// QueryData is the primary method called by grafana-server
+func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+	res := backend.NewQueryDataResponse()
+
+	log.Print.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
+
+	client, err := azuredx.NewClient(ctx, req.PluginContext.DataSourceInstanceSettings)
 	if err != nil {
 		return nil, err
 	}
 
-	for idx, q := range tsdbReq.GetQueries() {
-		qm := &azuredx.QueryModel{}
-		err := json.Unmarshal([]byte(q.GetModelJson()), qm)
-		if err != nil {
-			return nil, err
-		}
-		log.Print.Debug(fmt.Sprintf("Query ---> %v", q))
-		qm.MacroData = azuredx.NewMacroData(tsdbReq.GetTimeRange(), q.GetIntervalMs())
-		if err := qm.Interpolate(); err != nil {
-			return nil, err
-		}
-		md := &Metadata{
-			RawQuery: qm.Query,
-		}
-		qr := &datasource.QueryResult{
-			RefId: q.GetRefId(),
-		}
-		response.Results[idx] = qr
-		var tableRes *azuredx.TableResponse
-		tableRes, md.KustoError, err = client.KustoRequest(azuredx.RequestPayload{
-			CSL: qm.Query,
-			DB:  qm.Database,
-		})
-		if err != nil {
-			qr.Error = err.Error()
-			mdString, jsonErr := md.JSONString()
-			if jsonErr != nil {
-				log.Print.Debug("failed to marshal metadata", jsonErr)
-				continue
-			}
-			qr.MetaJson = mdString
-			continue
-		}
-		switch qm.Format {
-		case "test":
-			err := client.TestRequest()
-			if err != nil {
-				return nil, err
-			}
-			return response, nil
-		case "table":
-			gTables, err := tableRes.ToTables()
-			if err != nil {
-				qr.Error = err.Error()
-				break
-			}
-			qr.Tables = gTables
-		case "time_series":
-			series, timeNotASC, err := tableRes.ToTimeSeries()
-			if err != nil {
-				qr.Error = err.Error()
-				break
-			}
-			md.TimeNotASC = timeNotASC
-			qr.Series = series
-		case "time_series_adx_series":
-			series, err := tableRes.ToADXTimeSeries()
-			if err != nil {
-				qr.Error = err.Error()
-				break
-			}
-			qr.Series = series
-		default:
-			return nil, fmt.Errorf("unsupported query type: '%v'", qm.Format)
-		}
-
-		if qr.MetaJson == "" {
-			mdString, err := md.JSONString()
-			if err != nil {
-				log.Print.Debug("could not add metadata", err) // only log since this is just metadata
-				continue
-			}
-			qr.MetaJson = mdString
-		}
+	for _, q := range req.Queries {
+		res.Responses[q.RefID] = plugin.handleQuery(client, q)
 	}
-	return response, nil
+
+	return res, nil
 }
 
 // Metadata holds datasource metadata to send to the frontend
@@ -114,11 +131,10 @@ type Metadata struct {
 	TimeNotASC bool
 }
 
-// JSONString performs a json.Marshal on the metadata object and returns the JSON as a string.
-func (md *Metadata) JSONString() (string, error) {
-	b, err := json.Marshal(md)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
+func (md *Metadata) CustomObject() map[string]interface{} {
+	m := make(map[string]interface{}, 3)
+	m["RawQuery"] = md.RawQuery
+	m["KustoError"] = md.KustoError
+	m["TimeNotASC"] = md.TimeNotASC
+	return m
 }

@@ -1,14 +1,19 @@
 import _ from 'lodash';
-import { MetricFindValue, DataQueryResponse, DataSourceInstanceSettings, DataQueryRequest } from '@grafana/data';
+import {
+  MetricFindValue,
+  DataQueryResponse,
+  DataSourceInstanceSettings,
+  DataQueryRequest,
+  ScopedVar,
+} from '@grafana/data';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import QueryBuilder from './query_builder';
 import Cache from './cache';
 import RequestAggregator from './request_aggregator';
 import { AdxDataSourceOptions, KustoQuery, AdxSchema } from './types';
-import { Observable, from } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import Emitter from './emitter';
+import { Observable, of } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -31,58 +36,104 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   query(request: DataQueryRequest<KustoQuery>): Observable<DataQueryResponse> {
-    const queryTargets = {};
-
-    const queries = _.filter(request.targets, item => {
-      queryTargets[item.refId] = item;
-      return item.hide !== true;
-    }).map(item => {
-      const interpolatedQuery = new QueryBuilder(
-        this.templateSrv.replace(item.query, request.scopedVars, this.interpolateVariable),
-        request
-      ).interpolate().query;
-
-      return {
-        refId: item.refId,
-        intervalMs: request.intervalMs,
-        maxDataPoints: request.maxDataPoints,
-        datasourceId: this.id,
-        query: interpolatedQuery,
-        database: this.templateSrv.replace(item.database, request.scopedVars),
-        resultFormat: item.resultFormat,
-      };
-    });
-
-    if (queries.length === 0) {
-      return from(Promise.resolve({ data: [] }));
-    }
-
-    return from(
-      this.backendSrv
-        .datasourceRequest({
-          url: '/api/tsdb/query',
-          method: 'POST',
-          data: {
-            from: request.range.from.valueOf().toString(),
-            to: request.range.to.valueOf().toString(),
-            queries: queries,
-          },
-        })
-        .then(results => {
-          Emitter.emit('ds-request-response', results);
-
-          const responseParser = new ResponseParser();
-          const ret = responseParser.processQueryResult(results);
-
-          return this.processAlias(queryTargets, ret);
-        })
-    ).pipe(
-      catchError(error => {
-        Emitter.emit('ds-request-error', error);
-        return from(Promise.resolve({ data: [] }));
+    return super.query(request).pipe(
+      mergeMap((res: DataQueryResponse) => {
+        console.log('TODO... process results');
+        return of(res); //from(this.processResponse(res));
       })
     );
   }
+
+  filterQuery(item: KustoQuery): boolean {
+    return item.hide !== true;
+  }
+
+  applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
+    // const interpolatedQuery = new QueryBuilder(
+    //   this.templateSrv.replace(target.query, scopedVars, this.interpolateVariable),
+    //   request
+    // ).interpolate().query;
+
+    return {
+      ...target,
+      query: this.templateSrv.replace(target.query, scopedVars),
+      database: this.templateSrv.replace(target.database, scopedVars),
+    };
+  }
+
+  //   query(request: DataQueryRequest<KustoQuery>): Observable<DataQueryResponse> {
+  //     const queryTargets = {};
+
+  //     const queries = _.filter(request.targets, item => {
+  //       queryTargets[item.refId] = item;
+  //       return item.hide !== true;
+  //     }).map(item => {
+  //       const interpolatedQuery = new QueryBuilder(
+  //         this.templateSrv.replace(item.query, request.scopedVars, this.interpolateVariable),
+  //         request
+  //       ).interpolate().query;
+
+  //       return {
+  //         refId: item.refId,
+  //         intervalMs: request.intervalMs,
+  //         maxDataPoints: request.maxDataPoints,
+  //         datasourceId: this.id,
+  //         datasource: this.name,
+  //         query: interpolatedQuery,
+  //         ,
+  //         resultFormat: item.resultFormat,
+  //       };
+  //     });
+
+  //     if (queries.length === 0) {
+  //       return from(Promise.resolve({ data: [] }));
+  //     }
+
+  // <<<<<<< HEAD
+  //     return from(
+  //       this.backendSrv
+  //         .datasourceRequest({
+  //           url: '/api/tsdb/query',
+  //           method: 'POST',
+  //           data: {
+  //             from: request.range.from.valueOf().toString(),
+  //             to: request.range.to.valueOf().toString(),
+  //             queries: queries,
+  //           },
+  //         })
+  //         .then(results => {
+  //           Emitter.emit('ds-request-response', results);
+
+  //           const responseParser = new ResponseParser();
+  //           const ret = responseParser.processQueryResult(results);
+
+  //           return this.processAlias(queryTargets, ret);
+  //         })
+  //     ).pipe(
+  //       catchError(error => {
+  //         Emitter.emit('ds-request-error', error);
+  //         return from(Promise.resolve({ data: [] }));
+  //       })
+  //     );
+  // =======
+  //     return this.backendSrv
+  //       .datasourceRequest({
+  //         url: '/api/ds/query',
+  //         method: 'POST',
+  //         data: {
+  //           from: options.range.from.valueOf().toString(),
+  //           to: options.range.to.valueOf().toString(),
+  //           queries: queries,
+  //         },
+  //       })
+  //       .then(results => {
+  //         // const responseParser = new ResponseParser();
+  //         // const ret = responseParser.processQueryResult(results);
+  //         // return this.processAlias(queryTargets, ret);
+  //         return { data: resultsToDataFrames(results?.data) };
+  //       });
+  // >>>>>>> origin/sdk
+  //   }
 
   processAlias(queryTargets: {}, response: any) {
     return {
@@ -190,7 +241,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   testDatasource(): Promise<any> {
     return this.backendSrv
       .datasourceRequest({
-        url: '/api/tsdb/query',
+        url: '/api/ds/query',
         method: 'POST',
         data: {
           from: '5m',
@@ -201,6 +252,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
               intervalMs: 1,
               maxDataPoints: 1,
               datasourceId: this.id,
+              datasource: this.name,
               query: '.show databases',
               resultFormat: 'test',
             },
