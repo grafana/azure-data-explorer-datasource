@@ -29,7 +29,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
   const [databases, setDatabases] = useState<Array<SelectableValue<string>>>([]);
   const [showHelp, setShowHelp] = useState<boolean>(false);
   const [query, setQuery] = useState<string>(props.query.query ?? defaultQuery);
-  const [alias, setAlias] = useState<string>(props.query.alias);
+  const [alias, setAlias] = useState<string>(props.query.alias ?? '');
   const [showLastQuery, setShowLastQuery] = useState<boolean>(true);
   const [lastQueryError, setLastQueryError] = useState<string>('');
   const [lastQuery, setLastQuery] = useState<string>('');

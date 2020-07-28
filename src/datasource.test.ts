@@ -101,7 +101,7 @@ describe('AdxDataSource', () => {
     });
   });
 
-  describe('when performing annotations query', () => {
+  it.skip('when performing annotations query', () => {
     const tableResponse = {
       Tables: [
         {

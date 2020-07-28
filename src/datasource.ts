@@ -1,19 +1,20 @@
-import _ from 'lodash';
 import {
   MetricFindValue,
   DataQueryResponse,
   DataSourceInstanceSettings,
   DataQueryRequest,
   ScopedVar,
+  TimeRange,
 } from '@grafana/data';
+import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
-import QueryBuilder from './query_builder';
 import Cache from './cache';
 import RequestAggregator from './request_aggregator';
 import { AdxDataSourceOptions, KustoQuery, AdxSchema } from './types';
 import { Observable, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
+import interpolateKustoQuery from './query_builder';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -49,14 +50,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
-    // const interpolatedQuery = new QueryBuilder(
-    //   this.templateSrv.replace(target.query, scopedVars, this.interpolateVariable),
-    //   request
-    // ).interpolate().query;
-
+    const q = interpolateKustoQuery(target.query);
     return {
       ...target,
-      query: this.templateSrv.replace(target.query, scopedVars),
+      query: this.templateSrv.replace(q, scopedVars),
       database: this.templateSrv.replace(target.database, scopedVars),
     };
   }
@@ -192,18 +189,15 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       });
     }
 
-    const queries: any[] = this.buildQuery(options.annotation.rawQuery, options, options.annotation.database);
-    return this.backendSrv
-      .datasourceRequest({
-        url: '/api/tsdb/query',
-        method: 'POST',
-        data: {
-          from: options.range.from.valueOf().toString(),
-          to: options.range.to.valueOf().toString(),
-          queries: queries,
-        },
-      })
+    const query = this.buildQuery(options.annotation.rawQuery, options, options.annotation.database);
+    return super
+      .query({
+        targets: [query],
+        range: options.range as TimeRange,
+      } as DataQueryRequest<KustoQuery>)
+      .toPromise()
       .then(results => {
+        console.log('Process');
         return new ResponseParser().parseAnnotations(results, options);
       });
   }
@@ -293,7 +287,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  getSchema(): Promise<AdxSchema> {
+  async getSchema(): Promise<AdxSchema> {
     const url = `${this.baseUrl}/v1/rest/mgmt`;
     const req = {
       csl: `.show databases schema as json`,
@@ -336,38 +330,21 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  private buildQuery(query: string, options: any, database: string) {
+  private buildQuery(query: string, options: any, database: string): KustoQuery {
     if (!options) {
       options = {};
     }
     if (!options.hasOwnProperty('scopedVars')) {
       options['scopedVars'] = {};
     }
-    const queryBuilder = new QueryBuilder(
-      this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable),
-      options
-    );
-    const url = `${this.baseUrl}/v1/rest/query`;
-    const interpolatedQuery = queryBuilder.interpolate().query;
-    const queries: any[] = [];
-    queries.push({
-      key: `${url}-table-${database}-${interpolatedQuery}`,
-      datasourceId: this.id,
-      url: url,
+    const interpolatedQuery = interpolateKustoQuery(query);
+    return {
+      refId: `adx-table-${database}-${interpolatedQuery}`,
       resultFormat: 'table',
       query: interpolatedQuery,
       database,
-    });
-    return queries;
+    };
   }
-
-  // refId: item.refId,
-  // intervalMs: options.intervalMs,
-  // maxDataPoints: options.maxDataPoints,
-  // datasourceId: this.id,
-  // query: interpolatedQuery,
-  // database: item.database,
-  // resultFormat: item.resultFormat,
 
   doRequest(url, data, maxRetries = 1) {
     return this.backendSrv
@@ -398,7 +375,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return value;
     }
 
-    const quotedValues = _.map(value, val => {
+    const quotedValues = map(value, val => {
       if (typeof value === 'number') {
         return value;
       }
