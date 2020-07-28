@@ -275,12 +275,12 @@ function onDataReceived(
       setTimeNotASC(fristSeriesMeta.custom?.TimeNotASC);
 
       const err = fristSeriesMeta.custom?.KustoError;
-      if(err) {
-        setLastQueryError(err)
+      if (err) {
+        setLastQueryError(err);
       }
     }
   }
-  
+
   if (data.error) {
     onDataError(data.error, props, setLastQueryError, setLastQuery);
   }
