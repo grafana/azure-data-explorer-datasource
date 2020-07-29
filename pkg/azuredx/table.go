@@ -272,7 +272,7 @@ func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
 			labelColIdxs = append(labelColIdxs, fieldIdx)
 		case "dynamic":
 			if field.Name == "Timestamp" {
-				if foundTime == true {
+				if foundTime {
 					return nil, fmt.Errorf("must be exactly one column named 'Timestamp', but response has more than one")
 				}
 				foundTime = true
@@ -338,4 +338,3 @@ func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
 
 	return out, nil
 }
-
