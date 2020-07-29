@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Button, Select, Input, InlineFormLabel, Icon } from '@grafana/ui';
-import { KustoQuery, AdxDataSourceOptions, AdxDatabaseSchema } from 'types';
+import { KustoQuery, AdxDataSourceOptions } from 'types';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { KustoMonacoEditor } from './monaco/KustoMonacoEditor';
@@ -46,6 +46,10 @@ const resultFormats: Array<SelectableValue<string>> = [
 export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
   state: State = {};
 
+  componentDidMount() {
+    this.componentDidUpdate({} as Props); // set the initial states
+  }
+
   componentDidUpdate(oldProps: Props) {
     const { data } = this.props;
     if (oldProps.data !== data) {
@@ -78,38 +82,6 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
     }
   }
 
-  // (() => {
-  //   onDataReceived(props.data, props, setLastQueryError, setLastQuery, setTimeNotASC);
-  // }, [props.data]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const schema = await props.datasource.getSchema();
-  //       setDatabases(prepareDatabaseOptions(schema.Databases));
-  //       if (!database && Object.keys(schema.Databases).length > 0) {
-  //         const firstDatabase = schema.Databases[Object.keys(schema.Databases)[0]];
-  //         setDatabase(firstDatabase.Name || '');
-  //       }
-  //     } catch (error) {
-  //       console.log('error', error);
-  //     }
-  //   })();
-  // }, []);
-
-  // const onChange = useCallback(() => {
-  //   props.onChange({
-  //     ...props.query,
-  //     resultFormat: resultFormat,
-  //     alias: alias,
-  //     database: database,
-  //   });
-  //   props.onRunQuery();
-  // }, [props]);
-
-  // const onBlur = useCallback(() => {
-  //   onChange();
-  // }, [props]);
   render() {
     const { query, databases, templateVariableOptions, onDatabaseChanged, onRawModeChange, datasource } = this.props;
     const { database, alias, resultFormat } = query;
@@ -264,13 +236,3 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
     );
   }
 }
-
-export const prepareDatabaseOptions = (databases: Record<string, AdxDatabaseSchema>) => {
-  const options: Array<SelectableValue<string>> = [];
-  for (const dbName of Object.keys(databases)) {
-    const db = databases[dbName];
-    options.push({ label: db.Name, value: db.Name });
-  }
-
-  return options;
-};
