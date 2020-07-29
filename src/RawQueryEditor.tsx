@@ -82,37 +82,41 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
 
   return (
     <div>
-      <div className="gf-form-inline">
-        <DatabaseSelect
-          databases={databases}
-          templateVariableOptions={props.templateVariableOptions}
-          database={database}
-          onChange={val => {
-            setDatabase(val);
-            onChange();
-          }}
-        />
-        <div className="gf-form">
-          <div className="width-1"></div>
-        </div>
-        <div className="gf-form">
+      <DatabaseSelect
+        databases={databases}
+        templateVariableOptions={props.templateVariableOptions}
+        database={database}
+        onChange={val => {
+          setDatabase(val);
+          onChange();
+        }}
+      >
+        <>
+          <div className="gf-form">
+            <label className="gf-form-label">(Run Query: Shift+Enter, Trigger Suggestion: Ctrl+Space)</label>
+          </div>
+          <div className="gf-form gf-form--grow">
+            <div className="gf-form-label gf-form-label--grow"></div>
+          </div>
           <Button
-            className="btn btn-primary width-10"
+            onClick={() => {
+              props.onRawModeChange();
+            }}
+          >
+            Query Builder
+          </Button>
+          &nbsp;
+          <Button
+            variant={'primary'}
             onClick={() => {
               onQueryChange();
               props.onRunQuery();
             }}
           >
-            Run
+            Run Query
           </Button>
-        </div>
-        <div className="gf-form">
-          <label className="gf-form-label">(Run Query: Shift+Enter, Trigger Suggestion: Ctrl+Space)</label>
-        </div>
-        <div className="gf-form gf-form--grow">
-          <div className="gf-form-label gf-form-label--grow"></div>
-        </div>
-      </div>
+        </>
+      </DatabaseSelect>
 
       <KustoMonacoEditor
         defaultTimeField="Timestamp"
@@ -168,13 +172,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = props => {
             Raw Query <Icon name={showLastQuery ? 'angle-down' : 'angle-right'} />
           </label>
         </div>
-        <Button
-          onClick={() => {
-            props.onRawModeChange();
-          }}
-        >
-          Query Builder
-        </Button>
+
         <div className="gf-form gf-form--grow">
           <div className="gf-form-label gf-form-label--grow"></div>
         </div>

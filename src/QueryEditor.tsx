@@ -36,7 +36,9 @@ interface State {
 }
 
 export class QueryEditor extends PureComponent<Props, State> {
-  state: State = {};
+  state: State = {
+    dirty: false,
+  };
 
   kustoExpressionParser = new KustoExpressionParser();
   templateVariableOptions: any;
@@ -274,7 +276,22 @@ export class QueryEditor extends PureComponent<Props, State> {
           templateVariableOptions={this.templateVariableOptions}
           database={database}
           onChange={this.onDatabaseChanged}
-        />
+        >
+          <>
+            <div className="gf-form gf-form--grow">
+              <div className="gf-form-label--grow" />
+            </div>
+            <Button onClick={this.onToggleRawMode}>Edit KQL</Button>&nbsp;
+            <Button
+              variant={this.state.dirty ? 'primary' : 'secondary'}
+              onClick={() => {
+                this.props.onRunQuery();
+              }}
+            >
+              Run Query
+            </Button>
+          </>
+        </DatabaseSelect>
         <KustoFromEditorSection
           value={from}
           label="From"
@@ -332,16 +349,6 @@ export class QueryEditor extends PureComponent<Props, State> {
                 />
               </>
             )}
-
-            <Button onClick={this.onToggleRawMode}>Edit KQL</Button>
-            <Button
-              variant={this.state.dirty ? 'primary' : 'secondary'}
-              onClick={() => {
-                this.props.onRunQuery();
-              }}
-            >
-              Run Query (testing button)
-            </Button>
           </HorizontalGroup>
         </div>
 
