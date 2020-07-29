@@ -294,6 +294,7 @@ func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
 	out := data.NewFrame(in.Name).SetMeta(&data.FrameMeta{ExecutedQueryString: in.Meta.ExecutedQueryString})
 
 	// Each row is a series
+	expectedRowLen := 0
 	for rowIdx := 0; rowIdx < in.Rows(); rowIdx++ {
 		// Set up the shared time index
 		if rowIdx == 0 {
@@ -303,6 +304,7 @@ func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
 			if err != nil {
 				return nil, err
 			}
+			expectedRowLen = len(times)
 			out.Fields = append(out.Fields, data.NewField("Timestamp", nil, times))
 		}
 
@@ -323,6 +325,11 @@ func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
 			err := json.Unmarshal([]byte(rawValues), &vals)
 			if err != nil {
 				return nil, err
+			}
+			if len(vals) == 0 {
+				// When all the values are null, the object is null in the response.
+				// Must set to length of frame for a consistent length frame
+				vals = make([]*float64, expectedRowLen)
 			}
 			out.Fields = append(out.Fields, data.NewField(in.Fields[valueIdx].Name, l, vals))
 		}
