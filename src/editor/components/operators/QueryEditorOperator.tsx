@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { PureComponent } from 'react';
 import { css } from 'emotion';
 import { Select, Button, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
@@ -15,50 +15,49 @@ interface Props {
   onChange: (expression: QueryEditorOperatorExpression) => void;
 }
 
-export const QueryEditorOperator: React.FC<Props> = props => {
-  const styles = getStyles();
-  const [operator, setOperator] = useState<QueryEditorOperatorDefinition | undefined>(props.value?.operator);
-  const [value, setValue] = useState(props.value);
-  const operators = useOperatorOptions(props.operators ?? []);
+export class QueryEditorOperator extends PureComponent<Props> {
+  onChangeOperator = (selectable: SelectableValue<string>) => {
+    if (selectable && selectable.value) {
+      const v = this.props.operators.find(o => o.value === selectable.value);
+      this.props.onChange(
+        verifyOperatorValues({
+          ...this.props.value!,
+          operator: v!,
+        })
+      );
+    }
+  };
 
-  const onChangeOperator = useCallback(
-    (selectable: SelectableValue<string>) => {
-      if (selectable && selectable.value) {
-        setOperator(props.operators.find(o => o.value === selectable.value));
-        setValue(undefined);
-      }
-    },
-    [setOperator, setValue, props.operators]
-  );
+  onChangeValue = (expression: QueryEditorOperatorExpression) => {
+    this.props.onChange(expression);
+  };
 
-  const onChangeValue = useCallback(
-    (expression: QueryEditorOperatorExpression) => {
-      setValue(expression);
-      props.onChange(expression);
-    },
-    [setValue, props.onChange]
-  );
+  render() {
+    const { operators, value } = this.props;
+    const styles = getStyles();
+    const { operator } = value!;
 
-  return (
-    <>
-      <div className={styles.container}>
-        <Select
-          options={operators}
-          value={operator?.value}
-          onChange={onChangeOperator}
-          renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
-            return (
-              <Button variant="secondary" {...otherProps} ref={ref}>
-                {operator?.label || operator?.value || ''}
-              </Button>
-            );
-          })}
-        />
-      </div>
-      {renderOperatorInput(operator, value, onChangeValue)}
-    </>
-  );
-};
+    return (
+      <>
+        <div className={styles.container}>
+          <Select
+            options={operators}
+            value={operator?.value}
+            onChange={this.onChangeOperator}
+            renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
+              return (
+                <Button variant="secondary" {...otherProps} ref={ref}>
+                  {operator?.label || operator?.value || ''}
+                </Button>
+              );
+            })}
+          />
+        </div>
+        {renderOperatorInput(operator, value, this.onChangeValue)}
+      </>
+    );
+  }
+}
 
 export const isOperator = (expression: QueryEditorExpression): expression is QueryEditorOperatorExpression => {
   return (expression as QueryEditorOperatorExpression)?.type === QueryEditorExpressionType.Operator;
@@ -88,15 +87,33 @@ const renderOperatorInput = (
   return null;
 };
 
-const useOperatorOptions = (options: QueryEditorOperatorDefinition[]): Array<SelectableValue<string>> => {
-  return options.map(option => {
+export function verifyOperatorValues(exp: QueryEditorOperatorExpression): QueryEditorOperatorExpression {
+  const { operator } = exp;
+  const untyped: any = exp;
+
+  if (operator.multipleValues) {
+    let values = untyped.values;
+    if (!Array.isArray(values)) {
+      values = [];
+    }
     return {
-      value: option.value,
-      label: option.label ?? option.value,
-      description: option.description,
-    };
-  });
-};
+      ...exp,
+      values,
+    } as QueryEditorOperatorExpression;
+  }
+
+  if (operator.booleanValues) {
+    return {
+      ...exp,
+      value: untyped.value ? true : false,
+    } as QueryEditorOperatorExpression;
+  }
+
+  return {
+    ...exp,
+    value: untyped.value ?? '',
+  } as QueryEditorOperatorExpression;
+}
 
 const getStyles = stylesFactory(() => {
   return {

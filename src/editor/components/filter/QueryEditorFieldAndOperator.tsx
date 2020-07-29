@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import React, { PureComponent } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
 import { QueryEditorOperatorExpression } from '../types';
 import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition } from '../../types';
 import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
-import { QueryEditorOperator } from '../operators/QueryEditorOperator';
+import { QueryEditorOperator, verifyOperatorValues } from '../operators/QueryEditorOperator';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 import { SelectableValue } from '@grafana/data';
 
@@ -21,81 +21,90 @@ export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpres
   operator: QueryEditorOperatorExpression;
 }
 
-export const QueryEditorFieldAndOperator: React.FC<Props> = props => {
-  const [field, setField] = useState(props.value?.field);
-  const [operator, setOperator] = useState(props.value?.operator);
-  const operatorsByType = useOperatorByType(props.operators);
+interface State {
+  // operators we can use for the field
+  operators: QueryEditorOperatorDefinition[];
+}
 
-  const onFieldChange = useCallback(
-    (expression: QueryEditorFieldExpression) => {
-      setField(expression);
-    },
-    [setField, props.value]
-  );
+export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
+  state: State = { operators: [] };
 
-  const onOperatorChange = useCallback(
-    (op: QueryEditorOperatorExpression) => {
-      setOperator(op);
-    },
-    [setField, props.value]
-  );
-
-  useEffect(() => {
-    if (operator && field) {
-      const payload = {
-        type: QueryEditorExpressionType.FieldAndOperator,
-        field,
-        operator,
-      };
-
-      props.onChange(payload);
-    } else {
-      console.log('NO operator and field????', props);
+  componentDidMount = () => {
+    const field = this.props.value?.field;
+    if (field) {
+      this.updateOperators(field);
     }
-  }, [field, operator]);
+  };
 
-  const operators = operatorsByType[field?.fieldType.toString() ?? ''] ?? [];
-  const styles = getStyles();
+  // Find the valid operators to the given field and save it in state
+  updateOperators = (field: QueryEditorFieldExpression): QueryEditorOperatorDefinition[] => {
+    const operators: QueryEditorOperatorDefinition[] = [];
+    for (const op of this.props.operators) {
+      if (op.supportTypes.includes(field.fieldType)) {
+        operators.push(op);
+      }
+    }
+    this.setState({ operators });
+    return operators;
+  };
 
-  return (
-    <div className={styles.container}>
-      <QueryEditorField
-        value={field}
-        fields={props.fields}
-        templateVariableOptions={props.templateVariableOptions}
-        onChange={onFieldChange}
-        placeholder="Choose column..."
-      />
-      <QueryEditorOperator value={operator} operators={operators} onChange={onOperatorChange} />
-    </div>
-  );
-};
+  onFieldChanged = (expression: QueryEditorFieldExpression) => {
+    let next = {
+      ...this.props.value!,
+      field: expression,
+    };
+
+    const operators = this.updateOperators(expression);
+    const currentOperator = next.operator?.operator?.value;
+    if (operators.length && !operators.find(op => op.value === currentOperator)) {
+      next.operator = {
+        type: QueryEditorExpressionType.Operator,
+        operator: {
+          ...operators[0],
+        },
+      };
+    }
+
+    // Give it default values
+    next.operator = verifyOperatorValues(next.operator);
+    this.props.onChange(next);
+  };
+
+  onOperatorChange = (expression: QueryEditorOperatorExpression) => {
+    this.props.onChange({
+      ...this.props.value!,
+      operator: expression,
+    });
+  };
+
+  render() {
+    const { value, fields, templateVariableOptions } = this.props;
+    const { operators } = this.state;
+
+    const styles = getStyles();
+    const showOperators = value?.operator || value?.field;
+
+    return (
+      <div className={styles.container}>
+        <QueryEditorField
+          value={value?.field}
+          fields={fields}
+          templateVariableOptions={templateVariableOptions}
+          onChange={this.onFieldChanged}
+          placeholder="Choose column..."
+        />
+        {showOperators && (
+          <QueryEditorOperator value={value?.operator} operators={operators} onChange={this.onOperatorChange} />
+        )}
+      </div>
+    );
+  }
+}
 
 export const isFieldAndOperator = (
   expression: QueryEditorExpression
 ): expression is QueryEditorFieldAndOperatorExpression => {
   return (expression as QueryEditorFieldAndOperatorExpression)?.type === QueryEditorExpressionType.FieldAndOperator;
-};
-
-const useOperatorByType = (
-  operators: QueryEditorOperatorDefinition[]
-): Record<string, QueryEditorOperatorDefinition[]> => {
-  return useMemo(() => {
-    const groups = {};
-
-    for (const operator of operators) {
-      for (const type of operator.supportTypes) {
-        const key = type.toString();
-
-        if (!Array.isArray(groups[key])) {
-          groups[key] = [];
-        }
-        groups[key].push(operator);
-      }
-    }
-
-    return groups;
-  }, [operators]);
 };
 
 const getStyles = stylesFactory(() => {

@@ -35,7 +35,7 @@ export const QueryEditorSingleOperator: React.FC<Props> = props => {
     });
   }, [value, props]);
 
-  return <Input width={30} value={value} onChange={onChange} onBlur={onBlur} />;
+  return <Input width={30} value={value} onChange={onChange} onBlur={onBlur} placeholder="Enter value..." />;
 };
 
 export const isSingleOperator = (

@@ -1,5 +1,5 @@
 import { css } from 'emotion';
-import React, { useState, useCallback } from 'react';
+import React, { PureComponent, useCallback } from 'react';
 import { Button, stylesFactory } from '@grafana/ui';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
 
@@ -19,71 +19,77 @@ export interface QueryEditorRepeaterExpression extends QueryEditorExpression {
   expressions: QueryEditorExpression[];
 }
 
-export const QueryEditorRepeater: React.FC<Props> = props => {
-  const [values, setValues] = useState(props.value.expressions);
-  const onChangeValue = useCallback(
-    (expression: QueryEditorExpression | undefined, index: number) => {
-      if (!expression) {
-        return;
-      }
-      values.splice(index, 1, expression);
-      setValues([...values]);
+export class QueryEditorRepeater extends PureComponent<Props> {
+  onChangeValue = (expression: QueryEditorExpression | undefined, index: number) => {
+    if (!expression) {
+      return;
+    }
 
-      props.onChange({
-        typeToRepeat: props.value.typeToRepeat,
-        type: QueryEditorExpressionType.OperatorRepeater,
-        expressions: values,
-      });
-    },
-    [setValues, props]
-  );
+    const { value, onChange } = this.props;
 
-  const onRemoveValue = useCallback(
-    (index: number) => {
-      const copy = [...values];
-      copy.splice(index, 1);
-      setValues(copy);
+    const expressions = [...value.expressions];
+    expressions.splice(index, 1, expression);
+    onChange({
+      ...value,
+      expressions,
+    });
+  };
 
-      props.onChange({
-        typeToRepeat: props.value.typeToRepeat,
-        type: QueryEditorExpressionType.OperatorRepeater,
-        expressions: copy,
-      });
+  onRemoveValue = (index: number) => {
+    const { value, onChange } = this.props;
 
-      console.log( 'remove  INDEX', index, copy );
-    },
-    [setValues, props]
-  );
+    const expressions = [...value.expressions];
+    expressions.splice(index, 1);
 
-  const styles = getStyles();
+    onChange({
+      ...value,
+      expressions,
+    });
+  };
 
-  if (values.length === 0) {
+  render() {
+    const { value } = this.props;
+    const { expressions } = value;
+    const styles = getStyles();
+
+    if (!expressions || !expressions.length) {
+      return (
+        <div className={styles.container}>
+          <AddButton index={0} onChange={this.onChangeValue} typeToAdd={value.typeToRepeat} />
+        </div>
+      );
+    }
+
     return (
-      <div className={styles.container}>
-        <AddButton index={0} onChange={onChangeValue} typeToAdd={props.value.typeToRepeat} />
+      <div>
+        {expressions.map((value, index) => {
+          const onChange = (exp: QueryEditorExpression | undefined) => this.onChangeValue(exp, index);
+          const containerStyles = !isFirstRow(index, expressions.length)
+            ? styles.containerWithSpacing
+            : styles.container;
+
+          return (
+            <div className={containerStyles} key={`rptr-${index}-${asKey(value)}`}>
+              {this.props.children({ value, onChange })}
+              <RemoveButton index={index} onRemove={this.onRemoveValue} />
+              {index !== 0 ? null : (
+                <AddButton
+                  index={expressions.length}
+                  onChange={this.onChangeValue}
+                  typeToAdd={this.props.value.typeToRepeat}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   }
+}
 
-  return (
-    <div>
-      {values.map((value, index) => {
-        const onChange = (exp: QueryEditorExpression | undefined) => onChangeValue(exp, index);
-        const containerStyles = !isFirstRow(index, values.length) ? styles.containerWithSpacing : styles.container;
-
-        return (
-          <div className={containerStyles} key={`rptr-${index}`}>
-            {props.children({ value, onChange })}
-            <RemoveButton index={index} onRemove={onRemoveValue} />
-            {index !== 0 ? null : (
-              <AddButton index={values.length} onChange={onChangeValue} typeToAdd={props.value.typeToRepeat} />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+function asKey(value: QueryEditorExpression): string {
+  return JSON.stringify(value);
+}
 
 export const isRepeater = (expression: QueryEditorExpression): expression is QueryEditorRepeaterExpression => {
   return (expression as QueryEditorRepeaterExpression)?.type === QueryEditorExpressionType.OperatorRepeater;
