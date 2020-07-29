@@ -28,6 +28,13 @@ export const QueryEditorGroupBy: React.FC<Props> = props => {
   const onChangeField = useCallback(
     (expression: QueryEditorFieldExpression) => {
       setField(expression);
+      if (expression.fieldType === QueryEditorFieldType.DateTime) {
+        setInterval({
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.Interval,
+          value: props.intervals[0].value,
+        });
+      }
     },
     [setField]
   );
