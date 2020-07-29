@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
-import { QueryEditorOperatorExpression } from '../types';
+import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
 import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition } from '../../types';
 import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
 import { QueryEditorOperator, verifyOperatorValues } from '../operators/QueryEditorOperator';
@@ -14,6 +14,7 @@ interface Props {
   templateVariableOptions: SelectableValue<string>;
   operators: QueryEditorOperatorDefinition[];
   onChange: (expression: QueryEditorFieldAndOperatorExpression | undefined) => void;
+  getSuggestions: ExpressionSuggestor;
 }
 
 export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpression {
@@ -83,6 +84,9 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
 
     const styles = getStyles();
     const showOperators = value?.operator || value?.field;
+    const getSuggestions = (txt: string, skip: QueryEditorExpression) => {
+      return this.props.getSuggestions(txt, this.props.value!);
+    };
 
     return (
       <div className={styles.container}>
@@ -94,7 +98,12 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
           placeholder="Choose column..."
         />
         {showOperators && (
-          <QueryEditorOperator value={value?.operator} operators={operators} onChange={this.onOperatorChange} />
+          <QueryEditorOperator
+            value={value?.operator}
+            operators={operators}
+            onChange={this.onOperatorChange}
+            getSuggestions={getSuggestions}
+          />
         )}
       </div>
     );

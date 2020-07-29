@@ -4,6 +4,7 @@ import { QueryEditorSectionRenderer } from './QueryEditorSectionRenderer';
 import { QueryEditorSectionBaseProps, QueryEditorSection } from '../QueryEditorSection';
 import { QueryEditorExpression, QueryEditorSectionExpression } from '../../../types';
 import { SelectableValue } from '@grafana/data';
+import { ExpressionSuggestor } from '../types';
 
 interface FilterSectionConfiguration {
   id: string;
@@ -16,6 +17,7 @@ export interface QueryEditorFilterSectionProps extends QueryEditorSectionBasePro
   fields: QueryEditorFieldDefinition[];
   templateVariableOptions: SelectableValue<string>;
   value?: QueryEditorSectionExpression;
+  getSuggestions: ExpressionSuggestor;
 }
 
 export const QueryEditorFilterSection = (
@@ -33,6 +35,7 @@ export const QueryEditorFilterSection = (
             templateVariableOptions={props.templateVariableOptions}
             onChange={onChange}
             config={config}
+            getSuggestions={props.getSuggestions}
           />
         )}
       </QueryEditorSection>

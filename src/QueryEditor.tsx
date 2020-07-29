@@ -8,7 +8,13 @@ import {
 } from 'QueryEditorSections';
 import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
 import { AdxDataSource } from 'datasource';
-import { KustoQuery, AdxDataSourceOptions, QueryEditorSectionExpression, AdxSchema } from 'types';
+import {
+  KustoQuery,
+  AdxDataSourceOptions,
+  QueryEditorSectionExpression,
+  AdxSchema,
+  QueryEditorExpression,
+} from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from './editor/types';
@@ -216,6 +222,19 @@ export class QueryEditor extends PureComponent<Props, State> {
     );
   };
 
+  // ExpressionSuggestor
+  getSuggestions = async (txt: string, skip: QueryEditorExpression): Promise<Array<SelectableValue<string>>> => {
+    console.log('TODO, suggestions without ', skip, this.props.query);
+
+    return Promise.resolve([
+      {
+        label: 'Test',
+        value: 'test',
+        description: 'hello world',
+      },
+    ]);
+  };
+
   render() {
     if (!this.state.schema) {
       return <>Loading schema...</>;
@@ -269,6 +288,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           fields={columns}
           templateVariableOptions={this.templateVariableOptions}
           onChange={this.onWhereChanged}
+          getSuggestions={this.getSuggestions}
         />
         <KustoValueColumnEditorSection
           value={reduce}
@@ -276,6 +296,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           fields={columns}
           templateVariableOptions={this.templateVariableOptions}
           onChange={this.onReduceChanged}
+          getSuggestions={this.getSuggestions}
         />
         <KustoGroupByEditorSection
           value={groupBy}
@@ -283,6 +304,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           fields={groupable}
           templateVariableOptions={this.templateVariableOptions}
           onChange={this.onGroupByChanged}
+          getSuggestions={this.getSuggestions}
         />
 
         <div className={styles.buttonRow}>

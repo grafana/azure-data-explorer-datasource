@@ -2,16 +2,21 @@ import { css } from 'emotion';
 import React, { PureComponent, useCallback } from 'react';
 import { Button, stylesFactory } from '@grafana/ui';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
+import { ExpressionSuggestor } from './types';
 
 interface Props {
   children: (props: ChildProps) => React.ReactElement;
   value: QueryEditorRepeaterExpression;
   onChange: (expression: QueryEditorRepeaterExpression) => void;
+
+  // get suggestions for the given input text
+  getSuggestions: ExpressionSuggestor;
 }
 
 interface ChildProps {
   value: QueryEditorExpression | undefined;
   onChange: (expression: QueryEditorExpression | undefined) => void;
+  getSuggestions: ExpressionSuggestor;
 }
 
 export interface QueryEditorRepeaterExpression extends QueryEditorExpression {
@@ -48,7 +53,7 @@ export class QueryEditorRepeater extends PureComponent<Props> {
   };
 
   render() {
-    const { value } = this.props;
+    const { value, getSuggestions } = this.props;
     const { expressions } = value;
     const styles = getStyles();
 
@@ -68,9 +73,10 @@ export class QueryEditorRepeater extends PureComponent<Props> {
             ? styles.containerWithSpacing
             : styles.container;
 
+          // HELP? asKey with json was required so that the right elements would be removed, but there must be some other way
           return (
             <div className={containerStyles} key={`rptr-${index}-${asKey(value)}`}>
-              {this.props.children({ value, onChange })}
+              {this.props.children({ value, onChange, getSuggestions })}
               <RemoveButton index={index} onRemove={this.onRemoveValue} />
               {index !== 0 ? null : (
                 <AddButton

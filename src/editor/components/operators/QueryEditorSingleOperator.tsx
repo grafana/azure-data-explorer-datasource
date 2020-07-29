@@ -1,42 +1,67 @@
-import React, { useState, useCallback } from 'react';
+import React, { PureComponent } from 'react';
 import { Input } from '@grafana/ui';
-import { QueryEditorOperatorExpression } from '../types';
+import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
-import { QueryEditorExpressionType } from '../../../types';
+import { QueryEditorExpressionType, QueryEditorExpression } from '../../../types';
 
 interface Props {
   value: string | undefined;
   onChange: (expression: QueryEditorSingleOperatorExpression) => void;
   operator: QueryEditorOperatorDefinition;
+  getSuggestions: ExpressionSuggestor;
+  expression: QueryEditorExpression;
 }
 
 export interface QueryEditorSingleOperatorExpression extends QueryEditorOperatorExpression {
   value: string;
 }
 
-export const QueryEditorSingleOperator: React.FC<Props> = props => {
-  const [value, setValue] = useState(props.value ?? '');
+interface State {
+  value: string;
+}
 
-  const onChange = useCallback(
-    (event: React.FormEvent<HTMLInputElement>) => {
-      if (!event || !event.currentTarget) {
-        return;
-      }
-      setValue(event.currentTarget.value);
-    },
-    [setValue]
-  );
+export class QueryEditorSingleOperator extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      value: props.value || '',
+    };
+  }
 
-  const onBlur = useCallback(() => {
-    props.onChange({
+  onChange = (event: React.FormEvent<HTMLInputElement>) => {
+    if (!event || !event.currentTarget) {
+      return;
+    }
+    const value = event.currentTarget.value;
+    this.setState({ value });
+  };
+
+  onBlur = () => {
+    this.props.onChange({
       type: QueryEditorExpressionType.Operator,
-      value: value,
-      operator: props.operator,
+      value: this.state.value,
+      operator: this.props.operator,
     });
-  }, [value, props]);
+  };
 
-  return <Input width={30} value={value} onChange={onChange} onBlur={onBlur} placeholder="Enter value..." />;
-};
+  onFocus = async () => {
+    const sugs = await this.props.getSuggestions('', this.props.expression);
+    console.log('TODO, show suggestions', sugs);
+  };
+
+  render() {
+    return (
+      <Input
+        width={30}
+        value={this.state.value}
+        onChange={this.onChange}
+        onFocus={this.onFocus}
+        onBlur={this.onBlur}
+        placeholder="Enter value..."
+      />
+    );
+  }
+}
 
 export const isSingleOperator = (
   expression: QueryEditorOperatorExpression | undefined

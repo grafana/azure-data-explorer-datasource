@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { css } from 'emotion';
 import { Select, Button, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorOperatorExpression } from '../types';
+import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
 import { QueryEditorMultiOperator, isMultiOperator } from './QueryEditorMultiOperator';
 import { isSingleOperator, QueryEditorSingleOperator } from './QueryEditorSingleOperator';
@@ -13,6 +13,7 @@ interface Props {
   value?: QueryEditorOperatorExpression;
   operators: QueryEditorOperatorDefinition[];
   onChange: (expression: QueryEditorOperatorExpression) => void;
+  getSuggestions: ExpressionSuggestor;
 }
 
 export class QueryEditorOperator extends PureComponent<Props> {
@@ -33,7 +34,7 @@ export class QueryEditorOperator extends PureComponent<Props> {
   };
 
   render() {
-    const { operators, value } = this.props;
+    const { operators, value, getSuggestions } = this.props;
     const styles = getStyles();
     const { operator } = value!;
 
@@ -53,7 +54,7 @@ export class QueryEditorOperator extends PureComponent<Props> {
             })}
           />
         </div>
-        {renderOperatorInput(operator, value, this.onChangeValue)}
+        {renderOperatorInput(operator, value, this.onChangeValue, getSuggestions)}
       </>
     );
   }
@@ -66,7 +67,8 @@ export const isOperator = (expression: QueryEditorExpression): expression is Que
 const renderOperatorInput = (
   operator: QueryEditorOperatorDefinition | undefined,
   value: QueryEditorOperatorExpression | undefined,
-  onChangeValue: (expression: QueryEditorOperatorExpression) => void
+  onChangeValue: (expression: QueryEditorOperatorExpression) => void,
+  getSuggestions: ExpressionSuggestor
 ) => {
   if (!operator) {
     return null;
@@ -81,7 +83,15 @@ const renderOperatorInput = (
   }
 
   if (!operator.multipleValues && (isSingleOperator(value) || !value)) {
-    return <QueryEditorSingleOperator operator={operator} value={value?.value} onChange={onChangeValue} />;
+    return (
+      <QueryEditorSingleOperator
+        operator={operator}
+        value={value?.value}
+        onChange={onChangeValue}
+        getSuggestions={getSuggestions}
+        expression={value!}
+      />
+    );
   }
 
   return null;

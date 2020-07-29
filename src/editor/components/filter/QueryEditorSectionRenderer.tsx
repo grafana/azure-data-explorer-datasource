@@ -6,6 +6,7 @@ import { QueryEditorExpression } from '../../../types';
 import { isReduce, QueryEditorReduce } from '../reduce/QueryEditorReduce';
 import { isGroupBy, QueryEditorGroupBy } from '../groupBy/QueryEditorGroupBy';
 import { SelectableValue } from '@grafana/data';
+import { ExpressionSuggestor } from '../types';
 
 interface Props<TConfig> {
   config: TConfig;
@@ -13,10 +14,11 @@ interface Props<TConfig> {
   templateVariableOptions: SelectableValue<string>;
   expression: QueryEditorExpression | undefined;
   onChange: (expression: QueryEditorExpression | undefined) => void;
+  getSuggestions: ExpressionSuggestor;
 }
 
 export function QueryEditorSectionRenderer<T>(props: Props<T>) {
-  const { expression, config, onChange, fields } = props;
+  const { expression, config, onChange, fields, getSuggestions } = props;
 
   if (!expression) {
     return null;
@@ -31,6 +33,7 @@ export function QueryEditorSectionRenderer<T>(props: Props<T>) {
         fields={fields}
         templateVariableOptions={props.templateVariableOptions}
         onChange={onChange}
+        getSuggestions={getSuggestions}
       />
     );
   }
@@ -63,7 +66,7 @@ export function QueryEditorSectionRenderer<T>(props: Props<T>) {
 
   if (isRepeater(expression)) {
     return (
-      <QueryEditorRepeater onChange={onChange} value={expression}>
+      <QueryEditorRepeater onChange={onChange} value={expression} getSuggestions={getSuggestions}>
         {childProps => (
           <QueryEditorSectionRenderer
             {...props}
