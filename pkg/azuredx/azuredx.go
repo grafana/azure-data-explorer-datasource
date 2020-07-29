@@ -177,3 +177,8 @@ type errorResponse struct {
 		Message string `json:"@message"`
 	} `json:"error"`
 }
+
+// AzureFrameMD is a type to populate a Frame's Custom metadata property.
+type AzureFrameMD struct {
+	ColumnTypes []string
+}

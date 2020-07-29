@@ -85,6 +85,21 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 			}
 			resp.Frames = append(resp.Frames, f)
 		}
+	case "time_series_adx_series":
+		orginalDFs, err := tableRes.ToDataFrames(interpolatedQuery)
+		if err != nil {
+			errorWithFrame(fmt.Errorf("error converting response to data frames: %w", err))
+			return resp
+		}
+		for _, f := range orginalDFs {
+			formatedDF, err := azuredx.ToADXTimeSeries(f)
+			if err != nil {
+				errorWithFrame(err)
+				return resp
+			}
+			resp.Frames = append(resp.Frames, formatedDF)
+		}
+
 	// 	series, timeNotASC, err := tableRes.ToTimeSeries()
 	// 	if err != nil {
 	// 		qr.Error = err.Error()
@@ -92,13 +107,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	// 	}
 	// 	md.TimeNotASC = timeNotASC
 	// 	qr.Series = series
-	// case "time_series_adx_series":
-	// 	series, err := tableRes.ToADXTimeSeries()
-	// 	if err != nil {
-	// 		qr.Error = err.Error()
-	// 		break
-	// 	}
-	// 	qr.Series = series
+
 	default:
 		resp.Error = fmt.Errorf("unsupported query type: '%v'", qm.Format)
 	}

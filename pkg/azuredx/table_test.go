@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xorcare/pointer"
 )
 
@@ -32,7 +33,9 @@ func TestResponseToFrames(t *testing.T) {
 			name:     "single bool should have extracted value",
 			testFile: "print_true.json",
 			errorIs:  assert.NoError,
-			frame:    data.NewFrame("", data.NewField("print_0", nil, []*bool{pointer.Bool(true)})),
+			frame: data.NewFrame("", data.NewField("print_0", nil, []*bool{pointer.Bool(true)})).SetMeta(
+				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool"}}},
+			),
 		},
 		{
 			name:     "supported types should load with values",
@@ -48,6 +51,9 @@ func TestResponseToFrames(t *testing.T) {
 				data.NewField("XLong", nil, []*int64{pointer.Int64(9223372036854775807)}),
 				data.NewField("XReal", nil, []*float64{pointer.Float64(1.797693134862315708145274237317043567981e+308)}),
 				data.NewField("XTimeSpan", nil, []*string{pointer.String("00:00:00.0000001")}),
+			).SetMeta(
+				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool", "string", "datetime",
+					"dynamic", "guid", "int", "long", "real", "timespan"}}},
 			),
 		},
 		{
@@ -63,6 +69,9 @@ func TestResponseToFrames(t *testing.T) {
 				data.NewField("XLong", nil, []*int64{nil}),
 				data.NewField("XReal", nil, []*float64{nil}),
 				data.NewField("XTimeSpan", nil, []*string{nil}),
+			).SetMeta(
+				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool", "datetime",
+					"dynamic", "guid", "int", "long", "real", "timespan"}}},
 			),
 		},
 	}
@@ -174,59 +183,60 @@ func TestResponseToFrames(t *testing.T) {
 // 	}
 // }
 
-// func TestTableResponse_ToADXTimeSeries(t *testing.T) {
-// 	tests := []struct {
-// 		name                  string
-// 		testFile              string // use either file or table, not both
-// 		testTable             *TableResponse
-// 		errorIs               assert.ErrorAssertionFunc
-// 		seriesCountIs         assert.ComparisonAssertionFunc
-// 		seriesCount           int
-// 		perSeriesValueCountIs assert.ComparisonAssertionFunc
-// 		perSeriesValueCount   int
-// 	}{
-// 		{
-// 			name:                  "should load series response",
-// 			testFile:              "adx_timeseries_multi_label_mulit_value.json",
-// 			errorIs:               assert.NoError,
-// 			seriesCountIs:         assert.Equal,
-// 			seriesCount:           8,
-// 			perSeriesValueCountIs: assert.Equal,
-// 			perSeriesValueCount:   10,
-// 		},
-// 		{
-// 			name:                  "should not err with null valued object column",
-// 			testFile:              "adx_timeseries_null_value_column.json",
-// 			errorIs:               assert.NoError,
-// 			seriesCountIs:         assert.Equal,
-// 			seriesCount:           8,
-// 			perSeriesValueCountIs: assert.Equal,
-// 			perSeriesValueCount:   216,
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if tt.testFile != "" && tt.testTable != nil {
-// 				t.Errorf("test logic error: test should not have both a testFile and a testTable")
-// 			}
-// 			var err error
-// 			respTable := tt.testTable
-// 			if tt.testFile != "" {
-// 				respTable, err = tableFromJSONFile(tt.testFile)
-// 				if err != nil {
-// 					t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
-// 				}
-// 			}
+func TestTableResponse_ToADXTimeSeries(t *testing.T) {
+	tests := []struct {
+		name                  string
+		testFile              string // use either file or table, not both
+		testTable             *TableResponse
+		errorIs               require.ErrorAssertionFunc
+		seriesCountIs         require.ComparisonAssertionFunc
+		seriesCount           int
+		perSeriesValueCountIs require.ComparisonAssertionFunc
+		perSeriesValueCount   int
+	}{
+		{
+			name:                  "should load series response",
+			testFile:              "adx_timeseries_multi_label_mulit_value.json",
+			seriesCountIs:         require.Equal,
+			seriesCount:           8,
+			perSeriesValueCountIs: require.Equal,
+			perSeriesValueCount:   10,
+		},
+		{
+			name:                  "should not err with null valued object column",
+			testFile:              "adx_timeseries_null_value_column.json",
+			seriesCountIs:         require.Equal,
+			seriesCount:           8,
+			perSeriesValueCountIs: require.Equal,
+			perSeriesValueCount:   216,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.testFile != "" && tt.testTable != nil {
+				t.Errorf("test logic error: test should not have both a testFile and a testTable")
+			}
+			var err error
+			respTable := tt.testTable
+			if tt.testFile != "" {
+				respTable, err = tableFromJSONFile(tt.testFile)
+				if err != nil {
+					t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
+				}
+			}
 
-// 			series, err := respTable.ToADXTimeSeries()
-// 			tt.errorIs(t, err)
-// 			if err != nil {
-// 				return
-// 			}
-// 			tt.seriesCountIs(t, tt.seriesCount, len(series))
-// 			for _, s := range series {
-// 				tt.perSeriesValueCountIs(t, tt.perSeriesValueCount, len(s.Points))
-// 			}
-// 		})
-// 	}
-// }
+			initialFrames, err := respTable.ToDataFrames("T | select NotActualQuery")
+			require.NoError(t, err)
+
+			require.Equal(t, 1, len(initialFrames))
+
+			convertedFrame, err := ToADXTimeSeries(initialFrames[0])
+			require.NoError(t, err)
+
+			tt.seriesCountIs(t, tt.seriesCount, len(convertedFrame.Fields)-1)
+			for _, f := range convertedFrame.Fields {
+				tt.perSeriesValueCountIs(t, tt.perSeriesValueCount, f.Len())
+			}
+		})
+	}
+}

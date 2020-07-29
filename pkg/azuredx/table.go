@@ -41,8 +41,8 @@ func (ar *TableResponse) getTableByName(name string) (Table, error) {
 	return Table{}, fmt.Errorf("no data as %v table is missing from the the response", name)
 }
 
-func (tables *TableResponse) ToDataFrames(executedQueryString string) (data.Frames, error) {
-	table, err := tables.getTableByName("Table_0")
+func (tr *TableResponse) ToDataFrames(executedQueryString string) (data.Frames, error) {
+	table, err := tr.getTableByName("Table_0")
 	if err != nil {
 		return nil, err
 	}
@@ -64,9 +64,11 @@ func (tables *TableResponse) ToDataFrames(executedQueryString string) (data.Fram
 func converterFrameForTable(t Table, executedQueryString string) (*data.FrameInputConverter, error) {
 	converters := []data.FieldConverter{}
 	colNames := make([]string, len(t.Columns))
+	colTypes := make([]string, len(t.Columns))
 
 	for i, col := range t.Columns {
 		colNames[i] = col.ColumnName
+		colTypes[i] = col.ColumnType
 		converter, ok := converterMap[col.ColumnType]
 		if !ok {
 			return nil, fmt.Errorf("unsupported analytics column type %v", col.ColumnType)
@@ -83,10 +85,10 @@ func converterFrameForTable(t Table, executedQueryString string) (*data.FrameInp
 	if err != nil {
 		return nil, err
 	}
-	if executedQueryString != "" {
-		fic.Frame.Meta = &data.FrameMeta{
-			ExecutedQueryString: executedQueryString,
-		}
+
+	fic.Frame.Meta = &data.FrameMeta{
+		ExecutedQueryString: executedQueryString,
+		Custom:              AzureFrameMD{ColumnTypes: colTypes},
 	}
 
 	return fic, nil
@@ -237,6 +239,97 @@ var longConverter = data.FieldConverter{
 		}
 		return &out, err
 	},
+}
+
+// ToADXTimeSeries returns Time series for a query that returns an ADX series type.
+// This done by having a query with make_series as the returned type.
+// The time column must be named "Timestamp".
+// Each Row has:
+// - N Columns for group by items, where each Group by item is a column individual string column
+// - An Array of Values per Aggregation Column
+// - Timestamp column
+//
+// From the ADX documentation, I believe all series will share the same time index,
+// so we create a wide frame.
+func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
+	if in.Rows() == 0 {
+		return in, nil
+	}
+
+	timeColIdx := -1
+	labelColIdxs := []int{}
+	valueColIdxs := []int{}
+
+	// TODO check to avoid panics
+	getKustoColType := func(fIdx int) string {
+		return in.Meta.Custom.(AzureFrameMD).ColumnTypes[fIdx]
+	}
+
+	foundTime := false
+	for fieldIdx, field := range in.Fields {
+		switch getKustoColType(fieldIdx) {
+		case "string":
+			labelColIdxs = append(labelColIdxs, fieldIdx)
+		case "dynamic":
+			if field.Name == "Timestamp" {
+				if foundTime == true {
+					return nil, fmt.Errorf("must be exactly one column named 'Timestamp', but response has more than one")
+				}
+				foundTime = true
+				timeColIdx = fieldIdx
+				continue
+			}
+			valueColIdxs = append(valueColIdxs, fieldIdx)
+
+		}
+	}
+
+	if timeColIdx == -1 {
+		return nil, fmt.Errorf("response must have a column named 'Timestamp'")
+	}
+	if len(valueColIdxs) < 1 {
+		return nil, fmt.Errorf("did not find a numeric value column, expected at least one column of type 'dynamic', got %v", len(valueColIdxs))
+	}
+
+	out := data.NewFrame(in.Name).SetMeta(&data.FrameMeta{ExecutedQueryString: in.Meta.ExecutedQueryString})
+
+	// Each row is a series
+	for rowIdx := 0; rowIdx < in.Rows(); rowIdx++ {
+		// Set up the shared time index
+		if rowIdx == 0 {
+			rawTimeArrayString := in.At(timeColIdx, 0).(string)
+			times := []time.Time{}
+			err := json.Unmarshal([]byte(rawTimeArrayString), &times)
+			if err != nil {
+				return nil, err
+			}
+			out.Fields = append(out.Fields, data.NewField("Timestamp", nil, times))
+		}
+
+		// Build the labels for the series from the row
+		var l data.Labels
+		for i, labelIdx := range labelColIdxs {
+			if i == 0 {
+				l = make(data.Labels)
+			}
+			labelVal, _ := in.ConcreteAt(labelIdx, rowIdx)
+			l[in.Fields[labelIdx].Name] = labelVal.(string)
+		}
+
+		for _, valueIdx := range valueColIdxs {
+			// Will treat all numberic values as nullable floats here
+			vals := []*float64{}
+			rawValues := in.At(valueIdx, rowIdx).(string)
+			err := json.Unmarshal([]byte(rawValues), &vals)
+			if err != nil {
+				return nil, err
+			}
+			out.Fields = append(out.Fields, data.NewField(in.Fields[valueIdx].Name, l, vals))
+		}
+
+	}
+
+	return out, nil
 }
 
 // ToADXTimeSeries returns Time series for a query that returns an ADX series type.
