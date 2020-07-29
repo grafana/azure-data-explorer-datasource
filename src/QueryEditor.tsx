@@ -151,6 +151,13 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
+  onRawQueryChange = (kql: string) => {
+    this.onUpdateQuery({
+      ...this.props.query,
+      query: kql,
+    });
+  };
+
   onDatabaseChanged = (db: string) => {
     this.onUpdateQuery({
       ...this.props.query,
@@ -238,11 +245,11 @@ export class QueryEditor extends PureComponent<Props, State> {
   };
 
   render() {
-    if (!this.state.schema) {
+    const { query } = this.props;
+    const { schema, databases, tables } = this.state;
+    if (!schema) {
       return <>Loading schema...</>;
     }
-    const { query } = this.props;
-    const { databases, tables } = this.state;
 
     // Proces the raw mode
     if (query.rawMode) {
@@ -251,6 +258,11 @@ export class QueryEditor extends PureComponent<Props, State> {
           {...this.props}
           onRawModeChange={this.onToggleRawMode}
           templateVariableOptions={this.templateVariableOptions}
+          onAliasChanged={this.onAliasChanged}
+          onResultFormatChanged={this.onResultFormatChanged}
+          onDatabaseChanged={this.onDatabaseChanged}
+          onRawQueryChange={this.onRawQueryChange}
+          databases={databases || []}
         />
       );
     }
