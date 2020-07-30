@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { QueryEditorProps, SelectableValue } from '@grafana/data';
+import { QueryEditorProps, SelectableValue, DataQueryRequest } from '@grafana/data';
 import {
   KustoFromEditorSection,
   KustoWhereEditorSection,
@@ -233,15 +233,52 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   // ExpressionSuggestor
   getSuggestions = async (txt: string, skip: QueryEditorExpression): Promise<Array<SelectableValue<string>>> => {
-    console.log('TODO, suggestions without ', skip, this.props.query);
+    const { query } = this.props;
 
-    return Promise.resolve([
-      {
-        label: 'Test',
-        value: 'test',
-        description: 'hello world',
-      },
-    ]);
+    // For now just support finding distinct field values
+    const from = (query.expression?.from?.expression as any)?.value;
+    const field = (skip as any)?.field?.value;
+    if (!from || !field) {
+      return Promise.resolve([]);
+    }
+
+    // Covid19
+    // | distinct State | order by State  asc | take 5
+    // Covid19 |
+    //  where  $__timeFilter(Timestamp) | distinct State | order by State asc | take 5
+
+    let kql = `${from}\n`;
+    // if (txt) {
+    //   kql += `| where ${field} has "${txt}" `;
+    // }
+    kql += `| distinct ${field} | order by ${field} asc | take 100`;
+
+    const q: KustoQuery = {
+      ...query,
+      rawMode: true,
+      query: kql,
+      resultFormat: 'table',
+    };
+
+    console.log('Get suggestions', kql);
+
+    return this.props.datasource
+      .query({
+        targets: [q],
+      } as DataQueryRequest<KustoQuery>)
+      .toPromise()
+      .then(res => {
+        if (res.data?.length) {
+          return res.data[0].fields[0].values.toArray().map(value => {
+            return {
+              label: `${value}`,
+              value,
+            };
+          });
+        }
+        console.log('Got response', kql, res);
+        return [];
+      });
   };
 
   render() {

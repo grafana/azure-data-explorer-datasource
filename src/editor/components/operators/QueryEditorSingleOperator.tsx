@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react';
-import { Input } from '@grafana/ui';
+import { SegmentAsync, IconButton } from '@grafana/ui';
 import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
 import { QueryEditorExpressionType, QueryEditorExpression } from '../../../types';
+import { SelectableValue } from '@grafana/data';
 
 interface Props {
   value: string | undefined;
@@ -16,52 +17,43 @@ export interface QueryEditorSingleOperatorExpression extends QueryEditorOperator
   value: string;
 }
 
-interface State {
-  value: string;
-}
-
-export class QueryEditorSingleOperator extends PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      value: props.value || '',
-    };
-  }
-
-  onChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (!event || !event.currentTarget) {
-      return;
-    }
-    const value = event.currentTarget.value;
-    this.setState({ value });
-  };
-
-  onBlur = () => {
+export class QueryEditorSingleOperator extends PureComponent<Props> {
+  onChange = (evt: SelectableValue<any>) => {
     this.props.onChange({
       type: QueryEditorExpressionType.Operator,
-      value: this.state.value,
+      value: `${evt.value}`, // Currently strings only
       operator: this.props.operator,
     });
   };
 
-  onFocus = async () => {
-    const sugs = await this.props.getSuggestions('', this.props.expression);
-    console.log('TODO, show suggestions', sugs);
-  };
-
   render() {
+    const value = this.props.value || '';
+
     return (
-      <Input
-        width={30}
-        value={this.state.value}
+      <SegmentAsync
+        allowCustomValue
+        Component={<SingleValueDisplay value={value} />}
+        value={value}
+        loadOptions={(query?: string) => this.props.getSuggestions(query ?? '', this.props.expression)}
         onChange={this.onChange}
-        onFocus={this.onFocus}
-        onBlur={this.onBlur}
-        placeholder="Enter value..."
       />
     );
   }
 }
+
+interface SingleValueDisplayProps {
+  value: string;
+  onRemove?: () => void;
+}
+
+export const SingleValueDisplay: React.FC<SingleValueDisplayProps> = props => {
+  return (
+    <div className="gf-form-label">
+      {props.value ? props.value : 'Click to enter value...'} &nbsp;
+      {props.onRemove && <IconButton name="times" size="sm" surface="header" onClick={props.onRemove} />}
+    </div>
+  );
+};
 
 export const isSingleOperator = (
   expression: QueryEditorOperatorExpression | undefined

@@ -1,73 +1,79 @@
-import React, { useState, useCallback } from 'react';
-import { Select } from '@grafana/ui';
-import { SelectableValue } from '@grafana/data';
-import { QueryEditorOperatorExpression } from '../types';
+import React, { PureComponent } from 'react';
+import { AsyncMultiSelect } from '@grafana/ui';
+import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
-import { QueryEditorExpressionType } from '../../../types';
+import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 
 interface Props {
   values: string[] | undefined;
   onChange: (expression: QueryEditorMultiOperatorExpression) => void;
   operator: QueryEditorOperatorDefinition;
+  getSuggestions: ExpressionSuggestor;
+  expression: QueryEditorExpression;
 }
 
 export interface QueryEditorMultiOperatorExpression extends QueryEditorOperatorExpression {
   values: string[];
 }
 
-export const QueryEditorMultiOperator: React.FC<Props> = props => {
-  // Hack: prepareOptions called to create the default options from persisted values, as currently the ADX query editor
-  // do not have dynamic options enabled as there might be loads of such
-  const [options, setOptions] = useState<Array<SelectableValue<string>>>(prepareOptions(props.values || []));
-  const onCreate = useCallback(
-    (value: string) => {
-      if (!value) {
-        return;
-      }
+export class QueryEditorMultiOperator extends PureComponent<Props> {
+  // // Hack: prepareOptions called to create the default options from persisted values, as currently the ADX query editor
+  // // do not have dynamic options enabled as there might be loads of such
+  // const [options, setOptions] = useState<Array<SelectableValue<string>>>(prepareOptions(props.values || []));
+  onCreate = (value: string) => {
+    // if (!value) {
+    //   return;
+    // }
 
-      setOptions([...options, { value, label: value }]);
+    // setOptions([...options, { value, label: value }]);
 
-      props.onChange({
-        type: QueryEditorExpressionType.Operator,
-        values: [...props.values, value],
-        operator: props.operator,
-      });
-    },
-    [setOptions, props]
-  );
+    // props.onChange({
+    //   type: QueryEditorExpressionType.Operator,
+    //   values: [...props.values, value],
+    //   operator: props.operator,
+    // });
 
-  const onChange = useCallback(
-    selectable => {
-      if (!Array.isArray(selectable)) {
-        return;
-      }
+    console.log('CREATE', value);
+  };
 
-      props.onChange({
-        type: QueryEditorExpressionType.Operator,
-        values: selectable.map(s => s.value),
-        operator: props.operator,
-      });
-    },
-    [props]
-  );
+  onChange = (selectable: any) => {
+    if (!Array.isArray(selectable)) {
+      return;
+    }
 
-  return (
-    <Select
-      width={30}
-      isMulti={true}
-      options={options}
-      value={props.values}
-      onChange={onChange}
-      onCreateOption={onCreate}
-      allowCustomValue={true}
-      noOptionsMessage={'Start typing to add filters...'}
-    />
-  );
-};
+    this.props.onChange({
+      type: QueryEditorExpressionType.Operator,
+      values: selectable.map(s => s.value),
+      operator: this.props.operator,
+    });
+  };
 
-const prepareOptions = (values: string[]) => {
-  return values.map<SelectableValue<string>>(v => ({ label: v, value: v }));
-};
+  getSuggestions = (txt: string) => {
+    console.log('Getting suggestions', txt);
+    return this.props.getSuggestions(txt, this.props.expression);
+  };
+
+  render() {
+    const values = this.props.values || [];
+    const current = values.map(v => {
+      return { label: v, value: v };
+    });
+
+    return (
+      <AsyncMultiSelect
+        width={30}
+        placeholder="Enter values..."
+        loadOptions={this.getSuggestions}
+        value={current}
+        onChange={this.onChange}
+        onCreateOption={this.onCreate}
+        allowCustomValue={true}
+        noOptionsMessage={'Start typing to add filters...'}
+      />
+    );
+  }
+}
+
 export const isMultiOperator = (
   expression: QueryEditorOperatorExpression | undefined
 ): expression is QueryEditorMultiOperatorExpression => {

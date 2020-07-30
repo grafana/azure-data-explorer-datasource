@@ -7,6 +7,8 @@ import {
   TimeRange,
   KeyValue,
   DataFrame,
+  AnnotationQueryRequest,
+  AnnotationEvent,
 } from '@grafana/data';
 import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
@@ -16,6 +18,7 @@ import RequestAggregator from './request_aggregator';
 import { AdxDataSourceOptions, KustoQuery, AdxSchema } from './types';
 import { Observable, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
+import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
@@ -128,14 +131,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     };
   }
 
-  annotationQuery(options) {
-    if (!options.annotation.rawQuery) {
+  async annotationQuery(options: AnnotationQueryRequest<KustoQuery>): Promise<AnnotationEvent[]> {
+    if (!options.annotation.rawMode) {
       return Promise.reject({
         message: 'Query missing in annotation definition',
       });
     }
 
-    const query = this.buildQuery(options.annotation.rawQuery, options, options.annotation.database);
+    const query = this.buildQuery(options.annotation.query, options, options.annotation.database);
     return super
       .query({
         targets: [query],
@@ -143,8 +146,11 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       } as DataQueryRequest<KustoQuery>)
       .toPromise()
       .then(results => {
-        console.log('Process');
-        return new ResponseParser().parseAnnotations(results, options);
+        console.log('Process Annotation results', results);
+        if (results.data?.length) {
+          return getAnnotationsFromFrame(results.data[0] as DataFrame);
+        }
+        return [];
       });
   }
 
@@ -189,7 +195,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  getDefaultOrFirstDatabase() {
+  async getDefaultOrFirstDatabase(): Promise<string> {
     if (this.defaultOrFirstDatabase) {
       return Promise.resolve(this.defaultOrFirstDatabase);
     }

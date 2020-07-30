@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { css } from 'emotion';
-import { Select, Button, stylesFactory } from '@grafana/ui';
+import { Select, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
@@ -47,9 +47,9 @@ export class QueryEditorOperator extends PureComponent<Props> {
             onChange={this.onChangeOperator}
             renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
               return (
-                <Button variant="secondary" {...otherProps} ref={ref}>
-                  {operator?.label || operator?.value || ''}
-                </Button>
+                <div ref={ref} {...otherProps} className="gf-form-label query-segment-operator">
+                  {operator?.label || operator?.value || '?'}
+                </div>
               );
             })}
           />
@@ -75,7 +75,15 @@ const renderOperatorInput = (
   }
 
   if (operator.multipleValues && (isMultiOperator(value) || !value)) {
-    return <QueryEditorMultiOperator operator={operator} values={value?.values ?? []} onChange={onChangeValue} />;
+    return (
+      <QueryEditorMultiOperator
+        operator={operator}
+        values={value?.values ?? []}
+        onChange={onChangeValue}
+        getSuggestions={getSuggestions}
+        expression={value!}
+      />
+    );
   }
 
   if (operator.booleanValues && (isBoolOperator(value) || !value)) {
@@ -102,9 +110,16 @@ export function verifyOperatorValues(exp: QueryEditorOperatorExpression): QueryE
   const untyped: any = exp;
 
   if (operator.multipleValues) {
-    let values = untyped.values;
+    let values: string[] = untyped.values;
     if (!Array.isArray(values)) {
       values = [];
+    }
+    if (!!!values.length) {
+      if (untyped.value) {
+        values.push(untyped.value); // keep the old single value
+      } else {
+        values.push('');
+      }
     }
     return {
       ...exp,

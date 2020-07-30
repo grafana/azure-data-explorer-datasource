@@ -26,13 +26,6 @@ export interface Variable {
   value: string;
 }
 
-export interface AnnotationItem {
-  annotation: any;
-  time: number;
-  text: string;
-  tags: string[];
-}
-
 // API interfaces
 export interface KustoDatabaseList {
   data: {
@@ -83,47 +76,6 @@ export interface DatabaseItem {
 }
 
 export class ResponseParser {
-  parseAnnotations(results, options): AnnotationItem[] {
-    let annotations: AnnotationItem[] = [];
-
-    if (results.data.hasOwnProperty('results')) {
-      Object.keys(results.data.results).forEach(resultKey => {
-        const result = results.data.results[resultKey];
-
-        if (result.tables.length > 0) {
-          result.tables.forEach(table => {
-            table.rows.forEach(row => {
-              const entry: AnnotationItem = {
-                annotation: options.annotation,
-                time: 0,
-                text: '',
-                tags: [],
-              };
-              table.columns.forEach((column, idx) => {
-                switch (column.text) {
-                  case 'StartTime':
-                    entry.time = Math.floor(ResponseParser.dateTimeToEpoch(row[idx]));
-                    break;
-                  case 'Text':
-                    entry.text = row[idx];
-                    break;
-                  case 'Tags':
-                    entry.tags = row[idx].trim().split(/\s*,\s*/);
-                    break;
-                }
-              });
-              annotations.push(entry);
-            });
-          });
-        }
-      });
-    } else {
-      annotations = this.transformToAnnotations(options, results);
-    }
-
-    return annotations;
-  }
-
   parseDatabases(results: KustoDatabaseList): DatabaseItem[] {
     const databases: DatabaseItem[] = [];
     if (!results || !results.data || !results.data.Tables || results.data.Tables.length === 0) {
@@ -275,42 +227,6 @@ export class ResponseParser {
       }
     }
     return false;
-  }
-
-  transformToAnnotations(options: any, result: any) {
-    const queryResult = this.parseQueryResult(result);
-    const list: AnnotationItem[] = [];
-
-    for (const result of queryResult.data) {
-      let timeIndex = -1;
-      let textIndex = -1;
-      let tagsIndex = -1;
-
-      for (let i = 0; i < result.columns.length; i++) {
-        if (timeIndex === -1 && result.columns[i].type === 'datetime') {
-          timeIndex = i;
-        }
-
-        if (textIndex === -1 && result.columns[i].text.toLowerCase() === 'text') {
-          textIndex = i;
-        }
-
-        if (tagsIndex === -1 && result.columns[i].text.toLowerCase() === 'tags') {
-          tagsIndex = i;
-        }
-      }
-
-      for (const row of result.rows) {
-        list.push({
-          annotation: options.annotation,
-          time: Math.floor(ResponseParser.dateTimeToEpoch(row[timeIndex])),
-          text: row[textIndex] ? row[textIndex].toString() : '',
-          tags: row[tagsIndex] ? row[tagsIndex].trim().split(/\s*,\s*/) : [],
-        });
-      }
-    }
-
-    return list;
   }
 
   static findOrCreateBucket(data: any, target: any): DataTarget {
