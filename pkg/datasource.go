@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
@@ -82,7 +81,6 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 					errorWithFrame(err)
 					return resp
 				}
-				backend.Logger.Debug(spew.Sdump(f, wideFrame))
 				f = wideFrame
 			}
 			resp.Frames = append(resp.Frames, f)
