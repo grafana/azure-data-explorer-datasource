@@ -117,8 +117,6 @@ export function verifyOperatorValues(exp: QueryEditorOperatorExpression): QueryE
     if (!!!values.length) {
       if (untyped.value) {
         values.push(untyped.value); // keep the old single value
-      } else {
-        values.push('');
       }
     }
     return {
