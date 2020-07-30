@@ -248,10 +248,10 @@ export class QueryEditor extends PureComponent<Props, State> {
     //  where  $__timeFilter(Timestamp) | distinct State | order by State asc | take 5
 
     let kql = `${from}\n`;
-    // if (txt) {
-    //   kql += `| where ${field} has "${txt}" `;
-    // }
-    kql += `| distinct ${field} | order by ${field} asc | take 100`;
+    if (txt) {
+      kql += `| where ${field} contains "${txt}" `;
+    }
+    kql += `| distinct ${field} | order by ${field} asc | take 251`;
 
     const q: KustoQuery = {
       ...query,
@@ -381,7 +381,7 @@ export class QueryEditor extends PureComponent<Props, State> {
               </InlineFormLabel>
               <Select options={resultFormats} value={resultFormat} onChange={this.onResultFormatChanged} />
             </div>
-            {resultFormat === 'time_series' && (
+            {false && resultFormat === 'time_series' && (
               <>
                 <InlineFormLabel className="query-keyword" width={7}>
                   Alias by

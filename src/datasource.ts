@@ -1,11 +1,9 @@
 import {
   MetricFindValue,
-  DataQueryResponse,
   DataSourceInstanceSettings,
   DataQueryRequest,
   ScopedVar,
   TimeRange,
-  KeyValue,
   DataFrame,
   AnnotationQueryRequest,
   AnnotationEvent,
@@ -16,8 +14,6 @@ import { ResponseParser, DatabaseItem } from './response_parser';
 import Cache from './cache';
 import RequestAggregator from './request_aggregator';
 import { AdxDataSourceOptions, KustoQuery, AdxSchema } from './types';
-import { Observable, of } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 
@@ -41,26 +37,28 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.requestAggregatorSrv = new RequestAggregator(this.backendSrv);
   }
 
-  query(request: DataQueryRequest<KustoQuery>): Observable<DataQueryResponse> {
-    let hasAlias = false;
-    for (const q of request.targets) {
-      if (q.alias && q.resultFormat !== 'table') {
-        hasAlias = true;
-        break;
-      }
-    }
+  // COMMENTING out alias for now... can use the displayName feature in fields
+  //
+  // query(request: DataQueryRequest<KustoQuery>): Observable<DataQueryResponse> {
+  //   let hasAlias = false;
+  //   for (const q of request.targets) {
+  //     if (q.alias && q.resultFormat !== 'table') {
+  //       hasAlias = true;
+  //       break;
+  //     }
+  //   }
 
-    if (hasAlias) {
-      return super.query(request).pipe(
-        mergeMap((res: DataQueryResponse) => {
-          return of(this.processAlias(request, res));
-        })
-      );
-    }
+  //   if (hasAlias) {
+  //     return super.query(request).pipe(
+  //       mergeMap((res: DataQueryResponse) => {
+  //         return of(this.processAlias(request, res));
+  //       })
+  //     );
+  //   }
 
-    // simple query
-    return super.query(request);
-  }
+  //   // simple query
+  //   return super.query(request);
+  // }
 
   filterQuery(item: KustoQuery): boolean {
     return item.hide !== true;
@@ -75,61 +73,61 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     };
   }
 
-  processAlias(request: DataQueryRequest<KustoQuery>, res: DataQueryResponse): DataQueryResponse {
-    if (!res.data || !res.data.length) {
-      return res;
-    }
+  // processAlias(request: DataQueryRequest<KustoQuery>, res: DataQueryResponse): DataQueryResponse {
+  //   if (!res.data || !res.data.length) {
+  //     return res;
+  //   }
 
-    const byRefId: KeyValue<KustoQuery> = {};
-    for (const target of request.targets) {
-      if (target.alias && target.resultFormat !== 'table') {
-        byRefId[target.refId] = target;
-      }
-    }
+  //   const byRefId: KeyValue<KustoQuery> = {};
+  //   for (const target of request.targets) {
+  //     if (target.alias && target.resultFormat !== 'table') {
+  //       byRefId[target.refId] = target;
+  //     }
+  //   }
 
-    return {
-      ...res,
-      data: res.data.map((frame: DataFrame) => {
-        const query = byRefId[frame.refId!];
-        if (query && query.alias) {
-          console.log('TODO, alias', query.alias);
-          // try {
-          //   const key = Object.keys(r.target)[0];
-          //   let meta = r.target;
-          //   if (key !== '0') {
-          //     meta = r.target[key];
-          //   }
-          //   const full = JSON.stringify(r.target)
-          //     .replace(/"/g, '')
-          //     .replace(/^\{(.*?)\}$/, '$1');
-          //   // Generating a default time series metric name requires both the metricname
-          //   // and the value, but only if multiple values were requested.
-          //   // By default, and for backwards compatibility, if there is only one metric
-          //   // in the alias values, use that one.
-          //   let defaultAlias = meta[Object.keys(meta)[0]];
-          //   if (typeof response.valueCount !== 'undefined' && response.valueCount > 1) {
-          //     defaultAlias =
-          //       Object.keys(meta)
-          //         .map(key => '$' + key)
-          //         .join('.') + '.$value';
-          //   }
-          //   templateVars['value'] = { text: key, value: key };
-          //   templateVars['full'] = { text: full, value: full };
-          //   Object.keys(meta).forEach(t => {
-          //     templateVars[t] = { text: meta[t], value: meta[t] };
-          //   });
-          //   if (!alias) {
-          //     alias = defaultAlias;
-          //   }
-          //   r.target = this.templateSrv.replace(alias, templateVars);
-          // } catch (ex) {
-          //   console.log('Error generating time series alias', ex);
-          // }
-        }
-        return frame;
-      }),
-    };
-  }
+  //   return {
+  //     ...res,
+  //     data: res.data.map((frame: DataFrame) => {
+  //       const query = byRefId[frame.refId!];
+  //       if (query && query.alias) {
+  //         console.log('TODO, alias', query.alias);
+  //         try {
+  //           const key = Object.keys(r.target)[0];
+  //           let meta = r.target;
+  //           if (key !== '0') {
+  //             meta = r.target[key];
+  //           }
+  //           const full = JSON.stringify(r.target)
+  //             .replace(/"/g, '')
+  //             .replace(/^\{(.*?)\}$/, '$1');
+  //           // Generating a default time series metric name requires both the metricname
+  //           // and the value, but only if multiple values were requested.
+  //           // By default, and for backwards compatibility, if there is only one metric
+  //           // in the alias values, use that one.
+  //           let defaultAlias = meta[Object.keys(meta)[0]];
+  //           if (typeof response.valueCount !== 'undefined' && response.valueCount > 1) {
+  //             defaultAlias =
+  //               Object.keys(meta)
+  //                 .map(key => '$' + key)
+  //                 .join('.') + '.$value';
+  //           }
+  //           templateVars['value'] = { text: key, value: key };
+  //           templateVars['full'] = { text: full, value: full };
+  //           Object.keys(meta).forEach(t => {
+  //             templateVars[t] = { text: meta[t], value: meta[t] };
+  //           });
+  //           if (!alias) {
+  //             alias = defaultAlias;
+  //           }
+  //           r.target = this.templateSrv.replace(alias, templateVars);
+  //         } catch (ex) {
+  //           console.log('Error generating time series alias', ex);
+  //         }
+  //       }
+  //       return frame;
+  //     }),
+  //   };
+  // }
 
   async annotationQuery(options: AnnotationQueryRequest<KustoQuery>): Promise<AnnotationEvent[]> {
     if (!options.annotation.rawMode) {

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Button, Select, Input, InlineFormLabel, Icon } from '@grafana/ui';
+import { Button, Select, InlineFormLabel, Icon } from '@grafana/ui';
 import { KustoQuery, AdxDataSourceOptions } from 'types';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
@@ -84,7 +84,7 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
 
   render() {
     const { query, databases, templateVariableOptions, onDatabaseChanged, onRawModeChange, datasource } = this.props;
-    const { database, alias, resultFormat } = query;
+    const { database, resultFormat } = query;
 
     const { showLastQuery, lastQueryError, lastQuery, timeNotASC, showHelp } = this.state;
 
@@ -122,7 +122,7 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
 
         <div className="gf-form-inline">
           <div className="gf-form">
-            <InlineFormLabel className="query-keyword" width={7}>
+            {/* <InlineFormLabel className="query-keyword" width={7}>
               ALIAS BY
             </InlineFormLabel>
             <Input
@@ -132,7 +132,7 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
               placeholder="Naming pattern"
               onChange={this.props.onAliasChanged}
               onBlur={this.props.onRunQuery}
-            />
+            /> */}
             <InlineFormLabel className="query-keyword" width={7}>
               Format As
             </InlineFormLabel>
