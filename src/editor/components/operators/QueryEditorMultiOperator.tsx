@@ -17,23 +17,17 @@ export interface QueryEditorMultiOperatorExpression extends QueryEditorOperatorE
 }
 
 export class QueryEditorMultiOperator extends PureComponent<Props> {
-  // // Hack: prepareOptions called to create the default options from persisted values, as currently the ADX query editor
-  // // do not have dynamic options enabled as there might be loads of such
-  // const [options, setOptions] = useState<Array<SelectableValue<string>>>(prepareOptions(props.values || []));
   onCreate = (value: string) => {
-    // if (!value) {
-    //   return;
-    // }
-
-    // setOptions([...options, { value, label: value }]);
-
-    // props.onChange({
-    //   type: QueryEditorExpressionType.Operator,
-    //   values: [...props.values, value],
-    //   operator: props.operator,
-    // });
-
-    console.log('CREATE', value);
+    if (!value) {
+      return;
+    }
+    // Append the new value
+    const values = [...this.props.values, value];
+    this.props.onChange({
+      type: QueryEditorExpressionType.Operator,
+      values,
+      operator: this.props.operator,
+    });
   };
 
   onChange = (selectable: any) => {

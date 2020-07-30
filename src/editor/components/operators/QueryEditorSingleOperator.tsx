@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { SegmentAsync, IconButton } from '@grafana/ui';
+import { AsyncSelect } from '@grafana/ui';
 import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
 import { QueryEditorExpressionType, QueryEditorExpression } from '../../../types';
@@ -26,34 +26,45 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
     });
   };
 
+  onCreate = (value: string) => {
+    if (!value) {
+      return;
+    }
+    this.props.onChange({
+      type: QueryEditorExpressionType.Operator,
+      value,
+      operator: this.props.operator,
+    });
+  };
+
+  getSuggestions = (txt: string) => {
+    console.log('Getting suggestions', txt);
+    return this.props.getSuggestions(txt, this.props.expression);
+  };
+
   render() {
-    const value = this.props.value || '';
+    const { value } = this.props;
+    const current = value
+      ? {
+          label: value,
+          value,
+        }
+      : undefined;
 
     return (
-      <SegmentAsync
-        allowCustomValue
-        Component={<SingleValueDisplay value={value} />}
-        value={value}
-        loadOptions={(query?: string) => this.props.getSuggestions(query ?? '', this.props.expression)}
+      <AsyncSelect
+        width={30}
+        placeholder="Enter value..."
+        loadOptions={this.getSuggestions}
+        value={current}
         onChange={this.onChange}
+        onCreateOption={this.onCreate}
+        allowCustomValue={true}
+        noOptionsMessage={'Start typing to add filters...'}
       />
     );
   }
 }
-
-interface SingleValueDisplayProps {
-  value: string;
-  onRemove?: () => void;
-}
-
-export const SingleValueDisplay: React.FC<SingleValueDisplayProps> = props => {
-  return (
-    <div className="gf-form-label">
-      {props.value ? props.value : 'Click to enter value...'} &nbsp;
-      {props.onRemove && <IconButton name="times" size="sm" surface="header" onClick={props.onRemove} />}
-    </div>
-  );
-};
 
 export const isSingleOperator = (
   expression: QueryEditorOperatorExpression | undefined

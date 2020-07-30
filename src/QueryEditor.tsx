@@ -300,6 +300,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           onDatabaseChanged={this.onDatabaseChanged}
           onRawQueryChange={this.onRawQueryChange}
           databases={databases || []}
+          dirty={this.state.dirty}
         />
       );
     }

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { css } from 'emotion';
-import { Select, stylesFactory } from '@grafana/ui';
+import { Select, stylesFactory, Button } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
@@ -42,14 +42,18 @@ export class QueryEditorOperator extends PureComponent<Props> {
       <>
         <div className={styles.container}>
           <Select
+            isSearchable={true}
             options={operators}
             value={operator?.value}
             onChange={this.onChangeOperator}
             renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
               return (
-                <div ref={ref} {...otherProps} className="gf-form-label query-segment-operator">
+                // <div ref={ref} {...otherProps} className="gf-form-label query-segment-operator">
+                //   {operator?.label || operator?.value || '?'}
+                // </div>
+                <Button ref={ref} {...otherProps} variant="secondary">
                   {operator?.label || operator?.value || '?'}
-                </div>
+                </Button>
               );
             })}
           />
