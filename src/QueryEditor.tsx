@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { debounce } from 'lodash';
 import { QueryEditorProps, SelectableValue, DataQueryRequest } from '@grafana/data';
 import {
   KustoFromEditorSection,
@@ -231,7 +232,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     );
   };
 
-  // ExpressionSuggestor
+  // The debounced version is passed down as properties
   getSuggestions = async (txt: string, skip: QueryEditorExpression): Promise<Array<SelectableValue<string>>> => {
     const { query } = this.props;
 
@@ -280,6 +281,11 @@ export class QueryEditor extends PureComponent<Props, State> {
         return [];
       });
   };
+
+  getSuggestionsNicely = debounce(this.getSuggestions, 300, {
+    leading: true,
+    trailing: true,
+  });
 
   render() {
     const { query } = this.props;
@@ -355,7 +361,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           fields={columns}
           templateVariableOptions={this.templateVariableOptions}
           onChange={this.onWhereChanged}
-          getSuggestions={this.getSuggestions}
+          getSuggestions={this.getSuggestionsNicely}
         />
         <KustoValueColumnEditorSection
           value={reduce}
@@ -363,7 +369,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           fields={columns}
           templateVariableOptions={this.templateVariableOptions}
           onChange={this.onReduceChanged}
-          getSuggestions={this.getSuggestions}
+          getSuggestions={this.getSuggestionsNicely}
         />
         <KustoGroupByEditorSection
           value={groupBy}
@@ -371,7 +377,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           fields={groupable}
           templateVariableOptions={this.templateVariableOptions}
           onChange={this.onGroupByChanged}
-          getSuggestions={this.getSuggestions}
+          getSuggestions={this.getSuggestionsNicely}
         />
 
         <div className={styles.buttonRow}>
