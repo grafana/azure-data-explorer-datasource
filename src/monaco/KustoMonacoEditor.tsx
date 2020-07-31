@@ -82,7 +82,7 @@ export class KustoMonacoEditor extends React.Component<Props, MonacoState> {
   getStyles = stylesFactory(() => ({
     editor: css`
       width: 100%;
-      height: 150px;
+      height: 200px;
     `,
   }));
 
