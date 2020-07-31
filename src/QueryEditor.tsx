@@ -376,8 +376,8 @@ export class QueryEditor extends PureComponent<Props, State> {
       });
   };
 
-  getSuggestionsNicely = debounce(this.getSuggestions, 300, {
-    leading: true,
+  getSuggestionsNicely = debounce(this.getSuggestions, 250, {
+    leading: false,
     trailing: true,
   });
 
