@@ -278,6 +278,19 @@ export class QueryEditor extends PureComponent<Props, State> {
       const columns = this.state.columnsByTable![table];
       const timeField = columns?.find(c => c.type === QueryEditorFieldType.DateTime);
       if (timeField) {
+        let reduce = query.expression?.reduce;
+        if (!reduce) {
+          // Needed so that the summarize renders
+          reduce = {
+            id: 'value-column',
+            expression: {
+              type: QueryEditorExpressionType.OperatorRepeater,
+              typeToRepeat: QueryEditorExpressionType.Reduce,
+              expressions: [],
+            } as QueryEditorRepeaterExpression,
+          };
+        }
+
         const groupBy = {
           id: 'group-by',
           expression: {
@@ -304,6 +317,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           ...query,
           expression: {
             ...query.expression,
+            reduce,
             groupBy,
           },
         };

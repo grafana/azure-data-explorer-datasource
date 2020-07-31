@@ -60,8 +60,21 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   //   return super.query(request);
   // }
 
-  filterQuery(item: KustoQuery): boolean {
-    return item.hide !== true;
+  /**
+   * Return true if it should execute
+   */
+  filterQuery(target: KustoQuery): boolean {
+    if (target.hide) {
+      return false;
+    }
+    if (target.rawMode) {
+      return true; // anything else we can check
+    }
+    const table = (target.expression?.from?.expression as any)?.value;
+    if (!table) {
+      return false; // Don't execute things without a table selected
+    }
+    return true;
   }
 
   applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
