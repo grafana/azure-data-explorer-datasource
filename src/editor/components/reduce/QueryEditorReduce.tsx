@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { css } from 'emotion';
 import { InlineFormLabel, stylesFactory } from '@grafana/ui';
-import { QueryEditorFieldDefinition, QueryEditorFunctionDefinition, QueryEditorFunctionParameter } from '../../types';
+import {
+  QueryEditorFieldDefinition,
+  QueryEditorFunctionDefinition,
+  QueryEditorFunctionParameter,
+  QueryEditorFieldType,
+} from '../../types';
 import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 import { SelectableValue } from '@grafana/data';
@@ -34,6 +39,19 @@ export const QueryEditorReduce: React.FC<Props> = props => {
   const onChangeField = useCallback(
     (expression: QueryEditorFieldExpression) => {
       setField(expression);
+
+      // Set a reasonable value
+      if (!props.value?.reduce?.value) {
+        let reducer = props.functions.find(f => f.value === 'avg');
+        if (!reducer) {
+          reducer = props.functions[0];
+        }
+        setReduce({
+          type: QueryEditorExpressionType.Field,
+          value: reducer.value,
+          fieldType: QueryEditorFieldType.Function,
+        });
+      }
     },
     [setField]
   );
