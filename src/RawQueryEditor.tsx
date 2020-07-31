@@ -12,6 +12,9 @@ type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 interface RawQueryEditorProps extends Props {
   databases: QueryEditorFieldDefinition[];
   dirty?: boolean;
+  lastQueryError?: string;
+  lastQuery?: string;
+  timeNotASC?: boolean;
 
   onRawQueryChange: (kql: string) => void;
   onAliasChanged: (v: any) => void;
@@ -23,9 +26,6 @@ interface RawQueryEditorProps extends Props {
 
 interface State {
   showLastQuery?: boolean;
-  lastQueryError?: string;
-  lastQuery?: string;
-  timeNotASC?: boolean;
   showHelp?: boolean;
 }
 const defaultQuery = [
@@ -46,47 +46,21 @@ const resultFormats: Array<SelectableValue<string>> = [
 export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
   state: State = {};
 
-  componentDidMount() {
-    this.componentDidUpdate({} as Props); // set the initial states
-  }
-
-  componentDidUpdate(oldProps: Props) {
-    const { data } = this.props;
-    if (oldProps.data !== data) {
-      const payload: State = {
-        lastQueryError: '',
-        lastQuery: '',
-        timeNotASC: false,
-      };
-      if (data) {
-        if (data.series && data.series.length) {
-          const fristSeriesMeta = data.series[0].meta;
-          if (fristSeriesMeta) {
-            payload.lastQuery = fristSeriesMeta.executedQueryString;
-            payload.timeNotASC = fristSeriesMeta.custom?.TimeNotASC;
-
-            payload.lastQueryError = fristSeriesMeta.custom?.KustoError;
-          }
-        }
-
-        if (data.error && !payload.lastQueryError) {
-          if (data.error.message) {
-            payload.lastQueryError = `${data.error.message}`;
-          } else {
-            payload.lastQueryError = `${data.error}`;
-          }
-        }
-      }
-
-      this.setState(payload);
-    }
-  }
-
   render() {
-    const { query, databases, templateVariableOptions, onDatabaseChanged, onRawModeChange, datasource } = this.props;
+    const {
+      query,
+      databases,
+      templateVariableOptions,
+      onDatabaseChanged,
+      onRawModeChange,
+      datasource,
+      lastQueryError,
+      lastQuery,
+      timeNotASC,
+    } = this.props;
     const { database, resultFormat } = query;
 
-    const { showLastQuery, lastQueryError, lastQuery, timeNotASC, showHelp } = this.state;
+    const { showLastQuery, showHelp } = this.state;
 
     return (
       <div>

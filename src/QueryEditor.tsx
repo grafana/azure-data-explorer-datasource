@@ -15,6 +15,7 @@ import {
   QueryEditorSectionExpression,
   AdxSchema,
   QueryEditorExpression,
+  QueryEditorExpressionType,
 } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
@@ -24,12 +25,17 @@ import { css } from 'emotion';
 
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
+import { QueryEditorGroupByExpression } from 'editor/components/groupBy/QueryEditorGroupBy';
+import { QueryEditorRepeaterExpression } from 'editor/components/QueryEditorRepeater';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface State {
   schema?: AdxSchema;
   dirty?: boolean;
+  lastQueryError?: string;
+  lastQuery?: string;
+  timeNotASC?: boolean;
 
   databases?: QueryEditorFieldDefinition[];
   tables?: QueryEditorFieldDefinition[];
@@ -46,8 +52,34 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   // Check when the query has changed, but not yet run
   componentDidUpdate(oldProps: Props) {
-    if (oldProps.data !== this.props.data && this.state.dirty) {
-      this.setState({ dirty: false });
+    const { data } = this.props;
+    if (oldProps.data !== data) {
+      const payload: State = {
+        lastQueryError: '',
+        lastQuery: '',
+        dirty: false,
+      };
+      if (data) {
+        if (data.series && data.series.length) {
+          const fristSeriesMeta = data.series[0].meta;
+          if (fristSeriesMeta) {
+            payload.lastQuery = fristSeriesMeta.executedQueryString;
+            payload.timeNotASC = fristSeriesMeta.custom?.TimeNotASC;
+
+            payload.lastQueryError = fristSeriesMeta.custom?.KustoError;
+          }
+        }
+
+        if (data.error && !payload.lastQueryError) {
+          if (data.error.message) {
+            payload.lastQueryError = `${data.error.message}`;
+          } else {
+            payload.lastQueryError = `${data.error}`;
+          }
+        }
+      }
+
+      this.setState(payload);
     }
   }
 
@@ -117,6 +149,9 @@ export class QueryEditor extends PureComponent<Props, State> {
         columnsByTable: columns,
         schema,
       });
+
+      // Update the latest error etc
+      this.componentDidUpdate({} as Props);
     } catch (error) {
       console.log('error', error);
     }
@@ -168,13 +203,15 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   onFromChanged = (from: QueryEditorSectionExpression) => {
     const { query } = this.props;
-    this.onUpdateQuery({
-      ...query,
-      expression: {
-        ...query.expression,
-        from,
-      },
-    });
+    this.onUpdateQuery(
+      this.verifyGroupByTime({
+        ...query,
+        expression: {
+          ...query.expression,
+          from,
+        },
+      })
+    );
   };
 
   onWhereChanged = (where: QueryEditorSectionExpression) => {
@@ -211,13 +248,12 @@ export class QueryEditor extends PureComponent<Props, State> {
   };
 
   onResultFormatChanged = (v: SelectableValue<string>) => {
-    const { query } = this.props;
     this.onUpdateQuery(
-      {
-        ...query,
+      this.verifyGroupByTime({
+        ...this.props.query,
         resultFormat: v.value || 'time_series',
-      },
-      true
+      }),
+      false
     );
   };
 
@@ -231,6 +267,50 @@ export class QueryEditor extends PureComponent<Props, State> {
       false
     );
   };
+
+  verifyGroupByTime(query: KustoQuery): KustoQuery {
+    if (!query || query.resultFormat !== 'time_series' || query.rawMode) {
+      return query;
+    }
+    let table = (query.expression?.from?.expression as any)?.value;
+    if (table && !(query?.expression?.groupBy?.expression as any)?.expressions?.length) {
+      table = this.kustoExpressionParser.fromTable(query.expression?.from, true);
+      const columns = this.state.columnsByTable![table];
+      const timeField = columns?.find(c => c.type === QueryEditorFieldType.DateTime);
+      if (timeField) {
+        const groupBy = {
+          id: 'group-by',
+          expression: {
+            type: QueryEditorExpressionType.OperatorRepeater,
+            typeToRepeat: QueryEditorExpressionType.GroupBy,
+            expressions: [
+              {
+                type: QueryEditorExpressionType.GroupBy,
+                field: {
+                  type: QueryEditorExpressionType.Field,
+                  fieldType: QueryEditorFieldType.DateTime,
+                  value: timeField.value,
+                },
+                interval: {
+                  type: QueryEditorExpressionType.Field,
+                  fieldType: QueryEditorFieldType.Interval,
+                  value: '$__interval',
+                },
+              } as QueryEditorGroupByExpression,
+            ],
+          } as QueryEditorRepeaterExpression,
+        };
+        return {
+          ...query,
+          expression: {
+            ...query.expression,
+            groupBy,
+          },
+        };
+      }
+    }
+    return query;
+  }
 
   // The debounced version is passed down as properties
   getSuggestions = async (txt: string, skip: QueryEditorExpression): Promise<Array<SelectableValue<string>>> => {
@@ -289,7 +369,8 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   render() {
     const { query } = this.props;
-    const { schema, databases, tables } = this.state;
+    const { schema, databases, tables, lastQueryError, lastQuery, dirty } = this.state;
+
     if (!schema) {
       return <>Loading schema...</>;
     }
@@ -299,6 +380,7 @@ export class QueryEditor extends PureComponent<Props, State> {
       return (
         <RawQueryEditor
           {...this.props}
+          {...this.state}
           onRawModeChange={this.onToggleRawMode}
           templateVariableOptions={this.templateVariableOptions}
           onAliasChanged={this.onAliasChanged}
@@ -306,7 +388,6 @@ export class QueryEditor extends PureComponent<Props, State> {
           onDatabaseChanged={this.onDatabaseChanged}
           onRawQueryChange={this.onRawQueryChange}
           databases={databases || []}
-          dirty={this.state.dirty}
         />
       );
     }
@@ -339,7 +420,7 @@ export class QueryEditor extends PureComponent<Props, State> {
             </div>
             <Button onClick={this.onToggleRawMode}>Edit KQL</Button>&nbsp;
             <Button
-              variant={this.state.dirty ? 'primary' : 'secondary'}
+              variant={dirty ? 'primary' : 'secondary'}
               onClick={() => {
                 this.props.onRunQuery();
               }}
@@ -408,7 +489,13 @@ export class QueryEditor extends PureComponent<Props, State> {
           </HorizontalGroup>
         </div>
 
-        <TextArea cols={80} rows={8} value={query.query} disabled={true} />
+        <TextArea cols={80} rows={8} value={dirty ? query.query : lastQuery} disabled={true} />
+
+        {lastQueryError && (
+          <div className="gf-form">
+            <pre className="gf-form-pre alert alert-error">{lastQueryError}</pre>
+          </div>
+        )}
       </>
     );
   }
