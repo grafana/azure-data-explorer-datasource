@@ -31,6 +31,11 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 
 	interpolatedQuery := qm.Query
 	var kustoError string
+
+	appendFrame := func(f *data.Frame) {
+		resp.Frames = append(resp.Frames, f)
+	}
+
 	errorWithFrame := func(err error) {
 		fm := &data.FrameMeta{ExecutedQueryString: interpolatedQuery}
 		if kustoError != "" {
@@ -40,7 +45,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 				kustoError,
 			}
 		}
-		resp.Frames = append(resp.Frames, &data.Frame{RefID: q.RefID, Meta: fm})
+		appendFrame(&data.Frame{RefID: q.RefID, Meta: fm})
 		resp.Error = err
 	}
 
@@ -72,18 +77,25 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 		for _, f := range frames {
 			tsSchema := f.TimeSeriesSchema()
 			if tsSchema.Type == data.TimeSeriesTypeNot {
-				errorWithFrame(fmt.Errorf("returned frame is not a series"))
-				return resp
+				f.AppendNotices(data.Notice{
+					Severity: data.NoticeSeverityWarning,
+					Text:     "Returned frame is not a time series, returning table format instead. The response must have at least one datetime field and one numeric field.",
+				})
+				appendFrame(f)
+				continue
 			}
 			if tsSchema.Type == data.TimeSeriesTypeLong {
 				wideFrame, err := data.LongToWide(f, nil)
 				if err != nil {
-					errorWithFrame(err)
-					return resp
+					f.AppendNotices(data.Notice{
+						Severity: data.NoticeSeverityWarning,
+						Text:     fmt.Sprintf("detected long formatted time series but failed to convert from long frame: %v. Returning table format instead.", err),
+					})
+					appendFrame(f)
+					continue
 				}
-				f = wideFrame
+				appendFrame(wideFrame)
 			}
-			resp.Frames = append(resp.Frames, f)
 		}
 	case "time_series_adx_series":
 		orginalDFs, err := tableRes.ToDataFrames(interpolatedQuery)
@@ -97,7 +109,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 				errorWithFrame(err)
 				return resp
 			}
-			resp.Frames = append(resp.Frames, formatedDF)
+			appendFrame(formatedDF)
 		}
 
 	// 	series, timeNotASC, err := tableRes.ToTimeSeries()
