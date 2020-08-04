@@ -36,7 +36,7 @@ export const QueryEditorBoolOperator: React.FC<Props> = props => {
     [props]
   );
 
-  return <Select width={15} options={options} value={props.value} onChange={onChange} />;
+  return <Select width={15} options={options} value={props.value} onChange={onChange} menuPlacement="bottom" />;
 };
 
 export const isBoolOperator = (

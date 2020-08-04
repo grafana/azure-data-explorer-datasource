@@ -29,6 +29,7 @@ export const QueryEditorField: React.FC<Props> = props => {
       value={value}
       options={[props.templateVariableOptions, ...options]}
       placeholder={props.placeholder}
+      menuPlacement="bottom"
     />
   );
 };

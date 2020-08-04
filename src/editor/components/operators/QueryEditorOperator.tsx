@@ -46,11 +46,9 @@ export class QueryEditorOperator extends PureComponent<Props> {
             options={operators}
             value={operator?.value}
             onChange={this.onChangeOperator}
+            menuPlacement="bottom"
             renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
               return (
-                // <div ref={ref} {...otherProps} className="gf-form-label query-segment-operator">
-                //   {operator?.label || operator?.value || '?'}
-                // </div>
                 <Button ref={ref} {...otherProps} variant="secondary">
                   {operator?.label || operator?.value || '?'}
                 </Button>
