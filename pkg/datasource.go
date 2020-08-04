@@ -76,15 +76,15 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 		}
 		for _, f := range frames {
 			tsSchema := f.TimeSeriesSchema()
-			if tsSchema.Type == data.TimeSeriesTypeNot {
+			switch tsSchema.Type {
+			case data.TimeSeriesTypeNot:
 				f.AppendNotices(data.Notice{
 					Severity: data.NoticeSeverityWarning,
 					Text:     "Returned frame is not a time series, returning table format instead. The response must have at least one datetime field and one numeric field.",
 				})
 				appendFrame(f)
 				continue
-			}
-			if tsSchema.Type == data.TimeSeriesTypeLong {
+			case data.TimeSeriesTypeLong:
 				wideFrame, err := data.LongToWide(f, nil)
 				if err != nil {
 					f.AppendNotices(data.Notice{
@@ -95,6 +95,8 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 					continue
 				}
 				appendFrame(wideFrame)
+			default:
+				appendFrame(f)
 			}
 		}
 	case "time_series_adx_series":
