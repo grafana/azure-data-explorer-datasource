@@ -107,7 +107,7 @@ func TestTableResponse_ToADXTimeSeries(t *testing.T) {
 	}{
 		{
 			name:                  "should load series response",
-			testFile:              "adx_timeseries_multi_label_mulit_value.json",
+			testFile:              "adx_timeseries_multi_label_multi_value.json",
 			seriesCountIs:         require.Equal,
 			seriesCount:           8,
 			perSeriesValueCountIs: require.Equal,
