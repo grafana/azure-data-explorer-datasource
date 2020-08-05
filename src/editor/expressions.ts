@@ -1,6 +1,10 @@
 import { QueryEditorExpression, QueryEditorExpressionType } from '../types';
 import { QueryEditorFieldType, QueryEditorOperatorDefinition } from './types';
 
+/** OPERATORS */
+export interface QueryEditorOperatorExpression extends QueryEditorExpression {
+  operator: QueryEditorOperatorDefinition;
+}
 export interface QueryEditorBoolOperatorExpression extends QueryEditorOperatorExpression {
   value: boolean;
 }
@@ -13,9 +17,14 @@ export interface QueryEditorSingleOperatorExpression extends QueryEditorOperator
   value: string;
 }
 
+/** COMBINED */
 export interface QueryEditorFieldExpression extends QueryEditorExpression {
   value: string;
   fieldType: QueryEditorFieldType;
+}
+export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpression {
+  field: QueryEditorFieldExpression;
+  operator: QueryEditorOperatorExpression;
 }
 
 export interface QueryEditorFunctionParameterExpression extends QueryEditorExpression {
@@ -33,15 +42,6 @@ export interface QueryEditorReduceExpression extends QueryEditorExpression {
 export interface QueryEditorGroupByExpression extends QueryEditorExpression {
   field: QueryEditorFieldExpression;
   interval?: QueryEditorFieldExpression;
-}
-
-export interface QueryEditorOperatorExpression extends QueryEditorExpression {
-  operator: QueryEditorOperatorDefinition;
-}
-
-export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpression {
-  field: QueryEditorFieldExpression;
-  operator: QueryEditorOperatorExpression;
 }
 
 export interface QueryEditorRepeaterExpression extends QueryEditorExpression {
