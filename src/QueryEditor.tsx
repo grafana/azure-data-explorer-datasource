@@ -9,7 +9,7 @@ import {
 } from 'QueryEditorSections';
 import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
 import { AdxDataSource } from 'datasource';
-import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
+import { KustoQuery, AdxDataSourceOptions, AdxSchema, QueryExpression } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from './editor/types';
@@ -23,6 +23,10 @@ import {
   QueryEditorRepeaterExpression,
   QueryEditorExpressionType,
   QueryEditorExpression,
+  QueryEditorArrayExpression,
+  QueryEditorFieldAndOperatorExpression,
+  QueryEditorFieldExpression,
+  QueryEditorOperatorExpression,
 } from './editor/expressions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
@@ -38,6 +42,13 @@ interface State {
   tables?: QueryEditorFieldDefinition[];
   columnsByTable?: Record<string, QueryEditorFieldDefinition[]>;
 }
+
+const defaultQuery: QueryExpression = {
+  where: {
+    type: QueryEditorExpressionType.And,
+    expressions: [],
+  },
+};
 
 export class QueryEditor extends PureComponent<Props, State> {
   state: State = {
@@ -157,7 +168,7 @@ export class QueryEditor extends PureComponent<Props, State> {
   onUpdateQuery = (q: KustoQuery, run?: boolean) => {
     // Render the query when the expression changes
     if (q.expression !== this.props.query.expression) {
-      const expression = q.expression || {};
+      const expression = q.expression || defaultQuery;
 
       const { columnsByTable } = this.state;
       const columns = columnsByTable![this.kustoExpressionParser.fromTable(expression.from, true)];
@@ -200,10 +211,12 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   onFromChanged = (from: QueryEditorExpression) => {
     const { query } = this.props;
+
     this.onUpdateQuery(
       this.verifyGroupByTime({
         ...query,
         expression: {
+          ...defaultQuery,
           ...query.expression,
           from,
         },
@@ -211,11 +224,12 @@ export class QueryEditor extends PureComponent<Props, State> {
     );
   };
 
-  onWhereChanged = (where: QueryEditorExpression) => {
+  onWhereChanged = (where: QueryEditorArrayExpression) => {
     const { query } = this.props;
     this.onUpdateQuery({
       ...query,
       expression: {
+        ...defaultQuery,
         ...query.expression,
         where,
       },
@@ -227,6 +241,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     this.onUpdateQuery({
       ...query,
       expression: {
+        ...defaultQuery,
         ...query.expression,
         reduce,
       },
@@ -238,6 +253,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     this.onUpdateQuery({
       ...query,
       expression: {
+        ...defaultQuery,
         ...query.expression,
         groupBy,
       },
@@ -308,7 +324,7 @@ export class QueryEditor extends PureComponent<Props, State> {
         return {
           ...query,
           expression: {
-            ...query.expression,
+            ...query.expression!,
             reduce,
             groupBy,
           },
@@ -399,10 +415,12 @@ export class QueryEditor extends PureComponent<Props, State> {
     }
 
     const { database, expression, alias, resultFormat } = query;
-    const { from, where, reduce, groupBy } = expression || {};
+    const { from, where, reduce, groupBy } = expression || defaultQuery;
 
     const { columnsByTable } = this.state;
     const columns = columnsByTable![this.kustoExpressionParser.fromTable(from, true)];
+
+    console.log('columnsByTable', columnsByTable);
 
     const groupable =
       columns?.filter(

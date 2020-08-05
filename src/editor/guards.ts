@@ -11,6 +11,7 @@ import {
   QueryEditorRepeaterExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
+  QueryEditorArrayExpression,
 } from './expressions';
 import { QueryEditorFieldType } from './types';
 
@@ -18,8 +19,10 @@ export const isReduceExpression = (expression: QueryEditorExpression): expressio
   return (expression as QueryEditorReduceExpression)?.type === QueryEditorExpressionType.Reduce;
 };
 
-export const isFieldExpression = (expression: QueryEditorExpression): expression is QueryEditorFieldExpression => {
-  return (expression as QueryEditorFieldExpression)?.type === QueryEditorExpressionType.Field;
+export const isFieldExpression = (
+  expression: QueryEditorExpression | undefined
+): expression is QueryEditorFieldExpression => {
+  return expression?.type === QueryEditorExpressionType.Field;
 };
 
 export const isFunctionParameterExpression = (
@@ -29,9 +32,9 @@ export const isFunctionParameterExpression = (
 };
 
 export const isFieldAndOperator = (
-  expression: QueryEditorExpression
+  expression: QueryEditorExpression | undefined
 ): expression is QueryEditorFieldAndOperatorExpression => {
-  return (expression as QueryEditorFieldAndOperatorExpression)?.type === QueryEditorExpressionType.FieldAndOperator;
+  return expression?.type === QueryEditorExpressionType.FieldAndOperator;
 };
 
 export const isGroupBy = (expression: QueryEditorExpression): expression is QueryEditorGroupByExpression => {
@@ -66,4 +69,16 @@ export const isSingleOperator = (
 
 export const isRepeater = (expression: QueryEditorExpression): expression is QueryEditorRepeaterExpression => {
   return (expression as QueryEditorRepeaterExpression)?.type === QueryEditorExpressionType.OperatorRepeater;
+};
+
+export const isAndExpression = (expression?: QueryEditorExpression): expression is QueryEditorArrayExpression => {
+  return expression?.type === QueryEditorExpressionType.And;
+};
+
+export const isOrExpression = (expression?: QueryEditorExpression): expression is QueryEditorArrayExpression => {
+  return expression?.type === QueryEditorExpressionType.Or;
+};
+
+export const isArrayExpression = (expression?: QueryEditorExpression): expression is QueryEditorArrayExpression => {
+  return isAndExpression(expression) || isOrExpression(expression);
 };

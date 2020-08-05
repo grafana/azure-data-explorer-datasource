@@ -1,9 +1,9 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
-import { QueryEditorExpression } from './editor/expressions';
+import { QueryEditorExpression, QueryEditorArrayExpression } from './editor/expressions';
 
 export interface QueryExpression {
   from?: QueryEditorExpression;
-  where?: QueryEditorExpression;
+  where: QueryEditorArrayExpression;
   reduce?: QueryEditorExpression;
   groupBy?: QueryEditorExpression;
 }

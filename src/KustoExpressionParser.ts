@@ -21,6 +21,7 @@ export class KustoExpressionParser {
   }
 
   fromTable(expression?: QueryEditorExpression, interpolate = false): string {
+    console.log('expression', expression);
     if (expression && isFieldExpression(expression)) {
       if (interpolate) {
         return this.templateSrv.replace(expression.value);

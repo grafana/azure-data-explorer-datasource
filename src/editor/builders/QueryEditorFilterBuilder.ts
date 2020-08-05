@@ -13,12 +13,12 @@ import {
 export class QueryEditorFilterBuilder {
   private operators: QueryEditorOperatorDefinition[];
   private conditionals: QueryEditorCondition[];
-  private multipleRows: boolean;
+  //private multipleRows: boolean;
 
   constructor() {
     this.conditionals = [];
     this.operators = [];
-    this.multipleRows = false;
+    // this.multipleRows = false;
   }
 
   withOperators(operators: (builder: (value: string) => QueyEditorOperatorBuilder) => void) {
@@ -27,7 +27,7 @@ export class QueryEditorFilterBuilder {
   }
 
   withMultipleRows(value: boolean) {
-    this.multipleRows = value;
+    // this.multipleRows = value;
     return this;
   }
 
@@ -35,24 +35,22 @@ export class QueryEditorFilterBuilder {
     return QueryEditorFilterSection({
       operators: this.operators,
       conditionals: this.conditionals,
-      defaultValue: this.buildFilterExpression(),
+      defaultValue: this.buildOperatorExpression(),
     });
   }
 
-  protected buildFilterExpression(): QueryEditorExpression {
-    if (this.multipleRows) {
-      if (this.operators.length > 0) {
-        return this.buildRepeaterExpression(QueryEditorExpressionType.FieldAndOperator);
-      }
-      return this.buildRepeaterExpression(QueryEditorExpressionType.Field);
-    }
-
-    if (this.operators.length > 0) {
-      return this.buildOperatorExpression();
-    }
-
-    return this.buildFieldExpression();
-  }
+  // protected buildFilterExpression(): QueryEditorFieldAndOperatorExpression {
+  //   // if (this.multipleRows) {
+  //   //   if (this.operators.length > 0) {
+  //   //     return this.buildRepeaterExpression(QueryEditorExpressionType.FieldAndOperator);
+  //   //   }
+  //   //   return this.buildRepeaterExpression(QueryEditorExpressionType.Field);
+  //   // }
+  //   // if (this.operators.length > 0) {
+  //   //   return this.buildOperatorExpression();
+  //   // }
+  //   // return this.buildFieldExpression();
+  // }
 
   private buildOperatorExpression(): QueryEditorFieldAndOperatorExpression {
     return {
@@ -65,13 +63,13 @@ export class QueryEditorFilterBuilder {
     };
   }
 
-  private buildRepeaterExpression(typeToRepeat: QueryEditorExpressionType): QueryEditorRepeaterExpression {
-    return {
-      type: QueryEditorExpressionType.OperatorRepeater,
-      typeToRepeat: typeToRepeat,
-      expressions: [],
-    };
-  }
+  // private buildRepeaterExpression(typeToRepeat: QueryEditorExpressionType): QueryEditorRepeaterExpression {
+  //   return {
+  //     type: QueryEditorExpressionType.OperatorRepeater,
+  //     typeToRepeat: typeToRepeat,
+  //     expressions: [],
+  //   };
+  // }
 
   private buildFieldExpression(): QueryEditorFieldExpression {
     return {
