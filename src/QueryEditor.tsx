@@ -25,8 +25,7 @@ import { css } from 'emotion';
 
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
-import { QueryEditorGroupByExpression } from 'editor/components/groupBy/QueryEditorGroupBy';
-import { QueryEditorRepeaterExpression } from 'editor/components/QueryEditorRepeater';
+import { QueryEditorGroupByExpression, QueryEditorRepeaterExpression } from './editor/expressions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 

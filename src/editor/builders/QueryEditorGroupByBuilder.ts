@@ -1,14 +1,16 @@
 import React from 'react';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../types';
-import { QueryEditorFieldExpression } from '../components/field/QueryEditorField';
 import {
   QueryEditorGroupBySection,
   QueryEditorGroupBySectionProps,
 } from '../components/groupBy/QueryEditorGroupBySection';
 import { QueryEditorIntervalBuilder } from './QueryEditorIntervalBuilder';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
-import { QueryEditorRepeaterExpression } from '../components/QueryEditorRepeater';
-import { QueryEditorGroupByExpression } from '../components/groupBy/QueryEditorGroupBy';
+import {
+  QueryEditorRepeaterExpression,
+  QueryEditorGroupByExpression,
+  QueryEditorFieldExpression,
+} from '../expressions';
 
 export class QueryEditorGroupByBuilder {
   private intervals: QueryEditorFieldDefinition[];

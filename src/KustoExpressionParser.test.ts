@@ -1,15 +1,17 @@
 import { KustoExpressionParser } from './KustoExpressionParser';
 import { QueryEditorSectionExpression, QueryEditorExpressionType } from './types';
-import { QueryEditorFieldExpression } from './editor/components/field/QueryEditorField';
 import { QueryEditorFieldType, QueryEditorFieldDefinition } from './editor/types';
-import { QueryEditorRepeaterExpression } from './editor/components/QueryEditorRepeater';
-import { QueryEditorMultiOperatorExpression } from './editor/components/operators/QueryEditorMultiOperator';
-import { QueryEditorFieldAndOperatorExpression } from './editor/components/filter/QueryEditorFieldAndOperator';
-import { QueryEditorReduceExpression } from './editor/components/reduce/QueryEditorReduce';
-import { QueryEditorGroupByExpression } from './editor/components/groupBy/QueryEditorGroupBy';
-import { QueryEditorSingleOperatorExpression } from 'editor/components/operators/QueryEditorSingleOperator';
 import { TemplateSrv } from './test/template_srv';
 import { setTemplateSrv } from '@grafana/runtime';
+import {
+  QueryEditorFieldExpression,
+  QueryEditorMultiOperatorExpression,
+  QueryEditorFieldAndOperatorExpression,
+  QueryEditorRepeaterExpression,
+  QueryEditorSingleOperatorExpression,
+  QueryEditorReduceExpression,
+  QueryEditorGroupByExpression,
+} from './editor/expressions';
 
 describe('KustoExpressionParser', () => {
   let kustoExpressionParser: KustoExpressionParser;
