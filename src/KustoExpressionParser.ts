@@ -1,13 +1,16 @@
-import { isField } from 'editor/components/field/QueryEditorField';
-import { isRepeater } from 'editor/components/QueryEditorRepeater';
-import { isMultiOperator } from 'editor/components/operators/QueryEditorMultiOperator';
 import { QueryEditorExpression, QueryEditorSectionExpression, QueryExpression } from './types';
-import { isFieldAndOperator } from './editor/components/filter/QueryEditorFieldAndOperator';
-import { isGroupBy, isDateGroupBy } from 'editor/components/groupBy/QueryEditorGroupBy';
-import { isReduce } from 'editor/components/reduce/QueryEditorReduce';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from 'editor/types';
-import { isSingleOperator } from 'editor/components/operators/QueryEditorSingleOperator';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
+import {
+  isReduceExpression,
+  isFieldExpression,
+  isFieldAndOperator,
+  isMultiOperator,
+  isSingleOperator,
+  isGroupBy,
+  isDateGroupBy,
+  isRepeater,
+} from './editor/guards';
 
 export class KustoExpressionParser {
   templateSrv: TemplateSrv;
@@ -17,7 +20,7 @@ export class KustoExpressionParser {
   }
 
   fromTable(section?: QueryEditorSectionExpression, interpolate = false): string {
-    if (section && section.expression && isField(section.expression)) {
+    if (section && section.expression && isFieldExpression(section.expression)) {
       if (interpolate) {
         return this.templateSrv.replace(section.expression.value);
       } else {
@@ -77,7 +80,7 @@ export class KustoExpressionParser {
 
     if (isRepeater(expression)) {
       for (const exp of expression.expressions) {
-        if (isReduce(exp) && exp.field?.value) {
+        if (isReduceExpression(exp) && exp.field?.value) {
           if (exp.field.fieldType === QueryEditorFieldType.DateTime) {
             timeCol = exp.field.value;
           } else {
@@ -85,7 +88,7 @@ export class KustoExpressionParser {
           }
         }
       }
-    } else if (isReduce(expression)) {
+    } else if (isReduceExpression(expression)) {
       fields.push(expression.field.value);
     }
 
@@ -163,7 +166,7 @@ export class KustoExpressionParser {
       let reduceExpressions: string[] = [];
 
       for (const exp of reduceExpression.expressions) {
-        if (isReduce(exp) && exp?.reduce?.value !== 'none' && exp?.field?.value) {
+        if (isReduceExpression(exp) && exp?.reduce?.value !== 'none' && exp?.field?.value) {
           if (exp?.parameters && exp?.parameters.length > 0) {
             reduceExpressions.push(
               `${exp.reduce.value}(${exp.field.value}, ${exp.parameters.map(p => p.value).join(', ')})`

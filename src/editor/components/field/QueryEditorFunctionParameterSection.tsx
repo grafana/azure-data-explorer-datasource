@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Input } from '@grafana/ui';
-import { QueryEditorExpressionType, QueryEditorExpression } from '../../../types';
-import { QueryEditorFieldType } from 'editor/types';
+import { QueryEditorExpressionType } from '../../../types';
+import { QueryEditorFieldType } from '../../types';
+import { QueryEditorFunctionParameterExpression } from '../../expressions';
 
 interface Props {
   name: string;
@@ -9,12 +10,6 @@ interface Props {
   fieldType: QueryEditorFieldType;
   description: string;
   onChange: (expression: QueryEditorFunctionParameterExpression) => void;
-}
-
-export interface QueryEditorFunctionParameterExpression extends QueryEditorExpression {
-  value: string;
-  fieldType: QueryEditorFieldType;
-  name: string;
 }
 
 export const QueryEditorFunctionParameterSection: React.FC<Props> = props => {
@@ -40,10 +35,4 @@ export const QueryEditorFunctionParameterSection: React.FC<Props> = props => {
   }, [value, props]);
 
   return <Input width={20} value={value} placeholder={props.description} onChange={onChange} onBlur={onBlur} />;
-};
-
-export const isFunctionParameter = (
-  expression: QueryEditorExpression | undefined
-): expression is QueryEditorFunctionParameterExpression => {
-  return (expression as QueryEditorFunctionParameterExpression)?.type === QueryEditorExpressionType.FunctionParameter;
 };

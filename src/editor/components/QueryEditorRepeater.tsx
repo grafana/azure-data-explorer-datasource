@@ -3,6 +3,7 @@ import React, { PureComponent, useCallback } from 'react';
 import { Button, stylesFactory } from '@grafana/ui';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
 import { ExpressionSuggestor } from './types';
+import { QueryEditorRepeaterExpression } from '../expressions';
 
 interface Props {
   children: (props: ChildProps) => React.ReactElement;
@@ -17,11 +18,6 @@ interface ChildProps {
   value: QueryEditorExpression | undefined;
   onChange: (expression: QueryEditorExpression | undefined) => void;
   getSuggestions: ExpressionSuggestor;
-}
-
-export interface QueryEditorRepeaterExpression extends QueryEditorExpression {
-  typeToRepeat: QueryEditorExpressionType;
-  expressions: QueryEditorExpression[];
 }
 
 export class QueryEditorRepeater extends PureComponent<Props> {
@@ -96,10 +92,6 @@ export class QueryEditorRepeater extends PureComponent<Props> {
 function asKey(value: QueryEditorExpression): string {
   return JSON.stringify(value);
 }
-
-export const isRepeater = (expression: QueryEditorExpression): expression is QueryEditorRepeaterExpression => {
-  return (expression as QueryEditorRepeaterExpression)?.type === QueryEditorExpressionType.OperatorRepeater;
-};
 
 const isFirstRow = (index: number, length: number): boolean => {
   return index + 1 === length;

@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react';
 import { AsyncMultiSelect } from '@grafana/ui';
-import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
+import { ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
+import { QueryEditorMultiOperatorExpression } from '../../expressions';
 
 interface Props {
   values: string[] | undefined;
@@ -10,10 +11,6 @@ interface Props {
   operator: QueryEditorOperatorDefinition;
   getSuggestions: ExpressionSuggestor;
   expression: QueryEditorExpression;
-}
-
-export interface QueryEditorMultiOperatorExpression extends QueryEditorOperatorExpression {
-  values: string[];
 }
 
 export class QueryEditorMultiOperator extends PureComponent<Props> {
@@ -67,9 +64,3 @@ export class QueryEditorMultiOperator extends PureComponent<Props> {
     );
   }
 }
-
-export const isMultiOperator = (
-  expression: QueryEditorOperatorExpression | undefined
-): expression is QueryEditorMultiOperatorExpression => {
-  return Array.isArray((expression as QueryEditorMultiOperatorExpression)?.values);
-};

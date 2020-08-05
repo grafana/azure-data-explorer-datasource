@@ -2,12 +2,13 @@ import React, { PureComponent } from 'react';
 import { css } from 'emotion';
 import { Select, stylesFactory, Button } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
+import { ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
-import { QueryEditorMultiOperator, isMultiOperator } from './QueryEditorMultiOperator';
-import { isSingleOperator, QueryEditorSingleOperator } from './QueryEditorSingleOperator';
-import { QueryEditorBoolOperator, isBoolOperator } from './QueryEditorBoolOperator';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
+import { QueryEditorMultiOperator } from './QueryEditorMultiOperator';
+import { QueryEditorSingleOperator } from './QueryEditorSingleOperator';
+import { QueryEditorBoolOperator } from './QueryEditorBoolOperator';
+import { QueryEditorOperatorExpression } from '../../expressions';
+import { isMultiOperator, isBoolOperator, isSingleOperator } from '../../guards';
 
 interface Props {
   value?: QueryEditorOperatorExpression;
@@ -61,10 +62,6 @@ export class QueryEditorOperator extends PureComponent<Props> {
     );
   }
 }
-
-export const isOperator = (expression: QueryEditorExpression): expression is QueryEditorOperatorExpression => {
-  return (expression as QueryEditorOperatorExpression)?.type === QueryEditorExpressionType.Operator;
-};
 
 const renderOperatorInput = (
   operator: QueryEditorOperatorDefinition | undefined,

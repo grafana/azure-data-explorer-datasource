@@ -1,10 +1,10 @@
 import React from 'react';
-
 import { QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionBaseProps } from '../QueryEditorSection';
-import { QueryEditorField, isField } from './QueryEditorField';
+import { QueryEditorField } from './QueryEditorField';
 import { QueryEditorExpression, QueryEditorSectionExpression } from '../../../types';
 import { SelectableValue } from '@grafana/data';
+import { isFieldExpression } from '../../guards';
 
 interface FieldSectionConfiguration {
   id: string;
@@ -21,7 +21,7 @@ export const QueryEditorFieldSection = (config: FieldSectionConfiguration): Reac
   return props => {
     const expression = props.value?.expression ?? config.expression;
 
-    if (!isField(expression)) {
+    if (!isFieldExpression(expression)) {
       return null;
     }
 

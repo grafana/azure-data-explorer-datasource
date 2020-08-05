@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
 import { AsyncSelect } from '@grafana/ui';
-import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
+import { ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
 import { QueryEditorExpressionType, QueryEditorExpression } from '../../../types';
 import { SelectableValue } from '@grafana/data';
+import { QueryEditorSingleOperatorExpression } from '../../expressions';
 
 interface Props {
   value: string | undefined;
@@ -12,11 +13,6 @@ interface Props {
   getSuggestions: ExpressionSuggestor;
   expression: QueryEditorExpression;
 }
-
-export interface QueryEditorSingleOperatorExpression extends QueryEditorOperatorExpression {
-  value: string;
-}
-
 export class QueryEditorSingleOperator extends PureComponent<Props> {
   onChange = (evt: SelectableValue<any>) => {
     this.props.onChange({
@@ -65,9 +61,3 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
     );
   }
 }
-
-export const isSingleOperator = (
-  expression: QueryEditorOperatorExpression | undefined
-): expression is QueryEditorSingleOperatorExpression => {
-  return typeof (expression as QueryEditorSingleOperatorExpression)?.value === 'string';
-};

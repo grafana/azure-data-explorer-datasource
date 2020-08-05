@@ -2,9 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../../types';
-import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
+import { QueryEditorField } from '../field/QueryEditorField';
+import { QueryEditorExpressionType } from '../../../types';
 import { SelectableValue } from '@grafana/data';
+import { QueryEditorGroupByExpression, QueryEditorFieldExpression } from '../../expressions';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];
@@ -13,11 +14,6 @@ interface Props {
   value?: QueryEditorGroupByExpression;
   label?: string;
   onChange: (expression: QueryEditorGroupByExpression) => void;
-}
-
-export interface QueryEditorGroupByExpression extends QueryEditorExpression {
-  field: QueryEditorFieldExpression;
-  interval?: QueryEditorFieldExpression;
 }
 
 export const QueryEditorGroupBy: React.FC<Props> = props => {
@@ -78,14 +74,6 @@ export const QueryEditorGroupBy: React.FC<Props> = props => {
       )}
     </div>
   );
-};
-
-export const isGroupBy = (expression: QueryEditorExpression): expression is QueryEditorGroupByExpression => {
-  return (expression as QueryEditorGroupByExpression)?.type === QueryEditorExpressionType.GroupBy;
-};
-
-export const isDateGroupBy = (expression: QueryEditorExpression): boolean => {
-  return (expression as QueryEditorGroupByExpression)?.field?.fieldType === QueryEditorFieldType.DateTime;
 };
 
 const getStyles = stylesFactory(() => {

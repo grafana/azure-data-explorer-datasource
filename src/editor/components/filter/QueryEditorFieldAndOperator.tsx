@@ -1,12 +1,17 @@
 import React, { PureComponent } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
-import { QueryEditorOperatorExpression, ExpressionSuggestor } from '../types';
+import { ExpressionSuggestor } from '../types';
 import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition } from '../../types';
-import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
+import { QueryEditorField } from '../field/QueryEditorField';
 import { QueryEditorOperator, verifyOperatorValues } from '../operators/QueryEditorOperator';
 import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 import { SelectableValue } from '@grafana/data';
+import {
+  QueryEditorFieldAndOperatorExpression,
+  QueryEditorFieldExpression,
+  QueryEditorOperatorExpression,
+} from '../../expressions';
 
 interface Props {
   value?: QueryEditorFieldAndOperatorExpression;
@@ -15,11 +20,6 @@ interface Props {
   operators: QueryEditorOperatorDefinition[];
   onChange: (expression: QueryEditorFieldAndOperatorExpression | undefined) => void;
   getSuggestions: ExpressionSuggestor;
-}
-
-export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpression {
-  field: QueryEditorFieldExpression;
-  operator: QueryEditorOperatorExpression;
 }
 
 interface State {
@@ -109,12 +109,6 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
     );
   }
 }
-
-export const isFieldAndOperator = (
-  expression: QueryEditorExpression
-): expression is QueryEditorFieldAndOperatorExpression => {
-  return (expression as QueryEditorFieldAndOperatorExpression)?.type === QueryEditorExpressionType.FieldAndOperator;
-};
 
 const getStyles = stylesFactory(() => {
   return {

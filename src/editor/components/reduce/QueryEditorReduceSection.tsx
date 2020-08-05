@@ -2,7 +2,7 @@ import React from 'react';
 import { QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionBaseProps } from '../QueryEditorSection';
 import { QueryEditorExpression, QueryEditorSectionExpression } from '../../../types';
-import { QueryEditorSectionRenderer } from '../filter/QueryEditorSectionRenderer';
+import { QueryEditorSectionRenderer } from '../QueryEditorSectionRenderer';
 import { SelectableValue } from '@grafana/data';
 import { ExpressionSuggestor } from '../types';
 

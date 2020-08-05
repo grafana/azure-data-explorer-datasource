@@ -7,13 +7,15 @@ import {
   QueryEditorFunctionParameter,
   QueryEditorFieldType,
 } from '../../types';
-import { QueryEditorField, QueryEditorFieldExpression } from '../field/QueryEditorField';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
+import { QueryEditorField } from '../field/QueryEditorField';
+import { QueryEditorExpressionType } from '../../../types';
 import { SelectableValue } from '@grafana/data';
+import { QueryEditorFunctionParameterSection } from '../field/QueryEditorFunctionParameterSection';
 import {
-  QueryEditorFunctionParameterSection,
+  QueryEditorReduceExpression,
+  QueryEditorFieldExpression,
   QueryEditorFunctionParameterExpression,
-} from '../field/QueryEditorFunctionParameterSection';
+} from '../../expressions';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];
@@ -22,12 +24,6 @@ interface Props {
   value?: QueryEditorReduceExpression;
   label?: string;
   onChange: (expression: QueryEditorReduceExpression) => void;
-}
-
-export interface QueryEditorReduceExpression extends QueryEditorExpression {
-  field: QueryEditorFieldExpression;
-  reduce: QueryEditorFieldExpression;
-  parameters?: QueryEditorFunctionParameterExpression[];
 }
 
 export const QueryEditorReduce: React.FC<Props> = props => {
@@ -117,10 +113,6 @@ export const QueryEditorReduce: React.FC<Props> = props => {
         })}
     </div>
   );
-};
-
-export const isReduce = (expression: QueryEditorExpression): expression is QueryEditorReduceExpression => {
-  return (expression as QueryEditorReduceExpression)?.type === QueryEditorExpressionType.Reduce;
 };
 
 const getStyles = stylesFactory(() => {

@@ -1,12 +1,13 @@
 import React from 'react';
-import { QueryEditorFieldDefinition } from '../../types';
-import { isFieldAndOperator, QueryEditorFieldAndOperator } from '../filter/QueryEditorFieldAndOperator';
-import { isRepeater, QueryEditorRepeater } from '../QueryEditorRepeater';
-import { QueryEditorExpression } from '../../../types';
-import { isReduce, QueryEditorReduce } from '../reduce/QueryEditorReduce';
-import { isGroupBy, QueryEditorGroupBy } from '../groupBy/QueryEditorGroupBy';
+import { QueryEditorFieldDefinition } from '../types';
+import { QueryEditorFieldAndOperator } from './filter/QueryEditorFieldAndOperator';
+import { QueryEditorRepeater } from './QueryEditorRepeater';
+import { QueryEditorExpression } from '../../types';
+import { QueryEditorReduce } from './reduce/QueryEditorReduce';
+import { QueryEditorGroupBy } from './groupBy/QueryEditorGroupBy';
 import { SelectableValue } from '@grafana/data';
-import { ExpressionSuggestor } from '../types';
+import { ExpressionSuggestor } from './types';
+import { isReduceExpression, isFieldAndOperator, isGroupBy, isRepeater } from '../guards';
 
 interface Props<TConfig> {
   config: TConfig;
@@ -38,7 +39,7 @@ export function QueryEditorSectionRenderer<T>(props: Props<T>) {
     );
   }
 
-  if (isReduce(expression)) {
+  if (isReduceExpression(expression)) {
     // TODO: fix any
     return (
       <QueryEditorReduce

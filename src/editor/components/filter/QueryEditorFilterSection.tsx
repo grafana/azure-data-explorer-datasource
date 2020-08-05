@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldDefinition } from '../../types';
-import { QueryEditorSectionRenderer } from './QueryEditorSectionRenderer';
+import { QueryEditorSectionRenderer } from '../QueryEditorSectionRenderer';
 import { QueryEditorSectionBaseProps, QueryEditorSection } from '../QueryEditorSection';
 import { QueryEditorExpression, QueryEditorSectionExpression } from '../../../types';
 import { SelectableValue } from '@grafana/data';
