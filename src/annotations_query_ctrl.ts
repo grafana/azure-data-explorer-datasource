@@ -1,35 +1,34 @@
-import './monaco/kusto_monaco_editor';
+import './AnnotationEditor';
+import { KustoQuery } from './types';
+import { AnnotationQueryRequest } from '@grafana/data';
+import { defaultsDeep } from 'lodash';
 
-export class KustoDBAnnotationsQueryCtrl {
+const defaultQuery: KustoQuery = {
+  database: '',
+  refId: 'anno',
+  resultFormat: 'table',
+  query: `<your table>\n| where $__timeFilter() \n| project TimeGenerated, Text=YourTitleColumn, Tags="tag1,tag2"`,
+  rawMode: true,
+};
+
+export class AnnotationCtrl {
+  // @ts-ignore
+  annotation: AnnotationQueryRequest<ServiceNowQuery>;
+
+  // @ts-ignore
+  private datasource?: ServiceNowDataSource;
+
   static templateUrl = 'partials/annotations.editor.html';
-  datasource: any;
-  annotation: any;
-  databases: any[];
-  showHelp = false;
-
-  defaultQuery =
-    '<your table>\n| where $__timeFilter() \n| project TimeGenerated, Text=YourTitleColumn, Tags="tag1,tag2"';
 
   /** @ngInject */
   constructor() {
-    this.annotation.rawQuery = this.annotation.rawQuery || this.defaultQuery;
-    this.databases = this.getDatabases();
+    // @ts-ignore
+    this.annotation.annotation = defaultsDeep(this.annotation.annotation, defaultQuery);
+    // @ts-ignore
+    this.annotation.datasourceId = this.datasource.id;
   }
 
-  getDatabases() {
-    if (this.databases && this.databases.length > 0) {
-      return this.databases;
-    }
-
-    return this.datasource
-      .getDatabases()
-      .then(list => {
-        this.databases = list;
-        if (list.length > 0 && !this.annotation.database) {
-          this.annotation.database = list[0].value;
-        }
-        return this.databases;
-      })
-      .catch(() => {});
-  }
+  onChange = (query: AnnotationQueryRequest<KustoQuery>) => {
+    this.annotation.annotation = query.annotation;
+  };
 }
