@@ -32,9 +32,8 @@ export class QueryEditorGroupByBuilder {
     return this;
   }
 
-  build(id: string): React.FC<QueryEditorGroupBySectionProps> {
+  build(): React.FC<QueryEditorGroupBySectionProps> {
     return QueryEditorGroupBySection({
-      id,
       intervals: this.intervals,
       defaultValue: this.buildGroupByExpressions(),
     });

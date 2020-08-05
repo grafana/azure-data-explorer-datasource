@@ -1,22 +1,22 @@
 import React from 'react';
 import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSectionRenderer } from '../QueryEditorSectionRenderer';
-import { QueryEditorSectionBaseProps, QueryEditorSection } from '../QueryEditorSection';
+import { QueryEditorSectionProps, QueryEditorSection } from '../QueryEditorSection';
 import { SelectableValue } from '@grafana/data';
 import { ExpressionSuggestor } from '../types';
-import { QueryEditorExpression, QueryEditorSectionExpression } from '../../expressions';
+import { QueryEditorExpression } from '../../expressions';
 
 interface FilterSectionConfiguration {
-  id: string;
   operators: QueryEditorOperatorDefinition[];
   conditionals: QueryEditorCondition[];
-  expression: QueryEditorExpression;
+  defaultValue: QueryEditorExpression;
 }
 
-export interface QueryEditorFilterSectionProps extends QueryEditorSectionBaseProps {
+export interface QueryEditorFilterSectionProps extends QueryEditorSectionProps {
   fields: QueryEditorFieldDefinition[];
   templateVariableOptions: SelectableValue<string>;
-  value?: QueryEditorSectionExpression;
+  value?: QueryEditorExpression;
+  onChange: (value: QueryEditorExpression) => void;
   getSuggestions: ExpressionSuggestor;
 }
 
@@ -24,21 +24,27 @@ export const QueryEditorFilterSection = (
   config: FilterSectionConfiguration
 ): React.FC<QueryEditorFilterSectionProps> => {
   return props => {
-    const expression = props.value?.expression ?? config.expression;
+    const expression = props.value ?? config.defaultValue;
+
+    // if (config.conditionals.length > 0) {
+    //   return <QueryEditorFilterRepeater {...props} />;
+    // }
 
     return (
-      <QueryEditorSection id={config.id} label={props.label} onChange={props.onChange}>
-        {({ onChange }) => (
-          <QueryEditorSectionRenderer<FilterSectionConfiguration>
-            expression={expression}
-            fields={props.fields}
-            templateVariableOptions={props.templateVariableOptions}
-            onChange={onChange}
-            config={config}
-            getSuggestions={props.getSuggestions}
-          />
-        )}
+      <QueryEditorSection label={props.label}>
+        <QueryEditorSectionRenderer<FilterSectionConfiguration>
+          expression={expression}
+          fields={props.fields}
+          templateVariableOptions={props.templateVariableOptions}
+          onChange={props.onChange}
+          config={config}
+          getSuggestions={props.getSuggestions}
+        />
       </QueryEditorSection>
     );
   };
 };
+
+// export const QueryEditorFilterRepeater: React.FC<QueryEditorFilterSectionProps> = props => {
+//   const [] = useState();
+// };

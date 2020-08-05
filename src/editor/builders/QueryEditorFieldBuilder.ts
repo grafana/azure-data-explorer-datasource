@@ -4,10 +4,9 @@ import { QueryEditorFieldSectionProps, QueryEditorFieldSection } from 'editor/co
 import { QueryEditorFieldExpression, QueryEditorExpressionType } from '../expressions';
 
 export class QueryEditorFieldBuilder {
-  build(id: string): React.FC<QueryEditorFieldSectionProps> {
+  build(): React.FC<QueryEditorFieldSectionProps> {
     return QueryEditorFieldSection({
-      id,
-      expression: this.buildFieldExpression(),
+      defaultValue: this.buildFieldExpression(),
     });
   }
 

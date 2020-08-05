@@ -10,29 +10,26 @@ import {
   QueryEditorSingleOperatorExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
-  QueryEditorSectionExpression,
   QueryEditorExpressionType,
+  QueryEditorExpression,
 } from './editor/expressions';
 
 describe('KustoExpressionParser', () => {
   let kustoExpressionParser: KustoExpressionParser;
-  let from: QueryEditorSectionExpression;
-  let where: QueryEditorSectionExpression;
-  let reduce: QueryEditorSectionExpression;
-  let groupBy: QueryEditorSectionExpression;
+  let from: QueryEditorExpression;
+  let where: QueryEditorExpression;
+  let reduce: QueryEditorExpression;
+  let groupBy: QueryEditorExpression;
 
   beforeEach(() => {
     setupTemplateSrv();
     kustoExpressionParser = new KustoExpressionParser();
 
     from = {
-      id: 'from',
-      expression: {
-        type: QueryEditorExpressionType.Field,
-        fieldType: QueryEditorFieldType.String,
-        value: 'StormEvents',
-      } as QueryEditorFieldExpression,
-    };
+      type: QueryEditorExpressionType.Field,
+      fieldType: QueryEditorFieldType.String,
+      value: 'StormEvents',
+    } as QueryEditorFieldExpression;
   });
 
   describe('simple query with group by', () => {
@@ -192,69 +189,63 @@ function setupTemplateSrv() {
 }
 
 // Setup functions
-function buildWhereWithMultiOperator(values: string[]): QueryEditorSectionExpression {
+function buildWhereWithMultiOperator(values: string[]): QueryEditorExpression {
   return {
-    id: 'where',
-    expression: {
-      type: QueryEditorExpressionType.OperatorRepeater,
-      typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
-      expressions: [
-        {
-          type: QueryEditorExpressionType.FieldAndOperator,
-          field: {
-            type: QueryEditorExpressionType.Field,
-            fieldType: QueryEditorFieldType.String,
-            value: 'StateCode',
-          },
+    type: QueryEditorExpressionType.OperatorRepeater,
+    typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+    expressions: [
+      {
+        type: QueryEditorExpressionType.FieldAndOperator,
+        field: {
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.String,
+          value: 'StateCode',
+        },
+        operator: {
+          type: QueryEditorExpressionType.Operator,
           operator: {
-            type: QueryEditorExpressionType.Operator,
-            operator: {
-              value: '!in',
-              multipleValues: true,
-              booleanValues: false,
-              description: 'not in (case-sensitive)',
-              label: '!in',
-            },
-            values: values,
-          } as QueryEditorMultiOperatorExpression,
-        } as QueryEditorFieldAndOperatorExpression,
-      ],
-    } as QueryEditorRepeaterExpression,
-  };
+            value: '!in',
+            multipleValues: true,
+            booleanValues: false,
+            description: 'not in (case-sensitive)',
+            label: '!in',
+          },
+          values: values,
+        } as QueryEditorMultiOperatorExpression,
+      } as QueryEditorFieldAndOperatorExpression,
+    ],
+  } as QueryEditorRepeaterExpression;
 }
 
-function buildWhereWithSingleOperator(): QueryEditorSectionExpression {
+function buildWhereWithSingleOperator(): QueryEditorExpression {
   return {
-    id: 'where',
-    expression: {
-      type: QueryEditorExpressionType.OperatorRepeater,
-      typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
-      expressions: [
-        {
-          type: QueryEditorExpressionType.FieldAndOperator,
-          field: {
-            type: QueryEditorExpressionType.Field,
-            fieldType: QueryEditorFieldType.String,
-            value: 'StateCode',
-          },
+    type: QueryEditorExpressionType.OperatorRepeater,
+    typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+    expressions: [
+      {
+        type: QueryEditorExpressionType.FieldAndOperator,
+        field: {
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.String,
+          value: 'StateCode',
+        },
+        operator: {
+          type: QueryEditorExpressionType.Operator,
           operator: {
-            type: QueryEditorExpressionType.Operator,
-            operator: {
-              value: '==',
-              multipleValues: true,
-              booleanValues: false,
-              description: 'not in (case-sensitive)',
-              label: '==',
-            },
-            value: 'NY',
-          } as QueryEditorSingleOperatorExpression,
-        } as QueryEditorFieldAndOperatorExpression,
-      ],
-    } as QueryEditorRepeaterExpression,
-  };
+            value: '==',
+            multipleValues: true,
+            booleanValues: false,
+            description: 'not in (case-sensitive)',
+            label: '==',
+          },
+          value: 'NY',
+        } as QueryEditorSingleOperatorExpression,
+      } as QueryEditorFieldAndOperatorExpression,
+    ],
+  } as QueryEditorRepeaterExpression;
 }
 
-function buildReduce(fields: string[], functions: string[], parameter = ''): QueryEditorSectionExpression {
+function buildReduce(fields: string[], functions: string[], parameter = ''): QueryEditorExpression {
   let expressions: QueryEditorReduceExpression[] = [];
 
   fields.forEach((field, i) => {
@@ -286,56 +277,47 @@ function buildReduce(fields: string[], functions: string[], parameter = ''): Que
   });
 
   return {
-    id: 'reduce',
-    expression: {
-      type: QueryEditorExpressionType.OperatorRepeater,
-      typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
-      expressions: expressions,
-    } as QueryEditorRepeaterExpression,
-  };
+    type: QueryEditorExpressionType.OperatorRepeater,
+    typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+    expressions: expressions,
+  } as QueryEditorRepeaterExpression;
 }
 
 function buildGroupBy() {
   return {
-    id: 'groupBy',
-    expression: {
-      type: QueryEditorExpressionType.OperatorRepeater,
-      typeToRepeat: QueryEditorExpressionType.GroupBy,
-      expressions: [
-        {
-          type: QueryEditorExpressionType.GroupBy,
-          field: {
-            type: QueryEditorExpressionType.Field,
-            fieldType: QueryEditorFieldType.DateTime,
-            value: 'StartTime',
-          },
-          interval: {
-            type: QueryEditorExpressionType.Field,
-            fieldType: QueryEditorFieldType.Interval,
-            value: '1h',
-          },
-        } as QueryEditorGroupByExpression,
-      ],
-    } as QueryEditorRepeaterExpression,
-  };
+    type: QueryEditorExpressionType.OperatorRepeater,
+    typeToRepeat: QueryEditorExpressionType.GroupBy,
+    expressions: [
+      {
+        type: QueryEditorExpressionType.GroupBy,
+        field: {
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.DateTime,
+          value: 'StartTime',
+        },
+        interval: {
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.Interval,
+          value: '1h',
+        },
+      } as QueryEditorGroupByExpression,
+    ],
+  } as QueryEditorRepeaterExpression;
 }
 
 function buildGroupByWithNoTimeColumn() {
   return {
-    id: 'groupBy',
-    expression: {
-      type: QueryEditorExpressionType.OperatorRepeater,
-      typeToRepeat: QueryEditorExpressionType.GroupBy,
-      expressions: [
-        {
-          type: QueryEditorExpressionType.GroupBy,
-          field: {
-            type: QueryEditorExpressionType.Field,
-            fieldType: QueryEditorFieldType.String,
-            value: 'State',
-          },
-        } as QueryEditorGroupByExpression,
-      ],
-    } as QueryEditorRepeaterExpression,
-  };
+    type: QueryEditorExpressionType.OperatorRepeater,
+    typeToRepeat: QueryEditorExpressionType.GroupBy,
+    expressions: [
+      {
+        type: QueryEditorExpressionType.GroupBy,
+        field: {
+          type: QueryEditorExpressionType.Field,
+          fieldType: QueryEditorFieldType.String,
+          value: 'State',
+        },
+      } as QueryEditorGroupByExpression,
+    ],
+  } as QueryEditorRepeaterExpression;
 }

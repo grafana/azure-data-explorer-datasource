@@ -11,7 +11,7 @@ import {
   isDateGroupBy,
   isRepeater,
 } from './editor/guards';
-import { QueryEditorSectionExpression, QueryEditorExpression } from './editor/expressions';
+import { QueryEditorExpression } from './editor/expressions';
 
 export class KustoExpressionParser {
   templateSrv: TemplateSrv;
@@ -20,12 +20,12 @@ export class KustoExpressionParser {
     this.templateSrv = getTemplateSrv();
   }
 
-  fromTable(section?: QueryEditorSectionExpression, interpolate = false): string {
-    if (section && section.expression && isFieldExpression(section.expression)) {
+  fromTable(expression?: QueryEditorExpression, interpolate = false): string {
+    if (expression && isFieldExpression(expression)) {
       if (interpolate) {
-        return this.templateSrv.replace(section.expression.value);
+        return this.templateSrv.replace(expression.value);
       } else {
-        return section.expression.value;
+        return expression.value;
       }
     }
     return '';
@@ -44,20 +44,20 @@ export class KustoExpressionParser {
     const defaultTimeColumn = columns?.find(col => col.type === QueryEditorFieldType.DateTime)?.value ?? 'Timestamp';
     const parts: string[] = [table];
 
-    if (reduce && reduce.expression && groupBy && groupBy.expression && this.isAggregated(groupBy.expression)) {
-      this.appendTimeFilter(groupBy.expression, defaultTimeColumn, parts);
+    if (reduce && groupBy && this.isAggregated(groupBy)) {
+      this.appendTimeFilter(groupBy, defaultTimeColumn, parts);
     } else {
       parts.push(`where $__timeFilter(${defaultTimeColumn})`);
     }
 
-    if (where && where.expression) {
-      this.appendWhere(where.expression, parts);
+    if (where) {
+      this.appendWhere(where, parts);
     }
 
-    if (reduce && reduce.expression && groupBy && groupBy.expression && this.isAggregated(groupBy.expression)) {
-      this.appendSummarize(reduce.expression, groupBy.expression, parts);
-    } else if (reduce && reduce.expression) {
-      this.appendProject(reduce?.expression, defaultTimeColumn, parts);
+    if (reduce && groupBy && this.isAggregated(groupBy)) {
+      this.appendSummarize(reduce, groupBy, parts);
+    } else if (reduce) {
+      this.appendProject(reduce, defaultTimeColumn, parts);
     }
 
     return parts.join('\n| ');

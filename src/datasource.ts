@@ -70,7 +70,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     if (target.rawMode) {
       return true; // anything else we can check
     }
-    const table = (target.expression?.from?.expression as any)?.value;
+    const table = (target.expression?.from as any)?.value;
     if (!table) {
       return false; // Don't execute things without a table selected
     }

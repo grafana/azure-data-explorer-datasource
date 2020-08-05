@@ -19,7 +19,7 @@ interface Props {
   fields: QueryEditorFieldDefinition[];
   templateVariableOptions: SelectableValue<string>;
   operators: QueryEditorOperatorDefinition[];
-  onChange: (expression: QueryEditorFieldAndOperatorExpression | undefined) => void;
+  onChange: (expression: QueryEditorFieldAndOperatorExpression) => void;
   getSuggestions: ExpressionSuggestor;
 }
 

@@ -1,11 +1,11 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
-import { QueryEditorSectionExpression } from './editor/expressions';
+import { QueryEditorExpression } from './editor/expressions';
 
 export interface QueryExpression {
-  from?: QueryEditorSectionExpression;
-  where?: QueryEditorSectionExpression;
-  reduce?: QueryEditorSectionExpression;
-  groupBy?: QueryEditorSectionExpression;
+  from?: QueryEditorExpression;
+  where?: QueryEditorExpression;
+  reduce?: QueryEditorExpression;
+  groupBy?: QueryEditorExpression;
 }
 
 export interface KustoQuery extends DataQuery {

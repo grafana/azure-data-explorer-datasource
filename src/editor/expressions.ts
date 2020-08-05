@@ -9,15 +9,12 @@ export enum QueryEditorExpressionType {
   Reduce = 'reduce',
   FunctionParameter = 'functionParameter',
   GroupBy = 'groupBy',
+  Or = 'or',
+  And = 'and',
 }
 
 export interface QueryEditorExpression {
   type: QueryEditorExpressionType;
-}
-
-export interface QueryEditorSectionExpression {
-  id: string;
-  expression?: QueryEditorExpression;
 }
 
 /** OPERATORS */
@@ -65,5 +62,9 @@ export interface QueryEditorGroupByExpression extends QueryEditorExpression {
 
 export interface QueryEditorRepeaterExpression extends QueryEditorExpression {
   typeToRepeat: QueryEditorExpressionType;
+  expressions: QueryEditorExpression[];
+}
+
+export interface QueryEditorArrayExpression extends QueryEditorExpression {
   expressions: QueryEditorExpression[];
 }

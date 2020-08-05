@@ -14,7 +14,7 @@ interface Props<TConfig> {
   fields: QueryEditorFieldDefinition[];
   templateVariableOptions: SelectableValue<string>;
   expression: QueryEditorExpression | undefined;
-  onChange: (expression: QueryEditorExpression | undefined) => void;
+  onChange: (expression: QueryEditorExpression) => void;
   getSuggestions: ExpressionSuggestor;
 }
 

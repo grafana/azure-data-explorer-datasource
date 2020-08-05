@@ -21,7 +21,6 @@ import {} from '@emotion/core';
 import {
   QueryEditorGroupByExpression,
   QueryEditorRepeaterExpression,
-  QueryEditorSectionExpression,
   QueryEditorExpressionType,
   QueryEditorExpression,
 } from './editor/expressions';
@@ -199,7 +198,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
-  onFromChanged = (from: QueryEditorSectionExpression) => {
+  onFromChanged = (from: QueryEditorExpression) => {
     const { query } = this.props;
     this.onUpdateQuery(
       this.verifyGroupByTime({
@@ -212,7 +211,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     );
   };
 
-  onWhereChanged = (where: QueryEditorSectionExpression) => {
+  onWhereChanged = (where: QueryEditorExpression) => {
     const { query } = this.props;
     this.onUpdateQuery({
       ...query,
@@ -223,7 +222,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
-  onReduceChanged = (reduce: QueryEditorSectionExpression) => {
+  onReduceChanged = (reduce: QueryEditorExpression) => {
     const { query } = this.props;
     this.onUpdateQuery({
       ...query,
@@ -234,7 +233,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
-  onGroupByChanged = (groupBy: QueryEditorSectionExpression) => {
+  onGroupByChanged = (groupBy: QueryEditorExpression) => {
     const { query } = this.props;
     this.onUpdateQuery({
       ...query,
@@ -270,8 +269,8 @@ export class QueryEditor extends PureComponent<Props, State> {
     if (!query || query.resultFormat !== 'time_series' || query.rawMode) {
       return query;
     }
-    let table = (query.expression?.from?.expression as any)?.value;
-    if (table && !(query?.expression?.groupBy?.expression as any)?.expressions?.length) {
+    let table = (query.expression?.from as any)?.value;
+    if (table && !(query?.expression?.groupBy as any)?.expressions?.length) {
       table = this.kustoExpressionParser.fromTable(query.expression?.from, true);
       const columns = this.state.columnsByTable![table];
       const timeField = columns?.find(c => c.type === QueryEditorFieldType.DateTime);
@@ -280,37 +279,32 @@ export class QueryEditor extends PureComponent<Props, State> {
         if (!reduce) {
           // Needed so that the summarize renders
           reduce = {
-            id: 'value-column',
-            expression: {
-              type: QueryEditorExpressionType.OperatorRepeater,
-              typeToRepeat: QueryEditorExpressionType.Reduce,
-              expressions: [],
-            } as QueryEditorRepeaterExpression,
-          };
+            type: QueryEditorExpressionType.OperatorRepeater,
+            typeToRepeat: QueryEditorExpressionType.Reduce,
+            expressions: [],
+          } as QueryEditorRepeaterExpression;
         }
 
         const groupBy = {
-          id: 'group-by',
-          expression: {
-            type: QueryEditorExpressionType.OperatorRepeater,
-            typeToRepeat: QueryEditorExpressionType.GroupBy,
-            expressions: [
-              {
-                type: QueryEditorExpressionType.GroupBy,
-                field: {
-                  type: QueryEditorExpressionType.Field,
-                  fieldType: QueryEditorFieldType.DateTime,
-                  value: timeField.value,
-                },
-                interval: {
-                  type: QueryEditorExpressionType.Field,
-                  fieldType: QueryEditorFieldType.Interval,
-                  value: '$__interval',
-                },
-              } as QueryEditorGroupByExpression,
-            ],
-          } as QueryEditorRepeaterExpression,
-        };
+          type: QueryEditorExpressionType.OperatorRepeater,
+          typeToRepeat: QueryEditorExpressionType.GroupBy,
+          expressions: [
+            {
+              type: QueryEditorExpressionType.GroupBy,
+              field: {
+                type: QueryEditorExpressionType.Field,
+                fieldType: QueryEditorFieldType.DateTime,
+                value: timeField.value,
+              },
+              interval: {
+                type: QueryEditorExpressionType.Field,
+                fieldType: QueryEditorFieldType.Interval,
+                value: '$__interval',
+              },
+            } as QueryEditorGroupByExpression,
+          ],
+        } as QueryEditorRepeaterExpression;
+
         return {
           ...query,
           expression: {
@@ -329,7 +323,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     const { query } = this.props;
 
     // For now just support finding distinct field values
-    const from = (query.expression?.from?.expression as any)?.value;
+    const from = (query.expression?.from as any)?.value;
     const field = (skip as any)?.field?.value;
     if (!from || !field) {
       return Promise.resolve([]);

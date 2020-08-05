@@ -29,9 +29,8 @@ export class QueryEditorReduceBuilder {
     return this;
   }
 
-  build(id: string): React.FC<QueryEditorReduceSectionProps> {
+  build(): React.FC<QueryEditorReduceSectionProps> {
     return QueryEditorReduceSection({
-      id,
       functions: this.functions,
       defaultValue: this.buildReduceExpression(),
     });

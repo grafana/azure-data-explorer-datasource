@@ -7,7 +7,7 @@ import {
 
 import { QueryEditorFieldType } from './editor/types';
 
-export const KustoFromEditorSection = buildFieldQueryEditorSection(fieldSection => fieldSection.build('from'));
+export const KustoFromEditorSection = buildFieldQueryEditorSection(fieldSection => fieldSection.build());
 
 export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSection =>
   filterSection
@@ -156,7 +156,7 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
         .add();
     })
     .withMultipleRows(true)
-    .build('where')
+    .build()
 );
 
 export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduceSection =>
@@ -192,7 +192,7 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
         .add();
     })
     .withMultipleRows(true)
-    .build('value-column')
+    .build()
 );
 
 export const KustoGroupByEditorSection = buildGroupByQueryEditorSection(groupBySection =>
@@ -234,5 +234,5 @@ export const KustoGroupByEditorSection = buildGroupByQueryEditorSection(groupByS
         .add();
     })
     .withMultipleRows(true)
-    .build('group-by')
+    .build()
 );

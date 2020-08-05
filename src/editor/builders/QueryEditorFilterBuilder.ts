@@ -31,12 +31,11 @@ export class QueryEditorFilterBuilder {
     return this;
   }
 
-  build(id: string): React.FC<QueryEditorFilterSectionProps> {
+  build(): React.FC<QueryEditorFilterSectionProps> {
     return QueryEditorFilterSection({
-      id,
       operators: this.operators,
       conditionals: this.conditionals,
-      expression: this.buildFilterExpression(),
+      defaultValue: this.buildFilterExpression(),
     });
   }
 

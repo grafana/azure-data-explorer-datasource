@@ -1,40 +1,38 @@
 import React from 'react';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorFieldDefinition } from '../../types';
-import { QueryEditorSection, QueryEditorSectionBaseProps } from '../QueryEditorSection';
+import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { QueryEditorField } from './QueryEditorField';
 import { isFieldExpression } from '../../guards';
-import { QueryEditorExpression, QueryEditorSectionExpression } from '../../expressions';
+import { QueryEditorExpression } from '../../expressions';
 
 interface FieldSectionConfiguration {
-  id: string;
-  expression: QueryEditorExpression;
+  defaultValue: QueryEditorExpression;
 }
 
-export interface QueryEditorFieldSectionProps extends QueryEditorSectionBaseProps {
+export interface QueryEditorFieldSectionProps extends QueryEditorSectionProps {
   fields: QueryEditorFieldDefinition[];
   templateVariableOptions: SelectableValue<string>;
-  value?: QueryEditorSectionExpression;
+  value?: QueryEditorExpression;
+  onChange: (value: QueryEditorExpression) => void;
 }
 
 export const QueryEditorFieldSection = (config: FieldSectionConfiguration): React.FC<QueryEditorFieldSectionProps> => {
   return props => {
-    const expression = props.value?.expression ?? config.expression;
+    const expression = props.value ?? config.defaultValue;
 
     if (!isFieldExpression(expression)) {
       return null;
     }
 
     return (
-      <QueryEditorSection id={config.id} label={props.label} onChange={props.onChange}>
-        {({ onChange }) => (
-          <QueryEditorField
-            fields={props.fields}
-            templateVariableOptions={props.templateVariableOptions}
-            onChange={onChange}
-            value={expression}
-          />
-        )}
+      <QueryEditorSection label={props.label}>
+        <QueryEditorField
+          fields={props.fields}
+          templateVariableOptions={props.templateVariableOptions}
+          onChange={props.onChange}
+          value={expression}
+        />
       </QueryEditorSection>
     );
   };
