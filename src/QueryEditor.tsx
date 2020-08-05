@@ -9,14 +9,7 @@ import {
 } from 'QueryEditorSections';
 import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
 import { AdxDataSource } from 'datasource';
-import {
-  KustoQuery,
-  AdxDataSourceOptions,
-  QueryEditorSectionExpression,
-  AdxSchema,
-  QueryEditorExpression,
-  QueryEditorExpressionType,
-} from 'types';
+import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from './editor/types';
@@ -25,7 +18,13 @@ import { css } from 'emotion';
 
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
-import { QueryEditorGroupByExpression, QueryEditorRepeaterExpression } from './editor/expressions';
+import {
+  QueryEditorGroupByExpression,
+  QueryEditorRepeaterExpression,
+  QueryEditorSectionExpression,
+  QueryEditorExpressionType,
+  QueryEditorExpression,
+} from './editor/expressions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 

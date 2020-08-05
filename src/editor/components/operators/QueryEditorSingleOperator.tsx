@@ -2,9 +2,12 @@ import React, { PureComponent } from 'react';
 import { AsyncSelect } from '@grafana/ui';
 import { ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
-import { QueryEditorExpressionType, QueryEditorExpression } from '../../../types';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorSingleOperatorExpression } from '../../expressions';
+import {
+  QueryEditorSingleOperatorExpression,
+  QueryEditorExpression,
+  QueryEditorExpressionType,
+} from '../../expressions';
 
 interface Props {
   value: string | undefined;

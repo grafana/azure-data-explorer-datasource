@@ -1,24 +1,5 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
-
-export enum QueryEditorExpressionType {
-  Field = 'field',
-  Conditional = 'conditional',
-  Operator = 'operator',
-  FieldAndOperator = 'fieldAndOperator',
-  OperatorRepeater = 'operatorRepeater',
-  Reduce = 'reduce',
-  FunctionParameter = 'functionParameter',
-  GroupBy = 'groupBy',
-}
-
-export interface QueryEditorExpression {
-  type: QueryEditorExpressionType;
-}
-
-export interface QueryEditorSectionExpression {
-  id: string;
-  expression?: QueryEditorExpression;
-}
+import { QueryEditorSectionExpression } from './editor/expressions';
 
 export interface QueryExpression {
   from?: QueryEditorSectionExpression;

@@ -1,10 +1,10 @@
 import React from 'react';
+import { SelectableValue } from '@grafana/data';
 import { QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionBaseProps } from '../QueryEditorSection';
 import { QueryEditorField } from './QueryEditorField';
-import { QueryEditorExpression, QueryEditorSectionExpression } from '../../../types';
-import { SelectableValue } from '@grafana/data';
 import { isFieldExpression } from '../../guards';
+import { QueryEditorExpression, QueryEditorSectionExpression } from '../../expressions';
 
 interface FieldSectionConfiguration {
   id: string;

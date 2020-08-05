@@ -2,8 +2,13 @@ import React from 'react';
 import { QueryEditorFunctionDefinition, QueryEditorFieldType } from '../types';
 import { QueryEditorReduceSection, QueryEditorReduceSectionProps } from '../components/reduce/QueryEditorReduceSection';
 import { QueryEditorFunctionBuilder } from './QueryEditorFunctionBuilder';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
-import { QueryEditorRepeaterExpression, QueryEditorReduceExpression, QueryEditorFieldExpression } from '../expressions';
+import {
+  QueryEditorRepeaterExpression,
+  QueryEditorReduceExpression,
+  QueryEditorFieldExpression,
+  QueryEditorExpression,
+  QueryEditorExpressionType,
+} from '../expressions';
 
 export class QueryEditorReduceBuilder {
   private functions: QueryEditorFunctionDefinition[];

@@ -5,11 +5,12 @@ import {
   QueryEditorGroupBySectionProps,
 } from '../components/groupBy/QueryEditorGroupBySection';
 import { QueryEditorIntervalBuilder } from './QueryEditorIntervalBuilder';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
 import {
   QueryEditorRepeaterExpression,
   QueryEditorGroupByExpression,
   QueryEditorFieldExpression,
+  QueryEditorExpression,
+  QueryEditorExpressionType,
 } from '../expressions';
 
 export class QueryEditorGroupByBuilder {

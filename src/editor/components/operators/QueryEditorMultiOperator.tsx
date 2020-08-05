@@ -2,8 +2,11 @@ import React, { PureComponent } from 'react';
 import { AsyncMultiSelect } from '@grafana/ui';
 import { ExpressionSuggestor } from '../types';
 import { QueryEditorOperatorDefinition } from '../../types';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
-import { QueryEditorMultiOperatorExpression } from '../../expressions';
+import {
+  QueryEditorMultiOperatorExpression,
+  QueryEditorExpression,
+  QueryEditorExpressionType,
+} from '../../expressions';
 
 interface Props {
   values: string[] | undefined;

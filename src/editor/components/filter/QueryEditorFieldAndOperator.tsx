@@ -5,12 +5,13 @@ import { ExpressionSuggestor } from '../types';
 import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
 import { QueryEditorOperator, verifyOperatorValues } from '../operators/QueryEditorOperator';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../../../types';
 import { SelectableValue } from '@grafana/data';
 import {
   QueryEditorFieldAndOperatorExpression,
   QueryEditorFieldExpression,
   QueryEditorOperatorExpression,
+  QueryEditorExpressionType,
+  QueryEditorExpression,
 } from '../../expressions';
 
 interface Props {

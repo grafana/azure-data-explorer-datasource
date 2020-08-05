@@ -1,5 +1,4 @@
 import { KustoExpressionParser } from './KustoExpressionParser';
-import { QueryEditorSectionExpression, QueryEditorExpressionType } from './types';
 import { QueryEditorFieldType, QueryEditorFieldDefinition } from './editor/types';
 import { TemplateSrv } from './test/template_srv';
 import { setTemplateSrv } from '@grafana/runtime';
@@ -11,6 +10,8 @@ import {
   QueryEditorSingleOperatorExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
+  QueryEditorSectionExpression,
+  QueryEditorExpressionType,
 } from './editor/expressions';
 
 describe('KustoExpressionParser', () => {

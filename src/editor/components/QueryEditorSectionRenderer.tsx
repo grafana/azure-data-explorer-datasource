@@ -2,12 +2,12 @@ import React from 'react';
 import { QueryEditorFieldDefinition } from '../types';
 import { QueryEditorFieldAndOperator } from './filter/QueryEditorFieldAndOperator';
 import { QueryEditorRepeater } from './QueryEditorRepeater';
-import { QueryEditorExpression } from '../../types';
 import { QueryEditorReduce } from './reduce/QueryEditorReduce';
 import { QueryEditorGroupBy } from './groupBy/QueryEditorGroupBy';
 import { SelectableValue } from '@grafana/data';
 import { ExpressionSuggestor } from './types';
 import { isReduceExpression, isFieldAndOperator, isGroupBy, isRepeater } from '../guards';
+import { QueryEditorExpression } from '../expressions';
 
 interface Props<TConfig> {
   config: TConfig;

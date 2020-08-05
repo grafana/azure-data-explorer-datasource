@@ -1,9 +1,8 @@
 import { css } from 'emotion';
 import React, { PureComponent, useCallback } from 'react';
 import { Button, stylesFactory } from '@grafana/ui';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../../types';
 import { ExpressionSuggestor } from './types';
-import { QueryEditorRepeaterExpression } from '../expressions';
+import { QueryEditorRepeaterExpression, QueryEditorExpression, QueryEditorExpressionType } from '../expressions';
 
 interface Props {
   children: (props: ChildProps) => React.ReactElement;

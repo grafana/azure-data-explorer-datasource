@@ -1,4 +1,4 @@
-import { QueryEditorExpression, QueryEditorSectionExpression, QueryExpression } from './types';
+import { QueryExpression } from './types';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from 'editor/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import {
@@ -11,6 +11,7 @@ import {
   isDateGroupBy,
   isRepeater,
 } from './editor/guards';
+import { QueryEditorSectionExpression, QueryEditorExpression } from './editor/expressions';
 
 export class KustoExpressionParser {
   templateSrv: TemplateSrv;

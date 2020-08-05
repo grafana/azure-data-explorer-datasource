@@ -1,8 +1,7 @@
 import React from 'react';
 import { QueryEditorFieldType } from '../types';
 import { QueryEditorFieldSectionProps, QueryEditorFieldSection } from 'editor/components/field/QueryEditorFieldSection';
-import { QueryEditorExpressionType } from '../../types';
-import { QueryEditorFieldExpression } from '../expressions';
+import { QueryEditorFieldExpression, QueryEditorExpressionType } from '../expressions';
 
 export class QueryEditorFieldBuilder {
   build(id: string): React.FC<QueryEditorFieldSectionProps> {

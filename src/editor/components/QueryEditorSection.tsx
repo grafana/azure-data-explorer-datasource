@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { InlineFormLabel } from '@grafana/ui';
-import { QueryEditorExpression, QueryEditorSectionExpression } from '../../types';
+import { QueryEditorSectionExpression, QueryEditorExpression } from '../expressions';
 
 interface QueryEditorSectionProps {
   id: string;

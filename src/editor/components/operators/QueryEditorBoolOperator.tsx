@@ -2,8 +2,7 @@ import React, { useCallback } from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorOperatorDefinition } from '../../types';
-import { QueryEditorExpressionType } from '../../../types';
-import { QueryEditorBoolOperatorExpression } from '../../expressions';
+import { QueryEditorBoolOperatorExpression, QueryEditorExpressionType } from '../../expressions';
 
 interface Props {
   value: boolean | undefined;

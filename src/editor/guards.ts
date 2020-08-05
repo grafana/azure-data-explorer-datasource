@@ -9,8 +9,9 @@ import {
   QueryEditorMultiOperatorExpression,
   QueryEditorSingleOperatorExpression,
   QueryEditorRepeaterExpression,
+  QueryEditorExpression,
+  QueryEditorExpressionType,
 } from './expressions';
-import { QueryEditorExpression, QueryEditorExpressionType } from '../types';
 import { QueryEditorFieldType } from './types';
 
 export const isReduceExpression = (expression: QueryEditorExpression): expression is QueryEditorReduceExpression => {

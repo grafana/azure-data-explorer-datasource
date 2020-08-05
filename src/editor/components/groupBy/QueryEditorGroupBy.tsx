@@ -3,9 +3,8 @@ import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
 import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
-import { QueryEditorExpressionType } from '../../../types';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorGroupByExpression, QueryEditorFieldExpression } from '../../expressions';
+import { QueryEditorGroupByExpression, QueryEditorFieldExpression, QueryEditorExpressionType } from '../../expressions';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];

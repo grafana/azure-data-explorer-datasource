@@ -8,13 +8,13 @@ import {
   QueryEditorFieldType,
 } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
-import { QueryEditorExpressionType } from '../../../types';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorFunctionParameterSection } from '../field/QueryEditorFunctionParameterSection';
 import {
   QueryEditorReduceExpression,
   QueryEditorFieldExpression,
   QueryEditorFunctionParameterExpression,
+  QueryEditorExpressionType,
 } from '../../expressions';
 
 interface Props {
