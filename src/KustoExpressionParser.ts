@@ -164,11 +164,21 @@ export class KustoExpressionParser {
         })
         .filter(part => !!part);
 
-      return parts.push(`where ${orParts.join(' or ')}`);
+      if (orParts.length > 0) {
+        parts.push(`where ${orParts.join(' or ')}`);
+      }
+
+      return;
     }
 
     if (isFieldAndOperator(expression)) {
-      parts.push(`where ${this.createWhere(expression)}`);
+      const statement = this.createWhere(expression);
+
+      if (statement) {
+        parts.push(`where ${statement}`);
+      }
+
+      return;
     }
   }
 
