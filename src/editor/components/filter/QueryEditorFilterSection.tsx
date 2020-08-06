@@ -114,40 +114,40 @@ export const QueryEditorFilterSection = (
                           onChange={operatorProps.onChange}
                           getSuggestions={props.getSuggestions}
                         />
+                        <div className={styles.spacing}>
+                          <Button variant="secondary" onClick={operatorProps.onRemove} icon="minus" />
+                        </div>
                         {isFirst && (
-                          <div className={styles.spacing}>
-                            <Select
-                              isSearchable={true}
-                              options={[
-                                {
-                                  value: 'append-row',
-                                  label: 'Add to this row',
-                                },
-                                {
-                                  value: 'new-row',
-                                  label: `Add a new "${props.label}" row`,
-                                },
-                              ]}
-                              onChange={value => {
-                                if (value?.value === 'append-row') {
-                                  return operatorProps.onAdd(config.defaultValue);
-                                }
+                          <Select
+                            isSearchable={true}
+                            options={[
+                              {
+                                value: 'append-row',
+                                label: 'Add to this row',
+                              },
+                              {
+                                value: 'new-row',
+                                label: `Add a new "${props.label}" row`,
+                              },
+                            ]}
+                            onChange={value => {
+                              if (value?.value === 'append-row') {
+                                return operatorProps.onAdd(config.defaultValue);
+                              }
 
-                                if (value?.value === 'new-row') {
-                                  return filterProps.onAdd({
-                                    type: QueryEditorExpressionType.Or,
-                                    expressions: [config.defaultValue],
-                                  } as QueryEditorArrayExpression);
-                                }
-                              }}
-                              menuPlacement="bottom"
-                              renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
-                                return <Button ref={ref} {...otherProps} variant="secondary" icon="plus" />;
-                              })}
-                            />
-                          </div>
+                              if (value?.value === 'new-row') {
+                                return filterProps.onAdd({
+                                  type: QueryEditorExpressionType.Or,
+                                  expressions: [config.defaultValue],
+                                } as QueryEditorArrayExpression);
+                              }
+                            }}
+                            menuPlacement="bottom"
+                            renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
+                              return <Button ref={ref} {...otherProps} variant="secondary" icon="plus" />;
+                            })}
+                          />
                         )}
-                        <Button variant="secondary" onClick={operatorProps.onRemove} icon="minus" />
                       </div>
                     );
                   }}
