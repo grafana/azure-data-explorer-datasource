@@ -7,15 +7,15 @@ import {
   DataFrame,
   AnnotationQueryRequest,
   AnnotationEvent,
+  LoadingState,
 } from '@grafana/data';
 import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
-import Cache from './cache';
-import RequestAggregator from './request_aggregator';
 import { AdxDataSourceOptions, KustoQuery, AdxSchema } from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
+import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -23,8 +23,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private baseUrl: string;
   private defaultOrFirstDatabase: string;
   private url?: string;
-  private cache: Cache;
-  private requestAggregatorSrv: RequestAggregator;
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
@@ -33,8 +31,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.baseUrl = '/azuredataexplorer';
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
-    this.cache = new Cache({ ttl: this.getCacheTtl(instanceSettings) });
-    this.requestAggregatorSrv = new RequestAggregator(this.backendSrv);
   }
 
   // COMMENTING out alias for now... can use the displayName feature in fields
@@ -143,51 +139,52 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   // }
 
   async annotationQuery(options: AnnotationQueryRequest<KustoQuery>): Promise<AnnotationEvent[]> {
-    if (!options.annotation.rawMode) {
+    const query = (options.annotation as any)?.annotation as KustoQuery;
+    if (!query) {
       return Promise.reject({
         message: 'Query missing in annotation definition',
       });
     }
 
-    const query = this.buildQuery(options.annotation.query, options, options.annotation.database);
     return super
       .query({
         targets: [query],
         range: options.range as TimeRange,
       } as DataQueryRequest<KustoQuery>)
       .toPromise()
-      .then(results => {
-        console.log('Process Annotation results', results);
-        if (results.data?.length) {
-          return getAnnotationsFromFrame(results.data[0] as DataFrame);
+      .then(res => {
+        if (res.state === LoadingState.Done) {
+          if (res.data?.length) {
+            return getAnnotationsFromFrame(res.data[0] as DataFrame);
+          }
+        }
+        if (res.state === LoadingState.Error) {
+          console.log('ADX Annotation ERROR???', res);
+          return Promise.reject({
+            message: 'Error with ADX annotation',
+          });
         }
         return [];
       });
   }
 
-  metricFindQuery(query: string, optionalOptions: any): Promise<MetricFindValue[]> {
+  async metricFindQuery(query: string, optionalOptions: any): Promise<MetricFindValue[]> {
     const databasesQuery = query.match(/^databases\(\)/i);
     if (databasesQuery) {
       return this.getDatabases();
     }
-
     return this.getDefaultOrFirstDatabase()
       .then(database => this.buildQuery(query, optionalOptions, database))
-      .then(queries =>
-        this.backendSrv.datasourceRequest({
-          url: '/api/tsdb/query',
-          method: 'POST',
-          data: {
-            from: '5m',
-            to: 'now',
-            queries,
-          },
-        })
+      .then(query =>
+        this.query({
+          targets: [query],
+        } as DataQueryRequest<KustoQuery>).toPromise()
       )
       .then(response => {
-        const responseParser = new ResponseParser();
-        const processedResponse = responseParser.processQueryResult(response);
-        return responseParser.processVariableQueryResult(processedResponse);
+        if (response.data && response.data.length) {
+          return firstStringFieldToMetricFindValue(response.data[0]);
+        }
+        return [];
       })
       .catch(err => {
         console.log('There was an error', err);
@@ -232,34 +229,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return this.templateSrv.getVariables().map(v => `$${v.name}`);
   }
 
-  doQueries(queries) {
-    return queries.map(query => {
-      const cacheResponse = this.cache.get(query.key);
-      if (cacheResponse) {
-        return cacheResponse;
-      } else {
-        return this.requestAggregatorSrv
-          .dsPost(query.key, this.url + query.url, query.data)
-          .then(result => {
-            const res = {
-              result: result,
-              query: query,
-            };
-            if (query.key) {
-              this.cache.put(query.key, res);
-            }
-            return res;
-          })
-          .catch(err => {
-            throw {
-              error: err,
-              query: query,
-            };
-          });
-      }
-    });
-  }
-
+  // Used for annotations and templage variables
   private buildQuery(query: string, options: any, database: string): KustoQuery {
     if (!options) {
       options = {};
@@ -269,14 +239,16 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     }
     const interpolatedQuery = interpolateKustoQuery(query);
     return {
-      refId: `adx-table-${database}-${interpolatedQuery}`,
+      refId: `adx-${interpolatedQuery}`,
       resultFormat: 'table',
+      rawMode: true,
       query: interpolatedQuery,
       database,
     };
   }
 
-  doRequest(url, data, maxRetries = 1) {
+  // Used to get the schema directly
+  doRequest(url: string, data: any, maxRetries = 1) {
     return this.backendSrv
       .datasourceRequest({
         url: this.url + url,
@@ -292,7 +264,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       });
   }
 
-  interpolateVariable(value, variable) {
+  interpolateVariable(value: any, variable) {
     if (typeof value === 'string') {
       if (variable.multi || variable.includeAll) {
         return "'" + value + "'";
@@ -313,18 +285,5 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return "'" + val + "'";
     });
     return quotedValues.join(',');
-  }
-
-  getCacheTtl(instanceSettings) {
-    if (instanceSettings.jsonData.minimalCache === undefined) {
-      // default ttl is 30 sec
-      return 30000;
-    }
-
-    if (instanceSettings.jsonData.minimalCache < 1) {
-      throw new Error('Minimal cache must be greater than or equal to 1.');
-    }
-
-    return instanceSettings.jsonData.minimalCache * 1000;
   }
 }

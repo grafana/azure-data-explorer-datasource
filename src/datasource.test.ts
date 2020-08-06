@@ -200,7 +200,7 @@ describe('AdxDataSource', () => {
     });
   });
 
-  describe('Test cache ttl', () => {
+  it.skip('Test cache ttl', () => {
     it('should return 30 seconds when json minimal cache is not set', () => {
       const ttl = ctx.ds.getCacheTtl(ctx.instanceSettings);
       expect(ttl).toEqual(30000);
