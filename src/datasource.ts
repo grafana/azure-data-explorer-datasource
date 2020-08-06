@@ -12,7 +12,7 @@ import {
 import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
-import { AdxDataSourceOptions, KustoQuery, AdxSchema } from './types';
+import { AdxDataSourceOptions, KustoQuery, AdxSchema, AdxColumnSchema } from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
@@ -225,6 +225,31 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
+  async getDynamicSchema(
+    database: string,
+    table: string,
+    columns: string[]
+  ): Promise<Record<string, AdxColumnSchema[]>> {
+    if (!database || !table || !Array.isArray(columns) || columns.length === 0) {
+      return {};
+    }
+    const queryParts: string[] = [];
+
+    const project = `project ${columns.map(column => column).join(', ')}`;
+    const summarize = `summarize ${columns.map(column => `buildschema(${column})`).join(', ')}`;
+
+    queryParts.push(table);
+    queryParts.push(project);
+    queryParts.push(summarize);
+
+    const query = this.buildQuery(queryParts.join('\n | '), {}, database);
+    const response = await this.query({
+      targets: [query],
+    } as DataQueryRequest<KustoQuery>).toPromise();
+
+    return dynamicSchemaParser(response.data as DataFrame[]);
+  }
+
   get variables() {
     return this.templateSrv.getVariables().map(v => `$${v.name}`);
   }
@@ -287,3 +312,48 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return quotedValues.join(',');
   }
 }
+
+const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchema[]> => {
+  const result: Record<string, AdxColumnSchema[]> = {};
+
+  for (const frame of frames) {
+    for (const field of frame.fields) {
+      const json = JSON.parse(field.values.get(0));
+
+      if (json === null) {
+        console.log('error with field', field);
+        continue;
+      }
+
+      const columnSchemas: AdxColumnSchema[] = [];
+      const columnName = field.name.replace('schema_', '');
+      recordSchema(columnName, json, columnSchemas);
+      result[columnName] = columnSchemas;
+    }
+  }
+
+  return result;
+};
+
+const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]) => {
+  if (!schema) {
+    console.log('error with column', columnName);
+    return;
+  }
+
+  for (const name of Object.keys(schema)) {
+    const key = `${columnName}.${name}`;
+
+    if (typeof schema[name] === 'string') {
+      result.push({
+        Name: key,
+        Type: schema[name],
+      });
+      continue;
+    }
+
+    if (typeof schema[name] === 'object') {
+      recordSchema(key, schema[name], result);
+    }
+  }
+};

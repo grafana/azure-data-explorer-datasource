@@ -9,10 +9,10 @@ import {
 } from 'QueryEditorSections';
 import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
 import { AdxDataSource } from 'datasource';
-import { KustoQuery, AdxDataSourceOptions, AdxSchema, QueryExpression } from 'types';
+import { KustoQuery, AdxDataSourceOptions, QueryExpression } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
-import { QueryEditorFieldDefinition, QueryEditorFieldType } from './editor/types';
+import { QueryEditorFieldType } from './editor/types';
 import { RawQueryEditor } from './RawQueryEditor';
 import { css } from 'emotion';
 
@@ -25,19 +25,16 @@ import {
   QueryEditorExpression,
   QueryEditorArrayExpression,
 } from './editor/expressions';
+import { AdxSchemaResolver } from './SchemaResolver';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface State {
-  schema?: AdxSchema;
+  schema?: boolean;
   dirty?: boolean;
   lastQueryError?: string;
   lastQuery?: string;
   timeNotASC?: boolean;
-
-  databases?: QueryEditorFieldDefinition[];
-  tables?: QueryEditorFieldDefinition[];
-  columnsByTable?: Record<string, QueryEditorFieldDefinition[]>;
 }
 
 const defaultQuery: QueryExpression = {
@@ -48,6 +45,13 @@ const defaultQuery: QueryExpression = {
 };
 
 export class QueryEditor extends PureComponent<Props, State> {
+  private schemaResolver: AdxSchemaResolver;
+
+  constructor(props: Props) {
+    super(props);
+    this.schemaResolver = new AdxSchemaResolver(props.datasource);
+  }
+
   state: State = {
     dirty: false,
   };
@@ -90,46 +94,15 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   async componentDidMount() {
     try {
-      const { datasource } = this.props;
       let query = { ...this.props.query }; // mutable query
 
-      const schema = await datasource.getSchema();
-      const dbs: QueryEditorFieldDefinition[] = [];
-      const tables: QueryEditorFieldDefinition[] = [];
-      const columns: Record<string, QueryEditorFieldDefinition[]> = {};
-
-      for (const dbName of Object.keys(schema.Databases)) {
-        const db = schema.Databases[dbName];
-        dbs.push({
-          type: QueryEditorFieldType.String,
-          value: dbName,
-          label: dbName,
-        });
-
-        for (const tableName of Object.keys(db.Tables)) {
-          const table = db.Tables[tableName];
-
-          tables.push({
-            type: QueryEditorFieldType.String,
-            value: tableName,
-            label: tableName,
-          });
-
-          for (const column of table.OrderedColumns) {
-            columns[tableName] = columns[tableName] ?? [];
-            columns[tableName].push({
-              type: toExpressionType(column.Type),
-              value: column.Name,
-            });
-          }
-        }
-      }
+      await this.schemaResolver.resolveAndCacheSchema();
+      const databases = this.schemaResolver.getDatabases();
 
       // Default first database...
-      if (!query.database && dbs.length) {
-        const firstDatabase = schema.Databases[Object.keys(schema.Databases)[0]];
-        if (firstDatabase && firstDatabase.Name) {
-          query.database = firstDatabase.Name;
+      if (!query.database && databases.length) {
+        if (databases[0] && databases[0].value) {
+          query.database = databases[0].value;
         }
       }
 
@@ -149,10 +122,7 @@ export class QueryEditor extends PureComponent<Props, State> {
       };
 
       this.setState({
-        databases: dbs,
-        tables,
-        columnsByTable: columns,
-        schema,
+        schema: true,
       });
 
       // Update the latest error etc
@@ -167,8 +137,9 @@ export class QueryEditor extends PureComponent<Props, State> {
     if (q.expression !== this.props.query.expression) {
       const expression = q.expression || defaultQuery;
 
-      const { columnsByTable } = this.state;
-      const columns = columnsByTable![this.kustoExpressionParser.fromTable(expression.from, true)];
+      const { database } = this.props.query;
+      const table = this.kustoExpressionParser.fromTable(expression.from, true);
+      const columns = this.schemaResolver.getColumnsForTable(database, table);
 
       q = {
         ...q,
@@ -216,6 +187,9 @@ export class QueryEditor extends PureComponent<Props, State> {
           ...defaultQuery,
           ...query.expression,
           from,
+          where: defaultQuery.where,
+          groupBy: defaultQuery.groupBy,
+          reduce: defaultQuery.reduce,
         },
       })
     );
@@ -285,7 +259,8 @@ export class QueryEditor extends PureComponent<Props, State> {
     let table = (query.expression?.from as any)?.value;
     if (table && !(query?.expression?.groupBy as any)?.expressions?.length) {
       table = this.kustoExpressionParser.fromTable(query.expression?.from, true);
-      const columns = this.state.columnsByTable![table];
+      const { database } = this.props.query;
+      const columns = this.schemaResolver.getColumnsForTable(database, table);
       const timeField = columns?.find(c => c.type === QueryEditorFieldType.DateTime);
       if (timeField) {
         let reduce = query.expression?.reduce;
@@ -388,11 +363,15 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   render() {
     const { query } = this.props;
-    const { schema, databases, tables, lastQueryError, lastQuery, dirty } = this.state;
+    const { schema, lastQueryError, lastQuery, dirty } = this.state;
 
     if (!schema) {
       return <>Loading schema...</>;
     }
+
+    const { database, expression, alias, resultFormat } = query;
+    const databases = this.schemaResolver.getDatabases();
+    const tables = this.schemaResolver.getTablesForDatabase(database);
 
     // Proces the raw mode
     if (query.rawMode) {
@@ -411,13 +390,13 @@ export class QueryEditor extends PureComponent<Props, State> {
       );
     }
 
-    const { database, expression, alias, resultFormat } = query;
     const { from, where, reduce, groupBy } = expression || defaultQuery;
 
-    const { columnsByTable } = this.state;
-    const columns = columnsByTable![this.kustoExpressionParser.fromTable(from, true)];
+    const table = this.kustoExpressionParser.fromTable(from, true);
+    const columns = this.schemaResolver.getColumnsForTable(database, table);
 
-    console.log('columnsByTable', columnsByTable);
+    console.log('table', table);
+    console.log('columns', columns);
 
     const groupable =
       columns?.filter(
@@ -532,23 +511,6 @@ const getStyles = stylesFactory(() => ({
     padding: 10px 0px;
   `,
 }));
-
-const toExpressionType = (kustoType: string): QueryEditorFieldType => {
-  // System.Object -> should do a lookup on those fields to flatten out their schema.
-
-  switch (kustoType) {
-    case 'System.Double':
-    case 'System.Int32':
-    case 'System.Int64':
-      return QueryEditorFieldType.Number;
-    case 'System.DateTime':
-      return QueryEditorFieldType.DateTime;
-    case 'System.Boolean':
-      return QueryEditorFieldType.Boolean;
-    default:
-      return QueryEditorFieldType.String;
-  }
-};
 
 const toOption = (value: string) => ({ label: value, value } as SelectableValue<string>);
 
