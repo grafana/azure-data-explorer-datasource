@@ -12,12 +12,13 @@ import {
   QueryEditorGroupByExpression,
   QueryEditorExpressionType,
   QueryEditorExpression,
+  QueryEditorArrayExpression,
 } from './editor/expressions';
 
 describe('KustoExpressionParser', () => {
   let kustoExpressionParser: KustoExpressionParser;
   let from: QueryEditorExpression;
-  let where: QueryEditorExpression;
+  let where: QueryEditorArrayExpression;
   let reduce: QueryEditorExpression;
   let groupBy: QueryEditorExpression;
 
@@ -189,60 +190,68 @@ function setupTemplateSrv() {
 }
 
 // Setup functions
-function buildWhereWithMultiOperator(values: string[]): QueryEditorExpression {
+function buildWhereWithMultiOperator(values: string[]): QueryEditorArrayExpression {
   return {
-    type: QueryEditorExpressionType.OperatorRepeater,
-    typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+    type: QueryEditorExpressionType.And,
     expressions: [
       {
-        type: QueryEditorExpressionType.FieldAndOperator,
-        field: {
-          type: QueryEditorExpressionType.Field,
-          fieldType: QueryEditorFieldType.String,
-          value: 'StateCode',
-        },
-        operator: {
-          type: QueryEditorExpressionType.Operator,
-          operator: {
-            value: '!in',
-            multipleValues: true,
-            booleanValues: false,
-            description: 'not in (case-sensitive)',
-            label: '!in',
-          },
-          values: values,
-        } as QueryEditorMultiOperatorExpression,
-      } as QueryEditorFieldAndOperatorExpression,
+        type: QueryEditorExpressionType.Or,
+        expressions: [
+          {
+            type: QueryEditorExpressionType.FieldAndOperator,
+            field: {
+              type: QueryEditorExpressionType.Field,
+              fieldType: QueryEditorFieldType.String,
+              value: 'StateCode',
+            },
+            operator: {
+              type: QueryEditorExpressionType.Operator,
+              operator: {
+                value: '!in',
+                multipleValues: true,
+                booleanValues: false,
+                description: 'not in (case-sensitive)',
+                label: '!in',
+              },
+              values: values,
+            } as QueryEditorMultiOperatorExpression,
+          } as QueryEditorFieldAndOperatorExpression,
+        ],
+      } as QueryEditorArrayExpression,
     ],
-  } as QueryEditorRepeaterExpression;
+  };
 }
 
-function buildWhereWithSingleOperator(): QueryEditorExpression {
+function buildWhereWithSingleOperator(): QueryEditorArrayExpression {
   return {
-    type: QueryEditorExpressionType.OperatorRepeater,
-    typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+    type: QueryEditorExpressionType.And,
     expressions: [
       {
-        type: QueryEditorExpressionType.FieldAndOperator,
-        field: {
-          type: QueryEditorExpressionType.Field,
-          fieldType: QueryEditorFieldType.String,
-          value: 'StateCode',
-        },
-        operator: {
-          type: QueryEditorExpressionType.Operator,
-          operator: {
-            value: '==',
-            multipleValues: true,
-            booleanValues: false,
-            description: 'not in (case-sensitive)',
-            label: '==',
-          },
-          value: 'NY',
-        } as QueryEditorSingleOperatorExpression,
-      } as QueryEditorFieldAndOperatorExpression,
+        type: QueryEditorExpressionType.Or,
+        expressions: [
+          {
+            type: QueryEditorExpressionType.FieldAndOperator,
+            field: {
+              type: QueryEditorExpressionType.Field,
+              fieldType: QueryEditorFieldType.String,
+              value: 'StateCode',
+            },
+            operator: {
+              type: QueryEditorExpressionType.Operator,
+              operator: {
+                value: '==',
+                multipleValues: true,
+                booleanValues: false,
+                description: 'not in (case-sensitive)',
+                label: '==',
+              },
+              value: 'NY',
+            } as QueryEditorSingleOperatorExpression,
+          } as QueryEditorFieldAndOperatorExpression,
+        ],
+      } as QueryEditorArrayExpression,
     ],
-  } as QueryEditorRepeaterExpression;
+  };
 }
 
 function buildReduce(fields: string[], functions: string[], parameter = ''): QueryEditorExpression {

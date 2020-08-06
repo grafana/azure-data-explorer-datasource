@@ -10,8 +10,10 @@ import {
   isGroupBy,
   isDateGroupBy,
   isRepeater,
+  isAndExpression,
+  isOrExpression,
 } from './editor/guards';
-import { QueryEditorExpression } from './editor/expressions';
+import { QueryEditorExpression, QueryEditorFieldAndOperatorExpression } from './editor/expressions';
 
 export class KustoExpressionParser {
   templateSrv: TemplateSrv;
@@ -21,7 +23,6 @@ export class KustoExpressionParser {
   }
 
   fromTable(expression?: QueryEditorExpression, interpolate = false): string {
-    console.log('expression', expression);
     if (expression && isFieldExpression(expression)) {
       if (interpolate) {
         return this.templateSrv.replace(expression.value);
@@ -103,58 +104,71 @@ export class KustoExpressionParser {
     parts.push(orderBy);
   }
 
-  private appendWhere(expression: QueryEditorExpression, parts: string[]) {
-    if (isFieldAndOperator(expression)) {
-      let where = 'where ';
+  private createWhere(expression: QueryEditorFieldAndOperatorExpression): string | undefined {
+    let where = '';
 
-      if (!expression.field) {
-        parts.push(where);
-        return;
-      }
-
-      where += `${expression.field.value} `;
-
-      if (!expression.operator) {
-        parts.push(where);
-        return;
-      }
-
-      // we should skip having the whole operator object
-      // and only have the value here directly on the operator.
-      where += `${expression.operator.operator.value} `;
-
-      // we should probably break this kind of code out into smaller function that
-      // can be reused in the parser.
-      if (isMultiOperator(expression.operator)) {
-        where += '(';
-        where += expression.operator.values
-          .map(value => {
-            if (this.isVariable(value)) {
-              return value;
-            } else {
-              return `'${value}'`;
-            }
-          })
-          .join(', ');
-        where += ')';
-      } else if (isSingleOperator(expression.operator)) {
-        if (
-          expression.field.fieldType === QueryEditorFieldType.String &&
-          !this.isQuotedString(expression.operator.value)
-        ) {
-          where += `'${expression.operator.value}'`;
-        } else {
-          where += expression.operator.value;
-        }
-      }
-
-      parts.push(where);
+    if (!expression.field) {
+      return;
     }
 
-    if (isRepeater(expression)) {
-      for (const exp of expression.expressions) {
-        this.appendWhere(exp, parts);
+    where += `${expression.field.value} `;
+
+    if (!expression.operator) {
+      return where;
+    }
+
+    // we should skip having the whole operator object
+    // and only have the value here directly on the operator.
+    where += `${expression.operator.operator.value} `;
+
+    // we should probably break this kind of code out into smaller function that
+    // can be reused in the parser.
+    if (isMultiOperator(expression.operator)) {
+      where += '(';
+      where += expression.operator.values
+        .map(value => {
+          if (this.isVariable(value)) {
+            return value;
+          } else {
+            return `'${value}'`;
+          }
+        })
+        .join(', ');
+      where += ')';
+    } else if (isSingleOperator(expression.operator)) {
+      if (
+        expression.field.fieldType === QueryEditorFieldType.String &&
+        !this.isQuotedString(expression.operator.value)
+      ) {
+        where += `'${expression.operator.value}'`;
+      } else {
+        where += expression.operator.value;
       }
+    }
+
+    return where;
+  }
+
+  private appendWhere(expression: QueryEditorExpression, parts: string[]) {
+    if (isAndExpression(expression)) {
+      return expression.expressions.map(and => this.appendWhere(and, parts));
+    }
+
+    if (isOrExpression(expression)) {
+      const orParts = expression.expressions
+        .map(orExpression => {
+          if (!isFieldAndOperator(orExpression)) {
+            return;
+          }
+          return this.createWhere(orExpression);
+        })
+        .filter(part => !!part);
+
+      return parts.push(`where ${orParts.join(' or ')}`);
+    }
+
+    if (isFieldAndOperator(expression)) {
+      parts.push(`where ${this.createWhere(expression)}`);
     }
   }
 

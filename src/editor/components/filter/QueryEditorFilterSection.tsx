@@ -102,7 +102,7 @@ export const QueryEditorFilterSection = (
                     return (
                       <div className={rowStyles}>
                         {!isFirst && (
-                          <InlineFormLabel className="query-keyword" width={2}>
+                          <InlineFormLabel className="query-keyword" width={3}>
                             or
                           </InlineFormLabel>
                         )}

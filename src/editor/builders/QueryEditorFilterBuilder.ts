@@ -4,9 +4,7 @@ import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldTy
 import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
 import {
   QueryEditorFieldAndOperatorExpression,
-  QueryEditorRepeaterExpression,
   QueryEditorFieldExpression,
-  QueryEditorExpression,
   QueryEditorExpressionType,
 } from '../expressions';
 

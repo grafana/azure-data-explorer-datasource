@@ -24,9 +24,6 @@ import {
   QueryEditorExpressionType,
   QueryEditorExpression,
   QueryEditorArrayExpression,
-  QueryEditorFieldAndOperatorExpression,
-  QueryEditorFieldExpression,
-  QueryEditorOperatorExpression,
 } from './editor/expressions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
