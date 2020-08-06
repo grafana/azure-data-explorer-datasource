@@ -12,7 +12,7 @@ import {
 } from '../../expressions';
 import { isFieldAndOperator, isOrExpression } from 'editor/guards';
 import { QueryEditorFieldAndOperator } from './QueryEditorFieldAndOperator';
-import { Button, Select, stylesFactory } from '@grafana/ui';
+import { Button, Select, stylesFactory, InlineFormLabel } from '@grafana/ui';
 
 interface FilterSectionConfiguration {
   operators: QueryEditorOperatorDefinition[];
@@ -59,74 +59,100 @@ export const QueryEditorFilterSection = (
     }
 
     return (
-      <Repeater value={props.value} onChange={props.onChange}>
+      <Repeater id="filter-and" value={props.value} onChange={props.onChange}>
         {filterProps => {
           if (!isOrExpression(filterProps.value)) {
-            console.log('invalid or-expression');
             return null;
           }
 
           if (filterProps.value.expressions.length === 0) {
-            console.log('or-expression is missing');
-            // add button to add or-expression/operator expression
-            return null;
+            if (filterProps.index > 0) {
+              return null;
+            }
+
+            return (
+              <QueryEditorSection label={props.label}>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    filterProps.onChange({
+                      type: QueryEditorExpressionType.Or,
+                      expressions: [config.defaultValue],
+                    } as QueryEditorArrayExpression);
+                  }}
+                  icon="plus"
+                />
+              </QueryEditorSection>
+            );
           }
 
           return (
             <QueryEditorSection label={props.label}>
-              <Repeater value={filterProps.value} onChange={filterProps.onChange}>
-                {operatorProps => {
-                  if (!isFieldAndOperator(operatorProps.value)) {
-                    console.log('invalid fieldandoperator-expression');
-                    return null;
-                  }
+              <div className={styles.container}>
+                <Repeater id="filter-or" value={filterProps.value} onChange={filterProps.onChange}>
+                  {operatorProps => {
+                    if (!isFieldAndOperator(operatorProps.value)) {
+                      console.log('invalid fieldandoperator-expression');
+                      return null;
+                    }
 
-                  const isFirst = operatorProps.index === 0;
-                  const containerStyles = isFirst ? styles.container : styles.containerWithLineBreak;
+                    const isFirst = operatorProps.index === 0;
+                    const rowStyles = isFirst ? styles.row : styles.rowWithSpacing;
 
-                  return (
-                    <div className={containerStyles}>
-                      <QueryEditorFieldAndOperator
-                        value={operatorProps.value}
-                        operators={config.operators}
-                        fields={props.fields}
-                        templateVariableOptions={props.templateVariableOptions}
-                        onChange={operatorProps.onChange}
-                        getSuggestions={props.getSuggestions}
-                      />
-                      <Select
-                        isSearchable={true}
-                        options={[
-                          {
-                            value: 'append-row',
-                            label: 'Add to this row',
-                          },
-                          {
-                            value: 'new-row',
-                            label: `Add a new "${props.label}" row`,
-                          },
-                        ]}
-                        onChange={value => {
-                          if (value?.value === 'append-row') {
-                            return operatorProps.onAdd(config.defaultValue);
-                          }
+                    return (
+                      <div className={rowStyles}>
+                        {!isFirst && (
+                          <InlineFormLabel className="query-keyword" width={2}>
+                            or
+                          </InlineFormLabel>
+                        )}
+                        <QueryEditorFieldAndOperator
+                          value={operatorProps.value}
+                          operators={config.operators}
+                          fields={props.fields}
+                          templateVariableOptions={props.templateVariableOptions}
+                          onChange={operatorProps.onChange}
+                          getSuggestions={props.getSuggestions}
+                        />
+                        {isFirst && (
+                          <div className={styles.spacing}>
+                            <Select
+                              isSearchable={true}
+                              options={[
+                                {
+                                  value: 'append-row',
+                                  label: 'Add to this row',
+                                },
+                                {
+                                  value: 'new-row',
+                                  label: `Add a new "${props.label}" row`,
+                                },
+                              ]}
+                              onChange={value => {
+                                if (value?.value === 'append-row') {
+                                  return operatorProps.onAdd(config.defaultValue);
+                                }
 
-                          if (value?.value === 'new-row') {
-                            return filterProps.onAdd({
-                              type: QueryEditorExpressionType.Or,
-                              expressions: [config.defaultValue],
-                            } as QueryEditorArrayExpression);
-                          }
-                        }}
-                        menuPlacement="bottom"
-                        renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
-                          return <Button ref={ref} {...otherProps} variant="secondary" icon="plus" />;
-                        })}
-                      />
-                    </div>
-                  );
-                }}
-              </Repeater>
+                                if (value?.value === 'new-row') {
+                                  return filterProps.onAdd({
+                                    type: QueryEditorExpressionType.Or,
+                                    expressions: [config.defaultValue],
+                                  } as QueryEditorArrayExpression);
+                                }
+                              }}
+                              menuPlacement="bottom"
+                              renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
+                                return <Button ref={ref} {...otherProps} variant="secondary" icon="plus" />;
+                              })}
+                            />
+                          </div>
+                        )}
+                        <Button variant="secondary" onClick={operatorProps.onRemove} icon="minus" />
+                      </div>
+                    );
+                  }}
+                </Repeater>
+              </div>
             </QueryEditorSection>
           );
         }}
@@ -136,18 +162,29 @@ export const QueryEditorFilterSection = (
 };
 
 const getStyles = stylesFactory(() => {
+  const row = css`
+    display: flex;
+    flex-direction: row;
+  `;
+
   return {
     container: css`
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
     `,
-    containerWithLineBreak: css`
-      width: 100%;
+    row: row,
+    rowWithSpacing: css`
+      ${row}
+      margin-top: 4px;
+    `,
+    spacing: css`
+      margin-right: 4px;
     `,
   };
 });
 
 interface RepeaterProps {
+  id: string;
   value: QueryEditorArrayExpression;
   onChange: (value: QueryEditorArrayExpression) => void;
   children: (props: ChildProps) => React.ReactElement | null;
@@ -185,7 +222,7 @@ export const Repeater: React.FC<RepeaterProps> = props => {
     <>
       {props.value.expressions.map((value, index) => {
         return (
-          <React.Fragment key={index}>
+          <React.Fragment key={`${props.id}-${index}`}>
             {props.children({
               index,
               value,

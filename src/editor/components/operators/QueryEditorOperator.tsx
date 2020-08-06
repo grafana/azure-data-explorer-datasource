@@ -41,7 +41,7 @@ export class QueryEditorOperator extends PureComponent<Props> {
 
     return (
       <>
-        <div className={styles.container}>
+        <div className={styles.button}>
           <Select
             isSearchable={true}
             options={operators}
@@ -73,31 +73,41 @@ const renderOperatorInput = (
     return null;
   }
 
+  const styles = getStyles();
+
   if (operator.multipleValues && (isMultiOperator(value) || !value)) {
     return (
-      <QueryEditorMultiOperator
-        operator={operator}
-        values={value?.values ?? []}
-        onChange={onChangeValue}
-        getSuggestions={getSuggestions}
-        expression={value!}
-      />
+      <div className={styles.container}>
+        <QueryEditorMultiOperator
+          operator={operator}
+          values={value?.values ?? []}
+          onChange={onChangeValue}
+          getSuggestions={getSuggestions}
+          expression={value!}
+        />
+      </div>
     );
   }
 
   if (operator.booleanValues && (isBoolOperator(value) || !value)) {
-    return <QueryEditorBoolOperator operator={operator} value={value?.value} onChange={onChangeValue} />;
+    return (
+      <div className={styles.container}>
+        <QueryEditorBoolOperator operator={operator} value={value?.value} onChange={onChangeValue} />
+      </div>
+    );
   }
 
   if (!operator.multipleValues && (isSingleOperator(value) || !value)) {
     return (
-      <QueryEditorSingleOperator
-        operator={operator}
-        value={value?.value}
-        onChange={onChangeValue}
-        getSuggestions={getSuggestions}
-        expression={value!}
-      />
+      <div className={styles.container}>
+        <QueryEditorSingleOperator
+          operator={operator}
+          value={value?.value}
+          onChange={onChangeValue}
+          getSuggestions={getSuggestions}
+          expression={value!}
+        />
+      </div>
     );
   }
 
@@ -140,8 +150,11 @@ export function verifyOperatorValues(exp: QueryEditorOperatorExpression): QueryE
 const getStyles = stylesFactory(() => {
   return {
     container: css`
-      margin-left: 4px;
       margin-right: 4px;
+    `,
+    button: css`
+      margin-right: 4px;
+      margin-left: 4px;
     `,
   };
 });
