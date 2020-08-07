@@ -34,7 +34,7 @@ export const QueryEditorFilterSection = (
   return props => {
     const styles = getStyles();
 
-    if (props.value.expressions.length === 0) {
+    if (props.value?.expressions?.length === 0) {
       return (
         <QueryEditorSection label={props.label}>
           <Button
@@ -65,7 +65,7 @@ export const QueryEditorFilterSection = (
             return null;
           }
 
-          if (filterProps.value.expressions.length === 0) {
+          if (filterProps.value?.expressions?.length === 0) {
             if (filterProps.index > 0) {
               return null;
             }
@@ -217,6 +217,10 @@ export const Repeater: React.FC<RepeaterProps> = props => {
     },
     [props.children, props.onChange, props.value]
   );
+
+  if (!props.value?.expressions) {
+    return null;
+  }
 
   return (
     <>
