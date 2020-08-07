@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorFunctionDefinition, QueryEditorFieldType } from '../types';
+import { QueryEditorFunctionDefinition, QueryEditorFieldType, QueryEditorProperty } from '../types';
 import { QueryEditorReduceSection, QueryEditorReduceSectionProps } from '../components/reduce/QueryEditorReduceSection';
 import { QueryEditorFunctionBuilder } from './QueryEditorFunctionBuilder';
 import {
@@ -8,7 +8,6 @@ import {
   QueryEditorPropertyExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
-  QueryEditorProperty,
 } from '../expressions';
 
 export class QueryEditorReduceBuilder {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../types';
+import { QueryEditorFieldDefinition, QueryEditorFieldType, QueryEditorProperty } from '../types';
 import {
   QueryEditorGroupBySection,
   QueryEditorGroupBySectionProps,
@@ -11,7 +11,6 @@ import {
   QueryEditorPropertyExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
-  QueryEditorProperty,
 } from '../expressions';
 
 export class QueryEditorGroupByBuilder {

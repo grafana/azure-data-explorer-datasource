@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
-import { QueryEditorFieldDefinition, QueryEditorFieldType } from '../../types';
+import { QueryEditorFieldDefinition, QueryEditorFieldType, QueryEditorProperty } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorGroupByExpression, QueryEditorExpressionType, QueryEditorProperty } from '../../expressions';
+import { QueryEditorGroupByExpression, QueryEditorExpressionType } from '../../expressions';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];

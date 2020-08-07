@@ -1,8 +1,13 @@
 import React from 'react';
 import { QueryEditorFilterSectionProps, QueryEditorFilterSection } from '../components/filter/QueryEditorFilterSection';
-import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldType } from '../types';
+import {
+  QueryEditorOperatorDefinition,
+  QueryEditorCondition,
+  QueryEditorFieldType,
+  QueryEditorProperty,
+} from '../types';
 import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
-import { QueryEditorFieldAndOperatorExpression, QueryEditorExpressionType, QueryEditorProperty } from '../expressions';
+import { QueryEditorFieldAndOperatorExpression, QueryEditorExpressionType } from '../expressions';
 
 export class QueryEditorFilterBuilder {
   private operators: QueryEditorOperatorDefinition[];

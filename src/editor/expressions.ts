@@ -1,4 +1,4 @@
-import { QueryEditorFieldType, QueryEditorOperatorDefinition } from './types';
+import { QueryEditorFieldType, QueryEditorOperatorDefinition, QueryEditorProperty } from './types';
 
 export enum QueryEditorExpressionType {
   Field = 'field',
@@ -11,10 +11,6 @@ export enum QueryEditorExpressionType {
   GroupBy = 'groupBy',
   Or = 'or',
   And = 'and',
-}
-export interface QueryEditorProperty {
-  type: QueryEditorFieldType;
-  name: string;
 }
 export interface QueryEditorExpression {
   type: QueryEditorExpressionType;

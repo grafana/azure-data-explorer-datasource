@@ -6,6 +6,7 @@ import {
   QueryEditorFunctionDefinition,
   QueryEditorFunctionParameter,
   QueryEditorFieldType,
+  QueryEditorProperty,
 } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
 import { SelectableValue } from '@grafana/data';
@@ -14,7 +15,6 @@ import {
   QueryEditorReduceExpression,
   QueryEditorFunctionParameterExpression,
   QueryEditorExpressionType,
-  QueryEditorProperty,
 } from '../../expressions';
 
 interface Props {

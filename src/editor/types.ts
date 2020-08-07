@@ -7,11 +7,15 @@ export enum QueryEditorFieldType {
   Interval = 'interval',
 }
 
+export interface QueryEditorProperty {
+  type: QueryEditorFieldType;
+  name: string;
+}
+
 export enum QueryEditorCondition {
   And = 'and',
   Or = 'or',
 }
-
 export interface QueryEditorOperatorDefinition {
   value: string;
   supportTypes: QueryEditorFieldType[];

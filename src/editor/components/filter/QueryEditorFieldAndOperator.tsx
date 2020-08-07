@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
 import { ExpressionSuggestor } from '../types';
-import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition } from '../../types';
+import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition, QueryEditorProperty } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
 import { QueryEditorOperator, verifyOperatorValues } from '../operators/QueryEditorOperator';
 import { SelectableValue } from '@grafana/data';
@@ -11,7 +11,6 @@ import {
   QueryEditorOperatorExpression,
   QueryEditorExpressionType,
   QueryEditorExpression,
-  QueryEditorProperty,
 } from '../../expressions';
 
 interface Props {
@@ -53,7 +52,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
   onFieldChanged = (expression: QueryEditorProperty) => {
     let next = {
       ...this.props.value!,
-      field: expression,
+      property: expression,
     };
 
     const operators = this.updateOperators(expression);

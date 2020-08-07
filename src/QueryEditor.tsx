@@ -146,6 +146,8 @@ export class QueryEditor extends PureComponent<Props, State> {
         ...q,
         query: this.kustoExpressionParser.query(expression, columns, database),
       };
+
+      console.log('q', q);
     }
 
     this.props.onChange(q);

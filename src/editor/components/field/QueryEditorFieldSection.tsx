@@ -1,15 +1,10 @@
 import React, { useCallback } from 'react';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorFieldDefinition } from '../../types';
+import { QueryEditorFieldDefinition, QueryEditorProperty } from '../../types';
 import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { QueryEditorField } from './QueryEditorField';
 import { isFieldExpression } from '../../guards';
-import {
-  QueryEditorExpression,
-  QueryEditorProperty,
-  QueryEditorExpressionType,
-  QueryEditorPropertyExpression,
-} from '../../expressions';
+import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorPropertyExpression } from '../../expressions';
 
 interface FieldSectionConfiguration {
   defaultValue: QueryEditorExpression;
