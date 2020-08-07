@@ -14,11 +14,12 @@ import {
   isOrExpression,
 } from './editor/guards';
 import { QueryEditorExpression, QueryEditorFieldAndOperatorExpression } from './editor/expressions';
+import { AdxSchemaResolver } from 'SchemaResolver';
 
 export class KustoExpressionParser {
   templateSrv: TemplateSrv;
 
-  constructor() {
+  constructor(private schemaResolver: AdxSchemaResolver) {
     this.templateSrv = getTemplateSrv();
   }
 
@@ -35,7 +36,7 @@ export class KustoExpressionParser {
 
   // we need to write tests for this one but I would like to have one expression tree
   // that is the entry before doing that.
-  query(sections: QueryExpression, columns: QueryEditorFieldDefinition[]): string {
+  query(sections: QueryExpression, columns: QueryEditorFieldDefinition[], database: string): string {
     const { from, where, reduce, groupBy } = sections;
     const table = this.fromTable(from);
 
@@ -57,7 +58,7 @@ export class KustoExpressionParser {
     }
 
     if (reduce && groupBy && this.isAggregated(groupBy)) {
-      this.appendSummarize(reduce, groupBy, parts);
+      this.appendSummarize(database, table, reduce, groupBy, parts);
     } else if (reduce) {
       this.appendProject(reduce, defaultTimeColumn, parts);
     }
@@ -183,6 +184,8 @@ export class KustoExpressionParser {
   }
 
   private appendSummarize(
+    database: string,
+    table: string,
     reduceExpression: QueryEditorExpression,
     groupByExpression: QueryEditorExpression,
     parts: string[]
@@ -193,12 +196,12 @@ export class KustoExpressionParser {
 
       for (const exp of reduceExpression.expressions) {
         if (isReduceExpression(exp) && exp?.reduce?.value !== 'none' && exp?.field?.value) {
+          const field = this.castIfDynamic(database, table, exp.field.value);
+
           if (exp?.parameters && exp?.parameters.length > 0) {
-            reduceExpressions.push(
-              `${exp.reduce.value}(${exp.field.value}, ${exp.parameters.map(p => p.value).join(', ')})`
-            );
+            reduceExpressions.push(`${exp.reduce.value}(${field}, ${exp.parameters.map(p => p.value).join(', ')})`);
           } else {
-            reduceExpressions.push(`${exp.reduce.value}(${exp.field.value})`);
+            reduceExpressions.push(`${exp.reduce.value}(${field})`);
           }
         }
       }
@@ -225,6 +228,32 @@ export class KustoExpressionParser {
         parts.push(orderBy);
       }
     }
+  }
+
+  private castIfDynamic(database: string, table: string, column: string): string {
+    if (!column || column.indexOf('.') < 0) {
+      return column;
+    }
+
+    const columnType = this.schemaResolver.getColumnType(database, table, column);
+
+    if (!columnType) {
+      return column;
+    }
+
+    const parts = column.split('.');
+
+    return parts.reduce((result: string, part, index) => {
+      if (!result) {
+        return `todynamic(${part})`;
+      }
+
+      if (index + 1 === parts.length) {
+        return `to${columnType}(${result}.${part})`;
+      }
+
+      return `todynamic(${result}.${part})`;
+    }, '');
   }
 
   private getGroupByFields(groupByExpression: QueryEditorExpression): GroupByFields {

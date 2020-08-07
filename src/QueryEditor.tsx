@@ -46,17 +46,18 @@ const defaultQuery: QueryExpression = {
 
 export class QueryEditor extends PureComponent<Props, State> {
   private schemaResolver: AdxSchemaResolver;
+  private kustoExpressionParser: KustoExpressionParser;
 
   constructor(props: Props) {
     super(props);
     this.schemaResolver = new AdxSchemaResolver(props.datasource);
+    this.kustoExpressionParser = new KustoExpressionParser(this.schemaResolver);
   }
 
   state: State = {
     dirty: false,
   };
 
-  kustoExpressionParser = new KustoExpressionParser();
   templateVariableOptions: any;
 
   // Check when the query has changed, but not yet run
@@ -143,7 +144,7 @@ export class QueryEditor extends PureComponent<Props, State> {
 
       q = {
         ...q,
-        query: this.kustoExpressionParser.query(expression, columns),
+        query: this.kustoExpressionParser.query(expression, columns, database),
       };
     }
 
@@ -394,9 +395,6 @@ export class QueryEditor extends PureComponent<Props, State> {
 
     const table = this.kustoExpressionParser.fromTable(from, true);
     const columns = this.schemaResolver.getColumnsForTable(database, table);
-
-    console.log('table', table);
-    console.log('columns', columns);
 
     const groupable =
       columns?.filter(

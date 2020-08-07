@@ -43,5 +43,5 @@ export interface AdxTableSchema {
 
 export interface AdxColumnSchema {
   Name: string;
-  Type: string;
+  CslType: string;
 }

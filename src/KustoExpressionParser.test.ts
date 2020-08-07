@@ -14,6 +14,7 @@ import {
   QueryEditorExpression,
   QueryEditorArrayExpression,
 } from './editor/expressions';
+import { AdxSchemaResolver } from './SchemaResolver';
 
 describe('KustoExpressionParser', () => {
   let kustoExpressionParser: KustoExpressionParser;
@@ -24,7 +25,7 @@ describe('KustoExpressionParser', () => {
 
   beforeEach(() => {
     setupTemplateSrv();
-    kustoExpressionParser = new KustoExpressionParser();
+    kustoExpressionParser = new KustoExpressionParser(setupSchemaResolver());
 
     from = {
       type: QueryEditorExpressionType.Field,
@@ -43,7 +44,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should generate a valid query', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY', 'TX')" +
@@ -67,7 +68,7 @@ describe('KustoExpressionParser', () => {
           value: 'StartTime',
         },
       ];
-      const query = kustoExpressionParser.query({ from, where, reduce }, columns);
+      const query = kustoExpressionParser.query({ from, where, reduce }, columns, 'db');
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY')" +
@@ -87,7 +88,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should generate a valid query', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
@@ -107,7 +108,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should not put quotes around a variable', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
       expect(query).toBe(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
@@ -134,7 +135,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should build a valid summarize and exclude the order by', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns);
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns, 'db');
       expect(query).toBe(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
@@ -153,11 +154,31 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should generate a valid query', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
           '\n| summarize percentile(DamageProperty, 95) by bin(StartTime, 1h)' +
+          '\n| order by StartTime asc'
+      );
+    });
+  });
+
+  describe('query with reduce on dynamic field value', () => {
+    beforeEach(() => {
+      where = buildWhereWithSingleOperator();
+      reduce = buildReduce(['Customers.Value'], ['sum']);
+      groupBy = buildGroupBy();
+    });
+
+    it('should generate a valid query', () => {
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
+      console.log('query', query);
+
+      expect(query).toBe(
+        'StormEvents' +
+          "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
+          '\n| summarize sum(tolong(todynamic(Customers).Value)) by bin(StartTime, 1h)' +
           '\n| order by StartTime asc'
       );
     });
@@ -329,4 +350,10 @@ function buildGroupByWithNoTimeColumn() {
       } as QueryEditorGroupByExpression,
     ],
   } as QueryEditorRepeaterExpression;
+}
+
+function setupSchemaResolver() {
+  return ({
+    getColumnType: () => 'long',
+  } as any) as AdxSchemaResolver;
 }

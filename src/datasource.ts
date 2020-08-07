@@ -347,7 +347,7 @@ const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]
     if (typeof schema[name] === 'string') {
       result.push({
         Name: key,
-        Type: schema[name],
+        CslType: schema[name],
       });
       continue;
     }

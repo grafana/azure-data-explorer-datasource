@@ -6,12 +6,14 @@ export class AdxSchemaResolver {
   private databases: QueryEditorFieldDefinition[];
   private tablesByDatabase: Record<string, QueryEditorFieldDefinition[]>;
   private columnsByTable: Record<string, QueryEditorFieldDefinition[]>;
+  private dynamicByColumn: Record<string, AdxColumnSchema>;
   private isCached: boolean;
 
   constructor(private datasource: AdxDataSource) {
     this.databases = [];
     this.tablesByDatabase = {};
     this.columnsByTable = {};
+    this.dynamicByColumn = {};
     this.isCached = false;
   }
 
@@ -26,6 +28,11 @@ export class AdxSchemaResolver {
   getColumnsForTable(database: string, table: string): QueryEditorFieldDefinition[] {
     const key = columnsKey(database, table);
     return this.columnsByTable[key] ?? [];
+  }
+
+  getColumnType(databse: string, table: string, column: string): string | undefined {
+    const key = `${databse}.${table}.${column}`;
+    return this.dynamicByColumn[key]?.CslType;
   }
 
   async resolveAndCacheSchema(): Promise<void> {
@@ -75,13 +82,12 @@ export class AdxSchemaResolver {
             }
 
             this.columnsByTable[key].push({
-              type: toExpressionType(column.Type),
+              type: toExpressionType(column.CslType),
               value: column.Name,
             });
           }
         }
       }
-      console.log('tables in cache', this.columnsByTable);
       this.isCached = true;
     } catch (error) {
       console.error('[ADX] could not load schema:', error);
@@ -104,10 +110,19 @@ export class AdxSchemaResolver {
       const result: Record<string, QueryEditorFieldDefinition[]> = {};
 
       for (const columnName of Object.keys(schemasByColumn)) {
-        result[columnName] = schemasByColumn[columnName].map(column => ({
-          type: toExpressionType(column.Type),
-          value: column.Name,
-        }));
+        for (const schema of schemasByColumn[columnName]) {
+          if (!result[columnName]) {
+            result[columnName] = [];
+          }
+
+          result[columnName].push({
+            type: toExpressionType(schema.CslType),
+            value: schema.Name,
+          });
+
+          const key = `${database}.${table}.${schema.Name}`;
+          this.dynamicByColumn[key] = schema;
+        }
       }
 
       return result;
@@ -118,7 +133,7 @@ export class AdxSchemaResolver {
 }
 
 const isDynamic = (column: AdxColumnSchema): boolean => {
-  return column.Type === 'System.Object';
+  return column.CslType === 'dynamic';
 };
 
 const columnsKey = (database: string, table: string): string => {
@@ -129,13 +144,13 @@ const toExpressionType = (kustoType: string): QueryEditorFieldType => {
   // System.Object -> should do a lookup on those fields to flatten out their schema.
 
   switch (kustoType) {
-    case 'System.Double':
-    case 'System.Int32':
-    case 'System.Int64':
+    case 'real':
+    case 'int':
+    case 'long':
       return QueryEditorFieldType.Number;
-    case 'System.DateTime':
+    case 'datetime':
       return QueryEditorFieldType.DateTime;
-    case 'System.Boolean':
+    case 'bool':
       return QueryEditorFieldType.Boolean;
     default:
       return QueryEditorFieldType.String;
