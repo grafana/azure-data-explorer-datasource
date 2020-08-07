@@ -17,7 +17,7 @@ interface Props {
   defaultTimeField: string;
   pluginBaseUrl: string;
   getSchema: () => Promise<AdxSchema>;
-  onChange: (string) => void;
+  onChange: (val: string) => void;
   onExecute: () => void;
 }
 
@@ -62,14 +62,14 @@ export class KustoMonacoEditor extends React.Component<Props, MonacoState> {
     /* tslint:disable:no-bitwise */
     this.kustoCodeEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       const newValue = this.kustoCodeEditor?.getValue();
-      this.props.onChange(newValue);
+      this.props.onChange(newValue!);
       this.props.onExecute();
     });
     /* tslint:enable:no-bitwise */
 
     this.kustoCodeEditor.setOnDidChangeModelContent(() => {
       const newValue = this.kustoCodeEditor?.getValue();
-      this.props.onChange(newValue);
+      this.props.onChange(newValue!);
     });
   }
 

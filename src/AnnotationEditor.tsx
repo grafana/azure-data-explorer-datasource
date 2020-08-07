@@ -27,7 +27,7 @@ export class AnnotationEditor extends PureComponent<Props> {
       },
     };
 
-    console.log('CurrentXX', update);
+    console.log('CurrentXX', update, query);
     this.props.change(update);
   };
 
@@ -45,6 +45,7 @@ export class AnnotationEditor extends PureComponent<Props> {
           query={annotation.annotation}
           onRunQuery={this.onRunQuery}
         />
+        <div>TODO: Add UI that will map result columns to annotation fields?</div>
       </>
     );
   }

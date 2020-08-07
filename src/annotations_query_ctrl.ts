@@ -5,7 +5,7 @@ import { defaultsDeep } from 'lodash';
 
 const defaultQuery: KustoQuery = {
   database: '',
-  refId: 'anno',
+  refId: 'annoz',
   resultFormat: 'table',
   query: `<your table>\n| where $__timeFilter() \n| project TimeGenerated, Text=YourTitleColumn, Tags="tag1,tag2"`,
   rawMode: true,
@@ -28,7 +28,7 @@ export class AnnotationCtrl {
     this.annotation.datasourceId = this.datasource.id;
   }
 
-  onChange = (query: AnnotationQueryRequest<KustoQuery>) => {
-    this.annotation.annotation = query.annotation;
+  onChange = (req: AnnotationQueryRequest<KustoQuery>) => {
+    this.annotation = req;
   };
 }
