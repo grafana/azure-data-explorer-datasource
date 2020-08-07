@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { QueryEditorField } from './QueryEditorField';
 import { isFieldExpression } from '../../guards';
-import { QueryEditorExpression } from '../../expressions';
+import {
+  QueryEditorExpression,
+  QueryEditorProperty,
+  QueryEditorExpressionType,
+  QueryEditorPropertyExpression,
+} from '../../expressions';
 
 interface FieldSectionConfiguration {
   defaultValue: QueryEditorExpression;
@@ -21,6 +26,16 @@ export const QueryEditorFieldSection = (config: FieldSectionConfiguration): Reac
   return props => {
     const expression = props.value ?? config.defaultValue;
 
+    const onChange = useCallback(
+      (property: QueryEditorProperty) => {
+        props.onChange({
+          type: QueryEditorExpressionType.Field,
+          property,
+        } as QueryEditorPropertyExpression);
+      },
+      [props.onChange]
+    );
+
     if (!isFieldExpression(expression)) {
       return null;
     }
@@ -30,8 +45,8 @@ export const QueryEditorFieldSection = (config: FieldSectionConfiguration): Reac
         <QueryEditorField
           fields={props.fields}
           templateVariableOptions={props.templateVariableOptions}
-          onChange={props.onChange}
-          value={expression}
+          onChange={onChange}
+          value={expression.property}
         />
       </QueryEditorSection>
     );

@@ -2,11 +2,7 @@ import React from 'react';
 import { QueryEditorFilterSectionProps, QueryEditorFilterSection } from '../components/filter/QueryEditorFilterSection';
 import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldType } from '../types';
 import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
-import {
-  QueryEditorFieldAndOperatorExpression,
-  QueryEditorFieldExpression,
-  QueryEditorExpressionType,
-} from '../expressions';
+import { QueryEditorFieldAndOperatorExpression, QueryEditorExpressionType, QueryEditorProperty } from '../expressions';
 
 export class QueryEditorFilterBuilder {
   private operators: QueryEditorOperatorDefinition[];
@@ -53,7 +49,7 @@ export class QueryEditorFilterBuilder {
   private buildOperatorExpression(): QueryEditorFieldAndOperatorExpression {
     return {
       type: QueryEditorExpressionType.FieldAndOperator,
-      field: this.buildFieldExpression(),
+      property: this.buildFieldExpression(),
       operator: {
         type: QueryEditorExpressionType.Operator,
         operator: this.operators[0],
@@ -69,11 +65,10 @@ export class QueryEditorFilterBuilder {
   //   };
   // }
 
-  private buildFieldExpression(): QueryEditorFieldExpression {
+  private buildFieldExpression(): QueryEditorProperty {
     return {
-      type: QueryEditorExpressionType.Field,
-      value: '',
-      fieldType: QueryEditorFieldType.String,
+      name: '',
+      type: QueryEditorFieldType.String,
     };
   }
 }

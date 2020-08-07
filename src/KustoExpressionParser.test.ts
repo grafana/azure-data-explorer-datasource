@@ -3,7 +3,7 @@ import { QueryEditorFieldType, QueryEditorFieldDefinition } from './editor/types
 import { TemplateSrv } from './test/template_srv';
 import { setTemplateSrv } from '@grafana/runtime';
 import {
-  QueryEditorFieldExpression,
+  QueryEditorPropertyExpression,
   QueryEditorMultiOperatorExpression,
   QueryEditorFieldAndOperatorExpression,
   QueryEditorRepeaterExpression,
@@ -29,9 +29,11 @@ describe('KustoExpressionParser', () => {
 
     from = {
       type: QueryEditorExpressionType.Field,
-      fieldType: QueryEditorFieldType.String,
-      value: 'StormEvents',
-    } as QueryEditorFieldExpression;
+      property: {
+        type: QueryEditorFieldType.String,
+        name: 'StormEvents',
+      },
+    } as QueryEditorPropertyExpression;
   });
 
   describe('simple query with group by', () => {
@@ -220,10 +222,9 @@ function buildWhereWithMultiOperator(values: string[]): QueryEditorArrayExpressi
         expressions: [
           {
             type: QueryEditorExpressionType.FieldAndOperator,
-            field: {
-              type: QueryEditorExpressionType.Field,
-              fieldType: QueryEditorFieldType.String,
-              value: 'StateCode',
+            property: {
+              type: QueryEditorFieldType.String,
+              name: 'StateCode',
             },
             operator: {
               type: QueryEditorExpressionType.Operator,
@@ -252,10 +253,9 @@ function buildWhereWithSingleOperator(): QueryEditorArrayExpression {
         expressions: [
           {
             type: QueryEditorExpressionType.FieldAndOperator,
-            field: {
-              type: QueryEditorExpressionType.Field,
-              fieldType: QueryEditorFieldType.String,
-              value: 'StateCode',
+            property: {
+              type: QueryEditorFieldType.String,
+              name: 'StateCode',
             },
             operator: {
               type: QueryEditorExpressionType.Operator,
@@ -281,15 +281,13 @@ function buildReduce(fields: string[], functions: string[], parameter = ''): Que
   fields.forEach((field, i) => {
     const expr = {
       type: QueryEditorExpressionType.Reduce,
-      field: {
-        type: QueryEditorExpressionType.Field,
-        fieldType: QueryEditorFieldType.Number,
-        value: field,
+      property: {
+        type: QueryEditorFieldType.Number,
+        name: field,
       },
       reduce: {
-        type: QueryEditorExpressionType.Field,
-        fieldType: QueryEditorFieldType.Function,
-        value: functions[i],
+        type: QueryEditorFieldType.Function,
+        name: functions[i],
       },
     } as QueryEditorReduceExpression;
     if (parameter) {
@@ -320,15 +318,13 @@ function buildGroupBy() {
     expressions: [
       {
         type: QueryEditorExpressionType.GroupBy,
-        field: {
-          type: QueryEditorExpressionType.Field,
-          fieldType: QueryEditorFieldType.DateTime,
-          value: 'StartTime',
+        property: {
+          type: QueryEditorFieldType.DateTime,
+          name: 'StartTime',
         },
         interval: {
-          type: QueryEditorExpressionType.Field,
-          fieldType: QueryEditorFieldType.Interval,
-          value: '1h',
+          type: QueryEditorFieldType.Interval,
+          name: '1h',
         },
       } as QueryEditorGroupByExpression,
     ],
@@ -342,10 +338,9 @@ function buildGroupByWithNoTimeColumn() {
     expressions: [
       {
         type: QueryEditorExpressionType.GroupBy,
-        field: {
-          type: QueryEditorExpressionType.Field,
-          fieldType: QueryEditorFieldType.String,
-          value: 'State',
+        property: {
+          type: QueryEditorFieldType.String,
+          name: 'State',
         },
       } as QueryEditorGroupByExpression,
     ],

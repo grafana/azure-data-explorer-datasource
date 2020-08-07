@@ -1,7 +1,7 @@
 import React from 'react';
 import { QueryEditorFieldType } from '../types';
 import { QueryEditorFieldSectionProps, QueryEditorFieldSection } from 'editor/components/field/QueryEditorFieldSection';
-import { QueryEditorFieldExpression, QueryEditorExpressionType } from '../expressions';
+import { QueryEditorPropertyExpression, QueryEditorExpressionType } from '../expressions';
 
 export class QueryEditorFieldBuilder {
   build(): React.FC<QueryEditorFieldSectionProps> {
@@ -10,11 +10,13 @@ export class QueryEditorFieldBuilder {
     });
   }
 
-  private buildFieldExpression(): QueryEditorFieldExpression {
+  private buildFieldExpression(): QueryEditorPropertyExpression {
     return {
       type: QueryEditorExpressionType.Field,
-      value: '',
-      fieldType: QueryEditorFieldType.String,
+      property: {
+        name: '',
+        type: QueryEditorFieldType.String,
+      },
     };
   }
 }

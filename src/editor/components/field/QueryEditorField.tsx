@@ -2,20 +2,20 @@ import React, { useCallback, useMemo } from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorFieldDefinition } from '../../types';
-import { QueryEditorFieldExpression, QueryEditorExpressionType } from '../../expressions';
+import { QueryEditorProperty } from '../../expressions';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];
   templateVariableOptions: SelectableValue<string>;
-  value?: QueryEditorFieldExpression;
-  onChange: (expression: QueryEditorFieldExpression) => void;
+  value?: QueryEditorProperty;
+  onChange: (property: QueryEditorProperty) => void;
   placeholder?: string;
 }
 
 export const QueryEditorField: React.FC<Props> = props => {
   const onChange = useOnChange(props);
   const options = useOptions(props.fields);
-  const value = props.value?.value;
+  const value = props.value?.name;
 
   return (
     <Select
@@ -62,9 +62,8 @@ const useOnChange = (props: Props) => {
 
       if (field) {
         props.onChange({
-          type: QueryEditorExpressionType.Field,
-          value: field.value,
-          fieldType: field.type,
+          name: field.value,
+          type: field.type,
         });
       }
     },

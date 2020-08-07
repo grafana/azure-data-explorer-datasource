@@ -26,9 +26,9 @@ export class KustoExpressionParser {
   fromTable(expression?: QueryEditorExpression, interpolate = false): string {
     if (expression && isFieldExpression(expression)) {
       if (interpolate) {
-        return this.templateSrv.replace(expression.value);
+        return this.templateSrv.replace(expression.property.name);
       } else {
-        return expression.value;
+        return expression.property.name;
       }
     }
     return '';
@@ -84,16 +84,16 @@ export class KustoExpressionParser {
 
     if (isRepeater(expression)) {
       for (const exp of expression.expressions) {
-        if (isReduceExpression(exp) && exp.field?.value) {
-          if (exp.field.fieldType === QueryEditorFieldType.DateTime) {
-            timeCol = exp.field.value;
+        if (isReduceExpression(exp) && exp.property?.name) {
+          if (exp.property.type === QueryEditorFieldType.DateTime) {
+            timeCol = exp.property.name;
           } else {
-            fields.push(exp.field.value);
+            fields.push(exp.property.name);
           }
         }
       }
     } else if (isReduceExpression(expression)) {
-      fields.push(expression.field.value);
+      fields.push(expression.property.name);
     }
 
     if (fields.length > 0) {
@@ -108,11 +108,11 @@ export class KustoExpressionParser {
   private createWhere(expression: QueryEditorFieldAndOperatorExpression): string | undefined {
     let where = '';
 
-    if (!expression.field) {
+    if (!expression.property) {
       return;
     }
 
-    where += `${expression.field.value} `;
+    where += `${expression.property.name} `;
 
     if (!expression.operator) {
       return where;
@@ -137,10 +137,7 @@ export class KustoExpressionParser {
         .join(', ');
       where += ')';
     } else if (isSingleOperator(expression.operator)) {
-      if (
-        expression.field.fieldType === QueryEditorFieldType.String &&
-        !this.isQuotedString(expression.operator.value)
-      ) {
+      if (expression.property.type === QueryEditorFieldType.String && !this.isQuotedString(expression.operator.value)) {
         where += `'${expression.operator.value}'`;
       } else {
         where += expression.operator.value;
@@ -195,13 +192,13 @@ export class KustoExpressionParser {
       let reduceExpressions: string[] = [];
 
       for (const exp of reduceExpression.expressions) {
-        if (isReduceExpression(exp) && exp?.reduce?.value !== 'none' && exp?.field?.value) {
-          const field = this.castIfDynamic(database, table, exp.field.value);
+        if (isReduceExpression(exp) && exp?.reduce?.name !== 'none' && exp?.property?.name) {
+          const field = this.castIfDynamic(database, table, exp.property.name);
 
           if (exp?.parameters && exp?.parameters.length > 0) {
-            reduceExpressions.push(`${exp.reduce.value}(${field}, ${exp.parameters.map(p => p.value).join(', ')})`);
+            reduceExpressions.push(`${exp.reduce.name}(${field}, ${exp.parameters.map(p => p.value).join(', ')})`);
           } else {
-            reduceExpressions.push(`${exp.reduce.value}(${field})`);
+            reduceExpressions.push(`${exp.reduce.name}(${field})`);
           }
         }
       }
@@ -264,10 +261,10 @@ export class KustoExpressionParser {
     if (isRepeater(groupByExpression)) {
       for (const exp of groupByExpression.expressions) {
         if (isGroupBy(exp) && isDateGroupBy(exp) && exp.interval) {
-          dateTimeField = exp.field.value;
-          interval = exp.interval.value;
-        } else if (isGroupBy(exp) && !isDateGroupBy(exp) && exp.field && exp.field.value) {
-          groupByFields.push(exp.field.value);
+          dateTimeField = exp.property.name;
+          interval = exp.interval.name;
+        } else if (isGroupBy(exp) && !isDateGroupBy(exp) && exp.property && exp.property.name) {
+          groupByFields.push(exp.property.name);
         }
       }
     }

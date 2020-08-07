@@ -12,9 +12,9 @@ import { SelectableValue } from '@grafana/data';
 import { QueryEditorFunctionParameterSection } from '../field/QueryEditorFunctionParameterSection';
 import {
   QueryEditorReduceExpression,
-  QueryEditorFieldExpression,
   QueryEditorFunctionParameterExpression,
   QueryEditorExpressionType,
+  QueryEditorProperty,
 } from '../../expressions';
 
 interface Props {
@@ -27,25 +27,24 @@ interface Props {
 }
 
 export const QueryEditorReduce: React.FC<Props> = props => {
-  const [field, setField] = useState(props.value?.field);
+  const [field, setField] = useState(props.value?.property);
   const [reduce, setReduce] = useState(props.value?.reduce);
   const [parameters, setParameters] = useState(props.value?.parameters);
   const styles = getStyles();
 
   const onChangeField = useCallback(
-    (expression: QueryEditorFieldExpression) => {
-      setField(expression);
+    (property: QueryEditorProperty) => {
+      setField(property);
 
       // Set a reasonable value
-      if (!props.value?.reduce?.value) {
+      if (!props.value?.reduce?.name) {
         let reducer = props.functions.find(f => f.value === 'avg');
         if (!reducer) {
           reducer = props.functions[0];
         }
         setReduce({
-          type: QueryEditorExpressionType.Field,
-          value: reducer.value,
-          fieldType: QueryEditorFieldType.Function,
+          name: reducer.value,
+          type: QueryEditorFieldType.Function,
         });
       }
     },
@@ -53,8 +52,8 @@ export const QueryEditorReduce: React.FC<Props> = props => {
   );
 
   const onChangeReduce = useCallback(
-    (expression: QueryEditorFieldExpression) => {
-      setReduce(expression);
+    (property: QueryEditorProperty) => {
+      setReduce(property);
     },
     [setReduce]
   );
@@ -68,9 +67,9 @@ export const QueryEditorReduce: React.FC<Props> = props => {
 
   useEffect(() => {
     if (field && reduce) {
-      const payload = {
+      const payload: QueryEditorReduceExpression = {
         type: QueryEditorExpressionType.Reduce,
-        field,
+        property: field,
         reduce,
         parameters: parameters,
       };
@@ -125,13 +124,13 @@ const getStyles = stylesFactory(() => {
 });
 
 const getParameters = (
-  reduce: QueryEditorFieldExpression | undefined,
+  reduce: QueryEditorProperty | undefined,
   functions: QueryEditorFunctionDefinition[]
 ): QueryEditorFunctionParameter[] => {
   if (!reduce) {
     return [];
   }
-  const func = functions.find(func => func.value === reduce.value);
+  const func = functions.find(func => func.value === reduce.name);
 
   return func?.parameters || [];
 };

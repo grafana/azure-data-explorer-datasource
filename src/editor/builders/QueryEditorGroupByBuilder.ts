@@ -8,9 +8,10 @@ import { QueryEditorIntervalBuilder } from './QueryEditorIntervalBuilder';
 import {
   QueryEditorRepeaterExpression,
   QueryEditorGroupByExpression,
-  QueryEditorFieldExpression,
+  QueryEditorPropertyExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
+  QueryEditorProperty,
 } from '../expressions';
 
 export class QueryEditorGroupByBuilder {
@@ -51,7 +52,10 @@ export class QueryEditorGroupByBuilder {
       return this.buildGroupByExpression();
     }
 
-    return this.buildFieldExpression(QueryEditorFieldType.String);
+    return {
+      type: QueryEditorExpressionType.Field,
+      property: this.buildProperty(QueryEditorFieldType.String),
+    } as QueryEditorPropertyExpression;
   }
 
   private buildRepeaterExpression(typeToRepeat: QueryEditorExpressionType): QueryEditorRepeaterExpression {
@@ -65,16 +69,15 @@ export class QueryEditorGroupByBuilder {
   private buildGroupByExpression(): QueryEditorGroupByExpression {
     return {
       type: QueryEditorExpressionType.GroupBy,
-      field: this.buildFieldExpression(QueryEditorFieldType.String),
-      interval: this.buildFieldExpression(QueryEditorFieldType.Interval),
+      property: this.buildProperty(QueryEditorFieldType.String),
+      interval: this.buildProperty(QueryEditorFieldType.Interval),
     };
   }
 
-  private buildFieldExpression(type: QueryEditorFieldType): QueryEditorFieldExpression {
+  private buildProperty(type: QueryEditorFieldType): QueryEditorProperty {
     return {
-      type: QueryEditorExpressionType.Field,
-      value: '',
-      fieldType: type,
+      name: '',
+      type,
     };
   }
 }

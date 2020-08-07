@@ -5,9 +5,10 @@ import { QueryEditorFunctionBuilder } from './QueryEditorFunctionBuilder';
 import {
   QueryEditorRepeaterExpression,
   QueryEditorReduceExpression,
-  QueryEditorFieldExpression,
+  QueryEditorPropertyExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
+  QueryEditorProperty,
 } from '../expressions';
 
 export class QueryEditorReduceBuilder {
@@ -48,7 +49,10 @@ export class QueryEditorReduceBuilder {
       return this.buildReduceFnExpression();
     }
 
-    return this.buildFieldExpression(QueryEditorFieldType.String);
+    return {
+      type: QueryEditorExpressionType.Field,
+      property: this.buildProperty(QueryEditorFieldType.String),
+    } as QueryEditorPropertyExpression;
   }
 
   private buildRepeaterExpression(typeToRepeat: QueryEditorExpressionType): QueryEditorRepeaterExpression {
@@ -62,16 +66,15 @@ export class QueryEditorReduceBuilder {
   private buildReduceFnExpression(): QueryEditorReduceExpression {
     return {
       type: QueryEditorExpressionType.Reduce,
-      field: this.buildFieldExpression(QueryEditorFieldType.String),
-      reduce: this.buildFieldExpression(QueryEditorFieldType.Function),
+      property: this.buildProperty(QueryEditorFieldType.String),
+      reduce: this.buildProperty(QueryEditorFieldType.Function),
     };
   }
 
-  private buildFieldExpression(type: QueryEditorFieldType): QueryEditorFieldExpression {
+  private buildProperty(type: QueryEditorFieldType): QueryEditorProperty {
     return {
-      type: QueryEditorExpressionType.Field,
-      value: '',
-      fieldType: type,
+      name: '',
+      type,
     };
   }
 }

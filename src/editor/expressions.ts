@@ -12,7 +12,10 @@ export enum QueryEditorExpressionType {
   Or = 'or',
   And = 'and',
 }
-
+export interface QueryEditorProperty {
+  type: QueryEditorFieldType;
+  name: string;
+}
 export interface QueryEditorExpression {
   type: QueryEditorExpressionType;
 }
@@ -34,12 +37,11 @@ export interface QueryEditorSingleOperatorExpression extends QueryEditorOperator
 }
 
 /** COMBINED */
-export interface QueryEditorFieldExpression extends QueryEditorExpression {
-  value: string;
-  fieldType: QueryEditorFieldType;
+export interface QueryEditorPropertyExpression extends QueryEditorExpression {
+  property: QueryEditorProperty;
 }
 export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpression {
-  field: QueryEditorFieldExpression;
+  property: QueryEditorProperty;
   operator: QueryEditorOperatorExpression;
 }
 
@@ -50,14 +52,14 @@ export interface QueryEditorFunctionParameterExpression extends QueryEditorExpre
 }
 
 export interface QueryEditorReduceExpression extends QueryEditorExpression {
-  field: QueryEditorFieldExpression;
-  reduce: QueryEditorFieldExpression;
+  property: QueryEditorProperty;
+  reduce: QueryEditorProperty;
   parameters?: QueryEditorFunctionParameterExpression[];
 }
 
 export interface QueryEditorGroupByExpression extends QueryEditorExpression {
-  field: QueryEditorFieldExpression;
-  interval?: QueryEditorFieldExpression;
+  property: QueryEditorProperty;
+  interval?: QueryEditorProperty;
 }
 
 export interface QueryEditorRepeaterExpression extends QueryEditorExpression {

@@ -280,15 +280,13 @@ export class QueryEditor extends PureComponent<Props, State> {
           expressions: [
             {
               type: QueryEditorExpressionType.GroupBy,
-              field: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.DateTime,
-                value: timeField.value,
+              property: {
+                type: QueryEditorFieldType.DateTime,
+                name: timeField.value,
               },
               interval: {
-                type: QueryEditorExpressionType.Field,
-                fieldType: QueryEditorFieldType.Interval,
-                value: '$__interval',
+                type: QueryEditorFieldType.Interval,
+                name: '$__interval',
               },
             } as QueryEditorGroupByExpression,
           ],

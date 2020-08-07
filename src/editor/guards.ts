@@ -1,6 +1,6 @@
 import {
   QueryEditorReduceExpression,
-  QueryEditorFieldExpression,
+  QueryEditorPropertyExpression,
   QueryEditorFunctionParameterExpression,
   QueryEditorFieldAndOperatorExpression,
   QueryEditorGroupByExpression,
@@ -19,9 +19,7 @@ export const isReduceExpression = (expression: QueryEditorExpression): expressio
   return (expression as QueryEditorReduceExpression)?.type === QueryEditorExpressionType.Reduce;
 };
 
-export const isFieldExpression = (
-  expression: QueryEditorExpression | undefined
-): expression is QueryEditorFieldExpression => {
+export const isFieldExpression = (expression: QueryEditorExpression): expression is QueryEditorPropertyExpression => {
   return expression?.type === QueryEditorExpressionType.Field;
 };
 
@@ -42,7 +40,7 @@ export const isGroupBy = (expression: QueryEditorExpression): expression is Quer
 };
 
 export const isDateGroupBy = (expression: QueryEditorExpression): boolean => {
-  return (expression as QueryEditorGroupByExpression)?.field?.fieldType === QueryEditorFieldType.DateTime;
+  return (expression as QueryEditorGroupByExpression)?.property?.type === QueryEditorFieldType.DateTime;
 };
 
 export const isBoolOperator = (

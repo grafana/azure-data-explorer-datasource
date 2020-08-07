@@ -8,10 +8,10 @@ import { QueryEditorOperator, verifyOperatorValues } from '../operators/QueryEdi
 import { SelectableValue } from '@grafana/data';
 import {
   QueryEditorFieldAndOperatorExpression,
-  QueryEditorFieldExpression,
   QueryEditorOperatorExpression,
   QueryEditorExpressionType,
   QueryEditorExpression,
+  QueryEditorProperty,
 } from '../../expressions';
 
 interface Props {
@@ -32,17 +32,17 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
   state: State = { operators: [] };
 
   componentDidMount = () => {
-    const field = this.props.value?.field;
+    const field = this.props.value?.property;
     if (field) {
       this.updateOperators(field);
     }
   };
 
   // Find the valid operators to the given field and save it in state
-  updateOperators = (field: QueryEditorFieldExpression): QueryEditorOperatorDefinition[] => {
+  updateOperators = (field: QueryEditorProperty): QueryEditorOperatorDefinition[] => {
     const operators: QueryEditorOperatorDefinition[] = [];
     for (const op of this.props.operators) {
-      if (op.supportTypes.includes(field.fieldType)) {
+      if (op.supportTypes.includes(field.type)) {
         operators.push(op);
       }
     }
@@ -50,7 +50,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
     return operators;
   };
 
-  onFieldChanged = (expression: QueryEditorFieldExpression) => {
+  onFieldChanged = (expression: QueryEditorProperty) => {
     let next = {
       ...this.props.value!,
       field: expression,
@@ -84,7 +84,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
     const { operators } = this.state;
 
     const styles = getStyles();
-    const showOperators = value?.operator || value?.field;
+    const showOperators = value?.operator || value?.property;
     const getSuggestions = (txt: string, skip: QueryEditorExpression) => {
       return this.props.getSuggestions(txt, this.props.value!);
     };
@@ -92,7 +92,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
     return (
       <div className={styles.container}>
         <QueryEditorField
-          value={value?.field}
+          value={value?.property}
           fields={fields}
           templateVariableOptions={templateVariableOptions}
           onChange={this.onFieldChanged}
