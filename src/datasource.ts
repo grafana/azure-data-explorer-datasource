@@ -159,9 +159,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
           }
         }
         if (res.state === LoadingState.Error) {
-          console.log('ADX Annotation ERROR???', res);
+          console.log('ADX Annotation ERROR???', options, res);
           return Promise.reject({
-            message: 'Error with ADX annotation',
+            message: options.annotation.name,
           });
         }
         return [];
