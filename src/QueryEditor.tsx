@@ -114,6 +114,7 @@ export class QueryEditor extends PureComponent<Props, State> {
       if (!query.resultFormat) {
         query.resultFormat = 'time_series';
       }
+
       this.onUpdateQuery(query);
 
       this.templateVariableOptions = {
@@ -312,8 +313,9 @@ export class QueryEditor extends PureComponent<Props, State> {
     const { query } = this.props;
 
     // For now just support finding distinct field values
-    const from = (query.expression?.from as any)?.value;
-    const field = (skip as any)?.field?.value;
+    const from = this.kustoExpressionParser.fromTable(query.expression?.from);
+    const field = (skip as any)?.property?.name;
+
     if (!from || !field) {
       return Promise.resolve([]);
     }

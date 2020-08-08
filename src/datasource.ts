@@ -16,6 +16,7 @@ import { AdxDataSourceOptions, KustoQuery, AdxSchema, AdxColumnSchema } from './
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
+import { QueryEditorPropertyExpression } from 'editor/expressions';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -43,7 +44,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     if (target.rawMode) {
       return true; // anything else we can check
     }
-    const table = (target.expression?.from as any)?.value;
+    const table = (target.expression?.from as QueryEditorPropertyExpression)?.property.name;
     if (!table) {
       return false; // Don't execute things without a table selected
     }
@@ -102,6 +103,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     if (databasesQuery) {
       return this.getDatabases();
     }
+
     return this.getDefaultOrFirstDatabase()
       .then(database => this.buildQuery(query, optionalOptions, database))
       .then(query =>
