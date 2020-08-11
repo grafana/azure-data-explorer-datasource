@@ -13,7 +13,7 @@ import {
   QueryEditorExpressionType,
   QueryEditorArrayExpression,
 } from './expressions';
-import { QueryEditorFieldType } from './types';
+import { QueryEditorPropertyType } from './types';
 
 export const isReduceExpression = (expression: QueryEditorExpression): expression is QueryEditorReduceExpression => {
   return (expression as QueryEditorReduceExpression)?.type === QueryEditorExpressionType.Reduce;
@@ -40,7 +40,7 @@ export const isGroupBy = (expression: QueryEditorExpression): expression is Quer
 };
 
 export const isDateGroupBy = (expression: QueryEditorExpression): boolean => {
-  return (expression as QueryEditorGroupByExpression)?.property?.type === QueryEditorFieldType.DateTime;
+  return (expression as QueryEditorGroupByExpression)?.property?.type === QueryEditorPropertyType.DateTime;
 };
 
 export const isBoolOperator = (

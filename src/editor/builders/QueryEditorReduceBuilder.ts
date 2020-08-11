@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorFunctionDefinition, QueryEditorFieldType, QueryEditorProperty } from '../types';
+import { QueryEditorFunctionDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../types';
 import { QueryEditorReduceSection, QueryEditorReduceSectionProps } from '../components/reduce/QueryEditorReduceSection';
 import { QueryEditorFunctionBuilder } from './QueryEditorFunctionBuilder';
 import {
@@ -50,7 +50,7 @@ export class QueryEditorReduceBuilder {
 
     return {
       type: QueryEditorExpressionType.Field,
-      property: this.buildProperty(QueryEditorFieldType.String),
+      property: this.buildProperty(QueryEditorPropertyType.String),
     } as QueryEditorPropertyExpression;
   }
 
@@ -65,12 +65,12 @@ export class QueryEditorReduceBuilder {
   private buildReduceFnExpression(): QueryEditorReduceExpression {
     return {
       type: QueryEditorExpressionType.Reduce,
-      property: this.buildProperty(QueryEditorFieldType.String),
-      reduce: this.buildProperty(QueryEditorFieldType.Function),
+      property: this.buildProperty(QueryEditorPropertyType.String),
+      reduce: this.buildProperty(QueryEditorPropertyType.Function),
     };
   }
 
-  private buildProperty(type: QueryEditorFieldType): QueryEditorProperty {
+  private buildProperty(type: QueryEditorPropertyType): QueryEditorProperty {
     return {
       name: '',
       type,

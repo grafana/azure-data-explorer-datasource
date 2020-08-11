@@ -1,9 +1,9 @@
-import { QueryEditorOperatorDefinition, QueryEditorFieldType } from '../types';
+import { QueryEditorOperatorDefinition, QueryEditorPropertyType } from '../types';
 
 export class QueyEditorOperatorBuilder {
   private label: string;
   private description: string;
-  private types: QueryEditorFieldType[];
+  private types: QueryEditorPropertyType[];
   private multiple: boolean;
   private bool: boolean;
 
@@ -25,7 +25,7 @@ export class QueyEditorOperatorBuilder {
     return this;
   }
 
-  supportTypes(types: QueryEditorFieldType[]) {
+  supportTypes(types: QueryEditorPropertyType[]) {
     this.types = types;
     return this;
   }

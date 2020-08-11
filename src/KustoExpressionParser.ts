@@ -1,5 +1,5 @@
 import { QueryExpression } from './types';
-import { QueryEditorFieldDefinition, QueryEditorFieldType } from 'editor/types';
+import { QueryEditorFieldDefinition, QueryEditorPropertyType } from 'editor/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import {
   isReduceExpression,
@@ -44,7 +44,7 @@ export class KustoExpressionParser {
       return '';
     }
 
-    const defaultTimeColumn = columns?.find(col => col.type === QueryEditorFieldType.DateTime)?.value ?? 'Timestamp';
+    const defaultTimeColumn = columns?.find(col => col.type === QueryEditorPropertyType.DateTime)?.value ?? 'Timestamp';
     const parts: string[] = [table];
 
     if (reduce && groupBy && this.isAggregated(groupBy)) {
@@ -85,7 +85,7 @@ export class KustoExpressionParser {
     if (isRepeater(expression)) {
       for (const exp of expression.expressions) {
         if (isReduceExpression(exp) && exp.property?.name) {
-          if (exp.property.type === QueryEditorFieldType.DateTime) {
+          if (exp.property.type === QueryEditorPropertyType.DateTime) {
             timeCol = exp.property.name;
           } else {
             fields.push(exp.property.name);
@@ -137,7 +137,10 @@ export class KustoExpressionParser {
         .join(', ');
       where += ')';
     } else if (isSingleOperator(expression.operator)) {
-      if (expression.property.type === QueryEditorFieldType.String && !this.isQuotedString(expression.operator.value)) {
+      if (
+        expression.property.type === QueryEditorPropertyType.String &&
+        !this.isQuotedString(expression.operator.value)
+      ) {
         where += `'${expression.operator.value}'`;
       } else {
         where += expression.operator.value;

@@ -1,6 +1,6 @@
 import { AdxDataSource } from './datasource';
 import { AdxColumnSchema } from 'types';
-import { QueryEditorFieldDefinition, QueryEditorFieldType } from 'editor/types';
+import { QueryEditorFieldDefinition, QueryEditorPropertyType } from 'editor/types';
 
 export class AdxSchemaResolver {
   private databases: QueryEditorFieldDefinition[];
@@ -47,7 +47,7 @@ export class AdxSchemaResolver {
         const db = schema.Databases[databaseName];
 
         this.databases.push({
-          type: QueryEditorFieldType.String,
+          type: QueryEditorPropertyType.String,
           value: databaseName,
           label: databaseName,
         });
@@ -60,7 +60,7 @@ export class AdxSchemaResolver {
           }
 
           this.tablesByDatabase[databaseName].push({
-            type: QueryEditorFieldType.String,
+            type: QueryEditorPropertyType.String,
             value: tableName,
             label: tableName,
           });
@@ -140,19 +140,19 @@ const columnsKey = (database: string, table: string): string => {
   return `${database}.${table}`;
 };
 
-const toExpressionType = (kustoType: string): QueryEditorFieldType => {
+const toExpressionType = (kustoType: string): QueryEditorPropertyType => {
   // System.Object -> should do a lookup on those fields to flatten out their schema.
 
   switch (kustoType) {
     case 'real':
     case 'int':
     case 'long':
-      return QueryEditorFieldType.Number;
+      return QueryEditorPropertyType.Number;
     case 'datetime':
-      return QueryEditorFieldType.DateTime;
+      return QueryEditorPropertyType.DateTime;
     case 'bool':
-      return QueryEditorFieldType.Boolean;
+      return QueryEditorPropertyType.Boolean;
     default:
-      return QueryEditorFieldType.String;
+      return QueryEditorPropertyType.String;
   }
 };

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { css } from 'emotion';
-import { QueryEditorOperatorDefinition, QueryEditorCondition, QueryEditorFieldDefinition } from '../../types';
+import { QueryEditorOperatorDefinition, QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSectionProps, QueryEditorSection } from '../QueryEditorSection';
 import { SelectableValue } from '@grafana/data';
 import { ExpressionSuggestor } from '../types';
@@ -16,7 +16,6 @@ import { Button, Select, stylesFactory, InlineFormLabel } from '@grafana/ui';
 
 interface FilterSectionConfiguration {
   operators: QueryEditorOperatorDefinition[];
-  conditionals: QueryEditorCondition[];
   defaultValue: QueryEditorFieldAndOperatorExpression;
 }
 

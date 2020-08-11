@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
-import { QueryEditorFieldDefinition, QueryEditorFieldType, QueryEditorProperty } from '../../types';
+import { QueryEditorFieldDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorGroupByExpression, QueryEditorExpressionType } from '../../expressions';
@@ -23,9 +23,9 @@ export const QueryEditorGroupBy: React.FC<Props> = props => {
   const onChangeField = useCallback(
     (property: QueryEditorProperty) => {
       setField(property);
-      if (property.type === QueryEditorFieldType.DateTime) {
+      if (property.type === QueryEditorPropertyType.DateTime) {
         setInterval({
-          type: QueryEditorFieldType.Interval,
+          type: QueryEditorPropertyType.Interval,
           name: props.intervals[0].value,
         });
       }
@@ -61,7 +61,7 @@ export const QueryEditorGroupBy: React.FC<Props> = props => {
         onChange={onChangeField}
         placeholder="Choose column..."
       />
-      {field?.type === QueryEditorFieldType.DateTime && (
+      {field?.type === QueryEditorPropertyType.DateTime && (
         <QueryEditorField
           value={interval}
           fields={props.intervals}

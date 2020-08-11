@@ -1,4 +1,4 @@
-export enum QueryEditorFieldType {
+export enum QueryEditorPropertyType {
   Number = 'number',
   String = 'string',
   Boolean = 'boolean',
@@ -8,17 +8,20 @@ export enum QueryEditorFieldType {
 }
 
 export interface QueryEditorProperty {
-  type: QueryEditorFieldType;
+  type: QueryEditorPropertyType;
   name: string;
 }
 
-export enum QueryEditorCondition {
-  And = 'and',
-  Or = 'or',
+export interface QueryEditorOperator<T> {
+  value: T;
+}
+
+export interface QueryEditorArrayOperator<T> {
+  values: T[];
 }
 export interface QueryEditorOperatorDefinition {
   value: string;
-  supportTypes: QueryEditorFieldType[];
+  supportTypes: QueryEditorPropertyType[];
   multipleValues: boolean;
   booleanValues: boolean;
   label?: string;
@@ -27,7 +30,7 @@ export interface QueryEditorOperatorDefinition {
 
 export interface QueryEditorFieldDefinition {
   value: string;
-  type: QueryEditorFieldType;
+  type: QueryEditorPropertyType;
   label?: string;
 }
 
@@ -37,7 +40,7 @@ export interface QueryEditorFunctionDefinition extends QueryEditorFieldDefinitio
 
 export interface QueryEditorFunctionParameter {
   name: string;
-  type: QueryEditorFieldType;
+  type: QueryEditorPropertyType;
   description: string;
   value?: string;
 }

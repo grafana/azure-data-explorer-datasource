@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { Input } from '@grafana/ui';
-import { QueryEditorFieldType } from '../../types';
+import { QueryEditorPropertyType } from '../../types';
 import { QueryEditorFunctionParameterExpression, QueryEditorExpressionType } from '../../expressions';
 
 interface Props {
   name: string;
   value: string | undefined;
-  fieldType: QueryEditorFieldType;
+  fieldType: QueryEditorPropertyType;
   description: string;
   onChange: (expression: QueryEditorFunctionParameterExpression) => void;
 }

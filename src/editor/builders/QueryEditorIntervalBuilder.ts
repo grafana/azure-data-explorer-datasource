@@ -1,4 +1,4 @@
-import { QueryEditorFieldType, QueryEditorFieldDefinition } from '../types';
+import { QueryEditorPropertyType, QueryEditorFieldDefinition } from '../types';
 
 export class QueryEditorIntervalBuilder {
   private label: string;
@@ -16,7 +16,7 @@ export class QueryEditorIntervalBuilder {
     this.intervals.push({
       value: this.value,
       label: this.label,
-      type: QueryEditorFieldType.Interval,
+      type: QueryEditorPropertyType.Interval,
     });
   }
 }

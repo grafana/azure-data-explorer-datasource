@@ -5,7 +5,7 @@ import {
   QueryEditorFieldDefinition,
   QueryEditorFunctionDefinition,
   QueryEditorFunctionParameter,
-  QueryEditorFieldType,
+  QueryEditorPropertyType,
   QueryEditorProperty,
 } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
@@ -44,7 +44,7 @@ export const QueryEditorReduce: React.FC<Props> = props => {
         }
         setReduce({
           name: reducer.value,
-          type: QueryEditorFieldType.Function,
+          type: QueryEditorPropertyType.Function,
         });
       }
     },

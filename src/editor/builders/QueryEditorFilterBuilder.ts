@@ -1,21 +1,14 @@
 import React from 'react';
 import { QueryEditorFilterSectionProps, QueryEditorFilterSection } from '../components/filter/QueryEditorFilterSection';
-import {
-  QueryEditorOperatorDefinition,
-  QueryEditorCondition,
-  QueryEditorFieldType,
-  QueryEditorProperty,
-} from '../types';
+import { QueryEditorOperatorDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../types';
 import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
 import { QueryEditorFieldAndOperatorExpression, QueryEditorExpressionType } from '../expressions';
 
 export class QueryEditorFilterBuilder {
   private operators: QueryEditorOperatorDefinition[];
-  private conditionals: QueryEditorCondition[];
   //private multipleRows: boolean;
 
   constructor() {
-    this.conditionals = [];
     this.operators = [];
     // this.multipleRows = false;
   }
@@ -33,7 +26,6 @@ export class QueryEditorFilterBuilder {
   build(): React.FC<QueryEditorFilterSectionProps> {
     return QueryEditorFilterSection({
       operators: this.operators,
-      conditionals: this.conditionals,
       defaultValue: this.buildOperatorExpression(),
     });
   }
@@ -73,7 +65,7 @@ export class QueryEditorFilterBuilder {
   private buildFieldExpression(): QueryEditorProperty {
     return {
       name: '',
-      type: QueryEditorFieldType.String,
+      type: QueryEditorPropertyType.String,
     };
   }
 }

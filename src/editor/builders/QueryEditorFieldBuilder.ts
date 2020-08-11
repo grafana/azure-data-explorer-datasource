@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorFieldType } from '../types';
+import { QueryEditorPropertyType } from '../types';
 import { QueryEditorFieldSectionProps, QueryEditorFieldSection } from 'editor/components/field/QueryEditorFieldSection';
 import { QueryEditorPropertyExpression, QueryEditorExpressionType } from '../expressions';
 
@@ -15,7 +15,7 @@ export class QueryEditorFieldBuilder {
       type: QueryEditorExpressionType.Field,
       property: {
         name: '',
-        type: QueryEditorFieldType.String,
+        type: QueryEditorPropertyType.String,
       },
     };
   }

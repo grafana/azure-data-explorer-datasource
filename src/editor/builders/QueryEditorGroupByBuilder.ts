@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorFieldDefinition, QueryEditorFieldType, QueryEditorProperty } from '../types';
+import { QueryEditorFieldDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../types';
 import {
   QueryEditorGroupBySection,
   QueryEditorGroupBySectionProps,
@@ -53,7 +53,7 @@ export class QueryEditorGroupByBuilder {
 
     return {
       type: QueryEditorExpressionType.Field,
-      property: this.buildProperty(QueryEditorFieldType.String),
+      property: this.buildProperty(QueryEditorPropertyType.String),
     } as QueryEditorPropertyExpression;
   }
 
@@ -68,12 +68,12 @@ export class QueryEditorGroupByBuilder {
   private buildGroupByExpression(): QueryEditorGroupByExpression {
     return {
       type: QueryEditorExpressionType.GroupBy,
-      property: this.buildProperty(QueryEditorFieldType.String),
-      interval: this.buildProperty(QueryEditorFieldType.Interval),
+      property: this.buildProperty(QueryEditorPropertyType.String),
+      interval: this.buildProperty(QueryEditorPropertyType.Interval),
     };
   }
 
-  private buildProperty(type: QueryEditorFieldType): QueryEditorProperty {
+  private buildProperty(type: QueryEditorPropertyType): QueryEditorProperty {
     return {
       name: '',
       type,

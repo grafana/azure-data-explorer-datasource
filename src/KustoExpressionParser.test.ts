@@ -1,5 +1,5 @@
 import { KustoExpressionParser } from './KustoExpressionParser';
-import { QueryEditorFieldType, QueryEditorFieldDefinition } from './editor/types';
+import { QueryEditorPropertyType, QueryEditorFieldDefinition } from './editor/types';
 import { TemplateSrv } from './test/template_srv';
 import { setTemplateSrv } from '@grafana/runtime';
 import {
@@ -30,7 +30,7 @@ describe('KustoExpressionParser', () => {
     from = {
       type: QueryEditorExpressionType.Field,
       property: {
-        type: QueryEditorFieldType.String,
+        type: QueryEditorPropertyType.String,
         name: 'StormEvents',
       },
     } as QueryEditorPropertyExpression;
@@ -66,7 +66,7 @@ describe('KustoExpressionParser', () => {
     it('should generate a valid query', () => {
       const columns: QueryEditorFieldDefinition[] = [
         {
-          type: QueryEditorFieldType.DateTime,
+          type: QueryEditorPropertyType.DateTime,
           value: 'StartTime',
         },
       ];
@@ -125,7 +125,7 @@ describe('KustoExpressionParser', () => {
     beforeEach(() => {
       columns = [
         {
-          type: QueryEditorFieldType.DateTime,
+          type: QueryEditorPropertyType.DateTime,
           value: 'StartTime',
         },
       ];
@@ -223,7 +223,7 @@ function buildWhereWithMultiOperator(values: string[]): QueryEditorArrayExpressi
           {
             type: QueryEditorExpressionType.FieldAndOperator,
             property: {
-              type: QueryEditorFieldType.String,
+              type: QueryEditorPropertyType.String,
               name: 'StateCode',
             },
             operator: {
@@ -254,7 +254,7 @@ function buildWhereWithSingleOperator(): QueryEditorArrayExpression {
           {
             type: QueryEditorExpressionType.FieldAndOperator,
             property: {
-              type: QueryEditorFieldType.String,
+              type: QueryEditorPropertyType.String,
               name: 'StateCode',
             },
             operator: {
@@ -282,11 +282,11 @@ function buildReduce(fields: string[], functions: string[], parameter = ''): Que
     const expr = {
       type: QueryEditorExpressionType.Reduce,
       property: {
-        type: QueryEditorFieldType.Number,
+        type: QueryEditorPropertyType.Number,
         name: field,
       },
       reduce: {
-        type: QueryEditorFieldType.Function,
+        type: QueryEditorPropertyType.Function,
         name: functions[i],
       },
     } as QueryEditorReduceExpression;
@@ -294,7 +294,7 @@ function buildReduce(fields: string[], functions: string[], parameter = ''): Que
       expr.parameters = [
         {
           name: 'aParam',
-          fieldType: QueryEditorFieldType.Number,
+          fieldType: QueryEditorPropertyType.Number,
           value: parameter,
           type: QueryEditorExpressionType.FunctionParameter,
         },
@@ -319,11 +319,11 @@ function buildGroupBy() {
       {
         type: QueryEditorExpressionType.GroupBy,
         property: {
-          type: QueryEditorFieldType.DateTime,
+          type: QueryEditorPropertyType.DateTime,
           name: 'StartTime',
         },
         interval: {
-          type: QueryEditorFieldType.Interval,
+          type: QueryEditorPropertyType.Interval,
           name: '1h',
         },
       } as QueryEditorGroupByExpression,
@@ -339,7 +339,7 @@ function buildGroupByWithNoTimeColumn() {
       {
         type: QueryEditorExpressionType.GroupBy,
         property: {
-          type: QueryEditorFieldType.String,
+          type: QueryEditorPropertyType.String,
           name: 'State',
         },
       } as QueryEditorGroupByExpression,

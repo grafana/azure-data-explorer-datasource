@@ -12,7 +12,7 @@ import { AdxDataSource } from 'datasource';
 import { KustoQuery, AdxDataSourceOptions, QueryExpression } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
-import { QueryEditorFieldType } from './editor/types';
+import { QueryEditorPropertyType } from './editor/types';
 import { RawQueryEditor } from './RawQueryEditor';
 import { css } from 'emotion';
 
@@ -265,7 +265,7 @@ export class QueryEditor extends PureComponent<Props, State> {
       table = this.kustoExpressionParser.fromTable(query.expression?.from, true);
       const { database } = this.props.query;
       const columns = this.schemaResolver.getColumnsForTable(database, table);
-      const timeField = columns?.find(c => c.type === QueryEditorFieldType.DateTime);
+      const timeField = columns?.find(c => c.type === QueryEditorPropertyType.DateTime);
       if (timeField) {
         let reduce = query.expression?.reduce;
         if (!reduce) {
@@ -284,11 +284,11 @@ export class QueryEditor extends PureComponent<Props, State> {
             {
               type: QueryEditorExpressionType.GroupBy,
               property: {
-                type: QueryEditorFieldType.DateTime,
+                type: QueryEditorPropertyType.DateTime,
                 name: timeField.value,
               },
               interval: {
-                type: QueryEditorFieldType.Interval,
+                type: QueryEditorPropertyType.Interval,
                 name: '$__interval',
               },
             } as QueryEditorGroupByExpression,
@@ -400,7 +400,7 @@ export class QueryEditor extends PureComponent<Props, State> {
 
     const groupable =
       columns?.filter(
-        column => column.type === QueryEditorFieldType.DateTime || column.type === QueryEditorFieldType.String
+        column => column.type === QueryEditorPropertyType.DateTime || column.type === QueryEditorPropertyType.String
       ) ?? [];
 
     const styles = getStyles();

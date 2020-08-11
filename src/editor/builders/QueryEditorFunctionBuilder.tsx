@@ -1,4 +1,4 @@
-import { QueryEditorFieldType, QueryEditorFunctionDefinition, QueryEditorFunctionParameter } from '../types';
+import { QueryEditorPropertyType, QueryEditorFunctionDefinition, QueryEditorFunctionParameter } from '../types';
 
 export class QueryEditorFunctionBuilder {
   private label: string;
@@ -13,7 +13,7 @@ export class QueryEditorFunctionBuilder {
     return this;
   }
 
-  withParameter(name: string, type: QueryEditorFieldType, description: string) {
+  withParameter(name: string, type: QueryEditorPropertyType, description: string) {
     this.parameters.push({ name, type, description });
     return this;
   }
@@ -22,7 +22,7 @@ export class QueryEditorFunctionBuilder {
     this.functions.push({
       value: this.value,
       label: this.label,
-      type: QueryEditorFieldType.Function,
+      type: QueryEditorPropertyType.Function,
       parameters: this.parameters,
     });
   }
