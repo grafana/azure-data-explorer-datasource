@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -39,6 +40,7 @@ type dataSourceData struct {
 	TenantID        string `json:"tenantId"`
 	ClusterURL      string `json:"clusterUrl"`
 	DefaultDatabase string `json:"defaultDatabase"`
+	TimeoutSeconds  int64  `json:"timeoutSeconds"`
 	Secret          string `json:"-"`
 }
 
@@ -54,6 +56,13 @@ type RequestPayload struct {
 	DB         string `json:"db"`
 	CSL        string `json:"csl"`
 	Properties string `json:"properties"`
+}
+
+// RequestProperties is the object that seralized as a string into Properties to set
+// request options like timeouts.
+// See properties under https://docs.microsoft.com/en-us/azure/data-explorer/kusto/api/rest/request#request-parameters
+type RequestProperties struct {
+	Options map[string]string
 }
 
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's
@@ -112,10 +121,39 @@ func (c *Client) TestRequest() error {
 	return nil
 }
 
+func formatTimeout(seconds int64) (string, error) {
+	if seconds >= 3600 {
+		return "", fmt.Errorf("timeout should be less than 1 hour")
+	}
+	d := time.Duration(seconds) * time.Second
+	if d.Minutes() < 1 {
+		return fmt.Sprintf("00:00:%02.0f", d.Seconds()), nil
+	}
+	tMinutes := d.Truncate(time.Minute)
+
+	tSeconds := d - tMinutes
+	return fmt.Sprintf("00:%02.0f:%02.0f)", tMinutes.Minutes(), tSeconds.Seconds()), nil
+}
+
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
 func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, error) {
+	c.TimeoutSeconds = 5
+	if c.TimeoutSeconds != 0 {
+		timeoutString, err := formatTimeout(c.TimeoutSeconds)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to encode the timeout string: %w", err)
+		}
+		propObj := RequestProperties{
+			Options: map[string]string{"servertimeout": timeoutString},
+		}
+		b, err := json.Marshal(propObj)
+		if err != nil {
+			return nil, "failed to encode request options", err
+		}
+		payload.Properties = string(b)
+	}
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(payload)
 	if err != nil {
@@ -138,7 +176,7 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, e
 	if resp.StatusCode > 299 {
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, "", err
+			return nil, "failed to read body", err
 		}
 		bodyString := string(bodyBytes)
 		if resp.StatusCode == 401 { // 401 does not have a JSON body
@@ -162,7 +200,7 @@ func tableFromJSON(rc io.Reader) (*TableResponse, error) {
 	decoder.UseNumber()
 	err := decoder.Decode(tr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode response body to json, possibly due to server timeout: %w", err)
 	}
 	if tr.Tables == nil || len(tr.Tables) == 0 {
 		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
