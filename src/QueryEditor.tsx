@@ -50,7 +50,8 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.schemaResolver = new AdxSchemaResolver(props.datasource);
+    
+    this.schemaResolver = props.datasource.schemaResolver;
     this.kustoExpressionParser = new KustoExpressionParser(this.schemaResolver);
   }
 
@@ -96,10 +97,9 @@ export class QueryEditor extends PureComponent<Props, State> {
   async componentDidMount() {
     try {
       let query = { ...this.props.query }; // mutable query
-
-      await this.schemaResolver.resolveAndCacheSchema();
+      await this.props.datasource.resolveAndCacheSchema();
       const databases = this.schemaResolver.getDatabases();
-
+      console.log('databases', databases)
       // Default first database...
       if (!query.database && databases.length) {
         if (databases[0] && databases[0].value) {

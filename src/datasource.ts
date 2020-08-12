@@ -17,13 +17,15 @@ import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
+import { AdxSchemaResolver } from 'SchemaResolver';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
-  private templateSrv: TemplateSrv;
+  private templateSrv: TemplateSrv; 
   private baseUrl: string;
-  private defaultOrFirstDatabase: string;
+  private defaultOrFirstDatabase: string; 
   private url?: string;
+  schemaResolver: AdxSchemaResolver;
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
@@ -32,6 +34,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.baseUrl = '/azuredataexplorer';
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
+    this.schemaResolver = new AdxSchemaResolver(this.getSchema.bind(this), this.getDynamicSchema.bind(this));
   }
 
   /**
@@ -143,6 +146,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       this.defaultOrFirstDatabase = databases[0].value;
       return this.defaultOrFirstDatabase;
     });
+  }
+
+  async resolveAndCacheSchema() {
+    return await this.schemaResolver.resolveAndCacheSchema();
   }
 
   async getSchema(): Promise<AdxSchema> {

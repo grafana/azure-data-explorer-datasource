@@ -1,6 +1,7 @@
-import { AdxDataSource } from './datasource';
-import { AdxColumnSchema } from 'types';
+import { AdxColumnSchema, AdxSchema } from 'types';
 import { QueryEditorFieldDefinition, QueryEditorPropertyType } from 'editor/types';
+
+type AdxDynamicSchemaResolver = (database: string, table: string, columns: string[]) =>  Promise<Record<string, AdxColumnSchema[]>>;
 
 export class AdxSchemaResolver {
   private databases: QueryEditorFieldDefinition[];
@@ -9,7 +10,7 @@ export class AdxSchemaResolver {
   private dynamicByColumn: Record<string, AdxColumnSchema>;
   private isCached: boolean;
 
-  constructor(private datasource: AdxDataSource) {
+  constructor(private schemaResolver: () => Promise<AdxSchema>, private dynamicSchemaResolver: AdxDynamicSchemaResolver) {
     this.databases = [];
     this.tablesByDatabase = {};
     this.columnsByTable = {};
@@ -40,9 +41,9 @@ export class AdxSchemaResolver {
       return;
     }
 
-    try {
-      const schema = await this.datasource.getSchema();
+    const schema = await this.schemaResolver();
 
+    try {
       for (const databaseName of Object.keys(schema.Databases)) {
         const db = schema.Databases[databaseName];
 
@@ -97,7 +98,7 @@ export class AdxSchemaResolver {
   private async getDynamicSchema(
     database: string,
     table: string,
-    columns: AdxColumnSchema[]
+    columns: AdxColumnSchema[],
   ): Promise<Record<string, QueryEditorFieldDefinition[]>> {
     const dynamicColumns = columns.filter(column => isDynamic(column)).map(column => column.Name);
 
@@ -106,7 +107,7 @@ export class AdxSchemaResolver {
     }
 
     try {
-      const schemasByColumn = await this.datasource.getDynamicSchema(database, table, dynamicColumns);
+      const schemasByColumn = await this.dynamicSchemaResolver(database, table, dynamicColumns);
       const result: Record<string, QueryEditorFieldDefinition[]> = {};
 
       for (const columnName of Object.keys(schemasByColumn)) {
