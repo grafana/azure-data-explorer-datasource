@@ -1,7 +1,11 @@
 import { AdxColumnSchema, AdxSchema } from 'types';
 import { QueryEditorFieldDefinition, QueryEditorPropertyType } from 'editor/types';
 
-type AdxDynamicSchemaResolver = (database: string, table: string, columns: string[]) =>  Promise<Record<string, AdxColumnSchema[]>>;
+type AdxDynamicSchemaResolver = (
+  database: string,
+  table: string,
+  columns: string[]
+) => Promise<Record<string, AdxColumnSchema[]>>;
 
 export class AdxSchemaResolver {
   private databases: QueryEditorFieldDefinition[];
@@ -10,7 +14,10 @@ export class AdxSchemaResolver {
   private dynamicByColumn: Record<string, AdxColumnSchema>;
   private isCached: boolean;
 
-  constructor(private schemaResolver: () => Promise<AdxSchema>, private dynamicSchemaResolver: AdxDynamicSchemaResolver) {
+  constructor(
+    private schemaResolver: () => Promise<AdxSchema>,
+    private dynamicSchemaResolver: AdxDynamicSchemaResolver
+  ) {
     this.databases = [];
     this.tablesByDatabase = {};
     this.columnsByTable = {};
@@ -98,7 +105,7 @@ export class AdxSchemaResolver {
   private async getDynamicSchema(
     database: string,
     table: string,
-    columns: AdxColumnSchema[],
+    columns: AdxColumnSchema[]
   ): Promise<Record<string, QueryEditorFieldDefinition[]>> {
     const dynamicColumns = columns.filter(column => isDynamic(column)).map(column => column.Name);
 

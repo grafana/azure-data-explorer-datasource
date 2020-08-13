@@ -21,9 +21,9 @@ import { AdxSchemaResolver } from 'SchemaResolver';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
-  private templateSrv: TemplateSrv; 
+  private templateSrv: TemplateSrv;
   private baseUrl: string;
-  private defaultOrFirstDatabase: string; 
+  private defaultOrFirstDatabase: string;
   private url?: string;
   schemaResolver: AdxSchemaResolver;
 

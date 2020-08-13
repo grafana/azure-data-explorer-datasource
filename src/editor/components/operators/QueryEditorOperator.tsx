@@ -69,7 +69,7 @@ const renderOperatorInput = (
   value: QueryEditorOperatorExpression | undefined,
   onChangeValue: (expression: QueryEditorOperatorExpression) => void,
   getSuggestions: ExpressionSuggestor,
-  templateVariableOptions: SelectableValue<string>,
+  templateVariableOptions: SelectableValue<string>
 ) => {
   if (!operator) {
     return null;

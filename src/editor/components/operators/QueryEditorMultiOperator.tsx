@@ -7,7 +7,7 @@ import {
   QueryEditorExpression,
   QueryEditorExpressionType,
 } from '../../expressions';
-import {SelectableValue} from "@grafana/data";
+import { SelectableValue } from '@grafana/data';
 
 interface Props {
   values: string[] | undefined;
@@ -63,7 +63,7 @@ export class QueryEditorMultiOperator extends PureComponent<Props> {
         value={current}
         onChange={this.onChange}
         onCreateOption={this.onCreate}
-        noOptionsMessage='No options found'
+        noOptionsMessage="No options found"
         isClearable
       />
     );

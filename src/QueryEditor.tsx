@@ -99,7 +99,7 @@ export class QueryEditor extends PureComponent<Props, State> {
       let query = { ...this.props.query }; // mutable query
       await this.props.datasource.resolveAndCacheSchema();
       const databases = this.schemaResolver.getDatabases();
-  
+
       // Default first database...
       if (!query.database && databases.length) {
         if (databases[0] && databases[0].value) {

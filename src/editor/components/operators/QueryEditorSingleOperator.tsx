@@ -47,7 +47,7 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
   };
 
   getSuggestions = async (txt: string) => {
-     return this.props.getSuggestions(txt, this.props.expression);
+    return this.props.getSuggestions(txt, this.props.expression);
   };
 
   render() {
@@ -71,7 +71,7 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
         allowCustomValue={true}
         backspaceRemovesValue
         isClearable
-        noOptionsMessage='No options found'
+        noOptionsMessage="No options found"
       />
     );
   }
