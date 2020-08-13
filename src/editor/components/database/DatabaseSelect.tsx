@@ -26,7 +26,8 @@ export const DatabaseSelect: React.FC<Props> = props => {
           onChange={db => {
             props.onChange(db.value);
           }}
-          allowCustomValue={true}
+          // Should we, really?
+          // allowCustomValue={true}
         />
       </div>
       {props.children}

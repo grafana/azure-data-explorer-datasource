@@ -93,7 +93,6 @@ export const QueryEditorReduce: React.FC<Props> = props => {
       <QueryEditorField
         value={reduce}
         fields={props.functions}
-        templateVariableOptions={props.templateVariableOptions}
         onChange={onChangeReduce}
         placeholder="Choose aggregation function..."
       />

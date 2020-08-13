@@ -7,6 +7,7 @@ import {
   QueryEditorExpression,
   QueryEditorExpressionType,
 } from '../../expressions';
+import {SelectableValue} from "@grafana/data";
 
 interface Props {
   values: string[] | undefined;
@@ -14,6 +15,7 @@ interface Props {
   operator: QueryEditorOperatorDefinition;
   getSuggestions: ExpressionSuggestor;
   expression: QueryEditorExpression;
+  templateVariableOptions: SelectableValue<string>;
 }
 
 export class QueryEditorMultiOperator extends PureComponent<Props> {
@@ -43,7 +45,6 @@ export class QueryEditorMultiOperator extends PureComponent<Props> {
   };
 
   getSuggestions = (txt: string) => {
-    console.log('Getting suggestions', txt);
     return this.props.getSuggestions(txt, this.props.expression);
   };
 
@@ -56,13 +57,13 @@ export class QueryEditorMultiOperator extends PureComponent<Props> {
     return (
       <AsyncMultiSelect
         width={30}
-        placeholder="Enter values..."
+        defaultOptions={[this.props.templateVariableOptions]}
+        placeholder="Start typing to add filters..."
         loadOptions={this.getSuggestions}
         value={current}
         onChange={this.onChange}
         onCreateOption={this.onCreate}
-        allowCustomValue={true}
-        noOptionsMessage={'Start typing to add filters...'}
+        noOptionsMessage='No options found'
       />
     );
   }

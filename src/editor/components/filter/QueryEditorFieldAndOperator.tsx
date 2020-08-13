@@ -103,6 +103,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
             operators={operators}
             onChange={this.onOperatorChange}
             getSuggestions={getSuggestions}
+            templateVariableOptions={templateVariableOptions}
           />
         )}
       </div>

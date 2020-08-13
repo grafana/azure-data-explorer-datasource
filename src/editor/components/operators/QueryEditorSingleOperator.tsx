@@ -15,6 +15,7 @@ interface Props {
   operator: QueryEditorOperatorDefinition;
   getSuggestions: ExpressionSuggestor;
   expression: QueryEditorExpression;
+  templateVariableOptions: SelectableValue<string>;
 }
 export class QueryEditorSingleOperator extends PureComponent<Props> {
   onChange = (evt: SelectableValue<any>) => {
@@ -42,7 +43,7 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
   };
 
   render() {
-    const { value } = this.props;
+    const { value, templateVariableOptions } = this.props;
     const current = value
       ? {
           label: value,
@@ -53,13 +54,14 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
     return (
       <AsyncSelect
         width={30}
-        placeholder="Enter value..."
+        placeholder="Start typing to add filters..."
         loadOptions={this.getSuggestions}
+        defaultOptions={[templateVariableOptions]}
         value={current}
         onChange={this.onChange}
         onCreateOption={this.onCreate}
         allowCustomValue={true}
-        noOptionsMessage={'Start typing to add filters...'}
+        noOptionsMessage='No options found'
       />
     );
   }

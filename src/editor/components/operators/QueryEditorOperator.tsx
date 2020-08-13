@@ -15,6 +15,7 @@ interface Props {
   operators: QueryEditorOperatorDefinition[];
   onChange: (expression: QueryEditorOperatorExpression) => void;
   getSuggestions: ExpressionSuggestor;
+  templateVariableOptions: SelectableValue<string>;
 }
 
 export class QueryEditorOperator extends PureComponent<Props> {
@@ -35,7 +36,7 @@ export class QueryEditorOperator extends PureComponent<Props> {
   };
 
   render() {
-    const { operators, value, getSuggestions } = this.props;
+    const { operators, value, getSuggestions, templateVariableOptions } = this.props;
     const styles = getStyles();
     const { operator } = value!;
 
@@ -57,7 +58,7 @@ export class QueryEditorOperator extends PureComponent<Props> {
             })}
           />
         </div>
-        {renderOperatorInput(operator, value, this.onChangeValue, getSuggestions)}
+        {renderOperatorInput(operator, value, this.onChangeValue, getSuggestions, templateVariableOptions)}
       </>
     );
   }
@@ -67,7 +68,8 @@ const renderOperatorInput = (
   operator: QueryEditorOperatorDefinition | undefined,
   value: QueryEditorOperatorExpression | undefined,
   onChangeValue: (expression: QueryEditorOperatorExpression) => void,
-  getSuggestions: ExpressionSuggestor
+  getSuggestions: ExpressionSuggestor,
+  templateVariableOptions: SelectableValue<string>,
 ) => {
   if (!operator) {
     return null;
@@ -84,6 +86,7 @@ const renderOperatorInput = (
           onChange={onChangeValue}
           getSuggestions={getSuggestions}
           expression={value!}
+          templateVariableOptions={templateVariableOptions}
         />
       </div>
     );
@@ -106,6 +109,7 @@ const renderOperatorInput = (
           onChange={onChangeValue}
           getSuggestions={getSuggestions}
           expression={value!}
+          templateVariableOptions={templateVariableOptions}
         />
       </div>
     );

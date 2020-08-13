@@ -58,7 +58,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     const q = interpolateKustoQuery(target.query);
     return {
       ...target,
-      query: this.templateSrv.replace(q, scopedVars),
+      query: this.templateSrv.replace(q, scopedVars, 'singlequote');,
       database: this.templateSrv.replace(target.database, scopedVars),
     };
   }
