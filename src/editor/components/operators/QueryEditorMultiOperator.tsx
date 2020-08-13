@@ -64,6 +64,7 @@ export class QueryEditorMultiOperator extends PureComponent<Props> {
         onChange={this.onChange}
         onCreateOption={this.onCreate}
         noOptionsMessage='No options found'
+        isClearable
       />
     );
   }

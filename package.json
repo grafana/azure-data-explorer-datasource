@@ -18,9 +18,13 @@
     "@grafana/ui": "latest",
     "@testing-library/react": "^10.4.6",
     "@types/angular": "1.6.49",
+    "@types/debounce-promise": "^3.1.2",
     "@types/grafana": "github:CorpGlory/types-grafana.git",
     "@types/lodash": "^4.14.158",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "monaco-editor": "0.17.0"
+  },
+  "dependencies": {
+    "debounce-promise": "^3.1.2"
   }
 }

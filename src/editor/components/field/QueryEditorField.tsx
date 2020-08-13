@@ -5,7 +5,7 @@ import { QueryEditorFieldDefinition, QueryEditorProperty } from '../../types';
 
 interface Props {
   fields: QueryEditorFieldDefinition[];
-  templateVariableOptions: SelectableValue<string>;
+  templateVariableOptions?: SelectableValue<string>;
   value?: QueryEditorProperty;
   onChange: (property: QueryEditorProperty) => void;
   placeholder?: string;
@@ -21,7 +21,7 @@ export const QueryEditorField: React.FC<Props> = props => {
       width={30}
       onChange={onChange}
       value={value}
-      options={[props.templateVariableOptions, ...options]}
+      options={props.templateVariableOptions ? [props.templateVariableOptions, ...options] : options}
       placeholder={props.placeholder}
       menuPlacement="bottom"
     />
@@ -56,7 +56,7 @@ const useOnChange = (props: Props) => {
       const { value } = selectable;
       let field = props.fields.find(o => o.value === value);
       if (!field) {
-        field = props.templateVariableOptions.options.find(o => o.value === value);
+        field = props.templateVariableOptions?.options.find(o => o.value === value);
       }
 
       if (field) {

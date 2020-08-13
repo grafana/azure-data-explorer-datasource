@@ -19,6 +19,15 @@ interface Props {
 }
 export class QueryEditorSingleOperator extends PureComponent<Props> {
   onChange = (evt: SelectableValue<any>) => {
+    // Handle clearing the value
+    if (evt === null) {
+      this.props.onChange({
+        type: QueryEditorExpressionType.Operator,
+        value: '',
+        operator: this.props.operator,
+      });
+      return;
+    }
     this.props.onChange({
       type: QueryEditorExpressionType.Operator,
       value: `${evt.value}`, // Currently strings only
@@ -37,9 +46,8 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
     });
   };
 
-  getSuggestions = (txt: string) => {
-    console.log('Getting suggestions', txt);
-    return this.props.getSuggestions(txt, this.props.expression);
+  getSuggestions = async (txt: string) => {
+     return this.props.getSuggestions(txt, this.props.expression);
   };
 
   render() {
@@ -61,6 +69,8 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
         onChange={this.onChange}
         onCreateOption={this.onCreate}
         allowCustomValue={true}
+        backspaceRemovesValue
+        isClearable
         noOptionsMessage='No options found'
       />
     );

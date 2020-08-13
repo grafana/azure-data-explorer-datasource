@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { debounce } from 'lodash';
+import debounce from 'debounce-promise';
 import { QueryEditorProps, SelectableValue, DataQueryRequest } from '@grafana/data';
 import {
   KustoFromEditorSection,
@@ -50,7 +50,7 @@ export class QueryEditor extends PureComponent<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    
+
     this.schemaResolver = props.datasource.schemaResolver;
     this.kustoExpressionParser = new KustoExpressionParser(this.schemaResolver);
   }
@@ -99,7 +99,7 @@ export class QueryEditor extends PureComponent<Props, State> {
       let query = { ...this.props.query }; // mutable query
       await this.props.datasource.resolveAndCacheSchema();
       const databases = this.schemaResolver.getDatabases();
-      console.log('databases', databases)
+  
       // Default first database...
       if (!query.database && databases.length) {
         if (databases[0] && databases[0].value) {
@@ -359,9 +359,8 @@ export class QueryEditor extends PureComponent<Props, State> {
       });
   };
 
-  getSuggestionsNicely = debounce(this.getSuggestions, 250, {
+  getSuggestionsNicely = debounce(this.getSuggestions, 300, {
     leading: false,
-    trailing: true,
   });
 
   render() {
