@@ -1,20 +1,14 @@
 import React, { PureComponent } from 'react';
 import { AsyncSelect } from '@grafana/ui';
 import { ExpressionSuggestor } from '../types';
-import { QueryEditorOperatorDefinition } from '../../types';
+import { QueryEditorOperatorDefinition, QueryEditorOperator } from '../../types';
 import { SelectableValue } from '@grafana/data';
-import {
-  QueryEditorSingleOperatorExpression,
-  QueryEditorExpression,
-  QueryEditorExpressionType,
-} from '../../expressions';
 
 interface Props {
   value: string | undefined;
-  onChange: (expression: QueryEditorSingleOperatorExpression) => void;
+  onChange: (operator: QueryEditorOperator) => void;
   operator: QueryEditorOperatorDefinition;
   getSuggestions: ExpressionSuggestor;
-  expression: QueryEditorExpression;
   templateVariableOptions: SelectableValue<string>;
 }
 export class QueryEditorSingleOperator extends PureComponent<Props> {
@@ -22,16 +16,14 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
     // Handle clearing the value
     if (evt === null) {
       this.props.onChange({
-        type: QueryEditorExpressionType.Operator,
         value: '',
-        operator: this.props.operator,
+        name: this.props.operator.value,
       });
       return;
     }
     this.props.onChange({
-      type: QueryEditorExpressionType.Operator,
       value: `${evt.value}`, // Currently strings only
-      operator: this.props.operator,
+      name: this.props.operator.value,
     });
   };
 
@@ -40,14 +32,13 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
       return;
     }
     this.props.onChange({
-      type: QueryEditorExpressionType.Operator,
       value,
-      operator: this.props.operator,
+      name: this.props.operator.value,
     });
   };
 
   getSuggestions = async (txt: string) => {
-    return this.props.getSuggestions(txt, this.props.expression);
+    return this.props.getSuggestions(txt);
   };
 
   render() {

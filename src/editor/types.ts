@@ -12,13 +12,11 @@ export interface QueryEditorProperty {
   name: string;
 }
 
-export interface QueryEditorOperator<T> {
+export interface QueryEditorOperator<T = any> {
+  name: string;
   value: T;
 }
 
-export interface QueryEditorArrayOperator<T> {
-  values: T[];
-}
 export interface QueryEditorOperatorDefinition {
   value: string;
   supportTypes: QueryEditorPropertyType[];

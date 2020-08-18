@@ -5,15 +5,12 @@ import {
   QueryEditorFieldAndOperatorExpression,
   QueryEditorGroupByExpression,
   QueryEditorOperatorExpression,
-  QueryEditorBoolOperatorExpression,
-  QueryEditorMultiOperatorExpression,
-  QueryEditorSingleOperatorExpression,
   QueryEditorRepeaterExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
   QueryEditorArrayExpression,
 } from './expressions';
-import { QueryEditorPropertyType } from './types';
+import { QueryEditorPropertyType, QueryEditorOperator } from './types';
 
 export const isReduceExpression = (expression: QueryEditorExpression): expression is QueryEditorReduceExpression => {
   return (expression as QueryEditorReduceExpression)?.type === QueryEditorExpressionType.Reduce;
@@ -43,26 +40,20 @@ export const isDateGroupBy = (expression: QueryEditorExpression): boolean => {
   return (expression as QueryEditorGroupByExpression)?.property?.type === QueryEditorPropertyType.DateTime;
 };
 
-export const isBoolOperator = (
-  expression: QueryEditorOperatorExpression | undefined
-): expression is QueryEditorBoolOperatorExpression => {
-  return typeof (expression as QueryEditorBoolOperatorExpression)?.value === 'boolean';
+export const isBoolOperator = (operator: QueryEditorOperator | undefined): operator is QueryEditorOperator<boolean> => {
+  return typeof operator?.value === 'boolean';
 };
 
-export const isMultiOperator = (
-  expression: QueryEditorOperatorExpression | undefined
-): expression is QueryEditorMultiOperatorExpression => {
-  return Array.isArray((expression as QueryEditorMultiOperatorExpression)?.values);
+export const isMultiOperator = (operator: QueryEditorOperator | undefined): operator is QueryEditorOperator<any[]> => {
+  return Array.isArray(operator?.value);
 };
 
 export const isOperator = (expression: QueryEditorExpression): expression is QueryEditorOperatorExpression => {
   return (expression as QueryEditorOperatorExpression)?.type === QueryEditorExpressionType.Operator;
 };
 
-export const isSingleOperator = (
-  expression: QueryEditorOperatorExpression | undefined
-): expression is QueryEditorSingleOperatorExpression => {
-  return typeof (expression as QueryEditorSingleOperatorExpression)?.value === 'string';
+export const isSingleOperator = (operator: QueryEditorOperator | undefined): operator is QueryEditorOperator<any> => {
+  return !isMultiOperator(operator);
 };
 
 export const isRepeater = (expression: QueryEditorExpression): expression is QueryEditorRepeaterExpression => {

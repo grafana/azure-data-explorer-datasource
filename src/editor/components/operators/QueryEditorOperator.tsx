@@ -3,42 +3,81 @@ import { css } from 'emotion';
 import { Select, stylesFactory, Button } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { ExpressionSuggestor } from '../types';
-import { QueryEditorOperatorDefinition } from '../../types';
+import { QueryEditorOperatorDefinition, QueryEditorOperator, QueryEditorProperty } from '../../types';
 import { QueryEditorMultiOperator } from './QueryEditorMultiOperator';
 import { QueryEditorSingleOperator } from './QueryEditorSingleOperator';
 import { QueryEditorBoolOperator } from './QueryEditorBoolOperator';
-import { QueryEditorOperatorExpression } from '../../expressions';
 import { isMultiOperator, isBoolOperator, isSingleOperator } from '../../guards';
+import { parseOperatorValue } from './parser';
 
 interface Props {
-  value?: QueryEditorOperatorExpression;
+  value?: QueryEditorOperator;
+  property?: QueryEditorProperty;
   operators: QueryEditorOperatorDefinition[];
-  onChange: (expression: QueryEditorOperatorExpression) => void;
+  onChange: (operator: QueryEditorOperator) => void;
   getSuggestions: ExpressionSuggestor;
   templateVariableOptions: SelectableValue<string>;
 }
 
-export class QueryEditorOperator extends PureComponent<Props> {
+export const definitionToOperator = (definition: QueryEditorOperatorDefinition): QueryEditorOperator => {
+  if (definition.booleanValues) {
+    const defaultValue: QueryEditorOperator<boolean> = {
+      name: definition.value,
+      value: false,
+    };
+
+    return defaultValue;
+  }
+
+  if (definition.multipleValues) {
+    const defaultValue: QueryEditorOperator<any[]> = {
+      name: definition.value,
+      value: [],
+    };
+
+    return defaultValue;
+  }
+
+  const defaultValue: QueryEditorOperator = {
+    name: definition.value,
+    value: '',
+  };
+
+  return defaultValue;
+};
+
+export class QueryEditorOperatorComponent extends PureComponent<Props> {
   onChangeOperator = (selectable: SelectableValue<string>) => {
     if (selectable && selectable.value) {
-      const v = this.props.operators.find(o => o.value === selectable.value);
-      this.props.onChange(
-        verifyOperatorValues({
-          ...this.props.value!,
-          operator: v!,
-        })
-      );
+      const { property, value } = this.props;
+      const definition = this.props.operators.find(o => o.value === selectable.value);
+
+      if (!definition || !property) {
+        return;
+      }
+
+      if (!value) {
+        this.props.onChange(definitionToOperator(definition));
+        return;
+      }
+
+      const operator = definitionToOperator(definition);
+      const defaultValue = operator.value;
+      const currentValue = value.value;
+      operator.value = parseOperatorValue(property, definition, currentValue, defaultValue);
+
+      this.props.onChange(operator);
     }
   };
 
-  onChangeValue = (expression: QueryEditorOperatorExpression) => {
-    this.props.onChange(expression);
+  onChangeValue = (operator: QueryEditorOperator) => {
+    this.props.onChange(operator);
   };
 
   render() {
     const { operators, value, getSuggestions, templateVariableOptions } = this.props;
     const styles = getStyles();
-    const { operator } = value!;
+    const definition = operators.find(o => o.value === value?.name);
 
     return (
       <>
@@ -46,69 +85,67 @@ export class QueryEditorOperator extends PureComponent<Props> {
           <Select
             isSearchable={true}
             options={operators}
-            value={operator?.value}
+            value={definition?.value}
             onChange={this.onChangeOperator}
             menuPlacement="bottom"
             renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
               return (
                 <Button ref={ref} {...otherProps} variant="secondary">
-                  {operator?.label || operator?.value || '?'}
+                  {definition?.label || definition?.value || '?'}
                 </Button>
               );
             })}
           />
         </div>
-        {renderOperatorInput(operator, value, this.onChangeValue, getSuggestions, templateVariableOptions)}
+        {renderOperatorInput(definition, value, this.onChangeValue, getSuggestions, templateVariableOptions)}
       </>
     );
   }
 }
 
 const renderOperatorInput = (
-  operator: QueryEditorOperatorDefinition | undefined,
-  value: QueryEditorOperatorExpression | undefined,
-  onChangeValue: (expression: QueryEditorOperatorExpression) => void,
+  definition: QueryEditorOperatorDefinition | undefined,
+  operator: QueryEditorOperator | undefined,
+  onChangeValue: (expression: QueryEditorOperator) => void,
   getSuggestions: ExpressionSuggestor,
   templateVariableOptions: SelectableValue<string>
 ) => {
-  if (!operator) {
+  if (!definition) {
     return null;
   }
 
   const styles = getStyles();
 
-  if (operator.multipleValues && (isMultiOperator(value) || !value)) {
+  if (definition.multipleValues && (isMultiOperator(operator) || !operator)) {
     return (
       <div className={styles.container}>
         <QueryEditorMultiOperator
-          operator={operator}
-          values={value?.values ?? []}
+          operator={definition}
+          values={operator?.value ?? []}
           onChange={onChangeValue}
           getSuggestions={getSuggestions}
-          expression={value!}
           templateVariableOptions={templateVariableOptions}
         />
       </div>
     );
   }
 
-  if (operator.booleanValues && (isBoolOperator(value) || !value)) {
+  if (definition.booleanValues && (isBoolOperator(operator) || !operator)) {
     return (
       <div className={styles.container}>
-        <QueryEditorBoolOperator operator={operator} value={value?.value} onChange={onChangeValue} />
+        <QueryEditorBoolOperator operator={definition} value={operator?.value} onChange={onChangeValue} />
       </div>
     );
   }
 
-  if (!operator.multipleValues && (isSingleOperator(value) || !value)) {
+  if (!definition.multipleValues && (isSingleOperator(operator) || !operator)) {
     return (
       <div className={styles.container}>
         <QueryEditorSingleOperator
-          operator={operator}
-          value={value?.value}
+          operator={definition}
+          value={operator?.value}
           onChange={onChangeValue}
           getSuggestions={getSuggestions}
-          expression={value!}
           templateVariableOptions={templateVariableOptions}
         />
       </div>
@@ -117,39 +154,6 @@ const renderOperatorInput = (
 
   return null;
 };
-
-export function verifyOperatorValues(exp: QueryEditorOperatorExpression): QueryEditorOperatorExpression {
-  const { operator } = exp;
-  const untyped: any = exp;
-
-  if (operator.multipleValues) {
-    let values: string[] = untyped.values;
-    if (!Array.isArray(values)) {
-      values = [];
-    }
-    if (!!!values.length) {
-      if (untyped.value) {
-        values.push(untyped.value); // keep the old single value
-      }
-    }
-    return {
-      ...exp,
-      values,
-    } as QueryEditorOperatorExpression;
-  }
-
-  if (operator.booleanValues) {
-    return {
-      ...exp,
-      value: untyped.value ? true : false,
-    } as QueryEditorOperatorExpression;
-  }
-
-  return {
-    ...exp,
-    value: untyped.value ?? '',
-  } as QueryEditorOperatorExpression;
-}
 
 const getStyles = stylesFactory(() => {
   return {

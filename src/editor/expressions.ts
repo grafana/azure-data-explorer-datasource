@@ -1,4 +1,9 @@
-import { QueryEditorPropertyType, QueryEditorOperatorDefinition, QueryEditorProperty } from './types';
+import {
+  QueryEditorPropertyType,
+  QueryEditorOperatorDefinition,
+  QueryEditorProperty,
+  QueryEditorOperator,
+} from './types';
 
 export enum QueryEditorExpressionType {
   Field = 'field',
@@ -38,7 +43,7 @@ export interface QueryEditorPropertyExpression extends QueryEditorExpression {
 }
 export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpression {
   property: QueryEditorProperty;
-  operator: QueryEditorOperatorExpression;
+  operator: QueryEditorOperator;
 }
 
 export interface QueryEditorFunctionParameterExpression extends QueryEditorExpression {

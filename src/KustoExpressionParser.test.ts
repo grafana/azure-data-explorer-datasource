@@ -1,13 +1,11 @@
 import { KustoExpressionParser } from './KustoExpressionParser';
-import { QueryEditorPropertyType, QueryEditorFieldDefinition } from './editor/types';
+import { QueryEditorPropertyType, QueryEditorFieldDefinition, QueryEditorOperator } from './editor/types';
 import { TemplateSrv } from './test/template_srv';
 import { setTemplateSrv } from '@grafana/runtime';
 import {
   QueryEditorPropertyExpression,
-  QueryEditorMultiOperatorExpression,
   QueryEditorFieldAndOperatorExpression,
   QueryEditorRepeaterExpression,
-  QueryEditorSingleOperatorExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
   QueryEditorExpressionType,
@@ -227,16 +225,9 @@ function buildWhereWithMultiOperator(values: string[]): QueryEditorArrayExpressi
               name: 'StateCode',
             },
             operator: {
-              type: QueryEditorExpressionType.Operator,
-              operator: {
-                value: '!in',
-                multipleValues: true,
-                booleanValues: false,
-                description: 'not in (case-sensitive)',
-                label: '!in',
-              },
-              values: values,
-            } as QueryEditorMultiOperatorExpression,
+              name: '!in',
+              value: values,
+            } as QueryEditorOperator<string[]>,
           } as QueryEditorFieldAndOperatorExpression,
         ],
       } as QueryEditorArrayExpression,
@@ -258,16 +249,9 @@ function buildWhereWithSingleOperator(): QueryEditorArrayExpression {
               name: 'StateCode',
             },
             operator: {
-              type: QueryEditorExpressionType.Operator,
-              operator: {
-                value: '==',
-                multipleValues: true,
-                booleanValues: false,
-                description: 'not in (case-sensitive)',
-                label: '==',
-              },
+              name: '==',
               value: 'NY',
-            } as QueryEditorSingleOperatorExpression,
+            } as QueryEditorOperator<string>,
           } as QueryEditorFieldAndOperatorExpression,
         ],
       } as QueryEditorArrayExpression,

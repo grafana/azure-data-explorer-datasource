@@ -3,7 +3,7 @@ import { css } from 'emotion';
 import { QueryEditorOperatorDefinition, QueryEditorFieldDefinition } from '../../types';
 import { QueryEditorSectionProps, QueryEditorSection } from '../QueryEditorSection';
 import { SelectableValue } from '@grafana/data';
-import { ExpressionSuggestor } from '../types';
+import { SkippableExpressionSuggestor } from '../types';
 import {
   QueryEditorExpression,
   QueryEditorArrayExpression,
@@ -24,7 +24,7 @@ export interface QueryEditorFilterSectionProps extends QueryEditorSectionProps {
   templateVariableOptions: SelectableValue<string>;
   value: QueryEditorArrayExpression;
   onChange: (value: QueryEditorArrayExpression) => void;
-  getSuggestions: ExpressionSuggestor;
+  getSuggestions: SkippableExpressionSuggestor;
 }
 
 export const QueryEditorFilterSection = (

@@ -12,7 +12,7 @@ import { AdxDataSource } from 'datasource';
 import { KustoQuery, AdxDataSourceOptions, QueryExpression } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
-import { QueryEditorPropertyType } from './editor/types';
+import { QueryEditorPropertyType, QueryEditorProperty } from './editor/types';
 import { RawQueryEditor } from './RawQueryEditor';
 import { css } from 'emotion';
 
@@ -309,12 +309,12 @@ export class QueryEditor extends PureComponent<Props, State> {
   }
 
   // The debounced version is passed down as properties
-  getSuggestions = async (txt: string, skip: QueryEditorExpression): Promise<Array<SelectableValue<string>>> => {
+  getSuggestions = async (txt: string, skip?: QueryEditorProperty): Promise<Array<SelectableValue<string>>> => {
     const { query } = this.props;
 
     // For now just support finding distinct field values
     const from = this.kustoExpressionParser.fromTable(query.expression?.from);
-    const field = (skip as any)?.property?.name;
+    const field = skip?.name;
 
     if (!from || !field) {
       return Promise.resolve([]);

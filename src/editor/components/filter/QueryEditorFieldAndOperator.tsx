@@ -1,17 +1,19 @@
 import React, { PureComponent } from 'react';
 import { css } from 'emotion';
+import _ from 'lodash';
 import { stylesFactory } from '@grafana/ui';
-import { ExpressionSuggestor } from '../types';
-import { QueryEditorFieldDefinition, QueryEditorOperatorDefinition, QueryEditorProperty } from '../../types';
-import { QueryEditorField } from '../field/QueryEditorField';
-import { QueryEditorOperator, verifyOperatorValues } from '../operators/QueryEditorOperator';
-import { SelectableValue } from '@grafana/data';
+import { SkippableExpressionSuggestor } from '../types';
 import {
-  QueryEditorFieldAndOperatorExpression,
-  QueryEditorOperatorExpression,
-  QueryEditorExpressionType,
-  QueryEditorExpression,
-} from '../../expressions';
+  QueryEditorFieldDefinition,
+  QueryEditorOperatorDefinition,
+  QueryEditorProperty,
+  QueryEditorOperator,
+} from '../../types';
+import { QueryEditorField } from '../field/QueryEditorField';
+import { QueryEditorOperatorComponent, definitionToOperator } from '../operators/QueryEditorOperator';
+import { SelectableValue } from '@grafana/data';
+import { QueryEditorFieldAndOperatorExpression } from '../../expressions';
+import { parseOperatorValue } from '../operators/parser';
 
 interface Props {
   value?: QueryEditorFieldAndOperatorExpression;
@@ -19,7 +21,7 @@ interface Props {
   templateVariableOptions: SelectableValue<string>;
   operators: QueryEditorOperatorDefinition[];
   onChange: (expression: QueryEditorFieldAndOperatorExpression) => void;
-  getSuggestions: ExpressionSuggestor;
+  getSuggestions: SkippableExpressionSuggestor;
 }
 
 interface State {
@@ -49,32 +51,39 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
     return operators;
   };
 
-  onFieldChanged = (expression: QueryEditorProperty) => {
-    let next = {
+  onFieldChanged = (property: QueryEditorProperty) => {
+    let next: QueryEditorFieldAndOperatorExpression = {
       ...this.props.value!,
-      property: expression,
+      property,
     };
 
-    const operators = this.updateOperators(expression);
-    const currentOperator = next.operator?.operator?.value;
-    if (operators.length && !operators.find(op => op.value === currentOperator)) {
-      next.operator = {
-        type: QueryEditorExpressionType.Operator,
-        operator: {
-          ...operators[0],
-        },
-      };
+    const operators = this.updateOperators(property);
+    const currentOperator = next.operator?.name;
+    const definition = operators.find(op => op.value === currentOperator);
+
+    if (operators.length && !definition) {
+      next.operator = definitionToOperator(operators[0]);
+      const defaultValue = next.operator.value;
+      const currentValue = this.props.value?.operator.value;
+      next.operator.value = parseOperatorValue(next.property, operators[0], currentValue, defaultValue);
+    }
+
+    if (!definition) {
+      return this.props.onChange(next);
     }
 
     // Give it default values
-    next.operator = verifyOperatorValues(next.operator);
+    next.operator = definitionToOperator(definition);
+    const defaultValue = next.operator.value;
+    const currentValue = this.props.value?.operator.value;
+    next.operator.value = parseOperatorValue(next.property, definition, currentValue, defaultValue);
     this.props.onChange(next);
   };
 
-  onOperatorChange = (expression: QueryEditorOperatorExpression) => {
+  onOperatorChange = (operator: QueryEditorOperator) => {
     this.props.onChange({
       ...this.props.value!,
-      operator: expression,
+      operator,
     });
   };
 
@@ -84,8 +93,8 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
 
     const styles = getStyles();
     const showOperators = value?.operator || value?.property;
-    const getSuggestions = (txt: string, skip: QueryEditorExpression) => {
-      return this.props.getSuggestions(txt, this.props.value!);
+    const getSuggestions = (txt: string) => {
+      return this.props.getSuggestions(txt, this.props.value?.property);
     };
 
     return (
@@ -98,11 +107,12 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
           placeholder="Choose column..."
         />
         {showOperators && (
-          <QueryEditorOperator
+          <QueryEditorOperatorComponent
             value={value?.operator}
             operators={operators}
             onChange={this.onOperatorChange}
             getSuggestions={getSuggestions}
+            property={value?.property}
             templateVariableOptions={templateVariableOptions}
           />
         )}

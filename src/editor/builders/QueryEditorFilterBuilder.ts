@@ -3,6 +3,7 @@ import { QueryEditorFilterSectionProps, QueryEditorFilterSection } from '../comp
 import { QueryEditorOperatorDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../types';
 import { QueyEditorOperatorBuilder } from './QueryEditorOperatorBuilder';
 import { QueryEditorFieldAndOperatorExpression, QueryEditorExpressionType } from '../expressions';
+import { definitionToOperator } from '../components/operators/QueryEditorOperator';
 
 export class QueryEditorFilterBuilder {
   private operators: QueryEditorOperatorDefinition[];
@@ -44,12 +45,14 @@ export class QueryEditorFilterBuilder {
   // }
 
   private buildOperatorExpression(): QueryEditorFieldAndOperatorExpression {
+    const operator = this.operators[0];
+
     return {
       type: QueryEditorExpressionType.FieldAndOperator,
       property: this.buildFieldExpression(),
       operator: {
-        type: QueryEditorExpressionType.Operator,
-        operator: this.operators[0],
+        name: operator.value,
+        value: definitionToOperator(operator),
       },
     };
   }

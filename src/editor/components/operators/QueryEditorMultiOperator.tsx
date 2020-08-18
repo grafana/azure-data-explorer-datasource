@@ -1,20 +1,14 @@
 import React, { PureComponent } from 'react';
 import { AsyncMultiSelect } from '@grafana/ui';
 import { ExpressionSuggestor } from '../types';
-import { QueryEditorOperatorDefinition } from '../../types';
-import {
-  QueryEditorMultiOperatorExpression,
-  QueryEditorExpression,
-  QueryEditorExpressionType,
-} from '../../expressions';
+import { QueryEditorOperatorDefinition, QueryEditorOperator } from '../../types';
 import { SelectableValue } from '@grafana/data';
 
 interface Props {
   values: string[] | undefined;
-  onChange: (expression: QueryEditorMultiOperatorExpression) => void;
+  onChange: (expression: QueryEditorOperator<string[]>) => void;
   operator: QueryEditorOperatorDefinition;
   getSuggestions: ExpressionSuggestor;
-  expression: QueryEditorExpression;
   templateVariableOptions: SelectableValue<string>;
 }
 
@@ -26,9 +20,8 @@ export class QueryEditorMultiOperator extends PureComponent<Props> {
     // Append the new value
     const values = [...this.props.values, value];
     this.props.onChange({
-      type: QueryEditorExpressionType.Operator,
-      values,
-      operator: this.props.operator,
+      value: values,
+      name: this.props.operator.value,
     });
   };
 
@@ -38,14 +31,13 @@ export class QueryEditorMultiOperator extends PureComponent<Props> {
     }
 
     this.props.onChange({
-      type: QueryEditorExpressionType.Operator,
-      values: selectable.map(s => s.value),
-      operator: this.props.operator,
+      value: selectable.map(s => s.value),
+      name: this.props.operator.value,
     });
   };
 
   getSuggestions = (txt: string) => {
-    return this.props.getSuggestions(txt, this.props.expression);
+    return this.props.getSuggestions(txt);
   };
 
   render() {

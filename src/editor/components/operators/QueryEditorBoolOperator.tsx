@@ -1,12 +1,11 @@
 import React, { useCallback } from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorOperatorDefinition } from '../../types';
-import { QueryEditorBoolOperatorExpression, QueryEditorExpressionType } from '../../expressions';
+import { QueryEditorOperatorDefinition, QueryEditorOperator } from '../../types';
 
 interface Props {
   value: boolean | undefined;
-  onChange: (expression: QueryEditorBoolOperatorExpression) => void;
+  onChange: (expression: QueryEditorOperator<boolean>) => void;
   operator: QueryEditorOperatorDefinition;
 }
 
@@ -23,8 +22,7 @@ export const QueryEditorBoolOperator: React.FC<Props> = props => {
       }
 
       props.onChange({
-        type: QueryEditorExpressionType.Operator,
-        operator: props.operator,
+        name: props.operator.value,
         value: selectable.value,
       });
     },

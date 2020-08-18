@@ -120,13 +120,13 @@ export class KustoExpressionParser {
 
     // we should skip having the whole operator object
     // and only have the value here directly on the operator.
-    where += `${expression.operator.operator.value} `;
+    where += `${expression.operator.name} `;
 
     // we should probably break this kind of code out into smaller function that
     // can be reused in the parser.
     if (isMultiOperator(expression.operator)) {
       where += '(';
-      where += expression.operator.values.map(this.processMultiValueFilter.bind(this)).join(', ');
+      where += expression.operator.value.map(this.processMultiValueFilter.bind(this)).join(', ');
       where += ')';
     } else if (isSingleOperator(expression.operator)) {
       if (
