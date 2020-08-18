@@ -5,7 +5,7 @@ import { QueryEditorOperatorDefinition, QueryEditorOperator } from '../../types'
 
 interface Props {
   value: boolean | undefined;
-  onChange: (expression: QueryEditorOperator<boolean>) => void;
+  onChange: (operator: QueryEditorOperator<boolean>) => void;
   operator: QueryEditorOperatorDefinition;
 }
 

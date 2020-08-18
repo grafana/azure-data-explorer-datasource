@@ -50,10 +50,7 @@ export class QueryEditorFilterBuilder {
     return {
       type: QueryEditorExpressionType.FieldAndOperator,
       property: this.buildFieldExpression(),
-      operator: {
-        name: operator.value,
-        value: definitionToOperator(operator),
-      },
+      operator: definitionToOperator(operator),
     };
   }
 
