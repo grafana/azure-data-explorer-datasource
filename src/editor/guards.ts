@@ -9,7 +9,7 @@ import {
   QueryEditorExpressionType,
   QueryEditorArrayExpression,
 } from './expressions';
-import { QueryEditorPropertyType, QueryEditorOperator, QueryEditorOperatorType } from './types';
+import { QueryEditorPropertyType, QueryEditorOperator } from './types';
 
 export const isReduceExpression = (expression: QueryEditorExpression): expression is QueryEditorReduceExpression => {
   return (expression as QueryEditorReduceExpression)?.type === QueryEditorExpressionType.Reduce;
@@ -45,7 +45,7 @@ export const isBoolOperator = (operator: QueryEditorOperator | undefined): opera
 
 export const isMultiOperator = (
   operator: QueryEditorOperator | undefined
-): operator is QueryEditorOperator<QueryEditorOperatorType[]> => {
+): operator is QueryEditorOperator<string[]> => {
   return Array.isArray(operator?.value);
 };
 
