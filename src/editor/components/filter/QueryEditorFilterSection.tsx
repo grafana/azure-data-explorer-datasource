@@ -7,7 +7,7 @@ import { SkippableExpressionSuggestor } from '../types';
 import {
   QueryEditorExpression,
   QueryEditorArrayExpression,
-  QueryEditorFieldAndOperatorExpression,
+  QueryEditorOperatorExpression,
   QueryEditorExpressionType,
 } from '../../expressions';
 import { isFieldAndOperator, isOrExpression } from 'editor/guards';
@@ -16,7 +16,7 @@ import { Button, Select, stylesFactory, InlineFormLabel } from '@grafana/ui';
 
 interface FilterSectionConfiguration {
   operators: QueryEditorOperatorDefinition[];
-  defaultValue: QueryEditorFieldAndOperatorExpression;
+  defaultValue: QueryEditorOperatorExpression;
 }
 
 export interface QueryEditorFilterSectionProps extends QueryEditorSectionProps {

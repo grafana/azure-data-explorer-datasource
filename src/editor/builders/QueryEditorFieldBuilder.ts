@@ -12,7 +12,7 @@ export class QueryEditorFieldBuilder {
 
   private buildFieldExpression(): QueryEditorPropertyExpression {
     return {
-      type: QueryEditorExpressionType.Field,
+      type: QueryEditorExpressionType.Property,
       property: {
         name: '',
         type: QueryEditorPropertyType.String,

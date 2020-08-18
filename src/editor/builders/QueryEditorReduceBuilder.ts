@@ -41,7 +41,7 @@ export class QueryEditorReduceBuilder {
       if (this.functions.length > 0) {
         return this.buildRepeaterExpression(QueryEditorExpressionType.Reduce);
       }
-      return this.buildRepeaterExpression(QueryEditorExpressionType.Field);
+      return this.buildRepeaterExpression(QueryEditorExpressionType.Property);
     }
 
     if (this.functions.length > 0) {
@@ -49,7 +49,7 @@ export class QueryEditorReduceBuilder {
     }
 
     return {
-      type: QueryEditorExpressionType.Field,
+      type: QueryEditorExpressionType.Property,
       property: this.buildProperty(QueryEditorPropertyType.String),
     } as QueryEditorPropertyExpression;
   }

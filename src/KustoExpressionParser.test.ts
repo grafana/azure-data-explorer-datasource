@@ -4,7 +4,7 @@ import { TemplateSrv } from './test/template_srv';
 import { setTemplateSrv } from '@grafana/runtime';
 import {
   QueryEditorPropertyExpression,
-  QueryEditorFieldAndOperatorExpression,
+  QueryEditorOperatorExpression,
   QueryEditorRepeaterExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
@@ -26,7 +26,7 @@ describe('KustoExpressionParser', () => {
     kustoExpressionParser = new KustoExpressionParser(setupSchemaResolver());
 
     from = {
-      type: QueryEditorExpressionType.Field,
+      type: QueryEditorExpressionType.Property,
       property: {
         type: QueryEditorPropertyType.String,
         name: 'StormEvents',
@@ -219,7 +219,7 @@ function buildWhereWithMultiOperator(values: string[]): QueryEditorArrayExpressi
         type: QueryEditorExpressionType.Or,
         expressions: [
           {
-            type: QueryEditorExpressionType.FieldAndOperator,
+            type: QueryEditorExpressionType.Operator,
             property: {
               type: QueryEditorPropertyType.String,
               name: 'StateCode',
@@ -228,7 +228,7 @@ function buildWhereWithMultiOperator(values: string[]): QueryEditorArrayExpressi
               name: '!in',
               value: values,
             } as QueryEditorOperator<string[]>,
-          } as QueryEditorFieldAndOperatorExpression,
+          } as QueryEditorOperatorExpression,
         ],
       } as QueryEditorArrayExpression,
     ],
@@ -243,7 +243,7 @@ function buildWhereWithSingleOperator(): QueryEditorArrayExpression {
         type: QueryEditorExpressionType.Or,
         expressions: [
           {
-            type: QueryEditorExpressionType.FieldAndOperator,
+            type: QueryEditorExpressionType.Operator,
             property: {
               type: QueryEditorPropertyType.String,
               name: 'StateCode',
@@ -252,7 +252,7 @@ function buildWhereWithSingleOperator(): QueryEditorArrayExpression {
               name: '==',
               value: 'NY',
             } as QueryEditorOperator<string>,
-          } as QueryEditorFieldAndOperatorExpression,
+          } as QueryEditorOperatorExpression,
         ],
       } as QueryEditorArrayExpression,
     ],
@@ -290,7 +290,7 @@ function buildReduce(fields: string[], functions: string[], parameter = ''): Que
 
   return {
     type: QueryEditorExpressionType.OperatorRepeater,
-    typeToRepeat: QueryEditorExpressionType.FieldAndOperator,
+    typeToRepeat: QueryEditorExpressionType.Operator,
     expressions: expressions,
   } as QueryEditorRepeaterExpression;
 }

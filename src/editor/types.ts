@@ -12,7 +12,10 @@ export interface QueryEditorProperty {
   name: string;
 }
 
-export interface QueryEditorOperator<T = any> {
+export type QueryEditorOperatorType = string | boolean | number;
+type QueryEditorOperatorValueType = QueryEditorOperatorType | QueryEditorOperatorType[];
+
+export interface QueryEditorOperator<T = QueryEditorOperatorValueType> {
   name: string;
   value: T;
 }

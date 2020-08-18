@@ -1,15 +1,8 @@
-import {
-  QueryEditorPropertyType,
-  QueryEditorOperatorDefinition,
-  QueryEditorProperty,
-  QueryEditorOperator,
-} from './types';
+import { QueryEditorPropertyType, QueryEditorProperty, QueryEditorOperator } from './types';
 
 export enum QueryEditorExpressionType {
-  Field = 'field',
-  Conditional = 'conditional',
+  Property = 'property',
   Operator = 'operator',
-  FieldAndOperator = 'fieldAndOperator',
   OperatorRepeater = 'operatorRepeater',
   Reduce = 'reduce',
   FunctionParameter = 'functionParameter',
@@ -21,27 +14,10 @@ export interface QueryEditorExpression {
   type: QueryEditorExpressionType;
 }
 
-/** OPERATORS */
-export interface QueryEditorOperatorExpression extends QueryEditorExpression {
-  operator: QueryEditorOperatorDefinition;
-}
-export interface QueryEditorBoolOperatorExpression extends QueryEditorOperatorExpression {
-  value: boolean;
-}
-
-export interface QueryEditorMultiOperatorExpression extends QueryEditorOperatorExpression {
-  values: string[];
-}
-
-export interface QueryEditorSingleOperatorExpression extends QueryEditorOperatorExpression {
-  value: string;
-}
-
-/** COMBINED */
 export interface QueryEditorPropertyExpression extends QueryEditorExpression {
   property: QueryEditorProperty;
 }
-export interface QueryEditorFieldAndOperatorExpression extends QueryEditorExpression {
+export interface QueryEditorOperatorExpression extends QueryEditorExpression {
   property: QueryEditorProperty;
   operator: QueryEditorOperator;
 }

@@ -44,7 +44,7 @@ export class QueryEditorGroupByBuilder {
       if (this.intervals.length > 0) {
         return this.buildRepeaterExpression(QueryEditorExpressionType.GroupBy);
       }
-      return this.buildRepeaterExpression(QueryEditorExpressionType.Field);
+      return this.buildRepeaterExpression(QueryEditorExpressionType.Property);
     }
 
     if (this.intervals.length > 0) {
@@ -52,7 +52,7 @@ export class QueryEditorGroupByBuilder {
     }
 
     return {
-      type: QueryEditorExpressionType.Field,
+      type: QueryEditorExpressionType.Property,
       property: this.buildProperty(QueryEditorPropertyType.String),
     } as QueryEditorPropertyExpression;
   }

@@ -12,15 +12,15 @@ import {
 import { QueryEditorField } from '../field/QueryEditorField';
 import { QueryEditorOperatorComponent, definitionToOperator } from '../operators/QueryEditorOperator';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorFieldAndOperatorExpression } from '../../expressions';
+import { QueryEditorOperatorExpression } from '../../expressions';
 import { parseOperatorValue } from '../operators/parser';
 
 interface Props {
-  value?: QueryEditorFieldAndOperatorExpression;
+  value?: QueryEditorOperatorExpression;
   fields: QueryEditorFieldDefinition[];
   templateVariableOptions: SelectableValue<string>;
   operators: QueryEditorOperatorDefinition[];
-  onChange: (expression: QueryEditorFieldAndOperatorExpression) => void;
+  onChange: (expression: QueryEditorOperatorExpression) => void;
   getSuggestions: SkippableExpressionSuggestor;
 }
 
@@ -52,7 +52,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
   };
 
   onFieldChanged = (property: QueryEditorProperty) => {
-    let next: QueryEditorFieldAndOperatorExpression = {
+    let next: QueryEditorOperatorExpression = {
       ...this.props.value!,
       property,
     };

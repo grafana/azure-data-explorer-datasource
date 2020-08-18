@@ -13,7 +13,7 @@ import {
   isAndExpression,
   isOrExpression,
 } from './editor/guards';
-import { QueryEditorExpression, QueryEditorFieldAndOperatorExpression } from './editor/expressions';
+import { QueryEditorExpression, QueryEditorOperatorExpression } from './editor/expressions';
 import { AdxSchemaResolver } from 'SchemaResolver';
 
 export class KustoExpressionParser {
@@ -105,7 +105,7 @@ export class KustoExpressionParser {
     parts.push(orderBy);
   }
 
-  private createWhere(expression: QueryEditorFieldAndOperatorExpression): string | undefined {
+  private createWhere(expression: QueryEditorOperatorExpression): string | undefined {
     let where = '';
 
     if (!expression.property) {

@@ -24,7 +24,7 @@ export const QueryEditorFieldSection = (config: FieldSectionConfiguration): Reac
     const onChange = useCallback(
       (property: QueryEditorProperty) => {
         props.onChange({
-          type: QueryEditorExpressionType.Field,
+          type: QueryEditorExpressionType.Property,
           property,
         } as QueryEditorPropertyExpression);
       },
