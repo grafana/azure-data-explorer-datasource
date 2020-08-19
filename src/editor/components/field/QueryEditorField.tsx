@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
-import { Select } from '@grafana/ui';
+import { css } from 'emotion';
+import { Select, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorPropertyDefinition, QueryEditorProperty } from '../../types';
 
@@ -19,21 +20,32 @@ export const definitionToProperty = (definition: QueryEditorPropertyDefinition):
 };
 
 export const QueryEditorField: React.FC<Props> = props => {
+  const styles = getStyles();
   const onChange = useOnChange(props);
   const options = useOptions(props.fields);
   const value = props.value?.name;
 
   return (
-    <Select
-      width={30}
-      onChange={onChange}
-      value={value}
-      options={props.templateVariableOptions ? [props.templateVariableOptions, ...options] : options}
-      placeholder={props.placeholder}
-      menuPlacement="bottom"
-    />
+    <div className={styles.container}>
+      <Select
+        width={30}
+        onChange={onChange}
+        value={value}
+        options={props.templateVariableOptions ? [props.templateVariableOptions, ...options] : options}
+        placeholder={props.placeholder}
+        menuPlacement="bottom"
+      />
+    </div>
   );
 };
+
+const getStyles = stylesFactory(() => {
+  return {
+    container: css`
+      margin-right: 4px;
+    `,
+  };
+});
 
 // Should remove this when I have fixed the underlying issue in the select component
 // it should use value as label if label is missing.

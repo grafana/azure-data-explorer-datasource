@@ -81,7 +81,7 @@ export class QueryEditorOperatorComponent extends PureComponent<Props> {
 
     return (
       <>
-        <div className={styles.button}>
+        <div className={styles.container}>
           <Select
             isSearchable={true}
             options={operators}
@@ -159,10 +159,6 @@ const getStyles = stylesFactory(() => {
   return {
     container: css`
       margin-right: 4px;
-    `,
-    button: css`
-      margin-right: 4px;
-      margin-left: 4px;
     `,
   };
 });

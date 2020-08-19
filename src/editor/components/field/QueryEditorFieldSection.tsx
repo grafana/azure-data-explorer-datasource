@@ -10,7 +10,7 @@ interface FieldSectionConfiguration {
   defaultValue: QueryEditorExpression;
 }
 
-export interface QueryEditorFieldSectionProps extends QueryEditorSectionProps {
+export interface QueryEditorFieldSectionProps extends React.PropsWithChildren<QueryEditorSectionProps> {
   fields: QueryEditorPropertyDefinition[];
   templateVariableOptions: SelectableValue<string>;
   value?: QueryEditorExpression;
@@ -43,6 +43,7 @@ export const QueryEditorFieldSection = (config: FieldSectionConfiguration): Reac
           onChange={onChange}
           value={expression.property}
         />
+        {props.children}
       </QueryEditorSection>
     );
   };

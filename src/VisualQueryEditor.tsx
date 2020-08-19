@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import { useAsync } from 'react-use';
+import { css } from 'emotion';
 import { KustoQuery, AdxSchema, QueryExpression, AdxTableSchema, AdxColumnSchema } from './types';
 import { tableToDefinition, tablesToDefinition, columnsToDefinition } from './schema/mapper';
 import {
@@ -14,6 +15,10 @@ import { definitionToProperty } from 'editor/components/field/QueryEditorField';
 import { isFieldExpression } from 'editor/guards';
 import { AdxDataSource } from 'datasource';
 import { AdxSchemaResovler } from 'schema/AdxSchemaResolver';
+import { QueryEditorSection } from 'editor/components/QueryEditorSection';
+import { InlineFormLabel, Select, stylesFactory } from '@grafana/ui';
+import { SelectableValue } from '@grafana/data';
+import { QueryEditorResultFormat } from 'QueryEditorResultFormat';
 
 const defaultQuery: QueryExpression = {
   where: {
@@ -126,7 +131,9 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         value={table}
         fields={tables}
         onChange={onChangeTable}
-      />
+      >
+        <QueryEditorResultFormat onChangeQuery={props.onChangeQuery} query={query} />
+      </KustoFromEditorSection>
       <KustoWhereEditorSection
         templateVariableOptions={[]}
         label="Where (filter)"
