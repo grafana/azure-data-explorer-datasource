@@ -1,5 +1,5 @@
 import { KustoExpressionParser } from './KustoExpressionParser';
-import { QueryEditorPropertyType, QueryEditorFieldDefinition, QueryEditorOperator } from './editor/types';
+import { QueryEditorPropertyType, QueryEditorPropertyDefinition, QueryEditorOperator } from './editor/types';
 import { TemplateSrv } from './test/template_srv';
 import { setTemplateSrv } from '@grafana/runtime';
 import {
@@ -62,7 +62,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should generate a valid query', () => {
-      const columns: QueryEditorFieldDefinition[] = [
+      const columns: QueryEditorPropertyDefinition[] = [
         {
           type: QueryEditorPropertyType.DateTime,
           value: 'StartTime',
@@ -119,7 +119,7 @@ describe('KustoExpressionParser', () => {
   });
 
   describe('table query with no time column', () => {
-    let columns: QueryEditorFieldDefinition[];
+    let columns: QueryEditorPropertyDefinition[];
     beforeEach(() => {
       columns = [
         {

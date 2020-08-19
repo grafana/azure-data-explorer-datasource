@@ -29,13 +29,13 @@ export interface QueryEditorOperatorDefinition {
   description?: string;
 }
 
-export interface QueryEditorFieldDefinition {
+export interface QueryEditorPropertyDefinition {
   value: string;
   type: QueryEditorPropertyType;
   label?: string;
 }
 
-export interface QueryEditorFunctionDefinition extends QueryEditorFieldDefinition {
+export interface QueryEditorFunctionDefinition extends QueryEditorPropertyDefinition {
   parameters?: QueryEditorFunctionParameter[];
 }
 

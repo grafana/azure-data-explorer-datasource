@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
 import { Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorFieldDefinition, QueryEditorProperty } from '../../types';
+import { QueryEditorPropertyDefinition, QueryEditorProperty } from '../../types';
 
 interface Props {
-  fields: QueryEditorFieldDefinition[];
+  fields: QueryEditorPropertyDefinition[];
   templateVariableOptions?: SelectableValue<string>;
   value?: QueryEditorProperty;
   onChange: (property: QueryEditorProperty) => void;
@@ -30,7 +30,7 @@ export const QueryEditorField: React.FC<Props> = props => {
 
 // Should remove this when I have fixed the underlying issue in the select component
 // it should use value as label if label is missing.
-const useOptions = (options: QueryEditorFieldDefinition[]): Array<SelectableValue<string>> => {
+const useOptions = (options: QueryEditorPropertyDefinition[]): Array<SelectableValue<string>> => {
   return useMemo(() => {
     if (!options) {
       return [];

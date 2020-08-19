@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { css } from 'emotion';
 import { stylesFactory } from '@grafana/ui';
-import { QueryEditorFieldDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../../types';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorGroupByExpression, QueryEditorExpressionType } from '../../expressions';
 
 interface Props {
-  fields: QueryEditorFieldDefinition[];
+  fields: QueryEditorPropertyDefinition[];
   templateVariableOptions: SelectableValue<string>;
-  intervals: QueryEditorFieldDefinition[];
+  intervals: QueryEditorPropertyDefinition[];
   value?: QueryEditorGroupByExpression;
   label?: string;
   onChange: (expression: QueryEditorGroupByExpression) => void;

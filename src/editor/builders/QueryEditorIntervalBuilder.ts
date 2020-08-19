@@ -1,9 +1,9 @@
-import { QueryEditorPropertyType, QueryEditorFieldDefinition } from '../types';
+import { QueryEditorPropertyType, QueryEditorPropertyDefinition } from '../types';
 
 export class QueryEditorIntervalBuilder {
   private label: string;
 
-  constructor(private value: string, private intervals: QueryEditorFieldDefinition[]) {
+  constructor(private value: string, private intervals: QueryEditorPropertyDefinition[]) {
     this.label = value;
   }
 

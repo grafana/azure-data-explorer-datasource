@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { css } from 'emotion';
-import { QueryEditorOperatorDefinition, QueryEditorFieldDefinition } from '../../types';
+import { QueryEditorOperatorDefinition, QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorSectionProps, QueryEditorSection } from '../QueryEditorSection';
 import { SelectableValue } from '@grafana/data';
 import { SkippableExpressionSuggestor } from '../types';
@@ -20,7 +20,7 @@ interface FilterSectionConfiguration {
 }
 
 export interface QueryEditorFilterSectionProps extends QueryEditorSectionProps {
-  fields: QueryEditorFieldDefinition[];
+  fields: QueryEditorPropertyDefinition[];
   templateVariableOptions: SelectableValue<string>;
   value: QueryEditorArrayExpression;
   onChange: (value: QueryEditorArrayExpression) => void;

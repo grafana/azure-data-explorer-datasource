@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorFieldDefinition } from '../types';
+import { QueryEditorPropertyDefinition } from '../types';
 import { QueryEditorFieldAndOperator } from './filter/QueryEditorFieldAndOperator';
 import { QueryEditorRepeater } from './QueryEditorRepeater';
 import { QueryEditorReduce } from './reduce/QueryEditorReduce';
@@ -11,7 +11,7 @@ import { QueryEditorExpression } from '../expressions';
 
 interface Props<TConfig> {
   config: TConfig;
-  fields: QueryEditorFieldDefinition[];
+  fields: QueryEditorPropertyDefinition[];
   templateVariableOptions: SelectableValue<string>;
   expression: QueryEditorExpression | undefined;
   onChange: (expression: QueryEditorExpression) => void;

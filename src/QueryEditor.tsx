@@ -9,7 +9,14 @@ import {
 } from 'QueryEditorSections';
 import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
 import { AdxDataSource } from 'datasource';
-import { KustoQuery, AdxDataSourceOptions, QueryExpression } from 'types';
+import {
+  KustoQuery,
+  AdxDataSourceOptions,
+  QueryExpression,
+  AdxColumnSchema,
+  AdxDatabaseSchema,
+  AdxTableSchema,
+} from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
 import { QueryEditorPropertyType, QueryEditorProperty } from './editor/types';
@@ -25,7 +32,8 @@ import {
   QueryEditorExpression,
   QueryEditorArrayExpression,
 } from './editor/expressions';
-import { AdxSchemaResolver } from './SchemaResolver';
+import { AdxSchemaResovler } from 'schema/AdxSchemaResolver';
+import { databasesToDefinition, columnsToDefinition, tablesToDefinition } from 'schema/mapper';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -35,6 +43,10 @@ interface State {
   lastQueryError?: string;
   lastQuery?: string;
   timeNotASC?: boolean;
+  columns: AdxColumnSchema[];
+  databases: AdxDatabaseSchema[];
+  tables: AdxTableSchema[];
+  loadingColumnSchema: boolean;
 }
 
 const defaultQuery: QueryExpression = {
@@ -45,18 +57,22 @@ const defaultQuery: QueryExpression = {
 };
 
 export class QueryEditor extends PureComponent<Props, State> {
-  private schemaResolver: AdxSchemaResolver;
+  private schemaResolver: AdxSchemaResovler;
   private kustoExpressionParser: KustoExpressionParser;
 
   constructor(props: Props) {
     super(props);
 
-    this.schemaResolver = props.datasource.schemaResolver;
-    this.kustoExpressionParser = new KustoExpressionParser(this.schemaResolver);
+    this.schemaResolver = new AdxSchemaResovler(this.props.datasource);
+    this.kustoExpressionParser = new KustoExpressionParser();
   }
 
   state: State = {
     dirty: false,
+    columns: [],
+    databases: [],
+    tables: [],
+    loadingColumnSchema: false,
   };
 
   templateVariableOptions: any;
@@ -69,6 +85,10 @@ export class QueryEditor extends PureComponent<Props, State> {
         lastQueryError: '',
         lastQuery: '',
         dirty: false,
+        columns: this.state.columns,
+        tables: this.state.tables,
+        databases: this.state.databases,
+        loadingColumnSchema: false,
       };
       if (data) {
         if (data.series && data.series.length) {
@@ -97,14 +117,23 @@ export class QueryEditor extends PureComponent<Props, State> {
   async componentDidMount() {
     try {
       let query = { ...this.props.query }; // mutable query
-      await this.props.datasource.resolveAndCacheSchema();
-      const databases = this.schemaResolver.getDatabases();
+      const databaseSchema = await this.schemaResolver.getDatabases();
+      console.log('dbschema', databaseSchema);
+      const databases = databasesToDefinition(databaseSchema);
 
       // Default first database...
       if (!query.database && databases.length) {
         if (databases[0] && databases[0].value) {
           query.database = databases[0].value;
         }
+      }
+
+      const tableSchema = await this.schemaResolver.getTablesForDatabase(query.database);
+      const table = this.kustoExpressionParser.fromTable(this.props.query.expression?.from);
+      let columnSchema = this.state.columns;
+
+      if (table) {
+        columnSchema = await this.schemaResolver.getColumnsForTable(query.database, table);
       }
 
       // Set the raw mode
@@ -124,6 +153,9 @@ export class QueryEditor extends PureComponent<Props, State> {
       };
 
       this.setState({
+        tables: tableSchema,
+        databases: databaseSchema,
+        columns: columnSchema,
         schema: true,
       });
 
@@ -140,8 +172,7 @@ export class QueryEditor extends PureComponent<Props, State> {
       const expression = q.expression || defaultQuery;
 
       const { database } = this.props.query;
-      const table = this.kustoExpressionParser.fromTable(expression.from, true);
-      const columns = this.schemaResolver.getColumnsForTable(database, table);
+      const { columns } = this.state;
 
       q = {
         ...q,
@@ -181,7 +212,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
-  onFromChanged = (from: QueryEditorExpression) => {
+  onFromChanged = async (from: QueryEditorExpression) => {
     const { query } = this.props;
 
     this.onUpdateQuery(
@@ -197,6 +228,11 @@ export class QueryEditor extends PureComponent<Props, State> {
         },
       })
     );
+
+    this.setState({ ...this.state, loadingColumnSchema: true });
+    const table = this.kustoExpressionParser.fromTable(from);
+    const columns = await this.schemaResolver.getColumnsForTable(query.database, table);
+    this.setState({ ...this.state, columns, loadingColumnSchema: false });
   };
 
   onWhereChanged = (where: QueryEditorArrayExpression) => {
@@ -263,9 +299,8 @@ export class QueryEditor extends PureComponent<Props, State> {
     let table = (query.expression?.from as any)?.value;
     if (table && !(query?.expression?.groupBy as any)?.expressions?.length) {
       table = this.kustoExpressionParser.fromTable(query.expression?.from, true);
-      const { database } = this.props.query;
-      const columns = this.schemaResolver.getColumnsForTable(database, table);
-      const timeField = columns?.find(c => c.type === QueryEditorPropertyType.DateTime);
+      const definitions = columnsToDefinition(this.state.columns);
+      const timeField = definitions?.find(c => c.type === QueryEditorPropertyType.DateTime);
       if (timeField) {
         let reduce = query.expression?.reduce;
         if (!reduce) {
@@ -372,8 +407,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     }
 
     const { database, expression, alias, resultFormat } = query;
-    const databases = this.schemaResolver.getDatabases();
-    const tables = this.schemaResolver.getTablesForDatabase(database);
+    const databases = databasesToDefinition(this.state.databases);
 
     // Proces the raw mode
     if (query.rawMode) {
@@ -387,15 +421,59 @@ export class QueryEditor extends PureComponent<Props, State> {
           onResultFormatChanged={this.onResultFormatChanged}
           onDatabaseChanged={this.onDatabaseChanged}
           onRawQueryChange={this.onRawQueryChange}
-          databases={databases || []}
+          databases={databases}
         />
       );
     }
 
     const { from, where, reduce, groupBy } = expression || defaultQuery;
+    const tables = tablesToDefinition(this.state.tables);
+    const columns = columnsToDefinition(this.state.columns);
 
-    const table = this.kustoExpressionParser.fromTable(from, true);
-    const columns = this.schemaResolver.getColumnsForTable(database, table);
+    if (this.state.loadingColumnSchema) {
+      return (
+        <>
+          <DatabaseSelect
+            labelWidth={12}
+            databases={databases!}
+            templateVariableOptions={this.templateVariableOptions}
+            database={database}
+            onChange={this.onDatabaseChanged}
+          >
+            <>
+              <div className="gf-form gf-form--grow">
+                <div className="gf-form-label--grow" />
+              </div>
+              <Button onClick={this.onToggleRawMode}>Edit KQL</Button>&nbsp;
+              <Button
+                variant={dirty ? 'primary' : 'secondary'}
+                onClick={() => {
+                  this.props.onRunQuery();
+                }}
+              >
+                Run Query
+              </Button>
+            </>
+          </DatabaseSelect>
+          <KustoFromEditorSection
+            value={from}
+            label="From"
+            fields={tables!}
+            templateVariableOptions={this.templateVariableOptions}
+            onChange={this.onFromChanged}
+          />
+          <span>loading columns schema</span>
+
+          <TextArea cols={80} rows={8} value={dirty ? query.query : lastQuery} disabled={true} />
+
+          {lastQueryError && (
+            <div className="gf-form">
+              <pre className="gf-form-pre alert alert-error">{lastQueryError}</pre>
+            </div>
+          )}
+        </>
+      );
+    }
 
     const groupable =
       columns?.filter(

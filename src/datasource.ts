@@ -17,7 +17,6 @@ import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
-import { AdxSchemaResolver } from 'SchemaResolver';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -25,7 +24,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private baseUrl: string;
   private defaultOrFirstDatabase: string;
   private url?: string;
-  schemaResolver: AdxSchemaResolver;
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
@@ -34,7 +32,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.baseUrl = '/azuredataexplorer';
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
-    this.schemaResolver = new AdxSchemaResolver(this.getSchema.bind(this), this.getDynamicSchema.bind(this));
   }
 
   /**
@@ -148,10 +145,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  async resolveAndCacheSchema() {
-    return await this.schemaResolver.resolveAndCacheSchema();
-  }
-
   async getSchema(): Promise<AdxSchema> {
     const url = `${this.baseUrl}/v1/rest/mgmt`;
     const req = {
@@ -173,10 +166,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     }
     const queryParts: string[] = [];
 
+    const where = `where ${columns.map(column => `isnotnull(${column})`).join(' and ')}`;
+    const sample = `sample 100`;
     const project = `project ${columns.map(column => column).join(', ')}`;
     const summarize = `summarize ${columns.map(column => `buildschema(${column})`).join(', ')}`;
 
     queryParts.push(table);
+    queryParts.push(where);
+    queryParts.push(sample);
     queryParts.push(project);
     queryParts.push(summarize);
 

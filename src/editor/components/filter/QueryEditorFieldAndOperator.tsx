@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { stylesFactory } from '@grafana/ui';
 import { SkippableExpressionSuggestor } from '../types';
 import {
-  QueryEditorFieldDefinition,
+  QueryEditorPropertyDefinition,
   QueryEditorOperatorDefinition,
   QueryEditorProperty,
   QueryEditorOperator,
@@ -17,7 +17,7 @@ import { parseOperatorValue } from '../operators/parser';
 
 interface Props {
   value?: QueryEditorOperatorExpression;
-  fields: QueryEditorFieldDefinition[];
+  fields: QueryEditorPropertyDefinition[];
   templateVariableOptions: SelectableValue<string>;
   operators: QueryEditorOperatorDefinition[];
   onChange: (expression: QueryEditorOperatorExpression) => void;

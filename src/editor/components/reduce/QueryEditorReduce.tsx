@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { css } from 'emotion';
 import { InlineFormLabel, stylesFactory } from '@grafana/ui';
 import {
-  QueryEditorFieldDefinition,
+  QueryEditorPropertyDefinition,
   QueryEditorFunctionDefinition,
   QueryEditorFunctionParameter,
   QueryEditorPropertyType,
@@ -18,7 +18,7 @@ import {
 } from '../../expressions';
 
 interface Props {
-  fields: QueryEditorFieldDefinition[];
+  fields: QueryEditorPropertyDefinition[];
   templateVariableOptions: SelectableValue<string>;
   functions: QueryEditorFunctionDefinition[];
   value?: QueryEditorReduceExpression;

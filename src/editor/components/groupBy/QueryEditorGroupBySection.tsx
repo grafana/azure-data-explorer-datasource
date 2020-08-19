@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorFieldDefinition } from '../../types';
+import { QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { QueryEditorSectionRenderer } from '../QueryEditorSectionRenderer';
 import { SelectableValue } from '@grafana/data';
@@ -8,11 +8,11 @@ import { QueryEditorExpression } from '../../expressions';
 
 interface GroupBySectionConfiguration {
   defaultValue: QueryEditorExpression;
-  intervals: QueryEditorFieldDefinition[];
+  intervals: QueryEditorPropertyDefinition[];
 }
 
 export interface QueryEditorGroupBySectionProps extends QueryEditorSectionProps {
-  fields: QueryEditorFieldDefinition[];
+  fields: QueryEditorPropertyDefinition[];
   templateVariableOptions: SelectableValue<string>;
   value?: QueryEditorExpression;
   onChange: (value: QueryEditorExpression) => void;

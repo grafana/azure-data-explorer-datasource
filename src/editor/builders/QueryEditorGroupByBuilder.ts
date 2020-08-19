@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryEditorFieldDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../types';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../types';
 import {
   QueryEditorGroupBySection,
   QueryEditorGroupBySectionProps,
@@ -14,7 +14,7 @@ import {
 } from '../expressions';
 
 export class QueryEditorGroupByBuilder {
-  private intervals: QueryEditorFieldDefinition[];
+  private intervals: QueryEditorPropertyDefinition[];
   private multipleRows = false;
 
   constructor() {

@@ -1,5 +1,5 @@
-import { QueryExpression } from './types';
-import { QueryEditorFieldDefinition, QueryEditorPropertyType } from 'editor/types';
+import { QueryExpression, AdxColumnSchema } from './types';
+import { QueryEditorPropertyType } from 'editor/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import {
   isReduceExpression,
@@ -14,12 +14,12 @@ import {
   isOrExpression,
 } from './editor/guards';
 import { QueryEditorExpression, QueryEditorOperatorExpression } from './editor/expressions';
-import { AdxSchemaResolver } from 'SchemaResolver';
+import { columnsToDefinition } from 'schema/mapper';
 
 export class KustoExpressionParser {
   templateSrv: TemplateSrv;
 
-  constructor(private schemaResolver: AdxSchemaResolver) {
+  constructor() {
     this.templateSrv = getTemplateSrv();
   }
 
@@ -36,7 +36,7 @@ export class KustoExpressionParser {
 
   // we need to write tests for this one but I would like to have one expression tree
   // that is the entry before doing that.
-  query(sections: QueryExpression, columns: QueryEditorFieldDefinition[], database: string): string {
+  query(sections: QueryExpression, columns: AdxColumnSchema[], database: string): string {
     const { from, where, reduce, groupBy } = sections;
     const table = this.fromTable(from);
 
@@ -44,7 +44,9 @@ export class KustoExpressionParser {
       return '';
     }
 
-    const defaultTimeColumn = columns?.find(col => col.type === QueryEditorPropertyType.DateTime)?.value ?? 'Timestamp';
+    const definitionColumns = columnsToDefinition(columns);
+    const defaultTimeColumn =
+      definitionColumns?.find(col => col.type === QueryEditorPropertyType.DateTime)?.value ?? 'Timestamp';
     const parts: string[] = [table];
 
     if (reduce && groupBy && this.isAggregated(groupBy)) {
@@ -58,7 +60,7 @@ export class KustoExpressionParser {
     }
 
     if (reduce && groupBy && this.isAggregated(groupBy)) {
-      this.appendSummarize(database, table, reduce, groupBy, parts);
+      this.appendSummarize(reduce, groupBy, columns, parts);
     } else if (reduce) {
       this.appendProject(reduce, defaultTimeColumn, parts);
     }
@@ -184,10 +186,9 @@ export class KustoExpressionParser {
   }
 
   private appendSummarize(
-    database: string,
-    table: string,
     reduceExpression: QueryEditorExpression,
     groupByExpression: QueryEditorExpression,
+    columns: AdxColumnSchema[],
     parts: string[]
   ) {
     if (isRepeater(groupByExpression) && isRepeater(reduceExpression)) {
@@ -196,7 +197,7 @@ export class KustoExpressionParser {
 
       for (const exp of reduceExpression.expressions) {
         if (isReduceExpression(exp) && exp?.reduce?.name !== 'none' && exp?.property?.name) {
-          const field = this.castIfDynamic(database, table, exp.property.name);
+          const field = this.castIfDynamic(exp.property.name, columns);
 
           if (exp?.parameters && exp?.parameters.length > 0) {
             reduceExpressions.push(`${exp.reduce.name}(${field}, ${exp.parameters.map(p => p.value).join(', ')})`);
@@ -230,12 +231,13 @@ export class KustoExpressionParser {
     }
   }
 
-  private castIfDynamic(database: string, table: string, column: string): string {
+  private castIfDynamic(column: string, columns: AdxColumnSchema[]): string {
     if (!column || column.indexOf('.') < 0) {
       return column;
     }
 
-    const columnType = this.schemaResolver.getColumnType(database, table, column);
+    const columnSchema = columns.find(c => c.Name === column);
+    const columnType = columnSchema?.CslType;
 
     if (!columnType) {
       return column;

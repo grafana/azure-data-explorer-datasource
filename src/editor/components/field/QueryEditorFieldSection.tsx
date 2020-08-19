@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorFieldDefinition, QueryEditorProperty } from '../../types';
+import { QueryEditorPropertyDefinition, QueryEditorProperty } from '../../types';
 import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { QueryEditorField } from './QueryEditorField';
 import { isFieldExpression } from '../../guards';
@@ -11,7 +11,7 @@ interface FieldSectionConfiguration {
 }
 
 export interface QueryEditorFieldSectionProps extends QueryEditorSectionProps {
-  fields: QueryEditorFieldDefinition[];
+  fields: QueryEditorPropertyDefinition[];
   templateVariableOptions: SelectableValue<string>;
   value?: QueryEditorExpression;
   onChange: (value: QueryEditorExpression) => void;

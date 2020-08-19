@@ -5,12 +5,12 @@ import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { KustoMonacoEditor } from './monaco/KustoMonacoEditor';
 import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
-import { QueryEditorFieldDefinition } from 'editor/types';
+import { QueryEditorPropertyDefinition } from 'editor/types';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface RawQueryEditorProps extends Props {
-  databases: QueryEditorFieldDefinition[];
+  databases: QueryEditorPropertyDefinition[];
   dirty?: boolean;
   lastQueryError?: string;
   lastQuery?: string;
