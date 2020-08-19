@@ -1,8 +1,8 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
-import { QueryEditorExpression, QueryEditorArrayExpression } from './editor/expressions';
+import { QueryEditorPropertyExpression, QueryEditorArrayExpression } from './editor/expressions';
 
 export interface QueryExpression {
-  from?: QueryEditorExpression;
+  from?: QueryEditorPropertyExpression;
   where: QueryEditorArrayExpression;
   reduce: QueryEditorArrayExpression;
   groupBy: QueryEditorArrayExpression;
@@ -44,4 +44,11 @@ export interface AdxTableSchema {
 export interface AdxColumnSchema {
   Name: string;
   CslType: string;
+}
+
+/** Typings for the useAsync hook from react-use */
+export interface AsyncState<T = {}> {
+  value?: T;
+  loading: boolean;
+  error?: Error;
 }

@@ -1,4 +1,5 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useMemo, useCallback } from 'react';
+import { useAsync } from 'react-use';
 import debounce from 'debounce-promise';
 import { QueryEditorProps, SelectableValue, DataQueryRequest } from '@grafana/data';
 import {
@@ -6,7 +7,7 @@ import {
   KustoWhereEditorSection,
   KustoValueColumnEditorSection,
   KustoGroupByEditorSection,
-} from 'QueryEditorSections';
+} from 'VisualQueryEditorSections';
 import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
 import { AdxDataSource } from 'datasource';
 import {
@@ -16,10 +17,11 @@ import {
   AdxColumnSchema,
   AdxDatabaseSchema,
   AdxTableSchema,
+  AdxSchema,
 } from 'types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { Button, TextArea, Select, HorizontalGroup, stylesFactory, InlineFormLabel, Input } from '@grafana/ui';
-import { QueryEditorPropertyType, QueryEditorProperty } from './editor/types';
+import { QueryEditorPropertyType, QueryEditorProperty, QueryEditorPropertyDefinition } from './editor/types';
 import { RawQueryEditor } from './RawQueryEditor';
 import { css } from 'emotion';
 
@@ -30,9 +32,18 @@ import {
   QueryEditorExpressionType,
   QueryEditorExpression,
   QueryEditorArrayExpression,
+  QueryEditorPropertyExpression,
 } from './editor/expressions';
 import { AdxSchemaResovler } from 'schema/AdxSchemaResolver';
-import { databasesToDefinition, columnsToDefinition, tablesToDefinition } from 'schema/mapper';
+import {
+  databasesToDefinition,
+  columnsToDefinition,
+  tablesToDefinition,
+  databaseToDefinition,
+  tableToSelectable,
+} from 'schema/mapper';
+import { VisualQueryEditor } from 'VisualQueryEditor';
+import { QueryEditorToolbar } from 'QueryEditorToolbar';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -63,6 +74,109 @@ const defaultQuery: QueryExpression = {
   },
 };
 
+export const TestingEditor: React.FC<Props> = props => {
+  const { datasource, query } = props;
+  const schema = useAsync(() => datasource.getSchema(), [datasource.id]);
+  const databases = useDatabaseOptions(schema.value);
+  const database = useSelectedDatabase(databases, query);
+
+  const onChangeDatabase = useCallback(
+    (database: string) => {
+      props.onChange({
+        ...props.query,
+        database,
+      });
+    },
+    [props.onChange, props.query]
+  );
+
+  const onToggleEditorMode = useCallback(() => {
+    props.onChange({
+      ...props.query,
+      rawMode: !props.query.rawMode,
+    });
+  }, [props.onChange, props.query]);
+
+  // const tables = useTableOptions(schema.value, database);
+  // const table = useSelectedTable(tables, query);
+
+  if (schema.loading) {
+    return <>Loading schema</>;
+  }
+
+  if (schema.error) {
+    return <>Error occured when loading schema</>;
+  }
+
+  if (databases.length === 0) {
+    return <>Could not find any databases in schema</>;
+  }
+
+  const editorMode = props.query.rawMode ? 'raw' : 'visual';
+
+  if (query.rawMode === true) {
+    return (
+      <>
+        <QueryEditorToolbar
+          onRunQuery={props.onRunQuery}
+          onToggleEditorMode={onToggleEditorMode}
+          editorMode={editorMode}
+          onChangeDatabase={onChangeDatabase}
+          database={database}
+          databases={databases}
+        />
+        <>RAW MODE</>;
+      </>
+    );
+  }
+
+  return (
+    <>
+      <QueryEditorToolbar
+        onRunQuery={props.onRunQuery}
+        onToggleEditorMode={onToggleEditorMode}
+        editorMode={editorMode}
+        onChangeDatabase={onChangeDatabase}
+        database={database}
+        databases={databases}
+      />
+      <VisualQueryEditor onChangeQuery={props.onChange} query={props.query} datasourceSchema={schema.value} />
+    </>
+  );
+};
+
+const useSelectedDatabase = (options: QueryEditorPropertyDefinition[], query: KustoQuery): string => {
+  return useMemo(() => {
+    const selected = options.find(option => option.value === query.database);
+
+    if (selected) {
+      return selected.value;
+    }
+
+    if (options.length > 0) {
+      return options[0].value;
+    }
+
+    return '';
+  }, [options, query.database]);
+};
+
+const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[] => {
+  return useMemo(() => {
+    const databases: QueryEditorPropertyDefinition[] = [];
+
+    if (!schema || !schema.Databases) {
+      return databases;
+    }
+
+    for (const name of Object.keys(schema.Databases)) {
+      const database = schema.Databases[name];
+      databases.push(databaseToDefinition(database));
+    }
+
+    return databases;
+  }, [schema]);
+};
 export class QueryEditor extends PureComponent<Props, State> {
   private schemaResolver: AdxSchemaResovler;
   private kustoExpressionParser: KustoExpressionParser;
@@ -125,7 +239,6 @@ export class QueryEditor extends PureComponent<Props, State> {
     try {
       let query = { ...this.props.query }; // mutable query
       const databaseSchema = await this.schemaResolver.getDatabases();
-      console.log('dbschema', databaseSchema);
       const databases = databasesToDefinition(databaseSchema);
 
       // Default first database...
@@ -185,13 +298,13 @@ export class QueryEditor extends PureComponent<Props, State> {
         ...q,
         query: this.kustoExpressionParser.query(expression, columns, database),
       };
-
-      console.log('q', q);
     }
 
     this.props.onChange(q);
+    console.log('onChange', q);
     if (run) {
       this.props.onRunQuery();
+      console.log('onRunQuery', q);
     } else {
       this.setState({ dirty: true });
     }

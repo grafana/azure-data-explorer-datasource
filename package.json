@@ -25,6 +25,7 @@
     "monaco-editor": "0.17.0"
   },
   "dependencies": {
-    "debounce-promise": "^3.1.2"
+    "debounce-promise": "^3.1.2",
+    "react-use": "^15.3.3"
   }
 }

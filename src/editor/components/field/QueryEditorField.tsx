@@ -11,6 +11,13 @@ interface Props {
   placeholder?: string;
 }
 
+export const definitionToProperty = (definition: QueryEditorPropertyDefinition): QueryEditorProperty => {
+  return {
+    name: definition.value,
+    type: definition.type,
+  };
+};
+
 export const QueryEditorField: React.FC<Props> = props => {
   const onChange = useOnChange(props);
   const options = useOptions(props.fields);

@@ -1,16 +1,35 @@
 import { AdxTableSchema, AdxColumnSchema, AdxDatabaseSchema } from '../types';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
+import { SelectableValue } from '@grafana/data';
+
+export const tableToDefinition = (table: AdxTableSchema): QueryEditorPropertyDefinition => {
+  return {
+    label: table.Name,
+    value: table.Name,
+    type: QueryEditorPropertyType.String,
+  };
+};
+
+export const tableToSelectable = (table: AdxTableSchema): SelectableValue<string> => {
+  return {
+    label: table.Name,
+    value: table.Name,
+  };
+};
+
+export const databaseToDefinition = (database: AdxDatabaseSchema): QueryEditorPropertyDefinition => {
+  return {
+    value: database.Name,
+    label: database.Name,
+    type: QueryEditorPropertyType.String,
+  };
+};
 
 export const databasesToDefinition = (databases: AdxDatabaseSchema[]): QueryEditorPropertyDefinition[] => {
   if (!Array.isArray(databases)) {
     return [];
   }
-
-  return databases.map(db => ({
-    value: db.Name,
-    label: db.Name,
-    type: QueryEditorPropertyType.String,
-  }));
+  return databases.map(databaseToDefinition);
 };
 
 export const tablesToDefinition = (tables: AdxTableSchema[]): QueryEditorPropertyDefinition[] => {
