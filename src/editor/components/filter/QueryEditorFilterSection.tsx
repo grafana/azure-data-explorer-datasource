@@ -122,11 +122,11 @@ export const QueryEditorFilterSection = (
                             options={[
                               {
                                 value: 'append-row',
-                                label: 'Add to this row',
+                                label: 'OR - include another option',
                               },
                               {
                                 value: 'new-row',
-                                label: `Add a new "${props.label}" row`,
+                                label: `AND - add a new "${props.label}" clause`,
                               },
                             ]}
                             onChange={value => {
