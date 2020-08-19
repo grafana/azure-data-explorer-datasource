@@ -140,7 +140,13 @@ export const TestingEditor: React.FC<Props> = props => {
         database={database}
         databases={databases}
       />
-      <VisualQueryEditor onChangeQuery={props.onChange} query={props.query} datasourceSchema={schema.value} />
+      <VisualQueryEditor
+        datasource={datasource}
+        database={database}
+        onChangeQuery={props.onChange}
+        query={query}
+        schema={schema.value}
+      />
     </>
   );
 };

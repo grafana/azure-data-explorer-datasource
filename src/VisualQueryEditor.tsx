@@ -1,11 +1,19 @@
 import React, { useMemo, useCallback } from 'react';
-import { KustoQuery, AdxSchema, QueryExpression } from './types';
-import { tableToDefinition } from './schema/mapper';
-import { QueryEditorExpressionType, QueryEditorPropertyExpression, QueryEditorExpression } from 'editor/expressions';
-import { QueryEditorPropertyDefinition } from 'editor/types';
-import { KustoFromEditorSection } from 'VisualQueryEditorSections';
+import { useAsync } from 'react-use';
+import { KustoQuery, AdxSchema, QueryExpression, AdxTableSchema, AdxColumnSchema } from './types';
+import { tableToDefinition, tablesToDefinition, columnsToDefinition } from './schema/mapper';
+import {
+  QueryEditorExpressionType,
+  QueryEditorPropertyExpression,
+  QueryEditorExpression,
+  QueryEditorArrayExpression,
+} from 'editor/expressions';
+import { QueryEditorPropertyDefinition, QueryEditorProperty } from 'editor/types';
+import { KustoFromEditorSection, KustoWhereEditorSection } from 'VisualQueryEditorSections';
 import { definitionToProperty } from 'editor/components/field/QueryEditorField';
 import { isFieldExpression } from 'editor/guards';
+import { AdxDataSource } from 'datasource';
+import { AdxSchemaResovler } from 'schema/AdxSchemaResolver';
 
 const defaultQuery: QueryExpression = {
   where: {
@@ -23,16 +31,28 @@ const defaultQuery: QueryExpression = {
 };
 
 interface Props {
+  database: string;
   query: KustoQuery;
   onChangeQuery: (query: KustoQuery) => void;
-  datasourceSchema?: AdxSchema;
+  schema?: AdxSchema;
+  datasource: AdxDataSource;
 }
 
 export const VisualQueryEditor: React.FC<Props> = props => {
-  const { query, onChangeQuery } = props;
+  const { query, database, datasource, schema } = props;
 
-  const tables = useTableOptions(props.datasourceSchema, query.database);
+  const tables = useTableOptions(schema, database);
   const table = useSelectedTable(tables, query);
+  const tableSchema = useAsync(async () => {
+    if (!table || !table.property) {
+      return [];
+    }
+
+    const schemaResolver = new AdxSchemaResovler(datasource);
+    return await schemaResolver.getColumnsForTable(database, table.property.name);
+  }, [datasource.id, database, table]);
+
+  const columns = useColumnOptions(tableSchema.value);
 
   const onChangeTable = useCallback(
     (expression: QueryEditorExpression) => {
@@ -40,19 +60,62 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         return;
       }
 
-      onChangeQuery({
-        ...query,
+      props.onChangeQuery({
+        ...props.query,
         expression: {
-          ...(query.expression ?? defaultQuery),
+          ...(props.query.expression ?? defaultQuery),
           from: expression,
         },
       });
     },
-    [props.onChangeQuery, query]
+    [props.onChangeQuery, props.query]
+  );
+
+  const onWhereChange = useCallback(
+    (expression: QueryEditorArrayExpression) => {
+      props.onChangeQuery({
+        ...props.query,
+        expression: {
+          ...(query.expression ?? defaultQuery),
+          where: expression,
+        },
+      });
+    },
+    [props.onChangeQuery, props.query]
   );
 
   if (tables.length === 0) {
     return <>Could not find any tables for database</>;
+  }
+
+  if (tableSchema.loading) {
+    return (
+      <>
+        <KustoFromEditorSection
+          templateVariableOptions={[]}
+          label="From"
+          value={table}
+          fields={tables}
+          onChange={onChangeTable}
+        />
+        <>Schema is loading</>
+      </>
+    );
+  }
+
+  if (tableSchema.error) {
+    return (
+      <>
+        <KustoFromEditorSection
+          templateVariableOptions={[]}
+          label="From"
+          value={table}
+          fields={tables}
+          onChange={onChangeTable}
+        />
+        <>Schema loading failed</>
+      </>
+    );
   }
 
   return (
@@ -64,8 +127,27 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         fields={tables}
         onChange={onChangeTable}
       />
+      <KustoWhereEditorSection
+        templateVariableOptions={[]}
+        label="Where (filter)"
+        value={query.expression?.where ?? defaultQuery.where}
+        fields={columns}
+        onChange={onWhereChange}
+        getSuggestions={async (txt: string, skip?: QueryEditorProperty) => {
+          return [];
+        }}
+      />
     </>
   );
+};
+
+const useColumnOptions = (tableSchema?: AdxColumnSchema[]): QueryEditorPropertyDefinition[] => {
+  return useMemo(() => {
+    if (!tableSchema) {
+      return [];
+    }
+    return columnsToDefinition(tableSchema);
+  }, [tableSchema]);
 };
 
 const useSelectedTable = (
