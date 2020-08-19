@@ -1,5 +1,5 @@
 import { KustoExpressionParser } from './KustoExpressionParser';
-import { QueryEditorPropertyType, QueryEditorPropertyDefinition, QueryEditorOperator } from './editor/types';
+import { QueryEditorPropertyType, QueryEditorOperator } from './editor/types';
 import { TemplateSrv } from './test/template_srv';
 import { setTemplateSrv } from '@grafana/runtime';
 import {
@@ -12,7 +12,7 @@ import {
   QueryEditorExpression,
   QueryEditorArrayExpression,
 } from './editor/expressions';
-import { AdxSchemaResolver } from './SchemaResolver';
+import { AdxColumnSchema } from 'types';
 
 describe('KustoExpressionParser', () => {
   let kustoExpressionParser: KustoExpressionParser;
@@ -23,7 +23,7 @@ describe('KustoExpressionParser', () => {
 
   beforeEach(() => {
     setupTemplateSrv();
-    kustoExpressionParser = new KustoExpressionParser(setupSchemaResolver());
+    kustoExpressionParser = new KustoExpressionParser();
 
     from = {
       type: QueryEditorExpressionType.Property,
@@ -62,10 +62,10 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should generate a valid query', () => {
-      const columns: QueryEditorPropertyDefinition[] = [
+      const columns: AdxColumnSchema[] = [
         {
-          type: QueryEditorPropertyType.DateTime,
-          value: 'StartTime',
+          Name: 'StartTime',
+          CslType: 'datetime',
         },
       ];
       const query = kustoExpressionParser.query({ from, where, reduce }, columns, 'db');
@@ -119,12 +119,12 @@ describe('KustoExpressionParser', () => {
   });
 
   describe('table query with no time column', () => {
-    let columns: QueryEditorPropertyDefinition[];
+    let columns: AdxColumnSchema[];
     beforeEach(() => {
       columns = [
         {
-          type: QueryEditorPropertyType.DateTime,
-          value: 'StartTime',
+          CslType: 'datetime',
+          Name: 'StartTime',
         },
       ];
       where = buildWhereWithMultiOperator(['$state']);
@@ -172,8 +172,13 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should generate a valid query', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
-      console.log('query', query);
+      const columns: AdxColumnSchema[] = [
+        {
+          Name: 'Customers.Value',
+          CslType: 'long',
+        },
+      ];
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns, 'db');
 
       expect(query).toBe(
         'StormEvents' +
@@ -329,10 +334,4 @@ function buildGroupByWithNoTimeColumn() {
       } as QueryEditorGroupByExpression,
     ],
   } as QueryEditorRepeaterExpression;
-}
-
-function setupSchemaResolver() {
-  return ({
-    getColumnType: () => 'long',
-  } as any) as AdxSchemaResolver;
 }
