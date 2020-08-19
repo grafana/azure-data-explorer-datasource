@@ -2,13 +2,18 @@ import { AdxColumnSchema, AdxDatabaseSchema, AdxTableSchema } from '../types';
 import { AdxDataSource } from '../datasource';
 import { cache } from './cache';
 
-const schemaKey = 'AdxSchemaResolver.schema';
+const schemaKey = 'AdxSchemaResolver';
 
 export class AdxSchemaResovler {
   constructor(private datasource: AdxDataSource) {}
 
+  private createCacheKey(addition: string): string {
+    return `${schemaKey}.${this.datasource.meta.id}.${addition}`;
+  }
+
   async getDatabases(): Promise<AdxDatabaseSchema[]> {
-    const schema = await cache(schemaKey, () => this.datasource.getSchema());
+    const cacheKey = this.createCacheKey('db');
+    const schema = await cache(cacheKey, () => this.datasource.getSchema());
     return Object.keys(schema.Databases).map(key => schema.Databases[key]);
   }
 
@@ -24,7 +29,7 @@ export class AdxSchemaResovler {
   }
 
   async getColumnsForTable(databaseName: string, tableName: string): Promise<AdxColumnSchema[]> {
-    const cacheKey = `${schemaKey}.${databaseName}.${tableName}`;
+    const cacheKey = this.createCacheKey(`db.${databaseName}.${tableName}`);
 
     return cache(cacheKey, async () => {
       const tables = await this.getTablesForDatabase(databaseName);
