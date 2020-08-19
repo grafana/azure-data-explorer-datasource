@@ -8,7 +8,7 @@ import { QueryEditorExpression, QueryEditorArrayExpression } from '../../express
 import { isReduceExpression } from 'editor/guards';
 import { QueryEditorReduce } from './QueryEditorReduce';
 import { Button, stylesFactory } from '@grafana/ui';
-import { QueryEditorRepeater } from '../common/QueryEditorRepeater';
+import { QueryEditorRepeater } from '../QueryEditorRepeater';
 
 interface ReduceSectionConfiguration {
   defaultValue: QueryEditorExpression;

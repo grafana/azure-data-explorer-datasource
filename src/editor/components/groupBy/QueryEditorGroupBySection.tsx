@@ -6,7 +6,7 @@ import { QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { ExpressionSuggestor } from '../types';
 import { QueryEditorExpression, QueryEditorArrayExpression } from '../../expressions';
-import { QueryEditorRepeater } from '../common/QueryEditorRepeater';
+import { QueryEditorRepeater } from '../QueryEditorRepeater';
 import { isGroupBy } from '../../guards';
 import { QueryEditorGroupBy } from './QueryEditorGroupBy';
 

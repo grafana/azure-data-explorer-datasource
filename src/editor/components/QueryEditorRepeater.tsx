@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { QueryEditorExpression, QueryEditorArrayExpression } from '../../expressions';
+import { QueryEditorExpression, QueryEditorArrayExpression } from '../expressions';
 
 interface Props {
   id: string;
