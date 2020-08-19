@@ -11,7 +11,6 @@ interface Props {
   templateVariableOptions: SelectableValue<string>;
   intervals: QueryEditorPropertyDefinition[];
   value?: QueryEditorGroupByExpression;
-  label?: string;
   onChange: (expression: QueryEditorGroupByExpression) => void;
 }
 

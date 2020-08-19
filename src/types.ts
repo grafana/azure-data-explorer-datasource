@@ -4,8 +4,8 @@ import { QueryEditorExpression, QueryEditorArrayExpression } from './editor/expr
 export interface QueryExpression {
   from?: QueryEditorExpression;
   where: QueryEditorArrayExpression;
-  reduce?: QueryEditorExpression;
-  groupBy?: QueryEditorExpression;
+  reduce: QueryEditorArrayExpression;
+  groupBy: QueryEditorArrayExpression;
 }
 
 export interface KustoQuery extends DataQuery {

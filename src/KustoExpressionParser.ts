@@ -9,11 +9,10 @@ import {
   isSingleOperator,
   isGroupBy,
   isDateGroupBy,
-  isRepeater,
   isAndExpression,
   isOrExpression,
 } from './editor/guards';
-import { QueryEditorExpression, QueryEditorOperatorExpression } from './editor/expressions';
+import { QueryEditorExpression, QueryEditorOperatorExpression, QueryEditorArrayExpression } from './editor/expressions';
 import { columnsToDefinition } from 'schema/mapper';
 
 export class KustoExpressionParser {
@@ -68,7 +67,7 @@ export class KustoExpressionParser {
     return parts.join('\n| ');
   }
 
-  appendTimeFilter(groupByExpression: QueryEditorExpression, defaultTimeColumn: string, parts: string[]) {
+  appendTimeFilter(groupByExpression: QueryEditorArrayExpression, defaultTimeColumn: string, parts: string[]) {
     let dateTimeField = defaultTimeColumn;
 
     if (groupByExpression) {
@@ -78,24 +77,20 @@ export class KustoExpressionParser {
     parts.push(`where $__timeFilter(${dateTimeField})`);
   }
 
-  appendProject(expression: QueryEditorExpression, defaultTimeColumn: string, parts: string[]) {
+  appendProject(expression: QueryEditorArrayExpression, defaultTimeColumn: string, parts: string[]) {
     let project = 'project ';
     let timeCol = defaultTimeColumn;
 
     const fields: string[] = [];
 
-    if (isRepeater(expression)) {
-      for (const exp of expression.expressions) {
-        if (isReduceExpression(exp) && exp.property?.name) {
-          if (exp.property.type === QueryEditorPropertyType.DateTime) {
-            timeCol = exp.property.name;
-          } else {
-            fields.push(exp.property.name);
-          }
+    for (const exp of expression.expressions) {
+      if (isReduceExpression(exp) && exp.property?.name) {
+        if (exp.property.type === QueryEditorPropertyType.DateTime) {
+          timeCol = exp.property.name;
+        } else {
+          fields.push(exp.property.name);
         }
       }
-    } else if (isReduceExpression(expression)) {
-      fields.push(expression.property.name);
     }
 
     if (fields.length > 0) {
@@ -186,48 +181,46 @@ export class KustoExpressionParser {
   }
 
   private appendSummarize(
-    reduceExpression: QueryEditorExpression,
-    groupByExpression: QueryEditorExpression,
+    reduceExpression: QueryEditorArrayExpression,
+    groupByExpression: QueryEditorArrayExpression,
     columns: AdxColumnSchema[],
     parts: string[]
   ) {
-    if (isRepeater(groupByExpression) && isRepeater(reduceExpression)) {
-      let summarize = 'summarize ';
-      let reduceExpressions: string[] = [];
+    let summarize = 'summarize ';
+    let reduceExpressions: string[] = [];
 
-      for (const exp of reduceExpression.expressions) {
-        if (isReduceExpression(exp) && exp?.reduce?.name !== 'none' && exp?.property?.name) {
-          const field = this.castIfDynamic(exp.property.name, columns);
+    for (const exp of reduceExpression.expressions) {
+      if (isReduceExpression(exp) && exp?.reduce?.name !== 'none' && exp?.property?.name) {
+        const field = this.castIfDynamic(exp.property.name, columns);
 
-          if (exp?.parameters && exp?.parameters.length > 0) {
-            reduceExpressions.push(`${exp.reduce.name}(${field}, ${exp.parameters.map(p => p.value).join(', ')})`);
-          } else {
-            reduceExpressions.push(`${exp.reduce.name}(${field})`);
-          }
-        }
-      }
-
-      summarize += reduceExpressions.join(', ');
-
-      const fields = this.getGroupByFields(groupByExpression);
-      if (fields.dateTimeField) {
-        summarize += ` by bin(${fields.dateTimeField}, ${fields.interval})`;
-      }
-      if (fields.groupByFields.length > 0) {
-        if (fields.dateTimeField) {
-          summarize += `,`;
+        if (exp?.parameters && exp?.parameters.length > 0) {
+          reduceExpressions.push(`${exp.reduce.name}(${field}, ${exp.parameters.map(p => p.value).join(', ')})`);
         } else {
-          summarize += ' by ';
+          reduceExpressions.push(`${exp.reduce.name}(${field})`);
         }
-        summarize += fields.groupByFields.join(', ');
       }
+    }
 
-      parts.push(summarize);
+    summarize += reduceExpressions.join(', ');
 
+    const fields = this.getGroupByFields(groupByExpression);
+    if (fields.dateTimeField) {
+      summarize += ` by bin(${fields.dateTimeField}, ${fields.interval})`;
+    }
+    if (fields.groupByFields.length > 0) {
       if (fields.dateTimeField) {
-        const orderBy = `order by ${fields.dateTimeField} asc`;
-        parts.push(orderBy);
+        summarize += `,`;
+      } else {
+        summarize += ' by ';
       }
+      summarize += fields.groupByFields.join(', ');
+    }
+
+    parts.push(summarize);
+
+    if (fields.dateTimeField) {
+      const orderBy = `order by ${fields.dateTimeField} asc`;
+      parts.push(orderBy);
     }
   }
 
@@ -258,27 +251,25 @@ export class KustoExpressionParser {
     }, '');
   }
 
-  private getGroupByFields(groupByExpression: QueryEditorExpression): GroupByFields {
+  private getGroupByFields(groupByExpression: QueryEditorArrayExpression): GroupByFields {
     let dateTimeField = '';
     let interval = '';
     let groupByFields: string[] = [];
 
-    if (isRepeater(groupByExpression)) {
-      for (const exp of groupByExpression.expressions) {
-        if (isGroupBy(exp) && isDateGroupBy(exp) && exp.interval) {
-          dateTimeField = exp.property.name;
-          interval = exp.interval.name;
-        } else if (isGroupBy(exp) && !isDateGroupBy(exp) && exp.property && exp.property.name) {
-          groupByFields.push(exp.property.name);
-        }
+    for (const exp of groupByExpression.expressions) {
+      if (isGroupBy(exp) && isDateGroupBy(exp) && exp.interval) {
+        dateTimeField = exp.property.name;
+        interval = exp.interval.name;
+      } else if (isGroupBy(exp) && !isDateGroupBy(exp) && exp.property && exp.property.name) {
+        groupByFields.push(exp.property.name);
       }
     }
 
     return { dateTimeField, interval, groupByFields };
   }
 
-  private isAggregated(exp: QueryEditorExpression): boolean {
-    return isRepeater(exp) && exp.expressions.length > 0;
+  private isAggregated(exp: QueryEditorArrayExpression): boolean {
+    return exp.expressions.length > 0;
   }
 
   private isQuotedString(value: string): boolean {

@@ -4,15 +4,14 @@ import {
   QueryEditorFunctionParameterExpression,
   QueryEditorOperatorExpression,
   QueryEditorGroupByExpression,
-  QueryEditorRepeaterExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
   QueryEditorArrayExpression,
 } from './expressions';
 import { QueryEditorPropertyType, QueryEditorOperator } from './types';
 
-export const isReduceExpression = (expression: QueryEditorExpression): expression is QueryEditorReduceExpression => {
-  return (expression as QueryEditorReduceExpression)?.type === QueryEditorExpressionType.Reduce;
+export const isReduceExpression = (expression?: QueryEditorExpression): expression is QueryEditorReduceExpression => {
+  return expression?.type === QueryEditorExpressionType.Reduce;
 };
 
 export const isFieldExpression = (expression: QueryEditorExpression): expression is QueryEditorPropertyExpression => {
@@ -20,19 +19,17 @@ export const isFieldExpression = (expression: QueryEditorExpression): expression
 };
 
 export const isFunctionParameterExpression = (
-  expression: QueryEditorExpression | undefined
+  expression?: QueryEditorExpression
 ): expression is QueryEditorFunctionParameterExpression => {
   return (expression as QueryEditorFunctionParameterExpression)?.type === QueryEditorExpressionType.FunctionParameter;
 };
 
-export const isFieldAndOperator = (
-  expression: QueryEditorExpression | undefined
-): expression is QueryEditorOperatorExpression => {
+export const isFieldAndOperator = (expression?: QueryEditorExpression): expression is QueryEditorOperatorExpression => {
   return expression?.type === QueryEditorExpressionType.Operator;
 };
 
-export const isGroupBy = (expression: QueryEditorExpression): expression is QueryEditorGroupByExpression => {
-  return (expression as QueryEditorGroupByExpression)?.type === QueryEditorExpressionType.GroupBy;
+export const isGroupBy = (expression?: QueryEditorExpression): expression is QueryEditorGroupByExpression => {
+  return expression?.type === QueryEditorExpressionType.GroupBy;
 };
 
 export const isDateGroupBy = (expression: QueryEditorExpression): boolean => {
@@ -43,20 +40,12 @@ export const isBoolOperator = (operator: QueryEditorOperator | undefined): opera
   return typeof operator?.value === 'boolean';
 };
 
-export const isMultiOperator = (
-  operator: QueryEditorOperator | undefined
-): operator is QueryEditorOperator<string[]> => {
+export const isMultiOperator = (operator?: QueryEditorOperator): operator is QueryEditorOperator<string[]> => {
   return Array.isArray(operator?.value);
 };
 
-export const isSingleOperator = (
-  operator: QueryEditorOperator | undefined
-): operator is QueryEditorOperator<string> => {
+export const isSingleOperator = (operator?: QueryEditorOperator): operator is QueryEditorOperator<string> => {
   return !isMultiOperator(operator);
-};
-
-export const isRepeater = (expression: QueryEditorExpression): expression is QueryEditorRepeaterExpression => {
-  return (expression as QueryEditorRepeaterExpression)?.type === QueryEditorExpressionType.OperatorRepeater;
 };
 
 export const isAndExpression = (expression?: QueryEditorExpression): expression is QueryEditorArrayExpression => {

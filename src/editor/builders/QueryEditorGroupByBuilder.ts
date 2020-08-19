@@ -1,29 +1,20 @@
 import React from 'react';
-import { QueryEditorPropertyDefinition, QueryEditorPropertyType, QueryEditorProperty } from '../types';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../types';
 import {
   QueryEditorGroupBySection,
   QueryEditorGroupBySectionProps,
 } from '../components/groupBy/QueryEditorGroupBySection';
 import { QueryEditorIntervalBuilder } from './QueryEditorIntervalBuilder';
-import {
-  QueryEditorRepeaterExpression,
-  QueryEditorGroupByExpression,
-  QueryEditorPropertyExpression,
-  QueryEditorExpression,
-  QueryEditorExpressionType,
-} from '../expressions';
+import { QueryEditorGroupByExpression, QueryEditorExpressionType } from '../expressions';
 
 export class QueryEditorGroupByBuilder {
   private intervals: QueryEditorPropertyDefinition[];
-  private multipleRows = false;
 
   constructor() {
     this.intervals = [];
-    this.multipleRows = false;
   }
 
   withMultipleRows(value: boolean) {
-    this.multipleRows = value;
     return this;
   }
 
@@ -39,44 +30,13 @@ export class QueryEditorGroupByBuilder {
     });
   }
 
-  private buildGroupByExpressions(): QueryEditorExpression {
-    if (this.multipleRows) {
-      if (this.intervals.length > 0) {
-        return this.buildRepeaterExpression(QueryEditorExpressionType.GroupBy);
-      }
-      return this.buildRepeaterExpression(QueryEditorExpressionType.Property);
-    }
-
-    if (this.intervals.length > 0) {
-      return this.buildGroupByExpression();
-    }
-
-    return {
-      type: QueryEditorExpressionType.Property,
-      property: this.buildProperty(QueryEditorPropertyType.String),
-    } as QueryEditorPropertyExpression;
-  }
-
-  private buildRepeaterExpression(typeToRepeat: QueryEditorExpressionType): QueryEditorRepeaterExpression {
-    return {
-      type: QueryEditorExpressionType.OperatorRepeater,
-      typeToRepeat: typeToRepeat,
-      expressions: [],
-    };
-  }
-
-  private buildGroupByExpression(): QueryEditorGroupByExpression {
+  private buildGroupByExpressions(): QueryEditorGroupByExpression {
     return {
       type: QueryEditorExpressionType.GroupBy,
-      property: this.buildProperty(QueryEditorPropertyType.String),
-      interval: this.buildProperty(QueryEditorPropertyType.Interval),
-    };
-  }
-
-  private buildProperty(type: QueryEditorPropertyType): QueryEditorProperty {
-    return {
-      name: '',
-      type,
+      property: {
+        name: '',
+        type: QueryEditorPropertyType.String,
+      },
     };
   }
 }

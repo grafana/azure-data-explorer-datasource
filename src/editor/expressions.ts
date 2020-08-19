@@ -3,7 +3,6 @@ import { QueryEditorPropertyType, QueryEditorProperty, QueryEditorOperator } fro
 export enum QueryEditorExpressionType {
   Property = 'property',
   Operator = 'operator',
-  OperatorRepeater = 'operatorRepeater',
   Reduce = 'reduce',
   FunctionParameter = 'functionParameter',
   GroupBy = 'groupBy',
@@ -38,12 +37,6 @@ export interface QueryEditorGroupByExpression extends QueryEditorExpression {
   property: QueryEditorProperty;
   interval?: QueryEditorProperty;
 }
-
-export interface QueryEditorRepeaterExpression extends QueryEditorExpression {
-  typeToRepeat: QueryEditorExpressionType;
-  expressions: QueryEditorExpression[];
-}
-
 export interface QueryEditorArrayExpression extends QueryEditorExpression {
   expressions: QueryEditorExpression[];
 }

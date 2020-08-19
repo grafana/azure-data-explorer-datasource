@@ -31,19 +31,6 @@ export class QueryEditorFilterBuilder {
     });
   }
 
-  // protected buildFilterExpression(): QueryEditorFieldAndOperatorExpression {
-  //   // if (this.multipleRows) {
-  //   //   if (this.operators.length > 0) {
-  //   //     return this.buildRepeaterExpression(QueryEditorExpressionType.FieldAndOperator);
-  //   //   }
-  //   //   return this.buildRepeaterExpression(QueryEditorExpressionType.Field);
-  //   // }
-  //   // if (this.operators.length > 0) {
-  //   //   return this.buildOperatorExpression();
-  //   // }
-  //   // return this.buildFieldExpression();
-  // }
-
   private buildOperatorExpression(): QueryEditorOperatorExpression {
     const operator = this.operators[0];
 
@@ -53,14 +40,6 @@ export class QueryEditorFilterBuilder {
       operator: definitionToOperator(operator),
     };
   }
-
-  // private buildRepeaterExpression(typeToRepeat: QueryEditorExpressionType): QueryEditorRepeaterExpression {
-  //   return {
-  //     type: QueryEditorExpressionType.OperatorRepeater,
-  //     typeToRepeat: typeToRepeat,
-  //     expressions: [],
-  //   };
-  // }
 
   private buildFieldExpression(): QueryEditorProperty {
     return {

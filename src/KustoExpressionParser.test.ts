@@ -5,7 +5,6 @@ import { setTemplateSrv } from '@grafana/runtime';
 import {
   QueryEditorPropertyExpression,
   QueryEditorOperatorExpression,
-  QueryEditorRepeaterExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
   QueryEditorExpressionType,
@@ -18,8 +17,8 @@ describe('KustoExpressionParser', () => {
   let kustoExpressionParser: KustoExpressionParser;
   let from: QueryEditorExpression;
   let where: QueryEditorArrayExpression;
-  let reduce: QueryEditorExpression;
-  let groupBy: QueryEditorExpression;
+  let reduce: QueryEditorArrayExpression;
+  let groupBy: QueryEditorArrayExpression;
 
   beforeEach(() => {
     setupTemplateSrv();
@@ -57,8 +56,8 @@ describe('KustoExpressionParser', () => {
   describe('simple query with no group by', () => {
     beforeEach(() => {
       where = buildWhereWithMultiOperator(['NY']);
-
       reduce = buildReduce(['State', 'DamageProperty'], ['none', 'none']);
+      groupBy = { type: QueryEditorExpressionType.And, expressions: [] };
     });
 
     it('should generate a valid query', () => {
@@ -68,7 +67,7 @@ describe('KustoExpressionParser', () => {
           CslType: 'datetime',
         },
       ];
-      const query = kustoExpressionParser.query({ from, where, reduce }, columns, 'db');
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns, 'db');
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY')" +
@@ -264,7 +263,7 @@ function buildWhereWithSingleOperator(): QueryEditorArrayExpression {
   };
 }
 
-function buildReduce(fields: string[], functions: string[], parameter = ''): QueryEditorExpression {
+function buildReduce(fields: string[], functions: string[], parameter = ''): QueryEditorArrayExpression {
   let expressions: QueryEditorReduceExpression[] = [];
 
   fields.forEach((field, i) => {
@@ -294,16 +293,14 @@ function buildReduce(fields: string[], functions: string[], parameter = ''): Que
   });
 
   return {
-    type: QueryEditorExpressionType.OperatorRepeater,
-    typeToRepeat: QueryEditorExpressionType.Operator,
+    type: QueryEditorExpressionType.And,
     expressions: expressions,
-  } as QueryEditorRepeaterExpression;
+  };
 }
 
-function buildGroupBy() {
+function buildGroupBy(): QueryEditorArrayExpression {
   return {
-    type: QueryEditorExpressionType.OperatorRepeater,
-    typeToRepeat: QueryEditorExpressionType.GroupBy,
+    type: QueryEditorExpressionType.And,
     expressions: [
       {
         type: QueryEditorExpressionType.GroupBy,
@@ -317,13 +314,12 @@ function buildGroupBy() {
         },
       } as QueryEditorGroupByExpression,
     ],
-  } as QueryEditorRepeaterExpression;
+  };
 }
 
-function buildGroupByWithNoTimeColumn() {
+function buildGroupByWithNoTimeColumn(): QueryEditorArrayExpression {
   return {
-    type: QueryEditorExpressionType.OperatorRepeater,
-    typeToRepeat: QueryEditorExpressionType.GroupBy,
+    type: QueryEditorExpressionType.And,
     expressions: [
       {
         type: QueryEditorExpressionType.GroupBy,
@@ -333,5 +329,5 @@ function buildGroupByWithNoTimeColumn() {
         },
       } as QueryEditorGroupByExpression,
     ],
-  } as QueryEditorRepeaterExpression;
+  };
 }

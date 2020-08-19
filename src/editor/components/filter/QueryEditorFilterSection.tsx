@@ -1,11 +1,10 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { css } from 'emotion';
 import { QueryEditorOperatorDefinition, QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorSectionProps, QueryEditorSection } from '../QueryEditorSection';
 import { SelectableValue } from '@grafana/data';
 import { SkippableExpressionSuggestor } from '../types';
 import {
-  QueryEditorExpression,
   QueryEditorArrayExpression,
   QueryEditorOperatorExpression,
   QueryEditorExpressionType,
@@ -13,6 +12,7 @@ import {
 import { isFieldAndOperator, isOrExpression } from 'editor/guards';
 import { QueryEditorFieldAndOperator } from './QueryEditorFieldAndOperator';
 import { Button, Select, stylesFactory, InlineFormLabel } from '@grafana/ui';
+import { QueryEditorRepeater } from '../common/QueryEditorRepeater';
 
 interface FilterSectionConfiguration {
   operators: QueryEditorOperatorDefinition[];
@@ -58,7 +58,7 @@ export const QueryEditorFilterSection = (
     }
 
     return (
-      <Repeater id="filter-and" value={props.value} onChange={props.onChange}>
+      <QueryEditorRepeater id="filter-and" value={props.value} onChange={props.onChange}>
         {filterProps => {
           if (!isOrExpression(filterProps.value)) {
             return null;
@@ -74,10 +74,12 @@ export const QueryEditorFilterSection = (
                 <Button
                   variant="secondary"
                   onClick={() => {
-                    filterProps.onChange({
+                    const expression: QueryEditorArrayExpression = {
                       type: QueryEditorExpressionType.Or,
                       expressions: [config.defaultValue],
-                    } as QueryEditorArrayExpression);
+                    };
+
+                    filterProps.onChange(expression);
                   }}
                   icon="plus"
                 />
@@ -88,7 +90,7 @@ export const QueryEditorFilterSection = (
           return (
             <QueryEditorSection label={props.label}>
               <div className={styles.container}>
-                <Repeater id="filter-or" value={filterProps.value} onChange={filterProps.onChange}>
+                <QueryEditorRepeater id="filter-or" value={filterProps.value} onChange={filterProps.onChange}>
                   {operatorProps => {
                     if (!isFieldAndOperator(operatorProps.value)) {
                       console.log('invalid fieldandoperator-expression');
@@ -150,12 +152,12 @@ export const QueryEditorFilterSection = (
                       </div>
                     );
                   }}
-                </Repeater>
+                </QueryEditorRepeater>
               </div>
             </QueryEditorSection>
           );
         }}
-      </Repeater>
+      </QueryEditorRepeater>
     );
   };
 };
@@ -181,61 +183,3 @@ const getStyles = stylesFactory(() => {
     `,
   };
 });
-
-interface RepeaterProps {
-  id: string;
-  value: QueryEditorArrayExpression;
-  onChange: (value: QueryEditorArrayExpression) => void;
-  children: (props: ChildProps) => React.ReactElement | null;
-}
-
-interface ChildProps {
-  index: number;
-  onChange: (value: QueryEditorExpression) => void;
-  onRemove: () => void;
-  onAdd: (value: QueryEditorExpression) => void;
-  value?: QueryEditorExpression;
-}
-
-export const Repeater: React.FC<RepeaterProps> = props => {
-  const onChange = useCallback(
-    (index: number, expression?: QueryEditorExpression) => {
-      const { expressions } = props.value;
-      const next = Array.from(expressions);
-
-      if (expression) {
-        next.splice(index, 1, expression);
-      } else {
-        next.splice(index, 1);
-      }
-
-      props.onChange({
-        ...props.value,
-        expressions: next,
-      });
-    },
-    [props.children, props.onChange, props.value]
-  );
-
-  if (!props.value?.expressions) {
-    return null;
-  }
-
-  return (
-    <>
-      {props.value.expressions.map((value, index) => {
-        return (
-          <React.Fragment key={`${props.id}-${index}`}>
-            {props.children({
-              index,
-              value,
-              onChange: (expression: QueryEditorExpression) => onChange(index, expression),
-              onAdd: (expression: QueryEditorExpression) => onChange(props.value.expressions.length, expression),
-              onRemove: () => onChange(index),
-            })}
-          </React.Fragment>
-        );
-      })}
-    </>
-  );
-};

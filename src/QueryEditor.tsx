@@ -27,7 +27,6 @@ import { css } from 'emotion';
 import {} from '@emotion/core';
 import {
   QueryEditorGroupByExpression,
-  QueryEditorRepeaterExpression,
   QueryEditorExpressionType,
   QueryEditorExpression,
   QueryEditorArrayExpression,
@@ -51,6 +50,14 @@ interface State {
 
 const defaultQuery: QueryExpression = {
   where: {
+    type: QueryEditorExpressionType.And,
+    expressions: [],
+  },
+  groupBy: {
+    type: QueryEditorExpressionType.And,
+    expressions: [],
+  },
+  reduce: {
     type: QueryEditorExpressionType.And,
     expressions: [],
   },
@@ -247,7 +254,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
-  onReduceChanged = (reduce: QueryEditorExpression) => {
+  onReduceChanged = (reduce: QueryEditorArrayExpression) => {
     const { query } = this.props;
     this.onUpdateQuery({
       ...query,
@@ -259,7 +266,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
-  onGroupByChanged = (groupBy: QueryEditorExpression) => {
+  onGroupByChanged = (groupBy: QueryEditorArrayExpression) => {
     const { query } = this.props;
     this.onUpdateQuery({
       ...query,
@@ -306,15 +313,13 @@ export class QueryEditor extends PureComponent<Props, State> {
         if (!reduce) {
           // Needed so that the summarize renders
           reduce = {
-            type: QueryEditorExpressionType.OperatorRepeater,
-            typeToRepeat: QueryEditorExpressionType.Reduce,
+            type: QueryEditorExpressionType.And,
             expressions: [],
-          } as QueryEditorRepeaterExpression;
+          } as QueryEditorArrayExpression;
         }
 
-        const groupBy = {
-          type: QueryEditorExpressionType.OperatorRepeater,
-          typeToRepeat: QueryEditorExpressionType.GroupBy,
+        const groupBy: QueryEditorArrayExpression = {
+          type: QueryEditorExpressionType.And,
           expressions: [
             {
               type: QueryEditorExpressionType.GroupBy,
@@ -328,7 +333,7 @@ export class QueryEditor extends PureComponent<Props, State> {
               },
             } as QueryEditorGroupByExpression,
           ],
-        } as QueryEditorRepeaterExpression;
+        };
 
         return {
           ...query,
@@ -514,7 +519,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           onChange={this.onFromChanged}
         />
         <KustoWhereEditorSection
-          value={where}
+          value={where ?? defaultQuery.where}
           label="Where (filter)"
           fields={columns}
           templateVariableOptions={this.templateVariableOptions}
@@ -522,7 +527,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           getSuggestions={this.getSuggestionsNicely}
         />
         <KustoValueColumnEditorSection
-          value={reduce}
+          value={reduce ?? defaultQuery.reduce}
           label="Value columns"
           fields={columns}
           templateVariableOptions={this.templateVariableOptions}
@@ -530,7 +535,7 @@ export class QueryEditor extends PureComponent<Props, State> {
           getSuggestions={this.getSuggestionsNicely}
         />
         <KustoGroupByEditorSection
-          value={groupBy}
+          value={groupBy ?? defaultQuery.groupBy}
           label="Group by (summarize)"
           fields={groupable}
           templateVariableOptions={this.templateVariableOptions}
