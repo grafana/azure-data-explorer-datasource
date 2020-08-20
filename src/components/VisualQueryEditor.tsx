@@ -54,11 +54,11 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   const onAutoComplete = useCallback(
     async (searchTerm?: string, column?: string) => {
       const tableName = table?.property.name;
-      const autoComplete = new AdxAutoComplete(datasource, database, tableName);
+      const autoComplete = new AdxAutoComplete(datasource, tableSchema.value, database, tableName);
       const values = await autoComplete.search(searchTerm, column);
       return values.map(value => ({ value, label: value }));
     },
-    [datasource, database, table]
+    [datasource, database, table, tableSchema.value]
   );
 
   const columns = useColumnOptions(tableSchema.value);
