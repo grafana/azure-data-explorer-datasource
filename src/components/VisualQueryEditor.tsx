@@ -20,7 +20,7 @@ import { definitionToProperty } from '../editor/components/field/QueryEditorFiel
 import { isFieldExpression } from '../editor/guards';
 import { AdxDataSource } from '../datasource';
 import { AdxSchemaResovler } from '../schema/AdxSchemaResolver';
-import { QueryEditorResultFormat } from '../components/QueryEditorResultFormat';
+import { QueryEditorResultFormat, useSelectedFormat } from '../components/QueryEditorResultFormat';
 import { KustoExpressionParser } from '../KustoExpressionParser';
 import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
@@ -41,6 +41,7 @@ const kustoExpressionParser = new KustoExpressionParser();
 export const VisualQueryEditor: React.FC<Props> = props => {
   const { query, database, datasource, schema } = props;
 
+  const resultFormat = useSelectedFormat(query.resultFormat);
   const tables = useTableOptions(schema, database);
   const table = useSelectedTable(tables, query);
   const tableSchema = useAsync(async () => {
@@ -77,12 +78,13 @@ export const VisualQueryEditor: React.FC<Props> = props => {
 
       props.onChangeQuery({
         ...props.query,
+        resultFormat: resultFormat,
         database: database,
         expression: next,
         query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [database, props.onChangeQuery, props.query, tableSchema.value]
+    [database, props.onChangeQuery, props.query, tableSchema.value, resultFormat]
   );
 
   const onWhereChange = useCallback(
@@ -95,12 +97,13 @@ export const VisualQueryEditor: React.FC<Props> = props => {
 
       props.onChangeQuery({
         ...props.query,
+        resultFormat: resultFormat,
         database: database,
         expression: next,
         query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value]
+    [props.onChangeQuery, props.query, tableSchema.value, resultFormat]
   );
 
   const onReduceChange = useCallback(
@@ -112,11 +115,12 @@ export const VisualQueryEditor: React.FC<Props> = props => {
 
       props.onChangeQuery({
         ...props.query,
+        resultFormat: resultFormat,
         expression: next,
         query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value]
+    [props.onChangeQuery, props.query, tableSchema.value, resultFormat]
   );
 
   const onGroupByChange = useCallback(
@@ -128,11 +132,12 @@ export const VisualQueryEditor: React.FC<Props> = props => {
 
       props.onChangeQuery({
         ...props.query,
+        resultFormat: resultFormat,
         expression: next,
         query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value]
+    [props.onChangeQuery, props.query, tableSchema.value, resultFormat]
   );
 
   if (tableSchema.loading) {

@@ -28,6 +28,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
+
     this.backendSrv = getBackendSrv();
     this.templateSrv = getTemplateSrv();
     this.baseUrl = '/azuredataexplorer';

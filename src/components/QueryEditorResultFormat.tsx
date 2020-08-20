@@ -16,7 +16,7 @@ const formats: Array<SelectableValue<string>> = [
 
 export const QueryEditorResultFormat: React.FC<Props> = props => {
   const { query } = props;
-  const format = useSelectedFormat(formats, query.resultFormat);
+  const format = useSelectedFormat(query.resultFormat);
   const onChangeFormat = useCallback(
     (selectable: SelectableValue<string>) => {
       if (!selectable || !selectable.value) {
@@ -52,7 +52,7 @@ const getStyles = stylesFactory(() => {
   };
 });
 
-const useSelectedFormat = (formats: Array<SelectableValue<string>>, format?: string): string => {
+export const useSelectedFormat = (format?: string): string => {
   const selected = formats.find(f => f.value === format);
 
   if (selected && selected.value) {
