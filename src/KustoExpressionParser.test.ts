@@ -48,7 +48,7 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY', 'TX')" +
-          `\n| limit ${limit}` +
+          `\n| take ${limit}` +
           '\n| summarize sum(DamageProperty) by bin(StartTime, 1h)' +
           '\n| order by StartTime asc'
       );
@@ -73,7 +73,7 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY')" +
-          `\n| limit ${limit}` +
+          `\n| take ${limit}` +
           '\n| project StartTime, State, DamageProperty' +
           '\n| order by StartTime asc'
       );
@@ -94,7 +94,7 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
-          `\n| limit ${limit}` +
+          `\n| take ${limit}` +
           '\n| summarize sum(DamageProperty) by bin(StartTime, 1h)' +
           '\n| order by StartTime asc'
       );
@@ -115,7 +115,7 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
-          `\n| limit ${limit}` +
+          `\n| take ${limit}` +
           '\n| summarize sum(DamageProperty) by bin(StartTime, 1h)' +
           '\n| order by StartTime asc'
       );
@@ -143,7 +143,7 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
-          `\n| limit ${limit}` +
+          `\n| take ${limit}` +
           '\n| summarize sum(DamageProperty) by State'
       );
     });
@@ -163,7 +163,7 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
-          `\n| limit ${limit}` +
+          `\n| take ${limit}` +
           '\n| summarize percentile(DamageProperty, 95) by bin(StartTime, 1h)' +
           '\n| order by StartTime asc'
       );
@@ -189,7 +189,7 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
-          `\n| limit ${limit}` +
+          `\n| take ${limit}` +
           '\n| summarize sum(tolong(todynamic(Customers).Value)) by bin(StartTime, 1h)' +
           '\n| order by StartTime asc'
       );

@@ -62,7 +62,7 @@ export class KustoExpressionParser {
       this.appendWhere(where, parts);
     }
 
-    parts.push(`limit ${this.limit}`);
+    parts.push(`take ${this.limit}`);
 
     if (reduce && groupBy && this.isAggregated(groupBy)) {
       this.appendSummarize(reduce, groupBy, columns, parts);
