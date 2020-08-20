@@ -23,6 +23,7 @@ export const QueryEditor: React.FC<Props> = props => {
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, query);
   const templateVariables = useTemplateVariables(datasource);
+  const rawMode = isRawMode(props);
 
   const onChangeDatabase = useCallback(
     (database: string) => {
@@ -37,8 +38,8 @@ export const QueryEditor: React.FC<Props> = props => {
   const onToggleEditorMode = useCallback(() => {
     props.onChange({
       ...props.query,
-      rawMode: !props.query.rawMode,
-      querySource: props.query.rawMode ? 'visual' : 'raw',
+      rawMode: !rawMode,
+      querySource: rawMode ? 'visual' : 'raw',
     });
   }, [props.onChange, props.query]);
 
@@ -64,7 +65,7 @@ export const QueryEditor: React.FC<Props> = props => {
     );
   }
 
-  const editorMode = props.query.rawMode ? 'raw' : 'visual';
+  const editorMode = rawMode ? 'raw' : 'visual';
 
   return (
     <>
@@ -712,10 +713,9 @@ const useTemplateVariables = (datasource: AdxDataSource) => {
 
 // const toOption = (value: string) => ({ label: value, value } as SelectableValue<string>);
 
-// function isInitialRawMode(props: Props): boolean {
-//   if (props.query.rawMode === undefined && props.query.query && !props.query.expression?.from) {
-//     return true;
-//   }
-
-//   return props.query.rawMode || false;
-// }
+function isRawMode(props: Props): boolean {
+  if (props.query.rawMode === undefined && props.query.query && !props.query.expression?.from) {
+    return true;
+  }
+  return props.query.rawMode || false;
+}
