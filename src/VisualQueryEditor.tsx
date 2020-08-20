@@ -69,28 +69,31 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       }
 
       const next = {
-        ...props.query.expression,
+        ...defaultQuery.expression,
         from: expression,
       };
 
       props.onChangeQuery({
         ...props.query,
+        database: database,
         expression: next,
         query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value]
+    [database, props.onChangeQuery, props.query, tableSchema.value]
   );
 
   const onWhereChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
       const next = {
         ...props.query.expression,
+        from: table,
         where: expression,
       };
 
       props.onChangeQuery({
         ...props.query,
+        database: database,
         expression: next,
         query: kustoExpressionParser.query(next, tableSchema.value),
       });
@@ -159,7 +162,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
           fields={tables}
           onChange={onChangeTable}
         />
-        <>Schema loading failed</>
+        <>Schema loading failed {tableSchema.error.message}</>
       </>
     );
   }

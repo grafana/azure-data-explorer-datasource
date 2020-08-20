@@ -55,12 +55,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
     let q = interpolateKustoQuery(target.query);
 
-    if (scopedVars['__interval']) {
-      q = this.templateSrv.replace(q, pick(scopedVars, '__interval'));
-    }
+    if (scopedVars) {
+      if (scopedVars['__interval']) {
+        q = this.templateSrv.replace(q, pick(scopedVars, '__interval'));
+      }
 
-    if (scopedVars['__interval_ms']) {
-      q = this.templateSrv.replace(q, pick(scopedVars, '__interval_ms'));
+      if (scopedVars['__interval_ms']) {
+        q = this.templateSrv.replace(q, pick(scopedVars, '__interval_ms'));
+      }
     }
 
     return {
