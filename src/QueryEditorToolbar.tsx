@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { css } from 'emotion';
-import { Select, Button, stylesFactory } from '@grafana/ui';
+import { Select, Button, stylesFactory, ConfirmModal } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorSection } from './editor/components/QueryEditorSection';
 
@@ -10,12 +10,22 @@ interface Props {
   database: string;
   databases: Array<SelectableValue<string>>;
   editorMode: EditorMode;
+  dirty: boolean;
   onChangeDatabase: (databaseName: string) => void;
   onRunQuery: () => void;
   onToggleEditorMode: () => void;
 }
 
 export const QueryEditorToolbar: React.FC<Props> = props => {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const onToggleMode = useCallback(() => {
+    if (!props.dirty || props.editorMode === 'visual') {
+      props.onToggleEditorMode();
+      return;
+    }
+    setShowConfirm(true);
+  }, [setShowConfirm, props.onToggleEditorMode, props.dirty, props.editorMode]);
+
   const styles = getStyles();
 
   return (
@@ -41,13 +51,26 @@ export const QueryEditorToolbar: React.FC<Props> = props => {
       <div className="gf-form gf-form--grow">
         <div className="gf-form-label--grow" />
       </div>
-      <Button variant="secondary" onClick={props.onToggleEditorMode}>
+      <Button variant="secondary" onClick={onToggleMode}>
         {props.editorMode === 'visual' ? 'Edit KQL' : 'Switch to builder'}
       </Button>
       <div className={styles.spacing} />
-      <Button variant="secondary" onClick={props.onRunQuery}>
+      <Button variant={props.dirty ? 'primary' : 'secondary'} onClick={props.onRunQuery}>
         Run Query
       </Button>
+      <ConfirmModal
+        isOpen={showConfirm}
+        title="Are you sure?"
+        body="You might loose manual changes done to the query if you go back to the visual builder."
+        confirmText="Yes, I am sure."
+        dismissText="No, continue edit query manually."
+        icon="exclamation-triangle"
+        onConfirm={() => {
+          setShowConfirm(false);
+          props.onToggleEditorMode();
+        }}
+        onDismiss={() => setShowConfirm(false)}
+      />
     </QueryEditorSection>
   );
 };

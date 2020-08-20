@@ -1,6 +1,6 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { useAsync } from 'react-use';
-import { QueryEditorProps } from '@grafana/data';
+import { QueryEditorProps, PanelData } from '@grafana/data';
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
 import { AdxDataSource } from './datasource';
@@ -13,8 +13,10 @@ import { QueryEditorToolbar } from './QueryEditorToolbar';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
-export const TestingEditor: React.FC<Props> = props => {
+export const QueryEditor: React.FC<Props> = props => {
   const { datasource, query } = props;
+  const executedQuery = useExecutedQuery(props.data);
+  const dirty = useDirty(props.query.query, executedQuery);
   const schema = useAsync(() => datasource.getSchema(), [datasource.id]);
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, query);
@@ -59,6 +61,7 @@ export const TestingEditor: React.FC<Props> = props => {
         onChangeDatabase={onChangeDatabase}
         database={database}
         databases={databases}
+        dirty={dirty}
       />
       {editorMode === 'raw' && (
         <RawQueryEditor
@@ -114,6 +117,19 @@ const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[]
 
     return databases;
   }, [schema]);
+};
+
+const useExecutedQuery = (data?: PanelData): string => {
+  return useMemo(() => {
+    return data?.series[0]?.meta?.executedQueryString ?? '';
+  }, [data]);
+};
+
+const useDirty = (query: string, executedQuery: string): boolean => {
+  return useMemo(() => {
+    // we need to interpolate/deinterpolate it so we compare same things.
+    return query !== executedQuery;
+  }, [query, executedQuery]);
 };
 
 // export class QueryEditor extends PureComponent<Props, State> {

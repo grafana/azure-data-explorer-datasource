@@ -48,10 +48,6 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     return await schemaResolver.getColumnsForTable(database, table.property.name);
   }, [datasource.id, database, table]);
 
-  const kustoQuery = useMemo(() => kustoExpressionParser.query(query.expression, tableSchema.value, database), [
-    query.expression,
-    tableSchema.value,
-  ]);
   const columns = useColumnOptions(tableSchema.value);
 
   const onChangeTable = useCallback(
@@ -60,54 +56,66 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         return;
       }
 
+      const next = {
+        ...props.query.expression,
+        from: expression,
+      };
+
       props.onChangeQuery({
         ...props.query,
-        expression: {
-          ...props.query.expression,
-          from: expression,
-        },
+        expression: next,
+        query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query]
+    [props.onChangeQuery, props.query, tableSchema.value]
   );
 
   const onWhereChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
+      const next = {
+        ...props.query.expression,
+        where: expression,
+      };
+
       props.onChangeQuery({
         ...props.query,
-        expression: {
-          ...props.query.expression,
-          where: expression,
-        },
+        expression: next,
+        query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query]
+    [props.onChangeQuery, props.query, tableSchema.value]
   );
 
   const onReduceChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
+      const next = {
+        ...props.query.expression,
+        reduce: expression,
+      };
+
       props.onChangeQuery({
         ...props.query,
-        expression: {
-          ...props.query.expression,
-          reduce: expression,
-        },
+        expression: next,
+        query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query]
+    [props.onChangeQuery, props.query, tableSchema.value]
   );
 
   const onGroupByChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
+      const next = {
+        ...props.query.expression,
+        groupBy: expression,
+      };
+
       props.onChangeQuery({
         ...props.query,
-        expression: {
-          ...props.query.expression,
-          groupBy: expression,
-        },
+        expression: next,
+        query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query]
+    [props.onChangeQuery, props.query, tableSchema.value]
   );
 
   if (tables.length === 0) {
@@ -188,7 +196,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         }}
       />
       <div className={styles.query}>
-        <TextArea cols={80} rows={8} value={kustoQuery} disabled={true} />
+        <TextArea cols={80} rows={8} value={props.query.query} disabled={true} />
       </div>
     </>
   );

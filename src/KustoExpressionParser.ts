@@ -35,7 +35,7 @@ export class KustoExpressionParser {
 
   // we need to write tests for this one but I would like to have one expression tree
   // that is the entry before doing that.
-  query(sections: QueryExpression | undefined, columns: AdxColumnSchema[] | undefined, database: string): string {
+  query(sections: QueryExpression | undefined, columns: AdxColumnSchema[] | undefined): string {
     if (!sections || !columns) {
       return '';
     }
