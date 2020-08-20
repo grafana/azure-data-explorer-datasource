@@ -9,7 +9,7 @@ import {
   QueryEditorExpression,
   QueryEditorArrayExpression,
 } from 'editor/expressions';
-import { QueryEditorPropertyDefinition, QueryEditorProperty, QueryEditorPropertyType } from '../editor/types';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import {
   KustoFromEditorSection,
   KustoWhereEditorSection,
