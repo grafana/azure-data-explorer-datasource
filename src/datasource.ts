@@ -9,7 +9,7 @@ import {
   AnnotationEvent,
   LoadingState,
 } from '@grafana/data';
-import { map } from 'lodash';
+import { map, pick } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import { AdxDataSourceOptions, KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery } from './types';
@@ -17,6 +17,7 @@ import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
+import { cache } from 'schema/cache';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -52,7 +53,16 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
-    const q = interpolateKustoQuery(target.query);
+    let q = interpolateKustoQuery(target.query);
+
+    if (scopedVars['__interval']) {
+      q = this.templateSrv.replace(q, pick(scopedVars, '__interval'));
+    }
+
+    if (scopedVars['__interval_ms']) {
+      q = this.templateSrv.replace(q, pick(scopedVars, '__interval_ms'));
+    }
+
     return {
       ...target,
       query: this.templateSrv.replace(q, scopedVars, 'singlequote'),
@@ -146,14 +156,16 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   async getSchema(): Promise<AdxSchema> {
-    const url = `${this.baseUrl}/v1/rest/mgmt`;
-    const req = {
-      querySource: 'schema',
-      csl: `.show databases schema as json`,
-    };
+    return cache(`${this.id}.schema.overview`, () => {
+      const url = `${this.baseUrl}/v1/rest/mgmt`;
+      const req = {
+        querySource: 'schema',
+        csl: `.show databases schema as json`,
+      };
 
-    return this.doRequest(url, req).then(response => {
-      return new ResponseParser().parseSchemaResult(response.data);
+      return this.doRequest(url, req).then(response => {
+        return new ResponseParser().parseSchemaResult(response.data);
+      });
     });
   }
 
@@ -234,6 +246,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   interpolateVariable(value: any, variable) {
+    console.log('value', value);
+    console.log('variable', variable);
+
     if (typeof value === 'string') {
       if (variable.multi || variable.includeAll) {
         return "'" + value + "'";

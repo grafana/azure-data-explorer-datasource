@@ -73,6 +73,7 @@ export const QueryEditor: React.FC<Props> = props => {
           onRawQueryChange={kql => {}}
           onAliasChanged={v => {}}
           onResultFormatChanged={() => {}}
+          lastQuery={executedQuery}
         />
       )}
       {editorMode === 'visual' && (
