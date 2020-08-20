@@ -155,7 +155,16 @@ const useDirty = (query: string, executedQuery: string): boolean => {
 
 const useExecutedQueryError = (data?: PanelData): string | undefined => {
   return useMemo(() => {
-    return data?.series[0]?.meta?.custom?.KustoError;
+    const kustoError = data?.series[0]?.meta?.custom?.KustoError;
+
+    if (data?.error && !kustoError) {
+      if (data.error.message) {
+        return `${data.error.message}`;
+      }
+      return `${data.error}`;
+    }
+
+    return kustoError;
   }, [data]);
 };
 
