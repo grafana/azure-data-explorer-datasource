@@ -37,9 +37,7 @@ describe('KustoExpressionParser', () => {
   describe('simple query with group by', () => {
     beforeEach(() => {
       where = buildWhereWithMultiOperator(['NY', 'TX']);
-
       reduce = buildReduce(['DamageProperty'], ['sum']);
-
       groupBy = buildGroupBy();
     });
 
@@ -48,9 +46,9 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY', 'TX')" +
-          `\n| take ${limit}` +
           '\n| summarize sum(DamageProperty) by bin(StartTime, 1h)' +
-          '\n| order by StartTime asc'
+          '\n| order by StartTime asc' +
+          `\n| take ${limit}`
       );
     });
   });
@@ -73,9 +71,9 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY')" +
-          `\n| take ${limit}` +
           '\n| project StartTime, State, DamageProperty' +
-          '\n| order by StartTime asc'
+          '\n| order by StartTime asc' +
+          `\n| take ${limit}`
       );
     });
   });
@@ -83,9 +81,7 @@ describe('KustoExpressionParser', () => {
   describe('query with filter with single value operator', () => {
     beforeEach(() => {
       where = buildWhereWithSingleOperator();
-
       reduce = buildReduce(['DamageProperty'], ['sum']);
-
       groupBy = buildGroupBy();
     });
 
@@ -94,9 +90,9 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
-          `\n| take ${limit}` +
           '\n| summarize sum(DamageProperty) by bin(StartTime, 1h)' +
-          '\n| order by StartTime asc'
+          '\n| order by StartTime asc' +
+          `\n| take ${limit}`
       );
     });
   });
@@ -104,9 +100,7 @@ describe('KustoExpressionParser', () => {
   describe('query with filter with multi value operator and template variable', () => {
     beforeEach(() => {
       where = buildWhereWithMultiOperator(['$state']);
-
       reduce = buildReduce(['DamageProperty'], ['sum']);
-
       groupBy = buildGroupBy();
     });
 
@@ -115,9 +109,9 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
-          `\n| take ${limit}` +
           '\n| summarize sum(DamageProperty) by bin(StartTime, 1h)' +
-          '\n| order by StartTime asc'
+          '\n| order by StartTime asc' +
+          `\n| take ${limit}`
       );
     });
   });
@@ -132,9 +126,7 @@ describe('KustoExpressionParser', () => {
         },
       ];
       where = buildWhereWithMultiOperator(['$state']);
-
       reduce = buildReduce(['DamageProperty'], ['sum']);
-
       groupBy = buildGroupByWithNoTimeColumn();
     });
 
@@ -143,8 +135,8 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
-          `\n| take ${limit}` +
-          '\n| summarize sum(DamageProperty) by State'
+          '\n| summarize sum(DamageProperty) by State' +
+          `\n| take ${limit}`
       );
     });
   });
@@ -152,9 +144,7 @@ describe('KustoExpressionParser', () => {
   describe('query with reduce function and a parameter', () => {
     beforeEach(() => {
       where = buildWhereWithSingleOperator();
-
       reduce = buildReduce(['DamageProperty'], ['percentile'], '95');
-
       groupBy = buildGroupBy();
     });
 
@@ -163,9 +153,9 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
-          `\n| take ${limit}` +
           '\n| summarize percentile(DamageProperty, 95) by bin(StartTime, 1h)' +
-          '\n| order by StartTime asc'
+          '\n| order by StartTime asc' +
+          `\n| take ${limit}`
       );
     });
   });
@@ -189,9 +179,9 @@ describe('KustoExpressionParser', () => {
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
-          `\n| take ${limit}` +
           '\n| summarize sum(tolong(todynamic(Customers).Value)) by bin(StartTime, 1h)' +
-          '\n| order by StartTime asc'
+          '\n| order by StartTime asc' +
+          `\n| take ${limit}`
       );
     });
   });

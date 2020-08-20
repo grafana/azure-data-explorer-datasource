@@ -18,7 +18,7 @@ import { columnsToDefinition } from 'schema/mapper';
 export class KustoExpressionParser {
   templateSrv: TemplateSrv;
 
-  constructor(private limit: number = 100000) {
+  constructor(private limit: number = 10000) {
     this.templateSrv = getTemplateSrv();
   }
 
@@ -62,13 +62,13 @@ export class KustoExpressionParser {
       this.appendWhere(where, parts);
     }
 
-    parts.push(`take ${this.limit}`);
-
     if (reduce && groupBy && this.isAggregated(groupBy)) {
       this.appendSummarize(reduce, groupBy, columns, parts);
     } else if (reduce) {
       this.appendProject(reduce, defaultTimeColumn, parts);
     }
+
+    parts.push(`take ${this.limit}`);
 
     return parts.join('\n| ');
   }
