@@ -1,31 +1,31 @@
 import React, { useMemo, useCallback } from 'react';
 import { useAsync } from 'react-use';
 import { css } from 'emotion';
-import { KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery } from './types';
-import { tableToDefinition, columnsToDefinition } from './schema/mapper';
+import { KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery } from '../types';
+import { tableToDefinition, columnsToDefinition } from '../schema/mapper';
 import {
   QueryEditorExpressionType,
   QueryEditorPropertyExpression,
   QueryEditorExpression,
   QueryEditorArrayExpression,
 } from 'editor/expressions';
-import { QueryEditorPropertyDefinition, QueryEditorProperty } from 'editor/types';
+import { QueryEditorPropertyDefinition, QueryEditorProperty } from '../editor/types';
 import {
   KustoFromEditorSection,
   KustoWhereEditorSection,
   KustoValueColumnEditorSection,
   KustoGroupByEditorSection,
-} from 'VisualQueryEditorSections';
-import { definitionToProperty } from 'editor/components/field/QueryEditorField';
-import { isFieldExpression } from 'editor/guards';
-import { AdxDataSource } from 'datasource';
-import { AdxSchemaResovler } from 'schema/AdxSchemaResolver';
-import { QueryEditorResultFormat } from 'QueryEditorResultFormat';
-import { KustoExpressionParser } from 'KustoExpressionParser';
+} from './VisualQueryEditorSections';
+import { definitionToProperty } from '../editor/components/field/QueryEditorField';
+import { isFieldExpression } from '../editor/guards';
+import { AdxDataSource } from '../datasource';
+import { AdxSchemaResovler } from '../schema/AdxSchemaResolver';
+import { QueryEditorResultFormat } from '../components/QueryEditorResultFormat';
+import { KustoExpressionParser } from '../KustoExpressionParser';
 import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { AdxAutoComplete } from 'schema/AdxAutoComplete';
-import { SchemaLoading, SchemaError, SchemaWarning } from 'SchemaMessages';
+import { AdxAutoComplete } from '../schema/AdxAutoComplete';
+import { SchemaLoading, SchemaError, SchemaWarning } from '../components/SchemaMessages';
 
 interface Props {
   database: string;

@@ -6,11 +6,11 @@ import {} from '@emotion/core';
 import { AdxDataSource } from './datasource';
 import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
 import { QueryEditorPropertyDefinition } from './editor/types';
-import { RawQueryEditor } from './RawQueryEditor';
+import { RawQueryEditor } from './components/RawQueryEditor';
 import { databaseToDefinition } from './schema/mapper';
-import { VisualQueryEditor } from './VisualQueryEditor';
-import { QueryEditorToolbar } from './QueryEditorToolbar';
-import { SchemaLoading } from 'SchemaMessages';
+import { VisualQueryEditor } from './components/VisualQueryEditor';
+import { QueryEditorToolbar } from './components/QueryEditorToolbar';
+import { SchemaLoading } from 'components/SchemaMessages';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 

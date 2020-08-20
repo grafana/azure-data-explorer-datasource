@@ -4,8 +4,8 @@ import { css } from 'emotion';
 import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
-import { KustoMonacoEditor } from './monaco/KustoMonacoEditor';
-import { QueryEditorResultFormat } from 'QueryEditorResultFormat';
+import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
+import { QueryEditorResultFormat } from 'components/QueryEditorResultFormat';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 

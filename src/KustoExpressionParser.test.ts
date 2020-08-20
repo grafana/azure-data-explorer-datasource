@@ -42,7 +42,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should generate a valid query', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY', 'TX')" +
@@ -66,7 +66,7 @@ describe('KustoExpressionParser', () => {
           CslType: 'datetime',
         },
       ];
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns, 'db');
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns);
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode !in ('NY')" +
@@ -86,7 +86,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should generate a valid query', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
@@ -106,7 +106,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should not put quotes around a variable', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
       expect(query).toBe(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
@@ -133,7 +133,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should build a valid summarize and exclude the order by', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns, 'db');
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns);
       expect(query).toBe(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)\n| where StateCode !in ($state)' +
@@ -152,7 +152,7 @@ describe('KustoExpressionParser', () => {
     });
 
     it('should generate a valid query', () => {
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, [], 'db');
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, []);
       expect(query).toBe(
         'StormEvents' +
           "\n| where $__timeFilter(StartTime)\n| where StateCode == 'NY'" +
@@ -176,7 +176,7 @@ describe('KustoExpressionParser', () => {
           CslType: 'long',
         },
       ];
-      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns, 'db');
+      const query = kustoExpressionParser.query({ from, where, reduce, groupBy }, columns);
 
       expect(query).toBe(
         'StormEvents' +

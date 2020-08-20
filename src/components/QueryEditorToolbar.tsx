@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { css } from 'emotion';
 import { Select, Button, stylesFactory, ConfirmModal } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorSection } from './editor/components/QueryEditorSection';
+import { QueryEditorSection } from '../editor/components/QueryEditorSection';
 
 type EditorMode = 'raw' | 'visual';
 

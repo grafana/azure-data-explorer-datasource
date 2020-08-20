@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { css } from 'emotion';
-import { KustoQuery } from './types';
+import { KustoQuery } from '../types';
 import { SelectableValue } from '@grafana/data';
 import { InlineFormLabel, Select, stylesFactory } from '@grafana/ui';
 
