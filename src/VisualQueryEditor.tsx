@@ -25,6 +25,7 @@ import { KustoExpressionParser } from 'KustoExpressionParser';
 import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { AdxAutoComplete } from 'schema/AdxAutoComplete';
+import { SchemaLoading, SchemaError, SchemaWarning } from 'SchemaMessages';
 
 interface Props {
   database: string;
@@ -133,10 +134,6 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     [props.onChangeQuery, props.query, tableSchema.value]
   );
 
-  if (tables.length === 0) {
-    return <>Could not find any tables for database</>;
-  }
-
   if (tableSchema.loading) {
     return (
       <>
@@ -147,7 +144,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
           fields={tables}
           onChange={onChangeTable}
         />
-        <>Schema is loading</>
+        <SchemaLoading />
       </>
     );
   }
@@ -162,7 +159,22 @@ export const VisualQueryEditor: React.FC<Props> = props => {
           fields={tables}
           onChange={onChangeTable}
         />
-        <>Schema loading failed {tableSchema.error.message}</>
+        <SchemaError message={`Could not load table schema: ${tableSchema.error?.message}`} />
+      </>
+    );
+  }
+
+  if (tableSchema.value?.length === 0) {
+    return (
+      <>
+        <KustoFromEditorSection
+          templateVariableOptions={props.templateVariableOptions}
+          label="From"
+          value={table}
+          fields={tables}
+          onChange={onChangeTable}
+        />
+        <SchemaWarning message="Table schema loaded successfully but without any columns" />
       </>
     );
   }

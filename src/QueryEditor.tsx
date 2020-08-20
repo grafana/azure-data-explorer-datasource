@@ -10,12 +10,14 @@ import { RawQueryEditor } from './RawQueryEditor';
 import { databaseToDefinition } from './schema/mapper';
 import { VisualQueryEditor } from './VisualQueryEditor';
 import { QueryEditorToolbar } from './QueryEditorToolbar';
+import { SchemaLoading } from 'SchemaMessages';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = props => {
   const { datasource, query } = props;
   const executedQuery = useExecutedQuery(props.data);
+  const executedQueryError = useExecutedQueryError(props.data);
   const dirty = useDirty(props.query.query, executedQuery);
   const schema = useAsync(() => datasource.getSchema(), [datasource.id]);
   const databases = useDatabaseOptions(schema.value);
@@ -41,21 +43,36 @@ export const QueryEditor: React.FC<Props> = props => {
   }, [props.onChange, props.query]);
 
   if (schema.loading) {
-    return <>Loading schema</>;
+    return <SchemaLoading />;
   }
 
   if (schema.error) {
-    return <>Error occured when loading schema</>;
+    return (
+      <div className="gf-form">
+        <pre className="gf-form-pre alert alert-error">Could not load datasource schema: {schema.error}</pre>
+      </div>
+    );
   }
 
   if (databases.length === 0) {
-    return <>Could not find any databases in schema</>;
+    return (
+      <div className="gf-form">
+        <pre className="gf-form-pre alert alert-warning">
+          Datasource schema loaded but without any databases and tables, please try again..
+        </pre>
+      </div>
+    );
   }
 
   const editorMode = props.query.rawMode ? 'raw' : 'visual';
 
   return (
     <>
+      {executedQueryError && (
+        <div className="gf-form">
+          <pre className="gf-form-pre alert alert-warning">Failed to execute query: {executedQueryError}</pre>
+        </div>
+      )}
       <QueryEditorToolbar
         onRunQuery={props.onRunQuery}
         onToggleEditorMode={onToggleEditorMode}
@@ -134,6 +151,12 @@ const useDirty = (query: string, executedQuery: string): boolean => {
     // we need to interpolate/deinterpolate it so we compare same things.
     return query !== executedQuery;
   }, [query, executedQuery]);
+};
+
+const useExecutedQueryError = (data?: PanelData): string | undefined => {
+  return useMemo(() => {
+    return data?.series[0]?.meta?.custom?.KustoError;
+  }, [data]);
 };
 
 const useTemplateVariables = (datasource: AdxDataSource) => {
