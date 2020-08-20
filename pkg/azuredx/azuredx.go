@@ -19,11 +19,12 @@ import (
 
 // QueryModel contains the query information from the API call that we use to make a query.
 type QueryModel struct {
-	Format    string `json:"resultFormat"`
-	QueryType string `json:"queryType"`
-	Query     string `json:"query"`
-	Database  string `json:"database"`
-	MacroData MacroData
+	Format      string `json:"resultFormat"`
+	QueryType   string `json:"queryType"`
+	Query       string `json:"query"`
+	Database    string `json:"database"`
+	QuerySource string `json:"querySource"` // used to identify if query came from getSchema, raw mode, etc
+	MacroData   MacroData
 }
 
 // Interpolate applys macro expansion on the QueryModel's Payload's Query string
@@ -115,7 +116,7 @@ func (c *Client) TestRequest() error {
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
-func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, error) {
+func (c *Client) KustoRequest(payload RequestPayload, querySource string) (*TableResponse, string, error) {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(payload)
 	if err != nil {
@@ -129,7 +130,10 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, e
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-ms-app", "Grafana-ADX")
-	req.Header.Set("x-ms-client-request-id", "KGC.execute;"+uuid.Must(uuid.NewRandom()).String())
+	if querySource == "" {
+		querySource = "unspecified"
+	}
+	req.Header.Set("x-ms-client-request-id", fmt.Sprintf("KGC.%v;%v", querySource, uuid.Must(uuid.NewRandom()).String()))
 	resp, err := c.Do(req)
 	if err != nil {
 		return nil, "", err
