@@ -1,3 +1,5 @@
+const packageJson = require('../package.json');
+
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 import {
   QueryEditorPropertyExpression,
@@ -21,9 +23,10 @@ export interface KustoQuery extends DataQuery {
   expression: QueryExpression;
   rawMode?: boolean;
   querySource: QuerySource;
+  pluginVersion: string;
 }
 
-export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource'> = {
+export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource' | 'pluginVersion'> = {
   query: '',
   querySource: 'raw',
   expression: {
@@ -40,6 +43,7 @@ export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySourc
       expressions: [],
     },
   },
+  pluginVersion: packageJson.version,
 };
 
 export interface AdxDataSourceOptions extends DataSourceJsonData {
