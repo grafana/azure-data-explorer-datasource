@@ -24,6 +24,7 @@ import { QueryEditorResultFormat } from 'QueryEditorResultFormat';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
+import { AdxAutoComplete } from 'schema/AdxAutoComplete';
 
 interface Props {
   database: string;
@@ -45,10 +46,19 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     if (!table || !table.property) {
       return [];
     }
-
     const schemaResolver = new AdxSchemaResovler(datasource);
     return await schemaResolver.getColumnsForTable(database, table.property.name);
   }, [datasource.id, database, table]);
+
+  const onAutoComplete = useCallback(
+    async (searchTerm?: string, column?: string) => {
+      const tableName = table?.property.name;
+      const autoComplete = new AdxAutoComplete(datasource, database, tableName);
+      const values = await autoComplete.search(searchTerm, column);
+      return values.map(value => ({ value, label: value }));
+    },
+    [datasource, database, table]
+  );
 
   const columns = useColumnOptions(tableSchema.value);
 
@@ -173,9 +183,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         value={query.expression?.where ?? defaultQuery.expression?.where}
         fields={columns}
         onChange={onWhereChange}
-        getSuggestions={async (txt: string, skip?: QueryEditorProperty) => {
-          return [];
-        }}
+        getSuggestions={onAutoComplete}
       />
       <KustoValueColumnEditorSection
         templateVariableOptions={props.templateVariableOptions}
@@ -193,9 +201,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         value={query.expression?.groupBy ?? defaultQuery.expression?.groupBy}
         fields={columns}
         onChange={onGroupByChange}
-        getSuggestions={async (txt: string, skip?: QueryEditorProperty) => {
-          return [];
-        }}
+        getSuggestions={onAutoComplete}
       />
       <div className={styles.query}>
         <TextArea cols={80} rows={8} value={props.query.query} disabled={true} />

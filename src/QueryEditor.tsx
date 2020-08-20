@@ -1,10 +1,10 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useAsync } from 'react-use';
 import { QueryEditorProps, PanelData } from '@grafana/data';
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
 import { AdxDataSource } from './datasource';
-import { KustoQuery, AdxDataSourceOptions, AdxSchema, AdxColumnSchema } from 'types';
+import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
 import { QueryEditorPropertyDefinition } from './editor/types';
 import { RawQueryEditor } from './RawQueryEditor';
 import { databaseToDefinition } from './schema/mapper';
@@ -36,6 +36,7 @@ export const QueryEditor: React.FC<Props> = props => {
     props.onChange({
       ...props.query,
       rawMode: !props.query.rawMode,
+      querySource: props.query.rawMode ? 'visual' : 'raw',
     });
   }, [props.onChange, props.query]);
 

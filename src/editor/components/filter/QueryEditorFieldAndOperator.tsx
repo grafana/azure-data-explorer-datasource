@@ -14,6 +14,7 @@ import { QueryEditorOperatorComponent, definitionToOperator } from '../operators
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorOperatorExpression } from '../../expressions';
 import { parseOperatorValue } from '../operators/parser';
+import debounce from 'debounce-promise';
 
 interface Props {
   value?: QueryEditorOperatorExpression;
@@ -87,15 +88,22 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
     });
   };
 
+  getSuggestions = debounce(
+    async (txt: string) => {
+      console.log('trigger', Date.now());
+      const column = this.props.value?.property.name;
+      return this.props.getSuggestions(txt, column);
+    },
+    500,
+    { leading: false }
+  );
+
   render() {
     const { value, fields, templateVariableOptions } = this.props;
     const { operators } = this.state;
 
     const styles = getStyles();
     const showOperators = value?.operator || value?.property;
-    const getSuggestions = (txt: string) => {
-      return this.props.getSuggestions(txt, this.props.value?.property);
-    };
 
     return (
       <div className={styles.container}>
@@ -111,7 +119,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
             value={value?.operator}
             operators={operators}
             onChange={this.onOperatorChange}
-            getSuggestions={getSuggestions}
+            getSuggestions={this.getSuggestions}
             property={value?.property}
             templateVariableOptions={templateVariableOptions}
           />

@@ -12,6 +12,7 @@ export interface QueryExpression {
   groupBy: QueryEditorArrayExpression;
 }
 
+type QuerySource = 'raw' | 'schema' | 'autocomplete' | 'visual';
 export interface KustoQuery extends DataQuery {
   query: string;
   database: string;
@@ -19,10 +20,12 @@ export interface KustoQuery extends DataQuery {
   resultFormat: string;
   expression: QueryExpression;
   rawMode?: boolean;
+  querySource: QuerySource;
 }
 
-export const defaultQuery: Pick<KustoQuery, 'query' | 'expression'> = {
+export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource'> = {
   query: '',
+  querySource: 'raw',
   expression: {
     where: {
       type: QueryEditorExpressionType.And,

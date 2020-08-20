@@ -148,6 +148,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   async getSchema(): Promise<AdxSchema> {
     const url = `${this.baseUrl}/v1/rest/mgmt`;
     const req = {
+      querySource: 'schema',
       csl: `.show databases schema as json`,
     };
 
@@ -179,7 +180,12 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
     const query = this.buildQuery(queryParts.join('\n | '), {}, database);
     const response = await this.query({
-      targets: [query],
+      targets: [
+        {
+          ...query,
+          querySource: 'schema',
+        },
+      ],
     } as DataQueryRequest<KustoQuery>).toPromise();
 
     return dynamicSchemaParser(response.data as DataFrame[]);
