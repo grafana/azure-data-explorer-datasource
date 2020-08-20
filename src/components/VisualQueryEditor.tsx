@@ -9,7 +9,7 @@ import {
   QueryEditorExpression,
   QueryEditorArrayExpression,
 } from 'editor/expressions';
-import { QueryEditorPropertyDefinition, QueryEditorProperty } from '../editor/types';
+import { QueryEditorPropertyDefinition, QueryEditorProperty, QueryEditorPropertyType } from '../editor/types';
 import {
   KustoFromEditorSection,
   KustoWhereEditorSection,
@@ -62,6 +62,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   );
 
   const columns = useColumnOptions(tableSchema.value);
+  const groupable = useGroupableColumns(columns);
 
   const onChangeTable = useCallback(
     (expression: QueryEditorExpression) => {
@@ -214,7 +215,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         templateVariableOptions={props.templateVariableOptions}
         label="Group by (summarize)"
         value={query.expression?.groupBy ?? defaultQuery.expression?.groupBy}
-        fields={columns}
+        fields={groupable}
         onChange={onGroupByChange}
         getSuggestions={onAutoComplete}
       />
@@ -232,6 +233,12 @@ const getStyles = stylesFactory(() => {
     `,
   };
 });
+
+const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
+  return useMemo(() => {
+    return columns.filter(c => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
+  }, [columns]);
+};
 
 const useColumnOptions = (tableSchema?: AdxColumnSchema[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {

@@ -90,7 +90,6 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
 
   getSuggestions = debounce(
     async (txt: string) => {
-      console.log('trigger', Date.now());
       const column = this.props.value?.property.name;
       return this.props.getSuggestions(txt, column);
     },
