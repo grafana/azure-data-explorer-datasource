@@ -1,26 +1,23 @@
 import React, { PureComponent } from 'react';
-import { Button, Select, InlineFormLabel, Icon } from '@grafana/ui';
-import { KustoQuery, AdxDataSourceOptions } from 'types';
+import { Icon, stylesFactory } from '@grafana/ui';
+import { css } from 'emotion';
+import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { KustoMonacoEditor } from './monaco/KustoMonacoEditor';
-import { DatabaseSelect } from './editor/components/database/DatabaseSelect';
-import { QueryEditorPropertyDefinition } from 'editor/types';
+import { QueryEditorResultFormat } from 'QueryEditorResultFormat';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface RawQueryEditorProps extends Props {
-  databases: QueryEditorPropertyDefinition[];
   dirty?: boolean;
   lastQueryError?: string;
   lastQuery?: string;
   timeNotASC?: boolean;
-
+  schema?: AdxSchema;
   onRawQueryChange: (kql: string) => void;
   onAliasChanged: (v: any) => void;
   onResultFormatChanged: (v: SelectableValue<string>) => void;
-  onRawModeChange: () => void;
-  onDatabaseChanged: (db: string) => void;
   templateVariableOptions: SelectableValue<string>;
 }
 
@@ -37,86 +34,39 @@ const defaultQuery = [
   '// | order by Timestamp asc',
 ].join('\n');
 
-const resultFormats: Array<SelectableValue<string>> = [
-  { label: 'Time series', value: 'time_series' },
-  { label: 'Table', value: 'table' },
-  { label: 'ADX Time series', value: 'time_series_adx_series' },
-];
-
 export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
   state: State = {};
 
-  render() {
-    const {
-      query,
-      databases,
-      templateVariableOptions,
-      onDatabaseChanged,
-      onRawModeChange,
-      datasource,
-      lastQueryError,
-      lastQuery,
-      timeNotASC,
-    } = this.props;
-    const { database, resultFormat } = query;
+  onRawQueryChange = (kql: string) => {
+    this.props.onChange({
+      ...this.props.query,
+      query: kql,
+    });
+  };
 
+  render() {
+    const { query, datasource, lastQueryError, lastQuery, timeNotASC, schema } = this.props;
     const { showLastQuery, showHelp } = this.state;
+
+    const styles = getStyles();
+
+    if (!schema) {
+      return null;
+    }
 
     return (
       <div>
-        <DatabaseSelect
-          databases={databases}
-          templateVariableOptions={templateVariableOptions}
-          database={database}
-          onChange={onDatabaseChanged}
-        >
-          <>
-            <div className="gf-form">
-              <label className="gf-form-label">(Run Query: Shift+Enter, Trigger Suggestion: Ctrl+Space)</label>
-            </div>
-            <div className="gf-form gf-form--grow">
-              <div className="gf-form-label gf-form-label--grow"></div>
-            </div>
-            <Button onClick={onRawModeChange}>Query Builder</Button>
-            &nbsp;
-            <Button variant={this.props.dirty ? 'primary' : 'secondary'} onClick={this.props.onRunQuery}>
-              Run Query
-            </Button>
-          </>
-        </DatabaseSelect>
-
         <KustoMonacoEditor
           defaultTimeField="Timestamp"
           pluginBaseUrl={datasource.meta.baseUrl}
           content={query.query || defaultQuery}
-          getSchema={datasource.getSchema.bind(datasource)}
-          onChange={this.props.onRawQueryChange}
+          getSchema={async () => schema}
+          onChange={this.onRawQueryChange}
           onExecute={this.props.onRunQuery}
         />
 
-        <div className="gf-form-inline">
-          <div className="gf-form">
-            {/* <InlineFormLabel className="query-keyword" width={7}>
-              ALIAS BY
-            </InlineFormLabel>
-            <Input
-              width={30}
-              type="text"
-              value={alias}
-              placeholder="Naming pattern"
-              onChange={this.props.onAliasChanged}
-              onBlur={this.props.onRunQuery}
-            /> */}
-            <InlineFormLabel className="query-keyword" width={7}>
-              Format As
-            </InlineFormLabel>
-            <Select
-              options={resultFormats}
-              value={resultFormat}
-              width={14}
-              onChange={this.props.onResultFormatChanged}
-            />
-          </div>
+        <div className={styles.toolbar}>
+          <QueryEditorResultFormat query={query} onChangeQuery={this.props.onChange} />
           <div className="gf-form">
             <label className="gf-form-label query-keyword" onClick={() => this.setState({ showHelp: !showHelp })}>
               Show Help <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
@@ -210,3 +160,13 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
     );
   }
 }
+
+const getStyles = stylesFactory(() => {
+  return {
+    toolbar: css`
+      display: flex;
+      flex-direction: row;
+      margin-top: 4px;
+    `,
+  };
+});

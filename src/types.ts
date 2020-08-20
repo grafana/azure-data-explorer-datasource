@@ -1,5 +1,9 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
-import { QueryEditorPropertyExpression, QueryEditorArrayExpression } from './editor/expressions';
+import {
+  QueryEditorPropertyExpression,
+  QueryEditorArrayExpression,
+  QueryEditorExpressionType,
+} from './editor/expressions';
 
 export interface QueryExpression {
   from?: QueryEditorPropertyExpression;
@@ -13,12 +17,26 @@ export interface KustoQuery extends DataQuery {
   database: string;
   alias?: string;
   resultFormat: string;
-  expression?: QueryExpression;
+  expression: QueryExpression;
   rawMode?: boolean;
 }
 
 export const defaultQuery: Partial<KustoQuery> = {
   query: '',
+  expression: {
+    where: {
+      type: QueryEditorExpressionType.And,
+      expressions: [],
+    },
+    groupBy: {
+      type: QueryEditorExpressionType.And,
+      expressions: [],
+    },
+    reduce: {
+      type: QueryEditorExpressionType.And,
+      expressions: [],
+    },
+  },
 };
 
 export interface AdxDataSourceOptions extends DataSourceJsonData {
@@ -44,11 +62,4 @@ export interface AdxTableSchema {
 export interface AdxColumnSchema {
   Name: string;
   CslType: string;
-}
-
-/** Typings for the useAsync hook from react-use */
-export interface AsyncState<T = {}> {
-  value?: T;
-  loading: boolean;
-  error?: Error;
 }

@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback } from 'react';
 import { useAsync } from 'react-use';
 import { css } from 'emotion';
-import { KustoQuery, AdxSchema, QueryExpression, AdxTableSchema, AdxColumnSchema } from './types';
-import { tableToDefinition, tablesToDefinition, columnsToDefinition } from './schema/mapper';
+import { KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery } from './types';
+import { tableToDefinition, columnsToDefinition } from './schema/mapper';
 import {
   QueryEditorExpressionType,
   QueryEditorPropertyExpression,
@@ -10,30 +10,19 @@ import {
   QueryEditorArrayExpression,
 } from 'editor/expressions';
 import { QueryEditorPropertyDefinition, QueryEditorProperty } from 'editor/types';
-import { KustoFromEditorSection, KustoWhereEditorSection } from 'VisualQueryEditorSections';
+import {
+  KustoFromEditorSection,
+  KustoWhereEditorSection,
+  KustoValueColumnEditorSection,
+  KustoGroupByEditorSection,
+} from 'VisualQueryEditorSections';
 import { definitionToProperty } from 'editor/components/field/QueryEditorField';
 import { isFieldExpression } from 'editor/guards';
 import { AdxDataSource } from 'datasource';
 import { AdxSchemaResovler } from 'schema/AdxSchemaResolver';
-import { QueryEditorSection } from 'editor/components/QueryEditorSection';
-import { InlineFormLabel, Select, stylesFactory } from '@grafana/ui';
-import { SelectableValue } from '@grafana/data';
 import { QueryEditorResultFormat } from 'QueryEditorResultFormat';
-
-const defaultQuery: QueryExpression = {
-  where: {
-    type: QueryEditorExpressionType.And,
-    expressions: [],
-  },
-  groupBy: {
-    type: QueryEditorExpressionType.And,
-    expressions: [],
-  },
-  reduce: {
-    type: QueryEditorExpressionType.And,
-    expressions: [],
-  },
-};
+import { KustoExpressionParser } from 'KustoExpressionParser';
+import { TextArea, stylesFactory } from '@grafana/ui';
 
 interface Props {
   database: string;
@@ -42,6 +31,8 @@ interface Props {
   schema?: AdxSchema;
   datasource: AdxDataSource;
 }
+
+const kustoExpressionParser = new KustoExpressionParser();
 
 export const VisualQueryEditor: React.FC<Props> = props => {
   const { query, database, datasource, schema } = props;
@@ -57,6 +48,10 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     return await schemaResolver.getColumnsForTable(database, table.property.name);
   }, [datasource.id, database, table]);
 
+  const kustoQuery = useMemo(() => kustoExpressionParser.query(query.expression, tableSchema.value, database), [
+    query.expression,
+    tableSchema.value,
+  ]);
   const columns = useColumnOptions(tableSchema.value);
 
   const onChangeTable = useCallback(
@@ -68,7 +63,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       props.onChangeQuery({
         ...props.query,
         expression: {
-          ...(props.query.expression ?? defaultQuery),
+          ...props.query.expression,
           from: expression,
         },
       });
@@ -81,8 +76,34 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       props.onChangeQuery({
         ...props.query,
         expression: {
-          ...(query.expression ?? defaultQuery),
+          ...props.query.expression,
           where: expression,
+        },
+      });
+    },
+    [props.onChangeQuery, props.query]
+  );
+
+  const onReduceChange = useCallback(
+    (expression: QueryEditorArrayExpression) => {
+      props.onChangeQuery({
+        ...props.query,
+        expression: {
+          ...props.query.expression,
+          reduce: expression,
+        },
+      });
+    },
+    [props.onChangeQuery, props.query]
+  );
+
+  const onGroupByChange = useCallback(
+    (expression: QueryEditorArrayExpression) => {
+      props.onChangeQuery({
+        ...props.query,
+        expression: {
+          ...props.query.expression,
+          groupBy: expression,
         },
       });
     },
@@ -123,6 +144,8 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     );
   }
 
+  const styles = getStyles();
+
   return (
     <>
       <KustoFromEditorSection
@@ -137,16 +160,47 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       <KustoWhereEditorSection
         templateVariableOptions={[]}
         label="Where (filter)"
-        value={query.expression?.where ?? defaultQuery.where}
+        value={query.expression?.where ?? defaultQuery.expression?.where}
         fields={columns}
         onChange={onWhereChange}
         getSuggestions={async (txt: string, skip?: QueryEditorProperty) => {
           return [];
         }}
       />
+      <KustoValueColumnEditorSection
+        templateVariableOptions={[]}
+        label="Value columns"
+        value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
+        fields={columns}
+        onChange={onReduceChange}
+        getSuggestions={async (txt: string, skip?: QueryEditorProperty) => {
+          return [];
+        }}
+      />
+      <KustoGroupByEditorSection
+        templateVariableOptions={[]}
+        label="Group by (summarize)"
+        value={query.expression?.groupBy ?? defaultQuery.expression?.groupBy}
+        fields={columns}
+        onChange={onGroupByChange}
+        getSuggestions={async (txt: string, skip?: QueryEditorProperty) => {
+          return [];
+        }}
+      />
+      <div className={styles.query}>
+        <TextArea cols={80} rows={8} value={kustoQuery} disabled={true} />
+      </div>
     </>
   );
 };
+
+const getStyles = stylesFactory(() => {
+  return {
+    query: css`
+      margin-top: 12px;
+    `,
+  };
+});
 
 const useColumnOptions = (tableSchema?: AdxColumnSchema[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {

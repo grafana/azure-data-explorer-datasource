@@ -35,7 +35,11 @@ export class KustoExpressionParser {
 
   // we need to write tests for this one but I would like to have one expression tree
   // that is the entry before doing that.
-  query(sections: QueryExpression, columns: AdxColumnSchema[], database: string): string {
+  query(sections: QueryExpression | undefined, columns: AdxColumnSchema[] | undefined, database: string): string {
+    if (!sections || !columns) {
+      return '';
+    }
+
     const { from, where, reduce, groupBy } = sections;
     const table = this.fromTable(from);
 
