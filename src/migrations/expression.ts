@@ -12,10 +12,14 @@ import {
 import { QueryEditorPropertyType, QueryEditorProperty } from 'editor/types';
 
 export const migrateExpression = (version: string | undefined, expression: any): QueryExpression => {
-  if (!version || _.startsWith('2.')) {
+  if (!version && looksLikeV2(expression)) {
     return migrateV2ToV3(expression);
   }
   return expression ?? defaultQuery.expression;
+};
+
+const looksLikeV2 = (expression: any): boolean => {
+  return typeof expression?.from?.expression?.value === 'string';
 };
 
 const migrateV2ToV3 = (expression: any): QueryExpression => {

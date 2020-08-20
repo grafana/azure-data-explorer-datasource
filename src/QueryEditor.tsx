@@ -1,16 +1,17 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import { useAsync } from 'react-use';
 import { QueryEditorProps, PanelData } from '@grafana/data';
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
 import { AdxDataSource } from './datasource';
-import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
+import { KustoQuery, AdxDataSourceOptions, AdxSchema, defaultQuery } from 'types';
 import { QueryEditorPropertyDefinition } from './editor/types';
 import { RawQueryEditor } from './components/RawQueryEditor';
 import { databaseToDefinition } from './schema/mapper';
 import { VisualQueryEditor } from './components/VisualQueryEditor';
 import { QueryEditorToolbar } from './components/QueryEditorToolbar';
 import { SchemaLoading } from 'components/SchemaMessages';
+import { migrateExpression } from 'migrations/expression';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -24,6 +25,24 @@ export const QueryEditor: React.FC<Props> = props => {
   const database = useSelectedDatabase(databases, query);
   const templateVariables = useTemplateVariables(datasource);
   const rawMode = isRawMode(props);
+
+  useEffect(() => {
+    if (!props.query) {
+      return;
+    }
+
+    const { pluginVersion, expression } = props.query;
+
+    if (pluginVersion) {
+      return;
+    }
+
+    props.onChange({
+      ...props.query,
+      pluginVersion: defaultQuery.pluginVersion,
+      expression: migrateExpression(pluginVersion, expression),
+    });
+  }, []);
 
   const onChangeDatabase = useCallback(
     (database: string) => {
