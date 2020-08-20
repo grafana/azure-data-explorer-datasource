@@ -29,6 +29,7 @@ export const QueryEditor: React.FC<Props> = props => {
   useEffect(() => {
     if (needsToBeMigrated(query)) {
       props.onChange(migrateQuery(query));
+      props.onRunQuery();
     }
   }, []);
 
