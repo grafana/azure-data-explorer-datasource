@@ -23,6 +23,7 @@ import { AdxSchemaResovler } from 'schema/AdxSchemaResolver';
 import { QueryEditorResultFormat } from 'QueryEditorResultFormat';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { TextArea, stylesFactory } from '@grafana/ui';
+import { SelectableValue } from '@grafana/data';
 
 interface Props {
   database: string;
@@ -30,6 +31,7 @@ interface Props {
   onChangeQuery: (query: KustoQuery) => void;
   schema?: AdxSchema;
   datasource: AdxDataSource;
+  templateVariableOptions: SelectableValue<string>;
 }
 
 const kustoExpressionParser = new KustoExpressionParser();
@@ -126,7 +128,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     return (
       <>
         <KustoFromEditorSection
-          templateVariableOptions={[]}
+          templateVariableOptions={props.templateVariableOptions}
           label="From"
           value={table}
           fields={tables}
@@ -141,7 +143,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     return (
       <>
         <KustoFromEditorSection
-          templateVariableOptions={[]}
+          templateVariableOptions={props.templateVariableOptions}
           label="From"
           value={table}
           fields={tables}
@@ -157,7 +159,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   return (
     <>
       <KustoFromEditorSection
-        templateVariableOptions={[]}
+        templateVariableOptions={props.templateVariableOptions}
         label="From"
         value={table}
         fields={tables}
@@ -166,7 +168,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         <QueryEditorResultFormat onChangeQuery={props.onChangeQuery} query={query} />
       </KustoFromEditorSection>
       <KustoWhereEditorSection
-        templateVariableOptions={[]}
+        templateVariableOptions={props.templateVariableOptions}
         label="Where (filter)"
         value={query.expression?.where ?? defaultQuery.expression?.where}
         fields={columns}
@@ -176,7 +178,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         }}
       />
       <KustoValueColumnEditorSection
-        templateVariableOptions={[]}
+        templateVariableOptions={props.templateVariableOptions}
         label="Value columns"
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
         fields={columns}
@@ -186,7 +188,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         }}
       />
       <KustoGroupByEditorSection
-        templateVariableOptions={[]}
+        templateVariableOptions={props.templateVariableOptions}
         label="Group by (summarize)"
         value={query.expression?.groupBy ?? defaultQuery.expression?.groupBy}
         fields={columns}

@@ -4,7 +4,7 @@ import { QueryEditorProps, PanelData } from '@grafana/data';
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
 import { AdxDataSource } from './datasource';
-import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
+import { KustoQuery, AdxDataSourceOptions, AdxSchema, AdxColumnSchema } from 'types';
 import { QueryEditorPropertyDefinition } from './editor/types';
 import { RawQueryEditor } from './RawQueryEditor';
 import { databaseToDefinition } from './schema/mapper';
@@ -20,6 +20,7 @@ export const QueryEditor: React.FC<Props> = props => {
   const schema = useAsync(() => datasource.getSchema(), [datasource.id]);
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, query);
+  const templateVariables = useTemplateVariables(datasource);
 
   const onChangeDatabase = useCallback(
     (database: string) => {
@@ -67,7 +68,7 @@ export const QueryEditor: React.FC<Props> = props => {
         <RawQueryEditor
           {...props}
           schema={schema.value}
-          templateVariableOptions={[]}
+          templateVariableOptions={templateVariables}
           onRawQueryChange={kql => {}}
           onAliasChanged={v => {}}
           onResultFormatChanged={() => {}}
@@ -80,6 +81,7 @@ export const QueryEditor: React.FC<Props> = props => {
           onChangeQuery={props.onChange}
           query={query}
           schema={schema.value}
+          templateVariableOptions={templateVariables}
         />
       )}
     </>
@@ -130,6 +132,18 @@ const useDirty = (query: string, executedQuery: string): boolean => {
     // we need to interpolate/deinterpolate it so we compare same things.
     return query !== executedQuery;
   }, [query, executedQuery]);
+};
+
+const useTemplateVariables = (datasource: AdxDataSource) => {
+  return useMemo(() => {
+    return {
+      label: 'Template Variables',
+      expanded: false,
+      options: datasource.variables.map(variable => {
+        return { label: variable, value: variable };
+      }),
+    };
+  }, [datasource.id]);
 };
 
 // export class QueryEditor extends PureComponent<Props, State> {
