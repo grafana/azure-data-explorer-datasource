@@ -53,7 +53,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	tableRes, kustoError, err = client.KustoRequest(azuredx.RequestPayload{
 		CSL: qm.Query,
 		DB:  qm.Database,
-	})
+	}, qm.QuerySource)
 
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
