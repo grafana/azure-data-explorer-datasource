@@ -207,9 +207,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
         fields={columns}
         onChange={onReduceChange}
-        getSuggestions={async (txt: string, skip?: QueryEditorProperty) => {
-          return [];
-        }}
+        getSuggestions={onAutoComplete}
       />
       <KustoGroupByEditorSection
         templateVariableOptions={props.templateVariableOptions}
