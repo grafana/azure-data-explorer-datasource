@@ -12,7 +12,7 @@ import {
 import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
-import { AdxDataSourceOptions, KustoQuery, AdxSchema, AdxColumnSchema } from './types';
+import { AdxDataSourceOptions, KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery } from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
@@ -197,8 +197,11 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     if (!options.hasOwnProperty('scopedVars')) {
       options['scopedVars'] = {};
     }
+
     const interpolatedQuery = interpolateKustoQuery(query);
+
     return {
+      ...defaultQuery,
       refId: `adx-${interpolatedQuery}`,
       resultFormat: 'table',
       rawMode: true,

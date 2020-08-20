@@ -4,7 +4,7 @@ import coreModule from 'grafana/app/core/core_module';
 import { AnnotationQueryRequest } from '@grafana/data';
 import { KustoQuery } from './types';
 import { AdxDataSource } from './datasource';
-import { QueryEditor } from 'QueryEditor';
+import { TestingEditor } from 'QueryEditor';
 
 interface Props {
   datasource: AdxDataSource;
@@ -39,7 +39,7 @@ export class AnnotationEditor extends PureComponent<Props> {
     const { datasource, annotation } = this.props;
     return (
       <>
-        <QueryEditor
+        <TestingEditor
           datasource={datasource}
           onChange={this.onQueryChange}
           query={annotation.annotation}

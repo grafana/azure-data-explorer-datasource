@@ -8,14 +8,13 @@ import {
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
   QueryEditorExpressionType,
-  QueryEditorExpression,
   QueryEditorArrayExpression,
 } from './editor/expressions';
 import { AdxColumnSchema } from 'types';
 
 describe('KustoExpressionParser', () => {
   let kustoExpressionParser: KustoExpressionParser;
-  let from: QueryEditorExpression;
+  let from: QueryEditorPropertyExpression;
   let where: QueryEditorArrayExpression;
   let reduce: QueryEditorArrayExpression;
   let groupBy: QueryEditorArrayExpression;

@@ -21,7 +21,7 @@ export interface KustoQuery extends DataQuery {
   rawMode?: boolean;
 }
 
-export const defaultQuery: Partial<KustoQuery> = {
+export const defaultQuery: Pick<KustoQuery, 'query' | 'expression'> = {
   query: '',
   expression: {
     where: {

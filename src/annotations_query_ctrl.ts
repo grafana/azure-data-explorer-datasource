@@ -1,9 +1,10 @@
 import './AnnotationEditor';
-import { KustoQuery } from './types';
+import { KustoQuery, defaultQuery as globalDefaultQuery } from './types';
 import { AnnotationQueryRequest } from '@grafana/data';
 import { defaultsDeep } from 'lodash';
 
 const defaultQuery: KustoQuery = {
+  ...globalDefaultQuery,
   database: '',
   refId: 'annoz',
   resultFormat: 'table',
