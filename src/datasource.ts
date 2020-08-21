@@ -41,9 +41,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
    * Return true if it should execute
    */
   filterQuery(target: KustoQuery): boolean {
-    if (needsToBeMigrated(target)) {
-      return false;
-    }
     if (target.hide) {
       return false;
     }
