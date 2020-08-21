@@ -12,6 +12,7 @@ export class KustoDBAnnotationsQueryCtrl {
   /** @ngInject */
   constructor() {
     this.annotation.query = this.annotation.query || this.defaultQuery;
+    this.annotation.resultFormat = 'table';
     this.databases = this.getDatabases();
   }
 

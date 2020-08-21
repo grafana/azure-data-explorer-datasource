@@ -68,14 +68,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   async annotationQuery(options: AnnotationQueryRequest<KustoQuery>): Promise<AnnotationEvent[]> {
-    const query = (options.annotation as any)?.annotation as KustoQuery;
+    const query = options.annotation as KustoQuery;
     if (!query) {
       return Promise.reject({
         message: 'Query missing in annotation definition',
       });
     }
 
-    query.query = options.annotation.query;
+    query.resultFormat = 'table';
 
     return super
       .query({
