@@ -12,17 +12,18 @@ const editorTemplate = `<div id="content" tabindex="0" style="width: 100%; heigh
 
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
+
   if (!window.hasOwnProperty('monaco')) {
     //(window as any).monaco = import(/* webpackChunkName: "/monaco.min" */ '../lib/monaco.min.js').then(() => {
     (window as any).System.import(`/${scope.pluginBaseUrl}/libs/monaco.min.js`).then(() => {
       setTimeout(() => {
         initMonaco(containerDiv, scope);
-      }, 1);
+      }, 100);
     });
   } else {
     setTimeout(() => {
       initMonaco(containerDiv, scope);
-    }, 1);
+    }, 100);
   }
 
   containerDiv.onblur = () => {
@@ -40,8 +41,7 @@ function link(scope, elem, attrs) {
 
   function initMonaco(containerDiv, scope) {
     const kustoCodeEditor = new KustoCodeEditor(containerDiv, scope.defaultTimeField, scope.getSchema, config);
-
-    kustoCodeEditor.initMonaco(scope);
+    kustoCodeEditor.initMonaco(scope.content);
 
     /* tslint:disable:no-bitwise */
     kustoCodeEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
@@ -71,6 +71,10 @@ function link(scope, elem, attrs) {
     scope.$on('$destroy', () => {
       kustoCodeEditor.disposeMonaco();
     });
+
+    window.onresize = () => {
+      kustoCodeEditor.resize();
+    };
   }
 }
 

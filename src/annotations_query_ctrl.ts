@@ -1,3 +1,4 @@
+import './monaco/kusto_monaco_editor';
 export class KustoDBAnnotationsQueryCtrl {
   static templateUrl = 'partials/annotations.editor.html';
   datasource: any;
@@ -10,7 +11,8 @@ export class KustoDBAnnotationsQueryCtrl {
 
   /** @ngInject */
   constructor() {
-    this.annotation.rawQuery = this.annotation.rawQuery || this.defaultQuery;
+    this.annotation.query = this.annotation.query || this.defaultQuery;
+    this.annotation.resultFormat = 'table';
     this.databases = this.getDatabases();
   }
 
@@ -28,6 +30,6 @@ export class KustoDBAnnotationsQueryCtrl {
         }
         return this.databases;
       })
-      .catch(() => {});
+      .catch(err => {});
   }
 }

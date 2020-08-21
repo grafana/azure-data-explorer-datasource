@@ -57,12 +57,12 @@
     }
   ],
   "dependencies": {
-    "grafanaVersion": "6.3.x",
+    "grafanaVersion": "7.1.x",
     "plugins": []
   },
   "metrics": true,
   "annotations": true,
   "backend": true,
-  "executable": "grafana-azure-data-explorer-datasource",
+  "executable": "gpx_adx",
   "alerting": true
 }

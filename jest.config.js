@@ -5,4 +5,5 @@
 const standard = require('@grafana/toolkit/src/config/jest.plugin.config');
 
 // This process will use the same config that `yarn test` is using
-module.exports = standard.jestConfig();
+// Including jsdom-sixteen to get the JSDOM v16 for Jest tests which is need for the react testing tools: https://github.com/testing-library/dom-testing-library/issues/477
+module.exports = { ...standard.jestConfig(), testEnvironment: 'jest-environment-jsdom-sixteen' };

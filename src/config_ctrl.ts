@@ -1,4 +1,4 @@
-import { KustoDBDatasource } from './datasource';
+import { AdxDataSource } from './datasource';
 import config from 'grafana/app/core/config';
 import { isVersionGtOrEq } from './version';
 
@@ -7,12 +7,13 @@ export class KustoDBConfigCtrl {
 
   current: any;
   suggestUrl: string;
-  kustoDbDatasource: any;
+  datasource: AdxDataSource | undefined;
   databases: any[];
   hasRequiredGrafanaVersion: boolean;
+  loading = false;
 
   /** @ngInject */
-  constructor($scope, backendSrv, $q) {
+  constructor(private $scope) {
     this.hasRequiredGrafanaVersion = this.hasMinVersion();
     this.suggestUrl = 'https://yourcluster.kusto.windows.net';
     $scope.getSuggestUrls = () => {
@@ -22,17 +23,24 @@ export class KustoDBConfigCtrl {
     this.databases = [];
     if (this.current.id) {
       this.current.url = 'api/datasources/proxy/' + this.current.id;
-      this.kustoDbDatasource = new KustoDBDatasource(this.current, backendSrv, $q, null);
+      this.datasource = new AdxDataSource(this.current);
       this.getDatabases();
     }
   }
 
   getDatabases() {
-    return this.kustoDbDatasource.getDatabases().then(dbs => {
+    if (!this.datasource) {
+      return [];
+    }
+
+    this.loading = true;
+    return this.datasource.getDatabases().then(dbs => {
+      this.loading = false;
       this.databases = dbs;
-      if (this.databases.length > 0) {
-        this.current.jsonData.defaultDatabase = this.current.jsonData.defaultDatabase || this.databases[0].value;
+      if (!this.current.jsonData.defaultDatabase && dbs.length) {
+        this.current.jsonData.defaultDatabase = dbs[0].value;
       }
+      this.$scope.$digest(); // force thigns to re-render
     });
   }
 

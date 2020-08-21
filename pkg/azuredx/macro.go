@@ -6,8 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
-	"github.com/grafana/grafana-plugin-model/go/datasource"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
 //  Macros:
@@ -19,13 +18,13 @@ import (
 
 // MacroData contains the information needed for macro expansion.
 type MacroData struct {
-	*datasource.TimeRange
+	*backend.TimeRange
 	intervalMS int64
 }
 
 // NewMacroData creates a MacroData object from the arguments that
 // can be used to interpolate macros with the Interpolate method.
-func NewMacroData(tr *datasource.TimeRange, intervalMS int64) MacroData {
+func NewMacroData(tr *backend.TimeRange, intervalMS int64) MacroData {
 	return MacroData{
 		TimeRange:  tr,
 		intervalMS: intervalMS,
@@ -74,13 +73,11 @@ var interpolationFuncs = map[string]func(string, MacroData) string{
 }
 
 func timeFromMacro(s string, md MacroData) string {
-	from := time.Unix(0, md.FromEpochMs*1e6)
-	return fmt.Sprintf("datetime(%v)", from.UTC().Format(time.RFC3339Nano))
+	return fmt.Sprintf("datetime(%v)", md.From.UTC().Format(time.RFC3339Nano))
 }
 
 func timeToMacro(s string, md MacroData) string {
-	to := time.Unix(0, md.ToEpochMs*1e6)
-	return fmt.Sprintf("datetime(%v)", to.UTC().Format(time.RFC3339Nano))
+	return fmt.Sprintf("datetime(%v)", md.To.UTC().Format(time.RFC3339Nano))
 }
 
 func timeIntervalMacro(s string, md MacroData) string {
@@ -94,10 +91,8 @@ func timeFilterMacro(s string, md MacroData) string {
 	if s == "" {
 		s = "TimeGenerated"
 	}
-	from := time.Unix(0, md.FromEpochMs*1e6)
-	to := time.Unix(0, md.ToEpochMs*1e6)
 	fmtString := "%v >= datetime(%v) and %v <= datetime(%v)"
-	timeString := fmt.Sprintf(fmtString, s, from.UTC().Format(time.RFC3339Nano), s, to.UTC().Format(time.RFC3339Nano))
-	log.Print.Debug("Time String: %s", timeString)
+	timeString := fmt.Sprintf(fmtString, s, md.From.UTC().Format(time.RFC3339Nano), s, md.To.UTC().Format(time.RFC3339Nano))
+	backend.Logger.Debug("Time String", "value", timeString)
 	return timeString
 }

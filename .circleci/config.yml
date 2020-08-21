@@ -40,14 +40,9 @@ workflows:
             - build_frontend
             - build_backend
             - build_docs
-      - e2e_canary:
-          requires:
-            - provisioning
-            - package
       - report:
           requires:
             - package
-            - e2e_canary
       - approve_release:
           type: approval
           requires:
@@ -62,9 +57,6 @@ executors:
   default_exec: # declares a reusable executor
     docker:
       - image: srclosson/grafana-plugin-ci-alpine:latest
-  e2e_exec:
-    docker:
-      - image: srclosson/grafana-plugin-ci-e2e:latest
   cloud_sdk_exec:
     docker:
       - image: google/cloud-sdk
@@ -203,62 +195,6 @@ jobs:
         root: .
         paths:
         - ci/jobs/provisioning
-
-  e2e_canary:
-    executor: e2e_exec
-    steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - restore_cache:
-        name: Restore node_modules
-        keys:
-        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - restore_cache:
-        name: Restore cypress cache
-        keys:
-        - cypress-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Exit if no e2e tests configured
-        command: |
-          [ -d cypress ] || circleci-agent step halt
-    - run:
-        name: Setup Grafana (local install)
-        command: |
-          ginstall canary
-          /opt/grafana/bin/grafana-server -config ci/grafana-test-env/custom.ini -homepath /opt/grafana &
-          ## To make sure grafana has started up
-          while ! $(netstat -tulpn | grep 3000 >/dev/null 2>&1); do sleep 1; done
-          /opt/grafana/bin/grafana-cli --version
-
-    - run:
-        name: Copy provisioning files
-        command: cp -r ci/jobs/provisioning provisioning/
-    - run:
-        name: Run e2e tests
-        command: |
-          # If the tests fail, but GRAFANACI_STRICT_E2E=0, don't worry about it
-          ./node_modules/.bin/grafana-e2e run \
-          || (
-            [ "$GRAFANACI_STRICT_E2E" -eq 0 ] && echo "Bypassing fail. ci-nostrict enabled"
-          )
-    - run:
-        when: always
-        name: Prepare task output dir
-        command: |
-          # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
-          mkdir ci/jobs/e2e_canary
-          # only copy if they exist
-          cp cypress/screenshots/*.* ci/jobs/e2e_canary 2>/dev/null || :
-          cp cypress/videos/*.* ci/jobs/e2e_canary 2>/dev/null || :
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/e2e_canary
-    - store_test_results:
-        path: ci/jobs/e2e_canary
-    - store_artifacts:
-        path: ci/jobs/e2e_canary
 
   report:
     executor: default_exec

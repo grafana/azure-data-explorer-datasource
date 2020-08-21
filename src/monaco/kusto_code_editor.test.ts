@@ -74,8 +74,8 @@ describe('KustoCodeEditor', () => {
         expect(completionItems[2].label).toBe('$__to');
         expect(completionItems[2].insertText.value).toBe('\\$__to');
 
-        expect(completionItems[3].label).toBe('$__interval');
-        expect(completionItems[3].insertText.value).toBe('\\$__interval');
+        expect(completionItems[3].label).toBe('$__timeInterval');
+        expect(completionItems[3].insertText.value).toBe('\\$__timeInterval');
       });
     });
   });

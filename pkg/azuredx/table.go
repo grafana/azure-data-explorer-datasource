@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"reflect"
-	"strings"
+	"strconv"
 	"time"
 
-	"github.com/grafana/grafana-plugin-model/go/datasource"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 )
 
 // TableResponse represents the response struct from Azure's Data Explorer REST API.
@@ -33,153 +32,213 @@ type Column struct {
 	ColumnType string
 }
 
-// ToTables turns a TableResponse into a slice of Tables appropriate for the plugin model.
-func (tr *TableResponse) ToTables() ([]*datasource.Table, error) {
-	tables := []*datasource.Table{}
-	for _, resTable := range tr.Tables { // Foreach Table in Response
-		if resTable.TableName != "Table_0" {
-			continue
+func (ar *TableResponse) getTableByName(name string) (Table, error) {
+	for _, t := range ar.Tables {
+		if t.TableName == name {
+			return t, nil
 		}
-		t := new(datasource.Table) // New API type table
-		columnTypes := make([]string, len(resTable.Columns))
-
-		t.Columns = make([]*datasource.TableColumn, len(resTable.Columns))
-
-		for colIdx, column := range resTable.Columns { // For column in the table
-			t.Columns[colIdx] = &datasource.TableColumn{Name: column.ColumnName}
-			if column.ColumnType == "" && column.DataType != "" {
-				switch column.DataType {
-				case "String":
-					columnTypes[colIdx] = kustoTypeString
-				case "Boolean":
-					columnTypes[colIdx] = kustoTypeBool
-				case "Guid":
-					columnTypes[colIdx] = kustoTypeGUID
-				case "DateTime":
-					columnTypes[colIdx] = kustoTypeDatetime
-				case "Int":
-					columnTypes[colIdx] = kustoTypeInt
-				case "Float":
-					columnTypes[colIdx] = kustoTypeReal
-				case "Long":
-				case "Decimal":
-					columnTypes[colIdx] = kustoTypeLong
-				case "Dynamic":
-					columnTypes[colIdx] = kustoTypeDynamic
-				}
-			} else {
-				columnTypes[colIdx] = column.ColumnType
-			}
-
-		}
-
-		t.Rows = make([]*datasource.TableRow, len(resTable.Rows))
-
-		for rowIdx, row := range resTable.Rows {
-			newRow := &datasource.TableRow{Values: make([]*datasource.RowValue, len(t.Columns))}
-			for recIdx, rec := range row {
-				var err error
-				newRow.Values[recIdx], err = extractValueForTable(rec, columnTypes[recIdx])
-				if err != nil {
-					return nil, err
-				}
-			}
-			t.Rows[rowIdx] = newRow
-		}
-		tables = append(tables, t)
-
 	}
-	return tables, nil
+	return Table{}, fmt.Errorf("no data as %v table is missing from the the response", name)
 }
 
-// ToTimeSeries turns a TableResponse into a slice of Tables appropriate for the plugin model.
-// Number Columns become a "Metric".
-// String, or things that can become strings that are not a number become a Tags/Labels.
-// There must be one and only one time column.
-func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, bool, error) {
-	series := []*datasource.TimeSeries{}
-	timeNotASC := false
-
-	for _, resTable := range tr.Tables { // Foreach Table in Response
-		if resTable.TableName != "Table_0" {
-			continue
-		}
-
-		seriesMap := make(map[string]map[string]*datasource.TimeSeries) // MetricName (Value Column) -> Tags -> Series
-
-		timeCount := 0
-		timeColumnIdx := 0
-		labelColumnIdxs := []int{}
-		valueColumnIdxs := []int{}
-
-		for colIdx, column := range resTable.Columns { // For column in the table
-			switch column.ColumnType {
-			case kustoTypeDatetime:
-				timeColumnIdx = colIdx
-				timeCount++
-			case kustoTypeInt, kustoTypeLong, kustoTypeReal:
-				valueColumnIdxs = append(valueColumnIdxs, colIdx)
-				seriesMap[column.ColumnName] = make(map[string]*datasource.TimeSeries)
-			case kustoTypeString, kustoTypeGUID:
-				labelColumnIdxs = append(labelColumnIdxs, colIdx)
-			default:
-				return nil, timeNotASC, fmt.Errorf("unsupported type '%v' in response for a time series query: must be datetime, int, long, real, guid, or string", column.ColumnType)
-			}
-		}
-
-		if timeCount != 1 {
-			return nil, timeNotASC, fmt.Errorf("expected exactly one column of type datetime in the response but got %v", timeCount)
-		}
-		if len(valueColumnIdxs) < 1 {
-			return nil, timeNotASC, fmt.Errorf("did not find a value column, must provide one column of type int, long, or real")
-		}
-
-		var lastTimeStamp int64
-		for rowIdx, row := range resTable.Rows {
-			if len(row) != len(labelColumnIdxs)+len(valueColumnIdxs)+1 {
-				return nil, timeNotASC, fmt.Errorf("unexpected number of rows in response")
-			}
-			timeStamp, err := extractTimeStamp(row[timeColumnIdx])
+func (tr *TableResponse) ToDataFrames(executedQueryString string) (data.Frames, error) {
+	table, err := tr.getTableByName("Table_0")
+	if err != nil {
+		return nil, err
+	}
+	converterFrame, err := converterFrameForTable(table, executedQueryString)
+	if err != nil {
+		return nil, err
+	}
+	for rowIdx, row := range table.Rows {
+		for fieldIdx, field := range row {
+			err = converterFrame.Set(fieldIdx, rowIdx, field)
 			if err != nil {
-				return nil, timeNotASC, err
-			}
-			if rowIdx == 0 {
-				lastTimeStamp = timeStamp
-			} else if lastTimeStamp > timeStamp {
-				timeNotASC = true
-			}
-			labels, err := labelMaker(resTable.Columns, row, labelColumnIdxs)
-			if err != nil {
-				return nil, false, err
-			}
-			for _, valueIdx := range valueColumnIdxs {
-				colName := resTable.Columns[valueIdx].ColumnName
-				// See if time Series exists- this is flawed as could confused values and labels, TODO do something better
-				series, ok := seriesMap[colName][labels.str]
-				if !ok {
-					series = &datasource.TimeSeries{}
-					series.Name = labels.GetName(colName)
-					series.Tags = labels.keyVals
-					seriesMap[colName][labels.str] = series
-				}
-				val, err := extractJSONNumberAsFloat(row[valueIdx])
-				if err != nil {
-					return nil, false, err
-				}
-				series.Points = append(series.Points, &datasource.Point{Timestamp: timeStamp, Value: val})
+				return nil, err
 			}
 		}
+	}
+	return data.Frames{converterFrame.Frame}, nil
+}
 
-		// Map Structure to Series
-		for _, sm := range seriesMap {
-			for _, s := range sm {
-				series = append(series, s)
-			}
+func converterFrameForTable(t Table, executedQueryString string) (*data.FrameInputConverter, error) {
+	converters := []data.FieldConverter{}
+	colNames := make([]string, len(t.Columns))
+	colTypes := make([]string, len(t.Columns))
+
+	for i, col := range t.Columns {
+		colNames[i] = col.ColumnName
+		colTypes[i] = col.ColumnType
+		converter, ok := converterMap[col.ColumnType]
+		if !ok {
+			return nil, fmt.Errorf("unsupported analytics column type %v", col.ColumnType)
 		}
-
+		converters = append(converters, converter)
 	}
 
-	return series, timeNotASC, nil
+	fic, err := data.NewFrameInputConverter(converters, len(t.Rows))
+	if err != nil {
+		return nil, err
+	}
+
+	err = fic.Frame.SetFieldNames(colNames...)
+	if err != nil {
+		return nil, err
+	}
+
+	fic.Frame.Meta = &data.FrameMeta{
+		ExecutedQueryString: executedQueryString,
+		Custom:              AzureFrameMD{ColumnTypes: colTypes},
+	}
+
+	return fic, nil
+}
+
+var converterMap = map[string]data.FieldConverter{
+	"string":   stringConverter,
+	"guid":     stringConverter,
+	"timespan": stringConverter,
+	"dynamic":  dynamicConverter,
+	"datetime": timeConverter,
+	"int":      intConverter,
+	"long":     longConverter,
+	"real":     realConverter,
+	"bool":     boolConverter,
+}
+
+var dynamicConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeString,
+	Converter: func(v interface{}) (interface{}, error) {
+		b, err := json.Marshal(v)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal dynamic type into JSON string '%v': %v", v, err)
+		}
+		return string(b), nil
+	},
+}
+
+var stringConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableString,
+	Converter: func(v interface{}) (interface{}, error) {
+		var as *string
+		if v == nil {
+			return as, nil
+		}
+		s, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected string but got type %T with a value of %v", v, v)
+		}
+		as = &s
+		return as, nil
+	},
+}
+
+var timeConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableTime,
+	Converter: func(v interface{}) (interface{}, error) {
+		var at *time.Time
+		if v == nil {
+			return at, nil
+		}
+		s, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected string but got type %T with a value of %v", v, v)
+		}
+		t, err := time.Parse(time.RFC3339Nano, s)
+		if err != nil {
+			return nil, err
+		}
+
+		return &t, nil
+	},
+}
+
+var realConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableFloat64,
+	Converter: func(v interface{}) (interface{}, error) {
+		var af *float64
+		if v == nil {
+			return af, nil
+		}
+		jN, ok := v.(json.Number)
+		if !ok {
+			s, sOk := v.(string)
+			if sOk {
+				switch s {
+				case "Infinity":
+					f := math.Inf(0)
+					return &f, nil
+				case "-Infinity":
+					f := math.Inf(-1)
+					return &f, nil
+				case "NaN":
+					f := math.NaN()
+					return &f, nil
+				}
+			}
+			return nil, fmt.Errorf("unexpected type, expected json.Number but got type %T for value %v", v, v)
+		}
+		f, err := jN.Float64()
+		if err != nil {
+			return nil, err
+		}
+		return &f, err
+	},
+}
+
+var boolConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableBool,
+	Converter: func(v interface{}) (interface{}, error) {
+		var ab *bool
+		if v == nil {
+			return ab, nil
+		}
+		b, ok := v.(bool)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected bool but got got type %T with a value of %v", v, v)
+		}
+		return &b, nil
+	},
+}
+
+var intConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableInt32,
+	Converter: func(v interface{}) (interface{}, error) {
+		var ai *int32
+		if v == nil {
+			return ai, nil
+		}
+		jN, ok := v.(json.Number)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected json.Number but got type %T with a value of %v", v, v)
+		}
+		var err error
+		iv, err := strconv.ParseInt(jN.String(), 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		aInt := int32(iv)
+		return &aInt, nil
+	},
+}
+
+var longConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableInt64,
+	Converter: func(v interface{}) (interface{}, error) {
+		var ai *int64
+		if v == nil {
+			return ai, nil
+		}
+		jN, ok := v.(json.Number)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected json.Number but got type %T with a value of %v", v, v)
+		}
+		out, err := jN.Int64()
+		if err != nil {
+			return nil, err
+		}
+		return &out, err
+	},
 }
 
 // ToADXTimeSeries returns Time series for a query that returns an ADX series type.
@@ -189,276 +248,93 @@ func (tr *TableResponse) ToTimeSeries() ([]*datasource.TimeSeries, bool, error) 
 // - N Columns for group by items, where each Group by item is a column individual string column
 // - An Array of Values per Aggregation Column
 // - Timestamp column
-func (tr *TableResponse) ToADXTimeSeries() ([]*datasource.TimeSeries, error) {
-	seriesCollection := []*datasource.TimeSeries{}
-	for _, resTable := range tr.Tables { // Foreach Table in Response
-		if resTable.TableName != "Table_0" {
-			continue
-		}
+//
+// From the ADX documentation, I believe all series will share the same time index,
+// so we create a wide frame.
+func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
+	if in.Rows() == 0 {
+		return in, nil
+	}
 
-		timeCount := 0
-		timeColumnIdx := 0
-		labelColumnIdxs := []int{} // idx to Label Name
-		valueColumnIdxs := []int{}
+	timeColIdx := -1
+	labelColIdxs := []int{}
+	valueColIdxs := []int{}
 
-		//TODO check len
-		for colIdx, column := range resTable.Columns { // For column in the table
-			switch column.ColumnType {
-			case kustoTypeString, kustoTypeGUID:
-				labelColumnIdxs = append(labelColumnIdxs, colIdx)
-			case kustoTypeDynamic:
-				if column.ColumnName == "Timestamp" {
-					timeColumnIdx = colIdx
-					timeCount++
-					continue
+	// TODO check to avoid panics
+	getKustoColType := func(fIdx int) string {
+		return in.Meta.Custom.(AzureFrameMD).ColumnTypes[fIdx]
+	}
+
+	foundTime := false
+	for fieldIdx, field := range in.Fields {
+		switch getKustoColType(fieldIdx) {
+		case "string":
+			labelColIdxs = append(labelColIdxs, fieldIdx)
+		case "dynamic":
+			if field.Name == "Timestamp" {
+				if foundTime {
+					return nil, fmt.Errorf("must be exactly one column named 'Timestamp', but response has more than one")
 				}
-				valueColumnIdxs = append(valueColumnIdxs, colIdx)
-			default:
-				return nil, fmt.Errorf("unsupported type '%v' in response for a ADX time series query: must be dynamic, guid, or string", column.ColumnType)
+				foundTime = true
+				timeColIdx = fieldIdx
+				continue
 			}
-		}
+			valueColIdxs = append(valueColIdxs, fieldIdx)
 
-		if timeCount != 1 {
-			return nil, fmt.Errorf("query must contain exactly one datetime column named 'Timestamp', got %v", timeCount)
 		}
-		if len(valueColumnIdxs) < 1 {
-			return nil, fmt.Errorf("did not find a value column, expected at least one column of type 'dynamic', got %v", len(valueColumnIdxs))
-		}
+	}
 
-		var times []int64
-		for rowIdx, row := range resTable.Rows {
-			if rowIdx == 0 { // Time values are repeated for every row, so we only need to do this once
-				interfaceSlice, ok := row[timeColumnIdx].([]interface{})
-				if !ok {
-					return nil, fmt.Errorf("time column was not of expected type, wanted []interface{} got %T", row[timeColumnIdx])
-				}
-				times = make([]int64, len(interfaceSlice))
-				for i, interfaceVal := range interfaceSlice {
-					var err error
-					times[i], err = extractTimeStamp(interfaceVal)
-					if err != nil {
-						return nil, err
-					}
-				}
-			}
+	if timeColIdx == -1 {
+		return nil, fmt.Errorf("response must have a column named 'Timestamp'")
+	}
+	if len(valueColIdxs) < 1 {
+		return nil, fmt.Errorf("did not find a numeric value column, expected at least one column of type 'dynamic', got %v", len(valueColIdxs))
+	}
 
-			labels, err := labelMaker(resTable.Columns, row, labelColumnIdxs)
+	out := data.NewFrame(in.Name).SetMeta(&data.FrameMeta{ExecutedQueryString: in.Meta.ExecutedQueryString})
+
+	// Each row is a series
+	expectedRowLen := 0
+	for rowIdx := 0; rowIdx < in.Rows(); rowIdx++ {
+		// Set up the shared time index
+		if rowIdx == 0 {
+			rawTimeArrayString := in.At(timeColIdx, 0).(string)
+			times := []time.Time{}
+			err := json.Unmarshal([]byte(rawTimeArrayString), &times)
 			if err != nil {
 				return nil, err
 			}
-			for _, valueIdx := range valueColumnIdxs {
-				// Handle case where all values are null
-				if interfaceIsNil(row[valueIdx]) {
-					series := &datasource.TimeSeries{
-						Name:   labels.GetName(resTable.Columns[valueIdx].ColumnName),
-						Points: make([]*datasource.Point, len(times)),
-						Tags:   labels.keyVals,
-					}
-					for idx, time := range times {
-						series.Points[idx] = &datasource.Point{Timestamp: time, Value: math.NaN()}
-					}
-					seriesCollection = append(seriesCollection, series)
-					continue
-				}
+			expectedRowLen = len(times)
+			out.Fields = append(out.Fields, data.NewField("Timestamp", nil, times))
+		}
 
-				interfaceSlice, ok := row[valueIdx].([]interface{})
-				if !ok {
-					return nil, fmt.Errorf("value column was not of expected type, wanted []interface{} got %T", row[valueIdx])
-				}
-				series := &datasource.TimeSeries{
-					Name:   labels.GetName(resTable.Columns[valueIdx].ColumnName),
-					Points: make([]*datasource.Point, len(interfaceSlice)),
-					Tags:   labels.keyVals,
-				}
-				for idx, interfaceVal := range interfaceSlice {
-					if interfaceIsNil(interfaceVal) {
-						series.Points[idx] = &datasource.Point{
-							Timestamp: times[idx],
-							Value:     math.NaN(),
-						}
-						continue
-					}
-					val, err := extractJSONNumberAsFloat(interfaceVal)
-					if err != nil {
-						return nil, err
-					}
-					series.Points[idx] = &datasource.Point{
-						Timestamp: times[idx],
-						Value:     val,
-					}
-				}
-				seriesCollection = append(seriesCollection, series)
+		// Build the labels for the series from the row
+		var l data.Labels
+		for i, labelIdx := range labelColIdxs {
+			if i == 0 {
+				l = make(data.Labels)
 			}
+			labelVal, _ := in.ConcreteAt(labelIdx, rowIdx)
+			l[in.Fields[labelIdx].Name] = labelVal.(string)
 		}
-	}
-	return seriesCollection, nil
-}
 
-type rowLabels struct {
-	keyVals map[string]string
-	str     string
-}
-
-func (r *rowLabels) GetName(colName string) string {
-	if len(r.keyVals) == 0 {
-		return colName
-	}
-
-	//var names []string
-	//for _, val := range r.keyVals {
-	//	names = append(names, val)
-	//}
-
-	return fmt.Sprintf("{ \"%v\": {%v} }", colName, r.str)
-	//return strings.Join(names, "|")
-}
-
-func labelMaker(columns []Column, row Row, labelColumnIdxs []int) (*rowLabels, error) {
-	labels := new(rowLabels)
-
-	var labelsSB strings.Builder
-	labels.keyVals = make(map[string]string, len(labelColumnIdxs))
-	for idx, labelIdx := range labelColumnIdxs { // gather labels
-		val, ok := row[labelIdx].(string)
-		if !ok {
-			return nil, fmt.Errorf("failed to get string value for column %v", row[labelIdx])
-		}
-		colName := columns[labelIdx].ColumnName
-		if _, err := labelsSB.WriteString(fmt.Sprintf("\"%v\":\"%v\"", colName, val)); err != nil {
-			return nil, err
-		}
-		if len(labelColumnIdxs) > 1 && idx != len(labelColumnIdxs)-1 {
-			if _, err := labelsSB.WriteString(", "); err != nil {
+		for _, valueIdx := range valueColIdxs {
+			// Will treat all numberic values as nullable floats here
+			vals := []*float64{}
+			rawValues := in.At(valueIdx, rowIdx).(string)
+			err := json.Unmarshal([]byte(rawValues), &vals)
+			if err != nil {
 				return nil, err
 			}
-		}
-		labels.keyVals[colName] = val
-	}
-	labels.str = labelsSB.String()
-	return labels, nil
-}
-
-// extractValueForTable returns a RowValue suitable for the plugin model based on the ColumnType provided by the TableResponse's Columns.
-// Available types as per the API are listed in "Scalar data types" https://docs.microsoft.com/en-us/azure/kusto/query/scalar-data-types/index.
-// However, since we get this over JSON the underlying types are not always the type as declared by ColumnType.
-func extractValueForTable(v interface{}, typ string) (*datasource.RowValue, error) {
-	r := &datasource.RowValue{}
-	var ok bool
-	var err error
-	if interfaceIsNil(v) {
-		// It's okay if the string value is null sometimes.
-		// Queries like .show databases will do this.
-		r.Kind = datasource.RowValue_TYPE_NULL
-		return r, nil
-	}
-
-	// Sometimes Kusto will not return a proper type, or an empty type.
-	// In this case, try to interpolate the type.
-	if typ == "" {
-		switch v.(type) {
-		case int:
-			typ = kustoTypeInt
-		case float64:
-			typ = kustoTypeReal
-		case string:
-			typ = kustoTypeString
-		case json.Number:
-			// For json.Number's we could have either a float or an int.
-			// Numbers can be either float or int. If there is a "."
-			// return float, otherwise return int.
-			sv := fmt.Sprintf("%v", v)
-			if strings.Contains(sv, ".") {
-				typ = kustoTypeReal
-			} else {
-				typ = kustoTypeInt
+			if len(vals) == 0 {
+				// When all the values are null, the object is null in the response.
+				// Must set to length of frame for a consistent length frame
+				vals = make([]*float64, expectedRowLen)
 			}
-		default:
-			return nil, fmt.Errorf("unsupplied type '%v' in table for value '%v'", typ, v)
+			out.Fields = append(out.Fields, data.NewField(in.Fields[valueIdx].Name, l, vals))
 		}
+
 	}
 
-	switch typ {
-	case kustoTypeBool:
-		r.Kind = datasource.RowValue_TYPE_BOOL
-		r.BoolValue, ok = v.(bool)
-		if !ok {
-			return nil, fmt.Errorf(extractFailFmt, v, "bool", typ, v)
-		}
-	case kustoTypeReal:
-		r.Kind = datasource.RowValue_TYPE_DOUBLE
-		r.DoubleValue, err = extractJSONNumberAsFloat(v)
-		if err != nil {
-			return nil, err
-		}
-	case kustoTypeInt, kustoTypeLong:
-		r.Kind = datasource.RowValue_TYPE_INT64
-		jN, ok := v.(json.Number)
-		if !ok {
-			return nil, fmt.Errorf(extractFailFmt, v, "json.Number", typ, v)
-		}
-		r.Int64Value, err = jN.Int64()
-		if err != nil {
-			return nil, fmt.Errorf("failed to extract int64 from json.Number: %v", err)
-		}
-	case kustoTypeDynamic:
-		r.Kind = datasource.RowValue_TYPE_STRING
-		b, err := json.Marshal(v)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal dynamic type into JSON string '%v': %v", v, err)
-		}
-		r.StringValue = string(b)
-	case kustoTypeString, kustoTypeGUID, kustoTypeTimespan, kustoTypeDatetime:
-		r.Kind = datasource.RowValue_TYPE_STRING
-		r.StringValue, ok = v.(string)
-		if !ok {
-			return nil, fmt.Errorf(extractFailFmt, v, "string", typ, v)
-		}
-	default: // documented values not handled: decimal
-		return nil, fmt.Errorf("unrecognized type '%v' in table for value '%v'", typ, v)
-	}
-	return r, nil
+	return out, nil
 }
-
-const extractFailFmt = "failed to extract value '%v' as a go of type %v, column type is %v and a go type of %T" // value, assertionType, columnType, value
-
-// extractTimeStamp extracts a Unix Timestamp in MS (suitable for the plugin) from an Azure Data Explorer Timestamp contained in an interface.
-// The interface comes from within an ADX TableResponse. It is either the value of a record, or a within a
-// dynamic record as in the case of a "series" response.
-func extractTimeStamp(v interface{}) (i int64, err error) {
-	nV, ok := v.(string)
-	if !ok {
-		return i, fmt.Errorf("expected interface of type string, got type '%T'", v)
-	}
-	t, err := time.Parse(time.RFC3339Nano, nV)
-	if err != nil {
-		return i, fmt.Errorf("failed to parse time for '%v'", nV)
-	}
-	return t.UnixNano() / 1e6, nil
-}
-
-// interfaceIsNil is used to check if the interface value within a TableResponse is nil.
-// https://stackoverflow.com/questions/13476349/check-for-nil-and-nil-interface-in-go
-func interfaceIsNil(v interface{}) bool {
-	return v == nil || (reflect.ValueOf(v).Kind() == reflect.Ptr && reflect.ValueOf(v).IsNil())
-}
-
-func extractJSONNumberAsFloat(v interface{}) (f float64, err error) {
-	jN, ok := v.(json.Number)
-	if !ok {
-		return float64(0), fmt.Errorf("expected json.Number but got type '%T' for '%v'", v, v)
-	}
-	return jN.Float64()
-}
-
-const (
-	kustoTypeBool     = "bool"
-	kustoTypeDatetime = "datetime"
-	kustoTypeDynamic  = "dynamic"
-	kustoTypeGUID     = "guid"
-	kustoTypeInt      = "int"
-	kustoTypeLong     = "long"
-	kustoTypeReal     = "real"
-	kustoTypeString   = "string"
-	kustoTypeTimespan = "timespan"
-	//kustoTypeDecimal  = "decimal"
-)

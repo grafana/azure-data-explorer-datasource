@@ -3,15 +3,16 @@ package azuredx
 import (
 	"fmt"
 	"testing"
+	"time"
 
-	"github.com/grafana/grafana-plugin-model/go/datasource"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMacroData_Interpolate(t *testing.T) {
-	fromEpochMS := int64(1564516953 * 1000)
+	fromTime := time.Date(2019, 7, 30, 20, 2, 33, 0, time.UTC)
 	fromString := "datetime(2019-07-30T20:02:33Z)"
-	toEpochMS := int64((1564516953 + 300) * 1000)
+	toTime := time.Date(2019, 7, 30, 20, 7, 33, 0, time.UTC)
 	toString := "datetime(2019-07-30T20:07:33Z)"
 
 	tests := []struct {
@@ -24,8 +25,8 @@ func TestMacroData_Interpolate(t *testing.T) {
 	}{
 		{
 			name: "should parse $__timeFrom",
-			macroData: NewMacroData(&datasource.TimeRange{
-				FromEpochMs: fromEpochMS,
+			macroData: NewMacroData(&backend.TimeRange{
+				From: fromTime,
 			}, 0),
 			errorIs:   assert.NoError,
 			query:     "$__timeFrom",
@@ -34,8 +35,8 @@ func TestMacroData_Interpolate(t *testing.T) {
 		},
 		{
 			name: "should parse $__timeFrom with spaces",
-			macroData: NewMacroData(&datasource.TimeRange{
-				FromEpochMs: fromEpochMS,
+			macroData: NewMacroData(&backend.TimeRange{
+				From: fromTime,
 			}, 0),
 			errorIs:   assert.NoError,
 			query:     " $__timeFrom ",
@@ -44,8 +45,8 @@ func TestMacroData_Interpolate(t *testing.T) {
 		},
 		{
 			name: "should parse $__timeTo",
-			macroData: NewMacroData(&datasource.TimeRange{
-				ToEpochMs: toEpochMS,
+			macroData: NewMacroData(&backend.TimeRange{
+				To: toTime,
 			}, 0),
 			errorIs:   assert.NoError,
 			query:     "$__timeTo",
@@ -62,9 +63,9 @@ func TestMacroData_Interpolate(t *testing.T) {
 		},
 		{
 			name: "should parse $__timeFilter()",
-			macroData: NewMacroData(&datasource.TimeRange{
-				FromEpochMs: fromEpochMS,
-				ToEpochMs:   toEpochMS,
+			macroData: NewMacroData(&backend.TimeRange{
+				From: fromTime,
+				To:   toTime,
 			}, 0),
 			errorIs:   assert.NoError,
 			query:     "$__timeFilter()",
@@ -73,9 +74,9 @@ func TestMacroData_Interpolate(t *testing.T) {
 		},
 		{
 			name: "should parse $__timeFilter(CatCount)",
-			macroData: NewMacroData(&datasource.TimeRange{
-				FromEpochMs: fromEpochMS,
-				ToEpochMs:   toEpochMS,
+			macroData: NewMacroData(&backend.TimeRange{
+				From: fromTime,
+				To:   toTime,
 			}, 0),
 			errorIs:   assert.NoError,
 			query:     "$__timeFilter(CatCount)",

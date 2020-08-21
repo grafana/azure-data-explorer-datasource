@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0]
+
+- Adds support for a new visual query editor
+- Ports the existing query editor to React
+
 ## [2.1.0]
 
 - Adds support for the databases() macro for template variable queries and the database variable can then be used in the databases dropdown in the query editor. This allows the user to switch databases for a query without editing it.

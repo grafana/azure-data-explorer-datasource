@@ -1,0 +1,47 @@
+export enum QueryEditorPropertyType {
+  Number = 'number',
+  String = 'string',
+  Boolean = 'boolean',
+  DateTime = 'dateTime',
+  Function = 'function',
+  Interval = 'interval',
+}
+
+export interface QueryEditorProperty {
+  type: QueryEditorPropertyType;
+  name: string;
+}
+
+export type QueryEditorOperatorType = string | boolean | number;
+type QueryEditorOperatorValueType = QueryEditorOperatorType | QueryEditorOperatorType[];
+
+export interface QueryEditorOperator<T = QueryEditorOperatorValueType> {
+  name: string;
+  value: T;
+}
+
+export interface QueryEditorOperatorDefinition {
+  value: string;
+  supportTypes: QueryEditorPropertyType[];
+  multipleValues: boolean;
+  booleanValues: boolean;
+  label?: string;
+  description?: string;
+}
+
+export interface QueryEditorPropertyDefinition {
+  value: string;
+  type: QueryEditorPropertyType;
+  label?: string;
+}
+
+export interface QueryEditorFunctionDefinition extends QueryEditorPropertyDefinition {
+  parameters?: QueryEditorFunctionParameter[];
+}
+
+export interface QueryEditorFunctionParameter {
+  name: string;
+  type: QueryEditorPropertyType;
+  description: string;
+  value?: string;
+}

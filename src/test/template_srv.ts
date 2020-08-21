@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { TimeRange } from '@grafana/data';
+import { TimeRange, VariableModel } from '@grafana/data';
 
 export class TemplateSrv {
   variables: any[] = [];
@@ -40,7 +40,7 @@ export class TemplateSrv {
     if (_.isString(value)) {
       return value;
     }
-    return '{' + value.join(',') + '}';
+    return value.join(',');
   }
 
   replace(target: string, scopedVars?: any, format?: string | Function) {
@@ -90,5 +90,9 @@ export class TemplateSrv {
 
   getAllValue(variable) {
     return null;
+  }
+
+  getVariables(): VariableModel[] {
+    return this.variables;
   }
 }
