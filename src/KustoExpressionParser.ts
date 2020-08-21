@@ -65,7 +65,7 @@ export class KustoExpressionParser {
     if (reduce && groupBy && this.isAggregated(groupBy)) {
       this.appendSummarize(reduce, groupBy, columns, parts);
     } else if (reduce) {
-      this.appendProject(reduce, defaultTimeColumn, parts);
+      this.appendProject(reduce, defaultTimeColumn, columns, parts);
     }
 
     parts.push(`take ${this.limit}`);
@@ -83,7 +83,12 @@ export class KustoExpressionParser {
     parts.push(`where $__timeFilter(${dateTimeField})`);
   }
 
-  appendProject(expression: QueryEditorArrayExpression, defaultTimeColumn: string, parts: string[]) {
+  appendProject(
+    expression: QueryEditorArrayExpression,
+    defaultTimeColumn: string,
+    columns: AdxColumnSchema[],
+    parts: string[]
+  ) {
     let project = 'project ';
     let timeCol = defaultTimeColumn;
 
@@ -100,11 +105,14 @@ export class KustoExpressionParser {
     }
 
     if (fields.length > 0) {
-      project += [timeCol].concat(fields).join(', ');
+      project += [timeCol]
+        .concat(fields)
+        .map(field => this.castIfDynamic(field, columns))
+        .join(', ');
       parts.push(project);
     }
 
-    const orderBy = `order by ${timeCol} asc`;
+    const orderBy = `order by ${this.castIfDynamic(timeCol, columns)} asc`;
     parts.push(orderBy);
   }
 
@@ -219,13 +227,13 @@ export class KustoExpressionParser {
       } else {
         summarize += ' by ';
       }
-      summarize += fields.groupByFields.join(', ');
+      summarize += fields.groupByFields.map(field => this.castIfDynamic(field, columns)).join(', ');
     }
 
     parts.push(summarize);
 
     if (fields.dateTimeField) {
-      const orderBy = `order by ${fields.dateTimeField} asc`;
+      const orderBy = `order by ${this.castIfDynamic(fields.dateTimeField, columns)} asc`;
       parts.push(orderBy);
     }
   }
