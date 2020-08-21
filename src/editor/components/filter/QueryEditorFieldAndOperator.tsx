@@ -91,7 +91,33 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
   getSuggestions = debounce(
     async (txt: string) => {
       const column = this.props.value?.property.name;
-      return this.props.getSuggestions(txt, column);
+      const results = await this.props.getSuggestions(txt, column);
+
+      if (Array.isArray(this.props.templateVariableOptions?.options)) {
+        const variables = this.props.templateVariableOptions.options.filter(v => {
+          if (typeof v?.value === 'string') {
+            return v.value.indexOf(txt) > -1;
+          }
+          return false;
+        });
+
+        Array.prototype.push.apply(results, variables);
+      }
+
+      if (Array.isArray(this.props.operators)) {
+        const operators = this.props.operators
+          .filter(o => {
+            if (typeof o.value === 'string') {
+              return o.value.indexOf(txt) > -1;
+            }
+            return false;
+          })
+          .map(o => ({ label: o.value, value: o.value }));
+
+        Array.prototype.push.apply(results, operators);
+      }
+
+      return results;
     },
     500,
     { leading: false }
