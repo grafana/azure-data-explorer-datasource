@@ -67,6 +67,7 @@ export const QueryEditorGroupBy: React.FC<Props> = props => {
           templateVariableOptions={props.templateVariableOptions}
           onChange={onChangeInterval}
           placeholder="Choose interval"
+          allowCustom={true}
         />
       )}
     </div>

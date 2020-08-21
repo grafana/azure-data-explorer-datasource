@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { css } from 'emotion';
 import { Select, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorPropertyDefinition, QueryEditorProperty } from '../../types';
+import { QueryEditorPropertyDefinition, QueryEditorProperty, QueryEditorPropertyType } from '../../types';
 
 interface Props {
   fields: QueryEditorPropertyDefinition[];
@@ -10,6 +10,7 @@ interface Props {
   value?: QueryEditorProperty;
   onChange: (property: QueryEditorProperty) => void;
   placeholder?: string;
+  allowCustom?: boolean;
 }
 
 export const definitionToProperty = (definition: QueryEditorPropertyDefinition): QueryEditorProperty => {
@@ -34,6 +35,7 @@ export const QueryEditorField: React.FC<Props> = props => {
         options={props.templateVariableOptions ? [props.templateVariableOptions, ...options] : options}
         placeholder={props.placeholder}
         menuPlacement="bottom"
+        allowCustomValue={props.allowCustom}
       />
     </div>
   );
@@ -73,9 +75,17 @@ const useOnChange = (props: Props) => {
       }
 
       const { value } = selectable;
-      let field = props.fields.find(o => o.value === value);
+      let field: QueryEditorPropertyDefinition | undefined = props.fields.find(o => o.value === value);
+
       if (!field) {
         field = props.templateVariableOptions?.options.find(o => o.value === value);
+      }
+
+      if (!field && value && props.allowCustom) {
+        field = {
+          value,
+          type: QueryEditorPropertyType.String,
+        };
       }
 
       if (field) {
