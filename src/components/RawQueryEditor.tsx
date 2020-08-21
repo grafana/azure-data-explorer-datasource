@@ -15,9 +15,6 @@ interface RawQueryEditorProps extends Props {
   lastQuery?: string;
   timeNotASC?: boolean;
   schema?: AdxSchema;
-  onRawQueryChange: (kql: string) => void;
-  onAliasChanged: (v: any) => void;
-  onResultFormatChanged: (v: SelectableValue<string>) => void;
   templateVariableOptions: SelectableValue<string>;
 }
 

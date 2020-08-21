@@ -8,6 +8,7 @@ import {
   AnnotationQueryRequest,
   AnnotationEvent,
   LoadingState,
+  ScopedVars,
 } from '@grafana/data';
 import { map, pick } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
@@ -43,6 +44,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     if (target.hide) {
       return false;
     }
+    if (typeof target.rawMode === 'undefined' && target.query) {
+      return true;
+    }
     if (target.rawMode) {
       return true; // anything else we can check
     }
@@ -54,17 +58,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
-    let q = interpolateKustoQuery(target.query);
-
-    if (scopedVars) {
-      if (scopedVars['__interval']) {
-        q = this.templateSrv.replace(q, pick(scopedVars, '__interval'));
-      }
-
-      if (scopedVars['__interval_ms']) {
-        q = this.templateSrv.replace(q, pick(scopedVars, '__interval_ms'));
-      }
-    }
+    let q = interpolateKustoQuery(target.query, scopedVars as ScopedVars);
 
     return {
       ...target,

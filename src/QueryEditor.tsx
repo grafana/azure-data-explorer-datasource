@@ -96,9 +96,6 @@ export const QueryEditor: React.FC<Props> = props => {
           {...props}
           schema={schema.value}
           templateVariableOptions={templateVariables}
-          onRawQueryChange={kql => {}}
-          onAliasChanged={v => {}}
-          onResultFormatChanged={() => {}}
           lastQuery={executedQuery}
         />
       )}

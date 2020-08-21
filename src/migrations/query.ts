@@ -5,6 +5,7 @@ export const migrateQuery = (query: KustoQuery): KustoQuery => {
   return {
     ...defaultQuery,
     ...query,
+    rawMode: isRawMode(query),
     pluginVersion: defaultQuery.pluginVersion,
     expression: migrateExpression(defaultQuery.pluginVersion, query.expression),
   };
@@ -29,3 +30,10 @@ export const needsToBeMigrated = (query: KustoQuery): boolean => {
 
   return false;
 };
+
+function isRawMode(query: KustoQuery): boolean {
+  if (query.rawMode === undefined && query.query && !query.expression?.from) {
+    return true;
+  }
+  return query.rawMode || false;
+}
