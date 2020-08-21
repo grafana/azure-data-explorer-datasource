@@ -97,6 +97,7 @@ export const QueryEditor: React.FC<Props> = props => {
           schema={schema.value}
           templateVariableOptions={templateVariables}
           lastQuery={executedQuery}
+          database={database}
         />
       )}
       {editorMode === 'visual' && (
