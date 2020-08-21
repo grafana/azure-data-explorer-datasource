@@ -12,6 +12,7 @@ const editorTemplate = `<div id="content" tabindex="0" style="width: 100%; heigh
 
 function link(scope, elem, attrs) {
   const containerDiv = elem.find('#content')[0];
+
   if (!window.hasOwnProperty('monaco')) {
     //(window as any).monaco = import(/* webpackChunkName: "/monaco.min" */ '../lib/monaco.min.js').then(() => {
     (window as any).System.import(`/${scope.pluginBaseUrl}/libs/monaco.min.js`).then(() => {
@@ -40,7 +41,6 @@ function link(scope, elem, attrs) {
 
   function initMonaco(containerDiv, scope) {
     const kustoCodeEditor = new KustoCodeEditor(containerDiv, scope.defaultTimeField, scope.getSchema, config);
-
     kustoCodeEditor.initMonaco(scope.content);
 
     /* tslint:disable:no-bitwise */

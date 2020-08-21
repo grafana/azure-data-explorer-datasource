@@ -10,7 +10,7 @@ import {
   LoadingState,
   ScopedVars,
 } from '@grafana/data';
-import { map, pick } from 'lodash';
+import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import { AdxDataSourceOptions, KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery } from './types';
@@ -68,13 +68,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   async annotationQuery(options: AnnotationQueryRequest<KustoQuery>): Promise<AnnotationEvent[]> {
-    console.log('ANNO', options);
     const query = (options.annotation as any)?.annotation as KustoQuery;
     if (!query) {
       return Promise.reject({
         message: 'Query missing in annotation definition',
       });
     }
+
+    query.query = options.annotation.query;
 
     return super
       .query({
@@ -213,7 +214,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       options['scopedVars'] = {};
     }
 
-    const interpolatedQuery = interpolateKustoQuery(query);
+    const interpolatedQuery = interpolateKustoQuery(query, options['scopedVars']);
 
     return {
       ...defaultQuery,
