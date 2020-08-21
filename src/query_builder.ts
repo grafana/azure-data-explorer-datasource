@@ -1,6 +1,6 @@
 import { ScopedVars } from '@grafana/data';
 
-export default function interpolateKustoQuery(query: string, scopedVars: ScopedVars): string {
+export default function interpolateKustoQuery(query: string, scopedVars?: ScopedVars): string {
   if (!query) {
     return '';
   }
