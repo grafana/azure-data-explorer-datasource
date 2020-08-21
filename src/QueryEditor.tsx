@@ -100,6 +100,7 @@ export const QueryEditor: React.FC<Props> = props => {
           onAliasChanged={v => {}}
           onResultFormatChanged={() => {}}
           lastQuery={executedQuery}
+          database={database}
         />
       )}
       {editorMode === 'visual' && (

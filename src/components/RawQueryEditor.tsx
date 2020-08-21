@@ -15,6 +15,7 @@ interface RawQueryEditorProps extends Props {
   lastQuery?: string;
   timeNotASC?: boolean;
   schema?: AdxSchema;
+  database: string;
   onRawQueryChange: (kql: string) => void;
   onAliasChanged: (v: any) => void;
   onResultFormatChanged: (v: SelectableValue<string>) => void;
@@ -41,6 +42,7 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
     this.props.onChange({
       ...this.props.query,
       query: kql,
+      database: this.props.database,
     });
   };
 
