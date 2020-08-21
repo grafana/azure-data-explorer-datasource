@@ -69,7 +69,7 @@ jobs:
       - restore_cache:
           name: restore node_modules
           keys:
-          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Install dependencies
           command: |
@@ -93,7 +93,7 @@ jobs:
       - restore_cache:
           name: restore node_modules
           keys:
-          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build docs
           command: |
@@ -111,10 +111,10 @@ jobs:
       - restore_cache:
           name: restore node_modules
           keys:
-          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build and test frontend
-          command:  |
+          command: |
             /usr/local/bin/grafana-toolkit plugin:ci-build
       - persist_to_workspace:
           root: .
@@ -128,7 +128,7 @@ jobs:
       - restore_cache:
           name: restore node_modules
           keys:
-          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Exit if no backend
           command: |
@@ -148,70 +148,71 @@ jobs:
 
   package:
     executor: default_exec
+    resource_class: xlarge
     steps:
-    - checkout
-    - restore_cache:
-        name: restore node_modules
-        keys:
-        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - attach_workspace:
-        at: .
-    - run:
-        name: Move results to ci folder
-        command:  |
-          /usr/local/bin/grafana-toolkit plugin:ci-build --finish
-    - run:
-        name: Package distribution
-        command: |
-          /usr/local/bin/grafana-toolkit plugin:ci-package
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/package
-        - ci/packages
-        - ci/dist
-        - ci/grafana-test-env
-    - store_artifacts:
-        path: ci
+      - checkout
+      - restore_cache:
+          name: restore node_modules
+          keys:
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - attach_workspace:
+          at: .
+      - run:
+          name: Move results to ci folder
+          command: |
+            /usr/local/bin/grafana-toolkit plugin:ci-build --finish
+      - run:
+          name: Package distribution
+          command: |
+            /usr/local/bin/grafana-toolkit plugin:ci-package
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci/jobs/package
+            - ci/packages
+            - ci/dist
+            - ci/grafana-test-env
+      - store_artifacts:
+          path: ci
 
   provisioning:
     executor: default_exec
     steps:
-    - checkout
-    - add_ssh_keys:
-        fingerprints:
-          - << pipeline.parameters.ssh-fingerprint >>
-    - run:
-        name: Checkout provisioning files
-        command: git clone git@github.com:grafana/plugin-provisioning.git
-    - run:
-        name: Prepare task output dir
-        command: |
-          mkdir ci # Avoid error if not exists
-          mkdir ci/jobs # Avoid error if not exists
-          mkdir ci/jobs/provisioning
-          mv plugin-provisioning/plugins/azure-data-explorer-datasource/provisioning/* ci/jobs/provisioning
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/provisioning
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - << pipeline.parameters.ssh-fingerprint >>
+      - run:
+          name: Checkout provisioning files
+          command: git clone git@github.com:grafana/plugin-provisioning.git
+      - run:
+          name: Prepare task output dir
+          command: |
+            mkdir ci # Avoid error if not exists
+            mkdir ci/jobs # Avoid error if not exists
+            mkdir ci/jobs/provisioning
+            mv plugin-provisioning/plugins/azure-data-explorer-datasource/provisioning/* ci/jobs/provisioning
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci/jobs/provisioning
 
   report:
     executor: default_exec
     steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - restore_cache:
-        name: restore node_modules
-        keys:
-          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Toolkit report
-        command: |
-          /usr/local/bin/grafana-toolkit plugin:ci-report
-    - store_artifacts:
-        path: ci
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          name: restore node_modules
+          keys:
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Toolkit report
+          command: |
+            /usr/local/bin/grafana-toolkit plugin:ci-report
+      - store_artifacts:
+          path: ci
 
   publish_github_release:
     executor: default_exec
@@ -219,13 +220,13 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-          - << pipeline.parameters.ssh-fingerprint >>
+            - << pipeline.parameters.ssh-fingerprint >>
       - attach_workspace:
           at: .
       - restore_cache:
           name: restore node_modules
           keys:
-          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: "Publish Release on GitHub"
           command: |
