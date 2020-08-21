@@ -188,13 +188,13 @@ const useTemplateVariables = (datasource: AdxDataSource) => {
 };
 
 // export class QueryEditor extends PureComponent<Props, State> {
-//   private schemaResolver: AdxSchemaResovler;
+//   private schemaResolver: AdxSchemaResolver;
 //   private kustoExpressionParser: KustoExpressionParser;
 
 //   constructor(props: Props) {
 //     super(props);
 
-//     this.schemaResolver = new AdxSchemaResovler(this.props.datasource);
+//     this.schemaResolver = new AdxSchemaResolver(this.props.datasource);
 //     this.kustoExpressionParser = new KustoExpressionParser();
 //   }
 

@@ -4,7 +4,7 @@ import { cache } from './cache';
 
 const schemaKey = 'AdxSchemaResolver';
 
-export class AdxSchemaResovler {
+export class AdxSchemaResolver {
   constructor(private datasource: AdxDataSource) {}
 
   private createCacheKey(addition: string): string {

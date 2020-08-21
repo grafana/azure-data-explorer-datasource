@@ -19,7 +19,7 @@ import {
 import { definitionToProperty } from '../editor/components/field/QueryEditorField';
 import { isFieldExpression } from '../editor/guards';
 import { AdxDataSource } from '../datasource';
-import { AdxSchemaResovler } from '../schema/AdxSchemaResolver';
+import { AdxSchemaResolver } from '../schema/AdxSchemaResolver';
 import { QueryEditorResultFormat, useSelectedFormat } from '../components/QueryEditorResultFormat';
 import { KustoExpressionParser } from '../KustoExpressionParser';
 import { TextArea, stylesFactory } from '@grafana/ui';

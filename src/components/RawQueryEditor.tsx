@@ -28,7 +28,7 @@ const defaultQuery = [
   '',
   '<table name>',
   '| where $__timeFilter(Timestamp)',
-  '// | summarize count() by <group by column>, bin(Timestamp, $__interval)',
+  '// | summarize count() by <group by column>, bin(Timestamp, $__timeInterval)',
   '// | order by Timestamp asc',
 ].join('\n');
 
