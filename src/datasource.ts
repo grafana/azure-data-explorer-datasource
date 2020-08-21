@@ -50,7 +50,13 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     if (target.rawMode) {
       return true; // anything else we can check
     }
-    const table = (target.expression?.from as QueryEditorPropertyExpression)?.property.name;
+
+    const tableExpr = target.expression?.from as QueryEditorPropertyExpression;
+    if (!tableExpr) {
+      return false;
+    }
+
+    const table = tableExpr.property?.name;
     if (!table) {
       return false; // Don't execute things without a table selected
     }
@@ -62,7 +68,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
     return {
       ...target,
-      query: this.templateSrv.replace(q, scopedVars, 'singlequote'),
+      query: this.templateSrv.replace(q, scopedVars, this.interpolateVariable),
       database: this.templateSrv.replace(target.database, scopedVars),
     };
   }
@@ -266,7 +272,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
       return "'" + val + "'";
     });
-    return quotedValues.join(',');
+    return quotedValues.filter(v => v !== "''").join(',');
   }
 }
 

@@ -198,7 +198,7 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
 export const KustoGroupByEditorSection = buildGroupByQueryEditorSection(groupBySection =>
   groupBySection
     .withIntervals(intervals => {
-      intervals('$__interval')
+      intervals('$__timeInterval')
         .withLabel('auto')
         .add();
       intervals('1m')
