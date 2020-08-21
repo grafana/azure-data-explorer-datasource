@@ -71,6 +71,10 @@ export class KustoMonacoEditor extends React.Component<Props, MonacoState> {
       const newValue = this.kustoCodeEditor?.getValue();
       this.props.onChange(newValue!);
     });
+
+    window.onresize = () => {
+      this.kustoCodeEditor?.resize();
+    };
   }
 
   componentWillUnmount() {

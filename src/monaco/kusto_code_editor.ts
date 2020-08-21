@@ -58,6 +58,8 @@ export default class KustoCodeEditor {
 
     this.codeEditor = monaco.editor.create(this.containerDiv, {
       value: content || 'Write your query here',
+      // Disabling the automatic resizing until we upgrade Monaco due to perf concerns: https://github.com/microsoft/monaco-editor/issues/28
+      // automaticLayout: true,
       language: 'kusto',
       selectionHighlight: false,
       theme: themeName,
@@ -112,6 +114,10 @@ export default class KustoCodeEditor {
         });
       });
     });
+  }
+
+  resize() {
+    this.codeEditor?.layout();
   }
 
   setOnDidChangeModelContent(listener) {
@@ -233,17 +239,17 @@ export default class KustoCodeEditor {
           },
         },
         {
-          label: '$__interval',
+          label: '$__timeInterval',
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: {
-            value: `\\$__interval`,
+            value: `\\$__timeInterval`,
           },
           documentation: {
             value:
               '##### Built-in variable that returns an automatic time grain suitable for the current timerange.\n\n' +
               'Used with the bin() function - `bin(' +
               this.defaultTimeField +
-              ', $__interval)` \n\n' +
+              ', $__timeInterval)` \n\n' +
               '[Grafana docs](http://docs.grafana.org/reference/templating/#the-interval-variable)',
           },
         },

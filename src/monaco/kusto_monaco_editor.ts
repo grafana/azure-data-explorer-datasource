@@ -18,12 +18,12 @@ function link(scope, elem, attrs) {
     (window as any).System.import(`/${scope.pluginBaseUrl}/libs/monaco.min.js`).then(() => {
       setTimeout(() => {
         initMonaco(containerDiv, scope);
-      }, 1);
+      }, 100);
     });
   } else {
     setTimeout(() => {
       initMonaco(containerDiv, scope);
-    }, 1);
+    }, 100);
   }
 
   containerDiv.onblur = () => {
@@ -71,6 +71,10 @@ function link(scope, elem, attrs) {
     scope.$on('$destroy', () => {
       kustoCodeEditor.disposeMonaco();
     });
+
+    window.onresize = () => {
+      kustoCodeEditor.resize();
+    };
   }
 }
 
