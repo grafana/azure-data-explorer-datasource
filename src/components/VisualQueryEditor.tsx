@@ -48,8 +48,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     if (!table || !table.property) {
       return [];
     }
-    const schemaResolver = new AdxSchemaResovler(datasource);
-    return await schemaResolver.getColumnsForTable(database, table.property.name);
+    return getTableSchema(datasource, database, table);
   }, [datasource.id, database, table]);
 
   const onAutoComplete = useCallback(
@@ -65,27 +64,26 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   const columns = useColumnOptions(tableSchema.value);
   const groupable = useGroupableColumns(columns);
 
-  const onChangeTable = useCallback(
-    (expression: QueryEditorExpression) => {
-      if (!isFieldExpression(expression)) {
-        return;
-      }
+  const onChangeTable = async (expression: QueryEditorExpression) => {
+    if (!isFieldExpression(expression) || !table) {
+      return;
+    }
 
-      const next = {
-        ...defaultQuery.expression,
-        from: expression,
-      };
+    const columns = await getTableSchema(datasource, database, expression);
 
-      props.onChangeQuery({
-        ...props.query,
-        resultFormat: resultFormat,
-        database: database,
-        expression: next,
-        query: kustoExpressionParser.query(next, tableSchema.value),
-      });
-    },
-    [database, props.onChangeQuery, props.query, tableSchema.value, resultFormat]
-  );
+    const next = {
+      ...defaultQuery.expression,
+      from: expression,
+    };
+
+    props.onChangeQuery({
+      ...props.query,
+      resultFormat: resultFormat,
+      database: database,
+      expression: next,
+      query: kustoExpressionParser.query(next, columns),
+    });
+  };
 
   const onWhereChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
@@ -300,3 +298,8 @@ const useTableOptions = (schema: AdxSchema | undefined, database: string): Query
     return tables;
   }, [database, schema]);
 };
+
+async function getTableSchema(datasource: AdxDataSource, database: string, table: QueryEditorPropertyExpression) {
+  const schemaResolver = new AdxSchemaResolver(datasource);
+  return await schemaResolver.getColumnsForTable(database, table.property.name);
+}
