@@ -148,7 +148,7 @@ jobs:
 
   package:
     executor: default_exec
-    resource_class: xlarge
+    resource_class: 2xlarge
     steps:
       - checkout
       - restore_cache:
