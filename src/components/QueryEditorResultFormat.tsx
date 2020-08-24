@@ -1,12 +1,11 @@
 import React, { useCallback } from 'react';
 import { css } from 'emotion';
-import { KustoQuery } from '../types';
 import { SelectableValue } from '@grafana/data';
 import { InlineFormLabel, Select, stylesFactory } from '@grafana/ui';
 
 interface Props {
-  query: KustoQuery;
-  onChangeQuery: (query: KustoQuery) => void;
+  format: string;
+  onChangeFormat: (format: string) => void;
   includeAdxTimeFormat: boolean;
 }
 
@@ -21,19 +20,14 @@ const adxTimeFormat: SelectableValue<string> = {
 };
 
 export const QueryEditorResultFormat: React.FC<Props> = props => {
-  const { query, includeAdxTimeFormat } = props;
-  const format = useSelectedFormat(query.resultFormat, includeAdxTimeFormat);
   const onChangeFormat = useCallback(
     (selectable: SelectableValue<string>) => {
       if (!selectable || !selectable.value) {
         return;
       }
-      props.onChangeQuery({
-        ...query,
-        resultFormat: selectable.value,
-      });
+      props.onChangeFormat(selectable.value);
     },
-    [query.resultFormat, props.onChangeQuery]
+    [props.format, props.onChangeFormat]
   );
 
   const styles = getStyles();
@@ -44,8 +38,8 @@ export const QueryEditorResultFormat: React.FC<Props> = props => {
         Format as
       </InlineFormLabel>
       <Select
-        options={includeAdxTimeFormat ? [...formats, adxTimeFormat] : formats}
-        value={format}
+        options={props.includeAdxTimeFormat ? [...formats, adxTimeFormat] : formats}
+        value={props.format}
         onChange={onChangeFormat}
       />
     </div>
@@ -62,7 +56,7 @@ const getStyles = stylesFactory(() => {
   };
 });
 
-export const useSelectedFormat = (format?: string, includeAdxFormat?: boolean): string => {
+export const selectResultFormat = (format?: string, includeAdxFormat?: boolean): string => {
   const selected = formats.find(f => f.value === format);
 
   if (includeAdxFormat && adxTimeFormat.value) {
