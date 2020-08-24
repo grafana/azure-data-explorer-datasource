@@ -2,10 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.1]
+
+- Support for value autocomplete in the visual query editor.
+- Support for dynamic columns in the visual query editor. Dynamic fields are automatically read from the table schema and are selectable when building up a query. Value autocomplete also works for dynamic columns.
+- Migration script for existing dashboards.
+- Performance improvements for the autocomplete and dynamic column features.
+- Performance improvements when loading the table schema.
+
 ## [3.0.0]
 
-- Adds support for a new visual query editor
-- Ports the existing query editor to React
+- Adds support for a new visual query editor.
+- Ports the existing query editor to React.
 
 ## [2.1.0]
 
