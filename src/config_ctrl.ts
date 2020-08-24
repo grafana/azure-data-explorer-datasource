@@ -9,8 +9,6 @@ export class KustoDBConfigCtrl {
   suggestUrl: string;
   datasource: AdxDataSource | undefined;
   databases: any[];
-  views: string[];
-  limits: number[];
   hasRequiredGrafanaVersion: boolean;
   loading = false;
 
