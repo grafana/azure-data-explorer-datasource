@@ -28,14 +28,6 @@ export class KustoDBConfigCtrl {
       this.datasource = new AdxDataSource(this.current);
       this.getDatabases();
     }
-
-    if (!this.current.jsonData.defaultView) {
-      this.current.jsonData.defaultView = 'visual';
-    }
-
-    if (!this.current.jsonData.resultLimit) {
-      this.current.jsonData.resultLimit = '10000';
-    }
   }
 
   getDatabases() {
