@@ -104,19 +104,6 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
         Array.prototype.push.apply(results, variables);
       }
 
-      if (Array.isArray(this.props.operators)) {
-        const operators = this.props.operators
-          .filter(o => {
-            if (typeof o.value === 'string') {
-              return o.value.indexOf(txt) > -1;
-            }
-            return false;
-          })
-          .map(o => ({ label: o.value, value: o.value }));
-
-        Array.prototype.push.apply(results, operators);
-      }
-
       return results;
     },
     500,
