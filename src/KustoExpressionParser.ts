@@ -231,7 +231,7 @@ export class KustoExpressionParser {
 
     const fields = this.getGroupByFields(groupByExpression);
     if (fields.dateTimeField) {
-      summarize += ` by bin(${fields.dateTimeField}, ${fields.interval})`;
+      summarize += ` by bin(${this.castIfDynamic(fields.dateTimeField, columns)}, ${fields.interval})`;
     }
     if (fields.groupByFields.length > 0) {
       if (fields.dateTimeField) {
