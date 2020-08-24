@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
 import { css } from 'emotion';
-import { KustoQuery } from '../types';
 import { SelectableValue } from '@grafana/data';
 import { InlineFormLabel, Select, stylesFactory } from '@grafana/ui';
 
 interface Props {
-  query: KustoQuery;
-  onChangeQuery: (query: KustoQuery) => void;
+  format: string;
+  onChangeFormat: (format: string) => void;
+  includeAdxTimeFormat: boolean;
 }
 
 const formats: Array<SelectableValue<string>> = [
@@ -14,20 +14,20 @@ const formats: Array<SelectableValue<string>> = [
   { label: 'Table', value: 'table' },
 ];
 
+const adxTimeFormat: SelectableValue<string> = {
+  label: 'ADX Time series',
+  value: 'time_series_adx_series',
+};
+
 export const QueryEditorResultFormat: React.FC<Props> = props => {
-  const { query } = props;
-  const format = useSelectedFormat(query.resultFormat);
   const onChangeFormat = useCallback(
     (selectable: SelectableValue<string>) => {
       if (!selectable || !selectable.value) {
         return;
       }
-      props.onChangeQuery({
-        ...query,
-        resultFormat: selectable.value,
-      });
+      props.onChangeFormat(selectable.value);
     },
-    [query.resultFormat, props.onChangeQuery]
+    [props.format, props.onChangeFormat]
   );
 
   const styles = getStyles();
@@ -37,7 +37,11 @@ export const QueryEditorResultFormat: React.FC<Props> = props => {
       <InlineFormLabel className="query-keyword" width={6}>
         Format as
       </InlineFormLabel>
-      <Select options={formats} value={format} onChange={onChangeFormat} />
+      <Select
+        options={props.includeAdxTimeFormat ? [...formats, adxTimeFormat] : formats}
+        value={props.format}
+        onChange={onChangeFormat}
+      />
     </div>
   );
 };
@@ -52,8 +56,14 @@ const getStyles = stylesFactory(() => {
   };
 });
 
-export const useSelectedFormat = (format?: string): string => {
+export const selectResultFormat = (format?: string, includeAdxFormat?: boolean): string => {
   const selected = formats.find(f => f.value === format);
+
+  if (includeAdxFormat && adxTimeFormat.value) {
+    if (adxTimeFormat.value === format) {
+      return adxTimeFormat.value;
+    }
+  }
 
   if (selected && selected.value) {
     return selected.value;

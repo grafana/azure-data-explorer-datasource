@@ -9,6 +9,22 @@ describe('QueryBuilder', () => {
     });
   });
 
+  describe('when $__contains and multi template variable has one selected value without quotes', () => {
+    it('should generate a where..in clause', () => {
+      const query = interpolateKustoQuery(`query=Tablename | where $__contains(col, val1)`);
+
+      expect(query).toContain(`where col in ('val1')`);
+    });
+  });
+
+  describe('when $__contains and multi template variable has multiple selected values without quotes', () => {
+    it('should generate a where..in clause', () => {
+      const query = interpolateKustoQuery(`query=Tablename | where $__contains(col, val1,val2)`);
+
+      expect(query).toContain(`where col in ('val1','val2')`);
+    });
+  });
+
   describe('when $__contains and multi template variable has one selected value', () => {
     it('should generate a where..in clause', () => {
       const query = interpolateKustoQuery(`query=Tablename | where $__contains(col, 'val1')`);

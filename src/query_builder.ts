@@ -34,7 +34,7 @@ function getMultiContains(inputs: string) {
     return '1 == 1';
   }
 
-  return `${field.trim()} in (${templateVar.trim()})`;
+  return `${field.trim()} in (${singleQuote(templateVar.trim())})`;
 }
 
 function escape(inputs: string) {
@@ -43,4 +43,19 @@ function escape(inputs: string) {
     .split(`','`)
     .map(v => `@'${v}'`)
     .join(', ');
+}
+
+function singleQuote(input: string) {
+  if (input.match(/,+/i)) {
+    return input
+      .split(',')
+      .map(singleQuote)
+      .join(',');
+  }
+
+  if (input.match(/^'(.*)'$/i)) {
+    return input;
+  }
+
+  return `'${input}'`;
 }

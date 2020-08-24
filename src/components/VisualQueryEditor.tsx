@@ -20,7 +20,7 @@ import { definitionToProperty } from '../editor/components/field/QueryEditorFiel
 import { isFieldExpression } from '../editor/guards';
 import { AdxDataSource } from '../datasource';
 import { AdxSchemaResolver } from '../schema/AdxSchemaResolver';
-import { QueryEditorResultFormat, useSelectedFormat } from '../components/QueryEditorResultFormat';
+import { QueryEditorResultFormat, selectResultFormat } from '../components/QueryEditorResultFormat';
 import { KustoExpressionParser } from '../KustoExpressionParser';
 import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
@@ -41,7 +41,7 @@ const kustoExpressionParser = new KustoExpressionParser();
 export const VisualQueryEditor: React.FC<Props> = props => {
   const { query, database, datasource, schema } = props;
 
-  const resultFormat = useSelectedFormat(query.resultFormat);
+  const resultFormat = selectResultFormat(query.resultFormat);
   const tables = useTableOptions(schema, database);
   const table = useSelectedTable(tables, query);
   const tableSchema = useAsync(async () => {
@@ -138,6 +138,16 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     [props.onChangeQuery, props.query, tableSchema.value, resultFormat]
   );
 
+  const onChangeResultFormat = useCallback(
+    (format: string) => {
+      props.onChangeQuery({
+        ...query,
+        resultFormat: format,
+      });
+    },
+    [props.onChangeQuery]
+  );
+
   if (tableSchema.loading) {
     return (
       <>
@@ -194,7 +204,11 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         fields={tables}
         onChange={onChangeTable}
       >
-        <QueryEditorResultFormat onChangeQuery={props.onChangeQuery} query={query} />
+        <QueryEditorResultFormat
+          format={resultFormat}
+          includeAdxTimeFormat={false}
+          onChangeFormat={onChangeResultFormat}
+        />
       </KustoFromEditorSection>
       <KustoWhereEditorSection
         templateVariableOptions={props.templateVariableOptions}

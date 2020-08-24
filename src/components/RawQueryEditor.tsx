@@ -5,7 +5,7 @@ import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
-import { QueryEditorResultFormat } from 'components/QueryEditorResultFormat';
+import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -36,16 +36,27 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
   state: State = {};
 
   onRawQueryChange = (kql: string) => {
+    const resultFormat = selectResultFormat(this.props.query.resultFormat);
+
     this.props.onChange({
       ...this.props.query,
       query: kql,
       database: this.props.database,
+      resultFormat,
+    });
+  };
+
+  onChangeResultFormat = (format: string) => {
+    this.props.onChange({
+      ...this.props.query,
+      resultFormat: format,
     });
   };
 
   render() {
     const { query, datasource, lastQueryError, lastQuery, timeNotASC, schema } = this.props;
     const { showLastQuery, showHelp } = this.state;
+    const resultFormat = selectResultFormat(query.resultFormat);
 
     const styles = getStyles();
 
@@ -65,7 +76,11 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
         />
 
         <div className={styles.toolbar}>
-          <QueryEditorResultFormat query={query} onChangeQuery={this.props.onChange} />
+          <QueryEditorResultFormat
+            includeAdxTimeFormat={true}
+            format={resultFormat}
+            onChangeFormat={this.onChangeResultFormat}
+          />
           <div className="gf-form">
             <label className="gf-form-label query-keyword" onClick={() => this.setState({ showHelp: !showHelp })}>
               Show Help <Icon name={showHelp ? 'angle-down' : 'angle-right'} />

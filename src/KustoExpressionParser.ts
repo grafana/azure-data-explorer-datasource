@@ -46,13 +46,12 @@ export class KustoExpressionParser {
     }
 
     const definitionColumns = columnsToDefinition(columns);
-    const defaultTimeColumn =
-      definitionColumns?.find(col => col.type === QueryEditorPropertyType.DateTime)?.value ?? 'Timestamp';
+    const defaultTimeColumn = definitionColumns?.find(col => col.type === QueryEditorPropertyType.DateTime)?.value;
     const parts: string[] = [table];
 
     if (reduce && groupBy && this.isAggregated(groupBy)) {
       this.appendTimeFilter(groupBy, defaultTimeColumn, parts);
-    } else {
+    } else if (defaultTimeColumn) {
       parts.push(`where $__timeFilter(${defaultTimeColumn})`);
     }
 
@@ -71,19 +70,25 @@ export class KustoExpressionParser {
     return parts.join('\n| ');
   }
 
-  appendTimeFilter(groupByExpression: QueryEditorArrayExpression, defaultTimeColumn: string, parts: string[]) {
+  appendTimeFilter(
+    groupByExpression: QueryEditorArrayExpression,
+    defaultTimeColumn: string | undefined,
+    parts: string[]
+  ) {
     let dateTimeField = defaultTimeColumn;
 
     if (groupByExpression) {
       dateTimeField = this.getGroupByFields(groupByExpression).dateTimeField || defaultTimeColumn;
     }
 
-    parts.push(`where $__timeFilter(${dateTimeField})`);
+    if (dateTimeField) {
+      parts.push(`where $__timeFilter(${dateTimeField})`);
+    }
   }
 
   appendProject(
     expression: QueryEditorArrayExpression,
-    defaultTimeColumn: string,
+    defaultTimeColumn: string | undefined,
     columns: AdxColumnSchema[],
     parts: string[]
   ) {
@@ -102,16 +107,25 @@ export class KustoExpressionParser {
       }
     }
 
+    let toProject: string[] = [];
+
+    if (timeCol) {
+      toProject.push(timeCol);
+    }
+
     if (fields.length > 0) {
-      project += [timeCol]
+      project += toProject
         .concat(fields)
         .map(field => this.castIfDynamic(field, columns))
         .join(', ');
+
       parts.push(project);
     }
 
-    const orderBy = `order by ${this.castIfDynamic(timeCol, columns)} asc`;
-    parts.push(orderBy);
+    if (timeCol) {
+      const orderBy = `order by ${this.castIfDynamic(timeCol, columns)} asc`;
+      parts.push(orderBy);
+    }
   }
 
   private createWhere(expression: QueryEditorOperatorExpression): string | undefined {
@@ -217,7 +231,7 @@ export class KustoExpressionParser {
 
     const fields = this.getGroupByFields(groupByExpression);
     if (fields.dateTimeField) {
-      summarize += ` by bin(${fields.dateTimeField}, ${fields.interval})`;
+      summarize += ` by bin(${this.castIfDynamic(fields.dateTimeField, columns)}, ${fields.interval})`;
     }
     if (fields.groupByFields.length > 0) {
       if (fields.dateTimeField) {
