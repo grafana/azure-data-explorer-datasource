@@ -194,7 +194,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         fields={tables}
         onChange={onChangeTable}
       >
-        <QueryEditorResultFormat onChangeQuery={props.onChangeQuery} query={query} />
+        <QueryEditorResultFormat includeAdxTimeFormat={false} onChangeQuery={props.onChangeQuery} query={query} />
       </KustoFromEditorSection>
       <KustoWhereEditorSection
         templateVariableOptions={props.templateVariableOptions}

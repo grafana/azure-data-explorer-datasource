@@ -7,6 +7,7 @@ import { InlineFormLabel, Select, stylesFactory } from '@grafana/ui';
 interface Props {
   query: KustoQuery;
   onChangeQuery: (query: KustoQuery) => void;
+  includeAdxTimeFormat: boolean;
 }
 
 const formats: Array<SelectableValue<string>> = [
@@ -14,9 +15,14 @@ const formats: Array<SelectableValue<string>> = [
   { label: 'Table', value: 'table' },
 ];
 
+const adxTimeFormat: SelectableValue<string> = {
+  label: 'ADX Time series',
+  value: 'time_series_adx_series',
+};
+
 export const QueryEditorResultFormat: React.FC<Props> = props => {
-  const { query } = props;
-  const format = useSelectedFormat(query.resultFormat);
+  const { query, includeAdxTimeFormat } = props;
+  const format = useSelectedFormat(query.resultFormat, includeAdxTimeFormat);
   const onChangeFormat = useCallback(
     (selectable: SelectableValue<string>) => {
       if (!selectable || !selectable.value) {
@@ -37,7 +43,11 @@ export const QueryEditorResultFormat: React.FC<Props> = props => {
       <InlineFormLabel className="query-keyword" width={6}>
         Format as
       </InlineFormLabel>
-      <Select options={formats} value={format} onChange={onChangeFormat} />
+      <Select
+        options={includeAdxTimeFormat ? [...formats, adxTimeFormat] : formats}
+        value={format}
+        onChange={onChangeFormat}
+      />
     </div>
   );
 };
@@ -52,8 +62,14 @@ const getStyles = stylesFactory(() => {
   };
 });
 
-export const useSelectedFormat = (format?: string): string => {
+export const useSelectedFormat = (format?: string, includeAdxFormat?: boolean): string => {
   const selected = formats.find(f => f.value === format);
+
+  if (includeAdxFormat && adxTimeFormat.value) {
+    if (adxTimeFormat.value === format) {
+      return adxTimeFormat.value;
+    }
+  }
 
   if (selected && selected.value) {
     return selected.value;

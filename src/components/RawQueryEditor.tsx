@@ -65,7 +65,7 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
         />
 
         <div className={styles.toolbar}>
-          <QueryEditorResultFormat query={query} onChangeQuery={this.props.onChange} />
+          <QueryEditorResultFormat includeAdxTimeFormat={true} query={query} onChangeQuery={this.props.onChange} />
           <div className="gf-form">
             <label className="gf-form-label query-keyword" onClick={() => this.setState({ showHelp: !showHelp })}>
               Show Help <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
