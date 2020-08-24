@@ -9,6 +9,8 @@ export class KustoDBConfigCtrl {
   suggestUrl: string;
   datasource: AdxDataSource | undefined;
   databases: any[];
+  views: string[];
+  limits: number[];
   hasRequiredGrafanaVersion: boolean;
   loading = false;
 
@@ -25,6 +27,14 @@ export class KustoDBConfigCtrl {
       this.current.url = 'api/datasources/proxy/' + this.current.id;
       this.datasource = new AdxDataSource(this.current);
       this.getDatabases();
+    }
+
+    if (!this.current.jsonData.defaultView) {
+      this.current.jsonData.defaultView = 'visual';
+    }
+
+    if (!this.current.jsonData.resultLimit) {
+      this.current.jsonData.resultLimit = '10000';
     }
   }
 

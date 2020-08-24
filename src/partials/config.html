@@ -103,6 +103,33 @@
       </info-popover>
     </div>
   </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-11">Default view</span>
+      <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultView">
+        <option value="visual">Visual Editor</option>
+        <option value="raw">Raw Text Editor</option>
+      </select>
+      <info-popover mode="right-normal">
+        <p>This value controls which view will be displayed as default when adding a new query.</p>
+      </info-popover>
+    </div>
+  </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-11">Result limit</span>
+      <select class="gf-form-input" ng-model="ctrl.current.jsonData.resultLimit">
+        <option value="1000">1000</option>
+        <option value="10000">10 000</option>
+        <option value="100000">100 000</option>
+        <option value="500000">500 000</option>
+        <option value="500000">1 000 000</option>
+      </select>
+      <info-popover mode="right-normal">
+        <p>This value limits the number of records/points that will be returned by the visual query builder.</p>
+      </info-popover>
+    </div>
+  </div>
 </div>
 
 <div class="gf-form-group" ng-if="ctrl.showMinVersionWarning()">
