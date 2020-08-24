@@ -36,7 +36,18 @@ const migrateV2ToV3 = (expression: any): QueryExpression => {
   }
 
   if (Array.isArray(expression?.where?.expression?.expressions)) {
-    migrated.where = migrateV2Array(expression?.where?.expression?.expressions);
+    migrated.where = {
+      type: QueryEditorExpressionType.And,
+      expressions: expression?.where?.expression?.expressions
+        .map(migrateV2Expression)
+        .filter(exp => !!exp)
+        .map(exp => {
+          return {
+            type: QueryEditorExpressionType.Or,
+            expressions: [exp],
+          };
+        }) as QueryEditorExpression[],
+    };
   }
 
   if (Array.isArray(expression?.reduce?.expression?.expressions)) {

@@ -12,7 +12,7 @@ import { migrateExpression } from './expression';
 // we started to save the version in v3.
 const version = undefined;
 
-describe.only('migrate expression from v2 to v3', () => {
+describe('migrate expression from v2 to v3', () => {
   describe('migrate expression with multiple where statements', () => {
     it('should generate a valid v3 expression', () => {
       const expressionV2 = createWithMultipleWhere();
@@ -30,16 +30,21 @@ describe.only('migrate expression from v2 to v3', () => {
           type: QueryEditorExpressionType.And,
           expressions: [
             {
-              type: QueryEditorExpressionType.Operator,
-              property: {
-                name: 'Country',
-                type: QueryEditorPropertyType.String,
-              },
-              operator: {
-                name: '==',
-                value: 'United States',
-              },
-            } as QueryEditorOperatorExpression,
+              type: QueryEditorExpressionType.Or,
+              expressions: [
+                {
+                  type: QueryEditorExpressionType.Operator,
+                  property: {
+                    name: 'Country',
+                    type: QueryEditorPropertyType.String,
+                  },
+                  operator: {
+                    name: '==',
+                    value: 'United States',
+                  },
+                } as QueryEditorOperatorExpression,
+              ],
+            } as QueryEditorArrayExpression,
           ],
         },
         reduce: emptyArrayExpression(),
@@ -67,16 +72,21 @@ describe.only('migrate expression from v2 to v3', () => {
           type: QueryEditorExpressionType.And,
           expressions: [
             {
-              type: QueryEditorExpressionType.Operator,
-              property: {
-                name: 'State',
-                type: QueryEditorPropertyType.String,
-              },
-              operator: {
-                name: 'in',
-                value: ['Texas', '$state'],
-              },
-            } as QueryEditorOperatorExpression,
+              type: QueryEditorExpressionType.Or,
+              expressions: [
+                {
+                  type: QueryEditorExpressionType.Operator,
+                  property: {
+                    name: 'State',
+                    type: QueryEditorPropertyType.String,
+                  },
+                  operator: {
+                    name: 'in',
+                    value: ['Texas', '$state'],
+                  },
+                } as QueryEditorOperatorExpression,
+              ],
+            } as QueryEditorArrayExpression,
           ],
         },
         reduce: {
