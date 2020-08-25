@@ -18,6 +18,7 @@ export class AdxAutoComplete {
     const queryParts: string[] = [];
 
     queryParts.push(this.table);
+    queryParts.push(`take 5000`);
     queryParts.push(`where ${column} contains "${searchTerm}"`);
     queryParts.push(`distinct ${this.castIfDynamic(column, this.columnSchema)}`);
     queryParts.push(`take 251`);
