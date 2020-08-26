@@ -183,14 +183,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     }
     const queryParts: string[] = [];
 
+    const take = 'take 50000';
     const where = `where ${columns.map(column => `isnotnull(${column})`).join(' and ')}`;
-    const sample = `sample 100`;
     const project = `project ${columns.map(column => column).join(', ')}`;
     const summarize = `summarize ${columns.map(column => `buildschema(${column})`).join(', ')}`;
 
     queryParts.push(table);
+    queryParts.push(take);
     queryParts.push(where);
-    queryParts.push(sample);
     queryParts.push(project);
     queryParts.push(summarize);
 
