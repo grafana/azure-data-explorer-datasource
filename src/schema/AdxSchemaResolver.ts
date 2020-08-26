@@ -8,7 +8,7 @@ export class AdxSchemaResolver {
   constructor(private datasource: AdxDataSource) {}
 
   private createCacheKey(addition: string): string {
-    return `${schemaKey}.${this.datasource.meta.id}.${addition}`;
+    return `${schemaKey}.${this.datasource.id}.${addition}`;
   }
 
   async getDatabases(): Promise<AdxDatabaseSchema[]> {
