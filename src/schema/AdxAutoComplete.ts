@@ -1,6 +1,7 @@
 import { KustoQuery, defaultQuery, AdxColumnSchema } from 'types';
-import { DataQueryRequest } from '@grafana/data';
+import { DataQueryRequest, TimeRange } from '@grafana/data';
 import { AdxDataSource } from '../datasource';
+import { getTemplateSrv } from '@grafana/runtime';
 
 export class AdxAutoComplete {
   constructor(
@@ -16,12 +17,18 @@ export class AdxAutoComplete {
     }
 
     const queryParts: string[] = [];
+    const defaultTimeColum = findDefaultTimeColumn(this.columnSchema);
 
     queryParts.push(this.table);
-    queryParts.push(`take 5000`);
+
+    if (defaultTimeColum) {
+      queryParts.push(`where $__timeFilter(${this.castIfDynamic(defaultTimeColum, this.columnSchema)})`);
+    }
+
     queryParts.push(`where ${column} contains "${searchTerm}"`);
+    queryParts.push('take 50000');
     queryParts.push(`distinct ${this.castIfDynamic(column, this.columnSchema)}`);
-    queryParts.push(`take 251`);
+    queryParts.push('take 251');
 
     const kql = queryParts.join('\n| ');
 
@@ -36,9 +43,11 @@ export class AdxAutoComplete {
     };
 
     const response = await this.datasource
-      .query({
-        targets: [query],
-      } as DataQueryRequest<KustoQuery>)
+      .query(
+        includeTimeRange({
+          targets: [query],
+        }) as DataQueryRequest<KustoQuery>
+      )
       .toPromise();
 
     if (!Array.isArray(response?.data) || response.data.length === 0) {
@@ -74,3 +83,24 @@ export class AdxAutoComplete {
     }, '');
   }
 }
+
+const findDefaultTimeColumn = (columns: AdxColumnSchema[]): string | undefined => {
+  const column = columns?.find(col => col.CslType === 'datetime');
+  return column?.Name;
+};
+
+/**
+ * this is a suuuper ugly way of doing this.
+ */
+const includeTimeRange = (option: any): any => {
+  const range = (getTemplateSrv() as any)?.timeRange as TimeRange;
+
+  if (!range) {
+    return option;
+  }
+
+  return {
+    ...option,
+    range,
+  };
+};

@@ -40,7 +40,7 @@ const kustoExpressionParser = new KustoExpressionParser();
 
 export const VisualQueryEditor: React.FC<Props> = props => {
   const { query, database, datasource, schema } = props;
-
+  console.log('q', query);
   const resultFormat = selectResultFormat(query.resultFormat);
   const tables = useTableOptions(schema, database);
   const table = useSelectedTable(tables, query);
