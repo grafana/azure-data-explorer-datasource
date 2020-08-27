@@ -16,19 +16,19 @@ import { needsToBeMigrated, migrateQuery } from 'migrations/query';
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = props => {
-  const { datasource, query } = props;
+  const { datasource } = props;
   const executedQuery = useExecutedQuery(props.data);
   const executedQueryError = useExecutedQueryError(props.data);
   const dirty = useDirty(props.query.query, executedQuery);
   const schema = useAsync(() => datasource.getSchema(), [datasource.id]);
   const databases = useDatabaseOptions(schema.value);
-  const database = useSelectedDatabase(databases, query);
+  const database = useSelectedDatabase(databases, props.query);
   const templateVariables = useTemplateVariables(datasource);
   const rawMode = isRawMode(props);
 
   useEffect(() => {
-    if (needsToBeMigrated(query)) {
-      props.onChange(migrateQuery(query));
+    if (needsToBeMigrated(props.query)) {
+      props.onChange(migrateQuery(props.query));
       props.onRunQuery();
     }
   }, []);
@@ -105,7 +105,7 @@ export const QueryEditor: React.FC<Props> = props => {
           datasource={datasource}
           database={database}
           onChangeQuery={props.onChange}
-          query={query}
+          query={props.query}
           schema={schema.value}
           templateVariableOptions={templateVariables}
         />

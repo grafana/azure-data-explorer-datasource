@@ -48,7 +48,22 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     if (!table || !table.property) {
       return [];
     }
-    return getTableSchema(datasource, database, table);
+
+    const schema = await getTableSchema(datasource, database, table);
+    const from = query.expression.from ?? table;
+
+    props.onChangeQuery({
+      ...props.query,
+      query: kustoExpressionParser.query(
+        {
+          ...props.query.expression,
+          from,
+        },
+        schema
+      ),
+    });
+
+    return schema;
   }, [datasource.id, database, table]);
 
   const onAutoComplete = useCallback(
@@ -64,26 +79,26 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   const columns = useColumnOptions(tableSchema.value);
   const groupable = useGroupableColumns(columns);
 
-  const onChangeTable = async (expression: QueryEditorExpression) => {
-    if (!isFieldExpression(expression) || !table) {
-      return;
-    }
+  const onChangeTable = useCallback(
+    (expression: QueryEditorExpression) => {
+      if (!isFieldExpression(expression) || !table) {
+        return;
+      }
 
-    const columns = await getTableSchema(datasource, database, expression);
+      const next = {
+        ...defaultQuery.expression,
+        from: expression,
+      };
 
-    const next = {
-      ...defaultQuery.expression,
-      from: expression,
-    };
-
-    props.onChangeQuery({
-      ...props.query,
-      resultFormat: resultFormat,
-      database: database,
-      expression: next,
-      query: kustoExpressionParser.query(next, columns),
-    });
-  };
+      props.onChangeQuery({
+        ...props.query,
+        resultFormat: resultFormat,
+        database: database,
+        expression: next,
+      });
+    },
+    [props.onChangeQuery, props.query, resultFormat, database]
+  );
 
   const onWhereChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
