@@ -56,9 +56,19 @@ export const QueryEditor: React.FC<Props> = props => {
   }
 
   if (schema.error) {
+    if ((schema.error as any)?.data?.Message) {
+      return (
+        <div className="gf-form">
+          <pre className="gf-form-pre alert alert-error">
+            Could not load datasource schema due too: {(schema.error as any)?.data?.Message}
+          </pre>
+        </div>
+      );
+    }
+
     return (
       <div className="gf-form">
-        <pre className="gf-form-pre alert alert-error">Could not load datasource schema: {schema.error}</pre>
+        <pre className="gf-form-pre alert alert-error">Could not load datasource schema: {String(schema.error)}</pre>
       </div>
     );
   }
