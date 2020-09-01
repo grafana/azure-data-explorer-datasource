@@ -44,6 +44,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   const resultFormat = selectResultFormat(query.resultFormat);
   const tables = useTableOptions(schema, database);
   const table = useSelectedTable(tables, query);
+
   const tableSchema = useAsync(async () => {
     if (!table || !table.property) {
       return [];
@@ -64,7 +65,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     });
 
     return schema;
-  }, [datasource.id, database, table]);
+  }, [datasource.id, database, table?.property.name]);
 
   const onAutoComplete = useCallback(
     async (searchTerm?: string, column?: string) => {
@@ -116,51 +117,62 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value, resultFormat]
+    [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
   );
 
   const onReduceChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
       const next = {
         ...props.query.expression,
+        from: table,
         reduce: expression,
       };
 
       props.onChangeQuery({
         ...props.query,
         resultFormat: resultFormat,
+        database: database,
         expression: next,
         query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value, resultFormat]
+    [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
   );
 
   const onGroupByChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
       const next = {
         ...props.query.expression,
+        from: table,
         groupBy: expression,
       };
 
       props.onChangeQuery({
         ...props.query,
         resultFormat: resultFormat,
+        database: database,
         expression: next,
         query: kustoExpressionParser.query(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value, resultFormat]
+    [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
   );
 
   const onChangeResultFormat = useCallback(
     (format: string) => {
+      const next = {
+        ...props.query.expression,
+        from: table,
+      };
+
       props.onChangeQuery({
         ...query,
+        expression: next,
+        database: database,
         resultFormat: format,
       });
     },
-    [props.onChangeQuery]
+    [props.onChangeQuery, table, database]
   );
 
   if (tableSchema.loading) {
@@ -302,7 +314,7 @@ const useSelectedTable = (
     }
 
     return;
-  }, [options, query.expression?.from]);
+  }, [options, query.expression?.from?.property.name]);
 };
 
 const useTableOptions = (schema: AdxSchema | undefined, database: string): QueryEditorPropertyDefinition[] => {

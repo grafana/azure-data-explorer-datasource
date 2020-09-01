@@ -250,9 +250,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   interpolateVariable(value: any, variable) {
-    console.log('value', value);
-    console.log('variable', variable);
-
     if (typeof value === 'string') {
       if (variable.multi || variable.includeAll) {
         return "'" + value + "'";
