@@ -22,7 +22,7 @@ export class AdxAutoComplete {
     queryParts.push(this.table);
 
     if (defaultTimeColum) {
-      queryParts.push(`where $__timeFilter(${this.castIfDynamic(defaultTimeColum, this.columnSchema)})`);
+      queryParts.push(this.createTimeFilter(defaultTimeColum));
     }
 
     queryParts.push(`where ${column} contains "${searchTerm}"`);
@@ -56,8 +56,15 @@ export class AdxAutoComplete {
     return response.data[0].fields[0].values.toArray();
   }
 
+  private createTimeFilter(timeColumn: string): string {
+    if (this.isDynamic(timeColumn)) {
+      return `where ${this.castIfDynamic(timeColumn, this.columnSchema)} between ($__timeFrom .. $__timeTo)`;
+    }
+    return `where $__timeFilter(${timeColumn})`;
+  }
+
   private castIfDynamic(column: string, columns: AdxColumnSchema[]): string {
-    if (!column || column.indexOf('.') < 0) {
+    if (!this.isDynamic(column)) {
       return column;
     }
 
@@ -82,9 +89,21 @@ export class AdxAutoComplete {
       return `todynamic(${result}.${part})`;
     }, '');
   }
+
+  private isDynamic(column: string): boolean {
+    return !!(column && column.indexOf('.') > -1);
+  }
 }
 
 const findDefaultTimeColumn = (columns: AdxColumnSchema[]): string | undefined => {
+  const firstLevelColumn = columns?.find(col => {
+    return col.CslType === 'datetime' && col.Name.indexOf('.') === -1;
+  });
+
+  if (firstLevelColumn) {
+    return firstLevelColumn?.Name;
+  }
+
   const column = columns?.find(col => col.CslType === 'datetime');
   return column?.Name;
 };
