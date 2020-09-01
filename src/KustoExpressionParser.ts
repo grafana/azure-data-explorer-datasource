@@ -13,7 +13,6 @@ import {
   isOrExpression,
 } from './editor/guards';
 import { QueryEditorExpression, QueryEditorOperatorExpression, QueryEditorArrayExpression } from './editor/expressions';
-import { columnsToDefinition } from 'schema/mapper';
 
 export class KustoExpressionParser {
   templateSrv: TemplateSrv;
@@ -45,14 +44,13 @@ export class KustoExpressionParser {
       return '';
     }
 
-    const definitionColumns = columnsToDefinition(columns);
-    const defaultTimeColumn = definitionColumns?.find(col => col.type === QueryEditorPropertyType.DateTime)?.value;
+    const defaultTimeColumn = this.findDefaultTimeColumn(columns);
     const parts: string[] = [table];
 
     if (reduce && groupBy && this.isAggregated(groupBy)) {
-      this.appendTimeFilter(groupBy, defaultTimeColumn, parts);
+      this.appendTimeFilter(groupBy, defaultTimeColumn, columns, parts);
     } else if (defaultTimeColumn) {
-      parts.push(`where $__timeFilter(${defaultTimeColumn})`);
+      parts.push(this.createTimeFilter(defaultTimeColumn, columns));
     }
 
     if (where) {
@@ -73,6 +71,7 @@ export class KustoExpressionParser {
   appendTimeFilter(
     groupByExpression: QueryEditorArrayExpression,
     defaultTimeColumn: string | undefined,
+    columns: AdxColumnSchema[],
     parts: string[]
   ) {
     let dateTimeField = defaultTimeColumn;
@@ -82,7 +81,7 @@ export class KustoExpressionParser {
     }
 
     if (dateTimeField) {
-      parts.push(`where $__timeFilter(${dateTimeField})`);
+      parts.push(this.createTimeFilter(dateTimeField, columns));
     }
   }
 
@@ -250,8 +249,32 @@ export class KustoExpressionParser {
     }
   }
 
+  private createTimeFilter(timeColumn: string, columnSchema: AdxColumnSchema[]): string {
+    if (this.isDynamic(timeColumn)) {
+      return `where ${this.castIfDynamic(timeColumn, columnSchema)} between ($__timeFrom .. $__timeTo)`;
+    }
+    return `where $__timeFilter(${timeColumn})`;
+  }
+
+  private findDefaultTimeColumn(columns: AdxColumnSchema[]): string | undefined {
+    const firstLevelColumn = columns?.find(col => {
+      return col.CslType === 'datetime' && col.Name.indexOf('.') === -1;
+    });
+
+    if (firstLevelColumn) {
+      return firstLevelColumn?.Name;
+    }
+
+    const column = columns?.find(col => col.CslType === 'datetime');
+    return column?.Name;
+  }
+
+  private isDynamic(column: string): boolean {
+    return !!(column && column.indexOf('.') > -1);
+  }
+
   private castIfDynamic(column: string, columns: AdxColumnSchema[]): string {
-    if (!column || column.indexOf('.') < 0) {
+    if (!this.isDynamic(column)) {
       return column;
     }
 

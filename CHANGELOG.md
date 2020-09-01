@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.3]
+
+- Bugfix: displays proper error message when credentials for datasource is invalid.
+- Bugfix: visual editor now supports time fields in dynamic columns.
+
 ## [3.0.1]
 
 - Support for value autocomplete in the visual query editor.
