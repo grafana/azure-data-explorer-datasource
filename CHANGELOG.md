@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.4]
+
+- Bugfix: visual editor now includes template variables in the database selector.
+
 ## [3.0.3]
 
 - Bugfix: displays proper error message when credentials for datasource is invalid.
