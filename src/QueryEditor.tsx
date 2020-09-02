@@ -21,9 +21,9 @@ export const QueryEditor: React.FC<Props> = props => {
   const executedQueryError = useExecutedQueryError(props.data);
   const dirty = useDirty(props.query.query, executedQuery);
   const schema = useAsync(() => datasource.getSchema(), [datasource.id]);
+  const templateVariables = useTemplateVariables(datasource);
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query);
-  const templateVariables = useTemplateVariables(datasource);
   const rawMode = isRawMode(props);
 
   useEffect(() => {
@@ -98,7 +98,7 @@ export const QueryEditor: React.FC<Props> = props => {
         editorMode={editorMode}
         onChangeDatabase={onChangeDatabase}
         database={database}
-        databases={databases}
+        databases={[templateVariables, ...databases]}
         dirty={dirty}
       />
       {editorMode === 'raw' && (
