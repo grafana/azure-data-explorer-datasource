@@ -43,7 +43,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
 
   const resultFormat = selectResultFormat(query.resultFormat);
   const tables = useTableOptions(schema, database);
-  const table = useSelectedTable(tables, query);
+  const table = useSelectedTable(tables, query, datasource);
 
   const tableSchema = useAsync(async () => {
     if (!table || !table.property) {
@@ -293,7 +293,8 @@ const useColumnOptions = (tableSchema?: AdxColumnSchema[]): QueryEditorPropertyD
 
 const useSelectedTable = (
   options: QueryEditorPropertyDefinition[],
-  query: KustoQuery
+  query: KustoQuery,
+  datasource: AdxDataSource
 ): QueryEditorPropertyExpression | undefined => {
   return useMemo(() => {
     const from = query.expression?.from?.property.name;
@@ -306,6 +307,18 @@ const useSelectedTable = (
       };
     }
 
+    const variable = datasource.variables.find(variable => variable === from);
+
+    if (variable) {
+      return {
+        type: QueryEditorExpressionType.Property,
+        property: {
+          name: variable,
+          type: QueryEditorPropertyType.String,
+        },
+      };
+    }
+
     if (options.length > 0) {
       return {
         type: QueryEditorExpressionType.Property,
@@ -314,7 +327,7 @@ const useSelectedTable = (
     }
 
     return;
-  }, [options, query.expression?.from?.property.name]);
+  }, [options, query.expression?.from?.property.name, datasource.variables]);
 };
 
 const useTableOptions = (schema: AdxSchema | undefined, database: string): QueryEditorPropertyDefinition[] => {
