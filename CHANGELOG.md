@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.5]
+
+- Bugfix: when selecting template variables in the visual editor for table or database the values wasn't properly set. This should now be fixed.
+
 ## [3.0.4]
 
 - Bugfix: visual editor now includes template variables in the database selector.

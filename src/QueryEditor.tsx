@@ -23,7 +23,7 @@ export const QueryEditor: React.FC<Props> = props => {
   const schema = useAsync(() => datasource.getSchema(), [datasource.id]);
   const templateVariables = useTemplateVariables(datasource);
   const databases = useDatabaseOptions(schema.value);
-  const database = useSelectedDatabase(databases, props.query);
+  const database = useSelectedDatabase(databases, props.query, datasource);
   const rawMode = isRawMode(props);
 
   useEffect(() => {
@@ -124,7 +124,11 @@ export const QueryEditor: React.FC<Props> = props => {
   );
 };
 
-const useSelectedDatabase = (options: QueryEditorPropertyDefinition[], query: KustoQuery): string => {
+const useSelectedDatabase = (
+  options: QueryEditorPropertyDefinition[],
+  query: KustoQuery,
+  datasource: AdxDataSource
+): string => {
   return useMemo(() => {
     const selected = options.find(option => option.value === query.database);
 
@@ -132,12 +136,18 @@ const useSelectedDatabase = (options: QueryEditorPropertyDefinition[], query: Ku
       return selected.value;
     }
 
+    const variable = datasource.variables.find(variable => variable === query.database);
+
+    if (variable) {
+      return variable;
+    }
+
     if (options.length > 0) {
       return options[0].value;
     }
 
     return '';
-  }, [options, query.database]);
+  }, [options, query.database, datasource.variables]);
 };
 
 const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[] => {
