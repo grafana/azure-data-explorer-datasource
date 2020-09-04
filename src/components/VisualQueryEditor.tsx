@@ -26,6 +26,7 @@ import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { AdxAutoComplete } from '../schema/AdxAutoComplete';
 import { SchemaLoading, SchemaError, SchemaWarning } from '../components/SchemaMessages';
+import { getTemplateSrv } from '@grafana/runtime';
 
 interface Props {
   database: string;
@@ -42,15 +43,17 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   const { query, database, datasource, schema } = props;
 
   const resultFormat = selectResultFormat(query.resultFormat);
-  const tables = useTableOptions(schema, database);
+  const databaseName = getTemplateSrv().replace(database);
+  const tables = useTableOptions(schema, databaseName);
   const table = useSelectedTable(tables, query, datasource);
+  const tableName = getTemplateSrv().replace(table?.property.name ?? '');
 
   const tableSchema = useAsync(async () => {
     if (!table || !table.property) {
       return [];
     }
 
-    const schema = await getTableSchema(datasource, database, table);
+    const schema = await getTableSchema(datasource, databaseName, tableName);
     const from = query.expression.from ?? table;
 
     props.onChangeQuery({
@@ -65,16 +68,15 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     });
 
     return schema;
-  }, [datasource.id, database, table?.property.name]);
+  }, [datasource.id, databaseName, tableName]);
 
   const onAutoComplete = useCallback(
     async (searchTerm?: string, column?: string) => {
-      const tableName = table?.property.name;
-      const autoComplete = new AdxAutoComplete(datasource, tableSchema.value, database, tableName);
+      const autoComplete = new AdxAutoComplete(datasource, tableSchema.value, databaseName, tableName);
       const values = await autoComplete.search(searchTerm, column);
       return values.map(value => ({ value, label: value }));
     },
-    [datasource, database, table, tableSchema.value]
+    [datasource, databaseName, tableName, tableSchema.value]
   );
 
   const columns = useColumnOptions(tableSchema.value);
@@ -353,7 +355,7 @@ const useTableOptions = (schema: AdxSchema | undefined, database: string): Query
   }, [database, schema]);
 };
 
-async function getTableSchema(datasource: AdxDataSource, database: string, table: QueryEditorPropertyExpression) {
+async function getTableSchema(datasource: AdxDataSource, databaseName: string, tableName: string) {
   const schemaResolver = new AdxSchemaResolver(datasource);
-  return await schemaResolver.getColumnsForTable(database, table.property.name);
+  return await schemaResolver.getColumnsForTable(databaseName, tableName);
 }
