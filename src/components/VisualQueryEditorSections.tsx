@@ -154,6 +154,28 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
         .withDescription('regex string matching')
         .multipleValues(false)
         .add();
+
+      operator('has_any')
+        .supportTypes([
+          QueryEditorPropertyType.String,
+          QueryEditorPropertyType.Number,
+          QueryEditorPropertyType.DateTime,
+        ])
+        .withDescription('any provided values matching')
+        .multipleValues(true)
+        .add();
+
+      operator('has')
+        .supportTypes([QueryEditorPropertyType.String])
+        .withDescription('match if whole term exists in column')
+        .multipleValues(false)
+        .add();
+
+      operator('!has')
+        .supportTypes([QueryEditorPropertyType.String])
+        .withDescription('match if whole term not exists in column')
+        .multipleValues(false)
+        .add();
     })
     .withMultipleRows(true)
     .build()
