@@ -63,6 +63,7 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
       operator('in~')
         .supportTypes([QueryEditorPropertyType.String, QueryEditorPropertyType.Number])
         .withDescription('in (case-insensitive)')
+        .multipleValues(true)
         .add();
 
       operator('!in')
