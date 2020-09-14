@@ -11,14 +11,79 @@ import {
   isDateGroupBy,
   isAndExpression,
   isOrExpression,
+  isMultiExpression,
 } from './editor/guards';
-import { QueryEditorExpression, QueryEditorOperatorExpression, QueryEditorArrayExpression } from './editor/expressions';
+import {
+  QueryEditorExpression,
+  QueryEditorOperatorExpression,
+  QueryEditorArrayExpression,
+  QueryEditorPropertyExpression,
+} from './editor/expressions';
 
 export class KustoExpressionParser {
-  templateSrv: TemplateSrv;
+  constructor(private limit: number = 10000, private templateSrv: TemplateSrv = getTemplateSrv()) {}
 
-  constructor(private limit: number = 10000) {
-    this.templateSrv = getTemplateSrv();
+  toQuery(expression?: QueryExpression): string {
+    const parts: string[] = [];
+
+    this.appendExpression(expression?.from, parts);
+    this.appendExpression(expression?.where, parts, 'where');
+
+    return parts.join('\n| ');
+  }
+
+  private appendExpression(expression: QueryEditorExpression | undefined, parts: string[], prefix = '') {
+    if (!expression) {
+      return;
+    }
+
+    if (isMultiExpression(expression)) {
+      return expression.expressions.forEach(exp => this.appendExpression(exp, parts, prefix));
+    }
+
+    if (isOrExpression(expression)) {
+      const orParts: string[] = [];
+      expression.expressions.map(exp => this.appendExpression(exp, orParts));
+
+      return parts.push(`${prefix} ${orParts.join(' or ')}`);
+    }
+
+    if (isFieldExpression(expression)) {
+      return this.appendProperty(expression, parts);
+    }
+
+    if (isFieldAndOperator(expression)) {
+      return this.appendOperator(expression, parts, prefix);
+    }
+  }
+
+  private appendOperator(expression: QueryEditorOperatorExpression, parts: string[], prefix) {
+    const { property, operator } = expression;
+    const value = this.formatValue(operator.value, property.type);
+
+    if (prefix) {
+      parts.push(`${prefix} ${property.name} ${operator.name} ${value}`);
+    } else {
+      parts.push(`${property.name} ${operator.name} ${value}`);
+    }
+  }
+
+  private formatValue(value: any, type: QueryEditorPropertyType): string {
+    if (Array.isArray(value)) {
+      return `(${value.map(v => this.formatValue(v, type)).join(', ')})`;
+    }
+
+    switch (type) {
+      case QueryEditorPropertyType.Number:
+      case QueryEditorPropertyType.Boolean:
+        return value;
+      default:
+        return `"${value}"`;
+    }
+  }
+
+  private appendProperty(expression: QueryEditorPropertyExpression, parts: string[]) {
+    parts.push(expression.property.name);
   }
 
   fromTable(expression?: QueryEditorExpression, interpolate = false): string {
