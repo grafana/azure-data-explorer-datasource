@@ -21,7 +21,6 @@ import { isFieldExpression } from '../editor/guards';
 import { AdxDataSource } from '../datasource';
 import { AdxSchemaResolver } from '../schema/AdxSchemaResolver';
 import { QueryEditorResultFormat, selectResultFormat } from '../components/QueryEditorResultFormat';
-import { KustoExpressionParser } from '../KustoExpressionParser';
 import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { AdxAutoComplete } from '../schema/AdxAutoComplete';
@@ -36,8 +35,6 @@ interface Props {
   datasource: AdxDataSource;
   templateVariableOptions: SelectableValue<string>;
 }
-
-const kustoExpressionParser = new KustoExpressionParser();
 
 export const VisualQueryEditor: React.FC<Props> = props => {
   const { query, database, datasource, schema } = props;
@@ -58,7 +55,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
 
     props.onChangeQuery({
       ...props.query,
-      query: kustoExpressionParser.query(
+      query: datasource.parseExpression(
         {
           ...props.query.expression,
           from,
@@ -116,7 +113,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         resultFormat: resultFormat,
         database: database,
         expression: next,
-        query: kustoExpressionParser.query(next, tableSchema.value),
+        query: datasource.parseExpression(next, tableSchema.value),
       });
     },
     [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
@@ -135,7 +132,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         resultFormat: resultFormat,
         database: database,
         expression: next,
-        query: kustoExpressionParser.query(next, tableSchema.value),
+        query: datasource.parseExpression(next, tableSchema.value),
       });
     },
     [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
@@ -154,7 +151,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         resultFormat: resultFormat,
         database: database,
         expression: next,
-        query: kustoExpressionParser.query(next, tableSchema.value),
+        query: datasource.parseExpression(next, tableSchema.value),
       });
     },
     [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
