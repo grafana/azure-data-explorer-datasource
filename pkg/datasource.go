@@ -134,10 +134,8 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 	res := backend.NewQueryDataResponse()
 
 	var fromAlert bool
-	if req.Headers != nil {
-		if req.Headers["FromAlert"] == "true" {
-			fromAlert = true
-		}
+	if req.Headers != nil && req.Headers["FromAlert"] == "true" {
+		fromAlert = true
 	}
 
 	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name, "fromAlert", fromAlert)
