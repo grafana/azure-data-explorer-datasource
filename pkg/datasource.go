@@ -13,7 +13,7 @@ import (
 // GrafanaAzureDXDatasource stores reference to plugin and logger
 type GrafanaAzureDXDatasource struct{}
 
-func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q backend.DataQuery) backend.DataResponse {
+func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, fromAlerting bool, q backend.DataQuery) backend.DataResponse {
 	resp := backend.DataResponse{}
 	qm := &azuredx.QueryModel{}
 
@@ -133,7 +133,14 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	res := backend.NewQueryDataResponse()
 
-	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
+	var fromAlert bool
+	if req.Headers != nil {
+		if req.Headers["FromAlert"] == "true" {
+			fromAlert = true
+		}
+	}
+
+	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name, "fromAlert", fromAlert)
 
 	client, err := azuredx.NewClient(ctx, req.PluginContext.DataSourceInstanceSettings)
 	if err != nil {
@@ -141,7 +148,7 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 	}
 
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = plugin.handleQuery(client, q)
+		res.Responses[q.RefID] = plugin.handleQuery(client, fromAlert, q)
 	}
 
 	return res, nil
