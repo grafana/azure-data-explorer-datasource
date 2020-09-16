@@ -3,6 +3,7 @@ import { dateTime } from '@grafana/data';
 import { TemplateSrv } from './test/template_srv';
 import _ from 'lodash';
 import { setBackendSrv, BackendSrv, BackendSrvRequest, setTemplateSrv } from '@grafana/runtime';
+import { EditorMode } from 'types';
 
 describe('AdxDataSource', () => {
   const ctx: any = {};
@@ -300,6 +301,34 @@ describe('AdxDataSource', () => {
         }
       );
       expect(result.data[0].target).toEqual('y');
+    });
+  });
+});
+
+describe('AdxDataSource', () => {
+  describe('when constructing with defaultEditorMode', () => {
+    it('then defaultEditorMode should be correct', () => {
+      const instanceSettings: any = {
+        jsonData: {
+          defaultEditorMode: EditorMode.Raw,
+        },
+      };
+
+      const datasource = new AdxDataSource(instanceSettings);
+
+      expect(datasource.getDefaultEditorMode()).toEqual(EditorMode.Raw);
+    });
+  });
+
+  describe('when constructing without defaultEditorMode', () => {
+    it('then defaultEditorMode should be Visual', () => {
+      const instanceSettings: any = {
+        jsonData: {},
+      };
+
+      const datasource = new AdxDataSource(instanceSettings);
+
+      expect(datasource.getDefaultEditorMode()).toEqual(EditorMode.Visual);
     });
   });
 });

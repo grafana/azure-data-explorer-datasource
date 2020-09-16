@@ -3,8 +3,7 @@ import { css } from 'emotion';
 import { Select, Button, stylesFactory, ConfirmModal } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorSection } from '../editor/components/QueryEditorSection';
-
-type EditorMode = 'raw' | 'visual';
+import { EditorMode } from 'types';
 
 interface Props {
   database: string;
@@ -43,7 +42,7 @@ export const QueryEditorToolbar: React.FC<Props> = props => {
           props.onChangeDatabase(selected.value);
         }}
       />
-      {props.editorMode === 'raw' && (
+      {props.editorMode === EditorMode.Raw && (
         <>
           <div className={styles.spacing} />
           <label className="gf-form-label">(Run Query: Shift+Enter, Trigger Suggestion: Ctrl+Space)</label>
@@ -53,7 +52,7 @@ export const QueryEditorToolbar: React.FC<Props> = props => {
         <div className="gf-form-label--grow" />
       </div>
       <Button variant="secondary" onClick={onToggleMode}>
-        {props.editorMode === 'visual' ? 'Edit KQL' : 'Switch to builder'}
+        {props.editorMode === EditorMode.Visual ? 'Edit KQL' : 'Switch to builder'}
       </Button>
       <div className={styles.spacing} />
       <Button variant={props.dirty ? 'primary' : 'secondary'} onClick={props.onRunQuery}>
