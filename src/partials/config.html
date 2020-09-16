@@ -115,7 +115,9 @@
   <div class="gf-form-inline">
     <div class="gf-form">
       <span class="gf-form-label width-11">Data concistency</span>
-      <select class="gf-form-input" ng-model="ctrl.current.jsonData.dataConsistency" ng-options="d.value as d.label for d in ctrl.dataConsistency"></select>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input" ng-model="ctrl.current.jsonData.dataConsistency" ng-options="d.value as d.label for d in ctrl.dataConsistency"></select>
+      </div>
       <info-popover mode="right-normal">
         By default the data consistency is strong. If you want to query your data with an other cosistency, choose the desired value.
       </info-popover>
