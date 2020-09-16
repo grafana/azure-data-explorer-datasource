@@ -3,11 +3,17 @@ import config from 'grafana/app/core/config';
 import { isVersionGtOrEq } from './version';
 import { EditorMode } from './types';
 
+const dataConsistency = {
+  strongconsistency: 'Strong',
+  weakconsistency: 'Weak',
+};
+
 export class KustoDBConfigCtrl {
   static templateUrl = 'partials/config.html';
 
   current: any;
   suggestUrl: string;
+  dataConsistency: any[];
   datasource: AdxDataSource | undefined;
   databases: any[];
   hasRequiredGrafanaVersion: boolean;
@@ -23,6 +29,7 @@ export class KustoDBConfigCtrl {
     };
 
     this.databases = [];
+
     if (this.current.id) {
       this.current.url = 'api/datasources/proxy/' + this.current.id;
       this.datasource = new AdxDataSource(this.current);
@@ -35,6 +42,15 @@ export class KustoDBConfigCtrl {
 
     if (!this.current.jsonData?.defaultEditorMode) {
       this.current.jsonData.defaultEditorMode = this.editorModes[0].value;
+    }
+
+    this.dataConsistency = Object.keys(dataConsistency).map(value => ({
+      value,
+      label: dataConsistency[value],
+    }));
+
+    if (!this.current.jsonData?.dataConsistency) {
+      this.current.jsonData.dataConsistency = this.dataConsistency[0].value;
     }
   }
 

@@ -41,6 +41,8 @@ type dataSourceData struct {
 	ClusterURL      string `json:"clusterUrl"`
 	DefaultDatabase string `json:"defaultDatabase"`
 	Secret          string `json:"-"`
+	DataConsistency string `json:"dataConsistency"`
+	CacheMaxAge     string `json:"cacheMaxAge"`
 }
 
 // Client is an http.Client used for API requests.
@@ -50,11 +52,22 @@ type Client struct {
 	Log hclog.Logger
 }
 
+// Options that can be set on the ADX Connection string
+type options struct {
+	DataConsistency string `json:"queryconsistency,omitempty"`
+	CacheMaxAge     string `json:"query_results_cache_max_age,omitempty"`
+}
+
+// Properties property bag of connection string options
+type Properties struct {
+	Options *options `json:"options,omitempty"`
+}
+
 // RequestPayload is the information that makes up a Kusto query for Azure's Data Explorer API.
 type RequestPayload struct {
-	DB         string `json:"db"`
-	CSL        string `json:"csl"`
-	Properties string `json:"properties"`
+	DB         string      `json:"db"`
+	CSL        string      `json:"csl"`
+	Properties *Properties `json:"properties,omitempty"`
 }
 
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's
@@ -68,6 +81,16 @@ func newDataSourceData(dInfo *backend.DataSourceInstanceSettings) (*dataSourceDa
 	}
 	d.Secret = dInfo.DecryptedSecureJSONData["clientSecret"]
 	return &d, nil
+}
+
+// NewConnectionProperties creates ADX connection properties based on datasource settings.
+func NewConnectionProperties(c *Client) *Properties {
+	return &Properties{
+		&options{
+			DataConsistency: c.DataConsistency,
+			CacheMaxAge:     c.CacheMaxAge,
+		},
+	}
 }
 
 // NewClient creates a new Azure Data Explorer http client from the DatasourceInfo.
@@ -95,13 +118,13 @@ func NewClient(ctx context.Context, dInfo *backend.DataSourceInstanceSettings) (
 func (c *Client) TestRequest() error {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(RequestPayload{
-		CSL: ".show databases schema",
-		DB:  c.DefaultDatabase,
+		CSL:        ".show databases schema",
+		DB:         c.DefaultDatabase,
+		Properties: NewConnectionProperties(c),
 	})
 	if err != nil {
 		return err
 	}
-
 	resp, err := c.Post(c.ClusterURL+"/v1/rest/query", "application/json", &buf)
 	if err != nil {
 		return err
@@ -122,7 +145,6 @@ func (c *Client) KustoRequest(payload RequestPayload, querySource string) (*Tabl
 	if err != nil {
 		return nil, "", err
 	}
-
 	req, err := http.NewRequest(http.MethodPost, c.ClusterURL+"/v1/rest/query", &buf)
 	if err != nil {
 		return nil, "", err
