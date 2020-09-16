@@ -26,9 +26,14 @@ export interface KustoQuery extends DataQuery {
   pluginVersion: string;
 }
 
+export enum EditorMode {
+  Visual = 'visual',
+  Raw = 'raw',
+}
+
 export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource' | 'pluginVersion'> = {
   query: '',
-  querySource: 'raw',
+  querySource: EditorMode.Raw,
   expression: {
     where: {
       type: QueryEditorExpressionType.And,
@@ -50,6 +55,7 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   defaultDatabase: string;
   minimalCache: number;
   defaultTakeLimit: number;
+  defaultEditorMode: EditorMode;
 }
 
 export interface AdxSchema {

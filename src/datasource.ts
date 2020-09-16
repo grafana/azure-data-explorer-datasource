@@ -13,7 +13,15 @@ import {
 import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
-import { AdxDataSourceOptions, KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery, QueryExpression } from './types';
+import {
+  AdxDataSourceOptions,
+  KustoQuery,
+  AdxSchema,
+  AdxColumnSchema,
+  defaultQuery,
+  QueryExpression,
+  EditorMode,
+} from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
@@ -28,6 +36,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private defaultOrFirstDatabase: string;
   private url?: string;
   private expressionParser: KustoExpressionParser;
+  private defaultEditorMode: EditorMode;
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
@@ -38,6 +47,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
     this.expressionParser = new KustoExpressionParser(instanceSettings.jsonData.defaultTakeLimit ?? 10000);
+    this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
   }
 
   /**
@@ -277,6 +287,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
   parseExpression(sections: QueryExpression | undefined, columns: AdxColumnSchema[] | undefined): string {
     return this.expressionParser.query(sections, columns);
+  }
+
+  getDefaultEditorMode(): EditorMode {
+    return this.defaultEditorMode;
   }
 }
 

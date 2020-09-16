@@ -4,7 +4,7 @@ import { QueryEditorProps, PanelData } from '@grafana/data';
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
 import { AdxDataSource } from './datasource';
-import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
+import { KustoQuery, AdxDataSourceOptions, AdxSchema, EditorMode } from 'types';
 import { QueryEditorPropertyDefinition } from './editor/types';
 import { RawQueryEditor } from './components/RawQueryEditor';
 import { databaseToDefinition } from './schema/mapper';
@@ -31,6 +31,15 @@ export const QueryEditor: React.FC<Props> = props => {
       props.onChange(migrateQuery(props.query));
       props.onRunQuery();
     }
+
+    if (isNewQuery(props) && isRawDefaultEditorMode(props)) {
+      props.onChange({
+        ...props.query,
+        rawMode: true,
+        querySource: EditorMode.Raw,
+      });
+      props.onRunQuery();
+    }
   }, []);
 
   const onChangeDatabase = useCallback(
@@ -47,7 +56,7 @@ export const QueryEditor: React.FC<Props> = props => {
     props.onChange({
       ...props.query,
       rawMode: !rawMode,
-      querySource: rawMode ? 'visual' : 'raw',
+      querySource: rawMode ? EditorMode.Visual : EditorMode.Raw,
     });
   }, [props.onChange, props.query]);
 
@@ -83,7 +92,7 @@ export const QueryEditor: React.FC<Props> = props => {
     );
   }
 
-  const editorMode = rawMode ? 'raw' : 'visual';
+  const editorMode = rawMode ? EditorMode.Raw : EditorMode.Visual;
 
   return (
     <>
@@ -101,7 +110,7 @@ export const QueryEditor: React.FC<Props> = props => {
         databases={[templateVariables, ...databases]}
         dirty={dirty}
       />
-      {editorMode === 'raw' && (
+      {editorMode === EditorMode.Raw && (
         <RawQueryEditor
           {...props}
           schema={schema.value}
@@ -110,7 +119,7 @@ export const QueryEditor: React.FC<Props> = props => {
           database={database}
         />
       )}
-      {editorMode === 'visual' && (
+      {editorMode === EditorMode.Visual && (
         <VisualQueryEditor
           datasource={datasource}
           database={database}
@@ -211,5 +220,14 @@ function isRawMode(props: Props): boolean {
   if (props.query.rawMode === undefined && props.query.query && !props.query.expression?.from) {
     return true;
   }
+
   return props.query.rawMode || false;
+}
+
+function isNewQuery(props: Props): boolean {
+  return props.query.rawMode === undefined;
+}
+
+function isRawDefaultEditorMode(props: Props): boolean {
+  return props.datasource.getDefaultEditorMode() === EditorMode.Raw;
 }
