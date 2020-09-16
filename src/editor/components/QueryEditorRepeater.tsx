@@ -17,9 +17,11 @@ interface ChildProps {
 }
 
 export const QueryEditorRepeater: React.FC<Props> = props => {
+  const { onChange: propsOnChange, children, value, id } = props;
+  /* eslint-disable react-hooks/exhaustive-deps */
   const onChange = useCallback(
     (index: number, expression?: QueryEditorExpression) => {
-      const { expressions } = props.value;
+      const { expressions } = value;
       const next = Array.from(expressions);
 
       if (expression) {
@@ -28,29 +30,32 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
         next.splice(index, 1);
       }
 
-      props.onChange({
-        ...props.value,
+      propsOnChange({
+        ...value,
         expressions: next,
       });
     },
-    [props.children, props.onChange, props.value]
+    [children, propsOnChange, value]
   );
+  /* eslint-enable react-hooks/exhaustive-deps */
 
-  if (!props.value?.expressions) {
+  if (!value?.expressions) {
     return null;
   }
 
+  const length = value.expressions.length;
+
   return (
     <>
-      {props.value.expressions.map((value, index) => {
+      {value.expressions.map((val, idx) => {
         return (
-          <React.Fragment key={`${props.id}-${index}`}>
-            {props.children({
-              index,
-              value,
-              onChange: (expression: QueryEditorExpression) => onChange(index, expression),
-              onAdd: (expression: QueryEditorExpression) => onChange(props.value.expressions.length, expression),
-              onRemove: () => onChange(index),
+          <React.Fragment key={`${id}-${idx}`}>
+            {children({
+              index: idx,
+              value: val,
+              onChange: (expression: QueryEditorExpression) => onChange(idx, expression),
+              onAdd: (expression: QueryEditorExpression) => onChange(length, expression),
+              onRemove: () => onChange(idx),
             })}
           </React.Fragment>
         );

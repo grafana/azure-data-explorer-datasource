@@ -20,14 +20,15 @@ const adxTimeFormat: SelectableValue<string> = {
 };
 
 export const QueryEditorResultFormat: React.FC<Props> = props => {
-  const onChangeFormat = useCallback(
+  const { onChangeFormat } = props;
+  const onFormatChange = useCallback(
     (selectable: SelectableValue<string>) => {
       if (!selectable || !selectable.value) {
         return;
       }
-      props.onChangeFormat(selectable.value);
+      onChangeFormat(selectable.value);
     },
-    [props.format, props.onChangeFormat]
+    [onChangeFormat]
   );
 
   const styles = getStyles();
@@ -40,7 +41,7 @@ export const QueryEditorResultFormat: React.FC<Props> = props => {
       <Select
         options={props.includeAdxTimeFormat ? [...formats, adxTimeFormat] : formats}
         value={props.format}
-        onChange={onChangeFormat}
+        onChange={onFormatChange}
       />
     </div>
   );

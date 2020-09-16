@@ -16,7 +16,7 @@ import { needsToBeMigrated, migrateQuery } from 'migrations/query';
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = props => {
-  const { datasource } = props;
+  const { datasource, onChange, onRunQuery, query } = props;
   const executedQuery = useExecutedQuery(props.data);
   const executedQueryError = useExecutedQueryError(props.data);
   const dirty = useDirty(props.query.query, executedQuery);
@@ -26,30 +26,32 @@ export const QueryEditor: React.FC<Props> = props => {
   const database = useSelectedDatabase(databases, props.query, datasource);
   const rawMode = isRawMode(props);
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    if (needsToBeMigrated(props.query)) {
-      props.onChange(migrateQuery(props.query));
-      props.onRunQuery();
+    if (needsToBeMigrated(query)) {
+      onChange(migrateQuery(query));
+      onRunQuery();
     }
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const onChangeDatabase = useCallback(
     (database: string) => {
-      props.onChange({
-        ...props.query,
+      onChange({
+        ...query,
         database,
       });
     },
-    [props.onChange, props.query]
+    [onChange, query]
   );
 
   const onToggleEditorMode = useCallback(() => {
-    props.onChange({
-      ...props.query,
+    onChange({
+      ...query,
       rawMode: !rawMode,
       querySource: rawMode ? 'visual' : 'raw',
     });
-  }, [props.onChange, props.query]);
+  }, [onChange, query, rawMode]);
 
   if (schema.loading) {
     return <SchemaLoading />;
@@ -196,15 +198,16 @@ const useExecutedQueryError = (data?: PanelData): string | undefined => {
 };
 
 const useTemplateVariables = (datasource: AdxDataSource) => {
+  const { variables } = datasource;
   return useMemo(() => {
     return {
       label: 'Template Variables',
       expanded: false,
-      options: datasource.variables.map(variable => {
+      options: variables.map(variable => {
         return { label: variable, value: variable };
       }),
     };
-  }, [datasource.id]);
+  }, [variables]);
 };
 
 function isRawMode(props: Props): boolean {
