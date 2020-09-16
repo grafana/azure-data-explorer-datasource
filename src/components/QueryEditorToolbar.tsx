@@ -19,7 +19,7 @@ export const QueryEditorToolbar: React.FC<Props> = props => {
   const { dirty, editorMode, onToggleEditorMode } = props;
   const [showConfirm, setShowConfirm] = useState(false);
   const onToggleMode = useCallback(() => {
-    if (!dirty || editorMode === 'visual') {
+    if (!dirty || editorMode === EditorMode.Visual) {
       onToggleEditorMode();
       return;
     }

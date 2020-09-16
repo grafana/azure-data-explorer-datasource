@@ -34,12 +34,12 @@ export const QueryEditor: React.FC<Props> = props => {
     }
 
     if (isNewQuery(props) && isRawDefaultEditorMode(props)) {
-      props.onChange({
+      onChange({
         ...props.query,
         rawMode: true,
         querySource: EditorMode.Raw,
       });
-      props.onRunQuery();
+      onRunQuery();
     }
   }, []);
   /* eslint-enable react-hooks/exhaustive-deps */
