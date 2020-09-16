@@ -43,6 +43,7 @@ type dataSourceData struct {
 	Secret          string `json:"-"`
 	DataConsistency string `json:"dataConsistency"`
 	CacheMaxAge     string `json:"cacheMaxAge"`
+	DynamicCaching  bool   `json:"dynamicCaching"`
 }
 
 // Client is an http.Client used for API requests.
@@ -84,11 +85,16 @@ func newDataSourceData(dInfo *backend.DataSourceInstanceSettings) (*dataSourceDa
 }
 
 // NewConnectionProperties creates ADX connection properties based on datasource settings.
-func NewConnectionProperties(c *Client) *Properties {
+func NewConnectionProperties(c *Client, cs *CacheSettings) *Properties {
+	cacheMaxAge := c.CacheMaxAge
+	if cs != nil {
+		cacheMaxAge = cs.CacheMaxAge
+	}
+
 	return &Properties{
 		&options{
 			DataConsistency: c.DataConsistency,
-			CacheMaxAge:     c.CacheMaxAge,
+			CacheMaxAge:     cacheMaxAge,
 		},
 	}
 }
@@ -120,7 +126,7 @@ func (c *Client) TestRequest() error {
 	err := json.NewEncoder(&buf).Encode(RequestPayload{
 		CSL:        ".show databases schema",
 		DB:         c.DefaultDatabase,
-		Properties: NewConnectionProperties(c),
+		Properties: NewConnectionProperties(c, nil),
 	})
 	if err != nil {
 		return err

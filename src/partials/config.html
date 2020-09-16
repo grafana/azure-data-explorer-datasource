@@ -1,5 +1,3 @@
-<h3 class="page-heading">Azure Data Explorer API Details</h3>
-
 <div class="gf-form-group">
   <div class="grafana-info-box">
     <h5>Configuring Azure and your Azure Data Explorer Database</h5>
@@ -26,6 +24,8 @@
         the documentation.</a></p>
   </div>
 </div>
+
+<h3 class="page-heading">Connection details</h3>
 
 <div class="gf-form-group">
   <div class="gf-form-inline">
@@ -94,19 +94,32 @@
       </info-popover>
     </div>
   </div>
+</div>
+
+<h3 class="page-heading">Query Optimizations</h3>
+<div class ="gf-form-group">
   <div class="gf-form-inline">
     <div class="gf-form">
       <span class="gf-form-label width-11">Default take limit</span>
       <input type="number" min="1" class="gf-form-input width-9" ng-model="ctrl.current.jsonData.defaultTakeLimit" spellcheck="false" placeholder="10000"></input>
       <info-popover mode="right-absolute">
-        The default take limit is 10 000. If you need a greater or lower default, enter the required value.
+        By default Grafana adds a take limit on 10 000 to prevent the plugin from issuing queries that could overload the ADX cluster.<br /><br/>This is only applied to the queries when using the visual query editor to build your queries.
+      </info-popover>
+    </div>
+  </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <gf-form-switch label="Use dynamic caching" checked="ctrl.current.jsonData.dynamicCaching" label-class="width-11">
+      </gf-form-switch>
+      <info-popover mode="right-normal">
+        By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored.<br /><br />For time series queries we will use the bin size to widen the time range but also as cache max age.
       </info-popover>
     </div>
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
       <span class="gf-form-label width-11">Cache Max Age</span>
-      <input class="gf-form-input width-9" ng-model="ctrl.current.jsonData.cacheMaxAge" spellcheck="false" placeholder="1m" ng-pattern="/^(\d{1,3}(\.\d{0,2})?(d|m|s|h|ms))$/"></input>
+      <input class="gf-form-input width-9" ng-model="ctrl.current.jsonData.cacheMaxAge" ng-disabled="ctrl.current.jsonData.dynamicCaching" spellcheck="false" placeholder="0m" ng-pattern="/^(\d{1,3}(\.\d{0,2})?(d|m|s|h|ms))$/"></input>
       <info-popover mode="right-absolute">
         By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.
       </info-popover>
@@ -125,7 +138,7 @@
 
 <div class="gf-form-group" ng-if="ctrl.showMinVersionWarning()">
   <div class=" alert alert-error">
-      This datasource requires Grafana 5.3.0 (5.3.0-beta1 or greater). <a class="external-link" target="_blank" href="https://grafana.com/get">Download a new version of
+      This datasource requires Grafana 7.1.0 or greater. <a class="external-link" target="_blank" href="https://grafana.com/get">Download a new version of
       Grafana here.</a>
   </div>
 </div>
