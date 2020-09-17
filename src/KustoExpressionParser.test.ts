@@ -95,6 +95,15 @@ describe('KustoExpressionParser', () => {
           '\n| where state == "TEXAS" or state == "FLORIDA"'
       );
     });
+
+    it('should parse expression with empty where filter', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('isActive', '==', '')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where isActive == ""');
+    });
   });
 });
 
