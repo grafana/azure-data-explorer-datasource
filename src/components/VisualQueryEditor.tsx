@@ -37,7 +37,8 @@ interface Props {
 }
 
 export const VisualQueryEditor: React.FC<Props> = props => {
-  const { query, database, datasource, schema } = props;
+  const { query, database, datasource, schema, onChangeQuery } = props;
+  const { id: datasourceId, parseExpression } = datasource;
 
   const resultFormat = selectResultFormat(query.resultFormat);
   const databaseName = getTemplateSrv().replace(database);
@@ -53,11 +54,11 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     const schema = await getTableSchema(datasource, databaseName, tableName);
     const from = query.expression.from ?? table;
 
-    props.onChangeQuery({
-      ...props.query,
-      query: datasource.parseExpression(
+    onChangeQuery({
+      ...query,
+      query: parseExpression(
         {
-          ...props.query.expression,
+          ...query.expression,
           from,
         },
         schema
@@ -65,7 +66,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     });
 
     return schema;
-  }, [datasource.id, databaseName, tableName]);
+  }, [datasourceId, databaseName, tableName]);
 
   const onAutoComplete = useCallback(
     async (searchTerm?: string, column?: string) => {
@@ -90,88 +91,88 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         from: expression,
       };
 
-      props.onChangeQuery({
-        ...props.query,
+      onChangeQuery({
+        ...query,
         resultFormat: resultFormat,
         database: database,
         expression: next,
       });
     },
-    [props.onChangeQuery, props.query, resultFormat, database]
+    [onChangeQuery, query, resultFormat, database, table]
   );
 
   const onWhereChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
       const next = {
-        ...props.query.expression,
+        ...query.expression,
         from: table,
         where: expression,
       };
 
-      props.onChangeQuery({
-        ...props.query,
+      onChangeQuery({
+        ...query,
         resultFormat: resultFormat,
         database: database,
         expression: next,
-        query: datasource.parseExpression(next, tableSchema.value),
+        query: parseExpression(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
+    [onChangeQuery, query, tableSchema.value, resultFormat, database, table, parseExpression]
   );
 
   const onReduceChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
       const next = {
-        ...props.query.expression,
+        ...query.expression,
         from: table,
         reduce: expression,
       };
 
-      props.onChangeQuery({
-        ...props.query,
+      onChangeQuery({
+        ...query,
         resultFormat: resultFormat,
         database: database,
         expression: next,
-        query: datasource.parseExpression(next, tableSchema.value),
+        query: parseExpression(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
+    [onChangeQuery, query, tableSchema.value, resultFormat, database, table, parseExpression]
   );
 
   const onGroupByChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
       const next = {
-        ...props.query.expression,
+        ...query.expression,
         from: table,
         groupBy: expression,
       };
 
-      props.onChangeQuery({
-        ...props.query,
+      onChangeQuery({
+        ...query,
         resultFormat: resultFormat,
         database: database,
         expression: next,
-        query: datasource.parseExpression(next, tableSchema.value),
+        query: parseExpression(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
+    [onChangeQuery, query, tableSchema.value, resultFormat, database, table, parseExpression]
   );
 
   const onChangeResultFormat = useCallback(
     (format: string) => {
       const next = {
-        ...props.query.expression,
+        ...query.expression,
         from: table,
       };
 
-      props.onChangeQuery({
+      onChangeQuery({
         ...query,
         expression: next,
         database: database,
         resultFormat: format,
       });
     },
-    [props.onChangeQuery, table, database]
+    [onChangeQuery, table, database, query]
   );
 
   if (tableSchema.loading) {

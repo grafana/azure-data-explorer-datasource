@@ -15,6 +15,7 @@ interface Props {
 }
 
 export const QueryEditorGroupBy: React.FC<Props> = props => {
+  const { intervals, onChange } = props;
   const [field, setField] = useState(props.value?.property);
   const [interval, setInterval] = useState(props.value?.interval);
   const styles = getStyles();
@@ -25,11 +26,11 @@ export const QueryEditorGroupBy: React.FC<Props> = props => {
       if (property.type === QueryEditorPropertyType.DateTime) {
         setInterval({
           type: QueryEditorPropertyType.Interval,
-          name: props.intervals[0].value,
+          name: intervals[0].value,
         });
       }
     },
-    [setField]
+    [setField, intervals]
   );
 
   const onChangeInterval = useCallback(
@@ -39,6 +40,7 @@ export const QueryEditorGroupBy: React.FC<Props> = props => {
     [setInterval]
   );
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (field) {
       const payload: QueryEditorGroupByExpression = {
@@ -47,9 +49,10 @@ export const QueryEditorGroupBy: React.FC<Props> = props => {
         interval,
       };
 
-      props.onChange(payload);
+      onChange(payload); // adding onChange to dependency array below causes maximum call depth error
     }
   }, [field, interval]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   return (
     <div className={styles.container}>

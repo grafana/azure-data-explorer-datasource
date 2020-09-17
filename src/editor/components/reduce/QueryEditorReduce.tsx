@@ -27,6 +27,7 @@ interface Props {
 }
 
 export const QueryEditorReduce: React.FC<Props> = props => {
+  const { value, functions, onChange } = props;
   const [field, setField] = useState(props.value?.property);
   const [reduce, setReduce] = useState(props.value?.reduce);
   const [parameters, setParameters] = useState(props.value?.parameters);
@@ -37,10 +38,10 @@ export const QueryEditorReduce: React.FC<Props> = props => {
       setField(property);
 
       // Set a reasonable value
-      if (!props.value?.reduce?.name) {
-        let reducer = props.functions.find(f => f.value === 'avg');
+      if (!value?.reduce?.name) {
+        let reducer = functions.find(f => f.value === 'avg');
         if (!reducer) {
-          reducer = props.functions[0];
+          reducer = functions[0];
         }
         setReduce({
           name: reducer.value,
@@ -48,7 +49,7 @@ export const QueryEditorReduce: React.FC<Props> = props => {
         });
       }
     },
-    [setField]
+    [setField, value, functions]
   );
 
   const onChangeReduce = useCallback(
@@ -65,6 +66,7 @@ export const QueryEditorReduce: React.FC<Props> = props => {
     [setParameters]
   );
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (field && reduce) {
       const payload: QueryEditorReduceExpression = {
@@ -74,9 +76,10 @@ export const QueryEditorReduce: React.FC<Props> = props => {
         parameters: parameters,
       };
 
-      props.onChange(payload);
+      onChange(payload); // adding onChange to dependency array below causes maximum call depth error
     }
   }, [field, reduce, parameters]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const reduceParameters: QueryEditorFunctionParameter[] = getParameters(reduce, props.functions);
 
