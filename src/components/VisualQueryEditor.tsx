@@ -246,20 +246,20 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         onChange={onWhereChange}
         getSuggestions={onAutoComplete}
       />
+      <KustoValueColumnEditorSection
+        templateVariableOptions={props.templateVariableOptions}
+        label="Value columns"
+        value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
+        fields={columns}
+        onChange={onReduceChange}
+        getSuggestions={onAutoComplete}
+      />
       <KustoGroupByEditorSection
         templateVariableOptions={props.templateVariableOptions}
         label="Group by (summarize)"
         value={groupBy}
         fields={groupable}
         onChange={onGroupByChange}
-        getSuggestions={onAutoComplete}
-      />
-      <KustoValueColumnEditorSection
-        templateVariableOptions={props.templateVariableOptions}
-        label={groupBy.expressions.length > 0 ? 'Calculate for each bin' : 'Calculate for dataset'}
-        value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
-        fields={columns}
-        onChange={onReduceChange}
         getSuggestions={onAutoComplete}
       />
       <div className={styles.query}>
