@@ -74,7 +74,7 @@ func takeLongest(d1 time.Duration, d2 time.Duration) time.Duration {
 func detectResolution(tr *backend.TimeRange) time.Duration {
 	diff := tr.To.Sub(tr.From)
 
-	if diff > time.Hour {
+	if diff > time.Hour*24*14 {
 		return cacheMaxAge
 	}
 
