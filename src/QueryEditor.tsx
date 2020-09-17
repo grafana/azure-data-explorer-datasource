@@ -4,7 +4,7 @@ import { QueryEditorProps, PanelData } from '@grafana/data';
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
 import { AdxDataSource } from './datasource';
-import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
+import { KustoQuery, AdxDataSourceOptions, AdxSchema, EditorMode } from 'types';
 import { QueryEditorPropertyDefinition } from './editor/types';
 import { RawQueryEditor } from './components/RawQueryEditor';
 import { databaseToDefinition } from './schema/mapper';
@@ -16,7 +16,7 @@ import { needsToBeMigrated, migrateQuery } from 'migrations/query';
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = props => {
-  const { datasource } = props;
+  const { datasource, onChange, onRunQuery, query } = props;
   const executedQuery = useExecutedQuery(props.data);
   const executedQueryError = useExecutedQueryError(props.data);
   const dirty = useDirty(props.query.query, executedQuery);
@@ -26,30 +26,41 @@ export const QueryEditor: React.FC<Props> = props => {
   const database = useSelectedDatabase(databases, props.query, datasource);
   const rawMode = isRawMode(props);
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    if (needsToBeMigrated(props.query)) {
-      props.onChange(migrateQuery(props.query));
-      props.onRunQuery();
+    if (needsToBeMigrated(query)) {
+      onChange(migrateQuery(query));
+      onRunQuery();
+    }
+
+    if (isNewQuery(props) && isRawDefaultEditorMode(props)) {
+      onChange({
+        ...props.query,
+        rawMode: true,
+        querySource: EditorMode.Raw,
+      });
+      onRunQuery();
     }
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const onChangeDatabase = useCallback(
     (database: string) => {
-      props.onChange({
-        ...props.query,
+      onChange({
+        ...query,
         database,
       });
     },
-    [props.onChange, props.query]
+    [onChange, query]
   );
 
   const onToggleEditorMode = useCallback(() => {
-    props.onChange({
-      ...props.query,
+    onChange({
+      ...query,
       rawMode: !rawMode,
-      querySource: rawMode ? 'visual' : 'raw',
+      querySource: rawMode ? EditorMode.Visual : EditorMode.Raw,
     });
-  }, [props.onChange, props.query]);
+  }, [onChange, query, rawMode]);
 
   if (schema.loading) {
     return <SchemaLoading />;
@@ -83,7 +94,7 @@ export const QueryEditor: React.FC<Props> = props => {
     );
   }
 
-  const editorMode = rawMode ? 'raw' : 'visual';
+  const editorMode = rawMode ? EditorMode.Raw : EditorMode.Visual;
 
   return (
     <>
@@ -101,7 +112,7 @@ export const QueryEditor: React.FC<Props> = props => {
         databases={[templateVariables, ...databases]}
         dirty={dirty}
       />
-      {editorMode === 'raw' && (
+      {editorMode === EditorMode.Raw && (
         <RawQueryEditor
           {...props}
           schema={schema.value}
@@ -110,7 +121,7 @@ export const QueryEditor: React.FC<Props> = props => {
           database={database}
         />
       )}
-      {editorMode === 'visual' && (
+      {editorMode === EditorMode.Visual && (
         <VisualQueryEditor
           datasource={datasource}
           database={database}
@@ -196,20 +207,30 @@ const useExecutedQueryError = (data?: PanelData): string | undefined => {
 };
 
 const useTemplateVariables = (datasource: AdxDataSource) => {
+  const { variables } = datasource;
   return useMemo(() => {
     return {
       label: 'Template Variables',
       expanded: false,
-      options: datasource.variables.map(variable => {
+      options: variables.map(variable => {
         return { label: variable, value: variable };
       }),
     };
-  }, [datasource.id]);
+  }, [variables]);
 };
 
 function isRawMode(props: Props): boolean {
   if (props.query.rawMode === undefined && props.query.query && !props.query.expression?.from) {
     return true;
   }
+
   return props.query.rawMode || false;
+}
+
+function isNewQuery(props: Props): boolean {
+  return props.query.rawMode === undefined;
+}
+
+function isRawDefaultEditorMode(props: Props): boolean {
+  return props.datasource.getDefaultEditorMode() === EditorMode.Raw;
 }
