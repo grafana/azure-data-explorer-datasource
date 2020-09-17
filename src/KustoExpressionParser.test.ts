@@ -178,7 +178,7 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(todatetime(todynamic(Column).StartTime))' +
+          '\n| where todatetime(todynamic(Column).StartTime) between ($__timeFrom .. $__timeTo)' +
           '\n| where isActive == true' +
           `\n| order by todatetime(todynamic(Column).StartTime) asc` +
           `\n| take ${limit}`
@@ -466,7 +466,7 @@ describe('KustoExpressionParser', () => {
 
     expect(parser.toQuery(expression, tableSchema)).toEqual(
       'StormEvents' +
-        '\n| where $__timeFilter(todatetime(todynamic(column).EndTime))' +
+        '\n| where todatetime(todynamic(column).EndTime) between ($__timeFrom .. $__timeTo)' +
         '\n| where column.isActive == true' +
         `\n| summarize by bin(todatetime(todynamic(column).EndTime), 1h), type` +
         `\n| order by todatetime(todynamic(column).EndTime) asc` +

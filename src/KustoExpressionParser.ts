@@ -1,24 +1,12 @@
 import { QueryExpression, AdxColumnSchema } from './types';
 import { QueryEditorPropertyType } from 'editor/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
-import {
-  isReduceExpression,
-  isFieldExpression,
-  isFieldAndOperator,
-  isMultiOperator,
-  isSingleOperator,
-  isGroupBy,
-  isDateGroupBy,
-  isAndExpression,
-  isOrExpression,
-  isMultiExpression,
-} from './editor/guards';
+import { isReduceExpression, isFieldAndOperator, isGroupBy, isOrExpression, isMultiExpression } from './editor/guards';
 import {
   QueryEditorExpression,
   QueryEditorOperatorExpression,
   QueryEditorArrayExpression,
   QueryEditorPropertyExpression,
-  QueryEditorReduceExpression,
 } from './editor/expressions';
 import { isArray } from 'lodash';
 
@@ -58,6 +46,12 @@ export class KustoExpressionParser {
     if (!context.timeColumn) {
       return;
     }
+
+    if (isDynamic(context.timeColumn)) {
+      parts.push(`where ${context.timeColumn} between ($__timeFrom .. $__timeTo)`);
+      return;
+    }
+
     parts.push(`where $__timeFilter(${context.timeColumn})`);
   }
 
@@ -555,7 +549,7 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
 };
 
 const isDynamic = (column: string): boolean => {
-  return !!(column && column.indexOf('.') > -1);
+  return !!(column && column.indexOf('.') > -1) || !!(column && column.indexOf('todynamic') > -1);
 };
 
 const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[]): string => {

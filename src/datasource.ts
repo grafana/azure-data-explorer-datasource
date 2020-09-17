@@ -41,12 +41,13 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
 
+    const takeLimit = instanceSettings.jsonData.defaultTakeLimit ?? 10000;
     this.backendSrv = getBackendSrv();
     this.templateSrv = getTemplateSrv();
     this.baseUrl = '/azuredataexplorer';
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
-    this.expressionParser = new KustoExpressionParser(instanceSettings.jsonData.defaultTakeLimit ?? 10000);
+    this.expressionParser = new KustoExpressionParser(takeLimit, this.templateSrv);
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
     this.parseExpression = this.parseExpression.bind(this);
   }
@@ -287,7 +288,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   parseExpression(sections: QueryExpression | undefined, columns: AdxColumnSchema[] | undefined): string {
-    return this.expressionParser.query(sections, columns);
+    return this.expressionParser.toQuery(sections, columns);
   }
 
   getDefaultEditorMode(): EditorMode {
