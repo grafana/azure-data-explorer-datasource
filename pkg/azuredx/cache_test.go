@@ -18,84 +18,25 @@ func TestNewCacheSettings(t *testing.T) {
 		returnVal     CacheSettings
 	}{
 		{
-			name: "should adjust settings based on time range difference 3d",
-			configuration: dataSourceData{
-				CacheMaxAge:    "10s",
-				DynamicCaching: true,
-			},
-			query: `SampleData\n | where state == "Texas"`,
-			timeRange: backend.TimeRange{
-				From: time.Date(2019, 7, 30, 20, 2, 33, 0, time.UTC),
-				To:   time.Date(2019, 8, 02, 21, 7, 33, 0, time.UTC),
-			},
-			returnIs: assert.Equal,
-			returnVal: CacheSettings{
-				CacheMaxAge: "60s",
-				TimeRange: &backend.TimeRange{
-					From: time.Date(2019, 7, 30, 20, 2, 0, 0, time.UTC),
-					To:   time.Date(2019, 8, 02, 21, 8, 0, 0, time.UTC),
-				},
-			},
-		},
-		{
-			name: "should adjust settings based on time range difference 1h",
-			configuration: dataSourceData{
-				CacheMaxAge:    "10s",
-				DynamicCaching: true,
-			},
-			query: `SampleData\n | where state == "Texas"`,
-			timeRange: backend.TimeRange{
-				From: time.Date(2019, 7, 30, 20, 2, 33, 0, time.UTC),
-				To:   time.Date(2019, 7, 30, 21, 7, 33, 0, time.UTC),
-			},
-			returnIs: assert.Equal,
-			returnVal: CacheSettings{
-				CacheMaxAge: "60s",
-				TimeRange: &backend.TimeRange{
-					From: time.Date(2019, 7, 30, 20, 2, 0, 0, time.UTC),
-					To:   time.Date(2019, 7, 30, 21, 8, 0, 0, time.UTC),
-				},
-			},
-		},
-		{
-			name: "should adjust settings based on time range difference 1m",
-			configuration: dataSourceData{
-				CacheMaxAge:    "10s",
-				DynamicCaching: true,
-			},
-			query: `SampleData\n | where state == "Texas"`,
-			timeRange: backend.TimeRange{
-				From: time.Date(2019, 7, 30, 20, 2, 33, 0, time.UTC),
-				To:   time.Date(2019, 7, 30, 21, 7, 33, 0, time.UTC),
-			},
-			returnIs: assert.Equal,
-			returnVal: CacheSettings{
-				CacheMaxAge: "60s",
-				TimeRange: &backend.TimeRange{
-					From: time.Date(2019, 7, 30, 20, 2, 0, 0, time.UTC),
-					To:   time.Date(2019, 7, 30, 21, 8, 0, 0, time.UTC),
-				},
-			},
-		},
-		{
-			name: "should adjust settings based on query to bin size 1h",
+			name: "should adjust settings based on query bin size 1m",
 			configuration: dataSourceData{
 				CacheMaxAge:    "10s",
 				DynamicCaching: true,
 			},
 			query: `SampleData\n` +
 				`| where state == "Texas"\n` +
-				`summarize avg(Coulumn) by bin(TimeColumn, 1h)`,
+				`summarize avg(Coulumn) by bin(TimeColumn, 1m)`,
+
 			timeRange: backend.TimeRange{
 				From: time.Date(2019, 7, 30, 20, 2, 33, 0, time.UTC),
 				To:   time.Date(2019, 7, 30, 21, 7, 33, 0, time.UTC),
 			},
 			returnIs: assert.Equal,
 			returnVal: CacheSettings{
-				CacheMaxAge: "3600s",
+				CacheMaxAge: "60s",
 				TimeRange: &backend.TimeRange{
-					From: time.Date(2019, 7, 30, 20, 0, 0, 0, time.UTC),
-					To:   time.Date(2019, 7, 30, 22, 0, 0, 0, time.UTC),
+					From: time.Date(2019, 7, 30, 20, 2, 0, 0, time.UTC),
+					To:   time.Date(2019, 7, 30, 21, 8, 0, 0, time.UTC),
 				},
 			},
 		},
@@ -122,15 +63,34 @@ func TestNewCacheSettings(t *testing.T) {
 			},
 		},
 		{
-			name: "should adjust settings based on query bin size 1m",
+			name: "should adjust settings based on query bin size 1h",
 			configuration: dataSourceData{
 				CacheMaxAge:    "10s",
 				DynamicCaching: true,
 			},
 			query: `SampleData\n` +
 				`| where state == "Texas"\n` +
-				`summarize avg(Coulumn) by bin(TimeColumn, 1m)`,
-
+				`summarize avg(Column) by bin(TimeColumn, 1h)`,
+			timeRange: backend.TimeRange{
+				From: time.Date(2019, 7, 30, 20, 2, 33, 0, time.UTC),
+				To:   time.Date(2019, 7, 30, 21, 7, 33, 0, time.UTC),
+			},
+			returnIs: assert.Equal,
+			returnVal: CacheSettings{
+				CacheMaxAge: "3600s",
+				TimeRange: &backend.TimeRange{
+					From: time.Date(2019, 7, 30, 20, 0, 0, 0, time.UTC),
+					To:   time.Date(2019, 7, 30, 22, 0, 0, 0, time.UTC),
+				},
+			},
+		},
+		{
+			name: "should adjust settings based on time range difference 1m",
+			configuration: dataSourceData{
+				CacheMaxAge:    "10s",
+				DynamicCaching: true,
+			},
+			query: `SampleData\n | where state == "Texas"`,
 			timeRange: backend.TimeRange{
 				From: time.Date(2019, 7, 30, 20, 2, 33, 0, time.UTC),
 				To:   time.Date(2019, 7, 30, 21, 7, 33, 0, time.UTC),
@@ -141,6 +101,26 @@ func TestNewCacheSettings(t *testing.T) {
 				TimeRange: &backend.TimeRange{
 					From: time.Date(2019, 7, 30, 20, 2, 0, 0, time.UTC),
 					To:   time.Date(2019, 7, 30, 21, 8, 0, 0, time.UTC),
+				},
+			},
+		},
+		{
+			name: "should adjust settings based on time range difference 3d",
+			configuration: dataSourceData{
+				CacheMaxAge:    "10s",
+				DynamicCaching: true,
+			},
+			query: `SampleData\n | where state == "Texas"`,
+			timeRange: backend.TimeRange{
+				From: time.Date(2019, 7, 30, 20, 2, 33, 0, time.UTC),
+				To:   time.Date(2019, 8, 02, 21, 7, 33, 0, time.UTC),
+			},
+			returnIs: assert.Equal,
+			returnVal: CacheSettings{
+				CacheMaxAge: "60s",
+				TimeRange: &backend.TimeRange{
+					From: time.Date(2019, 7, 30, 20, 2, 0, 0, time.UTC),
+					To:   time.Date(2019, 8, 02, 21, 8, 0, 0, time.UTC),
 				},
 			},
 		},

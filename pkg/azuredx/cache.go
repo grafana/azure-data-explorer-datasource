@@ -31,7 +31,7 @@ func NewCacheSettings(c *Client, q *backend.DataQuery, qm *QueryModel) *CacheSet
 		resolution = detectResolution(&q.TimeRange)
 	}
 
-	maxAge := takeLongest(resolution, cacheMinAge)
+	maxAge := adjustToMaxMinLimits(resolution)
 
 	return &CacheSettings{
 		CacheMaxAge: fmt.Sprintf("%vs", maxAge.Seconds()),
@@ -64,21 +64,24 @@ func expandTo(to time.Time, d time.Duration) time.Time {
 	return expanded
 }
 
-func takeLongest(d1 time.Duration, d2 time.Duration) time.Duration {
-	if d1 > d2 {
-		return d1
+func adjustToMaxMinLimits(resolution time.Duration) time.Duration {
+	if resolution > cacheMaxAge {
+		return cacheMaxAge
 	}
-	return d2
+	if resolution < cacheMinAge {
+		return cacheMinAge
+	}
+	return resolution
 }
 
 func detectResolution(tr *backend.TimeRange) time.Duration {
 	diff := tr.To.Sub(tr.From)
 
-	if diff > time.Hour*24*14 {
+	if diff > time.Hour*24*7*4 {
 		return cacheMaxAge
 	}
 
-	if diff > time.Minute {
+	if diff > time.Hour {
 		return time.Minute
 	}
 
