@@ -283,7 +283,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
         return value;
       }
 
-      return "'" + val + "'";
+      return "'" + escapeSpecial(val) + "'";
     });
     return quotedValues.filter(v => v !== "''").join(',');
   }
@@ -385,4 +385,8 @@ const includeTimeRange = (option: any): any => {
     ...option,
     range,
   };
+};
+
+const escapeSpecial = (value: string): string => {
+  return value.replace(/\'/gim, "\\'");
 };
