@@ -803,6 +803,63 @@ describe('KustoExpressionParser', () => {
           `\n| take ${limit}`
       );
     });
+
+    it('should parse expression with timeshift', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('country', '==', 'sweden')]),
+        timeshift: createProperty('2d'),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          "\n| where country == 'sweden'" +
+          `\n| order by StartTime asc` +
+          `\n| extend StartTime = StartTime - 2d` +
+          `\n| take ${limit}`
+      );
+    });
+
+    it('should parse expression with timeshift without any time column', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('country', '==', 'sweden')]),
+        timeshift: createProperty('2d'),
+      });
+
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where country == 'sweden'" + `\n| take ${limit}`);
+    });
+
+    it('should parse expression with timeshift without any valid timeshift value', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('country', '==', 'sweden')]),
+        timeshift: createProperty('100timmar'),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          "\n| where country == 'sweden'" +
+          `\n| order by StartTime asc` +
+          `\n| take ${limit}`
+      );
+    });
   });
 });
 
