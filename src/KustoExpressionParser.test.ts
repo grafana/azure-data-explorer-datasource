@@ -373,7 +373,22 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize count()` + `\n| take ${limit}`
+        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize count() by active` + `\n| take ${limit}`
+      );
+    });
+
+    it('should parse expression with summarize of count', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('column.isActive', '==', true)]),
+        reduce: createArray([createReduce('active', 'count'), createReduce('total', 'count')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' +
+          '\n| where column.isActive == true' +
+          `\n| summarize count() by active, total` +
+          `\n| take ${limit}`
       );
     });
 

@@ -125,6 +125,7 @@ export class KustoExpressionParser {
     groupBy: QueryEditorArrayExpression | undefined,
     parts: string[]
   ) {
+    let countAddedInReduce = false;
     const reduceParts: string[] = [];
     const groupByParts: string[] = [];
     const columns: string[] = [];
@@ -139,7 +140,11 @@ export class KustoExpressionParser {
       columns.push(column);
 
       if (func === 'count') {
-        reduceParts.push('count()');
+        if (!countAddedInReduce) {
+          countAddedInReduce = true;
+          reduceParts.push('count()');
+        }
+        groupByParts.push(column);
         continue;
       }
 
