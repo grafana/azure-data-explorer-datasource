@@ -17,7 +17,7 @@ describe('KustoExpressionParser', () => {
   const templateSrv: TemplateSrv = { getVariables: jest.fn(), replace: jest.fn() };
   const parser = new KustoExpressionParser(limit, templateSrv);
 
-  describe.only('toAutoCompleteQuery', () => {
+  describe('toAutoCompleteQuery', () => {
     it('should parse expression and exclude current filter index', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
