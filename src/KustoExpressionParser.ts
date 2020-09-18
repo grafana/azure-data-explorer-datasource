@@ -136,8 +136,15 @@ export class KustoExpressionParser {
       }
 
       const func = expression.reduce.name;
+      const parameters = expression.parameters;
       const column = context.castIfDynamic(expression.property.name);
       columns.push(column);
+
+      if (Array.isArray(parameters)) {
+        const funcParams = parameters.map(p => this.formatValue(p.value, p.fieldType)).join(', ');
+        reduceParts.push(`${func}(${column}, ${funcParams})`);
+        continue;
+      }
 
       if (func === 'count') {
         if (!countAddedInReduce) {

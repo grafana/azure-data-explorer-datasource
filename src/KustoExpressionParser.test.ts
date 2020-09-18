@@ -9,6 +9,7 @@ import {
   QueryEditorExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
+  QueryEditorFunctionParameterExpression,
 } from './editor/expressions';
 import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
 
@@ -690,6 +691,118 @@ describe('KustoExpressionParser', () => {
           `\n| take ${limit}`
       );
     });
+
+    it('should parse expression with summarize function that takes a parameter', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('column.country', '==', 'sweden')]),
+        reduce: createArray([createReduceWithParameter('amount', 'percentile', [1])]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column.type',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          "\n| where column.country == 'sweden'" +
+          `\n| order by StartTime asc` +
+          `\n| summarize percentile(amount, 1)` +
+          `\n| take ${limit}`
+      );
+    });
+
+    it('should parse expression with summarize function that takes multiple parameter', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('column.country', '==', 'sweden')]),
+        reduce: createArray([createReduceWithParameter('amount', 'percentile', [1, 2])]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column.type',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          "\n| where column.country == 'sweden'" +
+          `\n| order by StartTime asc` +
+          `\n| summarize percentile(amount, 1, 2)` +
+          `\n| take ${limit}`
+      );
+    });
+
+    it('should parse expression with summarize function that takes a parameter', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('column.country', '==', 'sweden')]),
+        reduce: createArray([createReduceWithParameter('amount', 'percentile', [1])]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column.type',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          "\n| where column.country == 'sweden'" +
+          `\n| order by StartTime asc` +
+          `\n| summarize percentile(amount, 1)` +
+          `\n| take ${limit}`
+      );
+    });
+
+    it('should parse expression with summarize function that takes multiple parameter of different types', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('column.country', '==', 'sweden')]),
+        reduce: createArray([createReduceWithParameter('amount', 'percentile', [1, '2'])]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column.type',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          "\n| where column.country == 'sweden'" +
+          `\n| order by StartTime asc` +
+          `\n| summarize percentile(amount, 1, '2')` +
+          `\n| take ${limit}`
+      );
+    });
   });
 });
 
@@ -729,6 +842,22 @@ const createReduce = (column: string, func: string): QueryEditorReduceExpression
       name: func,
     },
   };
+};
+
+const createReduceWithParameter = (column: string, func: string, params: any[]): QueryEditorReduceExpression => {
+  const reduce = createReduce(column, func);
+  reduce.parameters = params.map(v => {
+    const param: QueryEditorFunctionParameterExpression = {
+      type: QueryEditorExpressionType.FunctionParameter,
+      fieldType: valueToPropertyType(v),
+      value: v,
+      name: func,
+    };
+
+    return param;
+  });
+
+  return reduce;
 };
 
 const createProperty = (name: string): QueryEditorPropertyExpression => {
