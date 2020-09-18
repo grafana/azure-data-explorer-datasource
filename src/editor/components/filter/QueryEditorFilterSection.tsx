@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { css } from 'emotion';
 import { QueryEditorOperatorDefinition, QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorSectionProps, QueryEditorSection } from '../QueryEditorSection';
@@ -33,12 +33,9 @@ export const QueryEditorFilterSection = (
   return props => {
     const styles = getStyles();
 
-    const getSuggestions = useCallback(
-      (index: number): SkippableExpressionSuggestor => {
-        return (txt: string, column?: string) => props.getSuggestions(index, txt, column);
-      },
-      [props.getSuggestions]
-    );
+    const getSuggestions = (index: number): SkippableExpressionSuggestor => {
+      return (txt: string, column?: string) => props.getSuggestions(index, txt, column);
+    };
 
     if (props.value?.expressions?.length === 0) {
       return (

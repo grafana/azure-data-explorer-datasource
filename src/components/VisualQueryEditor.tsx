@@ -83,7 +83,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       // const values = await autoComplete.search(searchTerm, column);
       return values.map(value => ({ value, label: value }));
     },
-    [datasource, databaseName, tableName, tableSchema.value, query.expression]
+    [datasource, databaseName, tableSchema.value, query.expression]
   );
 
   const columns = useColumnOptions(tableSchema.value);
@@ -261,7 +261,6 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
         fields={columns}
         onChange={onReduceChange}
-        getSuggestions={onAutoComplete}
       />
       <KustoGroupByEditorSection
         templateVariableOptions={props.templateVariableOptions}
@@ -269,7 +268,6 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         value={groupBy}
         fields={groupable}
         onChange={onGroupByChange}
-        getSuggestions={onAutoComplete}
       />
       <div className={styles.query}>
         <TextArea cols={80} rows={8} value={props.query.query} disabled={true} />

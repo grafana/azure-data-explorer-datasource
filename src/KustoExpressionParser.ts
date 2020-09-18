@@ -1,14 +1,7 @@
-import { QueryExpression, AdxColumnSchema } from './types';
+import { QueryExpression, AdxColumnSchema, AutoCompleteQuery } from './types';
 import { QueryEditorPropertyType } from 'editor/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
-import {
-  isReduceExpression,
-  isFieldAndOperator,
-  isGroupBy,
-  isOrExpression,
-  isMultiExpression,
-  isAndExpression,
-} from './editor/guards';
+import { isReduceExpression, isFieldAndOperator, isGroupBy, isOrExpression, isAndExpression } from './editor/guards';
 import {
   QueryEditorExpression,
   QueryEditorOperatorExpression,
@@ -23,7 +16,9 @@ interface ParseContext {
 export class KustoExpressionParser {
   constructor(private limit: number = 10000, private templateSrv: TemplateSrv = getTemplateSrv()) {}
 
-  toAutoCompleteQuery(expression?: QueryExpression, tableSchema: AdxColumnSchema[]): string {}
+  toAutoCompleteQuery(expression?: AutoCompleteQuery, tableSchema?: AdxColumnSchema[]): string {
+    return '';
+  }
 
   toQuery(expression?: QueryExpression, tableSchema?: AdxColumnSchema[]): string {
     const context: ParseContext = {
