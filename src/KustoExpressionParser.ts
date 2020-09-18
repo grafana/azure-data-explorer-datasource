@@ -1,7 +1,14 @@
 import { QueryExpression, AdxColumnSchema } from './types';
 import { QueryEditorPropertyType } from 'editor/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
-import { isReduceExpression, isFieldAndOperator, isGroupBy, isOrExpression, isMultiExpression } from './editor/guards';
+import {
+  isReduceExpression,
+  isFieldAndOperator,
+  isGroupBy,
+  isOrExpression,
+  isMultiExpression,
+  isAndExpression,
+} from './editor/guards';
 import {
   QueryEditorExpression,
   QueryEditorOperatorExpression,
@@ -72,7 +79,7 @@ export class KustoExpressionParser {
       return;
     }
 
-    if (isMultiExpression(expression)) {
+    if (isMultiExpression(expression) || isAndExpression(expression)) {
       return expression.expressions.forEach(exp => this.appendWhere(context, exp, parts, prefix));
     }
 
