@@ -12,7 +12,7 @@ import {
 } from 'editor/expressions';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import {
-  KustoFromEditorSection,
+  KustoPropertyEditorSection,
   KustoWhereEditorSection,
   KustoValueColumnEditorSection,
   KustoGroupByEditorSection,
@@ -45,6 +45,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   const tables = useTableOptions(schema, databaseName);
   const table = useSelectedTable(tables, query, datasource);
   const tableName = getTemplateSrv().replace(table?.property.name ?? '');
+  const timeshiftOptions = useTimeshiftOptions();
 
   const tableSchema = useAsync(async () => {
     if (!table || !table.property) {
@@ -183,10 +184,33 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     [onChangeQuery, table, database, query]
   );
 
+  const onChangeTimeshift = useCallback(
+    (expression: QueryEditorExpression) => {
+      if (!isFieldExpression(expression) || !table) {
+        return;
+      }
+
+      const next = {
+        ...defaultQuery.expression,
+        ...query.expression,
+        from: table,
+        timeshift: expression,
+      };
+
+      onChangeQuery({
+        ...query,
+        resultFormat: resultFormat,
+        database: database,
+        expression: next,
+      });
+    },
+    [onChangeQuery, query, resultFormat, database, table]
+  );
+
   if (tableSchema.loading) {
     return (
       <>
-        <KustoFromEditorSection
+        <KustoPropertyEditorSection
           templateVariableOptions={props.templateVariableOptions}
           label="From"
           value={table}
@@ -201,7 +225,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   if (tableSchema.error) {
     return (
       <>
-        <KustoFromEditorSection
+        <KustoPropertyEditorSection
           templateVariableOptions={props.templateVariableOptions}
           label="From"
           value={table}
@@ -216,7 +240,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   if (tableSchema.value?.length === 0) {
     return (
       <>
-        <KustoFromEditorSection
+        <KustoPropertyEditorSection
           templateVariableOptions={props.templateVariableOptions}
           label="From"
           value={table}
@@ -229,11 +253,10 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   }
 
   const styles = getStyles();
-  const groupBy = query.expression?.groupBy ?? defaultQuery.expression?.groupBy;
 
   return (
     <>
-      <KustoFromEditorSection
+      <KustoPropertyEditorSection
         templateVariableOptions={props.templateVariableOptions}
         label="From"
         value={table}
@@ -245,7 +268,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
           includeAdxTimeFormat={false}
           onChangeFormat={onChangeResultFormat}
         />
-      </KustoFromEditorSection>
+      </KustoPropertyEditorSection>
       <KustoWhereEditorSection
         templateVariableOptions={props.templateVariableOptions}
         label="Where (filter)"
@@ -264,9 +287,18 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       <KustoGroupByEditorSection
         templateVariableOptions={props.templateVariableOptions}
         label="Group by (summarize)"
-        value={groupBy}
+        value={query.expression?.groupBy ?? defaultQuery.expression?.groupBy}
         fields={groupable}
         onChange={onGroupByChange}
+      />
+      <hr />
+      <KustoPropertyEditorSection
+        templateVariableOptions={[]}
+        label="Timeshift"
+        value={query.expression?.timeshift ?? defaultQuery.expression?.timeshift}
+        fields={timeshiftOptions}
+        onChange={onChangeTimeshift}
+        allowCustom={true}
       />
       <div className={styles.query}>
         <TextArea cols={80} rows={8} value={props.query.query} disabled={true} />
@@ -364,3 +396,30 @@ async function getTableSchema(datasource: AdxDataSource, databaseName: string, t
   const schemaResolver = new AdxSchemaResolver(datasource);
   return await schemaResolver.getColumnsForTable(databaseName, tableName);
 }
+
+const useTimeshiftOptions = (): QueryEditorPropertyDefinition[] => {
+  return useMemo((): QueryEditorPropertyDefinition[] => {
+    return [
+      {
+        label: 'No timeshift',
+        value: '',
+        type: QueryEditorPropertyType.TimeSpan,
+      },
+      {
+        label: 'Hour before',
+        value: '1h',
+        type: QueryEditorPropertyType.TimeSpan,
+      },
+      {
+        label: 'Day before',
+        value: '1d',
+        type: QueryEditorPropertyType.TimeSpan,
+      },
+      {
+        label: 'Week before',
+        value: '7d',
+        type: QueryEditorPropertyType.TimeSpan,
+      },
+    ];
+  }, []);
+};

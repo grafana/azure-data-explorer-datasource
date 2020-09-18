@@ -16,6 +16,7 @@ export interface QueryEditorFieldSectionProps extends React.PropsWithChildren<Qu
   templateVariableOptions: SelectableValue<string>;
   value?: QueryEditorExpression;
   onChange: (value: QueryEditorExpression) => void;
+  allowCustom?: boolean;
 }
 
 export const QueryEditorFieldSection = (config: FieldSectionConfiguration): React.FC<QueryEditorFieldSectionProps> => {
@@ -34,6 +35,7 @@ export const QueryEditorFieldSection = (config: FieldSectionConfiguration): Reac
           templateVariableOptions={props.templateVariableOptions}
           onChange={onChange(propsOnChange)}
           value={expression.property}
+          allowCustom={props.allowCustom}
         />
         {props.children}
       </QueryEditorSection>

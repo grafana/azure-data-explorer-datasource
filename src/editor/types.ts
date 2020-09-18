@@ -3,6 +3,7 @@ export enum QueryEditorPropertyType {
   String = 'string',
   Boolean = 'boolean',
   DateTime = 'dateTime',
+  TimeSpan = 'timeSpan',
   Function = 'function',
   Interval = 'interval',
 }

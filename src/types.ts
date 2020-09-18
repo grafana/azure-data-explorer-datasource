@@ -13,6 +13,7 @@ export interface QueryExpression {
   where: QueryEditorArrayExpression;
   reduce: QueryEditorArrayExpression;
   groupBy: QueryEditorArrayExpression;
+  timeshift?: QueryEditorPropertyExpression;
 }
 
 type QuerySource = 'raw' | 'schema' | 'autocomplete' | 'visual';
