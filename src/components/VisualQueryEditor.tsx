@@ -23,7 +23,6 @@ import { AdxSchemaResolver } from '../schema/AdxSchemaResolver';
 import { QueryEditorResultFormat, selectResultFormat } from '../components/QueryEditorResultFormat';
 import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { AdxAutoComplete } from '../schema/AdxAutoComplete';
 import { SchemaLoading, SchemaError, SchemaWarning } from '../components/SchemaMessages';
 import { getTemplateSrv } from '@grafana/runtime';
 
@@ -69,12 +68,22 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   }, [datasourceId, databaseName, tableName]);
 
   const onAutoComplete = useCallback(
-    async (searchTerm?: string, column?: string) => {
-      const autoComplete = new AdxAutoComplete(datasource, tableSchema.value, databaseName, tableName);
-      const values = await autoComplete.search(searchTerm, column);
+    async (index: number, searchTerm?: string, searchColumn?: string) => {
+      const values = await datasource.autoCompleteQuery(
+        {
+          searchTerm: searchTerm,
+          searchColumn: searchColumn,
+          database: databaseName,
+          expression: query.expression,
+          whereIndex: index,
+        },
+        tableSchema.value
+      );
+      // const autoComplete = new AdxAutoComplete(datasource, tableSchema.value, databaseName, tableName);
+      // const values = await autoComplete.search(searchTerm, column);
       return values.map(value => ({ value, label: value }));
     },
-    [datasource, databaseName, tableName, tableSchema.value]
+    [datasource, databaseName, tableName, tableSchema.value, query.expression]
   );
 
   const columns = useColumnOptions(tableSchema.value);

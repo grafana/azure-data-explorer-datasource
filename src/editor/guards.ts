@@ -57,9 +57,5 @@ export const isOrExpression = (expression?: QueryEditorExpression): expression i
 };
 
 export const isArrayExpression = (expression?: QueryEditorExpression): expression is QueryEditorArrayExpression => {
-  return isAndExpression(expression) || isOrExpression(expression) || isMultiExpression(expression);
-};
-
-export const isMultiExpression = (expression?: QueryEditorExpression): expression is QueryEditorArrayExpression => {
-  return expression?.type === QueryEditorExpressionType.Multiple;
+  return isAndExpression(expression) || isOrExpression(expression);
 };

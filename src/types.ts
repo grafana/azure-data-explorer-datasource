@@ -26,6 +26,14 @@ export interface KustoQuery extends DataQuery {
   pluginVersion: string;
 }
 
+export interface AutoCompleteQuery {
+  searchTerm?: string;
+  searchColumn?: string;
+  database: string;
+  expression: QueryExpression;
+  whereIndex: number;
+}
+
 export enum EditorMode {
   Visual = 'visual',
   Raw = 'raw',

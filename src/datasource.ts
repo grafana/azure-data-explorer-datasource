@@ -21,6 +21,7 @@ import {
   defaultQuery,
   QueryExpression,
   EditorMode,
+  AutoCompleteQuery,
 } from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
@@ -294,6 +295,35 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   getDefaultEditorMode(): EditorMode {
     return this.defaultEditorMode;
   }
+
+  async autoCompleteQuery(query: AutoCompleteQuery, columns: AdxColumnSchema[] | undefined): Promise<string[]> {
+    const autoQuery = this.expressionParser.toAutoCompleteQuery(query, columns);
+
+    if (!autoQuery) {
+      return [];
+    }
+
+    const kustQuery: KustoQuery = {
+      ...defaultQuery,
+      refId: `adx-${autoQuery}`,
+      database: query.database,
+      rawMode: true,
+      query: autoQuery,
+      resultFormat: 'table',
+      querySource: 'autocomplete',
+    };
+
+    const response = await this.query(
+      includeTimeRange({
+        targets: [kustQuery],
+      }) as DataQueryRequest<KustoQuery>
+    ).toPromise();
+
+    if (!Array.isArray(response?.data) || response.data.length === 0) {
+      return [];
+    }
+    return response.data[0].fields[0].values.toArray();
+  }
 }
 
 const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchema[]> => {
@@ -339,4 +369,20 @@ const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]
       recordSchema(key, schema[name], result);
     }
   }
+};
+
+/**
+ * this is a suuuper ugly way of doing this.
+ */
+const includeTimeRange = (option: any): any => {
+  const range = (getTemplateSrv() as any)?.timeRange as TimeRange;
+
+  if (!range) {
+    return option;
+  }
+
+  return {
+    ...option,
+    range,
+  };
 };
