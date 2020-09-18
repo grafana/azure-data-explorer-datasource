@@ -1,10 +1,12 @@
 import { SelectableValue } from '@grafana/data';
+import { QueryEditorOperatorExpression } from 'editor/expressions';
 
 export type ExpressionSuggestor = (txt: string) => Promise<Array<SelectableValue<string>>>;
-export type SkippableExpressionSuggestor = (txt: string, column?: string) => Promise<Array<SelectableValue<string>>>;
+export type SkippableExpressionSuggestor = (
+  search: QueryEditorOperatorExpression
+) => Promise<Array<SelectableValue<string>>>;
 
 export type SearchExpressionSuggestor = (
-  index: number,
-  txt: string,
-  column?: string
+  index: string,
+  search: QueryEditorOperatorExpression
 ) => Promise<Array<SelectableValue<string>>>;

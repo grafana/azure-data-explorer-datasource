@@ -5,6 +5,7 @@ import {
   QueryEditorPropertyExpression,
   QueryEditorArrayExpression,
   QueryEditorExpressionType,
+  QueryEditorOperatorExpression,
 } from './editor/expressions';
 
 export interface QueryExpression {
@@ -27,11 +28,10 @@ export interface KustoQuery extends DataQuery {
 }
 
 export interface AutoCompleteQuery {
-  searchTerm?: string;
-  searchColumn?: string;
   database: string;
+  search: QueryEditorOperatorExpression;
   expression: QueryExpression;
-  whereIndex: number;
+  index: string;
 }
 
 export enum EditorMode {

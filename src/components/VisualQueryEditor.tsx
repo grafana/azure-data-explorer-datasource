@@ -8,6 +8,7 @@ import {
   QueryEditorPropertyExpression,
   QueryEditorExpression,
   QueryEditorArrayExpression,
+  QueryEditorOperatorExpression,
 } from 'editor/expressions';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import {
@@ -68,19 +69,17 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   }, [datasourceId, databaseName, tableName]);
 
   const onAutoComplete = useCallback(
-    async (index: number, searchTerm?: string, searchColumn?: string) => {
+    async (index: string, search: QueryEditorOperatorExpression) => {
       const values = await datasource.autoCompleteQuery(
         {
-          searchTerm: searchTerm,
-          searchColumn: searchColumn,
+          search,
           database: databaseName,
           expression: query.expression,
-          whereIndex: index,
+          index,
         },
         tableSchema.value
       );
-      // const autoComplete = new AdxAutoComplete(datasource, tableSchema.value, databaseName, tableName);
-      // const values = await autoComplete.search(searchTerm, column);
+
       return values.map(value => ({ value, label: value }));
     },
     [datasource, databaseName, tableSchema.value, query.expression]

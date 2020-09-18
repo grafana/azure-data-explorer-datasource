@@ -1,13 +1,21 @@
 import { QueryExpression, AdxColumnSchema, AutoCompleteQuery } from './types';
 import { QueryEditorPropertyType } from 'editor/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
-import { isReduceExpression, isFieldAndOperator, isGroupBy, isOrExpression, isAndExpression } from './editor/guards';
+import {
+  isReduceExpression,
+  isFieldAndOperator,
+  isGroupBy,
+  isOrExpression,
+  isAndExpression,
+  isArrayExpression,
+} from './editor/guards';
 import {
   QueryEditorExpression,
   QueryEditorOperatorExpression,
   QueryEditorArrayExpression,
   QueryEditorPropertyExpression,
 } from './editor/expressions';
+import { cloneDeep } from 'lodash';
 
 interface ParseContext {
   timeColumn?: string;
@@ -16,19 +24,40 @@ interface ParseContext {
 export class KustoExpressionParser {
   constructor(private limit: number = 10000, private templateSrv: TemplateSrv = getTemplateSrv()) {}
 
-  toAutoCompleteQuery(expression?: AutoCompleteQuery, tableSchema?: AdxColumnSchema[]): string {
-    return '';
+  toAutoCompleteQuery(query?: AutoCompleteQuery, tableSchema?: AdxColumnSchema[]): string {
+    if (!query?.expression || !query.expression.from || !query.search.property) {
+      return '';
+    }
+
+    const context: ParseContext = {
+      timeColumn: defaultTimeColumn(tableSchema, query?.expression),
+      castIfDynamic: (column: string) => castIfDynamic(column, tableSchema),
+    };
+
+    const parts: string[] = [];
+    this.appendProperty(context, query.expression.from, parts);
+    this.appendTimeFilter(context, parts);
+
+    const where = replaceByIndex(query.index, query.expression.where, query.search);
+    const column = query.search.property.name;
+    this.appendWhere(context, where, parts, 'where');
+
+    parts.push('take 50000');
+    parts.push(`distinct ${context.castIfDynamic(column)}`);
+    parts.push('take 251');
+
+    return parts.join('\n| ');
   }
 
   toQuery(expression?: QueryExpression, tableSchema?: AdxColumnSchema[]): string {
+    if (!expression || !expression.from) {
+      return '';
+    }
+
     const context: ParseContext = {
       timeColumn: defaultTimeColumn(tableSchema, expression),
       castIfDynamic: (column: string) => castIfDynamic(column, tableSchema),
     };
-
-    if (!expression || !expression.from) {
-      return '';
-    }
 
     const parts: string[] = [];
     this.appendProperty(context, expression.from, parts);
@@ -274,4 +303,35 @@ const toDynamic = (column: AdxColumnSchema): string => {
 
     return `todynamic(${result}.${part})`;
   }, '');
+};
+
+const replaceByIndex = (
+  index: string,
+  expression: QueryEditorArrayExpression,
+  operator: QueryEditorOperatorExpression
+): QueryEditorArrayExpression => {
+  const keys = index.split('-').map(n => parseInt(n, 10));
+
+  let where = cloneDeep(expression);
+  let current = where.expressions;
+
+  for (let index = 0; index < keys.length; index++) {
+    const key = keys[index];
+
+    if (index === keys.length - 1) {
+      current[key] = operator;
+      break;
+    }
+
+    if (Array.isArray(current)) {
+      const exp = current[key];
+
+      if (isArrayExpression(exp)) {
+        current = exp.expressions;
+        continue;
+      }
+    }
+  }
+
+  return where;
 };

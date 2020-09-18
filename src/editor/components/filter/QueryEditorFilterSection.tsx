@@ -33,8 +33,8 @@ export const QueryEditorFilterSection = (
   return props => {
     const styles = getStyles();
 
-    const getSuggestions = (index: number): SkippableExpressionSuggestor => {
-      return (txt: string, column?: string) => props.getSuggestions(index, txt, column);
+    const getSuggestions = (index: string): SkippableExpressionSuggestor => {
+      return (search: QueryEditorOperatorExpression) => props.getSuggestions(index, search);
     };
 
     if (props.value?.expressions?.length === 0) {
@@ -117,7 +117,7 @@ export const QueryEditorFilterSection = (
                           fields={props.fields}
                           templateVariableOptions={props.templateVariableOptions}
                           onChange={operatorProps.onChange}
-                          getSuggestions={getSuggestions(operatorProps.index)}
+                          getSuggestions={getSuggestions(`${filterProps.index}-${operatorProps.index}`)}
                         />
                         <div className={styles.spacing}>
                           <Button variant="secondary" onClick={operatorProps.onRemove} icon="minus" />

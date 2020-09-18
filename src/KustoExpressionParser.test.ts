@@ -10,15 +10,142 @@ import {
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
 } from './editor/expressions';
-import { AdxColumnSchema, defaultQuery, QueryExpression } from 'types';
+import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
 
 describe('KustoExpressionParser', () => {
   const limit = 1000;
   const templateSrv: TemplateSrv = { getVariables: jest.fn(), replace: jest.fn() };
   const parser = new KustoExpressionParser(limit, templateSrv);
 
-  describe('toAutoCompleteQuery', () => {
-    it('', () => {});
+  describe.only('toAutoCompleteQuery', () => {
+    it('should parse expression and exclude current filter index', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('eventType', '==', 'ThunderStorm'), createOperator('state', '==', '')]),
+      });
+
+      const acQuery: AutoCompleteQuery = {
+        expression,
+        search: createOperator('state', 'contains', 'TEXAS'),
+        index: '1',
+        database: 'Samples',
+      };
+
+      expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
+        'StormEvents' +
+          "\n| where eventType == 'ThunderStorm'" +
+          "\n| where state contains 'TEXAS'" +
+          '\n| take 50000' +
+          '\n| distinct state' +
+          '\n| take 251'
+      );
+    });
+
+    it('should parse expression and exclude current filter index when nested', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([
+          createOperator('eventType', '==', 'ThunderStorm'),
+          createArray(
+            [createOperator('state', '==', ''), createOperator('eventType', '==', 'Ligthning')],
+            QueryEditorExpressionType.Or
+          ),
+        ]),
+      });
+
+      const acQuery: AutoCompleteQuery = {
+        expression,
+        search: createOperator('state', 'contains', 'TEXAS'),
+        index: '1-0',
+        database: 'Samples',
+      };
+
+      expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
+        'StormEvents' +
+          "\n| where eventType == 'ThunderStorm'" +
+          "\n| where state contains 'TEXAS' or eventType == 'Ligthning'" +
+          '\n| take 50000' +
+          '\n| distinct state' +
+          '\n| take 251'
+      );
+    });
+
+    it('should parse expression and with search column being dynamic', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([
+          createOperator('eventType', '==', 'ThunderStorm'),
+          createArray(
+            [createOperator('column.type', '==', ''), createOperator('eventType', '==', 'Ligthning')],
+            QueryEditorExpressionType.Or
+          ),
+        ]),
+      });
+
+      const acQuery: AutoCompleteQuery = {
+        expression,
+        search: createOperator('column.type', 'contains', 'TEXAS'),
+        index: '1-0',
+        database: 'Samples',
+      };
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column.type',
+          CslType: 'string',
+        },
+      ];
+
+      expect(parser.toAutoCompleteQuery(acQuery, tableSchema)).toEqual(
+        'StormEvents' +
+          "\n| where eventType == 'ThunderStorm'" +
+          "\n| where column.type contains 'TEXAS' or eventType == 'Ligthning'" +
+          '\n| take 50000' +
+          '\n| distinct tostring(todynamic(column).type)' +
+          '\n| take 251'
+      );
+    });
+
+    it('should parse expression and use default time value as time filter', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([
+          createOperator('eventType', '==', 'ThunderStorm'),
+          createArray(
+            [createOperator('column.type', '==', ''), createOperator('eventType', '==', 'Ligthning')],
+            QueryEditorExpressionType.Or
+          ),
+        ]),
+      });
+
+      const acQuery: AutoCompleteQuery = {
+        expression,
+        search: createOperator('column.type', 'contains', 'TEXAS'),
+        index: '1-0',
+        database: 'Samples',
+      };
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column.type',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toAutoCompleteQuery(acQuery, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          "\n| where eventType == 'ThunderStorm'" +
+          "\n| where column.type contains 'TEXAS' or eventType == 'Ligthning'" +
+          '\n| take 50000' +
+          '\n| distinct tostring(todynamic(column).type)' +
+          '\n| take 251'
+      );
+    });
   });
 
   describe('toQuery', () => {
