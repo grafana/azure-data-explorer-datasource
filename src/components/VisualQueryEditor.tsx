@@ -8,6 +8,7 @@ import {
   QueryEditorPropertyExpression,
   QueryEditorExpression,
   QueryEditorArrayExpression,
+  QueryEditorOperatorExpression,
 } from 'editor/expressions';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import {
@@ -23,7 +24,6 @@ import { AdxSchemaResolver } from '../schema/AdxSchemaResolver';
 import { QueryEditorResultFormat, selectResultFormat } from '../components/QueryEditorResultFormat';
 import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { AdxAutoComplete } from '../schema/AdxAutoComplete';
 import { SchemaLoading, SchemaError, SchemaWarning } from '../components/SchemaMessages';
 import { getTemplateSrv } from '@grafana/runtime';
 
@@ -69,12 +69,20 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   }, [datasourceId, databaseName, tableName]);
 
   const onAutoComplete = useCallback(
-    async (searchTerm?: string, column?: string) => {
-      const autoComplete = new AdxAutoComplete(datasource, tableSchema.value, databaseName, tableName);
-      const values = await autoComplete.search(searchTerm, column);
+    async (index: string, search: QueryEditorOperatorExpression) => {
+      const values = await datasource.autoCompleteQuery(
+        {
+          search,
+          database: databaseName,
+          expression: query.expression,
+          index,
+        },
+        tableSchema.value
+      );
+
       return values.map(value => ({ value, label: value }));
     },
-    [datasource, databaseName, tableName, tableSchema.value]
+    [datasource, databaseName, tableSchema.value, query.expression]
   );
 
   const columns = useColumnOptions(tableSchema.value);
@@ -221,6 +229,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   }
 
   const styles = getStyles();
+  const groupBy = query.expression?.groupBy ?? defaultQuery.expression?.groupBy;
 
   return (
     <>
@@ -251,15 +260,13 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
         fields={columns}
         onChange={onReduceChange}
-        getSuggestions={onAutoComplete}
       />
       <KustoGroupByEditorSection
         templateVariableOptions={props.templateVariableOptions}
         label="Group by (summarize)"
-        value={query.expression?.groupBy ?? defaultQuery.expression?.groupBy}
+        value={groupBy}
         fields={groupable}
         onChange={onGroupByChange}
-        getSuggestions={onAutoComplete}
       />
       <div className={styles.query}>
         <TextArea cols={80} rows={8} value={props.query.query} disabled={true} />

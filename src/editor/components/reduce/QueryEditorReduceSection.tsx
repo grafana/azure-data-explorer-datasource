@@ -3,7 +3,6 @@ import { css } from 'emotion';
 import { QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { SelectableValue } from '@grafana/data';
-import { ExpressionSuggestor } from '../types';
 import { QueryEditorExpression, QueryEditorArrayExpression } from '../../expressions';
 import { isReduceExpression } from 'editor/guards';
 import { QueryEditorReduce } from './QueryEditorReduce';
@@ -19,7 +18,6 @@ export interface QueryEditorReduceSectionProps extends QueryEditorSectionProps {
   fields: QueryEditorPropertyDefinition[];
   templateVariableOptions: SelectableValue<string>;
   value: QueryEditorArrayExpression;
-  getSuggestions: ExpressionSuggestor;
   onChange: (value: QueryEditorArrayExpression) => void;
 }
 
