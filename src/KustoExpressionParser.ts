@@ -16,6 +16,7 @@ import {
   QueryEditorPropertyExpression,
 } from './editor/expressions';
 import { isArray } from 'lodash';
+import { VariableModel } from '@grafana/data';
 
 interface ParseContext {
   timeColumn?: string;
@@ -176,17 +177,31 @@ export class KustoExpressionParser {
       return `(${value.map(v => this.formatValue(v, type)).join(', ')})`;
     }
 
+    if (this.isTemplateVariable(value)) {
+      return value;
+    }
+
     switch (type) {
       case QueryEditorPropertyType.Number:
       case QueryEditorPropertyType.Boolean:
         return value;
       default:
-        return `"${value}"`;
+        return `'${value}'`;
     }
   }
 
   private appendProperty(context: ParseContext, expression: QueryEditorPropertyExpression, parts: string[]) {
     parts.push(expression.property.name);
+  }
+
+  private isTemplateVariable(value: string): boolean {
+    if (!Array.isArray(this.templateSrv.getVariables())) {
+      return false;
+    }
+
+    return !!this.templateSrv.getVariables().find((variable: any) => {
+      return `$${variable?.id}` === value;
+    });
   }
 
   // fromTable(expression?: QueryEditorExpression, interpolate = false): string {

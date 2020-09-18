@@ -8,7 +8,6 @@ export enum QueryEditorExpressionType {
   GroupBy = 'groupBy',
   Or = 'or',
   And = 'and',
-  Multiple = 'multiple',
 }
 export interface QueryEditorExpression {
   type: QueryEditorExpressionType;

@@ -25,7 +25,7 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where eventType == "ThunderStorm"' + `\n| take ${limit}`
+        'StormEvents' + "\n| where eventType == 'ThunderStorm'" + `\n| take ${limit}`
       );
     });
 
@@ -63,7 +63,7 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where events in ("triggered", "closed")' + `\n| take ${limit}`
+        'StormEvents' + "\n| where events in ('triggered', 'closed')" + `\n| take ${limit}`
       );
     });
 
@@ -79,7 +79,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression)).toEqual(
         'StormEvents' +
           '\n| where isActive == true' +
-          '\n| where events in ("triggered", "closed")' +
+          "\n| where events in ('triggered', 'closed')" +
           `\n| take ${limit}`
       );
     });
@@ -100,8 +100,8 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression)).toEqual(
         'StormEvents' +
           '\n| where isActive == true' +
-          '\n| where events in ("triggered", "closed")' +
-          '\n| where state == "TEXAS" or state == "FLORIDA"' +
+          "\n| where events in ('triggered', 'closed')" +
+          "\n| where state == 'TEXAS' or state == 'FLORIDA'" +
           `\n| take ${limit}`
       );
     });
@@ -112,7 +112,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([createOperator('isActive', '==', '')]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where isActive == ""' + `\n| take ${limit}`);
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where isActive == ''" + `\n| take ${limit}`);
     });
 
     it('should parse expression with time filter when schema contains time column', () => {
@@ -501,6 +501,50 @@ describe('KustoExpressionParser', () => {
         `\n| take ${limit}`
     );
   });
+
+  it('should parse expression with template variable', () => {
+    const templateSrv: TemplateSrv = {
+      getVariables: jest.fn().mockReturnValue([
+        {
+          id: 'country',
+          current: {
+            text: 'usa',
+            value: 'USA',
+          },
+          multi: false,
+        },
+      ]),
+      replace: jest.fn(),
+    };
+
+    const parser = new KustoExpressionParser(limit, templateSrv);
+
+    const expression = createQueryExpression({
+      from: createProperty('StormEvents'),
+      where: createArray([createOperator('column.country', '==', '$country')]),
+      groupBy: createArray([createGroupBy('column.type')]),
+    });
+
+    const tableSchema: AdxColumnSchema[] = [
+      {
+        Name: 'column.type',
+        CslType: 'string',
+      },
+      {
+        Name: 'StartTime',
+        CslType: 'datetime',
+      },
+    ];
+
+    expect(parser.toQuery(expression, tableSchema)).toEqual(
+      'StormEvents' +
+        '\n| where $__timeFilter(StartTime)' +
+        '\n| where column.country == $country' +
+        `\n| summarize by tostring(todynamic(column).type)` +
+        `\n| order by StartTime asc` +
+        `\n| take ${limit}`
+    );
+  });
 });
 
 const createGroupBy = (column: string, interval?: string): QueryEditorGroupByExpression => {
@@ -589,7 +633,7 @@ const valueToPropertyType = (value: any): QueryEditorPropertyType => {
 
 const createArray = (
   expressions: QueryEditorExpression[],
-  type: QueryEditorExpressionType = QueryEditorExpressionType.Multiple
+  type: QueryEditorExpressionType = QueryEditorExpressionType.And
 ): QueryEditorArrayExpression => {
   return {
     type,
