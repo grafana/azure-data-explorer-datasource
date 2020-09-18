@@ -63,8 +63,8 @@ export class KustoExpressionParser {
     this.appendProperty(context, expression.from, parts);
     this.appendTimeFilter(context, parts);
     this.appendWhere(context, expression?.where, parts, 'where');
-    this.appendSummarize(context, expression.reduce, expression.groupBy, parts);
     this.appendOrderBy(context, parts);
+    this.appendSummarize(context, expression.reduce, expression.groupBy, parts);
 
     if (parts.length === 0) {
       return '';
