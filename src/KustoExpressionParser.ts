@@ -64,6 +64,7 @@ export class KustoExpressionParser {
     this.appendTimeFilter(context, parts);
     this.appendWhere(context, expression?.where, parts, 'where');
     this.appendOrderBy(context, parts);
+    this.appendTimeshift(context, expression.timeshift, parts);
     this.appendSummarize(context, expression.reduce, expression.groupBy, parts);
 
     if (parts.length === 0) {
@@ -72,6 +73,24 @@ export class KustoExpressionParser {
 
     parts.push(`take ${this.limit}`);
     return parts.join('\n| ');
+  }
+
+  private appendTimeshift(
+    context: ParseContext,
+    timeshift: QueryEditorPropertyExpression | undefined,
+    parts: string[]
+  ) {
+    if (!timeshift || !context.timeColumn) {
+      return;
+    }
+
+    const timeshiftWith = timeshift.property.name;
+
+    if (!isValidTimeSpan(timeshiftWith)) {
+      return;
+    }
+
+    parts.push(`extend ${context.timeColumn} = ${context.timeColumn} - ${timeshiftWith}`);
   }
 
   private appendTimeFilter(context: ParseContext, parts: string[]) {
@@ -346,4 +365,8 @@ const replaceByIndex = (
   }
 
   return where;
+};
+
+const isValidTimeSpan = (value: string) => {
+  return /^(\d{1,15}(?:d|h|ms|s|m){0,1})$/gm.test(value);
 };

@@ -78,7 +78,7 @@ const useOnChange = (props: Props) => {
       let field: QueryEditorPropertyDefinition | undefined = props.fields.find(o => o.value === value);
 
       if (!field) {
-        field = props.templateVariableOptions?.options.find(o => o.value === value);
+        field = props.templateVariableOptions?.options?.find(o => o.value === value);
       }
 
       if (!field && value && props.allowCustom) {
