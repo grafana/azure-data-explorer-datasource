@@ -11,7 +11,21 @@ interface Props {
   getSuggestions: ExpressionSuggestor;
   templateVariableOptions: SelectableValue<string>;
 }
-export class QueryEditorSingleOperator extends PureComponent<Props> {
+
+interface State {
+  defaultOptions: Array<SelectableValue<string>>;
+  isLoading: boolean;
+}
+
+export class QueryEditorSingleOperator extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      defaultOptions: [props.templateVariableOptions],
+      isLoading: false,
+    };
+  }
+
   onChange = (evt: SelectableValue<any>) => {
     // Handle clearing the value
     if (evt === null) {
@@ -38,11 +52,20 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
   };
 
   getSuggestions = async (txt: string) => {
-    return this.props.getSuggestions(txt);
+    this.setState({ isLoading: true });
+
+    const options = await this.props.getSuggestions(txt);
+
+    this.setState({
+      defaultOptions: [this.props.templateVariableOptions, ...options],
+      isLoading: false,
+    });
+
+    return options;
   };
 
   render() {
-    const { value, templateVariableOptions } = this.props;
+    const { value } = this.props;
     const current = value
       ? {
           label: value,
@@ -55,7 +78,9 @@ export class QueryEditorSingleOperator extends PureComponent<Props> {
         width={30}
         placeholder="Start typing to add filters..."
         loadOptions={this.getSuggestions}
-        defaultOptions={[templateVariableOptions]}
+        onOpenMenu={() => this.getSuggestions(value ?? '')}
+        defaultOptions={this.state.defaultOptions}
+        isLoading={this.state.isLoading}
         value={current}
         onChange={this.onChange}
         onCreateOption={this.onCreate}

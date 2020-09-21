@@ -38,7 +38,7 @@ interface Props {
 
 export const VisualQueryEditor: React.FC<Props> = props => {
   const { query, database, datasource, schema, onChangeQuery } = props;
-  const { id: datasourceId, parseExpression, autoCompleteQuery } = datasource;
+  const { id: datasourceId, parseExpression } = datasource;
 
   const resultFormat = selectResultFormat(query.resultFormat);
   const databaseName = getTemplateSrv().replace(database);
@@ -71,7 +71,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
 
   const onAutoComplete = useCallback(
     async (index: string, search: QueryEditorOperatorExpression) => {
-      const values = await autoCompleteQuery(
+      const values = await datasource.autoCompleteQuery(
         {
           search,
           database: databaseName,
@@ -83,7 +83,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
 
       return values.map(value => ({ value, label: value }));
     },
-    [autoCompleteQuery, databaseName, tableSchema.value, query.expression]
+    [datasource, databaseName, tableSchema.value, query.expression]
   );
 
   const columns = useColumnOptions(tableSchema.value);
