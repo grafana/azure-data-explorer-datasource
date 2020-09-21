@@ -12,7 +12,20 @@ interface Props {
   templateVariableOptions: SelectableValue<string>;
 }
 
-export class QueryEditorMultiOperator extends PureComponent<Props> {
+interface State {
+  defaultOptions: Array<SelectableValue<string>>;
+  isLoading: boolean;
+}
+
+export class QueryEditorMultiOperator extends PureComponent<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      defaultOptions: [props.templateVariableOptions],
+      isLoading: false,
+    };
+  }
+
   onCreate = (value: string) => {
     if (!value) {
       return;
@@ -36,8 +49,17 @@ export class QueryEditorMultiOperator extends PureComponent<Props> {
     });
   };
 
-  getSuggestions = (txt: string) => {
-    return this.props.getSuggestions(txt);
+  getSuggestions = async (txt: string) => {
+    this.setState({ isLoading: true });
+
+    const options = await this.props.getSuggestions(txt);
+
+    this.setState({
+      defaultOptions: [this.props.templateVariableOptions, ...options],
+      isLoading: false,
+    });
+
+    return options;
   };
 
   render() {
@@ -49,9 +71,11 @@ export class QueryEditorMultiOperator extends PureComponent<Props> {
     return (
       <AsyncMultiSelect
         width={30}
-        defaultOptions={[this.props.templateVariableOptions]}
         placeholder="Start typing to add filters..."
         loadOptions={this.getSuggestions}
+        onOpenMenu={() => this.getSuggestions('')}
+        defaultOptions={this.state.defaultOptions}
+        isLoading={this.state.isLoading}
         value={current}
         onChange={this.onChange}
         onCreateOption={this.onCreate}
