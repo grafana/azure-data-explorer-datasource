@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import { css } from 'emotion';
-import { Select, stylesFactory } from '@grafana/ui';
+import { stylesFactory, AsyncSelect } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
+
 import { QueryEditorPropertyDefinition, QueryEditorProperty, QueryEditorPropertyType } from '../../types';
 
 interface Props {
@@ -21,21 +22,27 @@ export const definitionToProperty = (definition: QueryEditorPropertyDefinition):
 };
 
 export const QueryEditorField: React.FC<Props> = props => {
+  const { value: propsValue, fields, allowCustom, placeholder, templateVariableOptions } = props;
   const styles = getStyles();
   const onChange = useOnChange(props);
-  const options = useOptions(props.fields);
-  const value = props.value?.name;
+  const options = useOptions(fields);
+  const value = useMemo(() => options.find(option => option.value === propsValue?.name), [options, propsValue]);
+  const loadOptions = useMemo(() => filterOptions(options, templateVariableOptions), [
+    options,
+    templateVariableOptions,
+  ]);
 
   return (
     <div className={styles.container}>
-      <Select
+      <AsyncSelect
         width={30}
         onChange={onChange}
         value={value}
-        options={props.templateVariableOptions ? [props.templateVariableOptions, ...options] : options}
-        placeholder={props.placeholder}
+        defaultOptions={options}
+        loadOptions={loadOptions}
+        placeholder={placeholder}
         menuPlacement="bottom"
-        allowCustomValue={props.allowCustom}
+        allowCustomValue={allowCustom}
       />
     </div>
   );
@@ -67,7 +74,7 @@ const useOptions = (options: QueryEditorPropertyDefinition[]): Array<SelectableV
   }, [options]);
 };
 
-const useOnChange = (props: Props) => {
+const useOnChange = ({ fields, allowCustom, templateVariableOptions, onChange }: Props) => {
   return useCallback(
     (selectable: SelectableValue<string>) => {
       if (!selectable || typeof selectable.value !== 'string') {
@@ -75,13 +82,13 @@ const useOnChange = (props: Props) => {
       }
 
       const { value } = selectable;
-      let field: QueryEditorPropertyDefinition | undefined = props.fields.find(o => o.value === value);
+      let field: QueryEditorPropertyDefinition | undefined = fields.find(o => o.value === value);
 
       if (!field) {
-        field = props.templateVariableOptions?.options?.find(o => o.value === value);
+        field = templateVariableOptions?.options?.find(o => o.value === value);
       }
 
-      if (!field && value && props.allowCustom) {
+      if (!field && value && allowCustom) {
         field = {
           value,
           type: QueryEditorPropertyType.String,
@@ -89,12 +96,24 @@ const useOnChange = (props: Props) => {
       }
 
       if (field) {
-        props.onChange({
+        onChange({
           name: field.value,
           type: field.type,
         });
       }
     },
-    [props]
+    [fields, onChange, templateVariableOptions, allowCustom]
   );
+};
+
+export const filterOptions = (
+  options: Array<SelectableValue<string>>,
+  templateVariableOptions?: SelectableValue<string>
+) => async (textSearchingFor: string) => {
+  const text = textSearchingFor.toLowerCase();
+  const allOptions = templateVariableOptions ? [templateVariableOptions, ...options] : options;
+  const exactMatchOptions = allOptions.filter(option => option.label?.toLowerCase().startsWith(text));
+  const anyMatchOptions = allOptions.filter(option => option.label?.toLowerCase().indexOf(text, 1) !== -1);
+
+  return exactMatchOptions.concat(anyMatchOptions);
 };
