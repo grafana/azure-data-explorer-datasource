@@ -19,7 +19,7 @@ describe('KustoExpressionParser', () => {
   const parser = new KustoExpressionParser(limit, templateSrv);
 
   describe('toAutoCompleteQuery', () => {
-    it('should parse expression and exclude current filter index', () => {
+    it('should parse expression with isnotempty function', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createArray([createOperator('eventType', '==', '')]),
