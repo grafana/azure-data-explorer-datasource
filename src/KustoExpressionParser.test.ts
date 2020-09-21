@@ -22,6 +22,24 @@ describe('KustoExpressionParser', () => {
     it('should parse expression and exclude current filter index', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
+        where: createArray([createOperator('eventType', '==', '')]),
+      });
+
+      const acQuery: AutoCompleteQuery = {
+        expression,
+        search: createOperator('eventType', 'isnotempty', ''),
+        index: '0',
+        database: 'Samples',
+      };
+
+      expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
+        'StormEvents' + '\n| where isnotempty(eventType)' + '\n| take 50000' + '\n| distinct eventType' + '\n| take 251'
+      );
+    });
+
+    it('should parse expression and exclude current filter index', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
         where: createArray([createOperator('eventType', '==', 'ThunderStorm'), createOperator('state', '==', '')]),
       });
 
@@ -856,6 +874,28 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           "\n| where country == 'sweden'" +
+          `\n| order by StartTime asc` +
+          `\n| take ${limit}`
+      );
+    });
+
+    it('should parse expression with isnotempty operator', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('country', 'isnotempty', '')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| where isnotempty(country)' +
           `\n| order by StartTime asc` +
           `\n| take ${limit}`
       );
