@@ -90,20 +90,12 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
 
   getSuggestions = debounce(
     async (txt: string) => {
-      console.log('asdf', this.props.value);
-      console.log('txt', txt);
       if (!this.props.value) {
         return [];
       }
 
-      const results = await this.props.getSuggestions({
-        type: QueryEditorExpressionType.Operator,
-        property: this.props.value?.property,
-        operator: {
-          name: 'contains',
-          value: txt,
-        },
-      });
+      const filter = createFilter(this.props.value.property, txt);
+      const results = await this.props.getSuggestions(filter);
 
       if (Array.isArray(this.props.templateVariableOptions?.options)) {
         const variables = this.props.templateVariableOptions.options.filter(v => {
@@ -118,7 +110,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
 
       return results;
     },
-    750,
+    800,
     { leading: false }
   );
 
@@ -161,3 +153,25 @@ const getStyles = stylesFactory(() => {
     `,
   };
 });
+
+const createFilter = (property: QueryEditorProperty, value: string): QueryEditorOperatorExpression => {
+  if (!value) {
+    return {
+      type: QueryEditorExpressionType.Operator,
+      property: property,
+      operator: {
+        name: 'isnotempty',
+        value,
+      },
+    };
+  }
+
+  return {
+    type: QueryEditorExpressionType.Operator,
+    property: property,
+    operator: {
+      name: 'contains',
+      value,
+    },
+  };
+};
