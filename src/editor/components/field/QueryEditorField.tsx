@@ -43,6 +43,7 @@ export const QueryEditorField: React.FC<Props> = props => {
         placeholder={placeholder}
         menuPlacement="bottom"
         allowCustomValue={allowCustom}
+        backspaceRemovesValue={true}
       />
     </div>
   );
@@ -114,6 +115,8 @@ export const filterOptions = (
   const allOptions = templateVariableOptions ? [templateVariableOptions, ...options] : options;
   const exactMatchOptions = allOptions.filter(option => option.label?.toLowerCase().startsWith(text));
   const anyMatchOptions = allOptions.filter(option => option.label?.toLowerCase().indexOf(text, 1) !== -1);
+  const sortedOptions = exactMatchOptions.concat(anyMatchOptions);
+  const uniqueOptions = [...new Set(sortedOptions)];
 
-  return exactMatchOptions.concat(anyMatchOptions);
+  return uniqueOptions;
 };
