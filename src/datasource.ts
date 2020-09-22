@@ -27,6 +27,7 @@ import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
+import { QueryEditorOperator } from 'editor/types';
 import { cache } from 'schema/cache';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 
@@ -51,6 +52,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.expressionParser = new KustoExpressionParser(takeLimit, this.templateSrv);
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
     this.parseExpression = this.parseExpression.bind(this);
+    this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
   }
 
   /**
@@ -322,7 +324,11 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     if (!Array.isArray(response?.data) || response.data.length === 0) {
       return [];
     }
-    return response.data[0].fields[0].values.toArray();
+
+    const results = response.data[0].fields[0].values.toArray();
+    const operator: QueryEditorOperator<string> = query.search.operator as QueryEditorOperator<string>; // why is this always T = QueryEditorOperatorValueType
+
+    return operator.name === 'contains' ? sortStartsWithValuesFirst(results, operator.value) : results;
   }
 }
 
@@ -389,4 +395,57 @@ const includeTimeRange = (option: any): any => {
 
 const escapeSpecial = (value: string): string => {
   return value.replace(/\'/gim, "\\'");
+};
+
+export const sortStartsWithValuesFirst = (arr: string[], searchText: string) => {
+  const text = searchText.toLowerCase();
+
+  arr.sort((a, b) => {
+    if (!a && !b) {
+      return 0;
+    }
+
+    if (!a && b) {
+      return -1;
+    }
+
+    if (a && !b) {
+      return 1;
+    }
+
+    const aLower = a.toLowerCase();
+    const bLower = b.toLowerCase();
+
+    if (aLower.startsWith(text) && bLower.startsWith(text)) {
+      return 0;
+    }
+
+    if (aLower.startsWith(text) && !bLower.startsWith(text) && bLower.includes(text, 1)) {
+      return -1;
+    }
+
+    if (aLower.startsWith(text) && !bLower.includes(text, 1)) {
+      return -1;
+    }
+
+    if (!aLower.startsWith(text) && aLower.includes(text, 1) && bLower.startsWith(text)) {
+      return 1;
+    }
+
+    if (!aLower.includes(text, 1) && bLower.startsWith(text)) {
+      return 1;
+    }
+
+    if (aLower.includes(text, 1) && !bLower.includes(text, 1)) {
+      return -1;
+    }
+
+    if (!aLower.includes(text, 1) && bLower.includes(text, 1)) {
+      return 1;
+    }
+
+    return 0;
+  });
+
+  return arr;
 };
