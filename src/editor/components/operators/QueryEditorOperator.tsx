@@ -159,6 +159,24 @@ const getStyles = stylesFactory(() => {
   return {
     container: css`
       margin-right: 4px;
+      /* when Grafanas Select has labels */
+      div[class*='grafana-select-option-description'] {
+        white-space: nowrap;
+      }
+      /* fallback until Grafanas Select has labels */
+      [aria-label*='Select options menu'] {
+        div {
+          div {
+            div {
+              div {
+                div {
+                  white-space: nowrap;
+                }
+              }
+            }
+          }
+        }
+      }
     `,
   };
 });
