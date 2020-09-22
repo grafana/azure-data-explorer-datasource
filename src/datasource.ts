@@ -51,6 +51,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.expressionParser = new KustoExpressionParser(takeLimit, this.templateSrv);
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
     this.parseExpression = this.parseExpression.bind(this);
+    this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
   }
 
   /**
