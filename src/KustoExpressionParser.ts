@@ -226,6 +226,11 @@ export class KustoExpressionParser {
     prefix?: string
   ) {
     const { property, operator } = expression;
+
+    if (!property.name || !operator.name) {
+      return;
+    }
+
     const value = this.formatValue(operator.value, property.type);
     parts.push(withPrefix(`${property.name} ${operator.name} ${value}`, prefix));
   }
