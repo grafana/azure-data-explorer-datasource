@@ -24,7 +24,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	}
 
 	cs := azuredx.NewCacheSettings(client, &q, qm)
-	qm.MacroData = azuredx.NewMacroData(cs.TimeRange, q.Interval.Microseconds())
+	qm.MacroData = azuredx.NewMacroData(cs.TimeRange, q.Interval.Milliseconds())
 
 	if err := qm.Interpolate(); err != nil {
 		resp.Error = err

@@ -3,13 +3,14 @@ package azuredx
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
 const cacheMinAge = time.Duration(10 * time.Second)
-const cacheMaxAge = time.Hour
+const day = time.Hour * 24
 
 // CacheSettings is use to enable caching on a per query basis
 type CacheSettings struct {
@@ -19,6 +20,12 @@ type CacheSettings struct {
 
 // NewCacheSettings is used to detect what cache settings is applicable for the current query.
 func NewCacheSettings(c *Client, q *backend.DataQuery, qm *QueryModel) *CacheSettings {
+	return newCacheSettings(c, q, qm, time.Since)
+}
+
+type timeSince = func(t time.Time) time.Duration
+
+func newCacheSettings(c *Client, q *backend.DataQuery, qm *QueryModel, ts timeSince) *CacheSettings {
 	if !c.DynamicCaching {
 		return &CacheSettings{
 			CacheMaxAge: c.CacheMaxAge,
@@ -26,16 +33,13 @@ func NewCacheSettings(c *Client, q *backend.DataQuery, qm *QueryModel) *CacheSet
 		}
 	}
 
-	resolution, err := detectBinSize(qm.Query, q.Interval)
-	if err != nil {
-		resolution = detectResolution(&q.TimeRange)
-	}
-
-	maxAge := adjustToMaxMinLimits(resolution)
+	resolution := detectResolution(qm.Query, q.Interval)
+	expandedTR := expandTimeRange(&q.TimeRange, resolution)
+	maxAge := calculateCacheMaxAge(resolution, expandedTR, ts)
 
 	return &CacheSettings{
-		CacheMaxAge: fmt.Sprintf("%vs", maxAge.Seconds()),
-		TimeRange:   expandTimeRange(&q.TimeRange, maxAge),
+		CacheMaxAge: formatDuration(maxAge),
+		TimeRange:   expandedTR,
 	}
 }
 
@@ -64,25 +68,22 @@ func expandTo(to time.Time, d time.Duration) time.Time {
 	return expanded
 }
 
-func adjustToMaxMinLimits(resolution time.Duration) time.Duration {
-	if resolution > cacheMaxAge {
-		return cacheMaxAge
-	}
-	if resolution < cacheMinAge {
-		return cacheMinAge
-	}
-	return resolution
-}
+func calculateCacheMaxAge(resolution time.Duration, tr *backend.TimeRange, since timeSince) time.Duration {
+	adjustedResolution := resolution / 2
+	fromOffset := since(tr.To).Round(cacheMinAge)
 
-func detectResolution(tr *backend.TimeRange) time.Duration {
-	diff := tr.To.Sub(tr.From)
-
-	if diff > time.Hour*24*7*4 {
-		return cacheMaxAge
+	if adjustedResolution > cacheMinAge {
+		if adjustedResolution >= fromOffset {
+			return adjustedResolution
+		}
+		return fromOffset
 	}
 
-	if diff > time.Hour {
-		return time.Minute
+	if fromOffset > cacheMinAge {
+		if fromOffset >= adjustedResolution {
+			return fromOffset
+		}
+		return adjustedResolution
 	}
 
 	return cacheMinAge
@@ -90,22 +91,57 @@ func detectResolution(tr *backend.TimeRange) time.Duration {
 
 // binSizeRE finds the bin size of a query by looking at the summarize statement
 // e.g. summarize avg(Column), count(Column) by bin(TimeColumn, 1d)
-var binSizeRE = regexp.MustCompile(`summarize [\w\$\(\)\.,\s]+ by bin\([\w\$\(\)\.]+, ` +
+var binSizeRE = regexp.MustCompile(`by bin\([\w\$\(\)\.]+, ` +
 	`((?:\$__\w+)|(?:\d{1,10}(?:h|m|ms)?))\)`) // in format e.g. $__timeInterval, 1d, 1h, 1s, 1m or 1ms
 
-func detectBinSize(query string, interval time.Duration) (time.Duration, error) {
+func detectResolution(query string, interval time.Duration) time.Duration {
 	match := binSizeRE.FindStringSubmatch(query)
 	if len(match) != 2 {
-		return cacheMinAge, fmt.Errorf("failed to detect bin size, errors: missing summarize/by bin statement")
+		return intevalOrDefault(interval)
 	}
 
 	if macroRE.MatchString(match[1]) {
-		return interval, nil
+		return intevalOrDefault(interval)
 	}
 
 	d, err := time.ParseDuration(match[1])
 	if err != nil {
-		return cacheMinAge, fmt.Errorf("failed to detect bin size, errors: '%v'", err)
+		return intevalOrDefault(interval)
 	}
-	return d, nil
+
+	if d <= interval {
+		return intevalOrDefault(interval)
+	}
+	return d
+}
+
+func intevalOrDefault(interval time.Duration) time.Duration {
+	if interval.Milliseconds() == 0 {
+		return time.Millisecond * 1000 // default to 1000ms
+	}
+	return interval
+}
+
+func formatDuration(d time.Duration) string {
+	var b strings.Builder
+
+	days := d / day
+	d -= days * day
+
+	hours := d / time.Hour
+	d -= hours * time.Hour
+
+	minutes := d / time.Minute
+	d -= minutes * time.Minute
+
+	seconds := d / time.Second
+	d -= seconds / time.Second
+
+	if days <= 0 {
+		fmt.Fprintf(&b, "%02d:%02d:%02d", hours, minutes, seconds)
+	} else {
+		fmt.Fprintf(&b, "%d.%02d:%02d:%02d", days, hours, minutes, seconds)
+	}
+
+	return b.String()
 }
