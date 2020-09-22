@@ -201,6 +201,10 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
         .withLabel('Count')
         .add();
 
+      functions('dcount')
+        .withLabel('dcount')
+        .add();
+
       functions('max')
         .withLabel('Max')
         .add();
