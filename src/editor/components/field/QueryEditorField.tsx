@@ -44,6 +44,7 @@ export const QueryEditorField: React.FC<Props> = props => {
         menuPlacement="bottom"
         allowCustomValue={allowCustom}
         backspaceRemovesValue={true}
+        isClearable={true}
       />
     </div>
   );
@@ -79,6 +80,9 @@ const useOnChange = ({ fields, allowCustom, templateVariableOptions, onChange }:
   return useCallback(
     (selectable: SelectableValue<string>) => {
       if (!selectable || typeof selectable.value !== 'string') {
+        const name: any = null;
+        const type = QueryEditorPropertyType.String;
+        onChange({ name, type });
         return;
       }
 
