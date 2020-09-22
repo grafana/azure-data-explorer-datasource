@@ -860,6 +860,55 @@ describe('KustoExpressionParser', () => {
           `\n| take ${limit}`
       );
     });
+
+    it('should parse expression with dcount reduce function', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('country', '==', 'sweden')]),
+        reduce: createArray([createReduce('country', 'dcount')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          "\n| where country == 'sweden'" +
+          `\n| order by StartTime asc` +
+          '\n| summarize dcount(country)' +
+          `\n| take ${limit}`
+      );
+    });
+
+    it('should parse expression with dcount reduce function with group by', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('country', '==', 'sweden')]),
+        reduce: createArray([createReduce('country', 'dcount')]),
+        groupBy: createArray([createGroupBy('continents')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          "\n| where country == 'sweden'" +
+          `\n| order by StartTime asc` +
+          '\n| summarize dcount(country) by continents' +
+          `\n| take ${limit}`
+      );
+    });
   });
 });
 
