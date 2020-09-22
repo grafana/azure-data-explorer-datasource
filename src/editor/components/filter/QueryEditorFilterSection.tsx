@@ -3,7 +3,7 @@ import { css } from 'emotion';
 import { QueryEditorOperatorDefinition, QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorSectionProps, QueryEditorSection } from '../QueryEditorSection';
 import { SelectableValue } from '@grafana/data';
-import { SkippableExpressionSuggestor } from '../types';
+import { SearchExpressionSuggestor, SkippableExpressionSuggestor } from '../types';
 import {
   QueryEditorArrayExpression,
   QueryEditorOperatorExpression,
@@ -24,7 +24,7 @@ export interface QueryEditorFilterSectionProps extends QueryEditorSectionProps {
   templateVariableOptions: SelectableValue<string>;
   value: QueryEditorArrayExpression;
   onChange: (value: QueryEditorArrayExpression) => void;
-  getSuggestions: SkippableExpressionSuggestor;
+  getSuggestions: SearchExpressionSuggestor;
 }
 
 export const QueryEditorFilterSection = (
@@ -32,6 +32,10 @@ export const QueryEditorFilterSection = (
 ): React.FC<QueryEditorFilterSectionProps> => {
   return props => {
     const styles = getStyles();
+
+    const getSuggestions = (index: string): SkippableExpressionSuggestor => {
+      return (search: QueryEditorOperatorExpression) => props.getSuggestions(index, search);
+    };
 
     if (props.value?.expressions?.length === 0) {
       return (
@@ -113,7 +117,7 @@ export const QueryEditorFilterSection = (
                           fields={props.fields}
                           templateVariableOptions={props.templateVariableOptions}
                           onChange={operatorProps.onChange}
-                          getSuggestions={props.getSuggestions}
+                          getSuggestions={getSuggestions(`${filterProps.index}-${operatorProps.index}`)}
                         />
                         <div className={styles.spacing}>
                           <Button variant="secondary" onClick={operatorProps.onRemove} icon="minus" />

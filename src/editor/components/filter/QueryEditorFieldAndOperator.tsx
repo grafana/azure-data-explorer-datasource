@@ -12,7 +12,7 @@ import {
 import { QueryEditorField } from '../field/QueryEditorField';
 import { QueryEditorOperatorComponent, definitionToOperator } from '../operators/QueryEditorOperator';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorOperatorExpression } from '../../expressions';
+import { QueryEditorExpressionType, QueryEditorOperatorExpression } from '../../expressions';
 import { parseOperatorValue } from '../operators/parser';
 import debounce from 'debounce-promise';
 
@@ -90,8 +90,18 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
 
   getSuggestions = debounce(
     async (txt: string) => {
-      const column = this.props.value?.property.name;
-      const results = await this.props.getSuggestions(txt, column);
+      if (!this.props.value) {
+        return [];
+      }
+
+      const results = await this.props.getSuggestions({
+        type: QueryEditorExpressionType.Operator,
+        property: this.props.value?.property,
+        operator: {
+          name: 'contains',
+          value: txt,
+        },
+      });
 
       if (Array.isArray(this.props.templateVariableOptions?.options)) {
         const variables = this.props.templateVariableOptions.options.filter(v => {
@@ -106,7 +116,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
 
       return results;
     },
-    500,
+    750,
     { leading: false }
   );
 

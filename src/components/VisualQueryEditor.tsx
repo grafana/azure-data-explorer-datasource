@@ -8,10 +8,11 @@ import {
   QueryEditorPropertyExpression,
   QueryEditorExpression,
   QueryEditorArrayExpression,
+  QueryEditorOperatorExpression,
 } from 'editor/expressions';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import {
-  KustoFromEditorSection,
+  KustoPropertyEditorSection,
   KustoWhereEditorSection,
   KustoValueColumnEditorSection,
   KustoGroupByEditorSection,
@@ -23,7 +24,6 @@ import { AdxSchemaResolver } from '../schema/AdxSchemaResolver';
 import { QueryEditorResultFormat, selectResultFormat } from '../components/QueryEditorResultFormat';
 import { TextArea, stylesFactory } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { AdxAutoComplete } from '../schema/AdxAutoComplete';
 import { SchemaLoading, SchemaError, SchemaWarning } from '../components/SchemaMessages';
 import { getTemplateSrv } from '@grafana/runtime';
 
@@ -37,13 +37,15 @@ interface Props {
 }
 
 export const VisualQueryEditor: React.FC<Props> = props => {
-  const { query, database, datasource, schema } = props;
+  const { query, database, datasource, schema, onChangeQuery } = props;
+  const { id: datasourceId, parseExpression, autoCompleteQuery } = datasource;
 
   const resultFormat = selectResultFormat(query.resultFormat);
   const databaseName = getTemplateSrv().replace(database);
   const tables = useTableOptions(schema, databaseName);
   const table = useSelectedTable(tables, query, datasource);
   const tableName = getTemplateSrv().replace(table?.property.name ?? '');
+  const timeshiftOptions = useTimeshiftOptions();
 
   const tableSchema = useAsync(async () => {
     if (!table || !table.property) {
@@ -53,11 +55,11 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     const schema = await getTableSchema(datasource, databaseName, tableName);
     const from = query.expression.from ?? table;
 
-    props.onChangeQuery({
-      ...props.query,
-      query: datasource.parseExpression(
+    onChangeQuery({
+      ...query,
+      query: parseExpression(
         {
-          ...props.query.expression,
+          ...query.expression,
           from,
         },
         schema
@@ -65,15 +67,23 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     });
 
     return schema;
-  }, [datasource.id, databaseName, tableName]);
+  }, [datasourceId, databaseName, tableName]);
 
   const onAutoComplete = useCallback(
-    async (searchTerm?: string, column?: string) => {
-      const autoComplete = new AdxAutoComplete(datasource, tableSchema.value, databaseName, tableName);
-      const values = await autoComplete.search(searchTerm, column);
+    async (index: string, search: QueryEditorOperatorExpression) => {
+      const values = await autoCompleteQuery(
+        {
+          search,
+          database: databaseName,
+          expression: query.expression,
+          index,
+        },
+        tableSchema.value
+      );
+
       return values.map(value => ({ value, label: value }));
     },
-    [datasource, databaseName, tableName, tableSchema.value]
+    [autoCompleteQuery, databaseName, tableSchema.value, query.expression]
   );
 
   const columns = useColumnOptions(tableSchema.value);
@@ -90,94 +100,117 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         from: expression,
       };
 
-      props.onChangeQuery({
-        ...props.query,
+      onChangeQuery({
+        ...query,
         resultFormat: resultFormat,
         database: database,
         expression: next,
       });
     },
-    [props.onChangeQuery, props.query, resultFormat, database]
+    [onChangeQuery, query, resultFormat, database, table]
   );
 
   const onWhereChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
       const next = {
-        ...props.query.expression,
+        ...query.expression,
         from: table,
         where: expression,
       };
 
-      props.onChangeQuery({
-        ...props.query,
+      onChangeQuery({
+        ...query,
         resultFormat: resultFormat,
         database: database,
         expression: next,
-        query: datasource.parseExpression(next, tableSchema.value),
+        query: parseExpression(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
+    [onChangeQuery, query, tableSchema.value, resultFormat, database, table, parseExpression]
   );
 
   const onReduceChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
       const next = {
-        ...props.query.expression,
+        ...query.expression,
         from: table,
         reduce: expression,
       };
 
-      props.onChangeQuery({
-        ...props.query,
+      onChangeQuery({
+        ...query,
         resultFormat: resultFormat,
         database: database,
         expression: next,
-        query: datasource.parseExpression(next, tableSchema.value),
+        query: parseExpression(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
+    [onChangeQuery, query, tableSchema.value, resultFormat, database, table, parseExpression]
   );
 
   const onGroupByChange = useCallback(
     (expression: QueryEditorArrayExpression) => {
       const next = {
-        ...props.query.expression,
+        ...query.expression,
         from: table,
         groupBy: expression,
       };
 
-      props.onChangeQuery({
-        ...props.query,
+      onChangeQuery({
+        ...query,
         resultFormat: resultFormat,
         database: database,
         expression: next,
-        query: datasource.parseExpression(next, tableSchema.value),
+        query: parseExpression(next, tableSchema.value),
       });
     },
-    [props.onChangeQuery, props.query, tableSchema.value, resultFormat, database, table]
+    [onChangeQuery, query, tableSchema.value, resultFormat, database, table, parseExpression]
   );
 
   const onChangeResultFormat = useCallback(
     (format: string) => {
       const next = {
-        ...props.query.expression,
+        ...query.expression,
         from: table,
       };
 
-      props.onChangeQuery({
+      onChangeQuery({
         ...query,
         expression: next,
         database: database,
         resultFormat: format,
       });
     },
-    [props.onChangeQuery, table, database]
+    [onChangeQuery, table, database, query]
+  );
+
+  const onChangeTimeshift = useCallback(
+    (expression: QueryEditorExpression) => {
+      if (!isFieldExpression(expression) || !table) {
+        return;
+      }
+
+      const next = {
+        ...defaultQuery.expression,
+        ...query.expression,
+        from: table,
+        timeshift: expression,
+      };
+
+      onChangeQuery({
+        ...query,
+        resultFormat: resultFormat,
+        database: database,
+        expression: next,
+      });
+    },
+    [onChangeQuery, query, resultFormat, database, table]
   );
 
   if (tableSchema.loading) {
     return (
       <>
-        <KustoFromEditorSection
+        <KustoPropertyEditorSection
           templateVariableOptions={props.templateVariableOptions}
           label="From"
           value={table}
@@ -192,7 +225,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   if (tableSchema.error) {
     return (
       <>
-        <KustoFromEditorSection
+        <KustoPropertyEditorSection
           templateVariableOptions={props.templateVariableOptions}
           label="From"
           value={table}
@@ -207,7 +240,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
   if (tableSchema.value?.length === 0) {
     return (
       <>
-        <KustoFromEditorSection
+        <KustoPropertyEditorSection
           templateVariableOptions={props.templateVariableOptions}
           label="From"
           value={table}
@@ -223,7 +256,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
 
   return (
     <>
-      <KustoFromEditorSection
+      <KustoPropertyEditorSection
         templateVariableOptions={props.templateVariableOptions}
         label="From"
         value={table}
@@ -235,7 +268,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
           includeAdxTimeFormat={false}
           onChangeFormat={onChangeResultFormat}
         />
-      </KustoFromEditorSection>
+      </KustoPropertyEditorSection>
       <KustoWhereEditorSection
         templateVariableOptions={props.templateVariableOptions}
         label="Where (filter)"
@@ -250,7 +283,6 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
         fields={columns}
         onChange={onReduceChange}
-        getSuggestions={onAutoComplete}
       />
       <KustoGroupByEditorSection
         templateVariableOptions={props.templateVariableOptions}
@@ -258,7 +290,15 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         value={query.expression?.groupBy ?? defaultQuery.expression?.groupBy}
         fields={groupable}
         onChange={onGroupByChange}
-        getSuggestions={onAutoComplete}
+      />
+      <hr />
+      <KustoPropertyEditorSection
+        templateVariableOptions={[]}
+        label="Timeshift"
+        value={query.expression?.timeshift ?? defaultQuery.expression?.timeshift}
+        fields={timeshiftOptions}
+        onChange={onChangeTimeshift}
+        allowCustom={true}
       />
       <div className={styles.query}>
         <TextArea cols={80} rows={8} value={props.query.query} disabled={true} />
@@ -356,3 +396,30 @@ async function getTableSchema(datasource: AdxDataSource, databaseName: string, t
   const schemaResolver = new AdxSchemaResolver(datasource);
   return await schemaResolver.getColumnsForTable(databaseName, tableName);
 }
+
+const useTimeshiftOptions = (): QueryEditorPropertyDefinition[] => {
+  return useMemo((): QueryEditorPropertyDefinition[] => {
+    return [
+      {
+        label: 'No timeshift',
+        value: '',
+        type: QueryEditorPropertyType.TimeSpan,
+      },
+      {
+        label: 'Hour before',
+        value: '1h',
+        type: QueryEditorPropertyType.TimeSpan,
+      },
+      {
+        label: 'Day before',
+        value: '1d',
+        type: QueryEditorPropertyType.TimeSpan,
+      },
+      {
+        label: 'Week before',
+        value: '7d',
+        type: QueryEditorPropertyType.TimeSpan,
+      },
+    ];
+  }, []);
+};

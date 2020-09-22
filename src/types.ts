@@ -5,6 +5,7 @@ import {
   QueryEditorPropertyExpression,
   QueryEditorArrayExpression,
   QueryEditorExpressionType,
+  QueryEditorOperatorExpression,
 } from './editor/expressions';
 
 export interface QueryExpression {
@@ -12,6 +13,7 @@ export interface QueryExpression {
   where: QueryEditorArrayExpression;
   reduce: QueryEditorArrayExpression;
   groupBy: QueryEditorArrayExpression;
+  timeshift?: QueryEditorPropertyExpression;
 }
 
 type QuerySource = 'raw' | 'schema' | 'autocomplete' | 'visual';
@@ -26,9 +28,21 @@ export interface KustoQuery extends DataQuery {
   pluginVersion: string;
 }
 
+export interface AutoCompleteQuery {
+  database: string;
+  search: QueryEditorOperatorExpression;
+  expression: QueryExpression;
+  index: string;
+}
+
+export enum EditorMode {
+  Visual = 'visual',
+  Raw = 'raw',
+}
+
 export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource' | 'pluginVersion'> = {
   query: '',
-  querySource: 'raw',
+  querySource: EditorMode.Raw,
   expression: {
     where: {
       type: QueryEditorExpressionType.And,
@@ -50,6 +64,7 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   defaultDatabase: string;
   minimalCache: number;
   defaultTakeLimit: number;
+  defaultEditorMode: EditorMode;
 }
 
 export interface AdxSchema {

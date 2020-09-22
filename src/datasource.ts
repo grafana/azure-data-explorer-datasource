@@ -13,11 +13,21 @@ import {
 import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
-import { AdxDataSourceOptions, KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery, QueryExpression } from './types';
+import {
+  AdxDataSourceOptions,
+  KustoQuery,
+  AdxSchema,
+  AdxColumnSchema,
+  defaultQuery,
+  QueryExpression,
+  EditorMode,
+  AutoCompleteQuery,
+} from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
+import { QueryEditorOperator } from 'editor/types';
 import { cache } from 'schema/cache';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 
@@ -28,16 +38,21 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private defaultOrFirstDatabase: string;
   private url?: string;
   private expressionParser: KustoExpressionParser;
+  private defaultEditorMode: EditorMode;
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
 
+    const takeLimit = instanceSettings.jsonData.defaultTakeLimit ?? 10000;
     this.backendSrv = getBackendSrv();
     this.templateSrv = getTemplateSrv();
     this.baseUrl = '/azuredataexplorer';
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
-    this.expressionParser = new KustoExpressionParser(instanceSettings.jsonData.defaultTakeLimit ?? 10000);
+    this.expressionParser = new KustoExpressionParser(takeLimit, this.templateSrv);
+    this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
+    this.parseExpression = this.parseExpression.bind(this);
+    this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
   }
 
   /**
@@ -270,13 +285,50 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
         return value;
       }
 
-      return "'" + val + "'";
+      return "'" + escapeSpecial(val) + "'";
     });
     return quotedValues.filter(v => v !== "''").join(',');
   }
 
   parseExpression(sections: QueryExpression | undefined, columns: AdxColumnSchema[] | undefined): string {
-    return this.expressionParser.query(sections, columns);
+    return this.expressionParser.toQuery(sections, columns);
+  }
+
+  getDefaultEditorMode(): EditorMode {
+    return this.defaultEditorMode;
+  }
+
+  async autoCompleteQuery(query: AutoCompleteQuery, columns: AdxColumnSchema[] | undefined): Promise<string[]> {
+    const autoQuery = this.expressionParser.toAutoCompleteQuery(query, columns);
+
+    if (!autoQuery) {
+      return [];
+    }
+
+    const kustQuery: KustoQuery = {
+      ...defaultQuery,
+      refId: `adx-${autoQuery}`,
+      database: query.database,
+      rawMode: true,
+      query: autoQuery,
+      resultFormat: 'table',
+      querySource: 'autocomplete',
+    };
+
+    const response = await this.query(
+      includeTimeRange({
+        targets: [kustQuery],
+      }) as DataQueryRequest<KustoQuery>
+    ).toPromise();
+
+    if (!Array.isArray(response?.data) || response.data.length === 0) {
+      return [];
+    }
+
+    const results = response.data[0].fields[0].values.toArray();
+    const operator: QueryEditorOperator<string> = query.search.operator as QueryEditorOperator<string>; // why is this always T = QueryEditorOperatorValueType
+
+    return operator.name === 'contains' ? sortStartsWithValuesFirst(results, operator.value) : results;
   }
 }
 
@@ -323,4 +375,77 @@ const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]
       recordSchema(key, schema[name], result);
     }
   }
+};
+
+/**
+ * this is a suuuper ugly way of doing this.
+ */
+const includeTimeRange = (option: any): any => {
+  const range = (getTemplateSrv() as any)?.timeRange as TimeRange;
+
+  if (!range) {
+    return option;
+  }
+
+  return {
+    ...option,
+    range,
+  };
+};
+
+const escapeSpecial = (value: string): string => {
+  return value.replace(/\'/gim, "\\'");
+};
+
+export const sortStartsWithValuesFirst = (arr: string[], searchText: string) => {
+  const text = searchText.toLowerCase();
+
+  arr.sort((a, b) => {
+    if (!a && !b) {
+      return 0;
+    }
+
+    if (!a && b) {
+      return -1;
+    }
+
+    if (a && !b) {
+      return 1;
+    }
+
+    const aLower = a.toLowerCase();
+    const bLower = b.toLowerCase();
+
+    if (aLower.startsWith(text) && bLower.startsWith(text)) {
+      return 0;
+    }
+
+    if (aLower.startsWith(text) && !bLower.startsWith(text) && bLower.includes(text, 1)) {
+      return -1;
+    }
+
+    if (aLower.startsWith(text) && !bLower.includes(text, 1)) {
+      return -1;
+    }
+
+    if (!aLower.startsWith(text) && aLower.includes(text, 1) && bLower.startsWith(text)) {
+      return 1;
+    }
+
+    if (!aLower.includes(text, 1) && bLower.startsWith(text)) {
+      return 1;
+    }
+
+    if (aLower.includes(text, 1) && !bLower.includes(text, 1)) {
+      return -1;
+    }
+
+    if (!aLower.includes(text, 1) && bLower.includes(text, 1)) {
+      return 1;
+    }
+
+    return 0;
+  });
+
+  return arr;
 };

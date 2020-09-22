@@ -1,8 +1,9 @@
-import { AdxDataSource } from './datasource';
+import { AdxDataSource, sortStartsWithValuesFirst } from './datasource';
 import { dateTime } from '@grafana/data';
 import { TemplateSrv } from './test/template_srv';
 import _ from 'lodash';
 import { setBackendSrv, BackendSrv, BackendSrvRequest, setTemplateSrv } from '@grafana/runtime';
+import { EditorMode } from 'types';
 
 describe('AdxDataSource', () => {
   const ctx: any = {};
@@ -300,6 +301,47 @@ describe('AdxDataSource', () => {
         }
       );
       expect(result.data[0].target).toEqual('y');
+    });
+  });
+});
+
+describe('AdxDataSource', () => {
+  describe('when constructing with defaultEditorMode', () => {
+    it('then defaultEditorMode should be correct', () => {
+      const instanceSettings: any = {
+        jsonData: {
+          defaultEditorMode: EditorMode.Raw,
+        },
+      };
+
+      const datasource = new AdxDataSource(instanceSettings);
+
+      expect(datasource.getDefaultEditorMode()).toEqual(EditorMode.Raw);
+    });
+  });
+
+  describe('when constructing without defaultEditorMode', () => {
+    it('then defaultEditorMode should be Visual', () => {
+      const instanceSettings: any = {
+        jsonData: {},
+      };
+
+      const datasource = new AdxDataSource(instanceSettings);
+
+      expect(datasource.getDefaultEditorMode()).toEqual(EditorMode.Visual);
+    });
+  });
+});
+
+describe('sortStartsWithValuesFirst', () => {
+  describe('when called with random ordered values', () => {
+    it('then should order startsWith values on top followed by values that include searchText', () => {
+      const arr = ['South Korea', 'Norway', 'Tailand', 'Taiwan', 'United States', 'Sweden', 'Finland'];
+      const searchText = 't';
+
+      const result = sortStartsWithValuesFirst(arr, searchText);
+
+      expect(result).toEqual(['Tailand', 'Taiwan', 'South Korea', 'United States', 'Norway', 'Sweden', 'Finland']);
     });
   });
 });

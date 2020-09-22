@@ -128,9 +128,22 @@
   <div class="gf-form-inline">
     <div class="gf-form">
       <span class="gf-form-label width-11">Data concistency</span>
-      <select class="gf-form-input" ng-model="ctrl.current.jsonData.dataConsistency" ng-options="d.value as d.label for d in ctrl.dataConsistency"></select>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input" ng-model="ctrl.current.jsonData.dataConsistency" ng-options="d.value as d.label for d in ctrl.dataConsistency"></select>
+      </div>
       <info-popover mode="right-normal">
         By default the data consistency is strong. If you want to query your data with an other cosistency, choose the desired value.
+      </info-popover>
+    </div>
+  </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-11">Default editor mode</span>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultEditorMode" ng-options="mode.value as mode.label for mode in ctrl.editorModes"></select>
+      </div>
+      <info-popover mode="right-normal">
+        The default editor mode is Visual. If you need to change the default editor mode choose the desired value.
       </info-popover>
     </div>
   </div>

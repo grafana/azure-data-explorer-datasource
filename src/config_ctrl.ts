@@ -1,6 +1,7 @@
 import { AdxDataSource } from './datasource';
 import config from 'grafana/app/core/config';
 import { isVersionGtOrEq } from './version';
+import { EditorMode } from './types';
 
 const dataConsistency = {
   strongconsistency: 'Strong',
@@ -17,6 +18,7 @@ export class KustoDBConfigCtrl {
   databases: any[];
   hasRequiredGrafanaVersion: boolean;
   loading = false;
+  editorModes: Array<{ value: string; label: string }>;
 
   /** @ngInject */
   constructor(private $scope) {
@@ -32,6 +34,14 @@ export class KustoDBConfigCtrl {
       this.current.url = 'api/datasources/proxy/' + this.current.id;
       this.datasource = new AdxDataSource(this.current);
       this.getDatabases();
+    }
+
+    this.editorModes = Object.keys(EditorMode)
+      .filter(key => isNaN(parseInt(key, 10)))
+      .map(key => ({ value: EditorMode[key], label: key }));
+
+    if (!this.current.jsonData?.defaultEditorMode) {
+      this.current.jsonData.defaultEditorMode = this.editorModes[0].value;
     }
 
     this.dataConsistency = Object.keys(dataConsistency).map(value => ({

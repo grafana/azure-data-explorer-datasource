@@ -4,7 +4,6 @@ import { Button, stylesFactory } from '@grafana/ui';
 import { css } from 'emotion';
 import { QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
-import { ExpressionSuggestor } from '../types';
 import { QueryEditorExpression, QueryEditorArrayExpression } from '../../expressions';
 import { QueryEditorRepeater } from '../QueryEditorRepeater';
 import { isGroupBy } from '../../guards';
@@ -20,7 +19,6 @@ export interface QueryEditorGroupBySectionProps extends QueryEditorSectionProps 
   templateVariableOptions: SelectableValue<string>;
   value: QueryEditorArrayExpression;
   onChange: (value: QueryEditorArrayExpression) => void;
-  getSuggestions: ExpressionSuggestor;
 }
 
 export const QueryEditorGroupBySection = (
