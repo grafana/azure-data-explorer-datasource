@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { css } from 'emotion';
 import { stylesFactory, AsyncSelect } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
@@ -22,15 +22,30 @@ export const definitionToProperty = (definition: QueryEditorPropertyDefinition):
 };
 
 export const QueryEditorField: React.FC<Props> = props => {
-  const { value: propsValue, fields, allowCustom, placeholder, templateVariableOptions } = props;
+  const {
+    value: propsValue,
+    fields,
+    allowCustom,
+    placeholder,
+    templateVariableOptions,
+    onChange: propsOnChange,
+  } = props;
+  const [prevValue, setPrevValue] = useState<QueryEditorProperty>((null as unknown) as QueryEditorProperty);
   const styles = getStyles();
-  const onChange = useOnChange(props);
   const options = useOptions(fields);
   const value = useMemo(() => options.find(option => option.value === propsValue?.name), [options, propsValue]);
   const loadOptions = useMemo(() => filterOptions(options, templateVariableOptions), [
     options,
     templateVariableOptions,
   ]);
+  const onChange = useOnChange(props, propsValue, setPrevValue);
+  const onCloseMenu = useCallback(() => {
+    if (!value && prevValue) {
+      propsOnChange({ ...prevValue });
+    }
+
+    setPrevValue((null as unknown) as QueryEditorProperty);
+  }, [propsOnChange, setPrevValue, prevValue, value]);
 
   return (
     <div className={styles.container}>
@@ -45,6 +60,7 @@ export const QueryEditorField: React.FC<Props> = props => {
         allowCustomValue={allowCustom}
         backspaceRemovesValue={true}
         isClearable={true}
+        onCloseMenu={onCloseMenu}
       />
     </div>
   );
@@ -76,13 +92,22 @@ const useOptions = (options: QueryEditorPropertyDefinition[]): Array<SelectableV
   }, [options]);
 };
 
-const useOnChange = ({ fields, allowCustom, templateVariableOptions, onChange }: Props) => {
+const useOnChange = (
+  { fields, allowCustom, templateVariableOptions, onChange }: Props,
+  currentValue: QueryEditorProperty | undefined,
+  setPrevValue: (value: QueryEditorProperty) => void
+) => {
   return useCallback(
     (selectable: SelectableValue<string>) => {
-      if (!selectable || typeof selectable.value !== 'string') {
+      if (!selectable || (typeof selectable.value !== 'string' && currentValue)) {
         const name: any = null;
         const type = QueryEditorPropertyType.String;
+
         onChange({ name, type });
+        if (currentValue) {
+          setPrevValue(currentValue);
+        }
+
         return;
       }
 
@@ -107,7 +132,7 @@ const useOnChange = ({ fields, allowCustom, templateVariableOptions, onChange }:
         });
       }
     },
-    [fields, onChange, templateVariableOptions, allowCustom]
+    [fields, onChange, templateVariableOptions, allowCustom, currentValue, setPrevValue]
   );
 };
 
