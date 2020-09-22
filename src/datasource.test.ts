@@ -1,4 +1,4 @@
-import { AdxDataSource } from './datasource';
+import { AdxDataSource, sortStartsWithValuesFirst } from './datasource';
 import { dateTime } from '@grafana/data';
 import { TemplateSrv } from './test/template_srv';
 import _ from 'lodash';
@@ -329,6 +329,19 @@ describe('AdxDataSource', () => {
       const datasource = new AdxDataSource(instanceSettings);
 
       expect(datasource.getDefaultEditorMode()).toEqual(EditorMode.Visual);
+    });
+  });
+});
+
+describe('sortStartsWithValuesFirst', () => {
+  describe('when called with random ordered values', () => {
+    it('then should order startsWith values on top followed by values that include searchText', () => {
+      const arr = ['South Korea', 'Norway', 'Tailand', 'Taiwan', 'United States', 'Sweden', 'Finland'];
+      const searchText = 't';
+
+      const result = sortStartsWithValuesFirst(arr, searchText);
+
+      expect(result).toEqual(['Tailand', 'Taiwan', 'South Korea', 'United States', 'Norway', 'Sweden', 'Finland']);
     });
   });
 });
