@@ -4,7 +4,11 @@
       <div class="gf-form">
         <label class="gf-form-label query-keyword width-9">Database</label>
         <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
-          <select class="gf-form-input min-width-12" ng-model="ctrl.annotation.database" ng-options="f.value as f.text for f in ctrl.databases"></select>
+          <select
+            class="gf-form-input min-width-12"
+            ng-model="ctrl.annotation.database"
+            ng-options="f.value as f.text for f in ctrl.databases"
+          ></select>
         </div>
       </div>
       <div class="gf-form">
@@ -17,8 +21,13 @@
         <label class="gf-form-label">(Run Query: Shift+Enter, Trigger Suggestion: Ctrl+Space)</label>
       </div>
     </div>
-    <kusto-monaco-editor content="ctrl.annotation.rawQuery" on-change="ctrl.panelCtrl.refresh()" get-schema="ctrl.datasource.getSchema(ctrl.annotation.database)"
-      default-time-field="Timestamp" plugin-base-url={{ctrl.datasource.meta.baseUrl}}></kusto-monaco-editor>
+    <kusto-monaco-editor
+      content="ctrl.annotation.query"
+      on-change="ctrl.panelCtrl.refresh()"
+      get-schema="ctrl.datasource.getSchema(ctrl.annotation.database)"
+      default-time-field="Timestamp"
+      plugin-base-url="{{ctrl.datasource.meta.baseUrl}}"
+    ></kusto-monaco-editor>
   </div>
 
   <div class="gf-form-inline">

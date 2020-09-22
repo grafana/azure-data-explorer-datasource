@@ -23,7 +23,7 @@ describe('KustoCodeEditor', () => {
         getLineContent: () => lineContent,
       };
 
-      const StandaloneMock = jest.fn<monaco.editor.ICodeEditor, []>();
+      const StandaloneMock = jest.fn() as jest.Mock<monaco.editor.ICodeEditor, []>;
       editor = new KustoCodeEditor(null, 'Timestamp', () => {}, {});
       editor.codeEditor = new StandaloneMock();
     });
@@ -74,8 +74,8 @@ describe('KustoCodeEditor', () => {
         expect(completionItems[2].label).toBe('$__to');
         expect(completionItems[2].insertText.value).toBe('\\$__to');
 
-        expect(completionItems[3].label).toBe('$__interval');
-        expect(completionItems[3].insertText.value).toBe('\\$__interval');
+        expect(completionItems[3].label).toBe('$__timeInterval');
+        expect(completionItems[3].insertText.value).toBe('\\$__timeInterval');
       });
     });
   });

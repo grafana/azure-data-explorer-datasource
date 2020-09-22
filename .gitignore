@@ -6,3 +6,5 @@ npm-debug.log
 coverage
 ci
 yarn.lock
+.d.ts
+.idea

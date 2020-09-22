@@ -5,18 +5,23 @@ export interface SuggestionController {
 }
 
 export default class KustoCodeEditor {
-  codeEditor: monaco.editor.IStandaloneCodeEditor;
-  completionItemProvider: monaco.IDisposable;
-  signatureHelpProvider: monaco.IDisposable;
+  codeEditor?: monaco.editor.IStandaloneCodeEditor;
+  completionItemProvider?: monaco.IDisposable;
+  signatureHelpProvider?: monaco.IDisposable;
 
   splitWithNewLineRegex = /[^\n]+\n?|\n/g;
   newLineRegex = /\r?\n/;
   startsWithKustoPipeRegex = /^\|\s*/g;
   kustoPipeRegexStrict = /^\|\s*$/g;
 
-  constructor(private containerDiv: any, private defaultTimeField: string, private getSchema: () => any, private config: any) {}
+  constructor(
+    private containerDiv: any,
+    private defaultTimeField: string,
+    private getSchema: () => any,
+    private config: any
+  ) {}
 
-  initMonaco(scope) {
+  initMonaco(content: string) {
     const themeName = this.config.bootData.user.lightTheme ? 'grafana-light' : 'vs-dark';
 
     monaco.editor.defineTheme('grafana-light', {
@@ -52,7 +57,9 @@ export default class KustoCodeEditor {
     });
 
     this.codeEditor = monaco.editor.create(this.containerDiv, {
-      value: scope.content || 'Write your query here',
+      value: content || 'Write your query here',
+      // Disabling the automatic resizing until we upgrade Monaco due to perf concerns: https://github.com/microsoft/monaco-editor/issues/28
+      // automaticLayout: true,
       language: 'kusto',
       selectionHighlight: false,
       theme: themeName,
@@ -80,7 +87,7 @@ export default class KustoCodeEditor {
 
       this.signatureHelpProvider = monaco.languages.registerSignatureHelpProvider('kusto', {
         signatureHelpTriggerCharacters: ['(', ')'],
-        provideSignatureHelp: this.getSignatureHelp.bind(this),
+        provideSignatureHelp: this.getSignatureHelp.bind(this) as any,
       });
     }
 
@@ -96,21 +103,25 @@ export default class KustoCodeEditor {
       }
 
       monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
-        const model = this.codeEditor.getModel();
+        const model = this.codeEditor?.getModel();
         if (!model) {
           return;
         }
         workerAccessor(model.uri).then(worker => {
           const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
           worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
-          this.codeEditor.layout();
+          this.codeEditor?.layout();
         });
       });
     });
   }
 
+  resize() {
+    this.codeEditor?.layout();
+  }
+
   setOnDidChangeModelContent(listener) {
-    this.codeEditor.onDidChangeModelContent(listener);
+    this.codeEditor?.onDidChangeModelContent(listener);
   }
 
   disposeMonaco() {
@@ -138,22 +149,22 @@ export default class KustoCodeEditor {
   }
 
   addCommand(keybinding: number, commandFunc: monaco.editor.ICommandHandler) {
-    this.codeEditor.addCommand(keybinding, commandFunc, 'readyToExecute');
+    this.codeEditor?.addCommand(keybinding, commandFunc, 'readyToExecute');
   }
 
   getValue() {
-    return this.codeEditor.getValue();
+    return this.codeEditor?.getValue();
   }
 
   toSuggestionController(srv: monaco.editor.IEditorContribution): SuggestionController {
-    return <any>srv;
+    return (srv as unknown) as SuggestionController;
   }
 
   setEditorContent(value) {
-    this.codeEditor.setValue(value);
+    this.codeEditor?.setValue(value);
   }
 
-  getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position) {
+  getCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position): any {
     const timeFilterDocs =
       '##### Macro that uses the selected timerange in Grafana to filter the query.\n\n' +
       '- `$__timeFilter()` -> Uses the ' +
@@ -161,7 +172,7 @@ export default class KustoCodeEditor {
       ' column\n\n' +
       '- `$__timeFilter(datetimeColumn)` ->  Uses the specified datetime column to build the query.';
 
-    var textUntilPosition = model.getValueInRange({
+    const textUntilPosition = model.getValueInRange({
       startLineNumber: 1,
       startColumn: 1,
       endLineNumber: position.lineNumber,
@@ -228,17 +239,17 @@ export default class KustoCodeEditor {
           },
         },
         {
-          label: '$__interval',
+          label: '$__timeInterval',
           kind: monaco.languages.CompletionItemKind.Keyword,
           insertText: {
-            value: `\\$__interval`,
+            value: `\\$__timeInterval`,
           },
           documentation: {
             value:
               '##### Built-in variable that returns an automatic time grain suitable for the current timerange.\n\n' +
               'Used with the bin() function - `bin(' +
               this.defaultTimeField +
-              ', $__interval)` \n\n' +
+              ', $__timeInterval)` \n\n' +
               '[Grafana docs](http://docs.grafana.org/reference/templating/#the-interval-variable)',
           },
         },
@@ -249,7 +260,7 @@ export default class KustoCodeEditor {
   }
 
   getSignatureHelp(model: monaco.editor.IReadOnlyModel, position: monaco.Position, token: monaco.CancellationToken) {
-    var textUntilPosition = model.getValueInRange({
+    const textUntilPosition = model.getValueInRange({
       startLineNumber: position.lineNumber,
       startColumn: position.column - 14,
       endLineNumber: position.lineNumber,
@@ -257,7 +268,7 @@ export default class KustoCodeEditor {
     });
 
     if (textUntilPosition !== '$__timeFilter(') {
-      return <monaco.languages.SignatureHelp>{};
+      return {} as monaco.languages.SignatureHelp;
     }
 
     const signature: monaco.languages.SignatureHelp = {
@@ -269,7 +280,10 @@ export default class KustoCodeEditor {
           parameters: [
             {
               label: 'timeColumn',
-              documentation: 'Default is ' + this.defaultTimeField + ' column. Datetime column to filter data using the selected date range. ',
+              documentation:
+                'Default is ' +
+                this.defaultTimeField +
+                ' column. Datetime column to filter data using the selected date range. ',
             },
           ],
         },
@@ -293,7 +307,7 @@ export default class KustoCodeEditor {
   }
 
   triggerSuggestions() {
-    const suggestController = this.codeEditor.getContribution('editor.contrib.suggestController');
+    const suggestController = this.codeEditor?.getContribution('editor.contrib.suggestController');
     if (!suggestController) {
       return;
     }
@@ -301,13 +315,13 @@ export default class KustoCodeEditor {
     const convertedController = this.toSuggestionController(suggestController);
 
     convertedController._model.cancel();
-    setTimeout(function() {
+    setTimeout(() => {
       convertedController._model.trigger(true);
     }, 10);
   }
 
   getCharAt(lineNumber: number, column: number) {
-    const model = this.codeEditor.getModel();
+    const model = this.codeEditor?.getModel();
     if (!model) {
       return '';
     }

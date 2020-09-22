@@ -1,5 +1,69 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+
+## [3.0.5]
+
+- Bugfix: when selecting template variables in the visual editor for table or database the values wasn't properly set. This should now be fixed.
+
+## [3.0.4]
+
+- Bugfix: visual editor now includes template variables in the database selector.
+
+## [3.0.3]
+
+- Bugfix: displays proper error message when credentials for datasource is invalid.
+- Bugfix: visual editor now supports time fields in dynamic columns.
+
+## [3.0.2]
+
+- Bugfix: Fixed issue with schema not updating when changing datasource.
+- Improved performance when loading table schema.
+- Improved performance when doing auto complete searching.
+
+## [3.0.1]
+
+- Support for value autocomplete in the visual query editor.
+- Support for dynamic columns in the visual query editor. Dynamic fields are automatically read from the table schema and are selectable when building up a query. Value autocomplete also works for dynamic columns.
+- Migration script for existing dashboards.
+- Performance improvements for the autocomplete and dynamic column features.
+- Performance improvements when loading the table schema.
+
+## [3.0.0]
+
+- Adds support for a new visual query editor.
+- Ports the existing query editor to React.
+
+## [2.1.0]
+
+- Adds support for the databases() macro for template variable queries and the database variable can then be used in the databases dropdown in the query editor. This allows the user to switch databases for a query without editing it.
+
+## [2.0.6]
+
+- Signed Plugin for v7
+
+## [2.0.5]
+
+- Bugfix for issue #61. This is a temp fix, as a proper fix requires refactoring some of the backend.
+
+## [2.0.4]
+
+- Bugfix for issue #73
+
+## [2.0.3]
+
+- Bugfix for monaco loader
+
+## [2.0.2]
+
+- Bugfix for issue #60
+- Updated packages
+
+## [2.0.1]
+
+- Add key value support to plugin (based off of mysql plugin)
+- New feature for metric naming and aliasing
+
 ## [2.0.0]
 
 - Time series queries now support alerting.
@@ -26,7 +90,7 @@
 
 ## v1.1.0
 
-- Adds $__escapeMulti macro
+- Adds \$\_\_escapeMulti macro
 
 ## v1.0.0
 

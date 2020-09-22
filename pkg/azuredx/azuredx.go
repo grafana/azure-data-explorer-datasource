@@ -17,17 +17,20 @@ import (
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/log"
 	"github.com/grafana/grafana_plugin_model/go/datasource"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/hashicorp/go-hclog"
 	"golang.org/x/oauth2/clientcredentials"
+	"golang.org/x/oauth2/microsoft"
 )
 
 // QueryModel contains the query information from the API call that we use to make a query.
 type QueryModel struct {
-	Format    string `json:"resultFormat"`
-	QueryType string `json:"queryType"`
-	Query     string `json:"query"`
-	Database  string `json:"database"`
-	MacroData MacroData
+	Format      string `json:"resultFormat"`
+	QueryType   string `json:"queryType"`
+	Query       string `json:"query"`
+	Database    string `json:"database"`
+	QuerySource string `json:"querySource"` // used to identify if query came from getSchema, raw mode, etc
+	MacroData   MacroData
 }
 
 // Interpolate applys macro expansion on the QueryModel's Payload's Query string
@@ -46,6 +49,8 @@ type dataSourceData struct {
 	AzureADAuthEndpoint string `json:"azureADAuthEndpoint"`
 	ADXResourceEndpoint string `json:"adxResourceEndpoint"`
 	Secret              string `json:"-"`
+	DataConsistency     string `json:"dataConsistency"`
+	CacheMaxAge         string `json:"cacheMaxAge"`
 }
 
 // Client is an http.Client used for API requests.
@@ -55,29 +60,50 @@ type Client struct {
 	Log hclog.Logger
 }
 
+// Options that can be set on the ADX Connection string
+type options struct {
+	DataConsistency string `json:"queryconsistency,omitempty"`
+	CacheMaxAge     string `json:"query_results_cache_max_age,omitempty"`
+}
+
+// Properties property bag of connection string options
+type Properties struct {
+	Options *options `json:"options,omitempty"`
+}
+
 // RequestPayload is the information that makes up a Kusto query for Azure's Data Explorer API.
 type RequestPayload struct {
-	DB         string `json:"db"`
-	CSL        string `json:"csl"`
-	Properties string `json:"properties"`
+	DB         string      `json:"db"`
+	CSL        string      `json:"csl"`
+	Properties *Properties `json:"properties,omitempty"`
 }
 
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's
 // JSONData and Encrypted JSONData which contains the information needed to connected to
 // the datasource.
-func newDataSourceData(dInfo *datasource.DatasourceInfo) (*dataSourceData, error) {
+func newDataSourceData(dInfo *backend.DataSourceInstanceSettings) (*dataSourceData, error) {
 	d := dataSourceData{}
-	err := json.Unmarshal([]byte(dInfo.GetJsonData()), &d)
+	err := json.Unmarshal(dInfo.JSONData, &d)
 	if err != nil {
 		return nil, err
 	}
-	d.Secret = dInfo.GetDecryptedSecureJsonData()["clientSecret"]
+	d.Secret = dInfo.DecryptedSecureJSONData["clientSecret"]
 	return &d, nil
+}
+
+// NewConnectionProperties creates ADX connection properties based on datasource settings.
+func NewConnectionProperties(c *Client) *Properties {
+	return &Properties{
+		&options{
+			DataConsistency: c.DataConsistency,
+			CacheMaxAge:     c.CacheMaxAge,
+		},
+	}
 }
 
 // NewClient creates a new Azure Data Explorer http client from the DatasourceInfo.
 // AAD OAuth authentication is setup for the client.
-func NewClient(ctx context.Context, dInfo *datasource.DatasourceInfo) (*Client, error) {
+func NewClient(ctx context.Context, dInfo *backend.DataSourceInstanceSettings) (*Client, error) {
 	c := Client{}
 	var err error
 	c.dataSourceData, err = newDataSourceData(dInfo)
@@ -123,13 +149,13 @@ func NewClient(ctx context.Context, dInfo *datasource.DatasourceInfo) (*Client, 
 func (c *Client) TestRequest() error {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(RequestPayload{
-		CSL: ".show databases schema",
-		DB:  c.DefaultDatabase,
+		CSL:        ".show databases schema",
+		DB:         c.DefaultDatabase,
+		Properties: NewConnectionProperties(c),
 	})
 	if err != nil {
 		return err
 	}
-
 	resp, err := c.Post(c.ClusterURL+"/v1/rest/query", "application/json", &buf)
 	if err != nil {
 		return err
@@ -144,21 +170,23 @@ func (c *Client) TestRequest() error {
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
-func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, error) {
+func (c *Client) KustoRequest(payload RequestPayload, querySource string) (*TableResponse, string, error) {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(payload)
 	if err != nil {
 		return nil, "", err
 	}
-
 	req, err := http.NewRequest(http.MethodPost, c.ClusterURL+"/v1/rest/query", &buf)
 	if err != nil {
 		return nil, "", err
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-ms-app", "Grafana ADX Plugin")
-	req.Header.Set("x-ms-client-request-id", "KGC.execute;"+uuid.Must(uuid.NewRandom()).String())
+	req.Header.Set("x-ms-app", "Grafana-ADX")
+	if querySource == "" {
+		querySource = "unspecified"
+	}
+	req.Header.Set("x-ms-client-request-id", fmt.Sprintf("KGC.%v;%v", querySource, uuid.Must(uuid.NewRandom()).String()))
 	resp, err := c.Do(req)
 	if err != nil {
 		return nil, "", err
@@ -176,7 +204,7 @@ func (c *Client) KustoRequest(payload RequestPayload) (*TableResponse, string, e
 		errorData := &errorResponse{}
 		err = json.Unmarshal(bodyBytes, errorData)
 		if err != nil {
-			log.Print.Debug("failed to unmarshal error body from response: %v", err)
+			backend.Logger.Debug("failed to unmarshal error body from response", "error", err)
 		}
 		return nil, errorData.Error.Message, fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
 	}
@@ -205,4 +233,9 @@ type errorResponse struct {
 	Error struct {
 		Message string `json:"@message"`
 	} `json:"error"`
+}
+
+// AzureFrameMD is a type to populate a Frame's Custom metadata property.
+type AzureFrameMD struct {
+	ColumnTypes []string
 }
