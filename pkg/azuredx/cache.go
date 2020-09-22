@@ -135,7 +135,6 @@ func formatDuration(d time.Duration) string {
 	d -= minutes * time.Minute
 
 	seconds := d / time.Second
-	d -= seconds / time.Second
 
 	if days <= 0 {
 		fmt.Fprintf(&b, "%02d:%02d:%02d", hours, minutes, seconds)
