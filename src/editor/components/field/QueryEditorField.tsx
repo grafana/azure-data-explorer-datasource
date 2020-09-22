@@ -38,7 +38,7 @@ export const QueryEditorField: React.FC<Props> = props => {
         width={30}
         onChange={onChange}
         value={value}
-        defaultOptions={options}
+        defaultOptions={templateVariableOptions ? [templateVariableOptions, ...options] : options}
         loadOptions={loadOptions}
         placeholder={placeholder}
         menuPlacement="bottom"
