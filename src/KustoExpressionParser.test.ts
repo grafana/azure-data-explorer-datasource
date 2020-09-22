@@ -909,6 +909,54 @@ describe('KustoExpressionParser', () => {
           `\n| take ${limit}`
       );
     });
+
+    it('should parse expression with empty where array', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([]),
+        reduce: createArray([createReduce('country', 'dcount')]),
+        groupBy: createArray([createGroupBy('continents')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          `\n| order by StartTime asc` +
+          '\n| summarize dcount(country) by continents' +
+          `\n| take ${limit}`
+      );
+    });
+
+    it('should parse expression with where array containg empty or', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createArray([], QueryEditorExpressionType.Or)]),
+        reduce: createArray([createReduce('country', 'dcount')]),
+        groupBy: createArray([createGroupBy('continents')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          `\n| order by StartTime asc` +
+          '\n| summarize dcount(country) by continents' +
+          `\n| take ${limit}`
+      );
+    });
   });
 });
 
