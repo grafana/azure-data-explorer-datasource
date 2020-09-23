@@ -830,9 +830,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where StartTime between (($__timeFrom - 2d) .. ($__timeTo - 2d))' +
           "\n| where country == 'sweden'" +
-          `\n| extend StartTime = StartTime - 2d` +
+          `\n| extend StartTime = StartTime + 2d` +
           `\n| order by StartTime asc` +
           `\n| take ${limit}`
       );
