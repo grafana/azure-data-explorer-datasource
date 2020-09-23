@@ -36,7 +36,7 @@ export class KustoExpressionParser {
 
     const parts: string[] = [];
     this.appendProperty(context, query.expression.from, parts);
-    this.appendTimeFilter(context, parts);
+    this.appendTimeFilter(context, undefined, parts);
 
     const where = replaceByIndex(query.index, query.expression.where, query.search);
     const column = query.search.property.name;
@@ -61,7 +61,7 @@ export class KustoExpressionParser {
 
     const parts: string[] = [];
     this.appendProperty(context, expression.from, parts);
-    this.appendTimeFilter(context, parts);
+    this.appendTimeFilter(context, expression.timeshift, parts);
     this.appendWhere(context, expression?.where, parts, 'where');
     this.appendOrderBy(context, parts);
     this.appendTimeshift(context, expression.timeshift, parts);
@@ -77,24 +77,30 @@ export class KustoExpressionParser {
 
   private appendTimeshift(
     context: ParseContext,
-    timeshift: QueryEditorPropertyExpression | undefined,
+    expression: QueryEditorPropertyExpression | undefined,
     parts: string[]
   ) {
-    if (!timeshift || !context.timeColumn) {
+    const timeshift = detectTimeshift(context, expression);
+
+    if (!timeshift) {
       return;
     }
-
-    const timeshiftWith = timeshift.property.name;
-
-    if (!isValidTimeSpan(timeshiftWith)) {
-      return;
-    }
-
-    parts.push(`extend ${context.timeColumn} = ${context.timeColumn} - ${timeshiftWith}`);
+    parts.push(`extend ${context.timeColumn} = ${context.timeColumn} + ${timeshift}`);
   }
 
-  private appendTimeFilter(context: ParseContext, parts: string[]) {
+  private appendTimeFilter(
+    context: ParseContext,
+    expression: QueryEditorPropertyExpression | undefined,
+    parts: string[]
+  ) {
     if (!context.timeColumn) {
+      return;
+    }
+
+    const timeshift = detectTimeshift(context, expression);
+
+    if (timeshift) {
+      parts.push(`where ${context.timeColumn} between (($__timeFrom - ${timeshift}) .. ($__timeTo - ${timeshift}))`);
       return;
     }
 
@@ -385,4 +391,20 @@ const replaceByIndex = (
 
 const isValidTimeSpan = (value: string) => {
   return /^(\d{1,15}(?:d|h|ms|s|m){0,1})$/gm.test(value);
+};
+
+const detectTimeshift = (
+  context: ParseContext,
+  timeshift: QueryEditorPropertyExpression | undefined
+): string | null => {
+  if (!timeshift || !context.timeColumn || !timeshift.property) {
+    return null;
+  }
+
+  const timeshiftWith = timeshift.property.name;
+
+  if (!isValidTimeSpan(timeshiftWith)) {
+    return null;
+  }
+  return timeshiftWith;
 };
