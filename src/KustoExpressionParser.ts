@@ -63,9 +63,9 @@ export class KustoExpressionParser {
     this.appendProperty(context, expression.from, parts);
     this.appendTimeFilter(context, expression.timeshift, parts);
     this.appendWhere(context, expression?.where, parts, 'where');
-    this.appendOrderBy(context, parts);
     this.appendTimeshift(context, expression.timeshift, parts);
     this.appendSummarize(context, expression.reduce, expression.groupBy, parts);
+    this.appendOrderBy(context, expression.groupBy, expression.reduce, parts);
 
     if (parts.length === 0) {
       return '';
@@ -112,11 +112,35 @@ export class KustoExpressionParser {
     parts.push(`where $__timeFilter(${context.timeColumn})`);
   }
 
-  private appendOrderBy(context: ParseContext, parts: string[]) {
+  private appendOrderBy(
+    context: ParseContext,
+    groupBy: QueryEditorArrayExpression,
+    reduce: QueryEditorArrayExpression,
+    parts: string[]
+  ) {
     if (!context.timeColumn) {
       return;
     }
-    parts.push(`order by ${context.timeColumn} asc`);
+
+    const noGroupBy = Array.isArray(groupBy.expressions) && groupBy.expressions.length === 0;
+    const noReduce = Array.isArray(reduce.expressions) && reduce.expressions.length === 0;
+
+    if (noGroupBy && noReduce) {
+      parts.push(`order by ${context.timeColumn} asc`);
+      return;
+    }
+
+    const hasInterval = groupBy.expressions.find(exp => {
+      if (!isGroupBy(exp) || !exp.interval) {
+        return false;
+      }
+      return true;
+    });
+
+    if (hasInterval) {
+      parts.push(`order by ${context.timeColumn} asc`);
+      return;
+    }
   }
 
   private appendWhere(

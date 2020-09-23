@@ -40,6 +40,20 @@ export const isBoolOperator = (operator: QueryEditorOperator | undefined): opera
   return typeof operator?.value === 'boolean';
 };
 
+export const isNumberOperator = (
+  operator: QueryEditorOperator | undefined,
+  propertyType: QueryEditorPropertyType | undefined
+): operator is QueryEditorOperator<number> => {
+  return propertyType === QueryEditorPropertyType.Number && typeof operator?.value === 'number';
+};
+
+export const isDateTimeOperator = (
+  operator: QueryEditorOperator | undefined,
+  propertyType: QueryEditorPropertyType | undefined
+): operator is QueryEditorOperator<string> => {
+  return propertyType === QueryEditorPropertyType.DateTime && typeof operator?.value === 'string';
+};
+
 export const isMultiOperator = (operator?: QueryEditorOperator): operator is QueryEditorOperator<string[]> => {
   return Array.isArray(operator?.value);
 };

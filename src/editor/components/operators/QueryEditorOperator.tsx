@@ -3,12 +3,19 @@ import { css } from 'emotion';
 import { Select, stylesFactory, Button } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { ExpressionSuggestor } from '../types';
-import { QueryEditorOperatorDefinition, QueryEditorOperator, QueryEditorProperty } from '../../types';
+import {
+  QueryEditorOperatorDefinition,
+  QueryEditorOperator,
+  QueryEditorProperty,
+  QueryEditorPropertyType,
+} from '../../types';
 import { QueryEditorMultiOperator } from './QueryEditorMultiOperator';
 import { QueryEditorSingleOperator } from './QueryEditorSingleOperator';
 import { QueryEditorBoolOperator } from './QueryEditorBoolOperator';
-import { isMultiOperator, isBoolOperator, isSingleOperator } from '../../guards';
+import { isMultiOperator, isBoolOperator, isSingleOperator, isDateTimeOperator, isNumberOperator } from '../../guards';
 import { parseOperatorValue } from './parser';
+import { QueryEditorStringOperator } from './QueryEditorStringOperator';
+import { QueryEditorNumberOperator } from './QueryEditorNumberOperator';
 
 interface Props {
   value?: QueryEditorOperator;
@@ -75,7 +82,7 @@ export class QueryEditorOperatorComponent extends PureComponent<Props> {
   };
 
   render() {
-    const { operators, value, getSuggestions, templateVariableOptions } = this.props;
+    const { operators, value, getSuggestions, templateVariableOptions, property } = this.props;
     const styles = getStyles();
     const definition = operators.find(o => o.value === value?.name);
 
@@ -97,7 +104,14 @@ export class QueryEditorOperatorComponent extends PureComponent<Props> {
             })}
           />
         </div>
-        {renderOperatorInput(definition, value, this.onChangeValue, getSuggestions, templateVariableOptions)}
+        {renderOperatorInput(
+          definition,
+          value,
+          this.onChangeValue,
+          getSuggestions,
+          templateVariableOptions,
+          property?.type
+        )}
       </>
     );
   }
@@ -108,13 +122,30 @@ const renderOperatorInput = (
   operator: QueryEditorOperator | undefined,
   onChangeValue: (expression: QueryEditorOperator) => void,
   getSuggestions: ExpressionSuggestor,
-  templateVariableOptions: SelectableValue<string>
+  templateVariableOptions: SelectableValue<string>,
+  propertyType: QueryEditorPropertyType | undefined
 ) => {
   if (!definition) {
     return null;
   }
 
   const styles = getStyles();
+
+  if (isDateTimeOperator(operator, propertyType)) {
+    return (
+      <div className={styles.container}>
+        <QueryEditorStringOperator operator={definition} value={operator?.value} onChange={onChangeValue} />
+      </div>
+    );
+  }
+
+  if (isNumberOperator(operator, propertyType)) {
+    return (
+      <div className={styles.container}>
+        <QueryEditorNumberOperator operator={definition} value={operator?.value} onChange={onChangeValue} />
+      </div>
+    );
+  }
 
   if (definition.multipleValues && (isMultiOperator(operator) || !operator)) {
     return (

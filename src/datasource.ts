@@ -325,6 +325,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return [];
     }
 
+    if (!Array.isArray(response.data[0].fields) || response.data[0].fields.length === 0) {
+      return [];
+    }
+
     const results = response.data[0].fields[0].values.toArray();
     const operator: QueryEditorOperator<string> = query.search.operator as QueryEditorOperator<string>; // why is this always T = QueryEditorOperatorValueType
 

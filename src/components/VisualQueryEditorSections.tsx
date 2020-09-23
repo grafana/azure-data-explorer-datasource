@@ -13,7 +13,11 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
   filterSection
     .withOperators(operator => {
       operator('==')
-        .supportTypes([QueryEditorPropertyType.String, QueryEditorPropertyType.Number])
+        .supportTypes([
+          QueryEditorPropertyType.String,
+          QueryEditorPropertyType.Number,
+          QueryEditorPropertyType.DateTime,
+        ])
         .withDescription('equal to')
         .add();
 
@@ -24,7 +28,11 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
         .add();
 
       operator('!=')
-        .supportTypes([QueryEditorPropertyType.String, QueryEditorPropertyType.Number])
+        .supportTypes([
+          QueryEditorPropertyType.String,
+          QueryEditorPropertyType.Number,
+          QueryEditorPropertyType.DateTime,
+        ])
         .withDescription('not equal to')
         .add();
 
@@ -35,12 +43,12 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
         .add();
 
       operator('>')
-        .supportTypes([QueryEditorPropertyType.Number])
+        .supportTypes([QueryEditorPropertyType.Number, QueryEditorPropertyType.DateTime])
         .withDescription('greater than')
         .add();
 
       operator('<')
-        .supportTypes([QueryEditorPropertyType.Number])
+        .supportTypes([QueryEditorPropertyType.Number, QueryEditorPropertyType.DateTime])
         .withDescription('less than')
         .add();
 
@@ -55,25 +63,25 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
         .add();
 
       operator('in')
-        .supportTypes([QueryEditorPropertyType.String, QueryEditorPropertyType.Number])
+        .supportTypes([QueryEditorPropertyType.String])
         .withDescription('in (case-sensitive)')
         .multipleValues(true)
         .add();
 
       operator('in~')
-        .supportTypes([QueryEditorPropertyType.String, QueryEditorPropertyType.Number])
+        .supportTypes([QueryEditorPropertyType.String])
         .withDescription('in (case-insensitive)')
         .multipleValues(true)
         .add();
 
       operator('!in')
-        .supportTypes([QueryEditorPropertyType.String, QueryEditorPropertyType.Number])
+        .supportTypes([QueryEditorPropertyType.String])
         .withDescription('not in (case-sensitive)')
         .multipleValues(true)
         .add();
 
       operator('!in~')
-        .supportTypes([QueryEditorPropertyType.String, QueryEditorPropertyType.Number])
+        .supportTypes([QueryEditorPropertyType.String])
         .withDescription('not in (case-insensitive)')
         .multipleValues(true)
         .add();
@@ -157,11 +165,7 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
         .add();
 
       operator('has_any')
-        .supportTypes([
-          QueryEditorPropertyType.String,
-          QueryEditorPropertyType.Number,
-          QueryEditorPropertyType.DateTime,
-        ])
+        .supportTypes([QueryEditorPropertyType.String])
         .withDescription('any provided values matching')
         .multipleValues(true)
         .add();
