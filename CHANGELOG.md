@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0]
+
+- Global query limit is now configurable in datasource settings.
+- Auto complete will include other filters when doing the search for possible values.
+- Added !has and has_any operators.
+- Adding datasource setting to set default view when creating new queries.
+- Dynamic caching added to enable caching setting on a per query basis.
+- Column names will not sort exact match on top.
+- Columns with auto complete support will now pre-populate options prior to typing.
+- Added support to perform time shift queries.
+- Added dcount() operator for aggregations.
+- Bugfix: operator descriptions are now wider and readable.
+- Bugfix: display template variables as options.
+- Bugfix: excluding empty/missing operators from query.
+- Bugfix: aggregations without group-by are not working.
+- Bugfix: time interval off by 1000ms.
+
 ## [3.0.5]
 
 - Bugfix: when selecting template variables in the visual editor for table or database the values wasn't properly set. This should now be fixed.
