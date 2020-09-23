@@ -130,6 +130,9 @@ export class KustoExpressionParser {
     if (isOrExpression(expression)) {
       const orParts: string[] = [];
       expression.expressions.map(exp => this.appendWhere(context, exp, orParts));
+      if (orParts.length === 0) {
+        return;
+      }
       return parts.push(`where ${orParts.join(' or ')}`);
     }
 
@@ -223,6 +226,10 @@ export class KustoExpressionParser {
     prefix?: string
   ) {
     const { property, operator } = expression;
+
+    if (!property.name || !operator.name) {
+      return;
+    }
 
     switch (operator.name) {
       case 'isnotempty':

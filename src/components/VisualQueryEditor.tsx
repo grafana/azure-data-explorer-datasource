@@ -202,9 +202,10 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         resultFormat: resultFormat,
         database: database,
         expression: next,
+        query: parseExpression(next, tableSchema.value),
       });
     },
-    [onChangeQuery, query, resultFormat, database, table]
+    [onChangeQuery, query, resultFormat, database, table, parseExpression, tableSchema.value]
   );
 
   if (tableSchema.loading) {
