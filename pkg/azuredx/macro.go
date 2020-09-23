@@ -20,6 +20,7 @@ import (
 type MacroData struct {
 	*backend.TimeRange
 	intervalMS int64
+	// pointer to map with intervalFuncs
 }
 
 // NewMacroData creates a MacroData object from the arguments that

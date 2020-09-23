@@ -23,7 +23,9 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 		return resp
 	}
 
-	qm.MacroData = azuredx.NewMacroData(&q.TimeRange, q.Interval.Microseconds())
+	cs := azuredx.NewCacheSettings(client, &q, qm)
+	qm.MacroData = azuredx.NewMacroData(cs.TimeRange, q.Interval.Milliseconds())
+
 	if err := qm.Interpolate(); err != nil {
 		resp.Error = err
 		return resp
@@ -53,7 +55,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	tableRes, kustoError, err = client.KustoRequest(azuredx.RequestPayload{
 		CSL:        qm.Query,
 		DB:         qm.Database,
-		Properties: azuredx.NewConnectionProperties(client),
+		Properties: azuredx.NewConnectionProperties(client, cs),
 	}, qm.QuerySource)
 
 	if err != nil {
