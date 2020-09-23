@@ -231,8 +231,16 @@ export class KustoExpressionParser {
       return;
     }
 
-    const value = this.formatValue(operator.value, property.type);
-    parts.push(withPrefix(`${property.name} ${operator.name} ${value}`, prefix));
+    switch (operator.name) {
+      case 'isnotempty':
+        parts.push(withPrefix(`${operator.name}(${property.name})`, prefix));
+        break;
+
+      default:
+        const value = this.formatValue(operator.value, property.type);
+        parts.push(withPrefix(`${property.name} ${operator.name} ${value}`, prefix));
+        break;
+    }
   }
 
   private formatValue(value: any, type: QueryEditorPropertyType): string {
