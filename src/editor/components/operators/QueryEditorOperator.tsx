@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { css } from 'emotion';
-import { Select, stylesFactory, Button, Switch } from '@grafana/ui';
+import { Select, stylesFactory, Button } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { ExpressionSuggestor } from '../types';
 import {
@@ -15,7 +15,6 @@ import { QueryEditorBoolOperator } from './QueryEditorBoolOperator';
 import { isMultiOperator, isBoolOperator, isSingleOperator, isDateTimeOperator, isNumberOperator } from '../../guards';
 import { parseOperatorValue } from './parser';
 import { QueryEditorStringOperator } from './QueryEditorStringOperator';
-import { property } from 'lodash';
 import { QueryEditorNumberOperator } from './QueryEditorNumberOperator';
 
 interface Props {
