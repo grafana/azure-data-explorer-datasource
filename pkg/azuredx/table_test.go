@@ -51,9 +51,10 @@ func TestResponseToFrames(t *testing.T) {
 				data.NewField("XLong", nil, []*int64{pointer.Int64(9223372036854775807)}),
 				data.NewField("XReal", nil, []*float64{pointer.Float64(1.797693134862315708145274237317043567981e+308)}),
 				data.NewField("XTimeSpan", nil, []*string{pointer.String("00:00:00.0000001")}),
+				data.NewField("XDecimal", nil, []*float64{pointer.Float64(4.52686980609418)}),
 			).SetMeta(
 				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool", "string", "datetime",
-					"dynamic", "guid", "int", "long", "real", "timespan"}}},
+					"dynamic", "guid", "int", "long", "real", "timespan", "decimal"}}},
 			),
 		},
 		{
@@ -69,6 +70,7 @@ func TestResponseToFrames(t *testing.T) {
 				data.NewField("XLong", nil, []*int64{nil}),
 				data.NewField("XReal", nil, []*float64{nil}),
 				data.NewField("XTimeSpan", nil, []*string{nil}),
+				data.NewField("XDecimal", nil, []*float64{nil}),
 			).SetMeta(
 				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool", "datetime",
 					"dynamic", "guid", "int", "long", "real", "timespan"}}},
