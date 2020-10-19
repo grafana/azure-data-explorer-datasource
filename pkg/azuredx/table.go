@@ -104,6 +104,7 @@ var converterMap = map[string]data.FieldConverter{
 	"long":     longConverter,
 	"real":     realConverter,
 	"bool":     boolConverter,
+	"decimal":  decimalConverter,
 }
 
 var dynamicConverter = data.FieldConverter{
@@ -234,6 +235,25 @@ var longConverter = data.FieldConverter{
 			return nil, fmt.Errorf("unexpected type, expected json.Number but got type %T with a value of %v", v, v)
 		}
 		out, err := jN.Int64()
+		if err != nil {
+			return nil, err
+		}
+		return &out, err
+	},
+}
+
+var decimalConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableFloat64,
+	Converter: func(v interface{}) (interface{}, error) {
+		var ai *float64
+		if v == nil {
+			return ai, nil
+		}
+		jN, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("unexpected type, expected String but got type %T with a value of %v", v, v)
+		}
+		out, err := strconv.ParseFloat(jN, 64)
 		if err != nil {
 			return nil, err
 		}
