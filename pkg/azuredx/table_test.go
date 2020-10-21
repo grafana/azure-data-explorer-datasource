@@ -73,7 +73,7 @@ func TestResponseToFrames(t *testing.T) {
 				data.NewField("XDecimal", nil, []*float64{nil}),
 			).SetMeta(
 				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool", "datetime",
-					"dynamic", "guid", "int", "long", "real", "timespan"}}},
+					"dynamic", "guid", "int", "long", "real", "timespan", "decimal"}}},
 			),
 		},
 	}

@@ -245,15 +245,15 @@ var longConverter = data.FieldConverter{
 var decimalConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableFloat64,
 	Converter: func(v interface{}) (interface{}, error) {
-		var ai *float64
+		var af *float64
 		if v == nil {
-			return ai, nil
+			return af, nil
 		}
-		jN, ok := v.(string)
+		jN, ok := v.(json.Number)
 		if !ok {
-			return nil, fmt.Errorf("unexpected type, expected String but got type %T with a value of %v", v, v)
+			return nil, fmt.Errorf("unexpected type, expected json.Number but got type %T with a value of %v", v, v)
 		}
-		out, err := strconv.ParseFloat(jN, 64)
+		out, err := jN.Float64()
 		if err != nil {
 			return nil, err
 		}
