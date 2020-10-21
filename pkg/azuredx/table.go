@@ -249,9 +249,19 @@ var decimalConverter = data.FieldConverter{
 		if v == nil {
 			return af, nil
 		}
+
+		jS, ok := v.(string)
+		if ok {
+			out, err := strconv.ParseFloat(jS, 64)
+			if err != nil {
+				return nil, err
+			}
+			return out, nil
+		}
+
 		jN, ok := v.(json.Number)
 		if !ok {
-			return nil, fmt.Errorf("unexpected type, expected json.Number but got type %T with a value of %v", v, v)
+			return nil, fmt.Errorf("unexpected type, expected json.Number or string but got type %T with a value of %v", v, v)
 		}
 		out, err := jN.Float64()
 		if err != nil {
