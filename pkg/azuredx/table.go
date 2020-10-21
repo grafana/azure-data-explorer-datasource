@@ -250,17 +250,17 @@ var decimalConverter = data.FieldConverter{
 			return af, nil
 		}
 
-		jS, ok := v.(string)
-		if ok {
+		jS, sOk := v.(string)
+		if sOk {
 			out, err := strconv.ParseFloat(jS, 64)
 			if err != nil {
 				return nil, err
 			}
-			return out, nil
+			return &out, err
 		}
 
-		jN, ok := v.(json.Number)
-		if !ok {
+		jN, nOk := v.(json.Number)
+		if !nOk {
 			return nil, fmt.Errorf("unexpected type, expected json.Number or string but got type %T with a value of %v", v, v)
 		}
 		out, err := jN.Float64()
