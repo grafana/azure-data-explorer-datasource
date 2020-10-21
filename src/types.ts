@@ -63,7 +63,6 @@ export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySourc
 export interface AdxDataSourceOptions extends DataSourceJsonData {
   defaultDatabase: string;
   minimalCache: number;
-  defaultTakeLimit: number;
   defaultEditorMode: EditorMode;
 }
 
