@@ -22,7 +22,7 @@ interface ParseContext {
   castIfDynamic: (column: string) => string;
 }
 export class KustoExpressionParser {
-  constructor(private limit: number = 10000, private templateSrv: TemplateSrv = getTemplateSrv()) {}
+  constructor(private templateSrv: TemplateSrv = getTemplateSrv()) {}
 
   toAutoCompleteQuery(query?: AutoCompleteQuery, tableSchema?: AdxColumnSchema[]): string {
     if (!query?.expression || !query.expression.from || !query.search.property) {
@@ -71,7 +71,6 @@ export class KustoExpressionParser {
       return '';
     }
 
-    parts.push(`take ${this.limit}`);
     return parts.join('\n| ');
   }
 

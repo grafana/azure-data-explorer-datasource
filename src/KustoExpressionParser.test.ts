@@ -14,9 +14,8 @@ import {
 import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
 
 describe('KustoExpressionParser', () => {
-  const limit = 1000;
   const templateSrv: TemplateSrv = { getVariables: jest.fn(), replace: jest.fn() };
-  const parser = new KustoExpressionParser(limit, templateSrv);
+  const parser = new KustoExpressionParser(templateSrv);
 
   describe('toAutoCompleteQuery', () => {
     it('should parse expression with isnotempty function', () => {
@@ -174,9 +173,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([createOperator('eventType', '==', 'ThunderStorm')]),
       });
 
-      expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + "\n| where eventType == 'ThunderStorm'" + `\n| take ${limit}`
-      );
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where eventType == 'ThunderStorm'");
     });
 
     it('should parse expression with where equal to boolean value', () => {
@@ -185,7 +182,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([createOperator('isActive', '==', true)]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where isActive == true' + `\n| take ${limit}`);
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where isActive == true');
     });
 
     it('should parse expression with where equal to numeric value', () => {
@@ -194,7 +191,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([createOperator('count', '==', 10)]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where count == 10' + `\n| take ${limit}`);
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where count == 10');
     });
 
     it('should parse expression with where in numeric values', () => {
@@ -203,7 +200,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([createOperator('count', 'in', [10, 20])]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where count in (10, 20)' + `\n| take ${limit}`);
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where count in (10, 20)');
     });
 
     it('should parse expression with where in string values', () => {
@@ -212,9 +209,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([createOperator('events', 'in', ['triggered', 'closed'])]),
       });
 
-      expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + "\n| where events in ('triggered', 'closed')" + `\n| take ${limit}`
-      );
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where events in ('triggered', 'closed')");
     });
 
     it('should parse expression with multiple where filters', () => {
@@ -227,10 +222,7 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' +
-          '\n| where isActive == true' +
-          "\n| where events in ('triggered', 'closed')" +
-          `\n| take ${limit}`
+        'StormEvents' + '\n| where isActive == true' + "\n| where events in ('triggered', 'closed')"
       );
     });
 
@@ -251,8 +243,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where isActive == true' +
           "\n| where events in ('triggered', 'closed')" +
-          "\n| where state == 'TEXAS' or state == 'FLORIDA'" +
-          `\n| take ${limit}`
+          "\n| where state == 'TEXAS' or state == 'FLORIDA'"
       );
     });
 
@@ -262,7 +253,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([createOperator('isActive', '==', '')]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where isActive == ''" + `\n| take ${limit}`);
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where isActive == ''");
     });
 
     it('should parse expression with time filter when schema contains time column', () => {
@@ -282,8 +273,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| where isActive == true' +
-          `\n| order by StartTime asc` +
-          `\n| take ${limit}`
+          `\n| order by StartTime asc`
       );
     });
 
@@ -308,8 +298,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| where isActive == true' +
-          `\n| order by StartTime asc` +
-          `\n| take ${limit}`
+          `\n| order by StartTime asc`
       );
     });
 
@@ -330,8 +319,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where todatetime(todynamic(Column).StartTime) between ($__timeFrom .. $__timeTo)' +
           '\n| where isActive == true' +
-          `\n| order by todatetime(todynamic(Column).StartTime) asc` +
-          `\n| take ${limit}`
+          `\n| order by todatetime(todynamic(Column).StartTime) asc`
       );
     });
 
@@ -356,8 +344,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(SavedTime)' +
           '\n| where isActive == true' +
-          `\n| order by SavedTime asc` +
-          `\n| take ${limit}`
+          `\n| order by SavedTime asc`
       );
     });
 
@@ -367,9 +354,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([createOperator('column.isActive', '==', true)]),
       });
 
-      expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where column.isActive == true' + `\n| take ${limit}`
-      );
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where column.isActive == true');
     });
 
     it('should parse expression with summarize of sum(active)', () => {
@@ -380,7 +365,7 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize sum(active)` + `\n| take ${limit}`
+        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize sum(active)`
       );
     });
 
@@ -392,7 +377,7 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize count() by active` + `\n| take ${limit}`
+        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize count() by active`
       );
     });
 
@@ -404,10 +389,7 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' +
-          '\n| where column.isActive == true' +
-          `\n| summarize count() by active, total` +
-          `\n| take ${limit}`
+        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize count() by active, total`
       );
     });
 
@@ -428,8 +410,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where column.isActive == true' +
-          `\n| summarize sum(toint(todynamic(todynamic(column).level).active))` +
-          `\n| take ${limit}`
+          `\n| summarize sum(toint(todynamic(todynamic(column).level).active))`
       );
     });
 
@@ -455,8 +436,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| where column.isActive == true' +
-          `\n| project toint(todynamic(todynamic(column).level).active), active` +
-          `\n| take ${limit}`
+          `\n| project toint(todynamic(todynamic(column).level).active), active`
       );
     });
 
@@ -482,8 +462,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| where column.isActive == true' +
-          `\n| summarize sum(toint(todynamic(todynamic(column).level).active))` +
-          `\n| take ${limit}`
+          `\n| summarize sum(toint(todynamic(todynamic(column).level).active))`
       );
     });
 
@@ -511,8 +490,7 @@ describe('KustoExpressionParser', () => {
           '\n| where $__timeFilter(StartTime)' +
           '\n| where column.isActive == true' +
           `\n| summarize sum(toint(todynamic(todynamic(column).level).active)) by bin(StartTime, 1h)` +
-          `\n| order by StartTime asc` +
-          `\n| take ${limit}`
+          `\n| order by StartTime asc`
       );
     });
 
@@ -539,8 +517,7 @@ describe('KustoExpressionParser', () => {
           '\n| where $__timeFilter(StartTime)' +
           '\n| where column.isActive == true' +
           `\n| summarize by bin(StartTime, 1h)` +
-          `\n| order by StartTime asc` +
-          `\n| take ${limit}`
+          `\n| order by StartTime asc`
       );
     });
 
@@ -567,8 +544,7 @@ describe('KustoExpressionParser', () => {
           '\n| where $__timeFilter(StartTime)' +
           '\n| where column.isActive == true' +
           `\n| summarize by bin(StartTime, 1h), type` +
-          `\n| order by StartTime asc` +
-          `\n| take ${limit}`
+          `\n| order by StartTime asc`
       );
     });
 
@@ -599,8 +575,7 @@ describe('KustoExpressionParser', () => {
           '\n| where $__timeFilter(EndTime)' +
           '\n| where column.isActive == true' +
           `\n| summarize by bin(EndTime, 1h), type` +
-          `\n| order by EndTime asc` +
-          `\n| take ${limit}`
+          `\n| order by EndTime asc`
       );
     });
 
@@ -631,8 +606,7 @@ describe('KustoExpressionParser', () => {
           '\n| where todatetime(todynamic(column).EndTime) between ($__timeFrom .. $__timeTo)' +
           '\n| where column.isActive == true' +
           `\n| summarize by bin(todatetime(todynamic(column).EndTime), 1h), type` +
-          `\n| order by todatetime(todynamic(column).EndTime) asc` +
-          `\n| take ${limit}`
+          `\n| order by todatetime(todynamic(column).EndTime) asc`
       );
     });
 
@@ -658,8 +632,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| where column.isActive == true' +
-          `\n| summarize by tostring(todynamic(column).type)` +
-          `\n| take ${limit}`
+          `\n| summarize by tostring(todynamic(column).type)`
       );
     });
 
@@ -678,7 +651,7 @@ describe('KustoExpressionParser', () => {
         replace: jest.fn(),
       };
 
-      const parser = new KustoExpressionParser(limit, templateSrv);
+      const parser = new KustoExpressionParser(templateSrv);
 
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
@@ -701,8 +674,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| where column.country == $country' +
-          `\n| summarize by tostring(todynamic(column).type)` +
-          `\n| take ${limit}`
+          `\n| summarize by tostring(todynamic(column).type)`
       );
     });
 
@@ -728,8 +700,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           "\n| where column.country == 'sweden'" +
-          `\n| summarize percentile(amount, 1)` +
-          `\n| take ${limit}`
+          `\n| summarize percentile(amount, 1)`
       );
     });
 
@@ -755,8 +726,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           "\n| where column.country == 'sweden'" +
-          `\n| summarize percentile(amount, 1, 2)` +
-          `\n| take ${limit}`
+          `\n| summarize percentile(amount, 1, 2)`
       );
     });
 
@@ -782,8 +752,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           "\n| where column.country == 'sweden'" +
-          `\n| summarize percentile(amount, 1)` +
-          `\n| take ${limit}`
+          `\n| summarize percentile(amount, 1)`
       );
     });
 
@@ -809,8 +778,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           "\n| where column.country == 'sweden'" +
-          `\n| summarize percentile(amount, 1, '2')` +
-          `\n| take ${limit}`
+          `\n| summarize percentile(amount, 1, '2')`
       );
     });
 
@@ -833,8 +801,7 @@ describe('KustoExpressionParser', () => {
           '\n| where StartTime between (($__timeFrom - 2d) .. ($__timeTo - 2d))' +
           "\n| where country == 'sweden'" +
           `\n| extend StartTime = StartTime + 2d` +
-          `\n| order by StartTime asc` +
-          `\n| take ${limit}`
+          `\n| order by StartTime asc`
       );
     });
 
@@ -845,7 +812,7 @@ describe('KustoExpressionParser', () => {
         timeshift: createProperty('2d'),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where country == 'sweden'" + `\n| take ${limit}`);
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where country == 'sweden'");
     });
 
     it('should parse expression with timeshift without any valid timeshift value', () => {
@@ -866,8 +833,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           "\n| where country == 'sweden'" +
-          `\n| order by StartTime asc` +
-          `\n| take ${limit}`
+          `\n| order by StartTime asc`
       );
     });
 
@@ -888,8 +854,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| where isnotempty(country)' +
-          `\n| order by StartTime asc` +
-          `\n| take ${limit}`
+          `\n| order by StartTime asc`
       );
     });
 
@@ -909,10 +874,7 @@ describe('KustoExpressionParser', () => {
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
-        'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| summarize dcount(country) by continents' +
-          `\n| take ${limit}`
+        'StormEvents' + '\n| where $__timeFilter(StartTime)' + '\n| summarize dcount(country) by continents'
       );
     });
 
@@ -932,10 +894,7 @@ describe('KustoExpressionParser', () => {
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
-        'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| summarize dcount(country) by continents' +
-          `\n| take ${limit}`
+        'StormEvents' + '\n| where $__timeFilter(StartTime)' + '\n| summarize dcount(country) by continents'
       );
     });
 
@@ -955,10 +914,7 @@ describe('KustoExpressionParser', () => {
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
-        'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| summarize dcount(country) by continents' +
-          `\n| take ${limit}`
+        'StormEvents' + '\n| where $__timeFilter(StartTime)' + '\n| summarize dcount(country) by continents'
       );
     });
   });

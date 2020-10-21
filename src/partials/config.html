@@ -100,15 +100,6 @@
 <div class ="gf-form-group">
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Default take limit</span>
-      <input type="number" min="1" class="gf-form-input width-9" ng-model="ctrl.current.jsonData.defaultTakeLimit" spellcheck="false" placeholder="10000"></input>
-      <info-popover mode="right-absolute">
-        By default Grafana adds a take limit on 10 000 to prevent the plugin from issuing queries that could overload the ADX cluster.<br /><br/>This is only applied to the queries when using the visual query editor to build your queries.
-      </info-popover>
-    </div>
-  </div>
-  <div class="gf-form-inline">
-    <div class="gf-form">
       <gf-form-switch label="Use dynamic caching" checked="ctrl.current.jsonData.dynamicCaching" label-class="width-11">
       </gf-form-switch>
       <info-popover mode="right-normal">
