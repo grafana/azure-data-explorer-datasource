@@ -2,6 +2,7 @@ import { QueryEditorPropertyType, QueryEditorFunctionDefinition, QueryEditorFunc
 
 export class QueryEditorFunctionBuilder {
   private label: string;
+  private appliedOnField = true;
   private parameters: QueryEditorFunctionParameter[] = [];
 
   constructor(private value: string, private functions: QueryEditorFunctionDefinition[]) {
@@ -18,12 +19,18 @@ export class QueryEditorFunctionBuilder {
     return this;
   }
 
+  isAppliedOnField(value: boolean) {
+    this.appliedOnField = value;
+    return this;
+  }
+
   add(): void {
     this.functions.push({
       value: this.value,
       label: this.label,
       type: QueryEditorPropertyType.Function,
       parameters: this.parameters,
+      applyOnField: this.appliedOnField,
     });
   }
 }
