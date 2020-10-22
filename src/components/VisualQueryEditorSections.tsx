@@ -189,10 +189,6 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
 export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduceSection =>
   reduceSection
     .withFunctions(functions => {
-      functions('none')
-        .withLabel('None')
-        .add();
-
       functions('sum')
         .withLabel('Sum')
         .add();
@@ -202,6 +198,7 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
         .add();
 
       functions('count')
+        .isAppliedOnField(false)
         .withLabel('Count')
         .add();
 
