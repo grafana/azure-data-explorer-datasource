@@ -78,6 +78,7 @@ export interface AdxDatabaseSchema {
   Name: string;
   Tables: Record<string, AdxTableSchema>;
   ExternalTables: Record<string, AdxTableSchema>;
+  Functions: Record<string, AdxFunctionSchema>;
 }
 
 export interface AdxTableSchema {
@@ -89,3 +90,13 @@ export interface AdxColumnSchema {
   Name: string;
   CslType: string;
 }
+
+export interface AdxFunctionSchema {
+  Body: string;
+  FunctionKind: string;
+  Name: string;
+  InputParameters: AdxFunctionInputParameterSchema[];
+  OutputColumns: AdxColumnSchema[];
+}
+
+export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
