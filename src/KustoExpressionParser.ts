@@ -202,7 +202,6 @@ export class KustoExpressionParser {
           countAddedInReduce = true;
           reduceParts.push('count()');
         }
-        groupByParts.push(column);
         continue;
       }
 

@@ -38,6 +38,7 @@ export interface QueryEditorPropertyDefinition {
 
 export interface QueryEditorFunctionDefinition extends QueryEditorPropertyDefinition {
   parameters?: QueryEditorFunctionParameter[];
+  applyOnField: boolean;
 }
 
 export interface QueryEditorFunctionParameter {
