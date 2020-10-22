@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Added support for decimal data type.
 - Removed global query limit to prevent data being truncated.
+- Bugfix: fixing so we properly select ADX time series option when editor is in raw mode.
 
 ## [3.1.0]
 
