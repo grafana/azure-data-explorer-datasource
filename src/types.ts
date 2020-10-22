@@ -67,6 +67,7 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   dataConsistency: string;
   cacheMaxAge: string;
   dynamicCaching: boolean;
+  useSchemaMapping: boolean;
 }
 
 export interface AdxSchema {

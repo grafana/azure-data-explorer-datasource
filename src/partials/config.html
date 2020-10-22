@@ -140,6 +140,22 @@
   </div>
 </div>
 
+<h3 class="page-heading">Database schema settings</h3>
+<div class ="gf-form-group">
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <gf-form-switch label="Use schema mapping" checked="ctrl.current.jsonData.useSchemaMapping" label-class="width-11">
+      </gf-form-switch>
+      <info-popover mode="right-normal">
+        By enabling this feature you can specify what tables/functions/views that should be available when building queries in the visual query builder.
+      </info-popover>
+    </div>
+  </div>
+  <div ng-show="ctrl.current.jsonData.useSchemaMapping">
+    
+  </div>
+</div>
+
 <div class="gf-form-group" ng-if="ctrl.showMinVersionWarning()">
   <div class=" alert alert-error">
       This datasource requires Grafana 7.1.0 or greater. <a class="external-link" target="_blank" href="https://grafana.com/get">Download a new version of
