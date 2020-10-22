@@ -36,7 +36,7 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
   state: State = {};
 
   onRawQueryChange = (kql: string) => {
-    const resultFormat = selectResultFormat(this.props.query.resultFormat);
+    const resultFormat = selectResultFormat(this.props.query.resultFormat, true);
 
     this.props.onChange({
       ...this.props.query,
@@ -56,7 +56,7 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
   render() {
     const { query, datasource, lastQueryError, lastQuery, timeNotASC, schema } = this.props;
     const { showLastQuery, showHelp } = this.state;
-    const resultFormat = selectResultFormat(query.resultFormat);
+    const resultFormat = selectResultFormat(query.resultFormat, true);
 
     const styles = getStyles();
 
