@@ -10,7 +10,7 @@ import {
   LoadingState,
   ScopedVars,
 } from '@grafana/data';
-import { map } from 'lodash';
+import { isEmpty, isUndefined, map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import {
@@ -58,7 +58,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
    * Return true if it should execute
    */
   filterQuery(target: KustoQuery): boolean {
-    if (target.hide) {
+    if (target.hide || !target.query) {
       return false;
     }
     if (typeof target.rawMode === 'undefined' && target.query) {
