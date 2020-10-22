@@ -10,7 +10,7 @@ import {
   LoadingState,
   ScopedVars,
 } from '@grafana/data';
-import { isEmpty, isUndefined, map } from 'lodash';
+import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import {
