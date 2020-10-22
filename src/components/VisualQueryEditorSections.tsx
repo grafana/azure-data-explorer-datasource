@@ -202,6 +202,7 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
         .add();
 
       functions('count')
+        .isAppliedOnField(false)
         .withLabel('Count')
         .add();
 

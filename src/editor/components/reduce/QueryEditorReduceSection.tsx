@@ -1,6 +1,6 @@
 import React from 'react';
 import { css } from 'emotion';
-import { QueryEditorPropertyDefinition } from '../../types';
+import { QueryEditorFunctionDefinition, QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { SelectableValue } from '@grafana/data';
 import { QueryEditorExpression, QueryEditorArrayExpression } from '../../expressions';
@@ -11,7 +11,7 @@ import { QueryEditorRepeater } from '../QueryEditorRepeater';
 
 interface ReduceSectionConfiguration {
   defaultValue: QueryEditorExpression;
-  functions: QueryEditorPropertyDefinition[];
+  functions: QueryEditorFunctionDefinition[];
 }
 
 export interface QueryEditorReduceSectionProps extends QueryEditorSectionProps {
