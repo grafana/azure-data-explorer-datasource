@@ -162,8 +162,37 @@
     </div>
   </div>
   <div ng-show="ctrl.current.jsonData.useSchemaMapping">
-    
+    <hr />
+    <div class="gf-form-inline" style="margin-top: 4px;" ng-repeat="mapping in ctrl.current.jsonData.schemaMappings">
+      <div style="width: 90%;">
+        <span>{{ctrl.formatMapping(mapping)}}</span>
+      </div>
+      <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.removeSchemaMapping($index)">X</a>
+    </div>
+    <div ng-if="ctrl.current.jsonData.schemaMappings.length === 0">
+      <span>No mappings added</span>
+    </div>
+    <hr />
+    <div class="gf-form">
+      <span class="gf-form-label width-5">Target</span>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input" ng-model="ctrl.mapping" ng-options="m as m.text for m in ctrl.schemaMappingOptions"></select>
+      </div>
+      <span ng-if="ctrl.mapping.input.length > 0" class="gf-form-label">(</span>
+    </div>
+    <div style="margin-left: 20px;">
+      <div class="gf-form" ng-repeat="i in ctrl.mapping.input">
+        <span class="gf-form-label">{{i.Name}}</span>
+        <input class="gf-form-input width-15" ng-model="ctrl.mapping.input[$index].Value" type="text" placeholder=""></input>
+        <span ng-if="($index + 1) !== ctrl.mapping.input.length" class="gf-form-label">,</span>
+      </div>
+    </div>
+    <div class="gf-form">
+      <span ng-if="ctrl.mapping.input.length > 0" class="gf-form-label">)</span>
+    </div>
+    <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.addSchemaMapping()">Add mapping</a>
   </div>
+  <hr />
 </div>
 
 <div class="gf-form-group" ng-if="ctrl.showMinVersionWarning()">
