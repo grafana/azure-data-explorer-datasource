@@ -22,6 +22,7 @@ import {
   QueryExpression,
   EditorMode,
   AutoCompleteQuery,
+  SchemaMapping,
 } from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
@@ -39,6 +40,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private url?: string;
   private expressionParser: KustoExpressionParser;
   private defaultEditorMode: EditorMode;
+  private schemaMappings: SchemaMapping[];
+  private schemaMappingsEnabled: boolean;
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
@@ -50,6 +53,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.url = instanceSettings.url;
     this.expressionParser = new KustoExpressionParser(this.templateSrv);
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
+    this.schemaMappings = instanceSettings.jsonData.schemaMappings;
+    this.schemaMappingsEnabled = instanceSettings.jsonData.useSchemaMapping;
     this.parseExpression = this.parseExpression.bind(this);
     this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
   }
@@ -192,6 +197,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       },
       refreshCache
     );
+  }
+
+  useSchemaMapping() {
+    return this.schemaMappingsEnabled ?? false;
+  }
+
+  getSchemaMappings() {
+    return this.schemaMappings ?? [];
   }
 
   async getDynamicSchema(

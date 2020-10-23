@@ -71,6 +71,7 @@ export class KustoDBConfigCtrl {
       database: this.mapping.database,
       type: this.mapping.type,
       name: this.mapping.text,
+      value: this.mapping.value,
       input:
         this.mapping.input?.map(i => ({
           name: i.Name,

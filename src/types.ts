@@ -64,6 +64,7 @@ export interface SchemaMapping {
   database: string;
   type: SchemaMappingType;
   name: string;
+  value: string;
   input: SchemaInputMapping[];
 }
 
@@ -101,6 +102,11 @@ export interface AdxDatabaseSchema {
 export interface AdxTableSchema {
   Name: string;
   OrderedColumns: AdxColumnSchema[];
+}
+
+export interface AdxMappedTabledSchema extends AdxTableSchema {
+  Type: SchemaMappingType;
+  Input: SchemaInputMapping[];
 }
 
 export interface AdxColumnSchema {

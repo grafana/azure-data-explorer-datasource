@@ -1,6 +1,7 @@
-import { AdxColumnSchema, AdxDatabaseSchema, AdxTableSchema } from '../types';
+import { AdxColumnSchema, AdxDatabaseSchema, AdxMappedTabledSchema, AdxTableSchema, SchemaMapping } from '../types';
 import { AdxDataSource } from '../datasource';
 import { cache } from './cache';
+import { map } from 'lodash';
 
 const schemaKey = 'AdxSchemaResolver';
 
@@ -12,9 +13,41 @@ export class AdxSchemaResolver {
   }
 
   async getDatabases(): Promise<AdxDatabaseSchema[]> {
-    const cacheKey = this.createCacheKey('db');
-    const schema = await cache(cacheKey, () => this.datasource.getSchema());
-    return Object.keys(schema.Databases).map(key => schema.Databases[key]);
+    const schema = await this.datasource.getSchema();
+
+    if (!this.datasource.useSchemaMapping()) {
+      return Object.keys(schema.Databases).map(key => schema.Databases[key]);
+    }
+
+    const schemaMappingsByDatabase = this.datasource
+      .getSchemaMappings()
+      .reduce((grouped: Record<string, SchemaMapping[]>, mapping) => {
+        if (!Array.isArray(grouped[mapping.database])) {
+          grouped[mapping.database] = [];
+        }
+        grouped[mapping.database].push(mapping);
+        return grouped;
+      }, {});
+
+    return Object.keys(schema.Databases).map(key => {
+      const database = schema.Databases[key];
+      const mappings = schemaMappingsByDatabase[key] ?? [];
+      const mappingsAsTables = mappings.reduce((record: Record<string, AdxTableSchema>, mapping) => {
+        const table: AdxMappedTabledSchema = {
+          Name: mapping.value,
+          OrderedColumns: [],
+          Type: mapping.type,
+          Input: mapping.input,
+        };
+        record[mapping.name] = table;
+        return record;
+      }, {});
+
+      return {
+        ...database,
+        Tables: mappingsAsTables,
+      };
+    });
   }
 
   async getTablesForDatabase(databaseName: string): Promise<AdxTableSchema[]> {
