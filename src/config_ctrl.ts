@@ -18,6 +18,7 @@ export class KustoDBConfigCtrl {
   databases: any[];
   hasRequiredGrafanaVersion: boolean;
   loading = false;
+  schemaError = false;
   editorModes: Array<{ value: string; label: string }>;
 
   /** @ngInject */
@@ -33,7 +34,7 @@ export class KustoDBConfigCtrl {
     if (this.current.id) {
       this.current.url = 'api/datasources/proxy/' + this.current.id;
       this.datasource = new AdxDataSource(this.current);
-      this.getDatabases();
+      this.refreshSchema();
     }
 
     this.editorModes = Object.keys(EditorMode)
@@ -54,20 +55,31 @@ export class KustoDBConfigCtrl {
     }
   }
 
-  getDatabases() {
+  refreshSchema() {
     if (!this.datasource) {
       return [];
     }
 
     this.loading = true;
-    return this.datasource.getDatabases().then(dbs => {
-      this.loading = false;
-      this.databases = dbs;
-      if (!this.current.jsonData.defaultDatabase && dbs.length) {
-        this.current.jsonData.defaultDatabase = dbs[0].value;
-      }
-      this.$scope.$digest(); // force thigns to re-render
-    });
+
+    return this.datasource
+      .getSchema(true)
+      .then(schema => {
+        this.databases = Object.keys(schema.Databases).map(key => ({ text: key, value: key }));
+
+        if (!this.current.jsonData.defaultDatabase && this.databases.length) {
+          this.current.jsonData.defaultDatabase = this.databases[0].value;
+        }
+
+        this.loading = false;
+        this.schemaError = false;
+        this.$scope.$digest();
+      })
+      .catch(e => {
+        this.loading = false;
+        this.schemaError = true;
+        this.$scope.$digest();
+      });
   }
 
   hasMinVersion(): boolean {

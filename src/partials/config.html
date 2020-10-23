@@ -81,19 +81,6 @@
     <input type="text" class="gf-form-input max-width-12" disabled="disabled" value="configured">
     <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.current.secureJsonFields.clientSecret = false">reset</a>
   </div>
-  <div class="gf-form-inline">
-    <div class="gf-form">
-      <span class="gf-form-label width-11">Default Database</span>
-      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
-        <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultDatabase" ng-options="f.value as f.text for f in ctrl.databases"></select>
-      </div>
-      <i ng-if="ctrl.loading" class="fa fa-spinner fa-pulse"></i>
-      
-      <info-popover mode="right-normal">
-        <p>Choose the default/preferred Database for this Azure Data Explorer Cluster.</p>
-      </info-popover>
-    </div>
-  </div>
 </div>
 
 <h3 class="page-heading">Query Optimizations</h3>
@@ -141,11 +128,30 @@
 </div>
 
 <h3 class="page-heading">Database schema settings
-  <a ng-click="" class="btn btn-small">
-    <icon name="'sync'" class="panel-loading__spinner spin-clockwise" style="margin-bottom: 0;"></icon>
+  <a ng-click="ctrl.refreshSchema()" class="btn btn-small">
+    <icon ng-if="ctrl.loading" name="'sync'" class="panel-loading__spinner spin-clockwise" style="margin-bottom: 0;"></icon>
+    <icon ng-if="!ctrl.loading" name="'sync'" style="margin-bottom: 0;"></icon>
   </a>
 </h3>
-<div class ="gf-form-group">
+<div ng-if="ctrl.schemaError" class ="gf-form-group">
+  <div class="alert alert-warning">
+    <div class="alert-body">
+      Could not load database schema, make sure you have correct credentials. Then save the settings and refresh the database schema settings.
+    </div>
+  </div>
+</div>
+<div ng-if="!ctrl.schemaError" class ="gf-form-group">
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-11">Default Database</span>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultDatabase" ng-options="f.value as f.text for f in ctrl.databases"></select>
+      </div>      
+      <info-popover mode="right-normal">
+        <p>Choose the default/preferred Database for this Azure Data Explorer Cluster.</p>
+      </info-popover>
+    </div>
+  </div>
   <div class="gf-form-inline">
     <div class="gf-form">
       <gf-form-switch label="Use schema mapping" checked="ctrl.current.jsonData.useSchemaMapping" label-class="width-11">

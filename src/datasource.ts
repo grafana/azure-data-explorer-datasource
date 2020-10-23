@@ -176,18 +176,22 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  async getSchema(): Promise<AdxSchema> {
-    return cache(`${this.id}.schema.overview`, () => {
-      const url = `${this.baseUrl}/v1/rest/mgmt`;
-      const req = {
-        querySource: 'schema',
-        csl: `.show databases schema as json`,
-      };
+  async getSchema(refreshCache = false): Promise<AdxSchema> {
+    return cache(
+      `${this.id}.schema.overview`,
+      () => {
+        const url = `${this.baseUrl}/v1/rest/mgmt`;
+        const req = {
+          querySource: 'schema',
+          csl: `.show databases schema as json`,
+        };
 
-      return this.doRequest(url, req).then(response => {
-        return new ResponseParser().parseSchemaResult(response.data);
-      });
-    });
+        return this.doRequest(url, req).then(response => {
+          return new ResponseParser().parseSchemaResult(response.data);
+        });
+      },
+      refreshCache
+    );
   }
 
   async getDynamicSchema(
