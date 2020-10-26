@@ -280,7 +280,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       />
       <KustoValueColumnEditorSection
         templateVariableOptions={props.templateVariableOptions}
-        label="Aggregate by"
+        label="Aggregate"
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
         fields={columns}
         onChange={onReduceChange}
