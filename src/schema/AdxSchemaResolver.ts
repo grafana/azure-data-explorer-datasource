@@ -1,7 +1,6 @@
 import { AdxColumnSchema, AdxDatabaseSchema, AdxMappedTabledSchema, AdxTableSchema, SchemaMapping } from '../types';
 import { AdxDataSource } from '../datasource';
 import { cache } from './cache';
-import { map } from 'lodash';
 
 const schemaKey = 'AdxSchemaResolver';
 
@@ -13,41 +12,9 @@ export class AdxSchemaResolver {
   }
 
   async getDatabases(): Promise<AdxDatabaseSchema[]> {
+    // exclude functions if they are not mapped.
     const schema = await this.datasource.getSchema();
-
-    if (!this.datasource.useSchemaMapping()) {
-      return Object.keys(schema.Databases).map(key => schema.Databases[key]);
-    }
-
-    const schemaMappingsByDatabase = this.datasource
-      .getSchemaMappings()
-      .reduce((grouped: Record<string, SchemaMapping[]>, mapping) => {
-        if (!Array.isArray(grouped[mapping.database])) {
-          grouped[mapping.database] = [];
-        }
-        grouped[mapping.database].push(mapping);
-        return grouped;
-      }, {});
-
-    return Object.keys(schema.Databases).map(key => {
-      const database = schema.Databases[key];
-      const mappings = schemaMappingsByDatabase[key] ?? [];
-      const mappingsAsTables = mappings.reduce((record: Record<string, AdxTableSchema>, mapping) => {
-        const table: AdxMappedTabledSchema = {
-          Name: mapping.value,
-          OrderedColumns: [],
-          Type: mapping.type,
-          Input: mapping.input,
-        };
-        record[mapping.name] = table;
-        return record;
-      }, {});
-
-      return {
-        ...database,
-        Tables: mappingsAsTables,
-      };
-    });
+    return Object.keys(schema.Databases).map(key => schema.Databases[key]);
   }
 
   async getTablesForDatabase(databaseName: string): Promise<AdxTableSchema[]> {
@@ -58,6 +25,7 @@ export class AdxSchemaResolver {
       return [];
     }
 
+    // combine functions, tables and views into one list.
     return Object.keys(database.Tables).map(key => database.Tables[key]);
   }
 
@@ -71,6 +39,9 @@ export class AdxSchemaResolver {
       if (!table) {
         return [];
       }
+
+      // check if view, table or function.
+      // if function getSchema and then do the following:
 
       const dynamicColumns = table.OrderedColumns.filter(column => column.CslType === 'dynamic').map(
         column => column.Name

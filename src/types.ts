@@ -71,6 +71,7 @@ export interface SchemaMapping {
 export enum SchemaMappingType {
   function = 'function',
   table = 'table',
+  materializedView = 'view',
 }
 export interface SchemaInputMapping {
   name: String;
@@ -97,6 +98,7 @@ export interface AdxDatabaseSchema {
   Tables: Record<string, AdxTableSchema>;
   ExternalTables: Record<string, AdxTableSchema>;
   Functions: Record<string, AdxFunctionSchema>;
+  MaterializedViews: Record<string, AdxTableSchema>;
 }
 
 export interface AdxTableSchema {

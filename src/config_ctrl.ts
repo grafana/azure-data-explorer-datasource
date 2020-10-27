@@ -70,13 +70,9 @@ export class KustoDBConfigCtrl {
     this.current.jsonData.schemaMappings.push({
       database: this.mapping.database,
       type: this.mapping.type,
-      name: this.mapping.text,
-      value: this.mapping.value,
-      input:
-        this.mapping.input?.map(i => ({
-          name: i.Name,
-          value: i.Value ?? '',
-        })) ?? [],
+      name: this.mapping.value,
+      displayName: this.mapping.name,
+      value: this.formatMappingValue(this.mapping),
     });
 
     this.mapping = undefined;
@@ -86,12 +82,8 @@ export class KustoDBConfigCtrl {
     this.current.jsonData.schemaMappings.splice(index, 1);
   }
 
-  formatMapping(mapping: any): string {
-    if (!mapping) {
-      return 'Invalid mapping';
-    }
-
-    switch (mapping.type) {
+  formatMappingValue(mapping: any): string {
+    switch (mapping?.type) {
       case 'function':
         const input = mapping.input ?? [];
         return `${mapping.name}(${input.map(i => i.value).join(',')})`;
@@ -100,11 +92,17 @@ export class KustoDBConfigCtrl {
     }
   }
 
+  formatMappingText(schemaMapping: any): string {
+    return `${schemaMapping.database}/${schemaMapping.type}s/${schemaMapping.name}`;
+  }
+
   refreshSchema() {
     if (!this.datasource) {
       return;
     }
     this.loading = true;
+    const databases: any[] = [];
+    const schemaMappingOptions: any[] = [];
 
     this.datasource
       .getSchema(true)
@@ -112,7 +110,7 @@ export class KustoDBConfigCtrl {
         for (const dbName of Object.keys(schema.Databases)) {
           const database = schema.Databases[dbName];
 
-          this.databases.push({
+          databases.push({
             text: database.Name,
             value: database.Name,
           });
@@ -120,10 +118,11 @@ export class KustoDBConfigCtrl {
           for (const tableName of Object.keys(database.Tables)) {
             const table = database.Tables[tableName];
 
-            this.schemaMappingOptions.push({
+            schemaMappingOptions.push({
               type: 'table',
               text: `${database.Name}/tables/${table.Name}`,
               value: table.Name,
+              name: table.Name,
               database: database.Name,
             });
           }
@@ -131,11 +130,24 @@ export class KustoDBConfigCtrl {
           for (const functionName of Object.keys(database.Functions)) {
             const func = database.Functions[functionName];
 
-            this.schemaMappingOptions.push({
+            schemaMappingOptions.push({
               type: 'function',
               text: `${database.Name}/functions/${func.Name}`,
               value: func.Name,
+              name: func.Name,
               input: func.InputParameters,
+              database: database.Name,
+            });
+          }
+
+          for (const viewName of Object.keys(database.MaterializedViews)) {
+            const view = database.MaterializedViews[viewName];
+
+            schemaMappingOptions.push({
+              type: 'materializedView',
+              text: `${database.Name}/materializedViews/${view.Name}`,
+              value: view.Name,
+              name: view.Name,
               database: database.Name,
             });
           }
@@ -145,11 +157,14 @@ export class KustoDBConfigCtrl {
           this.current.jsonData.defaultDatabase = this.databases[0].value;
         }
 
+        this.databases = databases;
+        this.schemaMappingOptions = schemaMappingOptions;
         this.loading = false;
         this.schemaError = false;
         this.$scope.$digest();
       })
       .catch(e => {
+        console.error('ADX failed to fetch schema: ', e);
         this.loading = false;
         this.schemaError = true;
         this.$scope.$digest();

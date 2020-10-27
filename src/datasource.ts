@@ -199,20 +199,35 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     );
   }
 
-  useSchemaMapping() {
-    return this.schemaMappingsEnabled ?? false;
-  }
+  async getFunctionSchema(database: string, targetFunction: string): Promise<Record<string, AdxColumnSchema[]>> {
+    const queryParts: string[] = [];
+    const take = 'take 50000';
 
-  getSchemaMappings() {
-    return this.schemaMappings ?? [];
+    queryParts.push(targetFunction);
+    queryParts.push(take);
+    queryParts.push('getSchema');
+
+    const query = this.buildQuery(queryParts.join('\n | '), {}, database);
+    const response = await this.query({
+      targets: [
+        {
+          ...query,
+          querySource: 'schema',
+        },
+      ],
+    } as DataQueryRequest<KustoQuery>).toPromise();
+
+    console.log(response.data);
+    return {};
+    //return functionSchemaParer(response);
   }
 
   async getDynamicSchema(
     database: string,
-    table: string,
+    source: string,
     columns: string[]
   ): Promise<Record<string, AdxColumnSchema[]>> {
-    if (!database || !table || !Array.isArray(columns) || columns.length === 0) {
+    if (!database || !source || !Array.isArray(columns) || columns.length === 0) {
       return {};
     }
     const queryParts: string[] = [];
@@ -222,7 +237,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     const project = `project ${columns.map(column => column).join(', ')}`;
     const summarize = `summarize ${columns.map(column => `buildschema(${column})`).join(', ')}`;
 
-    queryParts.push(table);
+    queryParts.push(source);
     queryParts.push(take);
     queryParts.push(where);
     queryParts.push(project);

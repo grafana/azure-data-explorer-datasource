@@ -154,7 +154,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <gf-form-switch label="Use schema mapping" checked="ctrl.current.jsonData.useSchemaMapping" label-class="width-11">
+      <gf-form-switch label="Use managed schema" checked="ctrl.current.jsonData.useSchemaMapping" label-class="width-11">
       </gf-form-switch>
       <info-popover mode="right-normal">
         By enabling this feature you can specify what tables/functions/views that should be available when building queries in the visual query builder.
@@ -164,8 +164,8 @@
   <div ng-show="ctrl.current.jsonData.useSchemaMapping">
     <hr />
     <div class="gf-form-inline" style="margin-top: 4px;" ng-repeat="mapping in ctrl.current.jsonData.schemaMappings">
-      <div style="width: 90%;">
-        <span>{{ctrl.formatMapping(mapping)}}</span>
+      <div class="gf-form-inline" style="flex-grow: 1;">
+        <span>{{ctrl.formatMappingText(mapping)}} -> {{mapping.displayName}}</span>
       </div>
       <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.removeSchemaMapping($index)">X</a>
     </div>
@@ -189,6 +189,15 @@
     </div>
     <div class="gf-form">
       <span ng-if="ctrl.mapping.input.length > 0" class="gf-form-label">)</span>
+    </div>
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <span class="gf-form-label width-5">Name</span>
+        <input class="gf-form-input width-24" spellcheck="false" ng-model="ctrl.mapping.name"></input>
+        <info-popover mode="right-absolute">
+          The name that will be displayed in "from"-options list in the visual query editor.
+        </info-popover>
+      </div>
     </div>
     <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.addSchemaMapping()">Add mapping</a>
   </div>
