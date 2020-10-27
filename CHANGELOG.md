@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Added support for decimal data type.
 - Removed global query limit to prevent data being truncated.
 - Improved the visual query builder to make it easier to add aggregations to a query.
+- Bugfix: prevent empty queries from triggering when creating dashboard.
 - Bugfix: fixing so we properly select ADX time series option when editor is in raw mode.
 
 ## [3.1.0]

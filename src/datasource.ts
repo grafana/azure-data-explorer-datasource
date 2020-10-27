@@ -63,7 +63,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
    * Return true if it should execute
    */
   filterQuery(target: KustoQuery): boolean {
-    if (target.hide) {
+    if (target.hide || !target.query) {
       return false;
     }
     if (typeof target.rawMode === 'undefined' && target.query) {
