@@ -1,4 +1,4 @@
-import { QueryExpression, AdxColumnSchema, AutoCompleteQuery } from './types';
+import { QueryExpression, AdxColumnSchema, AutoCompleteQuery, SchemaMapping } from './types';
 import { QueryEditorPropertyType } from 'editor/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import {
@@ -22,7 +22,7 @@ interface ParseContext {
   castIfDynamic: (column: string) => string;
 }
 export class KustoExpressionParser {
-  constructor(private templateSrv: TemplateSrv = getTemplateSrv()) {}
+  constructor(private templateSrv: TemplateSrv = getTemplateSrv(), private mappings: SchemaMapping[] = []) {}
 
   toAutoCompleteQuery(query?: AutoCompleteQuery, tableSchema?: AdxColumnSchema[]): string {
     if (!query?.expression || !query.expression.from || !query.search.property) {
@@ -290,7 +290,7 @@ export class KustoExpressionParser {
   }
 
   private appendProperty(context: ParseContext, expression: QueryEditorPropertyExpression, parts: string[]) {
-    parts.push(expression.property.name);
+    parts.push(resolveFrom(expression.property.name, this.mappings));
   }
 
   private isTemplateVariable(value: string): boolean {
@@ -429,4 +429,9 @@ const detectTimeshift = (
     return null;
   }
   return timeshiftWith;
+};
+
+const resolveFrom = (from: string, mappings: SchemaMapping[]): string => {
+  const mapping = mappings.find(m => m.displayName === from);
+  return mapping?.value ?? from;
 };

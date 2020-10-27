@@ -1,4 +1,4 @@
-import { AdxTableSchema, AdxColumnSchema, AdxDatabaseSchema } from '../types';
+import { AdxTableSchema, AdxColumnSchema, AdxDatabaseSchema, SchemaMapping } from '../types';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import { SelectableValue } from '@grafana/data';
 

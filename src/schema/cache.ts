@@ -7,3 +7,13 @@ export const cache = async <T>(key: string, resolver: () => Promise<T>, refresh 
   }
   return store[key];
 };
+
+export const reset = (keysStartingWith: string): void => {
+  const keys = Object.keys(store);
+
+  for (const key of keys) {
+    if (key.startsWith(keysStartingWith)) {
+      delete store[key];
+    }
+  }
+};

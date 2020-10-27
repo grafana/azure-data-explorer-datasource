@@ -35,26 +35,25 @@ export class AdxSchemaResolver {
       const table = tables.find(t => t.Name === tableName);
       const schemaMapping = this.datasource.getSchemaMappings();
 
-      console.log('table', table);
-
       if (!table) {
         return [];
       }
 
-      if (schemaMapping.enabled) {
-        const mapping = schemaMapping.mappings.find(m => m.displayName === table.Name);
-        console.log('mapping', mapping);
+      const mapping = schemaMapping.mappings.find(m => m.displayName === table.Name);
 
-        if (mapping?.type === SchemaMappingType.function) {
-          table.OrderedColumns = await this.datasource.getFunctionSchema(databaseName, mapping.value);
-        }
+      if (schemaMapping.enabled && mapping?.type === SchemaMappingType.function) {
+        table.OrderedColumns = await this.datasource.getFunctionSchema(databaseName, mapping.value);
       }
 
       const dynamicColumns = table.OrderedColumns.filter(column => column.CslType === 'dynamic').map(
         column => column.Name
       );
 
-      const schemaByColumn = await this.datasource.getDynamicSchema(databaseName, tableName, dynamicColumns);
+      const schemaByColumn = await this.datasource.getDynamicSchema(
+        databaseName,
+        mapping?.name ?? tableName,
+        dynamicColumns
+      );
 
       return table.OrderedColumns.reduce((columns: AdxColumnSchema[], column) => {
         const schemaForDynamicColumn = schemaByColumn[column.Name];

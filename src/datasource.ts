@@ -54,10 +54,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.baseUrl = '/azuredataexplorer';
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
-    this.expressionParser = new KustoExpressionParser(this.templateSrv);
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
     this.schemaMappings = instanceSettings.jsonData.schemaMappings ?? [];
     this.useSchemaMapping = instanceSettings.jsonData.useSchemaMapping ?? false;
+    this.expressionParser = new KustoExpressionParser(this.templateSrv, this.schemaMappings);
     this.parseExpression = this.parseExpression.bind(this);
     this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
   }
@@ -237,7 +237,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
     queryParts.push(targetFunction);
     queryParts.push(take);
-    queryParts.push('getSchema');
+    queryParts.push('getschema');
 
     const query = this.buildQuery(queryParts.join('\n | '), {}, database);
     const response = await this.query({
@@ -249,9 +249,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       ],
     } as DataQueryRequest<KustoQuery>).toPromise();
 
-    console.log('function schema', response.data);
-    return [];
-    //return functionSchemaParer(response);
+    return functionSchemaParser(response.data as DataFrame[]);
   }
 
   async getDynamicSchema(
@@ -398,6 +396,33 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return operator.name === 'contains' ? sortStartsWithValuesFirst(results, operator.value) : results;
   }
 }
+
+const functionSchemaParser = (frames: DataFrame[]): AdxColumnSchema[] => {
+  const result: AdxColumnSchema[] = [];
+  const fields = frames[0].fields;
+
+  if (!fields) {
+    return result;
+  }
+
+  const nameIndex = fields.findIndex(f => f.name === 'ColumnName');
+  const typeIndex = fields.findIndex(f => f.name === 'ColumnType');
+
+  if (nameIndex < 0 || typeIndex < 0) {
+    return result;
+  }
+
+  for (const frame of frames) {
+    for (let index = 0; index < frame.length; index++) {
+      result.push({
+        Name: frame.fields[nameIndex].values.get(index),
+        CslType: frame.fields[typeIndex].values.get(index),
+      });
+    }
+  }
+
+  return result;
+};
 
 const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchema[]> => {
   const result: Record<string, AdxColumnSchema[]> = {};
