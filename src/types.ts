@@ -64,20 +64,15 @@ export interface SchemaMapping {
   database: string;
   type: SchemaMappingType;
   name: string;
+  displayName: string;
   value: string;
-  input: SchemaInputMapping[];
 }
 
 export enum SchemaMappingType {
   function = 'function',
   table = 'table',
-  materializedView = 'view',
+  materializedView = 'materializedView',
 }
-export interface SchemaInputMapping {
-  name: String;
-  value: String;
-}
-
 export interface AdxDataSourceOptions extends DataSourceJsonData {
   defaultDatabase: string;
   minimalCache: number;
@@ -104,11 +99,6 @@ export interface AdxDatabaseSchema {
 export interface AdxTableSchema {
   Name: string;
   OrderedColumns: AdxColumnSchema[];
-}
-
-export interface AdxMappedTabledSchema extends AdxTableSchema {
-  Type: SchemaMappingType;
-  Input: SchemaInputMapping[];
 }
 
 export interface AdxColumnSchema {

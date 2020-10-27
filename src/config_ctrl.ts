@@ -83,17 +83,18 @@ export class KustoDBConfigCtrl {
   }
 
   formatMappingValue(mapping: any): string {
+    console.log('mapping', mapping);
     switch (mapping?.type) {
       case 'function':
         const input = mapping.input ?? [];
-        return `${mapping.name}(${input.map(i => i.value).join(',')})`;
+        return `${mapping.value}(${input.map(i => i.Value).join(',')})`;
       default:
-        return mapping.name;
+        return mapping.value;
     }
   }
 
   formatMappingText(schemaMapping: any): string {
-    return `${schemaMapping.database}/${schemaMapping.type}s/${schemaMapping.name}`;
+    return `${schemaMapping.database}/${schemaMapping.type}s/${schemaMapping.value}`;
   }
 
   refreshSchema() {

@@ -41,7 +41,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private expressionParser: KustoExpressionParser;
   private defaultEditorMode: EditorMode;
   private schemaMappings: SchemaMapping[];
-  private schemaMappingsEnabled: boolean;
+  private useSchemaMapping: boolean;
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
@@ -53,8 +53,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.url = instanceSettings.url;
     this.expressionParser = new KustoExpressionParser(this.templateSrv);
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
-    this.schemaMappings = instanceSettings.jsonData.schemaMappings;
-    this.schemaMappingsEnabled = instanceSettings.jsonData.useSchemaMapping;
+    this.schemaMappings = instanceSettings.jsonData.schemaMappings ?? [];
+    this.useSchemaMapping = instanceSettings.jsonData.useSchemaMapping ?? false;
     this.parseExpression = this.parseExpression.bind(this);
     this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
   }
@@ -199,7 +199,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     );
   }
 
-  async getFunctionSchema(database: string, targetFunction: string): Promise<Record<string, AdxColumnSchema[]>> {
+  getSchemaMappings(): { enabled: boolean; mappings: SchemaMapping[] } {
+    return {
+      enabled: this.useSchemaMapping,
+      mappings: this.schemaMappings ?? [],
+    };
+  }
+
+  async getFunctionSchema(database: string, targetFunction: string): Promise<AdxColumnSchema[]> {
     const queryParts: string[] = [];
     const take = 'take 50000';
 
@@ -217,8 +224,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       ],
     } as DataQueryRequest<KustoQuery>).toPromise();
 
-    console.log(response.data);
-    return {};
+    console.log('function schema', response.data);
+    return [];
     //return functionSchemaParer(response);
   }
 
