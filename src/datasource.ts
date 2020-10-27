@@ -10,7 +10,7 @@ import {
   LoadingState,
   ScopedVars,
 } from '@grafana/data';
-import { map } from 'lodash';
+import { cloneDeep, map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import {
@@ -23,6 +23,9 @@ import {
   EditorMode,
   AutoCompleteQuery,
   SchemaMapping,
+  SchemaMappingType,
+  AdxDatabaseSchema,
+  AdxTableSchema,
 } from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
@@ -181,8 +184,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  async getSchema(refreshCache = false): Promise<AdxSchema> {
-    return cache(
+  async getSchema(refreshCache = false, ignoreMapping = true): Promise<AdxSchema> {
+    const schema = await cache<AdxSchema>(
       `${this.id}.schema.overview`,
       () => {
         const url = `${this.baseUrl}/v1/rest/mgmt`;
@@ -197,6 +200,28 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       },
       refreshCache
     );
+
+    if (!this.useSchemaMapping) {
+      return schema;
+    }
+
+    if (ignoreMapping) {
+      return schema;
+    }
+
+    return Object.keys(schema.Databases).reduce((schema, dbName) => {
+      const database = schema.Databases[dbName];
+      const tables = filterAndMapTables(database, this.schemaMappings);
+
+      schema.Databases[dbName] = {
+        ...database,
+        Tables: tables,
+        MaterializedViews: {},
+        Functions: {},
+      };
+
+      return schema;
+    }, cloneDeep(schema));
   }
 
   getSchemaMappings(): { enabled: boolean; mappings: SchemaMapping[] } {
@@ -490,4 +515,47 @@ export const sortStartsWithValuesFirst = (arr: string[], searchText: string) => 
   });
 
   return arr;
+};
+
+const filterAndMapTables = (database: AdxDatabaseSchema, mappings: SchemaMapping[]): Record<string, AdxTableSchema> => {
+  return mappings.reduce((tables: Record<string, AdxTableSchema>, mapping) => {
+    if (mapping.database !== database.Name) {
+      return tables;
+    }
+
+    if (mapping.type === SchemaMappingType.table) {
+      if (!database.Tables[mapping.name]) {
+        return tables;
+      }
+      tables[mapping.displayName] = {
+        ...database.Tables[mapping.name],
+        Name: mapping.displayName,
+      };
+      return tables;
+    }
+
+    if (mapping.type === SchemaMappingType.materializedView) {
+      if (!database.MaterializedViews[mapping.name]) {
+        return tables;
+      }
+      tables[mapping.displayName] = {
+        ...database.MaterializedViews[mapping.name],
+        Name: mapping.displayName,
+      };
+      return tables;
+    }
+
+    if (mapping.type === SchemaMappingType.function) {
+      if (!database.Functions[mapping.name]) {
+        return tables;
+      }
+      tables[mapping.displayName] = {
+        Name: mapping.displayName,
+        OrderedColumns: [],
+      };
+      return tables;
+    }
+
+    return tables;
+  }, {});
 };

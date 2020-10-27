@@ -83,7 +83,6 @@ export class KustoDBConfigCtrl {
   }
 
   formatMappingValue(mapping: any): string {
-    console.log('mapping', mapping);
     switch (mapping?.type) {
       case 'function':
         const input = mapping.input ?? [];
@@ -106,7 +105,7 @@ export class KustoDBConfigCtrl {
     const schemaMappingOptions: any[] = [];
 
     this.datasource
-      .getSchema(true)
+      .getSchema({ refreshCache: true, ignoreMappings: true })
       .then(schema => {
         for (const dbName of Object.keys(schema.Databases)) {
           const database = schema.Databases[dbName];
