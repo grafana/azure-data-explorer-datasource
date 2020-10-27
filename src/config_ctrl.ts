@@ -105,7 +105,7 @@ export class KustoDBConfigCtrl {
     const schemaMappingOptions: any[] = [];
 
     this.datasource
-      .getSchema({ refreshCache: true, ignoreMappings: true })
+      .getSchema(true, true)
       .then(schema => {
         for (const dbName of Object.keys(schema.Databases)) {
           const database = schema.Databases[dbName];
