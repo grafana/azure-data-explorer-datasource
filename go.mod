@@ -3,6 +3,7 @@ module github.com/grafana/azure-data-explorer-datasource
 go 1.14
 
 require (
+	github.com/davecgh/go-spew v1.1.1
 	github.com/google/go-cmp v0.4.0
 	github.com/google/uuid v1.1.1
 	github.com/grafana/grafana-plugin-sdk-go v0.75.0

@@ -8,11 +8,13 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/hashicorp/go-hclog"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"golang.org/x/oauth2/microsoft"
 )
@@ -36,14 +38,17 @@ func (qm *QueryModel) Interpolate() (err error) {
 // dataSourceData holds the datasource configuration information for Azure Data Explorer's API
 // that is needed to execute a request against Azure's Data Explorer API.
 type dataSourceData struct {
-	ClientID        string `json:"clientId"`
-	TenantID        string `json:"tenantId"`
-	ClusterURL      string `json:"clusterUrl"`
-	DefaultDatabase string `json:"defaultDatabase"`
-	Secret          string `json:"-"`
-	DataConsistency string `json:"dataConsistency"`
-	CacheMaxAge     string `json:"cacheMaxAge"`
-	DynamicCaching  bool   `json:"dynamicCaching"`
+	ClientID           string        `json:"clientId"`
+	TenantID           string        `json:"tenantId"`
+	ClusterURL         string        `json:"clusterUrl"`
+	DefaultDatabase    string        `json:"defaultDatabase"`
+	Secret             string        `json:"-"`
+	DataConsistency    string        `json:"dataConsistency"`
+	CacheMaxAge        string        `json:"cacheMaxAge"`
+	DynamicCaching     bool          `json:"dynamicCaching"`
+	QueryTimeoutRaw    string        `json:"queryTimeout"`
+	QueryTimeout       time.Duration `json:"-"`
+	ServerTimeoutValue string        `json:"-"`
 }
 
 // Client is an http.Client used for API requests.
@@ -57,6 +62,7 @@ type Client struct {
 type options struct {
 	DataConsistency string `json:"queryconsistency,omitempty"`
 	CacheMaxAge     string `json:"query_results_cache_max_age,omitempty"`
+	ServerTimeout   string `json:"servertimeout,omitempty"`
 }
 
 // Properties property bag of connection string options
@@ -80,6 +86,19 @@ func newDataSourceData(dInfo *backend.DataSourceInstanceSettings) (*dataSourceDa
 	if err != nil {
 		return nil, err
 	}
+
+	if d.QueryTimeoutRaw == "" {
+		d.QueryTimeout = time.Second * 30
+	} else {
+		if d.QueryTimeout, err = time.ParseDuration(d.QueryTimeoutRaw); err != nil {
+			return nil, err
+		}
+	}
+
+	if d.ServerTimeoutValue, err = formatTimeout(d.QueryTimeout); err != nil {
+		return nil, err
+	}
+
 	d.Secret = dInfo.DecryptedSecureJSONData["clientSecret"]
 	return &d, nil
 }
@@ -95,6 +114,7 @@ func NewConnectionProperties(c *Client, cs *CacheSettings) *Properties {
 		&options{
 			DataConsistency: c.DataConsistency,
 			CacheMaxAge:     cacheMaxAge,
+			ServerTimeout:   c.ServerTimeoutValue,
 		},
 	}
 }
@@ -116,8 +136,27 @@ func NewClient(ctx context.Context, dInfo *backend.DataSourceInstanceSettings) (
 		Scopes:       []string{"https://kusto.kusto.windows.net/.default"},
 	}
 
-	c.Client = conf.Client(ctx)
+	authClient := oauth2.NewClient(ctx, conf.TokenSource(ctx))
+
+	c.Client = &http.Client{
+		Transport: authClient.Transport,
+		Timeout:   c.dataSourceData.QueryTimeout + 5*time.Second,
+	}
+
 	return &c, nil
+}
+
+func formatTimeout(d time.Duration) (string, error) {
+	if d >= 3600*time.Second {
+		return "", fmt.Errorf("timeout should be less than 1 hour")
+	}
+	if d < time.Minute {
+		return fmt.Sprintf("00:00:%02.0f", d.Seconds()), nil
+	}
+	tMinutes := d.Truncate(time.Minute)
+
+	tSeconds := d - tMinutes
+	return fmt.Sprintf("00:%02.0f:%02.0f)", tMinutes.Minutes(), tSeconds.Seconds()), nil
 }
 
 // TestRequest handles a data source test request in Grafana's Datasource configuration UI.
