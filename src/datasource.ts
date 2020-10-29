@@ -55,9 +55,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.url = instanceSettings.url;
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
     this.schemaMapper = new AdxSchemaMapper(useSchemaMapping, schemaMapping);
-    this.expressionParser = new KustoExpressionParser(this.templateSrv, this.schemaMapper);
+    this.expressionParser = new KustoExpressionParser(this.templateSrv);
     this.parseExpression = this.parseExpression.bind(this);
     this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
+    this.getSchemaMapper = this.getSchemaMapper.bind(this);
   }
 
   /**

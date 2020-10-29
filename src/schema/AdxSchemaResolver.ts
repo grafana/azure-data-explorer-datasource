@@ -58,7 +58,7 @@ export class AdxSchemaResolver {
     const mapper = this.datasource.getSchemaMapper();
 
     return cache(cacheKey, async () => {
-      const mapping = mapper.getMappingByName(tableName);
+      const mapping = mapper.getMappingByValue(tableName);
       const schema = await this.findSchema(databaseName, tableName, mapping);
 
       if (!schema) {

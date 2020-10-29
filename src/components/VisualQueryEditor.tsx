@@ -38,13 +38,14 @@ interface Props {
 
 export const VisualQueryEditor: React.FC<Props> = props => {
   const { query, database, datasource, schema, onChangeQuery } = props;
-  const { id: datasourceId, parseExpression, autoCompleteQuery } = datasource;
+  const { id: datasourceId, parseExpression, autoCompleteQuery, getSchemaMapper } = datasource;
 
   const resultFormat = selectResultFormat(query.resultFormat);
   const databaseName = getTemplateSrv().replace(database);
   const tables = useTableOptions(schema, databaseName, datasource);
   const table = useSelectedTable(tables, query, datasource);
   const tableName = getTemplateSrv().replace(table?.property.name ?? '');
+  const tableMapping = getSchemaMapper().getMappingByValue(table?.property.name);
   const timeshiftOptions = useTimeshiftOptions();
 
   const tableSchema = useAsync(async () => {
@@ -52,7 +53,8 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       return [];
     }
 
-    const schema = await getTableSchema(datasource, databaseName, tableName);
+    const name = tableMapping?.value ?? tableName;
+    const schema = await getTableSchema(datasource, databaseName, name);
     const expression = query.expression ?? defaultQuery.expression;
     const from = expression.from ?? table;
 
@@ -68,7 +70,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     });
 
     return schema;
-  }, [datasourceId, databaseName, tableName]);
+  }, [datasourceId, databaseName, tableName, tableMapping?.value]);
 
   const onAutoComplete = useCallback(
     async (index: string, search: QueryEditorOperatorExpression) => {

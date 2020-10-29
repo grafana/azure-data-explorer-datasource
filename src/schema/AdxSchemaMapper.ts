@@ -6,6 +6,7 @@ export class AdxSchemaMapper {
   private mappingsByDatabase: Record<string, SchemaMapping[]> = {};
   private displayNameToMapping: Record<string, SchemaMapping> = {};
   private nameToMapping: Record<string, SchemaMapping> = {};
+  private valueToMapping: Record<string, SchemaMapping> = {};
 
   constructor(private enabled = false, mappings: SchemaMapping[] = []) {
     for (const mapping of mappings) {
@@ -15,14 +16,15 @@ export class AdxSchemaMapper {
       this.mappingsByDatabase[mapping.database].push(mapping);
       this.displayNameToMapping[mapping.displayName] = mapping;
       this.nameToMapping[mapping.name] = mapping;
+      this.valueToMapping[mapping.value] = mapping;
     }
   }
 
-  getMappingByName(name?: string): SchemaMapping | undefined {
-    if (!this.enabled || !name) {
+  getMappingByValue(value?: string): SchemaMapping | undefined {
+    if (!this.enabled || !value) {
       return;
     }
-    return this.nameToMapping[name];
+    return this.valueToMapping[value];
   }
 
   getTableOptions(schema: AdxSchema, databaseName: string): QueryEditorPropertyDefinition[] {
@@ -78,6 +80,6 @@ const mappingToDefinition = (mapping: SchemaMapping): QueryEditorPropertyDefinit
   return {
     type: QueryEditorPropertyType.String,
     label: mapping.displayName,
-    value: mapping.name,
+    value: mapping.value,
   };
 };

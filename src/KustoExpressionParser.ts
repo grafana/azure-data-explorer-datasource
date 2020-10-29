@@ -16,14 +16,13 @@ import {
   QueryEditorPropertyExpression,
 } from './editor/expressions';
 import { cloneDeep } from 'lodash';
-import { AdxSchemaMapper } from './schema/AdxSchemaMapper';
 
 interface ParseContext {
   timeColumn?: string;
   castIfDynamic: (column: string) => string;
 }
 export class KustoExpressionParser {
-  constructor(private templateSrv: TemplateSrv = getTemplateSrv(), private mapper: AdxSchemaMapper) {}
+  constructor(private templateSrv: TemplateSrv = getTemplateSrv()) {}
 
   toAutoCompleteQuery(query?: AutoCompleteQuery, tableSchema?: AdxColumnSchema[]): string {
     if (!query?.expression || !query.expression.from || !query.search.property) {
@@ -291,8 +290,7 @@ export class KustoExpressionParser {
   }
 
   private appendProperty(context: ParseContext, expression: QueryEditorPropertyExpression, parts: string[]) {
-    const from = this.mapper.getMappingByName(expression.property.name);
-    parts.push(from?.value ?? expression.property.name);
+    parts.push(expression.property.name);
   }
 
   private isTemplateVariable(value: string): boolean {
