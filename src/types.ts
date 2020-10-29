@@ -77,6 +77,7 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   defaultDatabase: string;
   minimalCache: number;
   defaultEditorMode: EditorMode;
+  queryTimeout: string;
   dataConsistency: string;
   cacheMaxAge: string;
   dynamicCaching: boolean;

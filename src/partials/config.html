@@ -87,6 +87,15 @@
 <div class ="gf-form-group">
   <div class="gf-form-inline">
     <div class="gf-form">
+      <span class="gf-form-label width-11">Query timeout</span>
+      <input class="gf-form-input width-9" type="text" spellcheck="false" ng-model='ctrl.current.jsonData.queryTimeout' placeholder="30s" ng-pattern="/(^[1-5][0-9]?[sm]$)|(^60[sm]$)|(^1h$)/"></input>
+      <info-popover mode="right-absolute">
+        This value controls the client query timeout.
+      </info-popover>
+    </div>
+  </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
       <gf-form-switch label="Use dynamic caching" checked="ctrl.current.jsonData.dynamicCaching" label-class="width-11">
       </gf-form-switch>
       <info-popover mode="right-normal">

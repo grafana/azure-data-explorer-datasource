@@ -8,11 +8,13 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/hashicorp/go-hclog"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"golang.org/x/oauth2/microsoft"
 )
@@ -44,6 +46,17 @@ type dataSourceData struct {
 	DataConsistency string `json:"dataConsistency"`
 	CacheMaxAge     string `json:"cacheMaxAge"`
 	DynamicCaching  bool   `json:"dynamicCaching"`
+
+	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
+	// to the server execution timeout.
+	QueryTimeoutRaw string `json:"queryTimeout"`
+
+	// QueryTimeout the parsed duration of QueryTimeoutRaw.
+	QueryTimeout time.Duration `json:"-"`
+
+	// ServerTimeoutValue is the QueryTimeout formatted as a MS Timespan
+	// which is used as a connection property option.
+	ServerTimeoutValue string `json:"-"`
 }
 
 // Client is an http.Client used for API requests.
@@ -53,13 +66,15 @@ type Client struct {
 	Log hclog.Logger
 }
 
-// Options that can be set on the ADX Connection string
+// options are properties that can be set on the ADX Connection string.
+// https://docs.microsoft.com/en-us/azure/data-explorer/kusto/api/netfx/request-properties
 type options struct {
 	DataConsistency string `json:"queryconsistency,omitempty"`
 	CacheMaxAge     string `json:"query_results_cache_max_age,omitempty"`
+	ServerTimeout   string `json:"servertimeout,omitempty"`
 }
 
-// Properties property bag of connection string options
+// Properties is a property bag of connection string options.
 type Properties struct {
 	Options *options `json:"options,omitempty"`
 }
@@ -74,12 +89,26 @@ type RequestPayload struct {
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's
 // JSONData and Encrypted JSONData which contains the information needed to connected to
 // the datasource.
+// It also sets the QueryTimeout and ServerTimeoutValues by parsing QueryTimeoutRaw.
 func newDataSourceData(dInfo *backend.DataSourceInstanceSettings) (*dataSourceData, error) {
 	d := dataSourceData{}
 	err := json.Unmarshal(dInfo.JSONData, &d)
 	if err != nil {
 		return nil, err
 	}
+
+	if d.QueryTimeoutRaw == "" {
+		d.QueryTimeout = time.Second * 30
+	} else {
+		if d.QueryTimeout, err = time.ParseDuration(d.QueryTimeoutRaw); err != nil {
+			return nil, err
+		}
+	}
+
+	if d.ServerTimeoutValue, err = formatTimeout(d.QueryTimeout); err != nil {
+		return nil, err
+	}
+
 	d.Secret = dInfo.DecryptedSecureJSONData["clientSecret"]
 	return &d, nil
 }
@@ -95,6 +124,7 @@ func NewConnectionProperties(c *Client, cs *CacheSettings) *Properties {
 		&options{
 			DataConsistency: c.DataConsistency,
 			CacheMaxAge:     cacheMaxAge,
+			ServerTimeout:   c.ServerTimeoutValue,
 		},
 	}
 }
@@ -116,8 +146,47 @@ func NewClient(ctx context.Context, dInfo *backend.DataSourceInstanceSettings) (
 		Scopes:       []string{"https://kusto.kusto.windows.net/.default"},
 	}
 
-	c.Client = conf.Client(ctx)
+	// I hope this correct? The goal is to have a timeout for the
+	// the client that talks to the actual Data explorer API.
+	// One can attach a a variable, oauth2.HTTPClient, to the context of conf.Client(),
+	// but that is the timeout for the token retrieval I believe.
+	// https://github.com/golang/oauth2/issues/206
+	// https://github.com/golang/oauth2/issues/368
+	authClient := oauth2.NewClient(ctx, conf.TokenSource(ctx))
+
+	c.Client = &http.Client{
+		Transport: authClient.Transport,
+		// We add five seconds to the timeout so the client does not timeout before the server.
+		// This is because the QueryTimeout property is used to set the server execution timeout
+		// for queries. The server execution timeout does not apply to retrieving data, so when
+		// a query returns a large amount of data, timeouts will still occur while the data is
+		// being downloaded.
+		// In the future, if we get the timeout value from Grafana's data source proxy setting, we
+		// may have to flip this to subtract time.
+		Timeout: c.dataSourceData.QueryTimeout + 5*time.Second,
+	}
+
 	return &c, nil
+}
+
+// formatTimeout creates some sort of MS TimeSpan string for durations
+// that up to an hour. It is used for the servertimeout request property
+// option.
+// https://docs.microsoft.com/en-us/azure/data-explorer/kusto/concepts/querylimits#limit-execution-timeout
+func formatTimeout(d time.Duration) (string, error) {
+	if d > time.Hour {
+		return "", fmt.Errorf("timeout must be one hour or less")
+	}
+	if d == time.Hour {
+		return "01:00:00", nil
+	}
+	if d < time.Minute {
+		return fmt.Sprintf("00:00:%02.0f", d.Seconds()), nil
+	}
+	tMinutes := d.Truncate(time.Minute)
+
+	tSeconds := d - tMinutes
+	return fmt.Sprintf("00:%02.0f:%02.0f)", tMinutes.Minutes(), tSeconds.Seconds()), nil
 }
 
 // TestRequest handles a data source test request in Grafana's Datasource configuration UI.
