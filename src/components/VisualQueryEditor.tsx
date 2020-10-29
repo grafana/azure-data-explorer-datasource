@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from 'react';
 import { useAsync } from 'react-use';
 import { css } from 'emotion';
 import { KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery } from '../types';
-import { tableToDefinition, columnsToDefinition } from '../schema/mapper';
+import { columnsToDefinition } from '../schema/mapper';
 import {
   QueryEditorExpressionType,
   QueryEditorPropertyExpression,
@@ -38,13 +38,14 @@ interface Props {
 
 export const VisualQueryEditor: React.FC<Props> = props => {
   const { query, database, datasource, schema, onChangeQuery } = props;
-  const { id: datasourceId, parseExpression, autoCompleteQuery } = datasource;
+  const { id: datasourceId, parseExpression, autoCompleteQuery, getSchemaMapper } = datasource;
 
   const resultFormat = selectResultFormat(query.resultFormat);
   const databaseName = getTemplateSrv().replace(database);
-  const tables = useTableOptions(schema, databaseName);
+  const tables = useTableOptions(schema, databaseName, datasource);
   const table = useSelectedTable(tables, query, datasource);
   const tableName = getTemplateSrv().replace(table?.property.name ?? '');
+  const tableMapping = getSchemaMapper().getMappingByValue(table?.property.name);
   const timeshiftOptions = useTimeshiftOptions();
 
   const tableSchema = useAsync(async () => {
@@ -52,14 +53,16 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       return [];
     }
 
-    const schema = await getTableSchema(datasource, databaseName, tableName);
-    const from = query.expression.from ?? table;
+    const name = tableMapping?.value ?? tableName;
+    const schema = await getTableSchema(datasource, databaseName, name);
+    const expression = query.expression ?? defaultQuery.expression;
+    const from = expression.from ?? table;
 
     onChangeQuery({
       ...query,
       query: parseExpression(
         {
-          ...query.expression,
+          ...expression,
           from,
         },
         schema
@@ -67,7 +70,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
     });
 
     return schema;
-  }, [datasourceId, databaseName, tableName]);
+  }, [datasourceId, databaseName, tableName, tableMapping?.value]);
 
   const onAutoComplete = useCallback(
     async (index: string, search: QueryEditorOperatorExpression) => {
@@ -280,7 +283,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
       />
       <KustoValueColumnEditorSection
         templateVariableOptions={props.templateVariableOptions}
-        label="Aggregate by"
+        label="Aggregate"
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
         fields={columns}
         onChange={onReduceChange}
@@ -336,8 +339,10 @@ const useSelectedTable = (
   query: KustoQuery,
   datasource: AdxDataSource
 ): QueryEditorPropertyExpression | undefined => {
+  const variables = datasource.variables;
+  const from = query.expression?.from?.property.name;
+
   return useMemo(() => {
-    const from = query.expression?.from?.property.name;
     const selected = options.find(option => option.value === from);
 
     if (selected) {
@@ -347,7 +352,7 @@ const useSelectedTable = (
       };
     }
 
-    const variable = datasource.variables.find(variable => variable === from);
+    const variable = variables.find(variable => variable === from);
 
     if (variable) {
       return {
@@ -367,30 +372,22 @@ const useSelectedTable = (
     }
 
     return;
-  }, [options, query.expression?.from?.property.name, datasource.variables]);
+  }, [options, from, variables]);
 };
 
-const useTableOptions = (schema: AdxSchema | undefined, database: string): QueryEditorPropertyDefinition[] => {
+const useTableOptions = (
+  schema: AdxSchema | undefined,
+  database: string,
+  datasource: AdxDataSource
+): QueryEditorPropertyDefinition[] => {
+  const mapper = datasource.getSchemaMapper();
+
   return useMemo(() => {
     if (!schema || !schema.Databases) {
       return [];
     }
-
-    const databaseSchema = schema.Databases[database];
-
-    if (!databaseSchema || !databaseSchema.Tables) {
-      return [];
-    }
-
-    const tables: QueryEditorPropertyDefinition[] = [];
-
-    for (const name of Object.keys(databaseSchema.Tables)) {
-      const table = databaseSchema.Tables[name];
-      tables.push(tableToDefinition(table));
-    }
-
-    return tables;
-  }, [database, schema]);
+    return mapper.getTableOptions(schema, database);
+  }, [database, schema, mapper]);
 };
 
 async function getTableSchema(datasource: AdxDataSource, databaseName: string, tableName: string) {

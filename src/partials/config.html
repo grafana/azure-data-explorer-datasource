@@ -81,19 +81,6 @@
     <input type="text" class="gf-form-input max-width-12" disabled="disabled" value="configured">
     <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.current.secureJsonFields.clientSecret = false">reset</a>
   </div>
-  <div class="gf-form-inline">
-    <div class="gf-form">
-      <span class="gf-form-label width-11">Default Database</span>
-      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
-        <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultDatabase" ng-options="f.value as f.text for f in ctrl.databases"></select>
-      </div>
-      <i ng-if="ctrl.loading" class="fa fa-spinner fa-pulse"></i>
-      
-      <info-popover mode="right-normal">
-        <p>Choose the default/preferred Database for this Azure Data Explorer Cluster.</p>
-      </info-popover>
-    </div>
-  </div>
 </div>
 
 <h3 class="page-heading">Query Optimizations</h3>
@@ -138,6 +125,83 @@
       </info-popover>
     </div>
   </div>
+</div>
+
+<h3 class="page-heading">Database schema settings
+  <a ng-click="ctrl.refreshSchema()" class="btn btn-small">
+    <icon ng-if="ctrl.loading" name="'sync'" class="panel-loading__spinner spin-clockwise" style="margin-bottom: 0;"></icon>
+    <icon ng-if="!ctrl.loading" name="'sync'" style="margin-bottom: 0;"></icon>
+  </a>
+</h3>
+<div ng-if="ctrl.schemaError" class ="gf-form-group">
+  <div class="alert alert-warning">
+    <div class="alert-body">
+      Could not load database schema, make sure you have correct credentials. Then save the settings and refresh the database schema settings.
+    </div>
+  </div>
+</div>
+<div ng-if="!ctrl.schemaError" class ="gf-form-group">
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <span class="gf-form-label width-11">Default Database</span>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultDatabase" ng-options="f.value as f.text for f in ctrl.databases"></select>
+      </div>      
+      <info-popover mode="right-normal">
+        <p>Choose the default/preferred Database for this Azure Data Explorer Cluster.</p>
+      </info-popover>
+    </div>
+  </div>
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <gf-form-switch label="Use managed schema" checked="ctrl.current.jsonData.useSchemaMapping" label-class="width-11">
+      </gf-form-switch>
+      <info-popover mode="right-normal">
+        By enabling this feature you can specify what tables/functions/views that should be available when building queries in the visual query builder.
+      </info-popover>
+    </div>
+  </div>
+  <div ng-show="ctrl.current.jsonData.useSchemaMapping">
+    <hr />
+    <div class="gf-form-inline" style="margin-top: 4px;" ng-repeat="mapping in ctrl.current.jsonData.schemaMappings">
+      <div class="gf-form-inline" style="flex-grow: 1;">
+        <span>{{ctrl.formatMappingText(mapping)}} -> {{mapping.displayName}}</span>
+      </div>
+      <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.removeSchemaMapping($index)">X</a>
+    </div>
+    <div ng-if="ctrl.current.jsonData.schemaMappings.length === 0">
+      <span>No mappings added</span>
+    </div>
+    <hr />
+    <div class="gf-form">
+      <span class="gf-form-label width-5">Target</span>
+      <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
+        <select class="gf-form-input" ng-model="ctrl.mapping" ng-options="m as m.text for m in ctrl.schemaMappingOptions"></select>
+      </div>
+      <span ng-if="ctrl.mapping.input.length > 0" class="gf-form-label">(</span>
+    </div>
+    <div style="margin-left: 20px;">
+      <div class="gf-form" ng-repeat="i in ctrl.mapping.input">
+        <span class="gf-form-label">{{i.Name}}</span>
+        <input class="gf-form-input width-15" ng-model="ctrl.mapping.input[$index].Value" type="text" placeholder=""></input>
+        <span ng-if="($index + 1) !== ctrl.mapping.input.length" class="gf-form-label">,</span>
+      </div>
+    </div>
+    <div class="gf-form">
+      <span ng-if="ctrl.mapping.input.length > 0" class="gf-form-label">)</span>
+    </div>
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <span class="gf-form-label width-5">Name</span>
+        <input class="gf-form-input width-24" spellcheck="false" ng-model="ctrl.mapping.name"></input>
+        <info-popover mode="right-absolute">
+          The name that will be displayed in "from"-options list in the visual query editor.
+        </info-popover>
+      </div>
+    </div>
+    <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.addSchemaMapping()">Add mapping</a>
+  </div>
+  <hr />
 </div>
 
 <div class="gf-form-group" ng-if="ctrl.showMinVersionWarning()">
