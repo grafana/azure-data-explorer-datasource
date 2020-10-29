@@ -16,13 +16,14 @@ import {
   QueryEditorPropertyExpression,
 } from './editor/expressions';
 import { cloneDeep } from 'lodash';
+import { AdxSchemaMapper } from './schema/AdxSchemaMapper';
 
 interface ParseContext {
   timeColumn?: string;
   castIfDynamic: (column: string) => string;
 }
 export class KustoExpressionParser {
-  constructor(private templateSrv: TemplateSrv = getTemplateSrv(), private mappings: SchemaMapping[] = []) {}
+  constructor(private templateSrv: TemplateSrv = getTemplateSrv(), private mapper: AdxSchemaMapper) {}
 
   toAutoCompleteQuery(query?: AutoCompleteQuery, tableSchema?: AdxColumnSchema[]): string {
     if (!query?.expression || !query.expression.from || !query.search.property) {
@@ -290,7 +291,8 @@ export class KustoExpressionParser {
   }
 
   private appendProperty(context: ParseContext, expression: QueryEditorPropertyExpression, parts: string[]) {
-    parts.push(resolveFrom(expression.property.name, this.mappings));
+    const from = this.mapper.getMappingByName(expression.property.name);
+    parts.push(from?.value ?? expression.property.name);
   }
 
   private isTemplateVariable(value: string): boolean {
@@ -429,9 +431,4 @@ const detectTimeshift = (
     return null;
   }
   return timeshiftWith;
-};
-
-const resolveFrom = (from: string, mappings: SchemaMapping[]): string => {
-  const mapping = mappings.find(m => m.displayName === from);
-  return mapping?.value ?? from;
 };

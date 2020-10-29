@@ -1,4 +1,11 @@
-import { AdxColumnSchema, AdxDatabaseSchema, AdxTableSchema, SchemaMappingType } from '../types';
+import {
+  AdxColumnSchema,
+  AdxDatabaseSchema,
+  AdxFunctionSchema,
+  AdxTableSchema,
+  SchemaMapping,
+  SchemaMappingType,
+} from '../types';
 import { AdxDataSource } from '../datasource';
 import { cache } from './cache';
 
@@ -12,7 +19,7 @@ export class AdxSchemaResolver {
   }
 
   async getDatabases(): Promise<AdxDatabaseSchema[]> {
-    const schema = await this.datasource.getSchema(false, false);
+    const schema = await this.datasource.getSchema();
     return Object.keys(schema.Databases).map(key => schema.Databases[key]);
   }
 
@@ -23,29 +30,46 @@ export class AdxSchemaResolver {
     if (!database) {
       return [];
     }
-
     return Object.keys(database.Tables).map(key => database.Tables[key]);
+  }
+
+  async getViewsForDatabase(databaseName: string): Promise<AdxTableSchema[]> {
+    const databases = await this.getDatabases();
+    const database = databases.find(db => db.Name === databaseName);
+
+    if (!database) {
+      return [];
+    }
+    return Object.keys(database.MaterializedViews).map(key => database.MaterializedViews[key]);
+  }
+
+  async getFunctionsForDatabase(databaseName: string): Promise<AdxFunctionSchema[]> {
+    const databases = await this.getDatabases();
+    const database = databases.find(db => db.Name === databaseName);
+
+    if (!database) {
+      return [];
+    }
+    return Object.keys(database.Functions).map(key => database.Functions[key]);
   }
 
   async getColumnsForTable(databaseName: string, tableName: string): Promise<AdxColumnSchema[]> {
     const cacheKey = this.createCacheKey(`db.${databaseName}.${tableName}`);
+    const mapper = this.datasource.getSchemaMapper();
 
     return cache(cacheKey, async () => {
-      const tables = await this.getTablesForDatabase(databaseName);
-      const table = tables.find(t => t.Name === tableName);
-      const schemaMapping = this.datasource.getSchemaMappings();
+      const mapping = mapper.getMappingByName(tableName);
+      const schema = await this.findSchema(databaseName, tableName, mapping);
 
-      if (!table) {
+      if (!schema) {
         return [];
       }
 
-      const mapping = schemaMapping.mappings.find(m => m.displayName === table.Name);
-
-      if (schemaMapping.enabled && mapping?.type === SchemaMappingType.function) {
-        table.OrderedColumns = await this.datasource.getFunctionSchema(databaseName, mapping.value);
+      if (mapping?.type === SchemaMappingType.function) {
+        schema.OrderedColumns = await this.datasource.getFunctionSchema(databaseName, mapping.value);
       }
 
-      const dynamicColumns = table.OrderedColumns.filter(column => column.CslType === 'dynamic').map(
+      const dynamicColumns = schema.OrderedColumns.filter(column => column.CslType === 'dynamic').map(
         column => column.Name
       );
 
@@ -55,7 +79,7 @@ export class AdxSchemaResolver {
         dynamicColumns
       );
 
-      return table.OrderedColumns.reduce((columns: AdxColumnSchema[], column) => {
+      return schema.OrderedColumns.reduce((columns: AdxColumnSchema[], column) => {
         const schemaForDynamicColumn = schemaByColumn[column.Name];
 
         if (!Array.isArray(schemaForDynamicColumn)) {
@@ -67,5 +91,39 @@ export class AdxSchemaResolver {
         return columns;
       }, []);
     });
+  }
+
+  private async findSchema(
+    databaseName: string,
+    tableName: string,
+    mapping?: SchemaMapping
+  ): Promise<AdxTableSchema | undefined> {
+    const [tables, funcs, views] = await Promise.all([
+      this.getTablesForDatabase(databaseName),
+      this.getFunctionsForDatabase(databaseName),
+      this.getViewsForDatabase(databaseName),
+    ]);
+
+    const name = mapping?.name ?? tableName;
+
+    const table = tables.find(t => t.Name === name);
+    if (table) {
+      return table;
+    }
+
+    const view = views.find(v => v.Name === name);
+    if (view) {
+      return view;
+    }
+
+    const func = funcs.find(f => f.Name === name);
+    if (func) {
+      return {
+        Name: func.Name,
+        OrderedColumns: func.OutputColumns,
+      };
+    }
+
+    return;
   }
 }

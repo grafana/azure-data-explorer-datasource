@@ -10,7 +10,7 @@ import {
   LoadingState,
   ScopedVars,
 } from '@grafana/data';
-import { cloneDeep, map } from 'lodash';
+import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { ResponseParser, DatabaseItem } from './response_parser';
 import {
@@ -23,9 +23,6 @@ import {
   EditorMode,
   AutoCompleteQuery,
   SchemaMapping,
-  SchemaMappingType,
-  AdxDatabaseSchema,
-  AdxTableSchema,
 } from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
@@ -34,6 +31,7 @@ import { QueryEditorPropertyExpression } from 'editor/expressions';
 import { QueryEditorOperator } from 'editor/types';
 import { cache } from 'schema/cache';
 import { KustoExpressionParser } from 'KustoExpressionParser';
+import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -43,11 +41,13 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private url?: string;
   private expressionParser: KustoExpressionParser;
   private defaultEditorMode: EditorMode;
-  private schemaMappings: SchemaMapping[];
-  private useSchemaMapping: boolean;
+  private schemaMapper: AdxSchemaMapper;
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
+
+    const useSchemaMapping = instanceSettings.jsonData.useSchemaMapping ?? false;
+    const schemaMapping = instanceSettings.jsonData.schemaMappings ?? [];
 
     this.backendSrv = getBackendSrv();
     this.templateSrv = getTemplateSrv();
@@ -55,9 +55,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
-    this.schemaMappings = instanceSettings.jsonData.schemaMappings ?? [];
-    this.useSchemaMapping = instanceSettings.jsonData.useSchemaMapping ?? false;
-    this.expressionParser = new KustoExpressionParser(this.templateSrv, this.schemaMappings);
+    this.schemaMapper = new AdxSchemaMapper(useSchemaMapping, schemaMapping);
+    this.expressionParser = new KustoExpressionParser(this.templateSrv, this.schemaMapper);
     this.parseExpression = this.parseExpression.bind(this);
     this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
   }
@@ -184,8 +183,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  async getSchema(refreshCache = false, ignoreMapping = true): Promise<AdxSchema> {
-    const schema = await cache<AdxSchema>(
+  async getSchema(refreshCache = false): Promise<AdxSchema> {
+    return cache<AdxSchema>(
       `${this.id}.schema.overview`,
       () => {
         const url = `${this.baseUrl}/v1/rest/mgmt`;
@@ -200,35 +199,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       },
       refreshCache
     );
-
-    if (!this.useSchemaMapping) {
-      return schema;
-    }
-
-    if (ignoreMapping) {
-      return schema;
-    }
-
-    return Object.keys(schema.Databases).reduce((schema, dbName) => {
-      const database = schema.Databases[dbName];
-      const tables = filterAndMapTables(database, this.schemaMappings);
-
-      schema.Databases[dbName] = {
-        ...database,
-        Tables: tables,
-        MaterializedViews: {},
-        Functions: {},
-      };
-
-      return schema;
-    }, cloneDeep(schema));
-  }
-
-  getSchemaMappings(): { enabled: boolean; mappings: SchemaMapping[] } {
-    return {
-      enabled: this.useSchemaMapping,
-      mappings: this.schemaMappings ?? [],
-    };
   }
 
   async getFunctionSchema(database: string, targetFunction: string): Promise<AdxColumnSchema[]> {
@@ -349,6 +319,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return "'" + escapeSpecial(val) + "'";
     });
     return quotedValues.filter(v => v !== "''").join(',');
+  }
+
+  getSchemaMapper(): AdxSchemaMapper {
+    return this.schemaMapper;
   }
 
   parseExpression(sections: QueryExpression | undefined, columns: AdxColumnSchema[] | undefined): string {
@@ -540,47 +514,4 @@ export const sortStartsWithValuesFirst = (arr: string[], searchText: string) => 
   });
 
   return arr;
-};
-
-const filterAndMapTables = (database: AdxDatabaseSchema, mappings: SchemaMapping[]): Record<string, AdxTableSchema> => {
-  return mappings.reduce((tables: Record<string, AdxTableSchema>, mapping) => {
-    if (mapping.database !== database.Name) {
-      return tables;
-    }
-
-    if (mapping.type === SchemaMappingType.table) {
-      if (!database.Tables[mapping.name]) {
-        return tables;
-      }
-      tables[mapping.displayName] = {
-        ...database.Tables[mapping.name],
-        Name: mapping.displayName,
-      };
-      return tables;
-    }
-
-    if (mapping.type === SchemaMappingType.materializedView) {
-      if (!database.MaterializedViews[mapping.name]) {
-        return tables;
-      }
-      tables[mapping.displayName] = {
-        ...database.MaterializedViews[mapping.name],
-        Name: mapping.displayName,
-      };
-      return tables;
-    }
-
-    if (mapping.type === SchemaMappingType.function) {
-      if (!database.Functions[mapping.name]) {
-        return tables;
-      }
-      tables[mapping.displayName] = {
-        Name: mapping.displayName,
-        OrderedColumns: [],
-      };
-      return tables;
-    }
-
-    return tables;
-  }, {});
 };
