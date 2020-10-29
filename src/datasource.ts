@@ -30,6 +30,7 @@ import { QueryEditorPropertyExpression } from 'editor/expressions';
 import { QueryEditorOperator } from 'editor/types';
 import { cache } from 'schema/cache';
 import { KustoExpressionParser } from 'KustoExpressionParser';
+import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -39,19 +40,25 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private url?: string;
   private expressionParser: KustoExpressionParser;
   private defaultEditorMode: EditorMode;
+  private schemaMapper: AdxSchemaMapper;
 
   constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
+
+    const useSchemaMapping = instanceSettings.jsonData.useSchemaMapping ?? false;
+    const schemaMapping = instanceSettings.jsonData.schemaMappings ?? [];
 
     this.backendSrv = getBackendSrv();
     this.templateSrv = getTemplateSrv();
     this.baseUrl = '/azuredataexplorer';
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
-    this.expressionParser = new KustoExpressionParser(this.templateSrv);
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
+    this.schemaMapper = new AdxSchemaMapper(useSchemaMapping, schemaMapping);
+    this.expressionParser = new KustoExpressionParser(this.templateSrv);
     this.parseExpression = this.parseExpression.bind(this);
     this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
+    this.getSchemaMapper = this.getSchemaMapper.bind(this);
   }
 
   /**
@@ -176,26 +183,51 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  async getSchema(): Promise<AdxSchema> {
-    return cache(`${this.id}.schema.overview`, () => {
-      const url = `${this.baseUrl}/v1/rest/mgmt`;
-      const req = {
-        querySource: 'schema',
-        csl: `.show databases schema as json`,
-      };
+  async getSchema(refreshCache = false): Promise<AdxSchema> {
+    return cache<AdxSchema>(
+      `${this.id}.schema.overview`,
+      () => {
+        const url = `${this.baseUrl}/v1/rest/mgmt`;
+        const req = {
+          querySource: 'schema',
+          csl: `.show databases schema as json`,
+        };
 
-      return this.doRequest(url, req).then(response => {
-        return new ResponseParser().parseSchemaResult(response.data);
-      });
-    });
+        return this.doRequest(url, req).then(response => {
+          return new ResponseParser().parseSchemaResult(response.data);
+        });
+      },
+      refreshCache
+    );
+  }
+
+  async getFunctionSchema(database: string, targetFunction: string): Promise<AdxColumnSchema[]> {
+    const queryParts: string[] = [];
+    const take = 'take 50000';
+
+    queryParts.push(targetFunction);
+    queryParts.push(take);
+    queryParts.push('getschema');
+
+    const query = this.buildQuery(queryParts.join('\n | '), {}, database);
+    const response = await this.query({
+      targets: [
+        {
+          ...query,
+          querySource: 'schema',
+        },
+      ],
+    } as DataQueryRequest<KustoQuery>).toPromise();
+
+    return functionSchemaParser(response.data as DataFrame[]);
   }
 
   async getDynamicSchema(
     database: string,
-    table: string,
+    source: string,
     columns: string[]
   ): Promise<Record<string, AdxColumnSchema[]>> {
-    if (!database || !table || !Array.isArray(columns) || columns.length === 0) {
+    if (!database || !source || !Array.isArray(columns) || columns.length === 0) {
       return {};
     }
     const queryParts: string[] = [];
@@ -205,7 +237,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     const project = `project ${columns.map(column => column).join(', ')}`;
     const summarize = `summarize ${columns.map(column => `buildschema(${column})`).join(', ')}`;
 
-    queryParts.push(table);
+    queryParts.push(source);
     queryParts.push(take);
     queryParts.push(where);
     queryParts.push(project);
@@ -289,6 +321,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return quotedValues.filter(v => v !== "''").join(',');
   }
 
+  getSchemaMapper(): AdxSchemaMapper {
+    return this.schemaMapper;
+  }
+
   parseExpression(sections: QueryExpression | undefined, columns: AdxColumnSchema[] | undefined): string {
     return this.expressionParser.toQuery(sections, columns);
   }
@@ -334,6 +370,33 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return operator.name === 'contains' ? sortStartsWithValuesFirst(results, operator.value) : results;
   }
 }
+
+const functionSchemaParser = (frames: DataFrame[]): AdxColumnSchema[] => {
+  const result: AdxColumnSchema[] = [];
+  const fields = frames[0].fields;
+
+  if (!fields) {
+    return result;
+  }
+
+  const nameIndex = fields.findIndex(f => f.name === 'ColumnName');
+  const typeIndex = fields.findIndex(f => f.name === 'ColumnType');
+
+  if (nameIndex < 0 || typeIndex < 0) {
+    return result;
+  }
+
+  for (const frame of frames) {
+    for (let index = 0; index < frame.length; index++) {
+      result.push({
+        Name: frame.fields[nameIndex].values.get(index),
+        CslType: frame.fields[typeIndex].values.get(index),
+      });
+    }
+  }
+
+  return result;
+};
 
 const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchema[]> => {
   const result: Record<string, AdxColumnSchema[]> = {};

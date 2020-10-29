@@ -929,6 +929,28 @@ describe('KustoExpressionParser', () => {
         'StormEvents' + '\n| where $__timeFilter(StartTime)' + '\n| summarize dcount(country) by continents'
       );
     });
+
+    it('should parse expression with schema mappings for function', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents($__from, $__to)'),
+        where: createArray([createOperator('', '', '')]),
+        reduce: createArray([createReduce('country', 'dcount')]),
+        groupBy: createArray([createGroupBy('continents')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents($__from, $__to)' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| summarize dcount(country) by continents'
+      );
+    });
   });
 });
 

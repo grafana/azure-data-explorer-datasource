@@ -60,11 +60,29 @@ export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySourc
   pluginVersion: packageJson.version,
 };
 
+export interface SchemaMapping {
+  database: string;
+  type: SchemaMappingType;
+  name: string;
+  displayName: string;
+  value: string;
+}
+
+export enum SchemaMappingType {
+  function = 'function',
+  table = 'table',
+  materializedView = 'materializedView',
+}
 export interface AdxDataSourceOptions extends DataSourceJsonData {
   defaultDatabase: string;
   minimalCache: number;
   defaultEditorMode: EditorMode;
   queryTimeout: string;
+  dataConsistency: string;
+  cacheMaxAge: string;
+  dynamicCaching: boolean;
+  useSchemaMapping: boolean;
+  schemaMappings: SchemaMapping[];
 }
 
 export interface AdxSchema {
@@ -75,6 +93,8 @@ export interface AdxDatabaseSchema {
   Name: string;
   Tables: Record<string, AdxTableSchema>;
   ExternalTables: Record<string, AdxTableSchema>;
+  Functions: Record<string, AdxFunctionSchema>;
+  MaterializedViews: Record<string, AdxTableSchema>;
 }
 
 export interface AdxTableSchema {
@@ -86,3 +106,13 @@ export interface AdxColumnSchema {
   Name: string;
   CslType: string;
 }
+
+export interface AdxFunctionSchema {
+  Body: string;
+  FunctionKind: string;
+  Name: string;
+  InputParameters: AdxFunctionInputParameterSchema[];
+  OutputColumns: AdxColumnSchema[];
+}
+
+export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
