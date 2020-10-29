@@ -168,11 +168,15 @@ func NewClient(ctx context.Context, dInfo *backend.DataSourceInstanceSettings) (
 }
 
 // formatTimeout creates some sort of MS TimeSpan string for durations
-// that under an hour. It is used for the servertimeout request property
+// that up to an hour. It is used for the servertimeout request property
 // option.
+// https://docs.microsoft.com/en-us/azure/data-explorer/kusto/concepts/querylimits#limit-execution-timeout
 func formatTimeout(d time.Duration) (string, error) {
-	if d >= 3600*time.Second {
-		return "", fmt.Errorf("timeout should be less than 1 hour")
+	if d > time.Hour {
+		return "", fmt.Errorf("timeout must be one hour or less")
+	}
+	if d == time.Hour {
+		return "01:00:00", nil
 	}
 	if d < time.Minute {
 		return fmt.Sprintf("00:00:%02.0f", d.Seconds()), nil
