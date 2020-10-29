@@ -1,4 +1,4 @@
-import { QueryExpression, AdxColumnSchema, AutoCompleteQuery, SchemaMapping } from './types';
+import { QueryExpression, AdxColumnSchema, AutoCompleteQuery } from './types';
 import { QueryEditorPropertyType } from 'editor/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import {

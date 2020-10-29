@@ -12,10 +12,12 @@ import {
   QueryEditorFunctionParameterExpression,
 } from './editor/expressions';
 import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
+import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
 
 describe('KustoExpressionParser', () => {
   const templateSrv: TemplateSrv = { getVariables: jest.fn(), replace: jest.fn() };
-  const parser = new KustoExpressionParser(templateSrv);
+  const schemaMapper = ({ getTableOptions: jest.fn(), getMappingByName: jest.fn() } as any) as AdxSchemaMapper;
+  const parser = new KustoExpressionParser(templateSrv, schemaMapper);
 
   describe('toAutoCompleteQuery', () => {
     it('should parse expression with isnotempty function', () => {
@@ -663,7 +665,7 @@ describe('KustoExpressionParser', () => {
         replace: jest.fn(),
       };
 
-      const parser = new KustoExpressionParser(templateSrv);
+      const parser = new KustoExpressionParser(templateSrv, createMapper());
 
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
@@ -1040,4 +1042,11 @@ const createArray = (
     type,
     expressions,
   };
+};
+
+const createMapper = (): AdxSchemaMapper => {
+  return ({
+    getTableOptions: jest.fn(),
+    getMappingByName: jest.fn(),
+  } as any) as AdxSchemaMapper;
 };

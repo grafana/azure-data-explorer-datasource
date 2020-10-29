@@ -22,7 +22,6 @@ import {
   QueryExpression,
   EditorMode,
   AutoCompleteQuery,
-  SchemaMapping,
 } from './types';
 import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
