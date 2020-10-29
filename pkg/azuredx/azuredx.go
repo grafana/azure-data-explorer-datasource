@@ -66,14 +66,15 @@ type Client struct {
 	Log hclog.Logger
 }
 
-// Options that can be set on the ADX Connection string
+// options are properties that can be set on the ADX Connection string.
+// https://docs.microsoft.com/en-us/azure/data-explorer/kusto/api/netfx/request-properties
 type options struct {
 	DataConsistency string `json:"queryconsistency,omitempty"`
 	CacheMaxAge     string `json:"query_results_cache_max_age,omitempty"`
 	ServerTimeout   string `json:"servertimeout,omitempty"`
 }
 
-// Properties property bag of connection string options
+// Properties is a property bag of connection string options.
 type Properties struct {
 	Options *options `json:"options,omitempty"`
 }
@@ -88,6 +89,7 @@ type RequestPayload struct {
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's
 // JSONData and Encrypted JSONData which contains the information needed to connected to
 // the datasource.
+// It also sets the QueryTimeout and ServerTimeoutValues by parsing QueryTimeoutRaw.
 func newDataSourceData(dInfo *backend.DataSourceInstanceSettings) (*dataSourceData, error) {
 	d := dataSourceData{}
 	err := json.Unmarshal(dInfo.JSONData, &d)
