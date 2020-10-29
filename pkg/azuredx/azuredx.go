@@ -159,6 +159,8 @@ func NewClient(ctx context.Context, dInfo *backend.DataSourceInstanceSettings) (
 		// for queries. The server execution timeout does not apply to retrieving data, so when
 		// a query returns a large amount of data, timeouts will still occur while the data is
 		// being downloaded.
+		// In the future, if we get the timeout value from Grafana's data source proxy setting, we
+		// may have to flip this to subtract time.
 		Timeout: c.dataSourceData.QueryTimeout + 5*time.Second,
 	}
 
