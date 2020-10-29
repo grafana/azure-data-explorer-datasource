@@ -11,7 +11,14 @@ import {
   QueryEditorGroupByExpression,
   QueryEditorFunctionParameterExpression,
 } from './editor/expressions';
-import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
+import {
+  AdxColumnSchema,
+  AutoCompleteQuery,
+  defaultQuery,
+  QueryExpression,
+  SchemaMapping,
+  SchemaMappingType,
+} from 'types';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
 
 describe('KustoExpressionParser', () => {
@@ -931,6 +938,70 @@ describe('KustoExpressionParser', () => {
         'StormEvents' + '\n| where $__timeFilter(StartTime)' + '\n| summarize dcount(country) by continents'
       );
     });
+
+    it('should parse expression with schema mappings for table', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEventsRenamed'),
+        where: createArray([createOperator('', '', '')]),
+        reduce: createArray([createReduce('country', 'dcount')]),
+        groupBy: createArray([createGroupBy('continents')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      const parser = new KustoExpressionParser(
+        templateSrv,
+        createMapper({
+          displayName: 'StormEventsRenamed',
+          database: 'Sample',
+          name: 'StormEventsRenamed',
+          value: 'StormEvents',
+          type: SchemaMappingType.table,
+        })
+      );
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' + '\n| where $__timeFilter(StartTime)' + '\n| summarize dcount(country) by continents'
+      );
+    });
+
+    it('should parse expression with schema mappings for function', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('', '', '')]),
+        reduce: createArray([createReduce('country', 'dcount')]),
+        groupBy: createArray([createGroupBy('continents')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      const parser = new KustoExpressionParser(
+        templateSrv,
+        createMapper({
+          displayName: 'StormEvents',
+          database: 'Sample',
+          name: 'StormEvents',
+          value: 'StormEvents($__from, $__to)',
+          type: SchemaMappingType.function,
+        })
+      );
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents($__from, $__to)' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| summarize dcount(country) by continents'
+      );
+    });
   });
 });
 
@@ -1044,9 +1115,9 @@ const createArray = (
   };
 };
 
-const createMapper = (): AdxSchemaMapper => {
+const createMapper = (mapping?: SchemaMapping): AdxSchemaMapper => {
   return ({
     getTableOptions: jest.fn(),
-    getMappingByName: jest.fn(),
+    getMappingByName: jest.fn().mockReturnValue(mapping),
   } as any) as AdxSchemaMapper;
 };
