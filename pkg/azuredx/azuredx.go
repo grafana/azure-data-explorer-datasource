@@ -38,17 +38,25 @@ func (qm *QueryModel) Interpolate() (err error) {
 // dataSourceData holds the datasource configuration information for Azure Data Explorer's API
 // that is needed to execute a request against Azure's Data Explorer API.
 type dataSourceData struct {
-	ClientID           string        `json:"clientId"`
-	TenantID           string        `json:"tenantId"`
-	ClusterURL         string        `json:"clusterUrl"`
-	DefaultDatabase    string        `json:"defaultDatabase"`
-	Secret             string        `json:"-"`
-	DataConsistency    string        `json:"dataConsistency"`
-	CacheMaxAge        string        `json:"cacheMaxAge"`
-	DynamicCaching     bool          `json:"dynamicCaching"`
-	QueryTimeoutRaw    string        `json:"queryTimeout"`
-	QueryTimeout       time.Duration `json:"-"`
-	ServerTimeoutValue string        `json:"-"`
+	ClientID        string `json:"clientId"`
+	TenantID        string `json:"tenantId"`
+	ClusterURL      string `json:"clusterUrl"`
+	DefaultDatabase string `json:"defaultDatabase"`
+	Secret          string `json:"-"`
+	DataConsistency string `json:"dataConsistency"`
+	CacheMaxAge     string `json:"cacheMaxAge"`
+	DynamicCaching  bool   `json:"dynamicCaching"`
+
+	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
+	// to the server execution timeout.
+	QueryTimeoutRaw string `json:"queryTimeout"`
+
+	// QueryTimeout the parsed duration of QueryTimeoutRaw.
+	QueryTimeout time.Duration `json:"-"`
+
+	// ServerTimeoutValue is the QueryTimeout formatted as a MS Timespan
+	// which is used as a connection property option.
+	ServerTimeoutValue string `json:"-"`
 }
 
 // Client is an http.Client used for API requests.
@@ -136,16 +144,30 @@ func NewClient(ctx context.Context, dInfo *backend.DataSourceInstanceSettings) (
 		Scopes:       []string{"https://kusto.kusto.windows.net/.default"},
 	}
 
+	// I hope this correct? The goal is to have a timeout for the
+	// the client that talks to the actual Data explorer API.
+	// One can attach a a variable, oauth2.HTTPClient, to the context of conf.Client(),
+	// but that is the timeout for the token retrieval I believe.
+	// https://github.com/golang/oauth2/issues/206
+	// https://github.com/golang/oauth2/issues/368
 	authClient := oauth2.NewClient(ctx, conf.TokenSource(ctx))
 
 	c.Client = &http.Client{
 		Transport: authClient.Transport,
-		Timeout:   c.dataSourceData.QueryTimeout + 5*time.Second,
+		// We add five seconds to the timeout so the client does not timeout before the server.
+		// This is because the QueryTimeout property is used to set the server execution timeout
+		// for queries. The server execution timeout does not apply to retrieving data, so when
+		// a query returns a large amount of data, timeouts will still occur while the data is
+		// being downloaded.
+		Timeout: c.dataSourceData.QueryTimeout + 5*time.Second,
 	}
 
 	return &c, nil
 }
 
+// formatTimeout creates some sort of MS TimeSpan string for durations
+// that under an hour. It is used for the servertimeout request property
+// option.
 func formatTimeout(d time.Duration) (string, error) {
 	if d >= 3600*time.Second {
 		return "", fmt.Errorf("timeout should be less than 1 hour")
