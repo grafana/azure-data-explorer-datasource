@@ -663,7 +663,7 @@ describe('KustoExpressionParser', () => {
         replace: jest.fn(),
       };
 
-      const parser = new KustoExpressionParser(templateSrv, createMapper());
+      const parser = new KustoExpressionParser(templateSrv);
 
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
