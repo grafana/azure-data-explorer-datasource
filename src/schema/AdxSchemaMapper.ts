@@ -34,7 +34,7 @@ export class AdxSchemaMapper {
 
     if (!this.enabled) {
       return Object.keys(database.Tables).map(key => {
-        const table = database.Tables[name];
+        const table = database.Tables[key];
         return tableToDefinition(table);
       });
     }
