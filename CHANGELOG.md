@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Added support for handling schema mappings to filter out parts of the database schema being available in the visual query builder.
 - Bugfix: prevent empty queries from triggering when creating dashboard.
 - Bugfix: fixing so we properly select ADX time series option when editor is in raw mode.
+- Bugfix: added a timeout setting and will make sure the plugin is handling timeout of long running queries properly.
 
 ## [3.1.0]
 
