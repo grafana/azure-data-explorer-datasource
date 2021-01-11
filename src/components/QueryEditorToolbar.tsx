@@ -61,7 +61,7 @@ export const QueryEditorToolbar: React.FC<Props> = props => {
       <ConfirmModal
         isOpen={showConfirm}
         title="Are you sure?"
-        body="You might loose manual changes done to the query if you go back to the visual builder."
+        body="You might lose manual changes done to the query if you go back to the visual builder."
         confirmText="Yes, I am sure."
         dismissText="No, continue edit query manually."
         icon="exclamation-triangle"
