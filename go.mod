@@ -7,6 +7,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/grafana/grafana-plugin-sdk-go v0.75.0
 	github.com/hashicorp/go-hclog v0.0.0-20180709165350-ff2cf002a8dd
+	github.com/json-iterator/go v1.1.8
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/xorcare/pointer v1.1.0

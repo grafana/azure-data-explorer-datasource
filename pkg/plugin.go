@@ -14,7 +14,6 @@ func main() {
 		QueryDataHandler:   adx,
 		CheckHealthHandler: adx,
 	})
-
 	if err != nil {
 		backend.Logger.Error(err.Error())
 		os.Exit(1)

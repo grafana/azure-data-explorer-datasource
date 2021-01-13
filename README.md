@@ -34,7 +34,6 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 
 TODO: link to document on names in grafana 7.1+
 
-
 ### Docker
 
 1. Fetch the latest version of grafana from Docker Hub:
