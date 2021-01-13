@@ -1,12 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+	jsoniter "github.com/json-iterator/go"
 	"golang.org/x/net/context"
 )
 
@@ -17,7 +17,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 	resp := backend.DataResponse{}
 	qm := &azuredx.QueryModel{}
 
-	err := json.Unmarshal(q.JSON, qm)
+	err := jsoniter.Unmarshal(q.JSON, qm)
 	if err != nil {
 		resp.Error = err
 		return resp
@@ -57,7 +57,6 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 		DB:         qm.Database,
 		Properties: azuredx.NewConnectionProperties(client, cs),
 	}, qm.QuerySource)
-
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
 		errorWithFrame(err)

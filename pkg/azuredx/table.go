@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+	jsoniter "github.com/json-iterator/go"
 )
 
 // TableResponse represents the response struct from Azure's Data Explorer REST API.
@@ -110,7 +111,7 @@ var converterMap = map[string]data.FieldConverter{
 var dynamicConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeString,
 	Converter: func(v interface{}) (interface{}, error) {
-		b, err := json.Marshal(v)
+		b, err := jsoniter.Marshal(v)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal dynamic type into JSON string '%v': %v", v, err)
 		}
@@ -330,7 +331,7 @@ func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
 		if rowIdx == 0 {
 			rawTimeArrayString := in.At(timeColIdx, 0).(string)
 			times := []time.Time{}
-			err := json.Unmarshal([]byte(rawTimeArrayString), &times)
+			err := jsoniter.Unmarshal([]byte(rawTimeArrayString), &times)
 			if err != nil {
 				return nil, err
 			}
@@ -352,7 +353,7 @@ func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
 			// Will treat all numberic values as nullable floats here
 			vals := []*float64{}
 			rawValues := in.At(valueIdx, rowIdx).(string)
-			err := json.Unmarshal([]byte(rawValues), &vals)
+			err := jsoniter.Unmarshal([]byte(rawValues), &vals)
 			if err != nil {
 				return nil, err
 			}
