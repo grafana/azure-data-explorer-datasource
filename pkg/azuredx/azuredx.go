@@ -38,14 +38,15 @@ func (qm *QueryModel) Interpolate() (err error) {
 // dataSourceData holds the datasource configuration information for Azure Data Explorer's API
 // that is needed to execute a request against Azure's Data Explorer API.
 type dataSourceData struct {
-	ClientID        string `json:"clientId"`
-	TenantID        string `json:"tenantId"`
-	ClusterURL      string `json:"clusterUrl"`
-	DefaultDatabase string `json:"defaultDatabase"`
-	Secret          string `json:"-"`
-	DataConsistency string `json:"dataConsistency"`
-	CacheMaxAge     string `json:"cacheMaxAge"`
-	DynamicCaching  bool   `json:"dynamicCaching"`
+	ClientID           string `json:"clientId"`
+	TenantID           string `json:"tenantId"`
+	ClusterURL         string `json:"clusterUrl"`
+	DefaultDatabase    string `json:"defaultDatabase"`
+	Secret             string `json:"-"`
+	DataConsistency    string `json:"dataConsistency"`
+	CacheMaxAge        string `json:"cacheMaxAge"`
+	DynamicCaching     bool   `json:"dynamicCaching"`
+	EnableUserTracking bool   `json:"enableUserTracking"`
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
 	// to the server execution timeout.
@@ -227,11 +228,17 @@ func (c *Client) KustoRequest(payload RequestPayload, querySource string, user s
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-ms-app", "Grafana-ADX")
-	req.Header.Set("x-ms-user-id", user)
 	if querySource == "" {
 		querySource = "unspecified"
 	}
-	req.Header.Set("x-ms-client-request-id", fmt.Sprintf("KGC.%v;%v;%v", querySource, user, uuid.Must(uuid.NewRandom()).String()))
+	
+	msClientRequestIDHeader := fmt.Sprintf("KGC.%v;%v", querySource, uuid.Must(uuid.NewRandom()).String())
+	if c.dataSourceData.EnableUserTracking {
+		req.Header.Set("x-ms-user-id", user)
+		msClientRequestIDHeader += fmt.Sprintf(";%v", user)
+	}
+	req.Header.Set("x-ms-client-request-id", msClientRequestIDHeader)
+
 	resp, err := c.Do(req)
 	if err != nil {
 		return nil, "", err

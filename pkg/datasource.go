@@ -142,13 +142,13 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 		return nil, err
 	}
 
-	email := "Noninteractive"
+	username := "Noninteractive"
 	if req.PluginContext.User != nil {
-		email = req.PluginContext.User.Login
+		username = req.PluginContext.User.Login
 	}
 
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = plugin.handleQuery(client, q, email)
+		res.Responses[q.RefID] = plugin.handleQuery(client, q, username)
 	}
 
 	return res, nil

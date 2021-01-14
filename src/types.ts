@@ -83,6 +83,7 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   dynamicCaching: boolean;
   useSchemaMapping: boolean;
   schemaMappings: SchemaMapping[];
+  enableUserTracking: boolean;
 }
 
 export interface AdxSchema {
