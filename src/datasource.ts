@@ -88,11 +88,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
-    let q = interpolateKustoQuery(target.query, scopedVars as ScopedVars);
+    let query = interpolateKustoQuery(
+      this.templateSrv.replace(target.query, scopedVars, this.interpolateVariable),
+      scopedVars as ScopedVars
+    );
 
     return {
       ...target,
-      query: this.templateSrv.replace(q, scopedVars, this.interpolateVariable),
+      query,
       database: this.templateSrv.replace(target.database, scopedVars),
     };
   }

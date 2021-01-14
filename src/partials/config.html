@@ -30,7 +30,7 @@
 <div class="gf-form-group">
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Cluster URL</span>
+      <span class="gf-form-label width-13">Cluster URL</span>
       <input class="gf-form-input width-30" type="text" ng-model="ctrl.current.jsonData.clusterUrl" placeholder="{{ctrl.suggestUrl}}"
         bs-typeahead="getSuggestUrls" min-length="0" ng-pattern="/^(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/"
         required/>
@@ -41,7 +41,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Tenant Id</span>
+      <span class="gf-form-label width-13">Tenant Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.tenantId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
         <p>In the Azure Portal, navigate to Azure Active Directory -> Properties -> Directory ID.</p>
@@ -52,7 +52,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Client Id</span>
+      <span class="gf-form-label width-13">Client Id</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.jsonData.clientId' placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></input>
       <info-popover mode="right-absolute">
         <p>In the Azure Portal, navigate to Azure Active Directory -> App Registrations -> Choose your app ->
@@ -65,7 +65,7 @@
   </div>
   <div class="gf-form-inline" ng-if="!ctrl.current.secureJsonFields.clientSecret">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Client Secret</span>
+      <span class="gf-form-label width-13">Client Secret</span>
       <input class="gf-form-input width-30" type="text" ng-model='ctrl.current.secureJsonData.clientSecret' placeholder=""></input>
       <info-popover mode="right-absolute">
         <p>To create a new key, log in to Azure Portal, navigate to Azure Active Directory -> App Registrations ->
@@ -77,8 +77,8 @@
     </div>
   </div>
   <div class="gf-form" ng-if="ctrl.current.secureJsonFields.clientSecret">
-    <span class="gf-form-label width-11">Client Secret</span>
-    <input type="text" class="gf-form-input max-width-12" disabled="disabled" value="configured">
+    <span class="gf-form-label width-13">Client Secret</span>
+    <input type="text" class="gf-form-input max-width-13" disabled="disabled" value="configured">
     <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.current.secureJsonFields.clientSecret = false">reset</a>
   </div>
 </div>
@@ -87,7 +87,7 @@
 <div class ="gf-form-group">
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Query timeout</span>
+      <span class="gf-form-label width-13">Query timeout</span>
       <input class="gf-form-input width-9" type="text" spellcheck="false" ng-model='ctrl.current.jsonData.queryTimeout' placeholder="30s" ng-pattern="/(^[1-5][0-9]?[sm]$)|(^60[sm]$)|(^1h$)/"></input>
       <info-popover mode="right-absolute">
         This value controls the client query timeout.
@@ -96,7 +96,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <gf-form-switch label="Use dynamic caching" checked="ctrl.current.jsonData.dynamicCaching" label-class="width-11">
+      <gf-form-switch label="Use dynamic caching" checked="ctrl.current.jsonData.dynamicCaching" label-class="width-13">
       </gf-form-switch>
       <info-popover mode="right-normal">
         By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored.<br /><br />For time series queries we will use the bin size to widen the time range but also as cache max age.
@@ -105,7 +105,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Cache Max Age</span>
+      <span class="gf-form-label width-13">Cache Max Age</span>
       <input class="gf-form-input width-9" ng-model="ctrl.current.jsonData.cacheMaxAge" ng-disabled="ctrl.current.jsonData.dynamicCaching" spellcheck="false" placeholder="0m" ng-pattern="/^(\d{1,3}(\.\d{0,2})?(d|m|s|h|ms))$/"></input>
       <info-popover mode="right-absolute">
         By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.
@@ -114,7 +114,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Data concistency</span>
+      <span class="gf-form-label width-13">Data concistency</span>
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
         <select class="gf-form-input" ng-model="ctrl.current.jsonData.dataConsistency" ng-options="d.value as d.label for d in ctrl.dataConsistency"></select>
       </div>
@@ -125,7 +125,7 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Default editor mode</span>
+      <span class="gf-form-label width-13">Default editor mode</span>
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
         <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultEditorMode" ng-options="mode.value as mode.label for mode in ctrl.editorModes"></select>
       </div>
@@ -152,7 +152,7 @@
 <div ng-if="!ctrl.schemaError" class ="gf-form-group">
   <div class="gf-form-inline">
     <div class="gf-form">
-      <span class="gf-form-label width-11">Default Database</span>
+      <span class="gf-form-label width-13">Default Database</span>
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
         <select class="gf-form-input" ng-model="ctrl.current.jsonData.defaultDatabase" ng-options="f.value as f.text for f in ctrl.databases"></select>
       </div>      
@@ -163,13 +163,19 @@
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
-      <gf-form-switch label="Use managed schema" checked="ctrl.current.jsonData.useSchemaMapping" label-class="width-11">
+      <gf-form-switch label="Use managed schema" checked="ctrl.current.jsonData.useSchemaMapping" label-class="width-13">
       </gf-form-switch>
       <info-popover mode="right-normal">
         By enabling this feature you can specify what tables/functions/views that should be available when building queries in the visual query builder.
       </info-popover>
     </div>
   </div>
+  <h3 class="page-heading">Database schema settings
+    <a ng-click="ctrl.refreshSchema()" class="btn btn-small">
+      <icon ng-if="ctrl.loading" name="'sync'" class="panel-loading__spinner spin-clockwise" style="margin-bottom: 0;"></icon>
+      <icon ng-if="!ctrl.loading" name="'sync'" style="margin-bottom: 0;"></icon>
+    </a>
+  </h3>
   <div ng-show="ctrl.current.jsonData.useSchemaMapping">
     <hr />
     <div class="gf-form-inline" style="margin-top: 4px;" ng-repeat="mapping in ctrl.current.jsonData.schemaMappings">
@@ -201,7 +207,8 @@
     </div>
     <div class="gf-form-inline">
       <div class="gf-form">
-        <span class="gf-form-label width-5">Name</span>
+        <span class="gf-form-label width-5">Name
+        </div> </span>
         <input class="gf-form-input width-24" spellcheck="false" ng-model="ctrl.mapping.name"></input>
         <info-popover mode="right-absolute">
           The name that will be displayed in "from"-options list in the visual query editor.
@@ -219,3 +226,17 @@
       Grafana here.</a>
   </div>
 </div>
+
+
+<h3 class="page-heading">Tracking</h3>
+<div class ="gf-form-group">
+  <div class="gf-form-inline">
+    <div class="gf-form">
+      <gf-form-switch label="Forward username header to host" checked="ctrl.current.jsonData.enableUserTracking" label-class="width-13">
+      </gf-form-switch>
+      <info-popover mode="right-normal">
+        With this feature enabled, Grafana will pass the logged in user's username in the <code>x-ms-user-id</code> header and in the <code>x-ms-client-request-id</code> header when sending requests to ADX. Can be useful when tracking needs to be done in ADX. 
+      </info-popover>
+    </div>
+  </div>
+</div> 
