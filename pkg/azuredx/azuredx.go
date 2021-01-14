@@ -215,7 +215,7 @@ func (c *Client) TestRequest() error {
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
-func (c *Client) KustoRequest(payload RequestPayload, querySource string, user string) (*TableResponse, string, error) {
+func (c *Client) KustoRequest(payload RequestPayload, querySource string, user *backend.User) (*TableResponse, string, error) {
 	var buf bytes.Buffer
 	err := jsoniter.NewEncoder(&buf).Encode(payload)
 	if err != nil {
@@ -234,8 +234,8 @@ func (c *Client) KustoRequest(payload RequestPayload, querySource string, user s
 	
 	msClientRequestIDHeader := fmt.Sprintf("KGC.%v;%v", querySource, uuid.Must(uuid.NewRandom()).String())
 	if c.dataSourceData.EnableUserTracking {
-		req.Header.Set("x-ms-user-id", user)
-		msClientRequestIDHeader += fmt.Sprintf(";%v", user)
+		req.Header.Set("x-ms-user-id", user.Login)
+		msClientRequestIDHeader += fmt.Sprintf(";%v", user.Login)
 	}
 	req.Header.Set("x-ms-client-request-id", msClientRequestIDHeader)
 

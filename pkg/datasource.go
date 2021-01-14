@@ -13,7 +13,7 @@ import (
 // GrafanaAzureDXDatasource stores reference to plugin and logger
 type GrafanaAzureDXDatasource struct{}
 
-func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q backend.DataQuery, user string) backend.DataResponse {
+func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q backend.DataQuery, user *backend.User) backend.DataResponse {
 	resp := backend.DataResponse{}
 	qm := &azuredx.QueryModel{}
 
@@ -142,13 +142,8 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 		return nil, err
 	}
 
-	username := "Noninteractive"
-	if req.PluginContext.User != nil {
-		username = req.PluginContext.User.Login
-	}
-
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = plugin.handleQuery(client, q, username)
+		res.Responses[q.RefID] = plugin.handleQuery(client, q, req.PluginContext.User)
 	}
 
 	return res, nil
