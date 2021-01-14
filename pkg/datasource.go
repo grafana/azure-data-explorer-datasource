@@ -13,7 +13,7 @@ import (
 // GrafanaAzureDXDatasource stores reference to plugin and logger
 type GrafanaAzureDXDatasource struct{}
 
-func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q backend.DataQuery) backend.DataResponse {
+func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q backend.DataQuery, user string) backend.DataResponse {
 	resp := backend.DataResponse{}
 	qm := &azuredx.QueryModel{}
 
@@ -56,7 +56,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(client *azuredx.Client, q ba
 		CSL:        qm.Query,
 		DB:         qm.Database,
 		Properties: azuredx.NewConnectionProperties(client, cs),
-	}, qm.QuerySource)
+	}, qm.QuerySource, user)
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
 		errorWithFrame(err)
@@ -142,8 +142,13 @@ func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *back
 		return nil, err
 	}
 
+	email := "Noninteractive"
+	if req.PluginContext.User != nil {
+		email = req.PluginContext.User.Login
+	}
+
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = plugin.handleQuery(client, q)
+		res.Responses[q.RefID] = plugin.handleQuery(client, q, email)
 	}
 
 	return res, nil
