@@ -3,7 +3,6 @@ package azuredx
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/hashicorp/go-hclog"
@@ -92,7 +92,7 @@ type RequestPayload struct {
 // It also sets the QueryTimeout and ServerTimeoutValues by parsing QueryTimeoutRaw.
 func newDataSourceData(dInfo *backend.DataSourceInstanceSettings) (*dataSourceData, error) {
 	d := dataSourceData{}
-	err := json.Unmarshal(dInfo.JSONData, &d)
+	err := jsoniter.Unmarshal(dInfo.JSONData, &d)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func formatTimeout(d time.Duration) (string, error) {
 // TestRequest handles a data source test request in Grafana's Datasource configuration UI.
 func (c *Client) TestRequest() error {
 	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(RequestPayload{
+	err := jsoniter.NewEncoder(&buf).Encode(RequestPayload{
 		CSL:        ".show databases schema",
 		DB:         c.DefaultDatabase,
 		Properties: NewConnectionProperties(c, nil),
@@ -216,7 +216,7 @@ func (c *Client) TestRequest() error {
 // the API's JSON error response is returned as well (if available).
 func (c *Client) KustoRequest(payload RequestPayload, querySource string) (*TableResponse, string, error) {
 	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(payload)
+	err := jsoniter.NewEncoder(&buf).Encode(payload)
 	if err != nil {
 		return nil, "", err
 	}
@@ -246,7 +246,7 @@ func (c *Client) KustoRequest(payload RequestPayload, querySource string) (*Tabl
 			return nil, "", fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
 		}
 		errorData := &errorResponse{}
-		err = json.Unmarshal(bodyBytes, errorData)
+		err = jsoniter.Unmarshal(bodyBytes, errorData)
 		if err != nil {
 			backend.Logger.Debug("failed to unmarshal error body from response", "error", err)
 		}
@@ -258,7 +258,7 @@ func (c *Client) KustoRequest(payload RequestPayload, querySource string) (*Tabl
 
 func tableFromJSON(rc io.Reader) (*TableResponse, error) {
 	tr := &TableResponse{}
-	decoder := json.NewDecoder(rc)
+	decoder := jsoniter.NewDecoder(rc)
 	// Numbers as string (json.Number) so we can keep types as best we can (since the response has 'type' of column)
 	decoder.UseNumber()
 	err := decoder.Decode(tr)
@@ -268,6 +268,7 @@ func tableFromJSON(rc io.Reader) (*TableResponse, error) {
 	if tr.Tables == nil || len(tr.Tables) == 0 {
 		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
 	}
+
 	return tr, nil
 }
 
