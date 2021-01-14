@@ -214,7 +214,7 @@ func (c *Client) TestRequest() error {
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
-func (c *Client) KustoRequest(payload RequestPayload, querySource string) (*TableResponse, string, error) {
+func (c *Client) KustoRequest(payload RequestPayload, querySource string, user string) (*TableResponse, string, error) {
 	var buf bytes.Buffer
 	err := jsoniter.NewEncoder(&buf).Encode(payload)
 	if err != nil {
@@ -227,10 +227,11 @@ func (c *Client) KustoRequest(payload RequestPayload, querySource string) (*Tabl
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-ms-app", "Grafana-ADX")
+	req.Header.Set("x-ms-user-id", user)
 	if querySource == "" {
 		querySource = "unspecified"
 	}
-	req.Header.Set("x-ms-client-request-id", fmt.Sprintf("KGC.%v;%v", querySource, uuid.Must(uuid.NewRandom()).String()))
+	req.Header.Set("x-ms-client-request-id", fmt.Sprintf("KGC.%v;%v;%v", querySource, user, uuid.Must(uuid.NewRandom()).String()))
 	resp, err := c.Do(req)
 	if err != nil {
 		return nil, "", err
