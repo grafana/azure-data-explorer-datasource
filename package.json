@@ -1,6 +1,6 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
