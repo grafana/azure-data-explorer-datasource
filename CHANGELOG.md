@@ -1,5 +1,12 @@
 # Change Log
 
+## [3.3.0]
+
+- Add tracking capabilities by making it possible to pass the logged in Grafana user's username as a header to ADX
+- Use jsoniter instead of encoding/json in order to improve performance
+- Bugfix: Expand query template variables before building query
+- Bugfix: Fix minor typo in confirmation dialog
+
 All notable changes to this project will be documented in this file.
 
 ## [3.2.1]
