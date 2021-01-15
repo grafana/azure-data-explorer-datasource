@@ -234,8 +234,10 @@ func (c *Client) KustoRequest(payload RequestPayload, querySource string, user *
 	
 	msClientRequestIDHeader := fmt.Sprintf("KGC.%v;%v", querySource, uuid.Must(uuid.NewRandom()).String())
 	if c.dataSourceData.EnableUserTracking {
-		req.Header.Set("x-ms-user-id", user.Login)
 		msClientRequestIDHeader += fmt.Sprintf(";%v", user.Login)
+		if user != nil {
+			req.Header.Set("x-ms-user-id", user.Login)
+		}
 	}
 	req.Header.Set("x-ms-client-request-id", msClientRequestIDHeader)
 
