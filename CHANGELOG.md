@@ -1,5 +1,9 @@
 # Change Log
 
+## [3.3.1]
+
+- Bugfix: nil check plugincontext user before setting tracking header
+
 ## [3.3.0]
 
 - Add tracking capabilities by making it possible to pass the logged in Grafana user's username as a header to ADX
