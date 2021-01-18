@@ -259,7 +259,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return dynamicSchemaParser(response.data as DataFrame[]);
   }
 
-  get variables() {
+  getVariables() {
     return this.templateSrv.getVariables().map(v => `$${v.name}`);
   }
 

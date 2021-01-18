@@ -339,7 +339,8 @@ const useSelectedTable = (
   query: KustoQuery,
   datasource: AdxDataSource
 ): QueryEditorPropertyExpression | undefined => {
-  const variables = datasource.variables;
+  const variables = datasource.getVariables();
+
   const from = query.expression?.from?.property.name;
 
   return useMemo(() => {
