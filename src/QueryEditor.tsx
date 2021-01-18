@@ -140,6 +140,8 @@ const useSelectedDatabase = (
   query: KustoQuery,
   datasource: AdxDataSource
 ): string => {
+  const variables = datasource.getVariables();
+
   return useMemo(() => {
     const selected = options.find(option => option.value === query.database);
 
@@ -147,7 +149,7 @@ const useSelectedDatabase = (
       return selected.value;
     }
 
-    const variable = datasource.variables.find(variable => variable === query.database);
+    const variable = variables.find(variable => variable === query.database);
 
     if (variable) {
       return variable;
@@ -158,7 +160,7 @@ const useSelectedDatabase = (
     }
 
     return '';
-  }, [options, query.database, datasource.variables]);
+  }, [options, variables, query.database]);
 };
 
 const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[] => {
@@ -207,7 +209,8 @@ const useExecutedQueryError = (data?: PanelData): string | undefined => {
 };
 
 const useTemplateVariables = (datasource: AdxDataSource) => {
-  const { variables } = datasource;
+  const variables = datasource.getVariables();
+
   return useMemo(() => {
     return {
       label: 'Template Variables',
