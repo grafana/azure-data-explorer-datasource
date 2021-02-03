@@ -37,7 +37,8 @@ export class KustoMonacoEditor extends React.Component<Props, MonacoState> {
     };
 
     if (!window.hasOwnProperty('monaco')) {
-      (window as any).System.import(`/${props.pluginBaseUrl}/libs/monaco.min.js`).then(() => {
+      // using the standard import() here causes issues with webpack/babel/typescript because monaco is just so large
+      (window as any).System.import(`${props.pluginBaseUrl}/libs/monaco.min.js`).then(() => {
         setTimeout(() => {
           this.initMonaco();
         }, 1);

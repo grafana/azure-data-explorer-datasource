@@ -7,6 +7,8 @@ import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 
+import config from 'grafana/app/core/config';
+
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface RawQueryEditorProps extends Props {
@@ -57,6 +59,7 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
     const { query, datasource, lastQueryError, lastQuery, timeNotASC, schema } = this.props;
     const { showLastQuery, showHelp } = this.state;
     const resultFormat = selectResultFormat(query.resultFormat, true);
+    const baseUrl = `${config.appSubUrl}/${datasource.meta.baseUrl}`;
 
     const styles = getStyles();
 
@@ -68,7 +71,7 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
       <div>
         <KustoMonacoEditor
           defaultTimeField="Timestamp"
-          pluginBaseUrl={datasource.meta.baseUrl}
+          pluginBaseUrl={baseUrl}
           content={query.query || defaultQuery}
           getSchema={async () => schema}
           onChange={this.onRawQueryChange}
