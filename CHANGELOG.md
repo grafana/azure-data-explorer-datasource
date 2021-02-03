@@ -3,6 +3,7 @@
 ## [3.3.2]
 
 - Bugfix: Fixed an issue where the KQL Monaco editor wouldn't load when Grafana is served from a sub path
+- Bugfix: Fixed template query variables not working
 
 ## [3.3.1]
 
