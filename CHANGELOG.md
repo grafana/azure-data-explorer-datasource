@@ -1,5 +1,9 @@
 # Change Log
 
+## [3.3.2]
+
+- Bugfix: Fixed an issue where the KQL Monaco editor wouldn't load when Grafana is served from a sub path
+
 ## [3.3.1]
 
 - Bugfix: nil check plugincontext user before setting tracking header
