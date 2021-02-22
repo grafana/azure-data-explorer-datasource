@@ -16,7 +16,7 @@
     "@grafana/eslint-config": "2.0.0",
     "@grafana/runtime": "7.1.1",
     "@grafana/toolkit": "7.3.1",
-    "@grafana/ui": "7.1.4",
+    "@grafana/ui": "7.4.2",
     "@testing-library/react": "^10.4.6",
     "@types/angular": "1.6.49",
     "@types/debounce-promise": "^3.1.2",
