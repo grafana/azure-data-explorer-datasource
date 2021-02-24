@@ -176,18 +176,24 @@
       <icon ng-if="!ctrl.loading" name="'sync'" style="margin-bottom: 0;"></icon>
     </a>
   </h3>
+
   <div ng-show="ctrl.current.jsonData.useSchemaMapping">
     <hr />
+
     <div class="gf-form-inline" style="margin-top: 4px;" ng-repeat="mapping in ctrl.current.jsonData.schemaMappings">
       <div class="gf-form-inline" style="flex-grow: 1;">
         <span>{{ctrl.formatMappingText(mapping)}} -> {{mapping.displayName}}</span>
       </div>
+
       <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.removeSchemaMapping($index)">X</a>
     </div>
+
     <div ng-if="ctrl.current.jsonData.schemaMappings.length === 0">
       <span>No mappings added</span>
     </div>
+
     <hr />
+
     <div class="gf-form">
       <span class="gf-form-label width-5">Target</span>
       <div class="gf-form-select-wrapper gf-form-select-wrapper--caret-indent">
@@ -195,6 +201,7 @@
       </div>
       <span ng-if="ctrl.mapping.input.length > 0" class="gf-form-label">(</span>
     </div>
+
     <div style="margin-left: 20px;">
       <div class="gf-form" ng-repeat="i in ctrl.mapping.input">
         <span class="gf-form-label">{{i.Name}}</span>
@@ -202,9 +209,11 @@
         <span ng-if="($index + 1) !== ctrl.mapping.input.length" class="gf-form-label">,</span>
       </div>
     </div>
+
     <div class="gf-form">
       <span ng-if="ctrl.mapping.input.length > 0" class="gf-form-label">)</span>
     </div>
+
     <div class="gf-form-inline">
       <div class="gf-form">
         <span class="gf-form-label width-5">Name
@@ -214,7 +223,9 @@
           The name that will be displayed in "from"-options list in the visual query editor.
         </info-popover>
       </div>
+      
     </div>
+
     <a class="btn btn-secondary gf-form-btn" href="#" ng-click="ctrl.addSchemaMapping()">Add mapping</a>
   </div>
   <hr />

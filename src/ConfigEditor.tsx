@@ -1,11 +1,128 @@
+import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
+import { getBackendSrv } from '@grafana/runtime';
 import { FieldSet, Input, Button, InlineField, Switch, Select, LegacyForms } from '@grafana/ui';
-import React from 'react';
+import ConfigHelp from 'components/ConfigHelp';
+import React, { useEffect, useState, useCallback } from 'react';
+import { ResponseParser } from 'response_parser';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions, EditorMode, SchemaMappingOption } from 'types';
 
 const { SecretFormField } = LegacyForms;
 
-interface ConfigEditorProps {}
+export type Props = DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions>;
 
-const ConfigEditor: React.FC<ConfigEditorProps> = () => {
+interface ConfigEditorProps extends Props {}
+
+interface Schema {
+  databases: Array<{
+    text: string;
+    value: string;
+  }>;
+  schemaMappingOptions: SchemaMappingOption[];
+}
+
+async function refreshSchema(): Promise<Schema> {
+  const databases: Array<{ text: string; value: string }> = [];
+  const schemaMappingOptions: SchemaMappingOption[] = [];
+
+  const data = {
+    querySource: 'schema',
+    csl: `.show databases schema as json`,
+  };
+
+  const response = await getBackendSrv().datasourceRequest({
+    url: `/azuredataexplorer/v1/rest/mgmt`,
+    method: 'POST',
+    data: data,
+  });
+
+  // TODO: cache???
+  const schema = new ResponseParser().parseSchemaResult(response.data);
+
+  for (const database of Object.values(schema.Databases)) {
+    databases.push({
+      text: database.Name,
+      value: database.Name,
+    });
+
+    for (const table of Object.values(database.Tables)) {
+      schemaMappingOptions.push({
+        type: 'table',
+        text: `${database.Name}/tables/${table.Name}`,
+        value: table.Name,
+        name: table.Name,
+        database: database.Name,
+      });
+    }
+
+    for (const func of Object.values(database.Functions)) {
+      schemaMappingOptions.push({
+        type: 'function',
+        text: `${database.Name}/functions/${func.Name}`,
+        value: func.Name,
+        name: func.Name,
+        input: func.InputParameters,
+        database: database.Name,
+      });
+    }
+
+    for (const view of Object.values(database.MaterializedViews)) {
+      schemaMappingOptions.push({
+        type: 'materializedView',
+        text: `${database.Name}/materializedViews/${view.Name}`,
+        value: view.Name,
+        name: view.Name,
+        database: database.Name,
+      });
+    }
+  }
+
+  return { databases, schemaMappingOptions };
+}
+
+const ConfigEditor: React.FC<ConfigEditorProps> = ({ options, onOptionsChange }) => {
+  const [schema, setSchema] = useState<Schema>();
+  const { jsonData, secureJsonData } = options;
+
+  const handleFieldChange = useCallback(
+    <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => {
+      onOptionsChange({
+        ...options,
+        jsonData: {
+          ...jsonData,
+          [fieldName]: value,
+        },
+      });
+    },
+    [jsonData, onOptionsChange, options]
+  );
+
+  useEffect(() => {
+    if (options.id) {
+      refreshSchema().then(data => setSchema(data));
+    }
+  }, [options.id]);
+
+  useEffect(() => {
+    if (!jsonData.defaultDatabase && schema?.databases.length) {
+      handleFieldChange('defaultDatabase', schema?.databases[0].value);
+    }
+    // TODO: test this dependency array functions as expected
+  }, [schema?.databases, jsonData.defaultDatabase, handleFieldChange]);
+
+  const handleRefreshClick = useCallback(() => {
+    refreshSchema().then(data => setSchema(data));
+  }, []);
+
+  const dataConsistencyOptions: Array<SelectableValue<string>> = [
+    { value: 'strongconsistency', label: 'Strong' },
+    { value: 'weakconsistency', label: 'Weak' },
+  ];
+
+  const editorModeOptions: Array<SelectableValue<EditorMode>> = [
+    { value: EditorMode.Visual, label: 'Visual' },
+    { value: EditorMode.Raw, label: 'Raw' },
+  ];
+
   const clientSecretTooltip = (
     <>
       To create a new key, log in to Azure Portal, navigate to Azure Active Directory {'🡒'} App Registrations
@@ -23,46 +140,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = () => {
 
   return (
     <>
-      <div className="gf-form-group">
-        <div className="grafana-info-box">
-          <h5>Configuring Azure and your Azure Data Explorer Database</h5>
-          <h5>1. Create an AAD application</h5>
-          <p>
-            Details on how to do create one via the Azure portal or with the Azure CLI can be found{' '}
-            <a
-              className="external-link"
-              target="_blank"
-              href="https://github.com/grafana/azure-data-explorer-datasource#configuring-the-datasource-in-grafana"
-            >
-              here.
-            </a>
-          </p>
-
-          <h5>2. Connect the AAD Application to a database user</h5>
-          <p>
-            Navigate to the Azure Data Explorer Web UI via the Azure Portal. The AAD application that you created in
-            step 1 needs to be given viewer access to your Azure Data Explorer database. This is done using the dot
-            command <i>add</i>:<pre>.add database your_db_name viewers ('aadapp=your_client_id;your_tenant_id')</pre>
-          </p>
-
-          <h5>3. Configure the connection in Grafana</h5>
-          <p>
-            Use the details from the AAD Service Principle from Step 1 to fill in the field below. Then click the Save &
-            Test button.
-          </p>
-
-          <p>
-            Detailed instructions on all three steps can found in{' '}
-            <a
-              className="external-link"
-              target="_blank"
-              href="https://github.com/grafana/azure-data-explorer-datasource#configuring-the-datasource-in-grafana"
-            >
-              in the documentation.
-            </a>
-          </p>
-        </div>
-      </div>
+      <ConfigHelp />
 
       <FieldSet label="Connection Details">
         <InlineField
@@ -70,7 +148,13 @@ const ConfigEditor: React.FC<ConfigEditorProps> = () => {
           labelWidth={26}
           tooltip="The cluster url for your Azure Data Explorer database."
         >
-          <Input id="adx-cluster-url" placeholder="https://yourcluster.kusto.windows.net" width={60} />
+          <Input
+            value={jsonData.clusterUrl}
+            id="adx-cluster-url"
+            placeholder="https://yourcluster.kusto.windows.net"
+            width={60}
+            onChange={(ev: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('clusterUrl', ev.target.value)}
+          />
         </InlineField>
 
         <InlineField
@@ -90,7 +174,12 @@ const ConfigEditor: React.FC<ConfigEditorProps> = () => {
             </>
           }
         >
-          <Input id="adx-tenant-id" width={60} />
+          <Input
+            value={jsonData.tenantId}
+            id="adx-tenant-id"
+            width={60}
+            onChange={(ev: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('tenantId', ev.target.value)}
+          />
         </InlineField>
 
         <InlineField
@@ -112,15 +201,21 @@ const ConfigEditor: React.FC<ConfigEditorProps> = () => {
             </>
           }
         >
-          <Input id="adx-client-id" width={60} />
+          <Input
+            value={jsonData.clientId}
+            id="adx-client-id"
+            width={60}
+            onChange={(ev: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('clientId', ev.target.value)}
+          />
         </InlineField>
 
         <SecretFormField
           label="Client secret"
+          value={secureJsonData?.clientSecret}
           labelWidth={13}
           inputWidth={16}
           onReset={() => {}}
-          isConfigured={true}
+          isConfigured={!!secureJsonData?.clientSecret}
           // tooltip is typed too strictly (it can safely accept ReactNode), and has been fixed in https://github.com/grafana/grafana/pull/31310
           // but we just cast it to string to satisfy the types until we can upgrade
           tooltip={(clientSecretTooltip as unknown) as string}
@@ -129,7 +224,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = () => {
 
       <FieldSet label="Query Optimizations">
         <InlineField label="Query timeout" labelWidth={26} tooltip="This value controls the client query timeout.">
-          <Input id="adx-query-timeout" placeholder="30s" width={18} />
+          <Input value={jsonData.queryTimeout} id="adx-query-timeout" placeholder="30s" width={18} />
         </InlineField>
 
         <InlineField
@@ -137,7 +232,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = () => {
           labelWidth={26}
           tooltip="By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored.<br /><br />For time series queries we will use the bin size to widen the time range but also as cache max age."
         >
-          <Switch id="adx-caching" />
+          <Switch value={jsonData.dynamicCaching} id="adx-caching" />
         </InlineField>
 
         <InlineField
@@ -145,15 +240,25 @@ const ConfigEditor: React.FC<ConfigEditorProps> = () => {
           labelWidth={26}
           tooltip="By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live."
         >
-          <Input id="adx-cache-age" placeholder="0m" width={18} />
+          <Input value={jsonData.cacheMaxAge} id="adx-cache-age" placeholder="0m" width={18} />
         </InlineField>
 
         <InlineField label="Data consistency" labelWidth={26}>
-          <Select onChange={() => {}} width={18} />
+          <Select
+            options={dataConsistencyOptions}
+            value={dataConsistencyOptions.find(v => v.value === jsonData.dataConsistency)}
+            onChange={() => {}}
+            width={18}
+          />
         </InlineField>
 
         <InlineField label="Default editor mode" labelWidth={26}>
-          <Select onChange={() => {}} width={18} />
+          <Select
+            options={editorModeOptions}
+            value={editorModeOptions.find(v => v.value === jsonData.defaultEditorMode)}
+            onChange={() => {}}
+            width={18}
+          />
         </InlineField>
       </FieldSet>
 
@@ -162,7 +267,10 @@ const ConfigEditor: React.FC<ConfigEditorProps> = () => {
           <Select onChange={() => {}} />
         </InlineField>
 
-        <Button variant="primary">Reload</Button>
+        <Button variant="primary" onClick={handleRefreshClick}>
+          Reload
+        </Button>
+
         <Button variant="primary">Add mapping</Button>
       </FieldSet>
 

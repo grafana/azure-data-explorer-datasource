@@ -61,11 +61,20 @@ export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySourc
 };
 
 export interface SchemaMapping {
-  database: string;
   type: SchemaMappingType;
-  name: string;
-  displayName: string;
   value: string;
+  name: string;
+  database: string;
+  displayName: string;
+}
+
+export interface SchemaMappingOption {
+  text: string;
+  value: string;
+  type: string;
+  name: string;
+  database: string;
+  input?: AdxFunctionInputParameterSchema[];
 }
 
 export enum SchemaMappingType {
@@ -84,6 +93,16 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   useSchemaMapping: boolean;
   schemaMappings: SchemaMapping[];
   enableUserTracking: boolean;
+
+  // added
+  clusterUrl: string;
+  tenantId: string;
+  clientId: string;
+}
+
+// TODO: need to fix this??
+export interface AdxDataSourceSecureOptions {
+  clientSecret: string;
 }
 
 export interface AdxSchema {
