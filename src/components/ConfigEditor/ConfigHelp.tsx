@@ -23,8 +23,10 @@ const ConfigHelp: React.FC<ConfigHelpProps> = () => {
         <p>
           Navigate to the Azure Data Explorer Web UI via the Azure Portal. The AAD application that you created in step
           1 needs to be given viewer access to your Azure Data Explorer database. This is done using the dot command{' '}
-          <i>add</i>:<pre>.add database your_db_name viewers ('aadapp=your_client_id;your_tenant_id')</pre>
+          <i>add</i>:
         </p>
+
+        <pre>.add database your_db_name viewers ('aadapp=your_client_id;your_tenant_id')</pre>
 
         <h5>3. Configure the connection in Grafana</h5>
         <p>

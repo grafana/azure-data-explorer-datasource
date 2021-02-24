@@ -69,9 +69,9 @@ export interface SchemaMapping {
 }
 
 export interface SchemaMappingOption {
-  text: string;
+  label: string;
   value: string;
-  type: string;
+  type: SchemaMappingType;
   name: string;
   database: string;
   input?: AdxFunctionInputParameterSchema[];
@@ -91,7 +91,7 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   cacheMaxAge: string;
   dynamicCaching: boolean;
   useSchemaMapping: boolean;
-  schemaMappings: SchemaMapping[];
+  schemaMappings?: Array<Partial<SchemaMapping>>;
   enableUserTracking: boolean;
 
   // added
@@ -102,7 +102,7 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
 
 // TODO: need to fix this??
 export interface AdxDataSourceSecureOptions {
-  clientSecret: string;
+  clientSecret: string | false;
 }
 
 export interface AdxSchema {
