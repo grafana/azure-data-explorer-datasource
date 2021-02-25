@@ -1,6 +1,6 @@
 import { getBackendSrv } from '@grafana/runtime';
 import { ResponseParser } from '../../response_parser';
-import { SchemaMappingOption } from '../../types';
+import { SchemaMappingOption, SchemaMappingType } from '../../types';
 
 export interface Schema {
   databases: Array<{
@@ -36,7 +36,7 @@ export async function refreshSchema(baseUrl: string): Promise<Schema> {
 
     for (const table of Object.values(database.Tables)) {
       schemaMappingOptions.push({
-        type: 'table',
+        type: SchemaMappingType.table,
         label: `${database.Name}/tables/${table.Name}`,
         value: table.Name,
         name: table.Name,
@@ -46,7 +46,7 @@ export async function refreshSchema(baseUrl: string): Promise<Schema> {
 
     for (const func of Object.values(database.Functions)) {
       schemaMappingOptions.push({
-        type: 'function',
+        type: SchemaMappingType.function,
         label: `${database.Name}/functions/${func.Name}`,
         value: func.Name,
         name: func.Name,
@@ -57,7 +57,7 @@ export async function refreshSchema(baseUrl: string): Promise<Schema> {
 
     for (const view of Object.values(database.MaterializedViews)) {
       schemaMappingOptions.push({
-        type: 'materializedView',
+        type: SchemaMappingType.materializedView,
         label: `${database.Name}/materializedViews/${view.Name}`,
         value: view.Name,
         name: view.Name,

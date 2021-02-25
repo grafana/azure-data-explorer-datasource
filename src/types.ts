@@ -93,8 +93,6 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   useSchemaMapping: boolean;
   schemaMappings?: Array<Partial<SchemaMapping>>;
   enableUserTracking: boolean;
-
-  // added
   clusterUrl: string;
   tenantId: string;
   clientId: string;
