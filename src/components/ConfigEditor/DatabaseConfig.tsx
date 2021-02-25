@@ -11,7 +11,7 @@ import {
   Select,
   VerticalGroup,
 } from '@grafana/ui';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
 import { Schema } from './refreshSchema';
 
@@ -40,10 +40,11 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({
   onRefresh,
 }) => {
   const { jsonData } = options;
+  const mappings = useMemo(() => jsonData.schemaMappings ?? [], [jsonData.schemaMappings]);
 
   const handleAddNewMapping = useCallback(() => {
-    updateJsonData('schemaMappings', [...(jsonData.schemaMappings ?? []), {}]);
-  }, [jsonData.schemaMappings, updateJsonData]);
+    updateJsonData('schemaMappings', [...mappings, {}]);
+  }, [mappings, updateJsonData]);
 
   const handleMappingTargetChange = (index: number, change: SelectableValue<string>) => {
     const target = change.value && schema.schemaMappingOptions?.find(v => v.value === change.value);
@@ -51,7 +52,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({
       return;
     }
 
-    const newMappings = [...(jsonData.schemaMappings ?? [])];
+    const newMappings = [...mappings];
     newMappings[index] = {
       ...newMappings[index],
       database: target.database,
@@ -63,13 +64,19 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({
     updateJsonData('schemaMappings', newMappings);
   };
 
-  const handleNameChange = (index: number, value: string) => {
-    const newMappings = [...(jsonData.schemaMappings ?? [])];
+  const handleMappingNameChange = (index: number, value: string) => {
+    const newMappings = [...mappings];
     newMappings[index] = {
       ...newMappings[index],
       displayName: value,
     };
 
+    updateJsonData('schemaMappings', newMappings);
+  };
+
+  const handleRemoveMapping = (index: number) => {
+    const newMappings = [...mappings];
+    newMappings.splice(index, 1);
     updateJsonData('schemaMappings', newMappings);
   };
 
@@ -87,7 +94,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({
 
       <InlineField label="Use managed schema" labelWidth={26}>
         <InlineSwitch
-          id="adx-username-header"
+          id="adx-use-schema-mapping"
           value={jsonData.useSchemaMapping}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('useSchemaMapping', ev.target.checked)}
         />
@@ -96,7 +103,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({
       {jsonData.useSchemaMapping && (
         <InlineField label="Schema mappings" labelWidth={26}>
           <VerticalGroup spacing="xs">
-            {jsonData.schemaMappings?.map((mapping, index) => (
+            {mappings.map((mapping, index) => (
               <HorizontalGroup spacing="xs" key={index}>
                 <Select
                   value={schema.schemaMappingOptions.find(v => v.value === mapping.value)}
@@ -112,20 +119,32 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({
                 <Input
                   placeholder="Name"
                   value={mapping.displayName}
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) => handleNameChange(index, ev.target.value)}
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    handleMappingNameChange(index, ev.target.value)
+                  }
                 />
+                <Button
+                  variant="secondary"
+                  size="md"
+                  icon="trash-alt"
+                  aria-label="Remove"
+                  type="button"
+                  onClick={() => handleRemoveMapping(index)}
+                ></Button>
               </HorizontalGroup>
             ))}
 
-            <Button variant="secondary" size="md" onClick={handleAddNewMapping}>
+            <Button variant="secondary" size="md" onClick={handleAddNewMapping} type="button">
               Add mapping
             </Button>
           </VerticalGroup>
         </InlineField>
       )}
 
-      <Button variant="primary" onClick={onRefresh}>
-        Reload
+      <br />
+
+      <Button variant="primary" onClick={onRefresh} type="button">
+        Reload schema
       </Button>
     </FieldSet>
   );
