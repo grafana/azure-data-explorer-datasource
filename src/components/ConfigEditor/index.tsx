@@ -38,7 +38,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ options, onOptionsChange })
     if (!jsonData.defaultDatabase && schema?.databases.length) {
       updateJsonData('defaultDatabase', schema?.databases[0].value);
     }
-    // TODO: test this dependency array functions as expected
   }, [schema?.databases, jsonData.defaultDatabase, updateJsonData]);
 
   const handleRefreshClick = useCallback(() => {

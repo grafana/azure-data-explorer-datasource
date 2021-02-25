@@ -100,7 +100,6 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   clientId: string;
 }
 
-// TODO: need to fix this??
 export interface AdxDataSourceSecureOptions {
   clientSecret: string | false;
 }

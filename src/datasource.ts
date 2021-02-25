@@ -191,7 +191,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       `${this.id}.schema.overview`,
       () => {
         const url = `${this.baseUrl}/v1/rest/mgmt`;
-        console.log('getSchema url', url);
         const req = {
           querySource: 'schema',
           csl: `.show databases schema as json`,

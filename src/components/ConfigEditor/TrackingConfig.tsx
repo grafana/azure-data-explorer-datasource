@@ -18,7 +18,6 @@ const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData
           id="adx-username-header"
           value={jsonData.enableUserTracking}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-            // TODO: this is setting the wrong value???
             updateJsonData('enableUserTracking', ev.target.checked)
           }
         />

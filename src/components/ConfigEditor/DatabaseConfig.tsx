@@ -87,7 +87,6 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({
           width={45}
           options={schema.databases}
           value={schema.databases.find(v => v.value === jsonData.defaultDatabase)}
-          // TODO: do we change the type and set empty string to undefine it? or should we use undefined (lol)?
           onChange={(change: SelectableValue<string>) => updateJsonData('defaultDatabase', change.value || '')}
         />
       </InlineField>
