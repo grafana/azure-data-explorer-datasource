@@ -25,7 +25,6 @@ export async function refreshSchema(baseUrl: string): Promise<Schema> {
     data: data,
   });
 
-  // TODO: cache???
   const schema = new ResponseParser().parseSchemaResult(response.data);
 
   for (const database of Object.values(schema.Databases)) {

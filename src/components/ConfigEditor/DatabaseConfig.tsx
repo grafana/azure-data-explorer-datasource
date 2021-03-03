@@ -32,13 +32,7 @@ function formatMappingValue(mapping): string {
   }
 }
 
-const DatabaseConfig: React.FC<DatabaseConfigProps> = ({
-  options,
-  schema,
-  onOptionsChange,
-  updateJsonData,
-  onRefresh,
-}) => {
+const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, updateJsonData, onRefresh }) => {
   const { jsonData } = options;
   const mappings = useMemo(() => jsonData.schemaMappings ?? [], [jsonData.schemaMappings]);
 
