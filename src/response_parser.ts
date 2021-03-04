@@ -39,11 +39,6 @@ export interface KustoDatabaseItem {
   Rows: any[];
 }
 
-// export interface KustoSchema {
-//   Databases: { [key: string]: KustoDatabase };
-//   Plugins: any[];
-// }
-
 export interface KustoDatabase {
   Name: string;
   Tables: { [key: string]: KustoTable };

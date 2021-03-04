@@ -1,6 +1,6 @@
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
 import { FieldSet, InlineField, InlineSwitch, Input, Select } from '@grafana/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, EditorMode } from 'types';
 
 interface QueryConfigProps
@@ -8,18 +8,28 @@ interface QueryConfigProps
   updateJsonData: <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => void;
 }
 
+const dataConsistencyOptions: Array<{ value: string; label: string }> = [
+  { value: 'strongconsistency', label: 'Strong' },
+  { value: 'weakconsistency', label: 'Weak' },
+];
+
+const editorModeOptions: Array<{ value: EditorMode; label: string }> = [
+  { value: EditorMode.Visual, label: 'Visual' },
+  { value: EditorMode.Raw, label: 'Raw' },
+];
+
 const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) => {
   const { jsonData } = options;
 
-  const dataConsistencyOptions: Array<{ value: string; label: string }> = [
-    { value: 'strongconsistency', label: 'Strong' },
-    { value: 'weakconsistency', label: 'Weak' },
-  ];
-
-  const editorModeOptions: Array<SelectableValue<EditorMode>> = [
-    { value: EditorMode.Visual, label: 'Visual' },
-    { value: EditorMode.Raw, label: 'Raw' },
-  ];
+  // Set some default values
+  useEffect(() => {
+    if (!jsonData.dataConsistency) {
+      updateJsonData('dataConsistency', dataConsistencyOptions[0].value);
+    }
+    if (!jsonData.defaultEditorMode) {
+      updateJsonData('defaultEditorMode', editorModeOptions[0].value);
+    }
+  }, [jsonData.dataConsistency, jsonData.defaultEditorMode, updateJsonData]);
 
   return (
     <FieldSet label="Query Optimizations">
@@ -72,7 +82,7 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
         />
       </InlineField>
 
-      <InlineField label="Default editor mode" labelWidth={26}>
+      <InlineField label="Default editor mode" labelWidth={26} tooltip="Defaults to Visual">
         <Select
           options={editorModeOptions}
           value={editorModeOptions.find(v => v.value === jsonData.defaultEditorMode)}

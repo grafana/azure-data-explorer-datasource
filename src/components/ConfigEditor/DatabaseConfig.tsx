@@ -136,7 +136,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
 
       <br />
 
-      <Button variant="primary" onClick={onRefresh} type="button">
+      <Button variant="primary" onClick={onRefresh} type="button" icon="sync">
         Reload schema
       </Button>
     </FieldSet>

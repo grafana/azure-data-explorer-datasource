@@ -13,7 +13,17 @@ const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData
 
   return (
     <FieldSet label="Tracking">
-      <InlineField label="Send username header to host" labelWidth={26}>
+      <InlineField
+        label="Send username header to host"
+        labelWidth={26}
+        tooltip={
+          <p>
+            With this feature enabled, Grafana will pass the logged in user's username in the <code>x-ms-user-id</code>{' '}
+            header and in the <code>x-ms-client-request-id</code> header when sending requests to ADX. Can be useful
+            when tracking needs to be done in ADX.{' '}
+          </p>
+        }
+      >
         <InlineSwitch
           id="adx-username-header"
           value={jsonData.enableUserTracking}

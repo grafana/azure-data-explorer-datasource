@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
+import { DataSourcePluginOptionsEditorProps, updateDatasourcePluginResetOption } from '@grafana/data';
 import ConfigHelp from 'components/ConfigEditor/ConfigHelp';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
 import ConnectionConfig from './ConnectionConfig';
@@ -11,7 +11,8 @@ import TrackingConfig from './TrackingConfig';
 interface ConfigEditorProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {}
 
-const ConfigEditor: React.FC<ConfigEditorProps> = ({ options, onOptionsChange }) => {
+const ConfigEditor: React.FC<ConfigEditorProps> = props => {
+  const { options, onOptionsChange } = props;
   const [schema, setSchema] = useState<Schema>({ databases: [], schemaMappingOptions: [] });
   const { jsonData } = options;
 
@@ -44,11 +45,30 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ options, onOptionsChange })
     refreshSchema(options.url).then(data => setSchema(data));
   }, [options.url]);
 
+  const handleClearClientSecret = useCallback(() => {
+    onOptionsChange({
+      ...options,
+      secureJsonData: {
+        ...options.secureJsonData,
+        clientSecret: false,
+      },
+      secureJsonFields: {
+        ...options.secureJsonFields,
+        clientSecret: false,
+      },
+    });
+  }, [onOptionsChange, options]);
+
   return (
     <>
       <ConfigHelp />
 
-      <ConnectionConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
+      <ConnectionConfig
+        options={options}
+        onOptionsChange={onOptionsChange}
+        updateJsonData={updateJsonData}
+        handleClearClientSecret={handleClearClientSecret}
+      />
 
       <QueryConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
 

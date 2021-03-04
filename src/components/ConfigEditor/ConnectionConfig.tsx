@@ -8,9 +8,15 @@ const { SecretFormField } = LegacyForms;
 interface ConnectionConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
   updateJsonData: <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => void;
+  handleClearClientSecret: () => void;
 }
 
-const ConnectionConfig: React.FC<ConnectionConfigProps> = ({ options, onOptionsChange, updateJsonData }) => {
+const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
+  options,
+  onOptionsChange,
+  updateJsonData,
+  handleClearClientSecret,
+}) => {
   const { jsonData, secureJsonData, secureJsonFields } = options;
 
   const handleClientSecretChange = (ev?: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,9 +112,9 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({ options, onOptionsC
         label="Client secret"
         value={secureJsonData?.clientSecret || undefined}
         labelWidth={13}
-        inputWidth={16}
+        inputWidth={30}
         placeholder=""
-        onReset={() => handleClientSecretChange()}
+        onReset={() => handleClearClientSecret()}
         onChange={handleClientSecretChange}
         isConfigured={!!secureJsonData?.clientSecret || !!secureJsonFields?.clientSecret}
         // tooltip is typed too strictly (it can safely accept ReactNode), and has been fixed in https://github.com/grafana/grafana/pull/31310
