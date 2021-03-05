@@ -53,7 +53,7 @@ You need to have commit rights to the GitHub repository to publish a release.
 1. Update the version number in the `package.json` file.
 2. Update the `CHANGELOG.md` with the changes containted in the release.
 3. Commit the changes to master and push to GitHub.
-4. Create a release branch locally that follows the convention v(major).(minor).x. For example:
+4. Create a release branch locally that follows the convention v(major).(minor).x, leaving the patch as `x`. For example:
 
    ```bash
    git checkout -b v3.3.x
