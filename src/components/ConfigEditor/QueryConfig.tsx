@@ -70,7 +70,7 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
         />
       </InlineField>
 
-      <InlineField label="Data consistency" labelWidth={26}>
+      <InlineField label="Data consistency" labelWidth={26} tooltip="Defaults to Strong">
         <Select
           options={dataConsistencyOptions}
           value={dataConsistencyOptions.find(v => v.value === jsonData.dataConsistency)}
