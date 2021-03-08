@@ -8,14 +8,7 @@
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
-    "keywords": [
-      "azure",
-      "kusto",
-      "kustodb",
-      "azure data explorer",
-      "data",
-      "explorer"
-    ],
+    "keywords": ["azure", "kusto", "kustodb", "azure data explorer", "data", "explorer"],
     "logos": {
       "small": "img/logo.png",
       "large": "img/logo.png"
@@ -36,7 +29,7 @@
   },
   "routes": [
     {
-      "path": "azuredataexplorer",
+      "path": "azuredataexplorer-global",
       "method": "POST",
       "url": "{{.JsonData.clusterUrl}}",
       "headers": [
@@ -47,6 +40,46 @@
       ],
       "tokenAuth": {
         "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
+        "params": {
+          "grant_type": "client_credentials",
+          "client_id": "{{.JsonData.clientId}}",
+          "client_secret": "{{.SecureJsonData.clientSecret}}",
+          "resource": "https://kusto.kusto.windows.net"
+        }
+      }
+    },
+    {
+      "path": "azuredataexplorer-usgov",
+      "method": "POST",
+      "url": "{{.JsonData.clusterUrl}}",
+      "headers": [
+        {
+          "name": "x-ms-app",
+          "content": "Grafana-ADX"
+        }
+      ],
+      "tokenAuth": {
+        "url": "https://login.microsoftonline.us/{{.JsonData.tenantId}}/oauth2/token",
+        "params": {
+          "grant_type": "client_credentials",
+          "client_id": "{{.JsonData.clientId}}",
+          "client_secret": "{{.SecureJsonData.clientSecret}}",
+          "resource": "https://kusto.kusto.windows.net"
+        }
+      }
+    },
+    {
+      "path": "azuredataexplorer-china",
+      "method": "POST",
+      "url": "{{.JsonData.clusterUrl}}",
+      "headers": [
+        {
+          "name": "x-ms-app",
+          "content": "Grafana-ADX"
+        }
+      ],
+      "tokenAuth": {
+        "url": "https://login.chinacloudapi.cn/{{.JsonData.tenantId}}/oauth2/token",
         "params": {
           "grant_type": "client_credentials",
           "client_id": "{{.JsonData.clientId}}",

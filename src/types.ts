@@ -83,6 +83,7 @@ export enum SchemaMappingType {
   materializedView = 'materializedView',
 }
 export interface AdxDataSourceOptions extends DataSourceJsonData {
+  nationalCloud?: string;
   defaultDatabase: string;
   minimalCache: number;
   defaultEditorMode: EditorMode;
