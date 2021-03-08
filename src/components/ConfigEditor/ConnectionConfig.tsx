@@ -117,9 +117,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         onReset={() => handleClearClientSecret()}
         onChange={handleClientSecretChange}
         isConfigured={!!secureJsonData?.clientSecret || !!secureJsonFields?.clientSecret}
-        // tooltip is typed too strictly (it can safely accept ReactNode), and has been fixed in https://github.com/grafana/grafana/pull/31310
-        // but we just cast it to string to satisfy the types until we can upgrade
-        tooltip={(clientSecretTooltip as unknown) as string}
+        tooltip={clientSecretTooltip}
       />
     </FieldSet>
   );
