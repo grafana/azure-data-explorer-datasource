@@ -16,8 +16,8 @@
     "@grafana/eslint-config": "2.0.0",
     "@grafana/runtime": "7.1.1",
     "@grafana/toolkit": "7.3.1",
-    "@grafana/ui": "7.1.4",
-    "@testing-library/react": "^10.4.6",
+    "@grafana/ui": "7.5.0-beta.1",
+    "@testing-library/react": "^11.2.5",
     "@types/angular": "1.6.49",
     "@types/debounce-promise": "^3.1.2",
     "@types/grafana": "github:CorpGlory/types-grafana.git",
@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "debounce-promise": "^3.1.2",
+    "react-select-event": "^5.2.0",
     "react-use": "^15.3.3"
   }
 }

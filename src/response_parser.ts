@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { AdxSchema } from 'types';
 
 export interface DataTarget {
   target: string;
@@ -38,10 +39,6 @@ export interface KustoDatabaseItem {
   Rows: any[];
 }
 
-export interface KustoSchema {
-  Databases: { [key: string]: KustoDatabase };
-  Plugins: any[];
-}
 export interface KustoDatabase {
   Name: string;
   Tables: { [key: string]: KustoTable };
@@ -90,8 +87,8 @@ export class ResponseParser {
     return databases;
   }
 
-  parseSchemaResult(results: any): KustoSchema {
+  parseSchemaResult(results: any) {
     const schemaJson = results.Tables[0].Rows[0][0];
-    return JSON.parse(schemaJson);
+    return JSON.parse(schemaJson) as AdxSchema;
   }
 }

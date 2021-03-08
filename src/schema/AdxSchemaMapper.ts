@@ -2,14 +2,31 @@ import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../edito
 import { AdxDatabaseSchema, AdxSchema, SchemaMapping, SchemaMappingType } from '../types';
 import { tableToDefinition } from './mapper';
 
+// Mappings in the jsonData are partials - they might have undefined fields. We want to ignore them.
+const validMapping = (mapping: Partial<SchemaMapping>): mapping is SchemaMapping => {
+  return (
+    Object.values(mapping).every(v => v !== undefined) &&
+    !!mapping.database &&
+    !!mapping.displayName &&
+    !!mapping.name &&
+    !!mapping.type &&
+    !!mapping.value
+  );
+};
+
 export class AdxSchemaMapper {
   private mappingsByDatabase: Record<string, SchemaMapping[]> = {};
   private displayNameToMapping: Record<string, SchemaMapping> = {};
   private nameToMapping: Record<string, SchemaMapping> = {};
   private valueToMapping: Record<string, SchemaMapping> = {};
 
-  constructor(private enabled = false, mappings: SchemaMapping[] = []) {
+  constructor(private enabled = false, mappings: Array<Partial<SchemaMapping>> = []) {
     for (const mapping of mappings) {
+      // Skip mappings with empty values
+      if (!validMapping(mapping)) {
+        continue;
+      }
+
       if (!Array.isArray(this.mappingsByDatabase[mapping.database])) {
         this.mappingsByDatabase[mapping.database] = [];
       }
@@ -53,6 +70,7 @@ const filterAndMapToDefinition = (
   return mappings.reduce((all: QueryEditorPropertyDefinition[], mapping) => {
     if (mapping.type === SchemaMappingType.table) {
       if (database.Tables[mapping.name]) {
+        console.log('if (database.Tables[mapping.name])', mapping);
         all.push(mappingToDefinition(mapping));
         return all;
       }
@@ -60,6 +78,7 @@ const filterAndMapToDefinition = (
 
     if (mapping.type === SchemaMappingType.materializedView) {
       if (database.MaterializedViews[mapping.name]) {
+        console.log('if (database.MaterializedViews[mapping.name])', mapping);
         all.push(mappingToDefinition(mapping));
         return all;
       }
@@ -67,6 +86,7 @@ const filterAndMapToDefinition = (
 
     if (mapping.type === SchemaMappingType.function) {
       if (database.Functions[mapping.name]) {
+        console.log('if (database.Functions[mapping.name])', mapping);
         all.push(mappingToDefinition(mapping));
         return all;
       }

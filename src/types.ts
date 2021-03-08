@@ -61,11 +61,20 @@ export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySourc
 };
 
 export interface SchemaMapping {
+  type: SchemaMappingType;
+  value: string;
+  name: string;
   database: string;
+  displayName: string;
+}
+
+export interface SchemaMappingOption {
+  label: string;
+  value: string;
   type: SchemaMappingType;
   name: string;
-  displayName: string;
-  value: string;
+  database: string;
+  input?: AdxFunctionInputParameterSchema[];
 }
 
 export enum SchemaMappingType {
@@ -82,8 +91,15 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   cacheMaxAge: string;
   dynamicCaching: boolean;
   useSchemaMapping: boolean;
-  schemaMappings: SchemaMapping[];
+  schemaMappings?: Array<Partial<SchemaMapping>>;
   enableUserTracking: boolean;
+  clusterUrl: string;
+  tenantId: string;
+  clientId: string;
+}
+
+export interface AdxDataSourceSecureOptions {
+  clientSecret: string | false;
 }
 
 export interface AdxSchema {
