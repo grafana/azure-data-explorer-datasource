@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { DataSourcePluginOptionsEditorProps, updateDatasourcePluginResetOption } from '@grafana/data';
+import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import ConfigHelp from 'components/ConfigEditor/ConfigHelp';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
 import ConnectionConfig from './ConnectionConfig';
