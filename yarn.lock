@@ -1066,7 +1066,14 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.11.1", "@babel/runtime@^7.11.2", "@babel/runtime@^7.9.2":
+  version "7.13.10"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.13.10.tgz#47d42a57b6095f4468da440388fdbad8bebf0d7d"
+  integrity sha512-4QPkjJq6Ns3V/RgpEahRk+AGfL0eO6RHHtTWoNNr5mO49G6B5+X6d6THgWEAvTrznU5xYpbAlVKRYcsCgh/Akw==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
+"@babel/runtime@^7.12.5":
   version "7.12.18"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.12.18.tgz#af137bd7e7d9705a412b3caaf991fe6aaa97831b"
   integrity sha512-BogPQ7ciE6SYAUPtlm9tWbgI9+2AgqSam6QivMgXgAT+fKbgppaj4ZX15MHeLC1PVF5sNk70huBu20XxWOs8Cg==
@@ -1322,7 +1329,7 @@
 
 "@grafana/data@7.5.0-beta.1":
   version "7.5.0-beta.1"
-  resolved "https://npm.pkg.github.com/download/@grafana/data/7.5.0-beta.1/1a6c136c19b20958eeb7a9aa0b47017f1c97328963a23f47f5d1956c00ae9c2a#4c6dcd07daee713a06e46d230b9c09877fd5f732"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-7.5.0-beta.1.tgz#4c6dcd07daee713a06e46d230b9c09877fd5f732"
   integrity sha512-hYU3XWVp2rsLfSZVwYFM9wL0e+i1ktlNPzELGL66EcSV+ak41orlcjpwEpke4O7Vtht6t5qSoTycYlmj6+aZEw==
   dependencies:
     "@braintree/sanitize-url" "4.0.0"
@@ -1358,7 +1365,7 @@
 
 "@grafana/e2e-selectors@7.5.0-beta.1":
   version "7.5.0-beta.1"
-  resolved "https://npm.pkg.github.com/download/@grafana/e2e-selectors/7.5.0-beta.1/d192f5b9e70deb2bf8864262f6925bde0194e77194ae0d18f01fb2b79b129808#063734af7a112033d2e78219969619194fca3526"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-7.5.0-beta.1.tgz#063734af7a112033d2e78219969619194fca3526"
   integrity sha512-zn23xTrkNtCRSI4wg23CatAq2t4R2JWtqwEKvRfP3qWuJTwql2vu1pLJufJUcTkJtn3ImmwSMGvxZ/wI9SPbqQ==
   dependencies:
     "@grafana/tsconfig" "^1.0.0-rc1"
@@ -1581,7 +1588,7 @@
 
 "@grafana/ui@7.5.0-beta.1":
   version "7.5.0-beta.1"
-  resolved "https://npm.pkg.github.com/download/@grafana/ui/7.5.0-beta.1/6a6c35b7ac4e9f31fbb1704eb37eada84f3876c40d2504792fd017aabacb7dd5#0de30ebe9e51df956fa20f1d0a396d286b3f8c5f"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-7.5.0-beta.1.tgz#0de30ebe9e51df956fa20f1d0a396d286b3f8c5f"
   integrity sha512-/+VeGVRjRtd9bOwhzdwWqk8IVrENlGoMWCuRaNQU0+q2tdPQurXYbE3rmxKVtKysPTYNzbhS5Ox5QzYkPkoriA==
   dependencies:
     "@emotion/core" "10.0.27"
@@ -11531,9 +11538,9 @@ rc-tooltip@^4.0.0:
     rc-trigger "^4.2.1"
 
 rc-tooltip@^5.0.1:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/rc-tooltip/-/rc-tooltip-5.0.2.tgz#e48258fc9931bd9281102b2d9eacc5b986cf3258"
-  integrity sha512-A4FejSG56PzYtSNUU4H1pVzfhtkV/+qMT2clK0CsSj+9mbc4USEtpWeX6A/jjVL+goBOMKj8qlH7BCZmZWh/Nw==
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/rc-tooltip/-/rc-tooltip-5.1.0.tgz#abb453c463c31a705aa01d268279f4ae6ae3b15f"
+  integrity sha512-pFqD1JZwNIpbdcefB7k5xREoHAWM/k3yQwYF0iminbmDXERgq4rvBfUwIvlCqqZSM7HDr9hYeYr6ZsVNaKtvCQ==
   dependencies:
     "@babel/runtime" "^7.11.2"
     rc-trigger "^5.0.0"
@@ -11564,9 +11571,9 @@ rc-trigger@^4.0.0, rc-trigger@^4.2.1:
     rc-util "^5.0.1"
 
 rc-trigger@^5.0.0:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/rc-trigger/-/rc-trigger-5.2.2.tgz#a6669a48573464614e512741dfb6940933987196"
-  integrity sha512-e6tyCw/xqp4KfYodEK2ecgiUEWQCsqrw2rMXWF6zSeq9SYoXMVZJz4ao8xct4YSiAe7zuaCKkPprS0xdqnAtMg==
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/rc-trigger/-/rc-trigger-5.2.3.tgz#8c55046ab432d7b52d51c69afb57ebb5bbe37e17"
+  integrity sha512-6Fokao07HUbqKIDkDRFEM0AGZvsvK0Fbp8A/KFgl1ngaqfO1nY037cISCG1Jm5fxImVsXp9awdkP7Vu5cxjjog==
   dependencies:
     "@babel/runtime" "^7.11.2"
     classnames "^2.2.6"
