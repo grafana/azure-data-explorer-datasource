@@ -1327,6 +1327,20 @@
     rxjs "6.6.0"
     xss "1.0.6"
 
+"@grafana/data@7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-7.4.0.tgz#7e7ae998cc4d916ba7d004e27b38eab4b1199ee8"
+  integrity sha512-YlsA9uu3dO7hnbIUagjhAMXUU7puSSXxc42aOyuj/K9daPVMhOunI7lSM8PSm1uhKVifvd5DJOwlA0UQQRJqSw==
+  dependencies:
+    "@braintree/sanitize-url" "4.0.0"
+    "@types/d3-interpolate" "^1.3.1"
+    apache-arrow "0.16.0"
+    eventemitter3 "4.0.7"
+    lodash "4.17.20"
+    marked "1.2.2"
+    rxjs "6.6.3"
+    xss "1.0.6"
+
 "@grafana/data@7.5.0-beta.1":
   version "7.5.0-beta.1"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-7.5.0-beta.1.tgz#4c6dcd07daee713a06e46d230b9c09877fd5f732"
@@ -1361,6 +1375,17 @@
     commander "5.0.0"
     execa "4.0.0"
     typescript "3.9.3"
+    yaml "^1.8.3"
+
+"@grafana/e2e-selectors@7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-7.4.0.tgz#f286dab307b26e6b0628a1d5e9907e3943c38ed3"
+  integrity sha512-RCAXLOTUlO8nWALo1Wnl0pTkZYzUGnBV6RuetwEDaRkfZEEKXn3F1OerzF5iJWFsdFJvVehCZ7sFYOPmnEl/gg==
+  dependencies:
+    "@grafana/tsconfig" "^1.0.0-rc1"
+    commander "5.0.0"
+    execa "4.0.0"
+    typescript "4.1.2"
     yaml "^1.8.3"
 
 "@grafana/e2e-selectors@7.5.0-beta.1":
@@ -1413,13 +1438,13 @@
     prettier "1.19.1"
     typescript "4.0.2"
 
-"@grafana/runtime@7.1.1":
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-7.1.1.tgz#1b9684e048f0c66456dc93e9fbbcc1518bc0b1a8"
-  integrity sha512-lDTyDR6NpUXhfllwD1ypm+x9qbPwnpJiyB5K6I15jkk36yWBClLLOuK6Kwg2eUDHq84uOVqs6iOOipsT1mlLLQ==
+"@grafana/runtime@7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-7.4.0.tgz#c097adcdb151efd4211a4fc2bd91598c9cd7e627"
+  integrity sha512-ug2FPtzlEL4CykmrVp1Cnp6066ndzlMP8x/+rHNK7RR3HbS0ju2c+t6iq0vwU6605dwL71uOC+NOUuNIyZtYyg==
   dependencies:
-    "@grafana/data" "7.1.1"
-    "@grafana/ui" "7.1.1"
+    "@grafana/data" "7.4.0"
+    "@grafana/ui" "7.4.0"
     systemjs "0.20.19"
     systemjs-plugin-css "0.1.37"
 
@@ -1538,53 +1563,58 @@
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.0.0-rc1.tgz#d07ea16755a50cae21000113f30546b61647a200"
   integrity sha512-nucKPGyzlSKYSiJk5RA8GzMdVWhdYNdF+Hh65AXxjD9PlY69JKr5wANj8bVdQboag6dgg0BFKqgKPyY+YtV4Iw==
 
-"@grafana/ui@7.1.1":
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-7.1.1.tgz#198d8b54349e58411ab0cabad9c49e8cbfa367a1"
-  integrity sha512-TgXbL9lOpgBMkCLyOTXyjSG6ocy/88WKdrtN3binc8MPVWg3h8yAD4SeYBHCmrwD/Je9ePb77uiug4/4LK3wJQ==
+"@grafana/ui@7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-7.4.0.tgz#4c5eea4c5a00a342fb87bd9a462398e32a72bb84"
+  integrity sha512-jbpqWGqzdDmU5+lCOHY/DLTlpLD0rNgXJfQLWwPq2ilOdCq0ItIaehxM+e5XqzTy3J+q5nyNQZFH2wM+wqzZRw==
   dependencies:
     "@emotion/core" "^10.0.27"
-    "@grafana/data" "7.1.1"
-    "@grafana/e2e-selectors" "7.1.1"
+    "@grafana/data" "7.4.0"
+    "@grafana/e2e-selectors" "7.4.0"
     "@grafana/slate-react" "0.22.9-grafana"
     "@grafana/tsconfig" "^1.0.0-rc1"
-    "@iconscout/react-unicons" "^1.0.0"
+    "@iconscout/react-unicons" "1.1.4"
+    "@popperjs/core" "2.5.4"
+    "@sentry/browser" "5.25.0"
+    "@testing-library/jest-dom" "5.11.9"
     "@torkelo/react-select" "3.0.8"
+    "@types/hoist-non-react-statics" "3.3.1"
     "@types/react-beautiful-dnd" "12.1.2"
     "@types/react-color" "3.0.1"
     "@types/react-select" "3.0.8"
     "@types/react-table" "7.0.12"
     "@types/slate" "0.47.1"
     "@types/slate-react" "0.22.5"
-    bizcharts "^3.5.8"
     classnames "2.2.6"
     d3 "5.15.0"
     emotion "10.0.27"
+    hoist-non-react-statics "3.3.2"
     immutable "3.8.2"
     jquery "3.5.1"
-    lodash "4.17.15"
+    lodash "4.17.20"
     moment "2.24.0"
     monaco-editor "0.20.0"
-    papaparse "4.6.3"
+    papaparse "5.3.0"
     rc-cascader "1.0.1"
     rc-drawer "3.1.3"
-    rc-slider "9.3.1"
+    rc-slider "9.6.4"
     rc-time-picker "^3.7.3"
-    react "16.12.0"
+    react "17.0.1"
     react-beautiful-dnd "13.0.0"
     react-calendar "2.19.2"
     react-color "2.18.0"
     react-custom-scrollbars "4.2.1"
-    react-dom "16.12.0"
+    react-dom "17.0.1"
     react-highlight-words "0.16.0"
     react-hook-form "5.1.3"
     react-monaco-editor "0.36.0"
-    react-popper "1.3.3"
+    react-popper "2.2.4"
     react-storybook-addon-props-combinations "1.1.0"
     react-table "7.0.0"
-    react-transition-group "4.3.0"
+    react-transition-group "4.4.1"
     slate "0.47.8"
     tinycolor2 "1.4.1"
+    uplot "1.6.4"
 
 "@grafana/ui@7.5.0-beta.1":
   version "7.5.0-beta.1"
@@ -9140,15 +9170,15 @@ lodash@4.17.19, lodash@^4.0.1, lodash@^4.1.1, lodash@^4.17.10, lodash@^4.17.11, 
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
   integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
 
+lodash@4.17.20, lodash@^4.0.0, lodash@~4.17.10:
+  version "4.17.20"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+
 lodash@4.17.21:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
-
-lodash@^4.0.0, lodash@~4.17.10:
-  version "4.17.20"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
-  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
 log-symbols@^1.0.2:
   version "1.0.2"
@@ -9289,6 +9319,11 @@ map-visit@^1.0.0:
   integrity sha1-7Nyo8TFE5mDxtb1B8S80edmN+48=
   dependencies:
     object-visit "^1.0.0"
+
+marked@1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-1.2.2.tgz#5d77ffb789c4cb0ae828bfe76250f7140b123f70"
+  integrity sha512-5jjKHVl/FPo0Z6ocP3zYhKiJLzkwJAw4CZoLjv57FkvbUuwOX4LIBBGGcXjAY6ATcd1q9B8UTj5T9Umauj0QYQ==
 
 marked@2.0.1:
   version "2.0.1"
