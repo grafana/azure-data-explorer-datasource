@@ -48,20 +48,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     const useSchemaMapping = instanceSettings.jsonData.useSchemaMapping ?? false;
     const schemaMapping = instanceSettings.jsonData.schemaMappings ?? [];
 
-    switch (instanceSettings.jsonData.nationalCloud) {
-      case 'azure-global':
-        this.baseUrl = '/azuredataexplorer-global';
-        break;
-      case 'azure-usgov':
-        this.baseUrl = '/azuredataexplorer-usgov';
-        break;
-      case 'azure-china':
-        this.baseUrl = '/azuredataexplorer-china';
-        break;
-      default:
-        this.baseUrl = '/azuredataexplorer-global';
-        break;
-    }
+    this.baseUrl = '/azuredataexplorer';
 
     this.backendSrv = getBackendSrv();
     this.templateSrv = getTemplateSrv();

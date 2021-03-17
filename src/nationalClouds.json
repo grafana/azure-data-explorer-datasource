@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Azure AD (global service)",
+    "value": "https://login.microsoftonline.com"
+  },
+  {
+    "label": "Azure AD for US Government",
+    "value": "https://login.microsoftonline.us"
+  },
+  {
+    "label": "Azure AD China operated by 21Vianet",
+    "value": "https://login.chinacloudapi.cn"
+  }
+]

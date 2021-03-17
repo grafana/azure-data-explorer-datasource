@@ -2,23 +2,9 @@ import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/da
 import { FieldSet, InlineField, Input, LegacyForms, Select } from '@grafana/ui';
 import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import nationalClouds from '../../nationalClouds.json';
 
 const { SecretFormField } = LegacyForms;
-
-const nationalCloudOptions: Array<{ value: string; label: string }> = [
-  {
-    value: 'azure-global',
-    label: 'Azure AD (global service)',
-  },
-  {
-    value: 'azure-usgov',
-    label: 'Azure AD for US Government',
-  },
-  {
-    value: 'azure-china',
-    label: 'Azure AD China operated by 21Vianet',
-  },
-];
 
 interface ConnectionConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
@@ -37,7 +23,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
   // Set some default values
   useEffect(() => {
     if (!jsonData.nationalCloud) {
-      updateJsonData('nationalCloud', nationalCloudOptions[0].value);
+      updateJsonData('nationalCloud', nationalClouds[0].value);
     }
   }, [jsonData.nationalCloud, updateJsonData]);
 
@@ -71,10 +57,10 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
     <FieldSet label="Connection Details">
       <InlineField label="Azure national cloud" labelWidth={26} tooltip="Select an Azure National Cloud.">
         <Select
-          options={nationalCloudOptions}
-          value={nationalCloudOptions.find(v => v.value === jsonData.nationalCloud)}
+          options={nationalClouds}
+          value={nationalClouds.find(v => v.value === jsonData.nationalCloud)}
           onChange={(change: SelectableValue<string>) =>
-            updateJsonData('nationalCloud', change.value ? change.value : nationalCloudOptions[0].value)
+            updateJsonData('nationalCloud', change.value ? change.value : nationalClouds[0].value)
           }
           isClearable={false}
           width={60}
