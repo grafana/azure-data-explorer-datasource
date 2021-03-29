@@ -17,8 +17,8 @@ interface ChildProps {
 }
 
 export const QueryEditorRepeater: React.FC<Props> = props => {
-  const { onChange: propsOnChange, children, value, id } = props;
-  /* eslint-disable react-hooks/exhaustive-deps */
+  const { onChange: propsOnChange, children, value } = props;
+
   const onChange = useCallback(
     (index: number, expression?: QueryEditorExpression) => {
       const { expressions } = value;
@@ -40,9 +40,8 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
         expressions: remainingExpressions,
       });
     },
-    [children, propsOnChange, value]
+    [propsOnChange, value]
   );
-  /* eslint-enable react-hooks/exhaustive-deps */
 
   if (!value?.expressions) {
     return null;
@@ -54,7 +53,7 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
     <>
       {Array.from(value.expressions).map((val, idx) => {
         return (
-          <React.Fragment key={`${id}-${idx}`}>
+          <React.Fragment key={idx}>
             {children({
               index: idx,
               value: val,
