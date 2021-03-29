@@ -37,6 +37,7 @@ export interface QueryEditorGroupByExpression extends QueryEditorExpression {
   property: QueryEditorProperty;
   interval?: QueryEditorProperty;
 }
+
 export interface QueryEditorArrayExpression extends QueryEditorExpression {
-  expressions: QueryEditorExpression[];
+  expressions: QueryEditorExpression[] | QueryEditorArrayExpression[];
 }
