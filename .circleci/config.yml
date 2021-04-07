@@ -59,7 +59,7 @@ workflows:
           filters: *filter-only-release
       - publish_github_release:
           requires:
-          - approve_release
+            - approve_release
           filters: *filter-only-release
       - publish_gcs_release:
           requires:
@@ -68,12 +68,12 @@ workflows:
       - approve_publish_to_gcom:
           type: approval
           requires:
-          - publish_github_release
-          - publish_gcs_release
+            - publish_github_release
+            - publish_gcs_release
           filters: *filter-only-release
       - publish_to_gcom:
           requires:
-          - approve_publish_to_gcom
+            - approve_publish_to_gcom
           filters: *filter-only-release
 
 executors:
@@ -159,9 +159,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          name: restore node_modules
+          name: Restore node_modules
           keys:
             - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install node dependencies
+          command: yarn install
       - run:
           name: Build backend
           command: mage -v buildAll
@@ -182,32 +185,32 @@ jobs:
   code_coverage_frontend:
     executor: default_exec
     steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - restore_cache:
-        name: restore node_modules
-        keys:
-          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Run coverage report
-        command: |
-          /usr/local/bin/cc-test-reporter format-coverage -t lcov -o out/codeclimate.frontend.json ci/jobs/build_frontend/coverage/lcov.info
-    - run:
-        name: Install jest and jest-junit
-        command: yarn global add jest jest-junit
-    - run:
-        name: Run tests with JUnit as reporter
-        command: jest --ci --runInBand --reporters=default --reporters=jest-junit
-        environment:
-          JEST_JUNIT_OUTPUT_DIR: "test-results/jest/results.xml"
-    - persist_to_workspace:
-        root: .
-        paths:
-        - out
-        - ci/jobs/code_coverage_frontend
-    - store_test_results:
-        path: test-results
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          name: restore node_modules
+          keys:
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Run coverage report
+          command: |
+            /usr/local/bin/cc-test-reporter format-coverage -t lcov -o out/codeclimate.frontend.json ci/jobs/build_frontend/coverage/lcov.info
+      - run:
+          name: Install jest and jest-junit
+          command: yarn global add jest jest-junit
+      - run:
+          name: Run tests with JUnit as reporter
+          command: jest --ci --runInBand --reporters=default --reporters=jest-junit
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: 'test-results/jest/results.xml'
+      - persist_to_workspace:
+          root: .
+          paths:
+            - out
+            - ci/jobs/code_coverage_frontend
+      - store_test_results:
+          path: test-results
 
   code_coverage_backend:
     executor: e2e_exec
@@ -461,7 +464,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: "Copy Artifacts to GCP Release Bucket"
+          name: 'Copy Artifacts to GCP Release Bucket'
           command: |
             ls -l ci/jobs/build_frontend/dist/plugin.json
             echo "Contents of ci/jobs/build_frontend/dist/plugin.json"
@@ -510,7 +513,7 @@ jobs:
           keys:
             - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
-          name: "Publish Release on GitHub"
+          name: 'Publish Release on GitHub'
           command: |
             # copy ci artifacts
             mkdir -p artifacts
@@ -554,7 +557,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: "Copy Artifacts to GCP Bucket"
+          name: 'Copy Artifacts to GCP Bucket'
           command: |
             ls -l ci/jobs/build_frontend/dist/plugin.json
             echo "Contents of ci/jobs/build_frontend/dist/plugin.json"
@@ -595,7 +598,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: "Publish to GCOM"
+          name: 'Publish to GCOM'
           command: |
             if [ -z "${GCOM_PUBLISH_TOKEN}" ]; then
               echo "Missing GCOM Publish Key"
