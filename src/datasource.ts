@@ -269,10 +269,11 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       options = {};
     }
     if (!options.hasOwnProperty('scopedVars')) {
-      options['scopedVars'] = {};
+      options.scopedVars = {};
     }
 
-    const interpolatedQuery = interpolateKustoQuery(query, options['scopedVars']);
+    const replacedQuery = this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable);
+    const interpolatedQuery = interpolateKustoQuery(replacedQuery, options.scopedVars);
 
     return {
       ...defaultQuery,
