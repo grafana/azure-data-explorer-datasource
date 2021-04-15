@@ -176,6 +176,14 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where eventType == 'ThunderStorm'");
     });
 
+    it('should parse an expression with a table name that contains special characters', () => {
+      const expression = createQueryExpression({
+        from: createProperty('events.all'),
+      });
+
+      expect(parser.toQuery(expression)).toEqual("['events.all']");
+    });
+
     it('should parse expression with where equal to boolean value', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),

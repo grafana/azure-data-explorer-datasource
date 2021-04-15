@@ -53,7 +53,7 @@ export class KustoExpressionParser {
     if (!expression || !expression.from) {
       return '';
     }
-
+    
     const context: ParseContext = {
       timeColumn: defaultTimeColumn(tableSchema, expression),
       castIfDynamic: (column: string) => castIfDynamic(column, tableSchema),
@@ -290,7 +290,17 @@ export class KustoExpressionParser {
   }
 
   private appendProperty(context: ParseContext, expression: QueryEditorPropertyExpression, parts: string[]) {
-    parts.push(expression.property.name);
+    parts.push(this.formatProperty(expression.property.name));
+  }
+
+  private formatProperty(property: string): string {
+    const specialCharacters = /[\s\.-]/; // space, dot, or dash
+    
+    if (specialCharacters.test(property)) {
+      return `['${property}']`;
+    }
+
+    return property;
   }
 
   private isTemplateVariable(value: string): boolean {
