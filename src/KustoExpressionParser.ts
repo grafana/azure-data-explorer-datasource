@@ -53,7 +53,7 @@ export class KustoExpressionParser {
     if (!expression || !expression.from) {
       return '';
     }
-    
+
     const context: ParseContext = {
       timeColumn: defaultTimeColumn(tableSchema, expression),
       castIfDynamic: (column: string) => castIfDynamic(column, tableSchema),
