@@ -295,8 +295,9 @@ export class KustoExpressionParser {
 
   private formatProperty(property: string): string {
     const specialCharacters = /[\s\.-]/; // space, dot, or dash
-    
-    if (specialCharacters.test(property)) {
+    const schemaMappingCharacters = /[\$\(]/; // $ or (
+
+    if (specialCharacters.test(property) && !schemaMappingCharacters.test(property)) {
       return `['${property}']`;
     }
 
