@@ -290,7 +290,18 @@ export class KustoExpressionParser {
   }
 
   private appendProperty(context: ParseContext, expression: QueryEditorPropertyExpression, parts: string[]) {
-    parts.push(expression.property.name);
+    parts.push(this.formatProperty(expression.property.name));
+  }
+
+  private formatProperty(property: string): string {
+    const specialCharacters = /[\s\.-]/; // space, dot, or dash
+    const schemaMappingCharacters = /[\$\(]/; // $ or (
+
+    if (specialCharacters.test(property) && !schemaMappingCharacters.test(property)) {
+      return `['${property}']`;
+    }
+
+    return property;
   }
 
   private isTemplateVariable(value: string): boolean {
