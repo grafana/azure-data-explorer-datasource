@@ -1,5 +1,9 @@
 # Change Log
 
+## [3.3.3]
+
+- Bugfix: Fixed issue where query builder did not handle table names that contained special characters
+
 ## [3.3.2]
 
 - Bugfix: Fixed an issue where the KQL Monaco editor wouldn't load when Grafana is served from a sub path
