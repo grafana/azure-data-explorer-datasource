@@ -1,6 +1,6 @@
 # Change Log
 
-## [next]
+## [3.4.0]
 
 Note: The minimum required version of Grafana is now 7.4
 
