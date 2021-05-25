@@ -8,7 +8,6 @@ import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
 import { refreshSchema, Schema } from './refreshSchema';
 import TrackingConfig from './TrackingConfig';
-import { alertError } from '@grafana/data/types/appEvents';
 import { Alert } from '@grafana/ui';
 
 interface ConfigEditorProps
@@ -20,19 +19,24 @@ type FetchErrorResponse = FetchResponse<{
   response?: string;
 }>;
 
-const ConfigEditor: React.FC<ConfigEditorProps> = props => {
+const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
   const { options, onOptionsChange } = props;
   const [schema, setSchema] = useState<Schema>({ databases: [], schemaMappingOptions: [] });
   const [schemaError, setSchemaError] = useState<FetchErrorResponse['data']>();
   const { jsonData } = options;
-
   const updateSchema = (url: string) => {
+    if (!url.length) {
+      return;
+    }
     refreshSchema(url)
-      .then(data => {
+      .then((data) => {
         setSchema(data);
         setSchemaError(undefined);
       })
-      .catch((err: FetchErrorResponse) => setSchemaError(err.data));
+      .catch((err: FetchErrorResponse) => {
+        // TODO: make sure err.data is the format we are expecting
+        setSchemaError(err.data);
+      });
   };
 
   const updateJsonData = useCallback(
