@@ -19,7 +19,7 @@ type FetchErrorResponse = FetchResponse<{
   response?: string;
 }>;
 
-const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
+const ConfigEditor: React.FC<ConfigEditorProps> = props => {
   const { options, onOptionsChange } = props;
   const [schema, setSchema] = useState<Schema>({ databases: [], schemaMappingOptions: [] });
   const [schemaError, setSchemaError] = useState<FetchErrorResponse['data']>();
@@ -29,7 +29,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
       return;
     }
     refreshSchema(url)
-      .then((data) => {
+      .then(data => {
         setSchema(data);
         setSchemaError(undefined);
       })
@@ -81,7 +81,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
   }, [onOptionsChange, options]);
 
   return (
-    <>
+    <div data-testid="azure-data-explorer-config-editor">
       <ConfigHelp />
 
       <ConnectionConfig
@@ -108,7 +108,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
           {schemaError.message}
         </Alert>
       )}
-    </>
+    </div>
   );
 };
 
