@@ -21,7 +21,10 @@ func TestClient(t *testing.T) {
 		}
 		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			rw.WriteHeader(http.StatusOK)
-			rw.Write(testDataRes)
+			_, err := rw.Write(testDataRes)
+			if err != nil {
+				t.Errorf("test logic error: %s", err.Error())
+			}
 		}))
 		defer server.Close()
 
@@ -52,7 +55,10 @@ func TestClient(t *testing.T) {
 		}
 		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			rw.WriteHeader(http.StatusBadRequest)
-			rw.Write(testDataRes)
+			_, err := rw.Write(testDataRes)
+			if err != nil {
+				t.Errorf("test logic error: %s", err.Error())
+			}
 		}))
 		defer server.Close()
 
