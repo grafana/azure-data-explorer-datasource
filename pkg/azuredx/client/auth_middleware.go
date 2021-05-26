@@ -9,7 +9,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 )
 
-const authenticationMiddlewareName = "Authentication"
+const authenticationMiddlewareName = "AzureAuthentication"
 
 var logError = backend.Logger.Error
 
