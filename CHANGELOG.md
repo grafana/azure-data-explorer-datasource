@@ -1,5 +1,8 @@
 # Change Log
 
+## [next]
+- Bugfix: Fix an error loading schemas on the configuration page.
+
 ## [3.4.0]
 
 Note: The minimum required version of Grafana is now 7.4
