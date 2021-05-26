@@ -14,11 +14,13 @@ import (
 func TestClient(t *testing.T) {
     testUserLogin := "test-user"
 	t.Run("When server returns 200", func(t *testing.T) {
-		testDataRes, err := loadTestFile("./testdata/successful-response.json")
+		filename := "./testdata/successful-response.json"
+		testDataRes, err := loadTestFile(filename)
+		if err != nil {
+			t.Errorf("test logic error: file doesnt exist: %s", filename)
+		}
 		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-			require.Equal(t, testUserLogin, req.Header.Get("x-ms-user-id"))
 			rw.WriteHeader(http.StatusOK)
-			require.NoError(t, err)
 			rw.Write(testDataRes)
 		}))
 		defer server.Close()
@@ -43,12 +45,13 @@ func TestClient(t *testing.T) {
 	})
 
 	t.Run("When server returns 400", func(t *testing.T) {
-		testDataRes, err := loadTestFile("./testdata/error-response.json")
+		filename := "./testdata/error-response.json"
+		testDataRes, err := loadTestFile(filename)
+		if err != nil {
+			t.Errorf("test logic error: file doesnt exist: %s", filename)
+		}
 		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-			
-			require.Equal(t, testUserLogin, req.Header.Get("x-ms-user-id"))
 			rw.WriteHeader(http.StatusBadRequest)
-			require.NoError(t, err)
 			rw.Write(testDataRes)
 		}))
 		defer server.Close()
