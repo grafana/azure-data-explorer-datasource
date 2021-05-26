@@ -20,7 +20,7 @@ type FetchErrorResponse = FetchResponse<{
   response?: string;
 }>;
 
-const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
+const ConfigEditor: React.FC<ConfigEditorProps> = props => {
   const { options, onOptionsChange } = props;
   const [schema, setSchema] = useState<Schema>({ databases: [], schemaMappingOptions: [] });
   const [schemaError, setSchemaError] = useState<FetchErrorResponse['data']>();
@@ -59,7 +59,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
       // TODO: make sure err.data is the format we are expecting
       setSchemaError(err.data);
     }
-  }, [getDatasource]);
+  }, [getDatasource, options.secureJsonFields]);
 
   const updateJsonData = useCallback(
     <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => {
@@ -76,7 +76,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
 
   useEffect(() => {
     options.id && updateSchema();
-  }, [options.id]);
+  }, [options.id, updateSchema]);
 
   useEffect(() => {
     if (!jsonData.defaultDatabase && schema?.databases.length) {
