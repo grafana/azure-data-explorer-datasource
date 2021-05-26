@@ -1,8 +1,9 @@
-package azuredx
+package models
 
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"strconv"
 	"time"
@@ -368,4 +369,20 @@ func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
 	}
 
 	return out, nil
+}
+
+func TableFromJSON(rc io.Reader) (*TableResponse, error) {
+	tr := &TableResponse{}
+	decoder := jsoniter.NewDecoder(rc)
+	// Numbers as string (json.Number) so we can keep types as best we can (since the response has 'type' of column)
+	decoder.UseNumber()
+	err := decoder.Decode(tr)
+	if err != nil {
+		return nil, err
+	}
+	if tr.Tables == nil || len(tr.Tables) == 0 {
+		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
+	}
+
+	return tr, nil
 }

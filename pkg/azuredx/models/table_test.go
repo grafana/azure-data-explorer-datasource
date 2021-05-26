@@ -1,4 +1,4 @@
-package azuredx
+package models
 
 import (
 	"os"
@@ -19,7 +19,7 @@ func tableFromJSONFile(name string) (tr *TableResponse, err error) {
 		return
 	}
 	defer file.Close()
-	return tableFromJSON(file)
+	return TableFromJSON(file)
 }
 
 func TestResponseToFrames(t *testing.T) {
