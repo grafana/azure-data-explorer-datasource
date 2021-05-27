@@ -1,6 +1,6 @@
 # Change Log
 
-## [next]
+## [3.4.1]
 - Bugfix: Fix an error loading schemas on the configuration page.
 
 ## [3.4.0]
