@@ -38,11 +38,13 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	httpClientOptions, err := settings.HTTPClientOptions()
 	if err != nil {
 		backend.Logger.Error("failed to create HTTP client options", "error", err.Error())
+		return nil, err
 	}
 
 	httpClient, err := httpClientProvider.New(httpClientOptions)
 	if err != nil {
 		backend.Logger.Error("failed to create HTTP client", "error", err.Error())
+		return nil, err
 	}
 
 	return &GrafanaAzureDXDatasource{
