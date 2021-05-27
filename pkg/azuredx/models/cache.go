@@ -1,4 +1,4 @@
-package azuredx
+package models
 
 import (
 	"fmt"
@@ -19,16 +19,16 @@ type CacheSettings struct {
 }
 
 // NewCacheSettings is used to detect what cache settings is applicable for the current query.
-func NewCacheSettings(c *Client, q *backend.DataQuery, qm *QueryModel) *CacheSettings {
-	return newCacheSettings(c, q, qm, time.Since)
+func NewCacheSettings(s *DatasourceSettings, q *backend.DataQuery, qm *QueryModel) *CacheSettings {
+	return newCacheSettings(s, q, qm, time.Since)
 }
 
 type timeSince = func(t time.Time) time.Duration
 
-func newCacheSettings(c *Client, q *backend.DataQuery, qm *QueryModel, ts timeSince) *CacheSettings {
-	if !c.DynamicCaching {
+func newCacheSettings(s *DatasourceSettings, q *backend.DataQuery, qm *QueryModel, ts timeSince) *CacheSettings {
+	if !s.DynamicCaching {
 		return &CacheSettings{
-			CacheMaxAge: c.CacheMaxAge,
+			CacheMaxAge: s.CacheMaxAge,
 			TimeRange:   &q.TimeRange,
 		}
 	}

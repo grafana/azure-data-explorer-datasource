@@ -1,4 +1,4 @@
-package azuredx
+package models
 
 import (
 	"fmt"

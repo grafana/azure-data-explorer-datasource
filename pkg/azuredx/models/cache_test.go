@@ -1,4 +1,4 @@
-package azuredx
+package models
 
 import (
 	"testing"
@@ -16,7 +16,7 @@ func TestNewCacheSettings(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		configuration dataSourceData
+		configuration DatasourceSettings
 		query         string
 		interval      time.Duration
 		timeRange     backend.TimeRange
@@ -25,7 +25,7 @@ func TestNewCacheSettings(t *testing.T) {
 	}{
 		{
 			name: "should adjust settings based on query bin size 1m",
-			configuration: dataSourceData{
+			configuration: DatasourceSettings{
 				CacheMaxAge:    "10s",
 				DynamicCaching: true,
 			},
@@ -48,7 +48,7 @@ func TestNewCacheSettings(t *testing.T) {
 		},
 		{
 			name: "should adjust settings based on query bin size 10m",
-			configuration: dataSourceData{
+			configuration: DatasourceSettings{
 				CacheMaxAge:    "10s",
 				DynamicCaching: true,
 			},
@@ -71,7 +71,7 @@ func TestNewCacheSettings(t *testing.T) {
 		},
 		{
 			name: "should adjust settings based on query bin size 1h",
-			configuration: dataSourceData{
+			configuration: DatasourceSettings{
 				CacheMaxAge:    "10s",
 				DynamicCaching: true,
 			},
@@ -94,7 +94,7 @@ func TestNewCacheSettings(t *testing.T) {
 		},
 		{
 			name: "should adjust settings based on interval 1m",
-			configuration: dataSourceData{
+			configuration: DatasourceSettings{
 				CacheMaxAge:    "10s",
 				DynamicCaching: true,
 			},
@@ -116,7 +116,7 @@ func TestNewCacheSettings(t *testing.T) {
 		},
 		{
 			name: "should adjust settings based on interval 1h",
-			configuration: dataSourceData{
+			configuration: DatasourceSettings{
 				CacheMaxAge:    "10s",
 				DynamicCaching: true,
 			},
@@ -138,7 +138,7 @@ func TestNewCacheSettings(t *testing.T) {
 		},
 		{
 			name: "should adjust settings based on interval 1h when macro is present",
-			configuration: dataSourceData{
+			configuration: DatasourceSettings{
 				CacheMaxAge:    "10s",
 				DynamicCaching: true,
 			},
@@ -161,7 +161,7 @@ func TestNewCacheSettings(t *testing.T) {
 		},
 		{
 			name: "should only use cache max age when dynamic is disabled",
-			configuration: dataSourceData{
+			configuration: DatasourceSettings{
 				CacheMaxAge:    "10s",
 				DynamicCaching: false,
 			},
@@ -180,7 +180,7 @@ func TestNewCacheSettings(t *testing.T) {
 		},
 		{
 			name: "should not use caching when all are disabled",
-			configuration: dataSourceData{
+			configuration: DatasourceSettings{
 				CacheMaxAge:    "",
 				DynamicCaching: false,
 			},
@@ -201,11 +201,10 @@ func TestNewCacheSettings(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client := &Client{dataSourceData: &tt.configuration}
 			query := &backend.DataQuery{Interval: tt.interval, TimeRange: tt.timeRange}
 			queryModel := &QueryModel{Query: tt.query}
 
-			cs := newCacheSettings(client, query, queryModel, timeSince)
+			cs := newCacheSettings(&tt.configuration, query, queryModel, timeSince)
 
 			tt.returnIs(t, tt.returnVal.CacheMaxAge, cs.CacheMaxAge)
 			tt.returnIs(t, tt.returnVal.TimeRange.From, cs.TimeRange.From)
