@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { FetchResponse } from '@grafana/runtime';
+import { FetchResponse, getDataSourceSrv } from '@grafana/runtime';
 import ConfigHelp from 'components/ConfigEditor/ConfigHelp';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
 import ConnectionConfig from './ConnectionConfig';
@@ -8,8 +8,8 @@ import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
 import { refreshSchema, Schema } from './refreshSchema';
 import TrackingConfig from './TrackingConfig';
-import { alertError } from '@grafana/data/types/appEvents';
 import { Alert } from '@grafana/ui';
+import { AdxDataSource } from 'datasource';
 
 interface ConfigEditorProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {}
@@ -26,14 +26,40 @@ const ConfigEditor: React.FC<ConfigEditorProps> = props => {
   const [schemaError, setSchemaError] = useState<FetchErrorResponse['data']>();
   const { jsonData } = options;
 
-  const updateSchema = (url: string) => {
-    refreshSchema(url)
-      .then(data => {
-        setSchema(data);
-        setSchemaError(undefined);
-      })
-      .catch((err: FetchErrorResponse) => setSchemaError(err.data));
-  };
+  const getDatasource = useCallback(async () => {
+    const datasource = await getDataSourceSrv().get(options.name);
+    return datasource;
+  }, [options.name]);
+
+  const updateSchema = useCallback(async () => {
+    // no credentials, can't request datasource yet
+    if (!options.secureJsonFields || Object.keys(options.secureJsonFields).length === 0) {
+      return;
+    }
+
+    // TODO: it seems as though url should be defined on options, but it never is so we have to manually fetch it.
+    // why is url undefined on options? If we can figure that out, we don't need to manually fetch it.
+    const datasource = await getDatasource();
+    const url = (datasource as AdxDataSource).url;
+
+    if (!url) {
+      return;
+    }
+
+    try {
+      const schemaData = await refreshSchema(url);
+
+      if (!schemaData) {
+        return;
+      }
+
+      setSchema(schemaData);
+      setSchemaError(undefined);
+    } catch (err) {
+      // TODO: make sure err.data is the format we are expecting
+      setSchemaError(err.data);
+    }
+  }, [getDatasource, options.secureJsonFields]);
 
   const updateJsonData = useCallback(
     <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => {
@@ -49,18 +75,14 @@ const ConfigEditor: React.FC<ConfigEditorProps> = props => {
   );
 
   useEffect(() => {
-    options.id && updateSchema(options.url);
-  }, [options.id, options.url]);
+    options.id && updateSchema();
+  }, [options.id, updateSchema]);
 
   useEffect(() => {
     if (!jsonData.defaultDatabase && schema?.databases.length) {
       updateJsonData('defaultDatabase', schema?.databases[0].value);
     }
   }, [schema?.databases, jsonData.defaultDatabase, updateJsonData]);
-
-  const handleRefreshClick = useCallback(() => {
-    updateSchema(options.url);
-  }, [options.url]);
 
   const handleClearClientSecret = useCallback(() => {
     onOptionsChange({
@@ -77,7 +99,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = props => {
   }, [onOptionsChange, options]);
 
   return (
-    <>
+    <div data-testid="azure-data-explorer-config-editor">
       <ConfigHelp />
 
       <ConnectionConfig
@@ -94,7 +116,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = props => {
         options={options}
         onOptionsChange={onOptionsChange}
         updateJsonData={updateJsonData}
-        onRefresh={handleRefreshClick}
+        onRefresh={updateSchema}
       />
 
       <TrackingConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
@@ -104,7 +126,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = props => {
           {schemaError.message}
         </Alert>
       )}
-    </>
+    </div>
   );
 };
 
