@@ -10,8 +10,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 )
 
-var (
-)
+var ()
 
 var (
 	// timeNow makes it possible to test usage of time
@@ -24,7 +23,7 @@ type AccessTokenProvider struct {
 	authority string
 	secret    string
 	scopes    []string
-	cache 	  ConcurrentTokenCache
+	cache     ConcurrentTokenCache
 }
 
 func NewAccessTokenProvider(

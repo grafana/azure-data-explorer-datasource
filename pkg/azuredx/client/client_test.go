@@ -12,7 +12,7 @@ import (
 )
 
 func TestClient(t *testing.T) {
-    testUserLogin := "test-user"
+	testUserLogin := "test-user"
 	t.Run("When server returns 200", func(t *testing.T) {
 		filename := "./testdata/successful-response.json"
 		testDataRes, err := loadTestFile(filename)
@@ -32,19 +32,19 @@ func TestClient(t *testing.T) {
 			ClusterURL: server.URL,
 		}
 		payload := models.RequestPayload{
-			DB: "db-name",
+			DB:  "db-name",
 			CSL: "show databases",
 		}
 		user := &backend.User{
 			Login: testUserLogin,
 		}
-	
+
 		// Use Client & URL from our local test server
 		client := New(server.Client())
 		table, message, err := client.KustoRequest(settings, payload, "schema", user)
-		require.Empty(t, message)	
-		require.NoError(t, err)	
-		require.NotNil(t, table)	
+		require.Empty(t, message)
+		require.NoError(t, err)
+		require.NotNil(t, table)
 	})
 
 	t.Run("When server returns 400", func(t *testing.T) {
@@ -66,18 +66,18 @@ func TestClient(t *testing.T) {
 			ClusterURL: server.URL,
 		}
 		payload := models.RequestPayload{
-			DB: "db-name",
+			DB:  "db-name",
 			CSL: "show databases",
 		}
 		user := &backend.User{
 			Login: testUserLogin,
 		}
-	
+
 		client := New(server.Client())
 		table, message, err := client.KustoRequest(settings, payload, "schema", user)
-		require.Equal(t, "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'", message)	
-		require.Nil(t, table)	
-		require.NotNil(t, err)	
+		require.Equal(t, "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'", message)
+		require.Nil(t, table)
+		require.NotNil(t, err)
 	})
 }
 
