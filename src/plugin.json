@@ -27,28 +27,6 @@
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
-  "routes": [
-    {
-      "path": "azuredataexplorer",
-      "method": "POST",
-      "url": "{{.JsonData.clusterUrl}}",
-      "headers": [
-        {
-          "name": "x-ms-app",
-          "content": "Grafana-ADX"
-        }
-      ],
-      "tokenAuth": {
-        "url": "https://login.microsoftonline.com/{{.JsonData.tenantId}}/oauth2/token",
-        "params": {
-          "grant_type": "client_credentials",
-          "client_id": "{{.JsonData.clientId}}",
-          "client_secret": "{{.SecureJsonData.clientSecret}}",
-          "resource": "https://kusto.kusto.windows.net"
-        }
-      }
-    }
-  ],
   "dependencies": {
     "grafanaDependency": ">=7.4.0",
     "grafanaVersion": "7.4.x",

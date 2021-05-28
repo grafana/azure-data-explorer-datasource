@@ -26,9 +26,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = props => {
   const [schemaError, setSchemaError] = useState<FetchErrorResponse['data']>();
   const { jsonData } = options;
 
-  const getDatasource = useCallback(async () => {
+  const getDatasource = useCallback(async (): Promise<AdxDataSource> => {
     const datasource = await getDataSourceSrv().get(options.name);
-    return datasource;
+    return datasource as AdxDataSource;
   }, [options.name]);
 
   const updateSchema = useCallback(async () => {
@@ -37,17 +37,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = props => {
       return;
     }
 
-    // TODO: it seems as though url should be defined on options, but it never is so we have to manually fetch it.
-    // why is url undefined on options? If we can figure that out, we don't need to manually fetch it.
-    const datasource = await getDatasource();
-    const url = (datasource as AdxDataSource).url;
-
-    if (!url) {
-      return;
-    }
-
     try {
-      const schemaData = await refreshSchema(url);
+      const datasource = await getDatasource();
+      const schemaData = await refreshSchema(datasource);
 
       if (!schemaData) {
         return;

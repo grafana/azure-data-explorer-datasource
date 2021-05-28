@@ -1,13 +1,14 @@
 package client
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,20 +29,15 @@ func TestClient(t *testing.T) {
 		}))
 		defer server.Close()
 
-		settings := &models.DatasourceSettings{
-			ClusterURL: server.URL,
-		}
 		payload := models.RequestPayload{
-			DB:  "db-name",
-			CSL: "show databases",
-		}
-		user := &backend.User{
-			Login: testUserLogin,
+			DB:          "db-name",
+			CSL:         "show databases",
+			QuerySource: "schema",
 		}
 
-		// Use Client & URL from our local test server
 		client := New(server.Client())
-		table, message, err := client.KustoRequest(settings, payload, "schema", user)
+		table, statusCode, message, err := client.KustoRequest(server.URL, payload, nil)
+		require.Equal(t, http.StatusOK, statusCode)
 		require.Empty(t, message)
 		require.NoError(t, err)
 		require.NotNil(t, table)
@@ -62,21 +58,45 @@ func TestClient(t *testing.T) {
 		}))
 		defer server.Close()
 
-		settings := &models.DatasourceSettings{
-			ClusterURL: server.URL,
-		}
 		payload := models.RequestPayload{
-			DB:  "db-name",
-			CSL: "show databases",
-		}
-		user := &backend.User{
-			Login: testUserLogin,
+			DB:          "db-name",
+			CSL:         "show databases",
+			QuerySource: "schema",
 		}
 
 		client := New(server.Client())
-		table, message, err := client.KustoRequest(settings, payload, "schema", user)
+		table, statusCode, message, err := client.KustoRequest(server.URL, payload, nil)
+		require.Equal(t, http.StatusBadRequest, statusCode)
 		require.Equal(t, "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'", message)
 		require.Nil(t, table)
+		require.NotNil(t, err)
+	})
+
+	t.Run("Headers are set", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			require.Equal(t, "application/json", req.Header.Get("Accept"))
+			require.Equal(t, "application/json", req.Header.Get("Content-Type"))
+			require.Equal(t, "Grafana-ADX", req.Header.Get("x-ms-app"))
+			require.Contains(t, req.Header.Get("x-ms-client-request-id"), "KGC.schema")
+			require.Contains(t, req.Header.Get("x-ms-user-id"), testUserLogin)
+		}))
+		defer server.Close()
+
+		payload := models.RequestPayload{
+			DB:          "db-name",
+			CSL:         "show databases",
+			QuerySource: "schema",
+		}
+		headers := map[string]string{
+			"x-ms-user-id":           testUserLogin,
+			"x-ms-client-request-id": fmt.Sprintf("KGC.%v;%v", "schema", uuid.Must(uuid.NewRandom()).String()),
+		}
+
+		client := New(server.Client())
+		table, statusCode, message, err := client.KustoRequest(server.URL, payload, headers)
+		require.NotNil(t, statusCode)
+		require.Nil(t, table)
+		require.NotNil(t, message)
 		require.NotNil(t, err)
 	})
 }

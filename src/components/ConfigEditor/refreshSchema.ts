@@ -1,4 +1,5 @@
 import { getBackendSrv } from '@grafana/runtime';
+import { AdxDataSource } from 'datasource';
 import { ResponseParser } from '../../response_parser';
 import { SchemaMappingOption, SchemaMappingType } from '../../types';
 
@@ -10,23 +11,11 @@ export interface Schema {
   schemaMappingOptions: SchemaMappingOption[];
 }
 
-export async function refreshSchema(baseUrl: string): Promise<Schema> {
+export async function refreshSchema(datasource: AdxDataSource): Promise<Schema> {
   const databases: Array<{ label: string; value: string }> = [];
   const schemaMappingOptions: SchemaMappingOption[] = [];
 
-  const data = {
-    querySource: 'schema',
-    csl: `.show databases schema as json`,
-  };
-
-  const response = await getBackendSrv().datasourceRequest({
-    url: `${baseUrl}/azuredataexplorer/v1/rest/mgmt`,
-    method: 'POST',
-    data: data,
-  });
-
-  const schema = new ResponseParser().parseSchemaResult(response.data);
-
+  const schema = await datasource.getSchema();
   for (const database of Object.values(schema.Databases)) {
     databases.push({
       label: database.Name,

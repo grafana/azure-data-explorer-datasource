@@ -10,9 +10,10 @@ type options struct {
 
 // RequestPayload is the information that makes up a Kusto query for Azure's Data Explorer API.
 type RequestPayload struct {
-	DB         string      `json:"db"`
-	CSL        string      `json:"csl"`
-	Properties *Properties `json:"properties,omitempty"`
+	DB          string      `json:"db"`
+	CSL         string      `json:"csl"`
+	QuerySource string      `json:"querySource"`
+	Properties  *Properties `json:"properties,omitempty"`
 }
 
 // AzureFrameMD is a type to populate a Frame's Custom metadata property.
