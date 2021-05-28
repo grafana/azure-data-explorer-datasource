@@ -60,6 +60,9 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	adx.registerRoutes(mux)
 	adx.CallResourceHandler = httpadapter.New(mux)
 
+	return adx, nil
+}
+
 func (adx *AzureDataExplorer) Dispose() {
 	tokenCache.Purge()
 }
