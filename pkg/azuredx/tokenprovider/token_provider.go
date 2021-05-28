@@ -10,8 +10,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 )
 
-var ()
-
 var (
 	// timeNow makes it possible to test usage of time
 	timeNow = time.Now
