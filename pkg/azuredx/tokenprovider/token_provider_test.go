@@ -46,10 +46,6 @@ func TestTokenProvider(t *testing.T) {
 			return &azidentity.ClientSecretCredential{}, nil
 		}
 
-		// getAccessToken = func(ctx context.Context, credential TokenCredential, scopes []string) (string, error) {
-		// 	credential.Init()
-		// 	return ExpectedToken, nil
-		// }
 		provider := NewAccessTokenProvider(tokenCacheFake, TestClientId, TestTenantId, "", TestClientSecret, []string{Scope})
 		token, err := provider.GetAccessToken(ctx)
 		require.Nil(t, err)
@@ -66,10 +62,6 @@ func TestTokenProvider(t *testing.T) {
 			return &azidentity.ClientSecretCredential{}, nil
 		}
 
-		// getAccessToken = func(ctx context.Context, credential TokenCredential, scopes []string) (string, error) {
-		// 	credential.Init()
-		// 	return ExpectedToken, nil
-		// }
 		provider := NewAccessTokenProvider(tokenCacheFake, TestClientId, TestTenantId, AzurePublic, TestClientSecret, []string{Scope})
 		token, err := provider.GetAccessToken(ctx)
 		require.Nil(t, err)
@@ -85,10 +77,7 @@ func TestTokenProvider(t *testing.T) {
 
 			return &azidentity.ClientSecretCredential{}, nil
 		}
-		// getAccessToken = func(ctx context.Context, credential TokenCredential, scopes []string) (string, error) {
-		// 	credential.Init()
-		// 	return ExpectedToken, nil
-		// }
+
 		provider := NewAccessTokenProvider(tokenCacheFake, TestClientId, TestTenantId, AzureChina, TestClientSecret, []string{Scope})
 		token, err := provider.GetAccessToken(ctx)
 		require.Nil(t, err)
@@ -104,10 +93,7 @@ func TestTokenProvider(t *testing.T) {
 
 			return &azidentity.ClientSecretCredential{}, nil
 		}
-		// getAccessToken = func(ctx context.Context, credential TokenCredential, scopes []string) (string, error) {
-		// 	credential.Init()
-		// 	return ExpectedToken, nil
-		// }
+
 		provider := NewAccessTokenProvider(tokenCacheFake, TestClientId, TestTenantId, AzureUSGovernment, TestClientSecret, []string{Scope})
 		token, err := provider.GetAccessToken(ctx)
 		require.Nil(t, err)
