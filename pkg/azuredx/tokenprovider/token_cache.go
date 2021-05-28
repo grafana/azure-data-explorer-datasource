@@ -22,6 +22,7 @@ type TokenCredential interface {
 
 type ConcurrentTokenCache interface {
 	GetAccessToken(ctx context.Context, credential TokenCredential, scopes []string) (string, error)
+	Purge()
 }
 
 func NewConcurrentTokenCache() ConcurrentTokenCache {
@@ -51,6 +52,10 @@ type scopesCacheEntry struct {
 
 func (c *tokenCacheImpl) GetAccessToken(ctx context.Context, credential TokenCredential, scopes []string) (string, error) {
 	return c.getEntryFor(credential).getAccessToken(ctx, scopes)
+}
+
+func (c *tokenCacheImpl) Purge() {
+	c.cache = sync.Map{}
 }
 
 func (c *tokenCacheImpl) getEntryFor(credential TokenCredential) *credentialCacheEntry {

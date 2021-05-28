@@ -11,10 +11,6 @@ import (
 )
 
 var (
-	tokenCache = NewConcurrentTokenCache()
-)
-
-var (
 	// timeNow makes it possible to test usage of time
 	timeNow = time.Now
 )
@@ -25,9 +21,10 @@ type AccessTokenProvider struct {
 	authority string
 	secret    string
 	scopes    []string
+	cache     ConcurrentTokenCache
 }
 
-func NewAccessTokenProvider(
+func NewAccessTokenProvider(cache ConcurrentTokenCache,
 	clientId string, tenantId string, authority string, secret string, scopes []string) *AccessTokenProvider {
 	return &AccessTokenProvider{
 		clientID:  clientId,
@@ -35,12 +32,13 @@ func NewAccessTokenProvider(
 		authority: authority,
 		secret:    secret,
 		scopes:    scopes,
+		cache:     cache,
 	}
 }
 
 func (provider *AccessTokenProvider) GetAccessToken(ctx context.Context) (string, error) {
 	credential := provider.getClientSecretCredential()
-	accessToken, err := tokenCache.GetAccessToken(ctx, credential, provider.scopes)
+	accessToken, err := provider.cache.GetAccessToken(ctx, credential, provider.scopes)
 	if err != nil {
 		return "", err
 	}
