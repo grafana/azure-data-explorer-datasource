@@ -25,6 +25,7 @@ type AzureDataExplorer struct {
 }
 
 var tokenCache = tokenprovider.NewConcurrentTokenCache()
+const AdxScope = "https://kusto.kusto.windows.net/.default"
 
 func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	adx := &AzureDataExplorer{}
@@ -35,7 +36,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 	adx.settings = datasourceSettings
 
-	tokenProvider := tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, "AzurePublic", datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"})
+	tokenProvider := tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"})
 
 	httpClientProvider := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{
 		Middlewares: []sdkhttpclient.Middleware{

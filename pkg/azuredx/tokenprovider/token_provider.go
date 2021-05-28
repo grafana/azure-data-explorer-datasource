@@ -24,6 +24,8 @@ type AccessTokenProvider struct {
 	cache     ConcurrentTokenCache
 }
 
+var newClientSecretCredential = azidentity.NewClientSecretCredential
+
 func NewAccessTokenProvider(cache ConcurrentTokenCache,
 	clientId string, tenantId string, authority string, secret string, scopes []string) *AccessTokenProvider {
 	return &AccessTokenProvider{
@@ -47,7 +49,22 @@ func (provider *AccessTokenProvider) GetAccessToken(ctx context.Context) (string
 }
 
 func (provider *AccessTokenProvider) getClientSecretCredential() TokenCredential {
-	return &clientSecretCredential{authority: azidentity.AzurePublicCloud, tenantId: provider.tenantID, clientId: provider.clientID, clientSecret: provider.secret}
+	cloud := provider.resolveAuthorityHost(provider.authority)
+	return &clientSecretCredential{authority: cloud, tenantId: provider.tenantID, clientId: provider.clientID, clientSecret: provider.secret}
+}
+
+func (provider *AccessTokenProvider) resolveAuthorityHost(cloudName string) string {
+	switch cloudName {
+	case AzurePublic:
+		return azidentity.AzurePublicCloud
+	case AzureChina:
+		return azidentity.AzureChina
+	case AzureUSGovernment:
+		return azidentity.AzureGovernment
+	}
+
+	// Fallback to public cloud
+	return azidentity.AzurePublicCloud
 }
 
 type clientSecretCredential struct {
@@ -64,7 +81,7 @@ func (c *clientSecretCredential) GetCacheKey() string {
 
 func (c *clientSecretCredential) Init() error {
 	options := &azidentity.ClientSecretCredentialOptions{AuthorityHost: c.authority}
-	if credential, err := azidentity.NewClientSecretCredential(c.tenantId, c.clientId, c.clientSecret, options); err != nil {
+	if credential, err := newClientSecretCredential(c.tenantId, c.clientId, c.clientSecret, options); err != nil {
 		return err
 	} else {
 		c.credential = credential

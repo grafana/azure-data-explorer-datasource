@@ -1,9 +1,14 @@
-import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { FieldSet, InlineField, Input, LegacyForms } from '@grafana/ui';
-import React from 'react';
+import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
+import { FieldSet, InlineField, Input, LegacyForms, Select } from '@grafana/ui';
+import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
 
 const { SecretFormField } = LegacyForms;
+const azureClouds = [
+  { value: 'azuremonitor', label: 'Azure' },
+  { value: 'govazuremonitor', label: 'Azure US Government' },
+  { value: 'chinaazuremonitor', label: 'Azure China' },
+] as SelectableValue[];
 
 interface ConnectionConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
@@ -18,6 +23,13 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
   handleClearClientSecret,
 }) => {
   const { jsonData, secureJsonData, secureJsonFields } = options;
+
+  // Set some default values
+  useEffect(() => {
+    if (!jsonData.azureCloud) {
+      updateJsonData('azureCloud', azureClouds[0].value);
+    }
+  }, [jsonData.azureCloud, updateJsonData]);
 
   const handleClientSecretChange = (ev?: React.ChangeEvent<HTMLInputElement>) => {
     onOptionsChange({
@@ -47,6 +59,18 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
   return (
     <FieldSet label="Connection Details">
+      <InlineField label="Azure cloud" labelWidth={26} tooltip="Select an Azure Cloud.">
+        <Select
+          options={azureClouds}
+          value={azureClouds.find(v => v.value === jsonData.azureCloud)}
+          onChange={(change: SelectableValue<string>) =>
+            updateJsonData('azureCloud', change.value ? change.value : azureClouds[0].value)
+          }
+          isClearable={false}
+          width={60}
+        />
+      </InlineField>
+
       <InlineField label="Cluster URL" labelWidth={26} tooltip="The cluster url for your Azure Data Explorer database.">
         <Input
           value={jsonData.clusterUrl}
