@@ -20,6 +20,8 @@ type GrafanaAzureDXDatasource struct {
 	settings *models.DatasourceSettings
 }
 
+var tokenCache = tokenprovider.NewConcurrentTokenCache()
+
 func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	datasourceSettings := models.DatasourceSettings{}
 	err := datasourceSettings.Load(settings)
@@ -27,7 +29,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		return nil, err
 	}
 
-	tokenProvider := tokenprovider.NewAccessTokenProvider(datasourceSettings.ClientID, datasourceSettings.TenantID, "AzurePublic", datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"})
+	tokenProvider := tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, "AzurePublic", datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"})
 
 	httpClientProvider := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{
 		Middlewares: []sdkhttpclient.Middleware{
@@ -54,8 +56,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 }
 
 func (s *GrafanaAzureDXDatasource) Dispose() {
-	// Called before creatinga a new instance to allow plugin authors
-	// to cleanup.
+	tokenCache.Purge()
 }
 
 // QueryData is the primary method called by grafana-server

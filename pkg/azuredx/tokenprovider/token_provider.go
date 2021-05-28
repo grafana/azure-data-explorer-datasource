@@ -26,7 +26,7 @@ type AccessTokenProvider struct {
 	cache     ConcurrentTokenCache
 }
 
-func NewAccessTokenProvider(
+func NewAccessTokenProvider(cache ConcurrentTokenCache,
 	clientId string, tenantId string, authority string, secret string, scopes []string) *AccessTokenProvider {
 	return &AccessTokenProvider{
 		clientID:  clientId,
@@ -34,7 +34,7 @@ func NewAccessTokenProvider(
 		authority: authority,
 		secret:    secret,
 		scopes:    scopes,
-		cache:     NewConcurrentTokenCache(),
+		cache:     cache,
 	}
 }
 
