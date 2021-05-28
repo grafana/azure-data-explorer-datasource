@@ -27,8 +27,6 @@ type AccessTokenProvider struct {
 	cache 	  ConcurrentTokenCache
 }
 
-var newClientSecretCredential = azidentity.NewClientSecretCredential
-
 func NewAccessTokenProvider(
 	clientId string, tenantId string, authority string, secret string, scopes []string) *AccessTokenProvider {
 	return &AccessTokenProvider{
