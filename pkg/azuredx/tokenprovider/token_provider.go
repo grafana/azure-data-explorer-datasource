@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	tokenCache = NewConcurrentTokenCache()
 )
 
 var (
@@ -25,7 +24,10 @@ type AccessTokenProvider struct {
 	authority string
 	secret    string
 	scopes    []string
+	cache 	  ConcurrentTokenCache
 }
+
+var newClientSecretCredential = azidentity.NewClientSecretCredential
 
 func NewAccessTokenProvider(
 	clientId string, tenantId string, authority string, secret string, scopes []string) *AccessTokenProvider {
@@ -35,12 +37,13 @@ func NewAccessTokenProvider(
 		authority: authority,
 		secret:    secret,
 		scopes:    scopes,
+		cache:     NewConcurrentTokenCache(),
 	}
 }
 
 func (provider *AccessTokenProvider) GetAccessToken(ctx context.Context) (string, error) {
 	credential := provider.getClientSecretCredential()
-	accessToken, err := tokenCache.GetAccessToken(ctx, credential, provider.scopes)
+	accessToken, err := provider.cache.GetAccessToken(ctx, credential, provider.scopes)
 	if err != nil {
 		return "", err
 	}
