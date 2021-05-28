@@ -163,12 +163,12 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   async getDatabases(): Promise<DatabaseItem[]> {
-    return this.getResource('databases').then((response: KustoDatabaseList) => {
+    return this.getResource<KustoDatabaseList>('databases').then(response => {
       return new ResponseParser().parseDatabases(response);
     });
   }
 
-  async getResource(path: string): Promise<any> {
+  async getResource<T = unknown>(path: string): Promise<any> {
     return super.getResource(path);
   }
 
