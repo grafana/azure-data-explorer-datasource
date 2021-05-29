@@ -17,7 +17,10 @@ const ExpectedToken string = "4cb83b87-0ffb-4abd-82f6-48a8c08afc53"
 type tokenCacheFake struct{}
 
 func (c *tokenCacheFake) GetAccessToken(_ context.Context, credential TokenCredential, scopes []string) (string, error) {
-	credential.Init()
+	err := credential.Init()
+	if err != nil {
+		return "", err
+	}
 	return ExpectedToken, nil
 }
 
