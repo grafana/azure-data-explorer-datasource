@@ -7,7 +7,7 @@ const { SecretFormField } = LegacyForms;
 const azureClouds: SelectableValue<AzureCloudType>[] = [
   { value: AzureCloudType.AzurePublic, label: 'Azure' },
   { value: AzureCloudType.AzureUSGovernment, label: 'Azure US Government' },
-  { value: AzureCloudType.AzureUSGovernment, label: 'Azure China' },
+  { value: AzureCloudType.AzureChina, label: 'Azure China' },
 ];
 
 interface ConnectionConfigProps
