@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AzureCloudType } from 'types';
 
 const { SecretFormField } = LegacyForms;
-const azureClouds: SelectableValue<AzureCloudType>[] = [
+const azureClouds: Array<SelectableValue<AzureCloudType>> = [
   { value: AzureCloudType.AzurePublic, label: 'Azure' },
   { value: AzureCloudType.AzureUSGovernment, label: 'Azure US Government' },
   { value: AzureCloudType.AzureChina, label: 'Azure China' },
