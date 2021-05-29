@@ -1,14 +1,14 @@
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
 import { FieldSet, InlineField, Input, LegacyForms, Select } from '@grafana/ui';
 import React, { useEffect } from 'react';
-import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AzureCloudType } from 'types';
 
 const { SecretFormField } = LegacyForms;
-const azureClouds = [
-  { value: 'azuremonitor', label: 'Azure' },
-  { value: 'govazuremonitor', label: 'Azure US Government' },
-  { value: 'chinaazuremonitor', label: 'Azure China' },
-] as SelectableValue[];
+const azureClouds: SelectableValue<AzureCloudType>[] = [
+  { value: AzureCloudType.AzurePublic, label: 'Azure' },
+  { value: AzureCloudType.AzureUSGovernment, label: 'Azure US Government' },
+  { value: AzureCloudType.AzureUSGovernment, label: 'Azure China' },
+];
 
 interface ConnectionConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
@@ -27,7 +27,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
   // Set some default values
   useEffect(() => {
     if (!jsonData.azureCloud) {
-      updateJsonData('azureCloud', azureClouds[0].value);
+      updateJsonData('azureCloud', AzureCloudType.AzurePublic);
     }
   }, [jsonData.azureCloud, updateJsonData]);
 
@@ -63,8 +63,8 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         <Select
           options={azureClouds}
           value={azureClouds.find(v => v.value === jsonData.azureCloud)}
-          onChange={(change: SelectableValue<string>) =>
-            updateJsonData('azureCloud', change.value ? change.value : azureClouds[0].value)
+          onChange={(change: SelectableValue<AzureCloudType>) =>
+            updateJsonData('azureCloud', change.value ? change.value : AzureCloudType.AzurePublic)
           }
           isClearable={false}
           width={60}

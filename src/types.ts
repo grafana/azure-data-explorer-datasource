@@ -83,7 +83,7 @@ export enum SchemaMappingType {
   materializedView = 'materializedView',
 }
 export interface AdxDataSourceOptions extends DataSourceJsonData {
-  azureCloud?: string;
+  azureCloud?: AzureCloudType;
   defaultDatabase: string;
   minimalCache: number;
   defaultEditorMode: EditorMode;
@@ -134,3 +134,10 @@ export interface AdxFunctionSchema {
 }
 
 export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
+
+// must be in synch with clouds.go
+export enum AzureCloudType {
+  AzurePublic = 'azuremonitor',
+  AzureUSGovernment = 'govazuremonitor',
+  AzureChina = 'chinaazuremonitor',
+}
