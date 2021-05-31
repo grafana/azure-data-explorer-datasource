@@ -59,7 +59,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
   return (
     <FieldSet label="Connection Details">
-      <InlineField label="Azure cloud" labelWidth={26} tooltip="Select an Azure Cloud.">
+      <InlineField label="Azure cloud" labelWidth={26} tooltip="Select an Azure Cloud." required>
         <Select
           options={azureClouds}
           value={azureClouds.find(v => v.value === jsonData.azureCloud)}
