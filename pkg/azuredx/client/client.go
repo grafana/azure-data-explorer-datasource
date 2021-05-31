@@ -74,10 +74,10 @@ func (c *Client) KustoRequest(url string, payload models.RequestPayload, additio
 	}
 
 	resp, err := c.httpClient.Do(req)
-	statusCode := resp.StatusCode
 	if err != nil {
-		return nil, statusCode, "", err
+		return nil, 500, "", err
 	}
+	statusCode := resp.StatusCode
 	defer resp.Body.Close()
 	if resp.StatusCode > 299 {
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
