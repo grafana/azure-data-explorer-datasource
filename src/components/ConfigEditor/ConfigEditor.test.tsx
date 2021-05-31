@@ -6,6 +6,7 @@ import ConfigEditor from './index';
 import { EditorMode } from 'types';
 import * as refreshSchema from './refreshSchema';
 import * as grafanaRuntime from '@grafana/runtime';
+import { AdxDataSource } from 'datasource';
 
 describe('ConfigEditor', () => {
   let refreshSchemaSpy, getDatasourceSpy;
@@ -13,7 +14,7 @@ describe('ConfigEditor', () => {
   beforeEach(() => {
     refreshSchemaSpy = jest
       .spyOn(refreshSchema, 'refreshSchema')
-      .mockImplementation((url: string) => Promise.resolve({ databases: [], schemaMappingOptions: [] }));
+      .mockImplementation((datasource: AdxDataSource) => Promise.resolve({ databases: [], schemaMappingOptions: [] }));
 
     getDatasourceSpy = jest.spyOn(grafanaRuntime, 'getDataSourceSrv').mockImplementation(
       () =>

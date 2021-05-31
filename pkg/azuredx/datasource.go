@@ -2,32 +2,38 @@ package azuredx
 
 import (
 	"fmt"
+	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/tokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	jsoniter "github.com/json-iterator/go"
 	"golang.org/x/net/context"
 )
 
-// GrafanaAzureDXDatasource stores reference to plugin and logger
-type GrafanaAzureDXDatasource struct {
-	client   *client.Client
+// AzureDataExplorer stores reference to plugin and logger
+type AzureDataExplorer struct {
+	backend.CallResourceHandler
+	client   client.AdxClient
 	settings *models.DatasourceSettings
 }
 
 var tokenCache = tokenprovider.NewConcurrentTokenCache()
 
 func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
-	datasourceSettings := models.DatasourceSettings{}
+	adx := &AzureDataExplorer{}
+	datasourceSettings := &models.DatasourceSettings{}
 	err := datasourceSettings.Load(settings)
 	if err != nil {
 		return nil, err
 	}
+	adx.settings = datasourceSettings
 
 	tokenProvider := tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, "AzurePublic", datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"})
 
@@ -48,32 +54,34 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		backend.Logger.Error("failed to create HTTP client", "error", err.Error())
 		return nil, err
 	}
+	adx.client = client.New(httpClient)
 
-	return &GrafanaAzureDXDatasource{
-		client:   client.New(httpClient),
-		settings: &datasourceSettings,
-	}, nil
+	mux := http.NewServeMux()
+	adx.registerRoutes(mux)
+	adx.CallResourceHandler = httpadapter.New(mux)
+
+	return adx, nil
 }
 
-func (s *GrafanaAzureDXDatasource) Dispose() {
+func (adx *AzureDataExplorer) Dispose() {
 	tokenCache.Purge()
 }
 
 // QueryData is the primary method called by grafana-server
-func (plugin *GrafanaAzureDXDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
 	res := backend.NewQueryDataResponse()
 
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = plugin.handleQuery(q, req.PluginContext.User)
+		res.Responses[q.RefID] = adx.handleQuery(q, req.PluginContext.User)
 	}
 
 	return res, nil
 }
 
 // CheckHealth handles health checks
-func (plugin *GrafanaAzureDXDatasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	err := plugin.client.TestRequest(plugin.settings, models.NewConnectionProperties(plugin.settings, nil))
+func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
+	err := adx.client.TestRequest(adx.settings, models.NewConnectionProperties(adx.settings, nil))
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
@@ -87,7 +95,7 @@ func (plugin *GrafanaAzureDXDatasource) CheckHealth(ctx context.Context, req *ba
 	}, nil
 }
 
-func (plugin *GrafanaAzureDXDatasource) handleQuery(q backend.DataQuery, user *backend.User) backend.DataResponse {
+func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.User) backend.DataResponse {
 	resp := backend.DataResponse{}
 	qm := &models.QueryModel{}
 
@@ -97,7 +105,7 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(q backend.DataQuery, user *b
 		return resp
 	}
 
-	cs := models.NewCacheSettings(plugin.settings, &q, qm)
+	cs := models.NewCacheSettings(adx.settings, &q, qm)
 	qm.MacroData = models.NewMacroData(cs.TimeRange, q.Interval.Milliseconds())
 
 	if err := qm.Interpolate(); err != nil {
@@ -125,12 +133,24 @@ func (plugin *GrafanaAzureDXDatasource) handleQuery(q backend.DataQuery, user *b
 		resp.Error = err
 	}
 
+	headers := map[string]string{}
+	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%s", qm.QuerySource, uuid.Must(uuid.NewRandom()).String())
+	if adx.settings.EnableUserTracking {
+		if user != nil {
+			msClientRequestIDHeader += fmt.Sprintf(";%v", user.Login)
+			headers["x-ms-user-id"] = user.Login
+		}
+	}
+	headers["x-ms-client-request-id"] = msClientRequestIDHeader
+
 	var tableRes *models.TableResponse
-	tableRes, kustoError, err = plugin.client.KustoRequest(plugin.settings, models.RequestPayload{
-		CSL:        qm.Query,
-		DB:         qm.Database,
-		Properties: models.NewConnectionProperties(plugin.settings, cs),
-	}, qm.QuerySource, user)
+	tableRes, _, kustoError, err = adx.client.KustoRequest(adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
+		CSL:         qm.Query,
+		DB:          qm.Database,
+		Properties:  models.NewConnectionProperties(adx.settings, cs),
+		QuerySource: qm.QuerySource,
+	}, headers)
+
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
 		errorWithFrame(err)

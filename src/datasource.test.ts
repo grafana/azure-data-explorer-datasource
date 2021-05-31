@@ -21,11 +21,8 @@ describe('AdxDataSource', () => {
     const response = setupTableResponse();
 
     beforeEach(() => {
-      setupBackendSrv({
-        url: 'http://kustodb.com/azuredataexplorer/v1/rest/mgmt',
-        response: response,
-      });
       ctx.ds = new AdxDataSource(ctx.instanceSettings);
+      ctx.ds.getResource = jest.fn().mockResolvedValue(response);
     });
 
     it('should return a list of databases', () => {
@@ -41,11 +38,8 @@ describe('AdxDataSource', () => {
       let queryResults;
 
       beforeEach(async () => {
-        setupBackendSrv({
-          url: 'http://kustodb.com/azuredataexplorer/v1/rest/mgmt',
-          response: setupTableResponse(),
-        });
         ctx.ds = new AdxDataSource(ctx.instanceSettings);
+        ctx.ds.getResource = jest.fn().mockResolvedValue(setupTableResponse());
 
         queryResults = await ctx.ds.metricFindQuery('databases()');
       });
@@ -87,11 +81,8 @@ describe('AdxDataSource', () => {
     };
 
     beforeEach(() => {
-      setupBackendSrv({
-        url: 'http://kustodb.com/azuredataexplorer/v1/rest/mgmt',
-        response: response,
-      });
       ctx.ds = new AdxDataSource(ctx.instanceSettings);
+      ctx.ds.getResource = jest.fn().mockResolvedValue(response);
     });
 
     it('should return a parsed schema', () => {

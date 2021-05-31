@@ -28,9 +28,7 @@ export interface Variable {
 
 // API interfaces
 export interface KustoDatabaseList {
-  data: {
-    Tables: KustoDatabaseItem[];
-  };
+  Tables: KustoDatabaseItem[];
 }
 
 export interface KustoDatabaseItem {
@@ -74,11 +72,11 @@ export interface DatabaseItem {
 export class ResponseParser {
   parseDatabases(results: KustoDatabaseList): DatabaseItem[] {
     const databases: DatabaseItem[] = [];
-    if (!results || !results.data || !results.data.Tables || results.data.Tables.length === 0) {
+    if (!results) {
       return databases;
     }
 
-    for (const table of results.data.Tables) {
+    for (const table of results.Tables) {
       for (const row of table.Rows) {
         databases.push({ text: row[5] || row[0], value: row[0] });
       }

@@ -12,7 +12,7 @@ import {
 } from '@grafana/data';
 import { map } from 'lodash';
 import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
-import { ResponseParser, DatabaseItem } from './response_parser';
+import { ResponseParser, DatabaseItem, KustoDatabaseList } from './response_parser';
 import {
   AdxDataSourceOptions,
   KustoQuery,
@@ -35,7 +35,6 @@ import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
   private templateSrv: TemplateSrv;
-  private baseUrl: string;
   private defaultOrFirstDatabase: string;
   url?: string;
   private expressionParser: KustoExpressionParser;
@@ -50,7 +49,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
     this.backendSrv = getBackendSrv();
     this.templateSrv = getTemplateSrv();
-    this.baseUrl = '/azuredataexplorer';
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
     this.url = instanceSettings.url;
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
@@ -165,14 +163,13 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   async getDatabases(): Promise<DatabaseItem[]> {
-    const url = `${this.baseUrl}/v1/rest/mgmt`;
-    const req = {
-      csl: '.show databases',
-    };
-
-    return this.doRequest(url, req).then((response: any) => {
+    return this.getResource<KustoDatabaseList>('databases').then(response => {
       return new ResponseParser().parseDatabases(response);
     });
+  }
+
+  async getResource<T = unknown>(path: string): Promise<any> {
+    return super.getResource(path);
   }
 
   async getDefaultOrFirstDatabase(): Promise<string> {
@@ -189,17 +186,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   async getSchema(refreshCache = false): Promise<AdxSchema> {
     return cache<AdxSchema>(
       `${this.id}.schema.overview`,
-      () => {
-        const url = `${this.baseUrl}/v1/rest/mgmt`;
-        const req = {
-          querySource: 'schema',
-          csl: `.show databases schema as json`,
-        };
-
-        return this.doRequest(url, req).then(response => {
-          return new ResponseParser().parseSchemaResult(response.data);
-        });
-      },
+      () => this.getResource('schema').then(new ResponseParser().parseSchemaResult),
       refreshCache
     );
   }
