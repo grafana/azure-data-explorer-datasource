@@ -1,9 +1,14 @@
-import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { FieldSet, InlineField, Input, LegacyForms } from '@grafana/ui';
-import React from 'react';
-import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
+import { FieldSet, InlineField, Input, LegacyForms, Select } from '@grafana/ui';
+import React, { useEffect } from 'react';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AzureCloudType } from 'types';
 
 const { SecretFormField } = LegacyForms;
+const azureClouds: Array<SelectableValue<AzureCloudType>> = [
+  { value: AzureCloudType.AzurePublic, label: 'Azure' },
+  { value: AzureCloudType.AzureUSGovernment, label: 'Azure US Government' },
+  { value: AzureCloudType.AzureChina, label: 'Azure China' },
+];
 
 interface ConnectionConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
@@ -18,6 +23,13 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
   handleClearClientSecret,
 }) => {
   const { jsonData, secureJsonData, secureJsonFields } = options;
+
+  // Set some default values
+  useEffect(() => {
+    if (!jsonData.azureCloud) {
+      updateJsonData('azureCloud', AzureCloudType.AzurePublic);
+    }
+  }, [jsonData.azureCloud, updateJsonData]);
 
   const handleClientSecretChange = (ev?: React.ChangeEvent<HTMLInputElement>) => {
     onOptionsChange({
@@ -47,6 +59,18 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
   return (
     <FieldSet label="Connection Details">
+      <InlineField label="Azure cloud" labelWidth={26} tooltip="Select an Azure Cloud." required>
+        <Select
+          options={azureClouds}
+          value={azureClouds.find(v => v.value === jsonData.azureCloud)}
+          onChange={(change: SelectableValue<AzureCloudType>) =>
+            updateJsonData('azureCloud', change.value ? change.value : AzureCloudType.AzurePublic)
+          }
+          isClearable={false}
+          width={60}
+        />
+      </InlineField>
+
       <InlineField label="Cluster URL" labelWidth={26} tooltip="The cluster url for your Azure Data Explorer database.">
         <Input
           value={jsonData.clusterUrl}

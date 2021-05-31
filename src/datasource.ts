@@ -36,7 +36,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private backendSrv: BackendSrv;
   private templateSrv: TemplateSrv;
   private defaultOrFirstDatabase: string;
-  url?: string;
+  private url?: string;
   private expressionParser: KustoExpressionParser;
   private defaultEditorMode: EditorMode;
   private schemaMapper: AdxSchemaMapper;
