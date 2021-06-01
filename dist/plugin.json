@@ -1,0 +1,54 @@
+{
+  "type": "datasource",
+  "name": "Azure Data Explorer Datasource",
+  "id": "grafana-azure-data-explorer-datasource",
+  "info": {
+    "description": "Grafana data source for Azure Data Explorer",
+    "author": {
+      "name": "Grafana Labs",
+      "url": "https://grafana.com"
+    },
+    "keywords": [
+      "azure",
+      "kusto",
+      "kustodb",
+      "azure data explorer",
+      "data",
+      "explorer"
+    ],
+    "logos": {
+      "small": "img/logo.png",
+      "large": "img/logo.png"
+    },
+    "links": [
+      {
+        "name": "Project site",
+        "url": "https://github.com/grafana/azure-data-explorer-datasource"
+      },
+      {
+        "name": "Apache License",
+        "url": "https://github.com/grafana/azure-data-explorer-datasource/blob/master/LICENSE"
+      }
+    ],
+    "screenshots": [],
+    "version": "3.5.0",
+    "updated": "2021-06-01",
+    "build": {
+      "time": 1622530190286,
+      "repo": "git@github.com:grafana/azure-data-explorer-datasource.git",
+      "branch": "v3.5.x",
+      "hash": "263fa68bb97aa042b35856da6a56bb09e21c686c",
+      "number": 5109
+    }
+  },
+  "dependencies": {
+    "grafanaDependency": ">=7.4.0",
+    "grafanaVersion": "7.4.x",
+    "plugins": []
+  },
+  "metrics": true,
+  "annotations": true,
+  "backend": true,
+  "executable": "gpx_adx",
+  "alerting": true
+}
