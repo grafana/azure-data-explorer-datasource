@@ -1,6 +1,13 @@
 # Change Log
 
+## [3.5.0]
+
+- Add support for national clouds
+- Replace plugin proxy routes with call resource handler
+- Add instance manager, shared http client and use new token provider
+
 ## [3.4.1]
+
 - Bugfix: Fix an error loading schemas on the configuration page.
 
 ## [3.4.0]
