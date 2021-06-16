@@ -2,6 +2,7 @@ import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/da
 import { FieldSet, InlineField, Input, LegacyForms, Select } from '@grafana/ui';
 import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AzureCloudType } from 'types';
+import { selectors } from '../selectors';
 
 const { SecretFormField } = LegacyForms;
 const azureClouds: Array<SelectableValue<AzureCloudType>> = [
@@ -16,12 +17,12 @@ interface ConnectionConfigProps
   handleClearClientSecret: () => void;
 }
 
-const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
+const ConnectionConfig = ({
   options,
   onOptionsChange,
   updateJsonData,
   handleClearClientSecret,
-}) => {
+}: ConnectionConfigProps) => {
   const { jsonData, secureJsonData, secureJsonFields } = options;
 
   // Set some default values
@@ -50,6 +51,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
       <br />
       <a
         target="_blank"
+        rel="noreferrer"
         href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal"
       >
         Click here for detailed instructions on setting up an Azure Active Directory (AD) application.
@@ -62,7 +64,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
       <InlineField label="Azure cloud" labelWidth={26} tooltip="Select an Azure Cloud." required>
         <Select
           options={azureClouds}
-          value={azureClouds.find(v => v.value === jsonData.azureCloud)}
+          value={azureClouds.find((v) => v.value === jsonData.azureCloud)}
           onChange={(change: SelectableValue<AzureCloudType>) =>
             updateJsonData('azureCloud', change.value ? change.value : AzureCloudType.AzurePublic)
           }
@@ -75,6 +77,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         <Input
           value={jsonData.clusterUrl}
           id="adx-cluster-url"
+          aria-label={selectors.components.ConfigEditor.ConnectionConfig.clusterUrl}
           placeholder="https://yourcluster.kusto.windows.net"
           width={60}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('clusterUrl', ev.target.value)}
@@ -91,6 +94,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
             <br />
             <a
               target="_blank"
+              rel="noreferrer"
               href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal"
             >
               Click here for detailed instructions on setting up an Azure Active Directory (AD) application.
@@ -101,6 +105,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         <Input
           value={jsonData.tenantId}
           id="adx-tenant-id"
+          aria-label={selectors.components.ConfigEditor.ConnectionConfig.tenantId}
           width={60}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('tenantId', ev.target.value)}
         />
@@ -117,6 +122,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
             <br />
             <a
               target="_blank"
+              rel="noreferrer"
               href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal"
             >
               Click here for detailed instructions on setting up an Azure Active Directory (AD) application.
@@ -127,6 +133,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         <Input
           value={jsonData.clientId}
           id="adx-client-id"
+          aria-label={selectors.components.ConfigEditor.ConnectionConfig.clientId}
           width={60}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('clientId', ev.target.value)}
         />
@@ -134,12 +141,13 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
       <SecretFormField
         label="Client secret"
+        aria-label={selectors.components.ConfigEditor.ConnectionConfig.clientSecret}
         value={secureJsonData?.clientSecret || undefined}
         labelWidth={13}
         inputWidth={30}
         placeholder=""
         onReset={() => handleClearClientSecret()}
-        onChange={handleClientSecretChange}
+        onBlur={handleClientSecretChange}
         isConfigured={!!secureJsonData?.clientSecret || !!secureJsonFields?.clientSecret}
         tooltip={clientSecretTooltip}
       />
