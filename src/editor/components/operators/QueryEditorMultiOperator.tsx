@@ -31,11 +31,13 @@ export class QueryEditorMultiOperator extends PureComponent<Props, State> {
       return;
     }
     // Append the new value
-    const values = [...this.props.values, value];
-    this.props.onChange({
-      value: values,
-      name: this.props.operator.value,
-    });
+    if (this.props.values) {
+      const values = [...this.props.values, value];
+      this.props.onChange({
+        value: values,
+        name: this.props.operator.value,
+      });
+    }
   };
 
   onChange = (selectable: any) => {
@@ -44,7 +46,7 @@ export class QueryEditorMultiOperator extends PureComponent<Props, State> {
     }
 
     this.props.onChange({
-      value: selectable.map(s => s.value),
+      value: selectable.map((s) => s.value),
       name: this.props.operator.value,
     });
   };
@@ -64,7 +66,7 @@ export class QueryEditorMultiOperator extends PureComponent<Props, State> {
 
   render() {
     const values = this.props.values || [];
-    const current = values.map(v => {
+    const current = values.map((v) => {
       return { label: v, value: v };
     });
 

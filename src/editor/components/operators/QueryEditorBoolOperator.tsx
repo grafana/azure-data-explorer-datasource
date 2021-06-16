@@ -14,7 +14,7 @@ const options: Array<SelectableValue<boolean>> = [
   { value: false, label: 'False' },
 ];
 
-export const QueryEditorBoolOperator: React.FC<Props> = props => {
+export const QueryEditorBoolOperator = (props: Props) => {
   const onChange = useCallback(
     (selectable: SelectableValue<boolean>) => {
       if (!selectable || typeof selectable.value !== 'boolean') {

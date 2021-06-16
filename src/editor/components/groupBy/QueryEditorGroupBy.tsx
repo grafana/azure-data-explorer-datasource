@@ -14,7 +14,7 @@ interface Props {
   onChange: (expression: QueryEditorGroupByExpression) => void;
 }
 
-export const QueryEditorGroupBy: React.FC<Props> = props => {
+export const QueryEditorGroupBy = (props: Props) => {
   const { intervals, onChange } = props;
   const [field, setField] = useState(props.value?.property);
   const [interval, setInterval] = useState(props.value?.interval);

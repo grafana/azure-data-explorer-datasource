@@ -19,7 +19,7 @@ export class QueryEditorGroupByBuilder {
   }
 
   withIntervals(intervals: (builder: (value: string) => QueryEditorIntervalBuilder) => void) {
-    intervals(value => new QueryEditorIntervalBuilder(value, this.intervals));
+    intervals((value) => new QueryEditorIntervalBuilder(value, this.intervals));
     return this;
   }
 

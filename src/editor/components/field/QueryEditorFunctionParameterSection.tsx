@@ -11,7 +11,7 @@ interface Props {
   onChange: (expression: QueryEditorFunctionParameterExpression) => void;
 }
 
-export const QueryEditorFunctionParameterSection: React.FC<Props> = props => {
+export const QueryEditorFunctionParameterSection = (props: Props) => {
   const [value, setValue] = useState(props.value ?? '');
 
   const onChange = useCallback(

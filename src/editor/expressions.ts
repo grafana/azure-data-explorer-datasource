@@ -11,6 +11,7 @@ export enum QueryEditorExpressionType {
 }
 export interface QueryEditorExpression {
   type: QueryEditorExpressionType;
+  expressions?: any;
 }
 
 export interface QueryEditorPropertyExpression extends QueryEditorExpression {

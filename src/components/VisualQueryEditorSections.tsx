@@ -7,11 +7,11 @@ import {
 
 import { QueryEditorPropertyType } from '../editor/types';
 
-export const KustoPropertyEditorSection = buildFieldQueryEditorSection(fieldSection => fieldSection.build());
+export const KustoPropertyEditorSection = buildFieldQueryEditorSection((fieldSection) => fieldSection.build());
 
-export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSection =>
+export const KustoWhereEditorSection = buildFilterQueryEditorSection((filterSection) =>
   filterSection
-    .withOperators(operator => {
+    .withOperators((operator) => {
       operator('==')
         .supportTypes([
           QueryEditorPropertyType.String,
@@ -186,33 +186,20 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection(filterSecti
     .build()
 );
 
-export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduceSection =>
+export const KustoValueColumnEditorSection = buildReduceQueryEditorSection((reduceSection) =>
   reduceSection
-    .withFunctions(functions => {
-      functions('sum')
-        .withLabel('Sum')
-        .add();
+    .withFunctions((functions) => {
+      functions('sum').withLabel('Sum').add();
 
-      functions('avg')
-        .withLabel('Avg')
-        .add();
+      functions('avg').withLabel('Avg').add();
 
-      functions('count')
-        .isAppliedOnField(false)
-        .withLabel('Count')
-        .add();
+      functions('count').isAppliedOnField(false).withLabel('Count').add();
 
-      functions('dcount')
-        .withLabel('Dcount')
-        .add();
+      functions('dcount').withLabel('Dcount').add();
 
-      functions('max')
-        .withLabel('Max')
-        .add();
+      functions('max').withLabel('Max').add();
 
-      functions('min')
-        .withLabel('Min')
-        .add();
+      functions('min').withLabel('Min').add();
 
       functions('percentile')
         .withLabel('Percentile')
@@ -223,43 +210,25 @@ export const KustoValueColumnEditorSection = buildReduceQueryEditorSection(reduc
     .build()
 );
 
-export const KustoGroupByEditorSection = buildGroupByQueryEditorSection(groupBySection =>
+export const KustoGroupByEditorSection = buildGroupByQueryEditorSection((groupBySection) =>
   groupBySection
-    .withIntervals(intervals => {
-      intervals('$__timeInterval')
-        .withLabel('auto')
-        .add();
-      intervals('1m')
-        .withLabel('1 minute')
-        .add();
+    .withIntervals((intervals) => {
+      intervals('$__timeInterval').withLabel('auto').add();
+      intervals('1m').withLabel('1 minute').add();
 
-      intervals('5m')
-        .withLabel('5 minutes')
-        .add();
+      intervals('5m').withLabel('5 minutes').add();
 
-      intervals('15m')
-        .withLabel('15 minutes')
-        .add();
+      intervals('15m').withLabel('15 minutes').add();
 
-      intervals('30m')
-        .withLabel('30 minutes')
-        .add();
+      intervals('30m').withLabel('30 minutes').add();
 
-      intervals('1h')
-        .withLabel('1 hour')
-        .add();
+      intervals('1h').withLabel('1 hour').add();
 
-      intervals('6h')
-        .withLabel('6 hours')
-        .add();
+      intervals('6h').withLabel('6 hours').add();
 
-      intervals('12h')
-        .withLabel('12 hours')
-        .add();
+      intervals('12h').withLabel('12 hours').add();
 
-      intervals('1d')
-        .withLabel('1 day')
-        .add();
+      intervals('1d').withLabel('1 day').add();
     })
     .withMultipleRows(true)
     .build()

@@ -8,9 +8,9 @@ interface TrackingConfigProps
   updateJsonData: <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => void;
 }
 
-const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData }) => {
+const TrackingConfig = ({ options, updateJsonData }: TrackingConfigProps) => {
   const { jsonData } = options;
-
+  /* eslint-disable react/no-unescaped-entities */
   return (
     <FieldSet label="Tracking">
       <InlineField
@@ -34,6 +34,7 @@ const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData
       </InlineField>
     </FieldSet>
   );
+  /* eslint-enable */
 };
 
 export default TrackingConfig;

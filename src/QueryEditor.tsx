@@ -15,7 +15,7 @@ import { needsToBeMigrated, migrateQuery } from 'migrations/query';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
-export const QueryEditor: React.FC<Props> = props => {
+export const QueryEditor = (props: Props) => {
   const { datasource, onChange, onRunQuery, query } = props;
   const executedQuery = useExecutedQuery(props.data);
   const executedQueryError = useExecutedQueryError(props.data);
@@ -143,13 +143,13 @@ const useSelectedDatabase = (
   const variables = datasource.getVariables();
 
   return useMemo(() => {
-    const selected = options.find(option => option.value === query.database);
+    const selected = options.find((option) => option.value === query.database);
 
     if (selected) {
       return selected.value;
     }
 
-    const variable = variables.find(variable => variable === query.database);
+    const variable = variables.find((variable) => variable === query.database);
 
     if (variable) {
       return variable;
@@ -215,7 +215,7 @@ const useTemplateVariables = (datasource: AdxDataSource) => {
     return {
       label: 'Template Variables',
       expanded: false,
-      options: variables.map(variable => {
+      options: variables.map((variable) => {
         return { label: variable, value: variable };
       }),
     };

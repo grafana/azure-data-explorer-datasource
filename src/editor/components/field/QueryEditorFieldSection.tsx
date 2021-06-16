@@ -19,8 +19,9 @@ export interface QueryEditorFieldSectionProps extends React.PropsWithChildren<Qu
   allowCustom?: boolean;
 }
 
-export const QueryEditorFieldSection = (config: FieldSectionConfiguration): React.FC<QueryEditorFieldSectionProps> => {
-  return props => {
+export const QueryEditorFieldSection = (config: FieldSectionConfiguration) => {
+  /* eslint-disable-next-line react/display-name */
+  return (props: QueryEditorFieldSectionProps) => {
     const { onChange: propsOnChange } = props;
     const expression = props.value ?? config.defaultValue;
 

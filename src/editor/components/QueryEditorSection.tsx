@@ -5,7 +5,7 @@ export interface QueryEditorSectionProps {
   label: string;
 }
 
-export const QueryEditorSection: React.FC<PropsWithChildren<QueryEditorSectionProps>> = props => {
+export const QueryEditorSection = (props: PropsWithChildren<QueryEditorSectionProps>) => {
   return (
     <div className="gf-form">
       <InlineFormLabel className="query-keyword" width={12}>

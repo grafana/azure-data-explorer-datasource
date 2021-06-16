@@ -26,7 +26,7 @@ interface Props {
   onChange: (expression: QueryEditorReduceExpression) => void;
 }
 
-export const QueryEditorReduce: React.FC<Props> = props => {
+export const QueryEditorReduce = (props: Props) => {
   const { value, functions, onChange } = props;
   const [field, setField] = useState(props.value?.property);
   const [reduce, setReduce] = useState(props.value?.reduce);
@@ -40,7 +40,7 @@ export const QueryEditorReduce: React.FC<Props> = props => {
 
       // Set a reasonable value
       if (!value?.reduce?.name) {
-        let reducer = functions.find(f => f.value === 'avg');
+        let reducer = functions.find((f) => f.value === 'avg');
         if (!reducer) {
           reducer = functions[0];
         }
@@ -94,15 +94,15 @@ export const QueryEditorReduce: React.FC<Props> = props => {
       />
       {reduceParameters.length > 0 && (
         <div className={styles.params}>
-          {reduceParameters.map(param => {
+          {reduceParameters.map((param) => {
             return (
               <QueryEditorFunctionParameterSection
                 key={param.name}
                 name={param.name}
-                value={props.value?.parameters?.find(p => p.name === param.name)?.value}
+                value={props.value?.parameters?.find((p) => p.name === param.name)?.value}
                 description={param.description}
                 fieldType={param.type}
-                onChange={val => onChangeParameter([val])}
+                onChange={(val) => onChangeParameter([val])}
               />
             );
           })}
@@ -145,7 +145,7 @@ const getParameters = (
   if (!reduce) {
     return [];
   }
-  const func = functions.find(func => func.value === reduce.name);
+  const func = functions.find((func) => func.value === reduce.name);
 
   return func?.parameters || [];
 };
@@ -158,7 +158,7 @@ const useApplyOnField = (
     if (!property) {
       return functions[0]?.applyOnField ?? true;
     }
-    const func = functions.find(f => f.value === property.name);
+    const func = functions.find((f) => f.value === property.name);
     return func?.applyOnField ?? true;
   }, [functions, property]);
 };

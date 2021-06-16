@@ -26,13 +26,13 @@ function formatMappingValue(mapping): string {
   switch (mapping?.type) {
     case 'function':
       const input = mapping.input ?? [];
-      return `${mapping.value}(${input.map(i => i.Value).join(',')})`;
+      return `${mapping.value}(${input.map((i) => i.Value).join(',')})`;
     default:
       return mapping.value;
   }
 }
 
-const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, updateJsonData, onRefresh }) => {
+const DatabaseConfig = ({ options, schema, updateJsonData, onRefresh }: DatabaseConfigProps) => {
   const { jsonData } = options;
   const mappings = useMemo(() => jsonData.schemaMappings ?? [], [jsonData.schemaMappings]);
 
@@ -41,7 +41,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
   }, [mappings, updateJsonData]);
 
   const handleMappingTargetChange = (index: number, change: SelectableValue<string>) => {
-    const target = change.value && schema.schemaMappingOptions?.find(v => v.value === change.value);
+    const target = change.value && schema.schemaMappingOptions?.find((v) => v.value === change.value);
     if (!target) {
       return;
     }
@@ -80,7 +80,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
         <Select
           width={45}
           options={schema.databases}
-          value={schema.databases.find(v => v.value === jsonData.defaultDatabase)}
+          value={schema.databases.find((v) => v.value === jsonData.defaultDatabase)}
           onChange={(change: SelectableValue<string>) => updateJsonData('defaultDatabase', change.value || '')}
         />
       </InlineField>
@@ -99,9 +99,9 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
             {mappings.map((mapping, index) => (
               <HorizontalGroup spacing="xs" key={index}>
                 <Select
-                  value={schema.schemaMappingOptions.find(v => v.value === mapping.value)}
+                  value={schema.schemaMappingOptions.find((v) => v.value === mapping.value)}
                   options={schema.schemaMappingOptions}
-                  onChange={change => handleMappingTargetChange(index, change)}
+                  onChange={(change) => handleMappingTargetChange(index, change)}
                   width={38}
                   placeholder="Target"
                 />

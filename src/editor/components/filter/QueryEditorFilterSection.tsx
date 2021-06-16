@@ -27,10 +27,9 @@ export interface QueryEditorFilterSectionProps extends QueryEditorSectionProps {
   getSuggestions: SearchExpressionSuggestor;
 }
 
-export const QueryEditorFilterSection = (
-  config: FilterSectionConfiguration
-): React.FC<QueryEditorFilterSectionProps> => {
-  return props => {
+export const QueryEditorFilterSection = (config: FilterSectionConfiguration) => {
+  /* eslint-disable-next-line react/display-name */
+  return (props: QueryEditorFilterSectionProps) => {
     const styles = getStyles();
 
     const getSuggestions = (index: string): SkippableExpressionSuggestor => {
@@ -63,7 +62,7 @@ export const QueryEditorFilterSection = (
 
     return (
       <QueryEditorRepeater id="filter-and" value={props.value} onChange={props.onChange}>
-        {filterProps => {
+        {(filterProps) => {
           if (!isOrExpression(filterProps.value)) {
             return null;
           }
@@ -95,7 +94,7 @@ export const QueryEditorFilterSection = (
             <QueryEditorSection label={props.label}>
               <div className={styles.container}>
                 <QueryEditorRepeater id="filter-or" value={filterProps.value} onChange={filterProps.onChange}>
-                  {operatorProps => {
+                  {(operatorProps) => {
                     if (!isFieldAndOperator(operatorProps.value)) {
                       console.log('invalid fieldandoperator-expression');
                       return null;
@@ -135,7 +134,7 @@ export const QueryEditorFilterSection = (
                                 label: `AND - add a new "${props.label}" clause`,
                               },
                             ]}
-                            onChange={value => {
+                            onChange={(value) => {
                               if (value?.value === 'append-row') {
                                 return operatorProps.onAdd(config.defaultValue);
                               }
@@ -148,9 +147,12 @@ export const QueryEditorFilterSection = (
                               }
                             }}
                             menuPlacement="bottom"
-                            renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
-                              return <Button ref={ref} {...otherProps} variant="secondary" icon="plus" />;
-                            })}
+                            renderControl={
+                              /* eslint-disable-next-line react/display-name, react/prop-types */
+                              React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
+                                return <Button ref={ref} {...otherProps} variant="secondary" icon="plus" />;
+                              })
+                            }
                           />
                         )}
                       </div>

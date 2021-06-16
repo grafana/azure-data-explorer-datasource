@@ -60,7 +60,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
 
     const operators = this.updateOperators(property);
     const currentOperator = next.operator?.name;
-    const definition = operators.find(op => op.value === currentOperator);
+    const definition = operators.find((op) => op.value === currentOperator);
 
     if (operators.length && !definition) {
       next.operator = definitionToOperator(operators[0]);
@@ -98,7 +98,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
       const results = await this.props.getSuggestions(filter);
 
       if (Array.isArray(this.props.templateVariableOptions?.options)) {
-        const variables = this.props.templateVariableOptions.options.filter(v => {
+        const variables = this.props.templateVariableOptions.options.filter((v) => {
           if (typeof v?.value === 'string') {
             return v.value.indexOf(txt) > -1;
           }

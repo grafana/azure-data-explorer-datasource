@@ -19,7 +19,7 @@ const adxTimeFormat: SelectableValue<string> = {
   value: 'time_series_adx_series',
 };
 
-export const QueryEditorResultFormat: React.FC<Props> = props => {
+export const QueryEditorResultFormat = (props: Props) => {
   const { onChangeFormat } = props;
   const onFormatChange = useCallback(
     (selectable: SelectableValue<string>) => {
@@ -58,7 +58,7 @@ const getStyles = stylesFactory(() => {
 });
 
 export const selectResultFormat = (format?: string, includeAdxFormat?: boolean): string => {
-  const selected = formats.find(f => f.value === format);
+  const selected = formats.find((f) => f.value === format);
 
   if (includeAdxFormat && adxTimeFormat.value) {
     if (adxTimeFormat.value === format) {

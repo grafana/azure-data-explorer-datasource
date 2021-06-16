@@ -3,6 +3,7 @@ import React from 'react';
 interface ConfigHelpProps {}
 
 const ConfigHelp: React.FC<ConfigHelpProps> = () => {
+  /* eslint-disable react/no-unescaped-entities */
   return (
     <div className="gf-form-group">
       <div className="grafana-info-box">
@@ -13,6 +14,7 @@ const ConfigHelp: React.FC<ConfigHelpProps> = () => {
           <a
             className="external-link"
             target="_blank"
+            rel="noreferrer"
             href="https://github.com/grafana/azure-data-explorer-datasource#configuring-the-datasource-in-grafana"
           >
             here.
@@ -39,6 +41,7 @@ const ConfigHelp: React.FC<ConfigHelpProps> = () => {
           <a
             className="external-link"
             target="_blank"
+            rel="noreferrer"
             href="https://github.com/grafana/azure-data-explorer-datasource#configuring-the-datasource-in-grafana"
           >
             in the documentation.
@@ -47,6 +50,7 @@ const ConfigHelp: React.FC<ConfigHelpProps> = () => {
       </div>
     </div>
   );
+  /* eslint-enable react/no-unescaped-entities */
 };
 
 export default ConfigHelp;

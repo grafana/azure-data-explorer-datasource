@@ -16,7 +16,7 @@ interface ChildProps {
   value?: QueryEditorExpression;
 }
 
-export const QueryEditorRepeater: React.FC<Props> = props => {
+export const QueryEditorRepeater = (props: Props) => {
   const { onChange: propsOnChange, children, value } = props;
 
   const onChange = useCallback(
@@ -31,7 +31,7 @@ export const QueryEditorRepeater: React.FC<Props> = props => {
       }
 
       // Remove any expressions with empty sub expressions
-      const remainingExpressions = next.filter(v => {
+      const remainingExpressions = next.filter((v) => {
         return 'expressions' in v ? v.expressions.length > 0 : true;
       });
 

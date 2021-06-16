@@ -15,7 +15,7 @@ interface Props {
   onToggleEditorMode: () => void;
 }
 
-export const QueryEditorToolbar: React.FC<Props> = props => {
+export const QueryEditorToolbar = (props: Props) => {
   const { dirty, editorMode, onToggleEditorMode } = props;
   const [showConfirm, setShowConfirm] = useState(false);
   const onToggleMode = useCallback(() => {
@@ -35,7 +35,7 @@ export const QueryEditorToolbar: React.FC<Props> = props => {
         options={props.databases}
         placeholder="Select database"
         value={props.database}
-        onChange={selected => {
+        onChange={(selected) => {
           if (!selected || !selected.value) {
             return;
           }

@@ -36,7 +36,7 @@ interface Props {
   templateVariableOptions: SelectableValue<string>;
 }
 
-export const VisualQueryEditor: React.FC<Props> = props => {
+export const VisualQueryEditor = (props: Props) => {
   const { query, database, datasource, schema, onChangeQuery } = props;
   const { id: datasourceId, parseExpression, autoCompleteQuery, getSchemaMapper } = datasource;
 
@@ -84,7 +84,7 @@ export const VisualQueryEditor: React.FC<Props> = props => {
         tableSchema.value
       );
 
-      return values.map(value => ({ value, label: value }));
+      return values.map((value) => ({ value, label: value }));
     },
     [autoCompleteQuery, databaseName, tableSchema.value, query.expression]
   );
@@ -321,7 +321,7 @@ const getStyles = stylesFactory(() => {
 
 const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns.filter(c => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
+    return columns.filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
   }, [columns]);
 };
 
@@ -344,7 +344,7 @@ const useSelectedTable = (
   const from = query.expression?.from?.property.name;
 
   return useMemo(() => {
-    const selected = options.find(option => option.value === from);
+    const selected = options.find((option) => option.value === from);
 
     if (selected) {
       return {
@@ -353,7 +353,7 @@ const useSelectedTable = (
       };
     }
 
-    const variable = variables.find(variable => variable === from);
+    const variable = variables.find((variable) => variable === from);
 
     if (variable) {
       return {

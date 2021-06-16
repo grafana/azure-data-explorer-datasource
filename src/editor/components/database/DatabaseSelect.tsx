@@ -11,7 +11,7 @@ interface Props {
   children?: React.ReactElement;
 }
 
-export const DatabaseSelect: React.FC<Props> = props => {
+export const DatabaseSelect = (props: Props) => {
   return (
     <div className="gf-form">
       <InlineFormLabel className="query-keyword" width={props.labelWidth ?? 7}>
@@ -23,7 +23,7 @@ export const DatabaseSelect: React.FC<Props> = props => {
           options={[props.templateVariableOptions, ...props.databases]}
           placeholder="Select database"
           value={props.database}
-          onChange={db => {
+          onChange={(db) => {
             props.onChange(db.value);
           }}
           // Should we, really?

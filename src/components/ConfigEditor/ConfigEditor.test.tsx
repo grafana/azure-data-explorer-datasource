@@ -9,14 +9,14 @@ import * as grafanaRuntime from '@grafana/runtime';
 import { AdxDataSource } from 'datasource';
 
 describe('ConfigEditor', () => {
-  let refreshSchemaSpy, getDatasourceSpy;
+  let refreshSchemaSpy;
 
   beforeEach(() => {
     refreshSchemaSpy = jest
       .spyOn(refreshSchema, 'refreshSchema')
       .mockImplementation((datasource: AdxDataSource) => Promise.resolve({ databases: [], schemaMappingOptions: [] }));
 
-    getDatasourceSpy = jest.spyOn(grafanaRuntime, 'getDataSourceSrv').mockImplementation(
+    jest.spyOn(grafanaRuntime, 'getDataSourceSrv').mockImplementation(
       () =>
         ({
           get: () => Promise.resolve({ url: 'somestring' }),

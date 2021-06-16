@@ -21,7 +21,7 @@ export const definitionToProperty = (definition: QueryEditorPropertyDefinition):
   };
 };
 
-export const QueryEditorField: React.FC<Props> = props => {
+export const QueryEditorField = (props: Props) => {
   const {
     value: propsValue,
     fields,
@@ -30,21 +30,21 @@ export const QueryEditorField: React.FC<Props> = props => {
     templateVariableOptions,
     onChange: propsOnChange,
   } = props;
-  const [prevValue, setPrevValue] = useState<QueryEditorProperty>((null as unknown) as QueryEditorProperty);
+  const [prevValue, setPrevValue] = useState<QueryEditorProperty>(null as unknown as QueryEditorProperty);
   const styles = getStyles();
   const options = useOptions(fields);
-  const value = useMemo(() => options.find(option => option.value === propsValue?.name), [options, propsValue]);
-  const loadOptions = useMemo(() => filterOptions(options, templateVariableOptions), [
-    options,
-    templateVariableOptions,
-  ]);
+  const value = useMemo(() => options.find((option) => option.value === propsValue?.name), [options, propsValue]);
+  const loadOptions = useMemo(
+    () => filterOptions(options, templateVariableOptions),
+    [options, templateVariableOptions]
+  );
   const onChange = useOnChange(props, propsValue, setPrevValue);
   const onCloseMenu = useCallback(() => {
     if (!value && prevValue) {
       propsOnChange({ ...prevValue });
     }
 
-    setPrevValue((null as unknown) as QueryEditorProperty);
+    setPrevValue(null as unknown as QueryEditorProperty);
   }, [propsOnChange, setPrevValue, prevValue, value]);
 
   return (
@@ -82,7 +82,7 @@ const useOptions = (options: QueryEditorPropertyDefinition[]): Array<SelectableV
       return [];
     }
 
-    return options.map(option => {
+    return options.map((option) => {
       return {
         label: option.label ?? option.value,
         value: option.value,
@@ -112,10 +112,10 @@ const useOnChange = (
       }
 
       const { value } = selectable;
-      let field: QueryEditorPropertyDefinition | undefined = fields.find(o => o.value === value);
+      let field: QueryEditorPropertyDefinition | undefined = fields.find((o) => o.value === value);
 
       if (!field) {
-        field = templateVariableOptions?.options?.find(o => o.value === value);
+        field = templateVariableOptions?.options?.find((o) => o.value === value);
       }
 
       if (!field && value && allowCustom) {
@@ -136,16 +136,15 @@ const useOnChange = (
   );
 };
 
-export const filterOptions = (
-  options: Array<SelectableValue<string>>,
-  templateVariableOptions?: SelectableValue<string>
-) => async (textSearchingFor: string) => {
-  const text = textSearchingFor.toLowerCase();
-  const allOptions = templateVariableOptions ? [templateVariableOptions, ...options] : options;
-  const exactMatchOptions = allOptions.filter(option => option.label?.toLowerCase().startsWith(text));
-  const anyMatchOptions = allOptions.filter(option => option.label?.toLowerCase().indexOf(text, 1) !== -1);
-  const sortedOptions = exactMatchOptions.concat(anyMatchOptions);
-  const uniqueOptions = [...new Set(sortedOptions)];
+export const filterOptions =
+  (options: Array<SelectableValue<string>>, templateVariableOptions?: SelectableValue<string>) =>
+  async (textSearchingFor: string) => {
+    const text = textSearchingFor.toLowerCase();
+    const allOptions = templateVariableOptions ? [templateVariableOptions, ...options] : options;
+    const exactMatchOptions = allOptions.filter((option) => option.label?.toLowerCase().startsWith(text));
+    const anyMatchOptions = allOptions.filter((option) => option.label?.toLowerCase().indexOf(text, 1) !== -1);
+    const sortedOptions = exactMatchOptions.concat(anyMatchOptions);
+    const uniqueOptions = [...new Set(sortedOptions)];
 
-  return uniqueOptions;
-};
+    return uniqueOptions;
+  };
