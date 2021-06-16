@@ -9,3 +9,6 @@ yarn.lock
 .d.ts
 .idea
 pkg/__debug_bin
+videos
+report.json
+provisioning
