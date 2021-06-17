@@ -5,7 +5,7 @@
   "scripts": {
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
-    "dev": "rm -rf node_modules/@grafana/data/node_modules; npx grafana-toolkit plugin:dev",
+    "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch",
     "e2e": "grafana-e2e run",
     "e2e:open": "grafana-e2e open"
@@ -33,5 +33,8 @@
     "debounce-promise": "^3.1.2",
     "react-select-event": "^5.2.0",
     "react-use": "^15.3.3"
+  },
+  "resolutions": {
+    "rxjs": "6.6.3"
   }
 }
