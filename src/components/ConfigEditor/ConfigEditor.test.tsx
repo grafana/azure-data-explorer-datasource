@@ -23,7 +23,7 @@ describe('ConfigEditor', () => {
   });
 
   afterEach(() => {
-    refreshSchemaSpy.mockRestore();
+    jest.restoreAllMocks();
   });
 
   it('renders the component', async () => {
