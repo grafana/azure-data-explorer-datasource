@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom/extend-expect';
 import ConfigEditor from './index';
 import * as refreshSchema from './refreshSchema';
 import * as grafanaRuntime from '@grafana/runtime';
