@@ -11,7 +11,7 @@ import TrackingConfig from './TrackingConfig';
 import { Alert } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 
-interface ConfigEditorProps
+export interface ConfigEditorProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {}
 
 type FetchErrorResponse = FetchResponse<{
