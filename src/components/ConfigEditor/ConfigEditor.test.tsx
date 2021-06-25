@@ -27,22 +27,23 @@ describe('ConfigEditor', () => {
   });
 
   it('renders the component', async () => {
-    render(<ConfigEditor {...mockConfigEditorProps()} />);
-    await waitFor(() => expect(screen.getByTestId('azure-data-explorer-config-editor')).toBeInTheDocument());
+    await waitFor(() => render(<ConfigEditor {...mockConfigEditorProps()} />));
+
+    expect(screen.getByTestId('azure-data-explorer-config-editor')).toBeInTheDocument();
   });
 
   it('calls refreshSchema on render', async () => {
-    render(<ConfigEditor {...mockConfigEditorProps()} />);
-    await waitFor(() => expect(screen.getByTestId('azure-data-explorer-config-editor')).toBeInTheDocument());
+    await waitFor(() => render(<ConfigEditor {...mockConfigEditorProps()} />));
+
     expect(refreshSchemaSpy).toHaveBeenCalledTimes(1);
   });
 
   it('calls refreshSchema on click of "Reload schema" button', async () => {
-    render(<ConfigEditor {...mockConfigEditorProps()} />);
     await waitFor(() => {
-      expect(screen.getByTestId('azure-data-explorer-config-editor')).toBeInTheDocument();
+      render(<ConfigEditor {...mockConfigEditorProps()} />);
       userEvent.click(screen.getByRole('button', { name: 'Reload schema' }));
     });
+
     expect(refreshSchemaSpy).toHaveBeenCalledTimes(2);
   });
 });
