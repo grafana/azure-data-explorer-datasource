@@ -139,8 +139,8 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         inputWidth={30}
         placeholder=""
         onReset={() => handleClearClientSecret()}
-        onBlur={handleClientSecretChange}
-        isConfigured={!!secureJsonData?.clientSecret || !!secureJsonFields?.clientSecret}
+        onChange={handleClientSecretChange}
+        isConfigured={!!secureJsonFields?.clientSecret}
         tooltip={clientSecretTooltip}
       />
     </FieldSet>
