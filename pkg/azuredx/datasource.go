@@ -25,6 +25,7 @@ type AzureDataExplorer struct {
 }
 
 var tokenCache = tokenprovider.NewConcurrentTokenCache()
+
 const AdxScope = "https://kusto.kusto.windows.net/.default"
 
 func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
@@ -36,7 +37,11 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 	adx.settings = datasourceSettings
 
-	tokenProvider := tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"})
+	adxScope := "https://kusto.kusto.windows.net/.default"
+	if datasourceSettings.AzureCloud == "govazuremonitor" {
+		adxScope = datasourceSettings.ClusterURL + "/.default"
+	}
+	tokenProvider := tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{adxScope})
 
 	httpClientProvider := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{
 		Middlewares: []sdkhttpclient.Middleware{
