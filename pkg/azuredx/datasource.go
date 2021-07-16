@@ -25,6 +25,7 @@ type AzureDataExplorer struct {
 }
 
 var tokenCache = tokenprovider.NewConcurrentTokenCache()
+
 const AdxScope = "https://kusto.kusto.windows.net/.default"
 
 func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
@@ -115,7 +116,6 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	}
 
 	interpolatedQuery := qm.Query
-	var kustoError string
 
 	appendFrame := func(f *data.Frame) {
 		resp.Frames = append(resp.Frames, f)
@@ -123,13 +123,6 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 
 	errorWithFrame := func(err error) {
 		fm := &data.FrameMeta{ExecutedQueryString: interpolatedQuery}
-		if kustoError != "" {
-			fm.Custom = struct {
-				KustoError string
-			}{
-				kustoError,
-			}
-		}
 		appendFrame(&data.Frame{RefID: q.RefID, Meta: fm})
 		resp.Error = err
 	}
@@ -145,7 +138,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	headers["x-ms-client-request-id"] = msClientRequestIDHeader
 
 	var tableRes *models.TableResponse
-	tableRes, _, kustoError, err = adx.client.KustoRequest(adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
+	tableRes, err = adx.client.KustoRequest(adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
 		CSL:         qm.Query,
 		DB:          qm.Database,
 		Properties:  models.NewConnectionProperties(adx.settings, cs),
