@@ -26,8 +26,6 @@ type AzureDataExplorer struct {
 
 var tokenCache = tokenprovider.NewConcurrentTokenCache()
 
-const AdxScope = "https://kusto.kusto.windows.net/.default"
-
 func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	adx := &AzureDataExplorer{}
 	datasourceSettings := &models.DatasourceSettings{}
