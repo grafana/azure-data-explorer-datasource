@@ -35,10 +35,8 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 	adx.settings = datasourceSettings
 
-	adxScope := "https://kusto.kusto.windows.net/.default"
-	if datasourceSettings.AzureCloud == "govazuremonitor" {
-		adxScope = datasourceSettings.ClusterURL + "/.default"
-	}
+	adxScope := getAdxScope(datasourceSettings.AzureCloud, datasourceSettings.ClusterURL)
+
 	tokenProvider := tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{adxScope})
 
 	httpClientProvider := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{
@@ -65,6 +63,16 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	adx.CallResourceHandler = httpadapter.New(mux)
 
 	return adx, nil
+}
+
+func getAdxScope(cloudName string, clusterUrl string) string {
+	switch cloudName {
+	case tokenprovider.AzureChina:
+		return "https://kusto.kusto.chinacloudapi.cn/.default"
+	case tokenprovider.AzureUSGovernment:
+		return clusterUrl + "/.default"
+	}
+	return "https://kusto.kusto.windows.net/.default"
 }
 
 func (adx *AzureDataExplorer) Dispose() {
