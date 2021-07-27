@@ -9,7 +9,6 @@ import (
 	json "github.com/json-iterator/go"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
 type AdxClient interface {
@@ -79,11 +78,16 @@ func (c *Client) KustoRequest(url string, payload models.RequestPayload, additio
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode/100 != 2 {
+	switch {
+	case resp.StatusCode == http.StatusUnauthorized:
+		// HTTP 401 has no error body
+		return nil, fmt.Errorf("Azure HTTP %q", resp.Status)
+
+	case resp.StatusCode/100 != 2:
 		var r models.ErrorResponse
 		err := json.NewDecoder(resp.Body).Decode(&r)
-		if err != nil && resp.StatusCode != http.StatusNotFound {
-			backend.Logger.Debug("malformed Azure error response", "error", err)
+		if err != nil {
+			return nil, fmt.Errorf("Azure HTTP %q with malformed error response: %s", resp.Status, err)
 		}
 		return nil, fmt.Errorf("Azure HTTP %q: %q", resp.Status, r.Error.Message)
 	}
