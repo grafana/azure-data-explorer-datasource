@@ -2,9 +2,9 @@ package azuredx
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/tokenprovider"
@@ -25,6 +25,7 @@ type AzureDataExplorer struct {
 }
 
 var tokenCache = tokenprovider.NewConcurrentTokenCache()
+
 const AdxScope = "https://kusto.kusto.windows.net/.default"
 
 func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
@@ -135,7 +136,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	}
 
 	headers := map[string]string{}
-	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%s", qm.QuerySource, uuid.Must(uuid.NewRandom()).String())
+	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", qm.QuerySource, rand.Uint64())
 	if adx.settings.EnableUserTracking {
 		if user != nil {
 			msClientRequestIDHeader += fmt.Sprintf(";%v", user.Login)
