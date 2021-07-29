@@ -1,7 +1,6 @@
 package azuredx
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -9,16 +8,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var kustoRequestMock func(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, int, string, error)
-var table = &models.TableResponse{
-	Tables: []models.Table{
-		{
-			TableName: "Table_0",
-			Columns:   []models.Column{},
-			Rows:      []models.Row{},
+var (
+	kustoRequestMock func(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
+	table            = &models.TableResponse{
+		Tables: []models.Table{
+			{
+				TableName: "Table_0",
+				Columns:   []models.Column{},
+				Rows:      []models.Row{},
+			},
 		},
-	},
-}
+	}
+)
 
 func TestDatasource(t *testing.T) {
 	var adx AzureDataExplorer
@@ -37,12 +38,12 @@ func TestDatasource(t *testing.T) {
 			TimeRange:     backend.TimeRange{},
 			JSON:          []byte(`{"resultFormat": "table","querySource": "schema"}`),
 		}
-		kustoRequestMock = func(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, int, string, error) {
+		kustoRequestMock = func(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
 			require.Equal(t, ClusterURL+"/v1/rest/query", url)
 			require.Contains(t, additionalHeaders, "x-ms-user-id")
 			require.Equal(t, UserLogin, additionalHeaders["x-ms-user-id"])
 			require.Contains(t, additionalHeaders["x-ms-client-request-id"], UserLogin)
-			return table, http.StatusOK, "", nil
+			return table, nil
 		}
 		res := adx.handleQuery(query, &backend.User{Login: UserLogin})
 		require.NoError(t, res.Error)
@@ -55,6 +56,6 @@ func (c *fakeClient) TestRequest(datasourceSettings *models.DatasourceSettings, 
 	panic("not implemented")
 }
 
-func (c *fakeClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, int, string, error) {
+func (c *fakeClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
 	return kustoRequestMock(url, payload, additionalHeaders)
 }
