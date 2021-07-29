@@ -76,7 +76,7 @@ func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryD
 	res := backend.NewQueryDataResponse()
 
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = adx.dataQuery(q, req.PluginContext.User)
+		res.Responses[q.RefID] = adx.handleQuery(q, req.PluginContext.User)
 	}
 
 	return res, nil
@@ -98,7 +98,7 @@ func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.Chec
 	}, nil
 }
 
-func (adx *AzureDataExplorer) dataQuery(q backend.DataQuery, user *backend.User) backend.DataResponse {
+func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.User) backend.DataResponse {
 	var qm models.QueryModel
 	err := json.Unmarshal(q.JSON, &qm)
 	if err != nil {

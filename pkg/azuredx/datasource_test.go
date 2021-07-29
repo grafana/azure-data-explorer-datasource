@@ -45,7 +45,7 @@ func TestDatasource(t *testing.T) {
 			require.Contains(t, additionalHeaders["x-ms-client-request-id"], UserLogin)
 			return table, nil
 		}
-		res := adx.dataQuery(query, &backend.User{Login: UserLogin})
+		res := adx.handleQuery(query, &backend.User{Login: UserLogin})
 		require.NoError(t, res.Error)
 	})
 }
