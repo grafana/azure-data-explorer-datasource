@@ -25,9 +25,9 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 		QuerySource: "schema",
 	}
 
-	response, statusCode, kustoErr, err := adx.client.KustoRequest(adx.settings.ClusterURL+ManagementApiPath, payload, nil)
+	response, err := adx.client.KustoRequest(adx.settings.ClusterURL+ManagementApiPath, payload, nil)
 	if err != nil {
-		respondWithError(rw, statusCode, kustoErr, err)
+		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
 	}
 
@@ -48,9 +48,9 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 		CSL: ".show databases",
 	}
 
-	response, statusCode, kustoErr, err := adx.client.KustoRequest(adx.settings.ClusterURL+ManagementApiPath, payload, nil)
+	response, err := adx.client.KustoRequest(adx.settings.ClusterURL+ManagementApiPath, payload, nil)
 	if err != nil {
-		respondWithError(rw, statusCode, kustoErr, err)
+		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
 	}
 
