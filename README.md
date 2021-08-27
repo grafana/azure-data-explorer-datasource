@@ -1,4 +1,4 @@
-# Azure Data Explorer Datasource For Grafana
+# Azure Data Explorer data source for Grafana
 
 [![CircleCI](https://circleci.com/gh/grafana/azure-data-explorer-datasource.svg?style=svg)](https://circleci.com/gh/grafana/azure-data-explorer-datasource)
 [![Go Report Card](https://goreportcard.com/badge/github.com/grafana/azure-data-explorer-datasource)](https://goreportcard.com/report/github.com/grafana/azure-data-explorer-datasource)
