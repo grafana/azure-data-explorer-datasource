@@ -5,9 +5,6 @@ import {
   ScopedVar,
   TimeRange,
   DataFrame,
-  AnnotationQueryRequest,
-  AnnotationEvent,
-  LoadingState,
   ScopedVars,
 } from '@grafana/data';
 import { map } from 'lodash';
@@ -23,8 +20,8 @@ import {
   EditorMode,
   AutoCompleteQuery,
 } from './types';
-import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
+import { migrateAnnotation } from './migrations/annotation';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
 import { QueryEditorOperator } from 'editor/types';
@@ -98,44 +95,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     };
   }
 
-  async annotationQuery(options: AnnotationQueryRequest<KustoQuery>): Promise<AnnotationEvent[]> {
-    const query = options.annotation as KustoQuery;
-    if (!query) {
-      return Promise.reject({
-        message: 'Query missing in annotation definition',
-      });
-    }
-
-    query.resultFormat = 'table';
-
-    return super
-      .query({
-        targets: [query],
-        range: options.range as TimeRange,
-        maxDataPoints: 200, // ???
-        interval: '10ms',
-        intervalMs: 10 * 1000,
-      } as DataQueryRequest<KustoQuery>)
-      .toPromise()
-      .then(res => {
-        if (res.state === LoadingState.Done) {
-          if (res.data?.length) {
-            return getAnnotationsFromFrame(res.data[0] as DataFrame, {
-              field: {
-                time: 'StartTime',
-              },
-            });
-          }
-        }
-        if (res.state === LoadingState.Error) {
-          console.log('ADX Annotation ERROR???', options, res);
-          return Promise.reject({
-            message: options.annotation.name,
-          });
-        }
-        return [];
-      });
-  }
+  annotations = {
+    prepareAnnotation: migrateAnnotation,
+  };
 
   async metricFindQuery(query: string, optionalOptions: any): Promise<MetricFindValue[]> {
     const databasesQuery = query.match(/^databases\(\)/i);
