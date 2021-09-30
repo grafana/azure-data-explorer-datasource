@@ -31,7 +31,7 @@ const NEW_ANNOTATION = {
   },
 };
 
-describe('ADX: migrateAnnotation', () => {
+describe('migrateAnnotation', () => {
   it('migrates old annotations', () => {
     const migrated = migrateAnnotation(OLD_ANNOTATION);
     expect(migrated).toEqual(NEW_ANNOTATION);

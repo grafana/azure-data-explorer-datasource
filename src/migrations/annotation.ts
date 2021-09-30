@@ -1,6 +1,13 @@
 import { KustoQuery, defaultQuery } from 'types';
 
-export const migrateAnnotation = (annotation: any) => {
+type inputAnnotation = {
+  database?: string;
+  query?: string;
+  target?: KustoQuery;
+  resultFormat?: string;
+};
+
+export const migrateAnnotation = (annotation: inputAnnotation) => {
   if (annotation.target && annotation.target.database) {
     return annotation;
   }
@@ -8,11 +15,11 @@ export const migrateAnnotation = (annotation: any) => {
   const newQuery: KustoQuery = {
     ...defaultQuery,
     ...(annotation.target ?? {}),
-    database: annotation.database,
-    query: annotation.query,
+    database: annotation.database ?? '',
+    query: annotation.query ?? '',
     rawMode: true,
     refId: annotation.target?.refId ?? 'Anno',
-    resultFormat: annotation.resultFormat,
+    resultFormat: annotation.resultFormat ?? 'table',
     pluginVersion: defaultQuery.pluginVersion,
   };
 
