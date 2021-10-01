@@ -1,21 +1,25 @@
 import { KustoQuery, defaultQuery } from 'types';
 
 type inputAnnotation = {
-  database?: string;
+  datasource: string;
+  database: string;
+  enable: boolean;
+  name: string;
+  iconColor: string;
   query?: string;
   target?: KustoQuery;
   resultFormat?: string;
 };
 
 export const migrateAnnotation = (annotation: inputAnnotation) => {
-  if (annotation.target && annotation.target.database) {
+  if (annotation.target && annotation.target.database !== null) {
     return annotation;
   }
 
   const newQuery: KustoQuery = {
     ...defaultQuery,
     ...(annotation.target ?? {}),
-    database: annotation.database ?? '',
+    database: annotation.database,
     query: annotation.query ?? '',
     rawMode: true,
     refId: annotation.target?.refId ?? 'Anno',
