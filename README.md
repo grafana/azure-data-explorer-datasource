@@ -1,5 +1,6 @@
 # Azure Data Explorer data source for Grafana
 
+[![Build Status](https://drone.grafana.net/api/badges/grafana/azure-data-explorer-datasource/status.svg)](https://drone.grafana.net/grafana/azure-data-explorer-datasource)
 [![Go Report Card](https://goreportcard.com/badge/github.com/grafana/azure-data-explorer-datasource)](https://goreportcard.com/report/github.com/grafana/azure-data-explorer-datasource)
 [![David Dependancy Status](https://david-dm.org/grafana/azure-data-explorer-datasource.svg)](https://david-dm.org/grafana/azure-data-explorer-datasource)
 [![David Dev Dependency Status](https://david-dm.org/grafana/azure-data-explorer-datasource/dev-status.svg)](https://david-dm.org/grafana/azure-data-explorer-datasource/?type=dev)
