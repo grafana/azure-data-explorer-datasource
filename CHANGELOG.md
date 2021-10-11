@@ -1,6 +1,8 @@
 # Change Log
 
 ## [next]
+
+- Bugfix: Fixed issue where HTTP timeout setting was not being applied
 - Bugfix: Fixed issue when typing vs copy/pasting client secret in configuration
 
 ## [3.5.0]

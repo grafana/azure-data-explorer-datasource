@@ -13,6 +13,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+
 	// 100% compatible drop-in replacement of "encoding/json"
 	json "github.com/json-iterator/go"
 	"golang.org/x/net/context"
@@ -51,6 +52,8 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		backend.Logger.Error("failed to create HTTP client options", "error", err.Error())
 		return nil, err
 	}
+
+	httpClientOptions.Timeouts.Timeout = datasourceSettings.QueryTimeout
 
 	httpClient, err := httpClientProvider.New(httpClientOptions)
 	if err != nil {
