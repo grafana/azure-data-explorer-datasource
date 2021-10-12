@@ -4,6 +4,7 @@
 
 - Bugfix: Fixed issue where HTTP timeout setting was not being applied
 - Bugfix: Fixed issue when typing vs copy/pasting client secret in configuration
+- Bugfix: Fixed issue where annotation queries were not being displayed
 
 ## [3.5.0]
 
