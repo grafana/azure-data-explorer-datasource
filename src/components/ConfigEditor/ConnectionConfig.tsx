@@ -1,5 +1,5 @@
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
-import { FieldSet, InlineField, Input, LegacyForms, Select } from '@grafana/ui';
+import { FieldSet, InlineField, InlineSwitch, Input, LegacyForms, Select } from '@grafana/ui';
 import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AzureCloudType } from 'types';
 
@@ -143,6 +143,30 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         isConfigured={!!secureJsonFields?.clientSecret}
         tooltip={clientSecretTooltip}
       />
+
+      <InlineField
+        label="Use On-Behalf-Of"
+        labelWidth={26}
+        tooltip={
+          <>
+            Propagate Grafana client credentials to ADX with a token exchange. When enabled the service account (Client
+            ID) impersonates the user by augmenting the access token. See the{' '}
+            <a
+              target="_blank"
+              href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow"
+            >
+              developer documentation
+            </a>{' '}
+            for detail on the concept.
+          </>
+        }
+      >
+        <InlineSwitch
+          id="adx-on-behalf-of"
+          value={jsonData.onBehalfOf}
+          onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('onBehalfOf', ev.target.checked)}
+        />
+      </InlineField>
     </FieldSet>
   );
 };
