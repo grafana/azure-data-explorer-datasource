@@ -97,6 +97,7 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   clusterUrl: string;
   tenantId: string;
   clientId: string;
+  oauthPassThru: boolean;
 }
 
 export interface AdxDataSourceSecureOptions {

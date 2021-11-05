@@ -11,6 +11,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 
@@ -79,6 +80,8 @@ func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryD
 	res := backend.NewQueryDataResponse()
 
 	for _, q := range req.Queries {
+		token := req.Headers["Authorization"]
+		log.DefaultLogger.Debug("token", token)
 		res.Responses[q.RefID] = adx.handleQuery(q, req.PluginContext.User)
 	}
 

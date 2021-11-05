@@ -26,10 +26,13 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
   // Set some default values
   useEffect(() => {
+    if (!jsonData.oauthPassThru) {
+      updateJsonData('oauthPassThru', true);
+    }
     if (!jsonData.azureCloud) {
       updateJsonData('azureCloud', AzureCloudType.AzurePublic);
     }
-  }, [jsonData.azureCloud, updateJsonData]);
+  }, [jsonData.azureCloud, updateJsonData, jsonData.oauthPassThru]);
 
   const handleClientSecretChange = (ev?: React.ChangeEvent<HTMLInputElement>) => {
     onOptionsChange({
