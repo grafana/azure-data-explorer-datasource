@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/azureauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/tokenprovider"
@@ -22,8 +23,9 @@ import (
 // AzureDataExplorer stores reference to plugin and logger
 type AzureDataExplorer struct {
 	backend.CallResourceHandler
-	client   client.AdxClient
-	settings *models.DatasourceSettings
+	client     client.AdxClient
+	settings   *models.DatasourceSettings
+	onBehalfOf *azureauth.OnBehalfOf
 }
 
 var tokenCache = tokenprovider.NewConcurrentTokenCache()
@@ -52,7 +54,6 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		backend.Logger.Error("failed to create HTTP client options", "error", err.Error())
 		return nil, err
 	}
-
 	httpClientOptions.Timeouts.Timeout = datasourceSettings.QueryTimeout
 
 	httpClient, err := httpClientProvider.New(httpClientOptions)
@@ -61,6 +62,10 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		return nil, err
 	}
 	adx.client = client.New(httpClient)
+
+	if adx.settings.OnBehalfOf {
+		adx.onBehalfOf = &azureauth.OnBehalfOf{*adx.settings, httpClient}
+	}
 
 	mux := http.NewServeMux()
 	adx.registerRoutes(mux)
@@ -78,8 +83,21 @@ func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryD
 	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
 	res := backend.NewQueryDataResponse()
 
+	var accessToken string
+	if adx.onBehalfOf != nil {
+		token, err := azureauth.BearerToken(req)
+		if err != nil {
+			return nil, fmt.Errorf("bearer from data request unavailable: %w", err)
+		}
+		accessToken, err = adx.onBehalfOf.TokenExchange(token)
+		if err != nil {
+			return nil, fmt.Errorf("token exchange for data request failed: %w", err)
+		}
+		backend.Logger.Debug("aquired on-behalf-of token for data request")
+	}
+
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = adx.handleQuery(q, req.PluginContext.User)
+		res.Responses[q.RefID] = adx.handleQuery(q, req.PluginContext.User, accessToken)
 	}
 
 	return res, nil
@@ -101,7 +119,7 @@ func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.Chec
 	}, nil
 }
 
-func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.User) backend.DataResponse {
+func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.User, bearerToken string) backend.DataResponse {
 	var qm models.QueryModel
 	err := json.Unmarshal(q.JSON, &qm)
 	if err != nil {
@@ -115,7 +133,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	}
 	props := models.NewConnectionProperties(adx.settings, cs)
 
-	resp, err := adx.modelQuery(qm, props, user)
+	resp, err := adx.modelQuery(qm, props, user, bearerToken)
 	if err != nil {
 		resp.Frames = append(resp.Frames, &data.Frame{
 			RefID: q.RefID,
@@ -126,8 +144,11 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	return resp
 }
 
-func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User) (backend.DataResponse, error) {
+func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User, bearerToken string) (backend.DataResponse, error) {
 	headers := map[string]string{}
+	if bearerToken != "" {
+		headers["Authorization"] = "Bearer " + bearerToken
+	}
 	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%s", q.QuerySource, uuid.Must(uuid.NewRandom()).String())
 	if adx.settings.EnableUserTracking {
 		if user != nil {
