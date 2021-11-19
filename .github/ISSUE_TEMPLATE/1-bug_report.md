@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report a bug you found when using this plugin
-labels: 'type: bug'
+labels: type/bug
 ---
 
 <!--
@@ -37,6 +37,7 @@ If applicable, add screenshots to help explain your problem.
 **Anything else we need to know?**:
 
 **Environment**:
+
 - Grafana version:
 - Plugin version:
 - OS Grafana is installed on:
