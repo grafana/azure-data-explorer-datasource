@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report a bug you found when using this plugin
-labels: type/bug
+labels: datasource/ADX, type/bug
 ---
 
 <!--
