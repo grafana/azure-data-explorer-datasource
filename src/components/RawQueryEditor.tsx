@@ -4,10 +4,8 @@ import { css } from 'emotion';
 import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
-import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
-
-import config from 'grafana/app/core/config';
+import { CodeEditor } from '@grafana/ui';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -56,10 +54,9 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
   };
 
   render() {
-    const { query, datasource, lastQueryError, lastQuery, timeNotASC, schema } = this.props;
+    const { query, lastQueryError, lastQuery, timeNotASC, schema } = this.props;
     const { showLastQuery, showHelp } = this.state;
     const resultFormat = selectResultFormat(query.resultFormat, true);
-    const baseUrl = `${config.appSubUrl}/${datasource.meta.baseUrl}`;
 
     const styles = getStyles();
 
@@ -69,13 +66,14 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
 
     return (
       <div>
-        <KustoMonacoEditor
-          defaultTimeField="Timestamp"
-          pluginBaseUrl={baseUrl}
-          content={query.query || defaultQuery}
-          getSchema={async () => schema}
-          onChange={this.onRawQueryChange}
-          onExecute={this.props.onRunQuery}
+        <CodeEditor
+          value={query.query || defaultQuery}
+          language="kusto"
+          height={200}
+          width={1000}
+          showMiniMap={false}
+          onBlur={this.props.onRunQuery}
+          onSave={this.onRawQueryChange}
         />
 
         <div className={styles.toolbar}>
