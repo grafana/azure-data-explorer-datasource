@@ -64,7 +64,10 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	adx.client = client.New(httpClient)
 
 	if adx.settings.OnBehalfOf {
-		adx.onBehalfOf = &azureauth.OnBehalfOf{*adx.settings, httpClient}
+		adx.onBehalfOf = &azureauth.OnBehalfOf{
+			DatasourceSettings: *adx.settings,
+			Client:             httpClient,
+		}
 	}
 
 	mux := http.NewServeMux()

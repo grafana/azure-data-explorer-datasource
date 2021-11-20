@@ -51,7 +51,7 @@ func (auth *OnBehalfOf) TokenExchange(accessToken string) (string, error) {
 		var r struct {
 			Desc string `json:"error_description"`
 		}
-		json.Unmarshal(body, &r)
+		_ = json.Unmarshal(body, &r)
 		return "", fmt.Errorf("on-behalf-of grant POST <%q> status %q: %q", tokenURL, resp.Status, r.Desc)
 	}
 
