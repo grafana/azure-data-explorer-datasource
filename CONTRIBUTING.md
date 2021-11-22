@@ -65,7 +65,4 @@ You need to have commit rights to the GitHub repository to publish a release.
    git push origin master --tags
    ```
 
-6. This triggers the [release pipeline on GitHub](https://github.com/grafana/azure-data-explorer-datasource/actions/workflows/release.yml).
-7. Update the plugin reference in the [grafana-plugin-repository](https://github.com/grafana/grafana-plugin-repository/blob/master/repo.json)/
-8. Check that the release is published to [grafana.com](https://grafana.com/grafana/plugins/azure-data-explorer-datasource).
-9. Test the published version of the plugin either locally or on a Hosted Grafana instance.
+6. Follow the Drone release process that you can find [here](https://github.com/grafana/integrations-team/wiki/Plugin-Release-Process#drone-release-process)
