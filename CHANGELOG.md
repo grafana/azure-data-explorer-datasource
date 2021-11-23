@@ -1,9 +1,5 @@
 # Change Log
 
-## [3.6.0]
-
-- Replaced custom query editor with @grafana/ui common editor, with support for Kusto.
-
 ## [3.5.1]
 
 - Bugfix: Fixed issue where HTTP timeout setting was not being applied
