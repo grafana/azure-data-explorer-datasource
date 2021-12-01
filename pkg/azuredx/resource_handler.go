@@ -2,6 +2,7 @@ package azuredx
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -62,6 +63,9 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 }
 
 func respondWithError(rw http.ResponseWriter, code int, message string, err error) {
+	if err != nil {
+		message = fmt.Sprintf("%s: %s", message, err)
+	}
 	httpError := models.NewHttpError(message, code, err)
 	response, err := json.Marshal(httpError)
 	if err != nil {
