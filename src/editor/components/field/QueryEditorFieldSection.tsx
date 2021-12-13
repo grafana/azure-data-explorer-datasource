@@ -20,7 +20,7 @@ export interface QueryEditorFieldSectionProps extends React.PropsWithChildren<Qu
 }
 
 export const QueryEditorFieldSection = (config: FieldSectionConfiguration): React.FC<QueryEditorFieldSectionProps> => {
-  return props => {
+  return (props) => {
     const { onChange: propsOnChange } = props;
     const expression = props.value ?? config.defaultValue;
 

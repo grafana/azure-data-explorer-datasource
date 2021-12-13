@@ -14,14 +14,14 @@ describe('RequestAggregator', () => {
   describe('when ds request is successful', () => {
     beforeEach(() => {
       requestAggregator = new RequestAggregator({
-        datasourceRequest: async () => new Promise(resolve => setTimeout(() => resolve(), 100)),
+        datasourceRequest: async () => new Promise((resolve) => setTimeout(() => resolve(), 100)),
       });
     });
 
     describe('and many requests are made', () => {
       let res;
       beforeEach(() => {
-        res = requestData.map(r => requestAggregator.dsPost(r.key, r.url, r.payload));
+        res = requestData.map((r) => requestAggregator.dsPost(r.key, r.url, r.payload));
       });
 
       it('should aggregate requests where the keys are equal', () => {
@@ -46,7 +46,7 @@ describe('RequestAggregator', () => {
     describe('and many requests are made', () => {
       let res;
       beforeEach(() => {
-        res = requestData.map(r => requestAggregator.dsPost(r.key, r.url, r.payload));
+        res = requestData.map((r) => requestAggregator.dsPost(r.key, r.url, r.payload));
       });
 
       it('should aggregate requests where the keys are equal', () => {

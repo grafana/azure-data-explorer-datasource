@@ -1002,7 +1002,7 @@ const createReduce = (column: string, func: string): QueryEditorReduceExpression
 
 const createReduceWithParameter = (column: string, func: string, params: any[]): QueryEditorReduceExpression => {
   const reduce = createReduce(column, func);
-  reduce.parameters = params.map(v => {
+  reduce.parameters = params.map((v) => {
     const param: QueryEditorFunctionParameterExpression = {
       type: QueryEditorExpressionType.FunctionParameter,
       fieldType: valueToPropertyType(v),
