@@ -8,7 +8,7 @@ interface Props {
   operator: QueryEditorOperatorDefinition;
 }
 
-export const QueryEditorNumberOperator: React.FC<Props> = (props) => {
+export const QueryEditorNumberOperator: React.FC<Props> = props => {
   const [value, setValue] = useState<string>(String(props.value ?? 0));
   const {
     onChange,
@@ -40,7 +40,7 @@ const parseToNumber = (value: string | undefined): number => {
     return 0;
   }
 
-  if (isNaN(value as unknown as number)) {
+  if (isNaN((value as unknown) as number)) {
     return 0;
   }
 

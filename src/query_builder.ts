@@ -41,13 +41,16 @@ function escape(inputs: string) {
   return inputs
     .substring(1, inputs.length - 1)
     .split(`','`)
-    .map((v) => `@'${v}'`)
+    .map(v => `@'${v}'`)
     .join(', ');
 }
 
 function singleQuote(input: string) {
   if (input.match(/,+/i)) {
-    return input.split(',').map(singleQuote).join(',');
+    return input
+      .split(',')
+      .map(singleQuote)
+      .join(',');
   }
 
   if (input.match(/^'(.*)'$/i)) {

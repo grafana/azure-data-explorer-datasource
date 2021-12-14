@@ -73,7 +73,7 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
       <InlineField label="Data consistency" labelWidth={26} tooltip="Defaults to Strong">
         <Select
           options={dataConsistencyOptions}
-          value={dataConsistencyOptions.find((v) => v.value === jsonData.dataConsistency)}
+          value={dataConsistencyOptions.find(v => v.value === jsonData.dataConsistency)}
           onChange={(change: SelectableValue<string>) =>
             updateJsonData('dataConsistency', change.value ? change.value : dataConsistencyOptions[0].value)
           }
@@ -85,7 +85,7 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
       <InlineField label="Default editor mode" labelWidth={26} tooltip="Defaults to Visual">
         <Select
           options={editorModeOptions}
-          value={editorModeOptions.find((v) => v.value === jsonData.defaultEditorMode)}
+          value={editorModeOptions.find(v => v.value === jsonData.defaultEditorMode)}
           onChange={(change: SelectableValue<EditorMode>) =>
             updateJsonData('defaultEditorMode', change.value || EditorMode.Visual)
           }

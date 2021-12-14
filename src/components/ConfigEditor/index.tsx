@@ -20,7 +20,7 @@ type FetchErrorResponse = FetchResponse<{
   response?: string;
 }>;
 
-const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
+const ConfigEditor: React.FC<ConfigEditorProps> = props => {
   const { options, onOptionsChange } = props;
   const [schema, setSchema] = useState<Schema>({ databases: [], schemaMappingOptions: [] });
   const [schemaError, setSchemaError] = useState<FetchErrorResponse['data']>();
