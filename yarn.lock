@@ -2214,9 +2214,9 @@
     tiny-invariant "^1.0.1"
     tiny-warning "^0.0.3"
 
-"@grafana/toolkit@8.2":
+"@grafana/toolkit@8.2.7":
   version "8.2.7"
-  resolved "https://registry.npmjs.org/@grafana/toolkit/-/toolkit-8.2.7.tgz"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-8.2.7.tgz#0fdc9c806269079f862fc4883e6ea272dfb2bfb0"
   integrity sha512-rCjHzLtgoBMAWluBibcxbqXA8X0fThnZ2xwrmV3NovCUn/NJBuG49dElY6OQQFIPF3pmpd8kNDagz9yMiUZ6NA==
   dependencies:
     "@babel/core" "7.13.14"
