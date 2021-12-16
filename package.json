@@ -16,7 +16,7 @@
     "@grafana/e2e": "7.1.1",
     "@grafana/eslint-config": "2.0.0",
     "@grafana/runtime": "7.4.0",
-    "@grafana/toolkit": "7.3.1",
+    "@grafana/toolkit": "8.2.7",
     "@grafana/ui": "7.5.0-beta.1",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^13.1.9",
@@ -40,6 +40,7 @@
   "dependencies": {
     "debounce-promise": "^3.1.2",
     "react-select-event": "^5.2.0",
-    "react-use": "^15.3.3"
+    "react-use": "^15.3.3",
+    "tslib": "^2.3.1"
   }
 }

@@ -30,7 +30,7 @@ function link(scope, elem, attrs) {
     scope.onChange();
   };
 
-  containerDiv.onkeydown = evt => {
+  containerDiv.onkeydown = (evt) => {
     if (evt.key === 'Escape') {
       evt.stopPropagation();
       return true;

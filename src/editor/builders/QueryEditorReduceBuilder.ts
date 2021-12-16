@@ -16,7 +16,7 @@ export class QueryEditorReduceBuilder {
   }
 
   withFunctions(functions: (builder: (value: string) => QueryEditorFunctionBuilder) => void) {
-    functions(value => new QueryEditorFunctionBuilder(value, this.functions));
+    functions((value) => new QueryEditorFunctionBuilder(value, this.functions));
     return this;
   }
 
