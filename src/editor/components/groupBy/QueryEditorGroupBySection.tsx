@@ -24,7 +24,7 @@ export interface QueryEditorGroupBySectionProps extends QueryEditorSectionProps 
 export const QueryEditorGroupBySection = (
   config: GroupBySectionConfiguration
 ): React.FC<QueryEditorGroupBySectionProps> => {
-  return (props) => {
+  return function F(props) {
     const styles = getStyles();
 
     if (props.value.expressions.length === 0) {

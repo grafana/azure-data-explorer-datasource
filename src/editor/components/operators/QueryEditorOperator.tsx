@@ -95,9 +95,9 @@ export class QueryEditorOperatorComponent extends PureComponent<Props> {
             value={definition?.value}
             onChange={this.onChangeOperator}
             menuPlacement="bottom"
-            renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
+            renderControl={React.forwardRef(function F({ value, isOpen, invalid, ...otherProps }, ref) {
               return (
-                <Button ref={ref} {...otherProps} variant="secondary">
+                <Button {...otherProps} ref={ref} variant="secondary">
                   {definition?.label || definition?.value || '?'}
                 </Button>
               );

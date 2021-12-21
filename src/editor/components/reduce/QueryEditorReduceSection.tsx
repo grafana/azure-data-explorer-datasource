@@ -24,7 +24,7 @@ export interface QueryEditorReduceSectionProps extends QueryEditorSectionProps {
 export const QueryEditorReduceSection = (
   config: ReduceSectionConfiguration
 ): React.FC<QueryEditorReduceSectionProps> => {
-  return (props) => {
+  return function F(props) {
     const styles = getStyles();
 
     if (props.value.expressions.length === 0) {

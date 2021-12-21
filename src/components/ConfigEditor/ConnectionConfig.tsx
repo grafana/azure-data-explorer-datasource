@@ -50,6 +50,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
       <br />
       <a
         target="_blank"
+        rel="noreferrer"
         href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal"
       >
         Click here for detailed instructions on setting up an Azure Active Directory (AD) application.
@@ -91,6 +92,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
             <br />
             <a
               target="_blank"
+              rel="noreferrer"
               href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal"
             >
               Click here for detailed instructions on setting up an Azure Active Directory (AD) application.
@@ -117,6 +119,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
             <br />
             <a
               target="_blank"
+              rel="noreferrer"
               href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal"
             >
               Click here for detailed instructions on setting up an Azure Active Directory (AD) application.

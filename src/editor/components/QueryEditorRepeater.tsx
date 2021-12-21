@@ -32,7 +32,10 @@ export const QueryEditorRepeater: React.FC<Props> = (props) => {
 
       // Remove any expressions with empty sub expressions
       const remainingExpressions = next.filter((v) => {
-        return 'expressions' in v ? v.expressions.length > 0 : true;
+        if ('expressions' in v) {
+          return (v as QueryEditorArrayExpression).expressions.length > 0;
+        }
+        return false;
       });
 
       propsOnChange({

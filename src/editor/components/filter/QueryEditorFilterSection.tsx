@@ -30,7 +30,7 @@ export interface QueryEditorFilterSectionProps extends QueryEditorSectionProps {
 export const QueryEditorFilterSection = (
   config: FilterSectionConfiguration
 ): React.FC<QueryEditorFilterSectionProps> => {
-  return (props) => {
+  return function F(props) {
     const styles = getStyles();
 
     const getSuggestions = (index: string): SkippableExpressionSuggestor => {
@@ -148,8 +148,8 @@ export const QueryEditorFilterSection = (
                               }
                             }}
                             menuPlacement="bottom"
-                            renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
-                              return <Button ref={ref} {...otherProps} variant="secondary" icon="plus" />;
+                            renderControl={React.forwardRef(function F({ value, isOpen, invalid, ...otherProps }, ref) {
+                              return <Button {...otherProps} ref={ref} variant="secondary" icon="plus" />;
                             })}
                           />
                         )}

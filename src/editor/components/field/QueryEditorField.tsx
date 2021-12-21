@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import { stylesFactory, AsyncSelect } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 

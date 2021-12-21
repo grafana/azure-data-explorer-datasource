@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import ConfigEditor from './index';
 import * as refreshSchema from './refreshSchema';
 import * as grafanaRuntime from '@grafana/runtime';
@@ -27,23 +26,21 @@ describe('ConfigEditor', () => {
   });
 
   it('renders the component', async () => {
-    await waitFor(() => render(<ConfigEditor {...mockConfigEditorProps()} />));
+    render(<ConfigEditor {...mockConfigEditorProps()} />);
 
-    expect(screen.getByTestId('azure-data-explorer-config-editor')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('azure-data-explorer-config-editor')).toBeInTheDocument());
   });
 
   it('calls refreshSchema on render', async () => {
-    await waitFor(() => render(<ConfigEditor {...mockConfigEditorProps()} />));
+    render(<ConfigEditor {...mockConfigEditorProps()} />);
 
-    expect(refreshSchemaSpy).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(refreshSchemaSpy).toHaveBeenCalledTimes(1));
   });
 
   it('calls refreshSchema on click of "Reload schema" button', async () => {
-    await waitFor(() => {
-      render(<ConfigEditor {...mockConfigEditorProps()} />);
-      userEvent.click(screen.getByRole('button', { name: 'Reload schema' }));
-    });
+    render(<ConfigEditor {...mockConfigEditorProps()} />);
+    screen.getByText('Reload schema').click();
 
-    expect(refreshSchemaSpy).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(refreshSchemaSpy).toHaveBeenCalledTimes(2));
   });
 });

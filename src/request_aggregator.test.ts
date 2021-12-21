@@ -14,7 +14,7 @@ describe('RequestAggregator', () => {
   describe('when ds request is successful', () => {
     beforeEach(() => {
       requestAggregator = new RequestAggregator({
-        datasourceRequest: async () => new Promise((resolve) => setTimeout(() => resolve(), 100)),
+        datasourceRequest: async () => new Promise((resolve) => setTimeout(() => resolve(true), 100)),
       });
     });
 

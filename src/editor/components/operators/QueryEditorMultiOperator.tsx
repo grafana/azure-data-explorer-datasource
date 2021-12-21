@@ -31,7 +31,7 @@ export class QueryEditorMultiOperator extends PureComponent<Props, State> {
       return;
     }
     // Append the new value
-    const values = [...this.props.values, value];
+    const values = (this.props.values || []).concat(value);
     this.props.onChange({
       value: values,
       name: this.props.operator.value,
