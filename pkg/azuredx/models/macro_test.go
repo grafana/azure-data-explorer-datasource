@@ -83,6 +83,17 @@ func TestMacroData_Interpolate(t *testing.T) {
 			returnIs:  assert.Equal,
 			returnVal: fmt.Sprintf("CatCount >= %v and CatCount <= %v", fromString, toString),
 		},
+		{
+			name: "should parse $__timeFilter(value-with-hyphens)",
+			macroData: NewMacroData(&backend.TimeRange{
+				From: fromTime,
+				To:   toTime,
+			}, 0),
+			errorIs:   assert.NoError,
+			query:     "$__timeFilter(value-with-hyphens)",
+			returnIs:  assert.Equal,
+			returnVal: fmt.Sprintf("value-with-hyphens >= %v and value-with-hyphens <= %v", fromString, toString),
+		},
 	}
 
 	for _, tt := range tests {
