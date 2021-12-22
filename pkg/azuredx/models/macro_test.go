@@ -84,15 +84,37 @@ func TestMacroData_Interpolate(t *testing.T) {
 			returnVal: fmt.Sprintf("CatCount >= %v and CatCount <= %v", fromString, toString),
 		},
 		{
-			name: "should parse $__timeFilter(value-with-hyphens)",
+			name: "should parse and quote identifier with space",
 			macroData: NewMacroData(&backend.TimeRange{
 				From: fromTime,
 				To:   toTime,
 			}, 0),
 			errorIs:   assert.NoError,
-			query:     "$__timeFilter(value-with-hyphens)",
+			query:     "$__timeFilter(value with space)",
 			returnIs:  assert.Equal,
-			returnVal: fmt.Sprintf("value-with-hyphens >= %v and value-with-hyphens <= %v", fromString, toString),
+			returnVal: fmt.Sprintf("['value with space'] >= %v and ['value with space'] <= %v", fromString, toString),
+		},
+		{
+			name: "should parse and quote identifier with dot",
+			macroData: NewMacroData(&backend.TimeRange{
+				From: fromTime,
+				To:   toTime,
+			}, 0),
+			errorIs:   assert.NoError,
+			query:     "$__timeFilter(identifier.with.dot)",
+			returnIs:  assert.Equal,
+			returnVal: fmt.Sprintf("['identifier.with.dot'] >= %v and ['identifier.with.dot'] <= %v", fromString, toString),
+		},
+		{
+			name: "should parse and quote identifier with dashes",
+			macroData: NewMacroData(&backend.TimeRange{
+				From: fromTime,
+				To:   toTime,
+			}, 0),
+			errorIs:   assert.NoError,
+			query:     "$__timeFilter(identifier-with-dashes)",
+			returnIs:  assert.Equal,
+			returnVal: fmt.Sprintf("['identifier-with-dashes'] >= %v and ['identifier-with-dashes'] <= %v", fromString, toString),
 		},
 	}
 
