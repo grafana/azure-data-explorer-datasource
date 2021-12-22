@@ -43,6 +43,7 @@ func TestResourceHandler(t *testing.T) {
 		require.Nil(t, err)
 		require.Equal(t, http.StatusInternalServerError, httpError.StatusCode)
 		require.Contains(t, httpError.Error, fmt.Sprintf("HTTP error: %v", http.StatusBadRequest))
+		require.Equal(t, httpError.Message, fmt.Sprintf("Azure query unsuccessful: %s", httpError.Error))
 	})
 
 	t.Run("When kust request was successful route should return a json table", func(t *testing.T) {
