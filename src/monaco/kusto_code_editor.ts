@@ -93,21 +93,21 @@ export default class KustoCodeEditor {
 
     this.codeEditor.createContextKey('readyToExecute', true);
 
-    this.codeEditor.onDidChangeCursorSelection(event => {
+    this.codeEditor.onDidChangeCursorSelection((event) => {
       this.onDidChangeCursorSelection(event);
     });
 
-    this.getSchema().then(schema => {
+    this.getSchema().then((schema) => {
       if (!schema) {
         return;
       }
 
-      monaco.languages['kusto'].getKustoWorker().then(workerAccessor => {
+      monaco.languages['kusto'].getKustoWorker().then((workerAccessor) => {
         const model = this.codeEditor?.getModel();
         if (!model) {
           return;
         }
-        workerAccessor(model.uri).then(worker => {
+        workerAccessor(model.uri).then((worker) => {
           const dbName = Object.keys(schema.Databases).length > 0 ? Object.keys(schema.Databases)[0] : '';
           worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', dbName);
           this.codeEditor?.layout();
@@ -157,7 +157,7 @@ export default class KustoCodeEditor {
   }
 
   toSuggestionController(srv: monaco.editor.IEditorContribution): SuggestionController {
-    return (srv as unknown) as SuggestionController;
+    return srv as unknown as SuggestionController;
   }
 
   setEditorContent(value) {

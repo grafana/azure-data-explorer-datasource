@@ -13,6 +13,7 @@ const ConfigHelp: React.FC<ConfigHelpProps> = () => {
           <a
             className="external-link"
             target="_blank"
+            rel="noreferrer"
             href="https://github.com/grafana/azure-data-explorer-datasource#configuring-the-datasource-in-grafana"
           >
             here.
@@ -26,7 +27,7 @@ const ConfigHelp: React.FC<ConfigHelpProps> = () => {
           <i>add</i>:
         </p>
 
-        <pre>.add database your_db_name viewers ('aadapp=your_client_id;your_tenant_id')</pre>
+        <pre>.add database your_db_name viewers (&lsquo;aadapp=your_client_id;your_tenant_id&rsquo;)</pre>
 
         <h5>3. Configure the connection in Grafana</h5>
         <p>
@@ -39,6 +40,7 @@ const ConfigHelp: React.FC<ConfigHelpProps> = () => {
           <a
             className="external-link"
             target="_blank"
+            rel="noreferrer"
             href="https://github.com/grafana/azure-data-explorer-datasource#configuring-the-datasource-in-grafana"
           >
             in the documentation.

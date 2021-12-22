@@ -129,7 +129,7 @@ export class KustoExpressionParser {
       return;
     }
 
-    const hasInterval = groupBy.expressions.find(exp => {
+    const hasInterval = groupBy.expressions.find((exp) => {
       if (!isGroupBy(exp) || !exp.interval) {
         return false;
       }
@@ -153,12 +153,12 @@ export class KustoExpressionParser {
     }
 
     if (isAndExpression(expression)) {
-      return expression.expressions.forEach(exp => this.appendWhere(context, exp, parts, prefix));
+      return expression.expressions.forEach((exp) => this.appendWhere(context, exp, parts, prefix));
     }
 
     if (isOrExpression(expression)) {
       const orParts: string[] = [];
-      expression.expressions.map(exp => this.appendWhere(context, exp, orParts));
+      expression.expressions.map((exp) => this.appendWhere(context, exp, orParts));
       if (orParts.length === 0) {
         return;
       }
@@ -192,7 +192,7 @@ export class KustoExpressionParser {
       columns.push(column);
 
       if (Array.isArray(parameters)) {
-        const funcParams = parameters.map(p => this.formatValue(p.value, p.fieldType)).join(', ');
+        const funcParams = parameters.map((p) => this.formatValue(p.value, p.fieldType)).join(', ');
         reduceParts.push(`${func}(${column}, ${funcParams})`);
         continue;
       }
@@ -273,7 +273,7 @@ export class KustoExpressionParser {
 
   private formatValue(value: any, type: QueryEditorPropertyType): string {
     if (Array.isArray(value)) {
-      return `(${value.map(v => this.formatValue(v, type)).join(', ')})`;
+      return `(${value.map((v) => this.formatValue(v, type)).join(', ')})`;
     }
 
     if (this.isTemplateVariable(value)) {
@@ -324,7 +324,7 @@ const withPrefix = (value: string, prefix?: string): string => {
 
 const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpression): string | undefined => {
   if (Array.isArray(expression?.groupBy.expressions)) {
-    const groupByTimeColumn = expression?.groupBy.expressions.find(exp => {
+    const groupByTimeColumn = expression?.groupBy.expressions.find((exp) => {
       if (!isGroupBy(exp)) {
         return false;
       }
@@ -340,7 +340,7 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
     return;
   }
 
-  const firstLevelColumn = columns?.find(col => {
+  const firstLevelColumn = columns?.find((col) => {
     return col.CslType === 'datetime' && col.Name.indexOf('.') === -1;
   });
 
@@ -348,7 +348,7 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
     return firstLevelColumn?.Name;
   }
 
-  const column = columns?.find(col => col.CslType === 'datetime');
+  const column = columns?.find((col) => col.CslType === 'datetime');
 
   if (!column) {
     return column;
@@ -366,7 +366,7 @@ const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[]): string 
     return column;
   }
 
-  const columnSchema = tableSchema.find(c => c.Name === column);
+  const columnSchema = tableSchema.find((c) => c.Name === column);
 
   if (!columnSchema) {
     return column;
@@ -396,7 +396,7 @@ const replaceByIndex = (
   expression: QueryEditorArrayExpression,
   operator: QueryEditorOperatorExpression
 ): QueryEditorArrayExpression => {
-  const keys = index.split('-').map(n => parseInt(n, 10));
+  const keys = index.split('-').map((n) => parseInt(n, 10));
 
   let where = cloneDeep(expression);
   let current = where.expressions;

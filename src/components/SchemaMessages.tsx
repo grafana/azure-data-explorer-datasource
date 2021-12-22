@@ -3,7 +3,7 @@ import { css } from 'emotion';
 import { Icon, stylesFactory, useTheme } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 
-export const SchemaLoading: React.FC<{}> = props => {
+export const SchemaLoading: React.FC<{}> = (props) => {
   const theme = useTheme();
   const styles = getStyles(theme);
 
@@ -21,7 +21,7 @@ interface ErrorProps {
   message: string;
 }
 
-export const SchemaError: React.FC<ErrorProps> = props => {
+export const SchemaError: React.FC<ErrorProps> = (props) => {
   const theme = useTheme();
   const styles = getStyles(theme);
 
@@ -35,7 +35,7 @@ export const SchemaError: React.FC<ErrorProps> = props => {
   );
 };
 
-export const SchemaWarning: React.FC<ErrorProps> = props => {
+export const SchemaWarning: React.FC<ErrorProps> = (props) => {
   const theme = useTheme();
   const styles = getStyles(theme);
 
