@@ -1,24 +1,116 @@
-// Package azureauth implements Azure authorization.
+// Package azureauth provides authorization utilities for the Azure cloud.
 package azureauth
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
 
-// BearerToken extracts the client's token.
-func BearerToken(req *backend.QueryDataRequest) (accessToken string, err error) {
-	s, ok := req.Headers["Authorization"]
-	if !ok {
-		return "", errors.New("no HTTP Authorization value")
+// ServiceCredentials provides authorization for cloud service usage.
+type ServiceCredentials struct {
+	models.DatasourceSettings
+	// PostForm is an http.Client method.
+	PostForm func(url string, data url.Values) (*http.Response, error)
+}
+
+// QueryDataAuthorization returns an HTTP Authorization-header value which
+// represents the respective request.
+// ⚠️ A zero string must cause appliance of the service account instead.
+//
+// TODO(pascaldekloe): Merge the service principal appliance in here. The entire
+//	authorization decission must be centralised for security reasons alone.
+//	A fully progmatic approach also bypasses the SDK's incorrect use of
+//	http.RoundTripper.
+func (c *ServiceCredentials) QueryDataAuthorization(req *backend.QueryDataRequest) (string, error) {
+	if !c.OnBehalfOf {
+		return "", nil
 	}
 
-	const prefix = "Bearer "
-	// The scheme is case-insensitive 🤦 as per RFC 2617, subsection 1.2.
-	if len(s) < len(prefix) || !strings.EqualFold(s[:len(prefix)], prefix) {
-		return "", errors.New("unsupported HTTP Authorization scheme")
+	user := req.PluginContext.User // do nil-check once for all
+	if user == nil {
+		backend.Logger.Debug("using service principal for non-user request despite on-behalf-of configuration")
+		return "", nil
 	}
-	return s[len(prefix):], nil
+
+	// Azure requires an ID token (instead of an access token) for the exchange.
+	userToken, ok := req.Headers["X-ID-Token"]
+	if !ok {
+		if _, ok := req.Headers["Authorization"]; !ok {
+			// Grafana permits a mixture of OAuth2 and system accounts.
+			backend.Logger.Warn("user credentials unavailable for data request; continue with service principal despite on-behalf-of configuration", "user", user.Login)
+			return "", nil
+		}
+
+		backend.Logger.Error("ID token absent for data request; enable them on the Azure portal under: “App Registrations” → the respective application → “Manage” → “Authentication”", "user", user.Login)
+		return "", errors.New("ID token absent for data request")
+	}
+
+	onBehalfOfToken, err := c.onBehalfOf(userToken)
+	if err != nil {
+		backend.Logger.Error(err.Error(), "user", user.Login)
+		// Don't leak any context to the end-user.
+		return "", errors.New("on-behalf-of token exchange failed for data request")
+	}
+	backend.Logger.Debug("aquired on-behalf-of token for data request")
+
+	return "Bearer " + onBehalfOfToken, nil
+}
+
+// OnBehalfOf resolves a token which impersonates the subject of userToken.
+// UserToken has to be an ID token. See the following link for more detail.
+// https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow
+func (c *ServiceCredentials) onBehalfOf(userToken string) (onBehalfOfToken string, err error) {
+	params := make(url.Values)
+	params.Set("client_id", c.ClientID)
+	params.Set("client_secret", c.Secret)
+	params.Set("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
+	params.Set("assertion", userToken)
+	params.Set("scope", c.ClusterURL+"/.default")
+	params.Set("requested_token_use", "on_behalf_of")
+
+	// https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints
+	tokenURL := "https://login.microsoftonline.com/" + url.PathEscape(c.TenantID) + "/oauth2/v2.0/token"
+	req, err := http.NewRequest("GET", tokenURL, strings.NewReader(params.Encode()))
+	if err != nil {
+		return "", fmt.Errorf("on-behalf-of grant request <%q> instantiation: %w", tokenURL, err)
+	}
+	req.Header.Set("Accept", "application/json")
+
+	// HTTP Exchange
+	resp, err := c.PostForm(tokenURL, params)
+	if err != nil {
+		return "", fmt.Errorf("on-behalf-of grant POST <%q>: %w", tokenURL, err)
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("on-behalf-of grant POST <%q> response: %w", tokenURL, err)
+	}
+	if resp.StatusCode/100 != 2 {
+		var deny struct {
+			Desc string `json:"error_description"`
+		}
+		_ = json.Unmarshal(body, &deny)
+		return "", fmt.Errorf("on-behalf-of grant POST <%q> status %q: %q", tokenURL, resp.Status, deny.Desc)
+	}
+
+	// Parse Essentials
+	var grant struct {
+		Token string `json:"access_token"`
+	}
+	if err := json.Unmarshal(body, &grant); err != nil {
+		return "", fmt.Errorf("malformed response from on-behalf-of grant POST <%q>: %w", tokenURL, err)
+	}
+	if grant.Token == "" {
+		return "", fmt.Errorf("missing access_token in on-behalf-of grant response <%q>", tokenURL)
+	}
+	return grant.Token, nil
 }
