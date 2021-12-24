@@ -8,27 +8,12 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
-
-var onBehalfOfLatencySeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-	Namespace: "grafana",
-	Subsystem: "plugin_adx",
-	Name:      "obo_latency_seconds",
-	Help:      "On-behalf-of token exchange duration.",
-	Buckets:   []float64{0.01, 0.05, 0.10, 0.20, 0.40, 1.00},
-}, []string{"http_status"})
-
-func init() {
-	prometheus.MustRegister(onBehalfOfLatencySeconds)
-}
 
 // ServiceCredentials provides authorization for cloud service usage.
 type ServiceCredentials struct {
@@ -101,7 +86,6 @@ func (c *ServiceCredentials) onBehalfOf(userToken string) (onBehalfOfToken strin
 	req.Header.Set("Accept", "application/json")
 
 	// HTTP Exchange
-	reqStart := time.Now()
 	resp, err := c.PostForm(tokenURL, params)
 	if err != nil {
 		return "", fmt.Errorf("on-behalf-of grant POST <%q>: %w", tokenURL, err)
@@ -110,7 +94,6 @@ func (c *ServiceCredentials) onBehalfOf(userToken string) (onBehalfOfToken strin
 	if err != nil {
 		return "", fmt.Errorf("on-behalf-of grant POST <%q> response: %w", tokenURL, err)
 	}
-	onBehalfOfLatencySeconds.WithLabelValues(strconv.Itoa(resp.StatusCode)).Observe(float64(time.Since(reqStart)) / float64(time.Second))
 	if resp.StatusCode/100 != 2 {
 		var deny struct {
 			Desc string `json:"error_description"`
