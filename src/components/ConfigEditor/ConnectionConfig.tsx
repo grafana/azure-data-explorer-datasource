@@ -53,6 +53,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
       <br />
       <a
         target="_blank"
+        rel="noreferrer"
         href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal"
       >
         Click here for detailed instructions on setting up an Azure Active Directory (AD) application.
@@ -65,7 +66,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
       <InlineField label="Azure cloud" labelWidth={26} tooltip="Select an Azure Cloud." required>
         <Select
           options={azureClouds}
-          value={azureClouds.find(v => v.value === jsonData.azureCloud)}
+          value={azureClouds.find((v) => v.value === jsonData.azureCloud)}
           onChange={(change: SelectableValue<AzureCloudType>) =>
             updateJsonData('azureCloud', change.value ? change.value : AzureCloudType.AzurePublic)
           }
@@ -94,6 +95,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
             <br />
             <a
               target="_blank"
+              rel="noreferrer"
               href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal"
             >
               Click here for detailed instructions on setting up an Azure Active Directory (AD) application.
@@ -120,6 +122,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
             <br />
             <a
               target="_blank"
+              rel="noreferrer"
               href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal"
             >
               Click here for detailed instructions on setting up an Azure Active Directory (AD) application.

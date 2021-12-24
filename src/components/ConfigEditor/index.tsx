@@ -20,7 +20,7 @@ type FetchErrorResponse = FetchResponse<{
   response?: string;
 }>;
 
-const ConfigEditor: React.FC<ConfigEditorProps> = props => {
+const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
   const { options, onOptionsChange } = props;
   const [schema, setSchema] = useState<Schema>({ databases: [], schemaMappingOptions: [] });
   const [schemaError, setSchemaError] = useState<FetchErrorResponse['data']>();
@@ -28,7 +28,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = props => {
 
   const getDatasource = useCallback(async (): Promise<AdxDataSource> => {
     const datasource = await getDataSourceSrv().get(options.name);
-    return datasource as AdxDataSource;
+    return datasource as unknown as AdxDataSource;
   }, [options.name]);
 
   const updateSchema = useCallback(async () => {

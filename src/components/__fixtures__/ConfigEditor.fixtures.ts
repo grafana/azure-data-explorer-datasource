@@ -4,6 +4,7 @@ import { EditorMode } from 'types';
 
 export const mockConfigEditorProps = (optionsOverrides?: Partial<ConfigEditorProps>): ConfigEditorProps => ({
   options: {
+    uid: '',
     id: Chance().integer({ min: 0 }),
     orgId: Chance().integer({ min: 0 }),
     name: Chance().word(),
@@ -18,6 +19,7 @@ export const mockConfigEditorProps = (optionsOverrides?: Partial<ConfigEditorPro
     basicAuthPassword: Chance().string(),
     basicAuthUser: Chance().name(),
     isDefault: true,
+    typeName: '',
     jsonData: {
       defaultDatabase: Chance().word(),
       minimalCache: Chance().integer({ min: 0 }),

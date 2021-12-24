@@ -15,7 +15,7 @@ export class QueryEditorFilterBuilder {
   }
 
   withOperators(operators: (builder: (value: string) => QueyEditorOperatorBuilder) => void) {
-    operators(value => new QueyEditorOperatorBuilder(value, this.operators));
+    operators((value) => new QueyEditorOperatorBuilder(value, this.operators));
     return this;
   }
 

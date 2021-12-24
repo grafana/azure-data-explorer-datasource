@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useEffect } from 'react';
 import { useAsync } from 'react-use';
-import { QueryEditorProps, PanelData } from '@grafana/data';
+import { QueryEditorProps, PanelData, DataSourceApi } from '@grafana/data';
 // Hack for issue: https://github.com/grafana/grafana/issues/26512
 import {} from '@emotion/core';
 import { AdxDataSource } from './datasource';
@@ -13,18 +13,19 @@ import { QueryEditorToolbar } from './components/QueryEditorToolbar';
 import { SchemaLoading } from 'components/SchemaMessages';
 import { needsToBeMigrated, migrateQuery } from 'migrations/query';
 
-type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
+type Props = QueryEditorProps<DataSourceApi<KustoQuery, AdxDataSourceOptions>, KustoQuery, AdxDataSourceOptions>;
 
-export const QueryEditor: React.FC<Props> = props => {
+export const QueryEditor: React.FC<Props> = (props) => {
   const { datasource, onChange, onRunQuery, query } = props;
+  const ds = datasource as unknown as AdxDataSource;
   const executedQuery = useExecutedQuery(props.data);
   const executedQueryError = useExecutedQueryError(props.data);
   const dirty = useDirty(props.query.query, executedQuery);
   const rawMode = isRawMode(props);
-  const schema = useAsync(() => datasource.getSchema(false), [datasource.id]);
-  const templateVariables = useTemplateVariables(datasource);
+  const schema = useAsync(() => ds.getSchema(false), [datasource.id]);
+  const templateVariables = useTemplateVariables(ds);
   const databases = useDatabaseOptions(schema.value);
-  const database = useSelectedDatabase(databases, props.query, datasource);
+  const database = useSelectedDatabase(databases, props.query, ds);
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
@@ -123,7 +124,7 @@ export const QueryEditor: React.FC<Props> = props => {
       )}
       {editorMode === EditorMode.Visual && (
         <VisualQueryEditor
-          datasource={datasource}
+          datasource={ds}
           database={database}
           onChangeQuery={props.onChange}
           query={props.query}
@@ -143,13 +144,13 @@ const useSelectedDatabase = (
   const variables = datasource.getVariables();
 
   return useMemo(() => {
-    const selected = options.find(option => option.value === query.database);
+    const selected = options.find((option) => option.value === query.database);
 
     if (selected) {
       return selected.value;
     }
 
-    const variable = variables.find(variable => variable === query.database);
+    const variable = variables.find((variable) => variable === query.database);
 
     if (variable) {
       return variable;
@@ -206,7 +207,7 @@ const useTemplateVariables = (datasource: AdxDataSource) => {
     return {
       label: 'Template Variables',
       expanded: false,
-      options: variables.map(variable => {
+      options: variables.map((variable) => {
         return { label: variable, value: variable };
       }),
     };
@@ -226,5 +227,5 @@ function isNewQuery(props: Props): boolean {
 }
 
 function isRawDefaultEditorMode(props: Props): boolean {
-  return props.datasource.getDefaultEditorMode() === EditorMode.Raw;
+  return (props.datasource as unknown as AdxDataSource).getDefaultEditorMode() === EditorMode.Raw;
 }

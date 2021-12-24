@@ -11,7 +11,7 @@ export default class RequestAggregator {
         method: 'POST',
         data,
       })
-      .catch(error => {
+      .catch((error) => {
         if (maxRetries > 0) {
           return this.doRequest(url, data, maxRetries - 1);
         }

@@ -292,4 +292,4 @@ MyLogs
 
 ## CHANGELOG
 
-See the [Changelog](./CHANGELOG.md).
+See the [Changelog](https://github.com/grafana/azure-data-explorer-datasource/blob/master/CHANGELOG.md).

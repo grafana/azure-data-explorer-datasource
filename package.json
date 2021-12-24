@@ -1,22 +1,23 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "3.5.0",
+  "version": "3.6.1",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
-    "test": "grafana-toolkit plugin:test",
+    "test": "jest --notify --watch",
     "dev": "grafana-toolkit plugin:dev",
-    "watch": "grafana-toolkit plugin:dev --watch"
+    "watch": "grafana-toolkit plugin:dev --watch",
+    "sign": "grafana-toolkit plugin:sign"
   },
   "author": "Grafana Labs",
   "license": "Apache",
   "devDependencies": {
-    "@grafana/data": "7.1.1",
-    "@grafana/e2e": "7.1.1",
-    "@grafana/eslint-config": "2.0.0",
-    "@grafana/runtime": "7.4.0",
-    "@grafana/toolkit": "7.3.1",
-    "@grafana/ui": "7.5.0-beta.1",
+    "@emotion/core": "^11.0.0",
+    "@grafana/data": "8.2.6",
+    "@grafana/e2e": "8.2.6",
+    "@grafana/runtime": "8.2.6",
+    "@grafana/toolkit": "8.2.6",
+    "@grafana/ui": "8.2.6",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^13.1.9",
     "@types/angular": "1.6.49",
@@ -27,18 +28,16 @@
     "@typescript-eslint/eslint-plugin": "3.6.0",
     "@typescript-eslint/parser": "3.6.0",
     "chance": "^1.1.7",
-    "eslint": "7.4.0",
-    "eslint-config-prettier": "6.11.0",
-    "eslint-plugin-jsdoc": "28.6.1",
-    "eslint-plugin-prettier": "3.1.4",
-    "eslint-plugin-react-hooks": "4.0.5",
+    "emotion": "^11.0.0",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "monaco-editor": "0.17.0",
     "ts-jest": "^26.4.3"
   },
   "dependencies": {
+    "@testing-library/jest-dom": "^5.16.1",
     "debounce-promise": "^3.1.2",
     "react-select-event": "^5.2.0",
-    "react-use": "^15.3.3"
+    "react-use": "^15.3.3",
+    "tslib": "^2.3.1"
   }
 }

@@ -2,14 +2,13 @@ import React, { PureComponent } from 'react';
 import { Icon, stylesFactory } from '@grafana/ui';
 import { css } from 'emotion';
 import { KustoQuery, AdxDataSourceOptions, AdxSchema } from 'types';
-import { AdxDataSource } from 'datasource';
-import { QueryEditorProps, SelectableValue } from '@grafana/data';
+import { DataSourceApi, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 
 import config from 'grafana/app/core/config';
 
-type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
+type Props = QueryEditorProps<DataSourceApi<KustoQuery, AdxDataSourceOptions>, KustoQuery, AdxDataSourceOptions>;
 
 interface RawQueryEditorProps extends Props {
   dirty?: boolean;

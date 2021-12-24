@@ -57,7 +57,7 @@ export class QueryEditorOperatorComponent extends PureComponent<Props> {
   onChangeOperator = (selectable: SelectableValue<string>) => {
     if (selectable && selectable.value) {
       const { property, value } = this.props;
-      const definition = this.props.operators.find(o => o.value === selectable.value);
+      const definition = this.props.operators.find((o) => o.value === selectable.value);
 
       if (!definition || !property) {
         return;
@@ -84,7 +84,7 @@ export class QueryEditorOperatorComponent extends PureComponent<Props> {
   render() {
     const { operators, value, getSuggestions, templateVariableOptions, property } = this.props;
     const styles = getStyles();
-    const definition = operators.find(o => o.value === value?.name);
+    const definition = operators.find((o) => o.value === value?.name);
 
     return (
       <>
@@ -95,9 +95,9 @@ export class QueryEditorOperatorComponent extends PureComponent<Props> {
             value={definition?.value}
             onChange={this.onChangeOperator}
             menuPlacement="bottom"
-            renderControl={React.forwardRef(({ value, isOpen, invalid, ...otherProps }, ref) => {
+            renderControl={React.forwardRef(function F({ value, isOpen, invalid, ...otherProps }, ref) {
               return (
-                <Button ref={ref} {...otherProps} variant="secondary">
+                <Button {...otherProps} ref={ref} variant="secondary">
                   {definition?.label || definition?.value || '?'}
                 </Button>
               );

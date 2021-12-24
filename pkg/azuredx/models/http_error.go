@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 type HttpError struct {
 	Message    string
 	Error      string
@@ -13,6 +15,7 @@ func NewHttpError(message string, statusCode int, err error) *HttpError {
 	}
 	if err != nil {
 		httpError.Error = err.Error()
+		httpError.Message = fmt.Sprintf("%s: %s", message, err)
 	}
 
 	return httpError
