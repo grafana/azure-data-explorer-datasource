@@ -37,17 +37,14 @@ func (c *ServiceCredentials) QueryDataAuthorization(req *backend.QueryDataReques
 
 	user := req.PluginContext.User // do nil-check once for all
 	if user == nil {
-		backend.Logger.Debug("using service principal for non-user request despite on-behalf-of configuration")
-		return "", nil
+		return "", errors.New("non-user requests not permitted with on-behalf-of configuration")
 	}
 
 	// Azure requires an ID token (instead of an access token) for the exchange.
 	userToken, ok := req.Headers["X-ID-Token"]
 	if !ok {
 		if _, ok := req.Headers["Authorization"]; !ok {
-			// Grafana permits a mixture of OAuth2 and system accounts.
-			backend.Logger.Warn("user credentials unavailable for data request; continue with service principal despite on-behalf-of configuration", "user", user.Login)
-			return "", nil
+			return "", errors.New("system accounts are denied with on-behalf-of configuration")
 		}
 
 		backend.Logger.Error("ID token absent for data request; enable them on the Azure portal under: “App Registrations” → the respective application → “Manage” → “Authentication”", "user", user.Login)

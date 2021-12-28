@@ -46,12 +46,12 @@ func TestQueryDataAuthorization(t *testing.T) {
 			IDTokenHeader: testToken,
 			User:          &backend.User{Login: "alice"}},
 
-		1: {Want: "", WantErr: "",
+		1: {Want: "", WantErr: "non-user requests not permitted with on-behalf-of configuration",
 			PostFormMock:  wantNoHTTP,
 			IDTokenHeader: testToken,
 			User:          nil},
 
-		2: {Want: "", WantErr: "",
+		2: {Want: "", WantErr: "system accounts are denied with on-behalf-of configuration",
 			PostFormMock: wantNoHTTP,
 			User:         &backend.User{Login: "alice"}},
 
