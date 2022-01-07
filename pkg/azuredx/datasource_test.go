@@ -52,7 +52,7 @@ func TestDatasource(t *testing.T) {
 
 type fakeClient struct{}
 
-func (c *fakeClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties) error {
+func (c *fakeClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
 	panic("not implemented")
 }
 

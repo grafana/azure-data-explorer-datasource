@@ -41,22 +41,13 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 	adx.settings = datasourceSettings
 
-	tokenProvider := tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"})
-
-	httpClientProvider := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{
-		Middlewares: []sdkhttpclient.Middleware{
-			client.AuthMiddleware(tokenProvider),
-		},
-	})
-
 	httpClientOptions, err := settings.HTTPClientOptions()
 	if err != nil {
 		backend.Logger.Error("failed to create HTTP client options", "error", err.Error())
 		return nil, err
 	}
 	httpClientOptions.Timeouts.Timeout = datasourceSettings.QueryTimeout
-
-	httpClient, err := httpClientProvider.New(httpClientOptions)
+	httpClient, err := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{}).New(httpClientOptions)
 	if err != nil {
 		backend.Logger.Error("failed to create HTTP client", "error", err.Error())
 		return nil, err
@@ -64,8 +55,9 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	adx.client = client.New(httpClient)
 
 	adx.serviceCredentials = azureauth.ServiceCredentials{
-		DatasourceSettings: *adx.settings,
-		PostForm:           httpClient.PostForm,
+		DatasourceSettings:    *datasourceSettings,
+		PostForm:              httpClient.PostForm,
+		ServicePrincipalToken: tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"}).GetAccessToken,
 	}
 
 	mux := http.NewServeMux()
@@ -98,7 +90,12 @@ func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryD
 
 // CheckHealth handles health checks
 func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	err := adx.client.TestRequest(adx.settings, models.NewConnectionProperties(adx.settings, nil))
+	authorization, err := adx.serviceCredentials.ServicePrincipalAuthorization(ctx)
+	if err != nil {
+		return nil, err
+	}
+	headers := map[string]string{"Authorization": authorization}
+	err = adx.client.TestRequest(adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
@@ -138,10 +135,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 }
 
 func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User, authorization string) (backend.DataResponse, error) {
-	headers := map[string]string{}
-	if authorization != "" {
-		headers["Authorization"] = authorization
-	}
+	headers := map[string]string{"Authorization": authorization}
 	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%s", q.QuerySource, uuid.Must(uuid.NewRandom()).String())
 	if adx.settings.EnableUserTracking {
 		if user != nil {

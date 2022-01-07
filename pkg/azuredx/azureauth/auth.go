@@ -2,6 +2,7 @@
 package azureauth
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,21 +21,42 @@ type ServiceCredentials struct {
 	models.DatasourceSettings
 	// PostForm is an http.Client method.
 	PostForm func(url string, data url.Values) (*http.Response, error)
+	// ServicePrincipalToken resolves service credentials.
+	ServicePrincipalToken func(context.Context) (token string, err error)
+}
+
+// ServicePrincipalAuthorization returns an HTTP Authorization-header value which
+// represents the service principal.
+func (c *ServiceCredentials) ServicePrincipalAuthorization(ctx context.Context) (string, error) {
+	token, err := c.ServicePrincipalToken(ctx)
+	if err != nil {
+		return "", fmt.Errorf("service principal token unavailable: %w", err)
+	}
+	return "Bearer " + token, nil
 }
 
 // QueryDataAuthorization returns an HTTP Authorization-header value which
 // represents the respective request.
-// ⚠️ A zero string must cause appliance of the service account instead.
-//
-// TODO(pascaldekloe): Merge the service principal appliance in here. The entire
-//	authorization decission must be centralised for security reasons alone.
-//	A fully progmatic approach also bypasses the SDK's incorrect use of
-//	http.RoundTripper.
 func (c *ServiceCredentials) QueryDataAuthorization(req *backend.QueryDataRequest) (string, error) {
-	if !c.OnBehalfOf {
-		return "", nil
-	}
+	switch {
+	case c.OnBehalfOf:
+		return c.queryDataOnBehalfOf(req)
 
+	// TODO(pascaldekloe): case c.ClientCreds [oauthPassThru]
+
+	default:
+		backend.Logger.Debug("using service principal token for data request")
+		ctx := context.Background()
+		if c.QueryTimeout != 0 {
+			var cancel context.CancelFunc
+			ctx, cancel = context.WithTimeout(ctx, c.QueryTimeout)
+			defer cancel()
+		}
+		return c.ServicePrincipalAuthorization(ctx)
+	}
+}
+
+func (c *ServiceCredentials) queryDataOnBehalfOf(req *backend.QueryDataRequest) (string, error) {
 	user := req.PluginContext.User // do nil-check once for all
 	if user == nil {
 		return "", errors.New("non-user requests not permitted with on-behalf-of configuration")

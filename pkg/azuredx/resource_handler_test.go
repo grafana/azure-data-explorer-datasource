@@ -1,6 +1,7 @@
 package azuredx
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -36,6 +37,9 @@ func TestResourceHandler(t *testing.T) {
 		setup()
 		adx.client = &failingClient{}
 		adx.settings = &models.DatasourceSettings{ClusterURL: "some-baseurl"}
+		adx.serviceCredentials.ServicePrincipalToken = func(context.Context) (token string, err error) {
+			return "test-token", nil
+		}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusInternalServerError, res.Code)
 		httpError := models.HttpError{}
@@ -50,6 +54,9 @@ func TestResourceHandler(t *testing.T) {
 		setup()
 		adx.client = &workingClient{}
 		adx.settings = &models.DatasourceSettings{ClusterURL: "some-baseurl"}
+		adx.serviceCredentials.ServicePrincipalToken = func(context.Context) (token string, err error) {
+			return "test-token", nil
+		}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusOK, res.Code)
 		tableResponse := models.TableResponse{}
@@ -63,7 +70,7 @@ func TestResourceHandler(t *testing.T) {
 
 type failingClient struct{}
 
-func (c *failingClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties) error {
+func (c *failingClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
 	panic("not implemented")
 }
 
@@ -73,7 +80,7 @@ func (c *failingClient) KustoRequest(url string, payload models.RequestPayload, 
 
 type workingClient struct{}
 
-func (c *workingClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties) error {
+func (c *workingClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
 	panic("not implemented")
 }
 
