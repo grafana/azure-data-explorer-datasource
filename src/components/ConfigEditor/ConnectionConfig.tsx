@@ -159,6 +159,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
             ID) impersonates the user by augmenting the access token. See the{' '}
             <a
               target="_blank"
+              rel="noreferrer"
               href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow"
             >
               developer documentation
