@@ -164,7 +164,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
             >
               developer documentation
             </a>{' '}
-            for detail on the concept.
+            for detail on the concept. This feature requires a Grafana version 8.3.4 or later.
           </>
         }
       >
