@@ -158,7 +158,7 @@ If the command succeeds you should get a result like this:
 
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
 
-The on-behalf-of switch makes Grafana propagate client credentials to ADX with a token exchange. When enabled the service account (Client ID) impersonates the user by augmenting the access token.
+The on-behalf-of switch makes Grafana propagate client credentials to ADX with a token exchange. When enabled the service account (Client ID) impersonates the user by augmenting the access token. See `./doc/on-behalf-of.md` for details.
 
 ## Writing Queries
 
