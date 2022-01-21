@@ -34,8 +34,8 @@ func init() {
 // ServiceCredentials provides authorization for cloud service usage.
 type ServiceCredentials struct {
 	models.DatasourceSettings
-	// PostForm is an http.Client method.
-	PostForm func(url string, data url.Values) (*http.Response, error)
+	// HTTPDo is the http.Client Do method.
+	HTTPDo func(req *http.Request) (*http.Response, error)
 	// ServicePrincipalToken resolves service credentials.
 	ServicePrincipalToken func(context.Context) (token string, err error)
 }
@@ -52,24 +52,24 @@ func (c *ServiceCredentials) ServicePrincipalAuthorization(ctx context.Context) 
 
 // QueryDataAuthorization returns an HTTP Authorization-header value which
 // represents the respective request.
-func (c *ServiceCredentials) QueryDataAuthorization(req *backend.QueryDataRequest) (string, error) {
+func (c *ServiceCredentials) QueryDataAuthorization(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
+	if c.QueryTimeout != 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.QueryTimeout)
+		defer cancel()
+	}
+
 	switch {
 	case c.OnBehalfOf:
-		return c.queryDataOnBehalfOf(req)
+		return c.queryDataOnBehalfOf(ctx, req)
 
 	default:
 		backend.Logger.Debug("using service principal token for data request")
-		ctx := context.Background()
-		if c.QueryTimeout != 0 {
-			var cancel context.CancelFunc
-			ctx, cancel = context.WithTimeout(ctx, c.QueryTimeout)
-			defer cancel()
-		}
 		return c.ServicePrincipalAuthorization(ctx)
 	}
 }
 
-func (c *ServiceCredentials) queryDataOnBehalfOf(req *backend.QueryDataRequest) (string, error) {
+func (c *ServiceCredentials) queryDataOnBehalfOf(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
 	user := req.PluginContext.User // do nil-check once for all
 	if user == nil {
 		return "", errors.New("non-user requests not permitted with on-behalf-of configuration")
@@ -86,7 +86,7 @@ func (c *ServiceCredentials) queryDataOnBehalfOf(req *backend.QueryDataRequest) 
 		return "", errors.New("ID token absent for data request")
 	}
 
-	onBehalfOfToken, err := c.onBehalfOf(userToken)
+	onBehalfOfToken, err := c.onBehalfOf(ctx, userToken)
 	if err != nil {
 		backend.Logger.Error(err.Error(), "user", user.Login)
 		// Don't leak any context to the end-user.
@@ -100,7 +100,7 @@ func (c *ServiceCredentials) queryDataOnBehalfOf(req *backend.QueryDataRequest) 
 // OnBehalfOf resolves a token which impersonates the subject of userToken.
 // UserToken has to be an ID token. See the following link for more detail.
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow
-func (c *ServiceCredentials) onBehalfOf(userToken string) (onBehalfOfToken string, err error) {
+func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (onBehalfOfToken string, err error) {
 	params := make(url.Values)
 	params.Set("client_id", c.ClientID)
 	params.Set("client_secret", c.Secret)
@@ -108,18 +108,20 @@ func (c *ServiceCredentials) onBehalfOf(userToken string) (onBehalfOfToken strin
 	params.Set("assertion", userToken)
 	params.Set("scope", c.ClusterURL+"/.default")
 	params.Set("requested_token_use", "on_behalf_of")
+	reqBody := strings.NewReader(params.Encode())
 
 	// https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints
 	tokenURL := "https://login.microsoftonline.com/" + url.PathEscape(c.TenantID) + "/oauth2/v2.0/token"
-	req, err := http.NewRequest("GET", tokenURL, strings.NewReader(params.Encode()))
+	req, err := http.NewRequestWithContext(ctx, "POST", tokenURL, reqBody)
 	if err != nil {
 		return "", fmt.Errorf("on-behalf-of grant request <%q> instantiation: %w", tokenURL, err)
 	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
 
 	// HTTP Exchange
 	reqStart := time.Now()
-	resp, err := c.PostForm(tokenURL, params)
+	resp, err := c.HTTPDo(req)
 	if err != nil {
 		return "", fmt.Errorf("on-behalf-of grant POST <%q>: %w", tokenURL, err)
 	}

@@ -56,7 +56,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 
 	adx.serviceCredentials = azureauth.ServiceCredentials{
 		DatasourceSettings:    *datasourceSettings,
-		PostForm:              httpClient.PostForm,
+		HTTPDo:                httpClient.Do,
 		ServicePrincipalToken: tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"}).GetAccessToken,
 	}
 
@@ -76,7 +76,7 @@ func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryD
 	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
 	res := backend.NewQueryDataResponse()
 
-	authorization, err := adx.serviceCredentials.QueryDataAuthorization(req)
+	authorization, err := adx.serviceCredentials.QueryDataAuthorization(ctx, req)
 	if err != nil {
 		return nil, err
 	}
