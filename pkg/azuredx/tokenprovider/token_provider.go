@@ -49,22 +49,20 @@ func (provider *AccessTokenProvider) GetAccessToken(ctx context.Context) (string
 }
 
 func (provider *AccessTokenProvider) getClientSecretCredential() TokenCredential {
-	cloud := provider.resolveAuthorityHost(provider.authority)
+	cloud := AuthorityBaseURL(provider.authority)
 	return &clientSecretCredential{authority: cloud, tenantId: provider.tenantID, clientId: provider.clientID, clientSecret: provider.secret}
 }
 
-func (provider *AccessTokenProvider) resolveAuthorityHost(cloudName string) string {
+// AuthorityBaseURL returns the OAuth2 root, including tailing slash.
+func AuthorityBaseURL(cloudName string) string {
 	switch cloudName {
-	case AzurePublic:
-		return azidentity.AzurePublicCloud
 	case AzureChina:
 		return azidentity.AzureChina
 	case AzureUSGovernment:
 		return azidentity.AzureGovernment
+	default:
+		return azidentity.AzurePublicCloud
 	}
-
-	// Fallback to public cloud
-	return azidentity.AzurePublicCloud
 }
 
 type clientSecretCredential struct {
