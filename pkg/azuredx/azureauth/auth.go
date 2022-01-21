@@ -57,8 +57,6 @@ func (c *ServiceCredentials) QueryDataAuthorization(req *backend.QueryDataReques
 	case c.OnBehalfOf:
 		return c.queryDataOnBehalfOf(req)
 
-	// TODO(pascaldekloe): case c.ClientCreds [oauthPassThru]
-
 	default:
 		backend.Logger.Debug("using service principal token for data request")
 		ctx := context.Background()
