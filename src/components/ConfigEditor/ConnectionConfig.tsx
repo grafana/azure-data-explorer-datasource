@@ -2,6 +2,7 @@ import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/da
 import { FieldSet, InlineField, Input, LegacyForms, Select } from '@grafana/ui';
 import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AzureCloudType } from 'types';
+import { selectors } from 'test/selectors';
 
 const { SecretFormField } = LegacyForms;
 const azureClouds: Array<SelectableValue<AzureCloudType>> = [
@@ -60,7 +61,13 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
   return (
     <FieldSet label="Connection Details">
-      <InlineField label="Azure cloud" labelWidth={26} tooltip="Select an Azure Cloud." required>
+      <InlineField
+        label="Azure cloud"
+        labelWidth={26}
+        tooltip="Select an Azure Cloud."
+        required
+        data-testid={selectors.components.configEditor.azureCloud.input}
+      >
         <Select
           options={azureClouds}
           value={azureClouds.find((v) => v.value === jsonData.azureCloud)}
@@ -74,7 +81,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
       <InlineField label="Cluster URL" labelWidth={26} tooltip="The cluster url for your Azure Data Explorer database.">
         <Input
-          data-testid='cluster-url'
+          data-testid={selectors.components.configEditor.clusterURL.input}
           value={jsonData.clusterUrl}
           id="adx-cluster-url"
           placeholder="https://yourcluster.kusto.windows.net"
@@ -104,7 +111,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         <Input
           value={jsonData.tenantId}
           id="adx-tenant-id"
-          data-testid='tenant-id'
+          data-testid={selectors.components.configEditor.tenantID.input}
           width={60}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('tenantId', ev.target.value)}
         />
@@ -132,7 +139,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         <Input
           value={jsonData.clientId}
           id="adx-client-id"
-          data-testid="client-id"
+          data-testid={selectors.components.configEditor.clientID.input}
           width={60}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('clientId', ev.target.value)}
         />
@@ -140,6 +147,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
       <SecretFormField
         label="Client secret"
+        data-testid={selectors.components.configEditor.clientSecret.input}
         value={secureJsonData?.clientSecret || undefined}
         labelWidth={13}
         inputWidth={30}
