@@ -45,14 +45,14 @@ export class KustoDBConfigCtrl {
     }
 
     this.editorModes = Object.keys(EditorMode)
-      .filter(key => isNaN(parseInt(key, 10)))
-      .map(key => ({ value: EditorMode[key], label: key }));
+      .filter((key) => isNaN(parseInt(key, 10)))
+      .map((key) => ({ value: EditorMode[key], label: key }));
 
     if (!this.current.jsonData?.defaultEditorMode) {
       this.current.jsonData.defaultEditorMode = this.editorModes[0].value;
     }
 
-    this.dataConsistency = Object.keys(dataConsistency).map(value => ({
+    this.dataConsistency = Object.keys(dataConsistency).map((value) => ({
       value,
       label: dataConsistency[value],
     }));
@@ -86,7 +86,7 @@ export class KustoDBConfigCtrl {
     switch (mapping?.type) {
       case 'function':
         const input = mapping.input ?? [];
-        return `${mapping.value}(${input.map(i => i.Value).join(',')})`;
+        return `${mapping.value}(${input.map((i) => i.Value).join(',')})`;
       default:
         return mapping.value;
     }
@@ -106,7 +106,7 @@ export class KustoDBConfigCtrl {
 
     this.datasource
       .getSchema(true)
-      .then(schema => {
+      .then((schema) => {
         for (const dbName of Object.keys(schema.Databases)) {
           const database = schema.Databases[dbName];
 
@@ -163,7 +163,7 @@ export class KustoDBConfigCtrl {
         this.schemaError = false;
         this.$scope.$digest();
       })
-      .catch(e => {
+      .catch((e) => {
         console.error('ADX failed to fetch schema: ', e);
         this.loading = false;
         this.schemaError = true;

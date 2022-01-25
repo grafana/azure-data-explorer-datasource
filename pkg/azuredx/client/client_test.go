@@ -34,9 +34,7 @@ func TestClient(t *testing.T) {
 		}
 
 		client := New(server.Client())
-		table, statusCode, message, err := client.KustoRequest(server.URL, payload, nil)
-		require.Equal(t, http.StatusOK, statusCode)
-		require.Empty(t, message)
+		table, err := client.KustoRequest(server.URL, payload, nil)
 		require.NoError(t, err)
 		require.NotNil(t, table)
 	})
@@ -63,11 +61,10 @@ func TestClient(t *testing.T) {
 		}
 
 		client := New(server.Client())
-		table, statusCode, message, err := client.KustoRequest(server.URL, payload, nil)
-		require.Equal(t, http.StatusBadRequest, statusCode)
-		require.Equal(t, "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'", message)
+		table, err := client.KustoRequest(server.URL, payload, nil)
 		require.Nil(t, table)
 		require.NotNil(t, err)
+		require.Contains(t, err.Error(), "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'")
 	})
 
 	t.Run("Headers are set", func(t *testing.T) {
@@ -91,10 +88,8 @@ func TestClient(t *testing.T) {
 		}
 
 		client := New(server.Client())
-		table, statusCode, message, err := client.KustoRequest(server.URL, payload, headers)
-		require.NotNil(t, statusCode)
+		table, err := client.KustoRequest(server.URL, payload, headers)
 		require.Nil(t, table)
-		require.NotNil(t, message)
 		require.NotNil(t, err)
 	})
 }

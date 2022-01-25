@@ -11,8 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const errorMessage string = "Request is invalid and cannot be executed."
-
 func TestResourceHandler(t *testing.T) {
 	var res *httptest.ResponseRecorder
 	var adx AzureDataExplorer
@@ -43,9 +41,9 @@ func TestResourceHandler(t *testing.T) {
 		httpError := models.HttpError{}
 		err := json.NewDecoder(res.Body).Decode(&httpError)
 		require.Nil(t, err)
-		require.Equal(t, errorMessage, httpError.Message)
 		require.Equal(t, http.StatusInternalServerError, httpError.StatusCode)
 		require.Contains(t, httpError.Error, fmt.Sprintf("HTTP error: %v", http.StatusBadRequest))
+		require.Equal(t, httpError.Message, fmt.Sprintf("Azure query unsuccessful: %s", httpError.Error))
 	})
 
 	t.Run("When kust request was successful route should return a json table", func(t *testing.T) {
@@ -69,8 +67,8 @@ func (c *failingClient) TestRequest(datasourceSettings *models.DatasourceSetting
 	panic("not implemented")
 }
 
-func (c *failingClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, int, string, error) {
-	return nil, http.StatusInternalServerError, errorMessage, fmt.Errorf("HTTP error: %v - %v", http.StatusBadRequest, "")
+func (c *failingClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+	return nil, fmt.Errorf("HTTP error: %v - %v", http.StatusBadRequest, "")
 }
 
 type workingClient struct{}
@@ -79,7 +77,7 @@ func (c *workingClient) TestRequest(datasourceSettings *models.DatasourceSetting
 	panic("not implemented")
 }
 
-func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, int, string, error) {
+func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
 	return &models.TableResponse{
 		Tables: []models.Table{
 			{
@@ -98,5 +96,5 @@ func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, 
 				},
 			},
 		},
-	}, http.StatusOK, "", nil
+	}, nil
 }

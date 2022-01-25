@@ -1,12 +1,6 @@
-# Azure Data Explorer Datasource For Grafana
+# Azure Data Explorer data source for Grafana
 
-[![CircleCI](https://circleci.com/gh/grafana/azure-data-explorer-datasource.svg?style=svg)](https://circleci.com/gh/grafana/azure-data-explorer-datasource)
-[![Go Report Card](https://goreportcard.com/badge/github.com/grafana/azure-data-explorer-datasource)](https://goreportcard.com/report/github.com/grafana/azure-data-explorer-datasource)
-[![David Dependancy Status](https://david-dm.org/grafana/azure-data-explorer-datasource.svg)](https://david-dm.org/grafana/azure-data-explorer-datasource)
-[![David Dev Dependency Status](https://david-dm.org/grafana/azure-data-explorer-datasource/dev-status.svg)](https://david-dm.org/grafana/azure-data-explorer-datasource/?type=dev)
-[![Known Vulnerabilities](https://snyk.io/test/github/grafana/azure-data-explorer-datasource/badge.svg)](https://snyk.io/test/github/grafana/azure-data-explorer-datasource)
-[![Maintainability](https://api.codeclimate.com/v1/badges/9b1dad4f06230140f3a7/maintainability)](https://codeclimate.com/github/grafana/azure-data-explorer-datasource/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/9b1dad4f06230140f3a7/test_coverage)](https://codeclimate.com/github/grafana/azure-data-explorer-datasource/test_coverage)
+[![Build Status](https://drone.grafana.net/api/badges/grafana/azure-data-explorer-datasource/status.svg)](https://drone.grafana.net/grafana/azure-data-explorer-datasource)
 
 [Azure Data Explorer](https://docs.microsoft.com/en-us/azure/data-explorer/) is a log analytics cloud platform optimized for ad-hoc big data queries.
 
@@ -18,7 +12,7 @@ This plugin requires Grafana 7.1.0 or newer as of version 3.0.0. Plugin versions
 
 If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can sign up for one [here](https://grafana.com/cloud/grafana).
 
-1. Click on the `Install Now` button on the [Azure Data Explorer page on Grafana.com](https://grafana.com/plugins/grafana-azure-data-explorer-datasource/installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
+1. Click on the `Install Now` button on the [Azure Data Explorer page on Grafana.com](https://grafana.com/plugins/grafana-azure-data-explorer-datasource/?tab=installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
    ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/grafana_cloud_install.png)
 
 2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Data Explorer datasource will be installed.
@@ -268,6 +262,8 @@ Create the variable in the dashboard settings. Usually you will need to write a 
 
 Read more about templating and variables in the [Grafana documentation](http://docs.grafana.org/reference/templating/#variables).
 
+> **Note:** Usage of template variables in the _Builder_ is currently not supported.
+
 ## Databases Variable
 
 There is no way to fetch a list of databases with the Kusto query language. When creating a template variable as described in the `Templating with variables` section, use the following function in the `Query` field to return a list of databases:
@@ -298,4 +294,4 @@ MyLogs
 
 ## CHANGELOG
 
-See the [Changelog](./CHANGELOG.md).
+See the [Changelog](https://github.com/grafana/azure-data-explorer-datasource/blob/master/CHANGELOG.md).

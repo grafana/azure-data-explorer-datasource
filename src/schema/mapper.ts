@@ -37,7 +37,7 @@ export const tablesToDefinition = (tables: AdxTableSchema[]): QueryEditorPropert
     return [];
   }
 
-  return tables.map(table => ({
+  return tables.map((table) => ({
     value: table.Name,
     label: table.Name,
     type: QueryEditorPropertyType.String,
@@ -49,7 +49,7 @@ export const columnsToDefinition = (columns: AdxColumnSchema[]): QueryEditorProp
     return [];
   }
 
-  return columns.map(column => ({
+  return columns.map((column) => ({
     value: column.Name,
     label: column.Name,
     type: toPropertyType(column.CslType),

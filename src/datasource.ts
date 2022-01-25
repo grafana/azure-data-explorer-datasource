@@ -5,9 +5,6 @@ import {
   ScopedVar,
   TimeRange,
   DataFrame,
-  AnnotationQueryRequest,
-  AnnotationEvent,
-  LoadingState,
   ScopedVars,
 } from '@grafana/data';
 import { map } from 'lodash';
@@ -23,8 +20,8 @@ import {
   EditorMode,
   AutoCompleteQuery,
 } from './types';
-import { getAnnotationsFromFrame } from './common/annotationsFromFrame';
 import interpolateKustoQuery from './query_builder';
+import { migrateAnnotation } from './migrations/annotation';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
 import { QueryEditorOperator } from 'editor/types';
@@ -98,44 +95,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     };
   }
 
-  async annotationQuery(options: AnnotationQueryRequest<KustoQuery>): Promise<AnnotationEvent[]> {
-    const query = options.annotation as KustoQuery;
-    if (!query) {
-      return Promise.reject({
-        message: 'Query missing in annotation definition',
-      });
-    }
-
-    query.resultFormat = 'table';
-
-    return super
-      .query({
-        targets: [query],
-        range: options.range as TimeRange,
-        maxDataPoints: 200, // ???
-        interval: '10ms',
-        intervalMs: 10 * 1000,
-      } as DataQueryRequest<KustoQuery>)
-      .toPromise()
-      .then(res => {
-        if (res.state === LoadingState.Done) {
-          if (res.data?.length) {
-            return getAnnotationsFromFrame(res.data[0] as DataFrame, {
-              field: {
-                time: 'StartTime',
-              },
-            });
-          }
-        }
-        if (res.state === LoadingState.Error) {
-          console.log('ADX Annotation ERROR???', options, res);
-          return Promise.reject({
-            message: options.annotation.name,
-          });
-        }
-        return [];
-      });
-  }
+  annotations = {
+    prepareAnnotation: migrateAnnotation,
+  };
 
   async metricFindQuery(query: string, optionalOptions: any): Promise<MetricFindValue[]> {
     const databasesQuery = query.match(/^databases\(\)/i);
@@ -144,26 +106,26 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     }
 
     return this.getDefaultOrFirstDatabase()
-      .then(database => this.buildQuery(query, optionalOptions, database))
-      .then(query =>
+      .then((database) => this.buildQuery(query, optionalOptions, database))
+      .then((query) =>
         this.query({
           targets: [query],
         } as DataQueryRequest<KustoQuery>).toPromise()
       )
-      .then(response => {
+      .then((response) => {
         if (response.data && response.data.length) {
           return firstStringFieldToMetricFindValue(response.data[0]);
         }
         return [];
       })
-      .catch(err => {
+      .catch((err) => {
         console.log('There was an error', err);
         throw err;
       });
   }
 
   async getDatabases(): Promise<DatabaseItem[]> {
-    return this.getResource<KustoDatabaseList>('databases').then(response => {
+    return this.getResource<KustoDatabaseList>('databases').then((response) => {
       return new ResponseParser().parseDatabases(response);
     });
   }
@@ -177,7 +139,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return Promise.resolve(this.defaultOrFirstDatabase);
     }
 
-    return this.getDatabases().then(databases => {
+    return this.getDatabases().then((databases) => {
       this.defaultOrFirstDatabase = databases[0].value;
       return this.defaultOrFirstDatabase;
     });
@@ -223,9 +185,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     const queryParts: string[] = [];
 
     const take = 'take 50000';
-    const where = `where ${columns.map(column => `isnotnull(${column})`).join(' and ')}`;
-    const project = `project ${columns.map(column => column).join(', ')}`;
-    const summarize = `summarize ${columns.map(column => `buildschema(${column})`).join(', ')}`;
+    const where = `where ${columns.map((column) => `isnotnull(${column})`).join(' and ')}`;
+    const project = `project ${columns.map((column) => column).join(', ')}`;
+    const summarize = `summarize ${columns.map((column) => `buildschema(${column})`).join(', ')}`;
 
     queryParts.push(source);
     queryParts.push(take);
@@ -247,7 +209,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   getVariables() {
-    return this.templateSrv.getVariables().map(v => `$${v.name}`);
+    return this.templateSrv.getVariables().map((v) => `$${v.name}`);
   }
 
   // Used for annotations and templage variables
@@ -280,7 +242,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
         method: 'POST',
         data: data,
       })
-      .catch(error => {
+      .catch((error) => {
         if (maxRetries > 0) {
           return this.doRequest(url, data, maxRetries - 1);
         }
@@ -302,14 +264,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return value;
     }
 
-    const quotedValues = map(value, val => {
+    const quotedValues = map(value, (val) => {
       if (typeof value === 'number') {
         return value;
       }
 
       return "'" + escapeSpecial(val) + "'";
     });
-    return quotedValues.filter(v => v !== "''").join(',');
+    return quotedValues.filter((v) => v !== "''").join(',');
   }
 
   getSchemaMapper(): AdxSchemaMapper {
@@ -370,8 +332,8 @@ const functionSchemaParser = (frames: DataFrame[]): AdxColumnSchema[] => {
     return result;
   }
 
-  const nameIndex = fields.findIndex(f => f.name === 'ColumnName');
-  const typeIndex = fields.findIndex(f => f.name === 'ColumnType');
+  const nameIndex = fields.findIndex((f) => f.name === 'ColumnName');
+  const typeIndex = fields.findIndex((f) => f.name === 'ColumnType');
 
   if (nameIndex < 0 || typeIndex < 0) {
     return result;

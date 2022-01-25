@@ -35,7 +35,7 @@ func NewMacroData(tr *backend.TimeRange, intervalMS int64) MacroData {
 // macroRE is a regular expression to match available macros
 var macroRE = regexp.MustCompile(`\$__` + // Prefix: $__
 	`(timeFilter|timeFrom|timeTo|timeInterval)` + // one of macro root names
-	`(\(\w*?\))?`) // optional () or optional (someArg)
+	`(\([a-zA-Z0-9_\s.-]*?\))?`) // optional () or optional (someArg)
 
 // Interpolate replaces macros with their values for the given query.
 func (md MacroData) Interpolate(query string) (string, error) {
@@ -55,7 +55,7 @@ func (md MacroData) Interpolate(query string) (string, error) {
 		}
 		arg := ""
 		if len(varSplit) > 1 {
-			arg = varSplit[1]
+			arg = quoteForSpacesDotsDashes(varSplit[1])
 		}
 		return funcToCall(arg, md)
 	}
@@ -64,6 +64,14 @@ func (md MacroData) Interpolate(query string) (string, error) {
 		return "", fmt.Errorf("failed to interpolate query, errors: %v", strings.Join(errorStrings, "\n"))
 	}
 	return interpolated, nil
+}
+
+func quoteForSpacesDotsDashes(s string) string {
+	// https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/schema-entities/entity-names#identifier-quoting
+	if strings.ContainsAny(s, " .-") {
+		return fmt.Sprintf("['%s']", s)
+	}
+	return s
 }
 
 var interpolationFuncs = map[string]func(string, MacroData) string{

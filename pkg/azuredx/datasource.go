@@ -13,7 +13,9 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
-	jsoniter "github.com/json-iterator/go"
+
+	// 100% compatible drop-in replacement of "encoding/json"
+	json "github.com/json-iterator/go"
 	"golang.org/x/net/context"
 )
 
@@ -50,6 +52,8 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 		backend.Logger.Error("failed to create HTTP client options", "error", err.Error())
 		return nil, err
 	}
+
+	httpClientOptions.Timeouts.Timeout = datasourceSettings.QueryTimeout
 
 	httpClient, err := httpClientProvider.New(httpClientOptions)
 	if err != nil {
@@ -98,43 +102,31 @@ func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.Chec
 }
 
 func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.User) backend.DataResponse {
-	resp := backend.DataResponse{}
-	qm := &models.QueryModel{}
-
-	err := jsoniter.Unmarshal(q.JSON, qm)
+	var qm models.QueryModel
+	err := json.Unmarshal(q.JSON, &qm)
 	if err != nil {
-		resp.Error = err
-		return resp
+		return backend.DataResponse{Error: fmt.Errorf("malformed request query: %w", err)}
 	}
 
-	cs := models.NewCacheSettings(adx.settings, &q, qm)
+	cs := models.NewCacheSettings(adx.settings, &q, &qm)
 	qm.MacroData = models.NewMacroData(cs.TimeRange, q.Interval.Milliseconds())
-
 	if err := qm.Interpolate(); err != nil {
-		resp.Error = err
-		return resp
+		return backend.DataResponse{Error: err}
 	}
+	props := models.NewConnectionProperties(adx.settings, cs)
 
-	interpolatedQuery := qm.Query
-	var kustoError string
-
-	appendFrame := func(f *data.Frame) {
-		resp.Frames = append(resp.Frames, f)
-	}
-
-	errorWithFrame := func(err error) {
-		fm := &data.FrameMeta{ExecutedQueryString: interpolatedQuery}
-		if kustoError != "" {
-			fm.Custom = struct {
-				KustoError string
-			}{
-				kustoError,
-			}
-		}
-		appendFrame(&data.Frame{RefID: q.RefID, Meta: fm})
+	resp, err := adx.modelQuery(qm, props, user)
+	if err != nil {
+		resp.Frames = append(resp.Frames, &data.Frame{
+			RefID: q.RefID,
+			Meta:  &data.FrameMeta{ExecutedQueryString: qm.Query},
+		})
 		resp.Error = err
 	}
+	return resp
+}
 
+func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User) (backend.DataResponse, error) {
 	headers := map[string]string{}
 	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", qm.QuerySource, rand.Uint64())
 	if adx.settings.EnableUserTracking {
@@ -145,32 +137,29 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	}
 	headers["x-ms-client-request-id"] = msClientRequestIDHeader
 
-	var tableRes *models.TableResponse
-	tableRes, _, kustoError, err = adx.client.KustoRequest(adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
-		CSL:         qm.Query,
-		DB:          qm.Database,
-		Properties:  models.NewConnectionProperties(adx.settings, cs),
-		QuerySource: qm.QuerySource,
+	tableRes, err := adx.client.KustoRequest(adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
+		CSL:         q.Query,
+		DB:          q.Database,
+		Properties:  props,
+		QuerySource: q.QuerySource,
 	}, headers)
-
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
-		errorWithFrame(err)
-		return resp
+		return backend.DataResponse{}, err
 	}
-	switch qm.Format {
+
+	var resp backend.DataResponse
+	switch q.Format {
 	case "table":
-		resp.Frames, err = tableRes.ToDataFrames(interpolatedQuery)
+		resp.Frames, err = tableRes.ToDataFrames(q.Query)
 		if err != nil {
 			backend.Logger.Debug("error converting response to data frames", "error", err.Error())
-			errorWithFrame(fmt.Errorf("error converting response to data frames: %w", err))
-			return resp
+			return resp, fmt.Errorf("error converting response to data frames: %w", err)
 		}
 	case "time_series":
-		frames, err := tableRes.ToDataFrames(interpolatedQuery)
+		frames, err := tableRes.ToDataFrames(q.Query)
 		if err != nil {
-			errorWithFrame(err)
-			return resp
+			return resp, err
 		}
 		for _, f := range frames {
 			tsSchema := f.TimeSeriesSchema()
@@ -180,7 +169,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 					Severity: data.NoticeSeverityWarning,
 					Text:     "Returned frame is not a time series, returning table format instead. The response must have at least one datetime field and one numeric field.",
 				})
-				appendFrame(f)
+				resp.Frames = append(resp.Frames, f)
 				continue
 			case data.TimeSeriesTypeLong:
 				wideFrame, err := data.LongToWide(f, nil)
@@ -189,27 +178,25 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 						Severity: data.NoticeSeverityWarning,
 						Text:     fmt.Sprintf("detected long formatted time series but failed to convert from long frame: %v. Returning table format instead.", err),
 					})
-					appendFrame(f)
+					resp.Frames = append(resp.Frames, f)
 					continue
 				}
-				appendFrame(wideFrame)
+				resp.Frames = append(resp.Frames, wideFrame)
 			default:
-				appendFrame(f)
+				resp.Frames = append(resp.Frames, f)
 			}
 		}
 	case "time_series_adx_series":
-		orginalDFs, err := tableRes.ToDataFrames(interpolatedQuery)
+		orginalDFs, err := tableRes.ToDataFrames(q.Query)
 		if err != nil {
-			errorWithFrame(fmt.Errorf("error converting response to data frames: %w", err))
-			return resp
+			return resp, fmt.Errorf("error converting response to data frames: %w", err)
 		}
 		for _, f := range orginalDFs {
 			formatedDF, err := models.ToADXTimeSeries(f)
 			if err != nil {
-				errorWithFrame(err)
-				return resp
+				return resp, err
 			}
-			appendFrame(formatedDF)
+			resp.Frames = append(resp.Frames, formatedDF)
 		}
 
 	// 	series, timeNotASC, err := tableRes.ToTimeSeries()
@@ -221,8 +208,8 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	// 	qr.Series = series
 
 	default:
-		resp.Error = fmt.Errorf("unsupported query type: '%v'", qm.Format)
+		resp.Error = fmt.Errorf("unsupported query type: '%v'", q.Format)
 	}
 
-	return resp
+	return resp, nil
 }

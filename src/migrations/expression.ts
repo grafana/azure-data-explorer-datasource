@@ -40,8 +40,8 @@ const migrateV2ToV3 = (expression: any): QueryExpression => {
       type: QueryEditorExpressionType.And,
       expressions: expression?.where?.expression?.expressions
         .map(migrateV2Expression)
-        .filter(exp => !!exp)
-        .map(exp => {
+        .filter((exp) => !!exp)
+        .map((exp) => {
           return {
             type: QueryEditorExpressionType.Or,
             expressions: [exp],
@@ -71,7 +71,7 @@ const migrateV2Array = (expressions: any[]): QueryEditorArrayExpression => {
 
   return {
     type: QueryEditorExpressionType.And,
-    expressions: expressions.map(migrateV2Expression).filter(exp => !!exp) as QueryEditorExpression[],
+    expressions: expressions.map(migrateV2Expression).filter((exp) => !!exp) as QueryEditorExpression[],
   };
 };
 

@@ -18,9 +18,9 @@ const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData
         labelWidth={26}
         tooltip={
           <p>
-            With this feature enabled, Grafana will pass the logged in user's username in the <code>x-ms-user-id</code>{' '}
-            header and in the <code>x-ms-client-request-id</code> header when sending requests to ADX. Can be useful
-            when tracking needs to be done in ADX.{' '}
+            With this feature enabled, Grafana will pass the logged in user&#39;s username in the{' '}
+            <code>x-ms-user-id</code> header and in the <code>x-ms-client-request-id</code> header when sending requests
+            to ADX. Can be useful when tracking needs to be done in ADX.{' '}
           </p>
         }
       >

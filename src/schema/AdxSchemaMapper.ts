@@ -5,7 +5,7 @@ import { tableToDefinition } from './mapper';
 // Mappings in the jsonData are partials - they might have undefined fields. We want to ignore them.
 const validMapping = (mapping: Partial<SchemaMapping>): mapping is SchemaMapping => {
   return (
-    Object.values(mapping).every(v => v !== undefined) &&
+    Object.values(mapping).every((v) => v !== undefined) &&
     !!mapping.database &&
     !!mapping.displayName &&
     !!mapping.name &&
@@ -52,7 +52,7 @@ export class AdxSchemaMapper {
     }
 
     if (!this.enabled) {
-      return Object.keys(database.Tables).map(key => {
+      return Object.keys(database.Tables).map((key) => {
         const table = database.Tables[key];
         return tableToDefinition(table);
       });

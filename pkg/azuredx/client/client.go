@@ -3,18 +3,17 @@ package client
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
-	jsoniter "github.com/json-iterator/go"
+	// 100% compatible drop-in replacement of "encoding/json"
+	json "github.com/json-iterator/go"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
 type AdxClient interface {
 	TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties) error
-	KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, int, string, error)
+	KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
 }
 
 // Client is an http.Client used for API requests.
@@ -30,7 +29,7 @@ func New(client *http.Client) *Client {
 // TestRequest handles a data source test request in Grafana's Datasource configuration UI.
 func (c *Client) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties) error {
 	var buf bytes.Buffer
-	err := jsoniter.NewEncoder(&buf).Encode(models.RequestPayload{
+	err := json.NewEncoder(&buf).Encode(models.RequestPayload{
 		CSL:        ".show databases schema",
 		DB:         datasourceSettings.DefaultDatabase,
 		Properties: properties,
@@ -43,8 +42,9 @@ func (c *Client) TestRequest(datasourceSettings *models.DatasourceSettings, prop
 		return err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode > 299 {
-		return fmt.Errorf("HTTP error: %v", resp.Status)
+
+	if resp.StatusCode/100 != 2 {
+		return fmt.Errorf("Azure HTTP %q", resp.Status)
 	}
 	return nil
 }
@@ -52,15 +52,15 @@ func (c *Client) TestRequest(datasourceSettings *models.DatasourceSettings, prop
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
-func (c *Client) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, int, string, error) {
-	var buf bytes.Buffer
-	err := jsoniter.NewEncoder(&buf).Encode(payload)
+func (c *Client) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+	buf, err := json.Marshal(payload)
 	if err != nil {
-		return nil, http.StatusInternalServerError, "", err
+		return nil, fmt.Errorf("no Azure request serial: %w", err)
 	}
-	req, err := http.NewRequest(http.MethodPost, url, &buf)
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
 	if err != nil {
-		return nil, http.StatusInternalServerError, "", err
+		return nil, fmt.Errorf("no Azure request instance: %w", err)
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
@@ -68,34 +68,29 @@ func (c *Client) KustoRequest(url string, payload models.RequestPayload, additio
 	if payload.QuerySource == "" {
 		payload.QuerySource = "unspecified"
 	}
-
 	for key, value := range additionalHeaders {
 		req.Header.Set(key, value)
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, 500, "", err
+		return nil, err
 	}
-	statusCode := resp.StatusCode
 	defer resp.Body.Close()
-	if resp.StatusCode > 299 {
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
+
+	switch {
+	case resp.StatusCode == http.StatusUnauthorized:
+		// HTTP 401 has no error body
+		return nil, fmt.Errorf("Azure HTTP %q", resp.Status)
+
+	case resp.StatusCode/100 != 2:
+		var r models.ErrorResponse
+		err := json.NewDecoder(resp.Body).Decode(&r)
 		if err != nil {
-			return nil, http.StatusInternalServerError, "", err
+			return nil, fmt.Errorf("Azure HTTP %q with malformed error response: %s", resp.Status, err)
 		}
-		bodyString := string(bodyBytes)
-		if resp.StatusCode == 401 { // 401 does not have a JSON body
-			return nil, statusCode, "", fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
-		}
-		errorData := &models.ErrorResponse{}
-		err = jsoniter.Unmarshal(bodyBytes, errorData)
-		if err != nil {
-			backend.Logger.Debug("failed to unmarshal error body from response", "error", err)
-			statusCode = http.StatusInternalServerError
-		}
-		return nil, statusCode, errorData.Error.Message, fmt.Errorf("HTTP error: %v - %v", resp.Status, bodyString)
+		return nil, fmt.Errorf("Azure HTTP %q: %q", resp.Status, r.Error.Message)
 	}
-	tr, err := models.TableFromJSON(resp.Body)
-	return tr, statusCode, "", err
+
+	return models.TableFromJSON(resp.Body)
 }

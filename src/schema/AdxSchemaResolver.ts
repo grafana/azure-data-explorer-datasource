@@ -20,37 +20,37 @@ export class AdxSchemaResolver {
 
   async getDatabases(): Promise<AdxDatabaseSchema[]> {
     const schema = await this.datasource.getSchema();
-    return Object.keys(schema.Databases).map(key => schema.Databases[key]);
+    return Object.keys(schema.Databases).map((key) => schema.Databases[key]);
   }
 
   async getTablesForDatabase(databaseName: string): Promise<AdxTableSchema[]> {
     const databases = await this.getDatabases();
-    const database = databases.find(db => db.Name === databaseName);
+    const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
       return [];
     }
-    return Object.keys(database.Tables).map(key => database.Tables[key]);
+    return Object.keys(database.Tables).map((key) => database.Tables[key]);
   }
 
   async getViewsForDatabase(databaseName: string): Promise<AdxTableSchema[]> {
     const databases = await this.getDatabases();
-    const database = databases.find(db => db.Name === databaseName);
+    const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
       return [];
     }
-    return Object.keys(database.MaterializedViews).map(key => database.MaterializedViews[key]);
+    return Object.keys(database.MaterializedViews).map((key) => database.MaterializedViews[key]);
   }
 
   async getFunctionsForDatabase(databaseName: string): Promise<AdxFunctionSchema[]> {
     const databases = await this.getDatabases();
-    const database = databases.find(db => db.Name === databaseName);
+    const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
       return [];
     }
-    return Object.keys(database.Functions).map(key => database.Functions[key]);
+    return Object.keys(database.Functions).map((key) => database.Functions[key]);
   }
 
   async getColumnsForTable(databaseName: string, tableName: string): Promise<AdxColumnSchema[]> {
@@ -69,8 +69,8 @@ export class AdxSchemaResolver {
         schema.OrderedColumns = await this.datasource.getFunctionSchema(databaseName, mapping.value);
       }
 
-      const dynamicColumns = schema.OrderedColumns.filter(column => column.CslType === 'dynamic').map(
-        column => column.Name
+      const dynamicColumns = schema.OrderedColumns.filter((column) => column.CslType === 'dynamic').map(
+        (column) => column.Name
       );
 
       const schemaByColumn = await this.datasource.getDynamicSchema(
@@ -106,17 +106,17 @@ export class AdxSchemaResolver {
 
     const name = mapping?.name ?? tableName;
 
-    const table = tables.find(t => t.Name === name);
+    const table = tables.find((t) => t.Name === name);
     if (table) {
       return table;
     }
 
-    const view = views.find(v => v.Name === name);
+    const view = views.find((v) => v.Name === name);
     if (view) {
       return view;
     }
 
-    const func = funcs.find(f => f.Name === name);
+    const func = funcs.find((f) => f.Name === name);
     if (func) {
       return {
         Name: func.Name,

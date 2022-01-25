@@ -1,6 +1,4 @@
-import { getBackendSrv } from '@grafana/runtime';
 import { AdxDataSource } from 'datasource';
-import { ResponseParser } from '../../response_parser';
 import { SchemaMappingOption, SchemaMappingType } from '../../types';
 
 export interface Schema {
