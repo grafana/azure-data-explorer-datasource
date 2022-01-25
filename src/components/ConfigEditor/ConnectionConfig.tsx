@@ -62,6 +62,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
     <FieldSet label="Connection Details">
       <InlineField label="Azure cloud" labelWidth={26} tooltip="Select an Azure Cloud." required>
         <Select
+          aria-label='Azure cloud'
           options={azureClouds}
           value={azureClouds.find((v) => v.value === jsonData.azureCloud)}
           onChange={(change: SelectableValue<AzureCloudType>) =>
@@ -137,6 +138,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
       <SecretFormField
         label="Client secret"
+        aria-label="Client secret"
         value={secureJsonData?.clientSecret || undefined}
         labelWidth={13}
         inputWidth={30}
