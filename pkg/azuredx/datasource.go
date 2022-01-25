@@ -128,7 +128,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 
 func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User) (backend.DataResponse, error) {
 	headers := map[string]string{}
-	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", qm.QuerySource, rand.Uint64())
+	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", q.QuerySource, rand.Uint64())
 	if adx.settings.EnableUserTracking {
 		if user != nil {
 			msClientRequestIDHeader += fmt.Sprintf(";%v", user.Login)
