@@ -70,7 +70,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         htmlFor="azure-cloud-type"
       >
         <Select
-          id="azure-cloud-type"
+          inputId="azure-cloud-type"
           options={azureClouds}
           value={azureClouds.find((v) => v.value === jsonData.azureCloud)}
           onChange={(change: SelectableValue<AzureCloudType>) =>
