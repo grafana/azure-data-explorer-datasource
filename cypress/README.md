@@ -8,7 +8,7 @@
 apiVersion: 1
 
 datasources:
-  - jsonData:
+  -jsonData:
     clientId:
     clusterUrl:
     tenantId:
