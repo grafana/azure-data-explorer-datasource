@@ -25,7 +25,7 @@ e2e.scenario({
     e2e()
       .readProvisions(['datasources/adx.yaml'])
       .then((ADXProvisions: ADXProvision[]) => {
-        const datasource = ADXProvisions[0].datasources[0];
+        const datasource = ADXProvisions[0].datasources[1]; // Second entry in our common provisioning file
 
         e2e.flows.addDataSource({
           name: 'e2e-azure-data-explorer-datasource',
