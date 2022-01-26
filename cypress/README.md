@@ -5,20 +5,20 @@
 2. Symlink or copy `adx.yaml` with the following layout.
 
 ```yaml
-   apiVersion: 1
-   
-   datasources:
-       jsonData:
-         clientId:
-         clusterUrl:
-         tenantId:
-       secureJsonData:
-         clientSecret:
+apiVersion: 1
+
+datasources:
+  - jsonData:
+    clientId:
+    clusterUrl:
+    tenantId:
+  secureJsonData:
+    clientSecret:
    ```
 
 3. `yarn install` and build/watch grafana-azure-data-explorer-datasource frontend
 4. Run the same version of core Grafana as the target @grafana/e2e version. Example to run v8.2.6 in docker in localhost:3000:
 ```bash
-   docker run --rm  -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-azure-data-explorer-datasource --volume "{path to project}/azure-data-explorer-datasource:/var/lib/grafana/plugins" grafana/grafana:8.2.6
+docker run --rm  -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-azure-data-explorer-datasource --volume "{path to project}/azure-data-explorer-datasource:/var/lib/grafana/plugins" grafana/grafana:8.2.6
 ```
 5. Run one of the e2e scripts in package.json, e.g. `yarn run e2e:open`
