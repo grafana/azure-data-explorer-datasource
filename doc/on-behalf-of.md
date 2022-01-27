@@ -1,5 +1,6 @@
 # On-Behalf-Of Authorization
 
+⚠️ Only compatible with Grafana 8.3.4 or later above.
 ⚠️ Grafana alert-rules do not work with on-behalf-of authorization.
 
 
