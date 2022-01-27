@@ -1,13 +1,11 @@
 package client
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 	"github.com/stretchr/testify/require"
 )
@@ -86,7 +84,7 @@ func TestClient(t *testing.T) {
 		}
 		headers := map[string]string{
 			"x-ms-user-id":           testUserLogin,
-			"x-ms-client-request-id": fmt.Sprintf("KGC.%v;%v", "schema", uuid.Must(uuid.NewRandom()).String()),
+			"x-ms-client-request-id": "KGC.schema;deadbeef",
 		}
 
 		client := New(server.Client())

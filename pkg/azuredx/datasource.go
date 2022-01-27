@@ -2,9 +2,9 @@ package azuredx
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/azureauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -136,7 +136,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 
 func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User, authorization string) (backend.DataResponse, error) {
 	headers := map[string]string{"Authorization": authorization}
-	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%s", q.QuerySource, uuid.Must(uuid.NewRandom()).String())
+	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", q.QuerySource, rand.Uint64())
 	if adx.settings.EnableUserTracking {
 		if user != nil {
 			msClientRequestIDHeader += fmt.Sprintf(";%v", user.Login)
