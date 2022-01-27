@@ -16,3 +16,7 @@ In addition to the “Microsoft Graph” `User.Read`, a special “Azure Data Ex
 ## Monitoring
 
 Prometheus metrics are exposed on `/api/plugins/grafana-azure-data-explorer-datasource/metrics`. The `grafana_plugin_adx_obo_latency_seconds` histogram counts the number of requests, including the roundtrip times.
+
+## Troubleshooting
+
+Authorization errors are not propagated to the end user for security reasons. The Grafana logs will provide context instead.
