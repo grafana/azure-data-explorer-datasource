@@ -1,5 +1,6 @@
 import { e2e } from '@grafana/e2e';
 import { selectors } from '../../src/test/selectors';
+import TEST_DASHBOARD from '../dashboards/example.json';
 
 const e2eSelectors = e2e.getSelectors(selectors.components);
 
@@ -19,8 +20,8 @@ type ADXProvision = {
 };
 
 e2e.scenario({
-  describeName: 'Smoke tests',
-  itName: 'Adds ADX datasource',
+  describeName: 'Add ADX datasource',
+  itName: 'fills out datasource connection configuration',
   scenario: () => {
     e2e()
       .readProvisions(['datasources/adx.yaml'])
@@ -40,5 +41,13 @@ e2e.scenario({
           expectedAlertMessage: 'Success',
         });
       });
+  },
+});
+
+e2e.scenario({
+  describeName: 'Import dashboard',
+  itName: 'adds JSON',
+  scenario: () => {
+    e2e.flows.importDashboard(TEST_DASHBOARD);
   },
 });
