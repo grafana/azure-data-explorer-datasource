@@ -10,7 +10,7 @@ Configure Grafana to use OAuth2 with Azure Active Directory as [documented](http
 
 ID tokens must be enabled with a checkbox found on the [Azure portal](https://portal.azure.com/) under “App Registrations” → the respective application → “Manage” → “Authentication”.
 
-In addition to the “Microsoft Graph” `User.Read`, a special “Azure Data Explorer” `user_consent` permission must be enabled on the [Azure portal](https://portal.azure.com/)  under “App Registrations” → the respective application → “Manage” → “API permissions”.
+In addition to the “Microsoft Graph” `User.Read`, a special “Azure Data Explorer” `user_impersonation` permission must be enabled on the [Azure portal](https://portal.azure.com/)  under “App Registrations” → the respective application → “Manage” → “API permissions”. ⚠️ “Admin consent” is required.
 
 
 ## Monitoring
