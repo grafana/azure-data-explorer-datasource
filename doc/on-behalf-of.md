@@ -1,5 +1,33 @@
 # On-Behalf-Of Authorization
 
+The feature can be enabled with the checkbox from the plugin configuration screen.
+⚠️ When provisioning, you also need to set `oauthPassThru` to `true`, such as the following example has done.
+
+```yaml
+apiVersion: 1
+datasources:
+  - name: Azure Data Explorer
+    type: grafana-azure-data-explorer-datasource
+    access: proxy
+    basicAuth: false
+    editable: true
+    jsonData:
+      onBehalfOf: true
+      oauthPassThru: true
+      clientId: <your client UUID>
+      clusterUrl: <your cluster URL>
+      tenantId: <your tenant UUID>
+      tlsAuth: false
+      tlsAuthWithCACert: false
+      defaultDatabase: <your default database>
+    secureJsonData:
+      clientSecret: <your client secret>
+      tlsCACert: ''
+      tlsClientCert: ''
+      tlsClientKey: ''
+    version: 1
+```
+
 ⚠️ Only compatible with Grafana 8.3.4 or later above.
 ⚠️ Grafana alert-rules do not work with on-behalf-of authorization.
 

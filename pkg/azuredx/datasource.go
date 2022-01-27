@@ -1,6 +1,7 @@
 package azuredx
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -38,6 +39,10 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	err := datasourceSettings.Load(settings)
 	if err != nil {
 		return nil, err
+	}
+	// TODO(pascaldekloe): We need a way to set oauthPassThru in the plugin instead.
+	if datasourceSettings.OnBehalfOf && !datasourceSettings.OAuthPassThru {
+		return nil, errors.New("Azure datasource provisioned with onBehalfOf: true, and no oauthPassThru: true")
 	}
 	adx.settings = datasourceSettings
 

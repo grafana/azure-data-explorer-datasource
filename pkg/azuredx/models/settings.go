@@ -21,6 +21,7 @@ type DatasourceSettings struct {
 	DynamicCaching     bool   `json:"dynamicCaching"`
 	EnableUserTracking bool   `json:"enableUserTracking"`
 	OnBehalfOf         bool   `json:"onBehalfOf"`
+	OAuthPassThru      bool   `json:"oauthPassThru"`
 	AzureCloud         string `json:"azureCloud"`
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
