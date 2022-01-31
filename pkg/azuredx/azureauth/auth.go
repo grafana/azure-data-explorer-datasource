@@ -24,7 +24,6 @@ import (
 // The configuration names must be kept in synch with the Azure cloud options in
 // ConfigEditor.tsx.
 const (
-	azurePublic       = "azuremonitor"
 	azureChina        = "chinaazuremonitor"
 	azureUSGovernment = "govazuremonitor"
 )
