@@ -22,12 +22,12 @@
   "fiscalYearStartMonth": 0,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
+  "id": null,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": null,
+      "datasource": "e2e-azure-data-explorer-datasource",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -113,9 +113,9 @@
             }
           },
           "pluginVersion": "3.6.1",
-          "query": "PerfTest\n| where $__timeFilter(_Timestamp_)\n| order by _Timestamp_ asc",
-          "querySource": "visual",
-          "rawMode": false,
+          "query": "PerfTest\n| limit 10\n| order by _Timestamp_ asc",
+          "querySource": "raw",
+          "rawMode": true,
           "refId": "A",
           "resultFormat": "time_series"
         }
@@ -124,7 +124,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": null,
+      "datasource": "e2e-azure-data-explorer-datasource",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -180,7 +180,7 @@
             }
           },
           "pluginVersion": "3.6.1",
-          "query": "PerfTest\n",
+          "query": "PerfTest\n| limit 10\n| order by _Timestamp_ asc",
           "querySource": "raw",
           "rawMode": true,
           "refId": "A",
@@ -206,5 +206,5 @@
   "timezone": "",
   "title": "Example Dashboard",
   "uid": "EYtcnAx7k",
-  "version": 3
+  "version": 1
 }
