@@ -9,7 +9,6 @@ import (
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/azureauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/tokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
@@ -28,8 +27,6 @@ type AzureDataExplorer struct {
 	settings           *models.DatasourceSettings
 	serviceCredentials *azureauth.ServiceCredentials
 }
-
-var tokenCache = tokenprovider.NewConcurrentTokenCache()
 
 const AdxScope = "https://kusto.kusto.windows.net/.default"
 
@@ -59,18 +56,16 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 	adx.client = client.New(httpClient)
 
-	adx.serviceCredentials = azureauth.NewServiceCredentials(datasourceSettings, httpClient,
-		tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"}).GetAccessToken)
+	adx.serviceCredentials, err = azureauth.NewServiceCredentials(datasourceSettings, httpClient)
+	if err != nil {
+		return nil, err
+	}
 
 	mux := http.NewServeMux()
 	adx.registerRoutes(mux)
 	adx.CallResourceHandler = httpadapter.New(mux)
 
 	return adx, nil
-}
-
-func (adx *AzureDataExplorer) Dispose() {
-	tokenCache.Purge()
 }
 
 // QueryData is the primary method called by grafana-server

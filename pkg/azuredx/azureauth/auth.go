@@ -13,12 +13,33 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/tokenprovider"
 )
+
+// The configuration names must be kept in synch with the Azure cloud options in
+// ConfigEditor.tsx.
+const (
+	azurePublic       = "azuremonitor"
+	azureChina        = "chinaazuremonitor"
+	azureUSGovernment = "govazuremonitor"
+)
+
+// AuthorityBaseURL returns the OAuth2 root, including tailing slash.
+func authorityBaseURL(cloudName string) string {
+	switch cloudName {
+	case azureChina:
+		return azidentity.AzureChina
+	case azureUSGovernment:
+		return azidentity.AzureGovernment
+	default:
+		return azidentity.AzurePublicCloud
+	}
+}
 
 var onBehalfOfLatencySeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Namespace: "grafana",
@@ -37,24 +58,37 @@ type ServiceCredentials struct {
 	models.DatasourceSettings
 	// HTTPDo is the http.Client Do method.
 	HTTPDo func(req *http.Request) (*http.Response, error)
-	// ServicePrincipalToken resolves service credentials.
-	ServicePrincipalToken func(context.Context) (token string, err error)
+	// ServicePrincipalToken is the azidentity.ClientSecretCredential GetToken method.
+	ServicePrincipalToken func(ctx context.Context, opts azcore.TokenRequestOptions) (*azcore.AccessToken, error)
 	tokenCache            *cache
 }
 
-func NewServiceCredentials(settings *models.DatasourceSettings, client *http.Client, servicePrincipalToken func(context.Context) (token string, err error)) *ServiceCredentials {
+func NewServiceCredentials(settings *models.DatasourceSettings, client *http.Client) (*ServiceCredentials, error) {
+	options := &azidentity.ClientSecretCredentialOptions{
+		AuthorityHost: authorityBaseURL(settings.AzureCloud),
+	}
+	clientSecret, err := azidentity.NewClientSecretCredential(settings.TenantID, settings.ClientID, settings.Secret, options)
+	if err != nil {
+		return nil, fmt.Errorf("unusable client secret: %w", err)
+	}
+
 	return &ServiceCredentials{
 		DatasourceSettings:    *settings,
 		HTTPDo:                client.Do,
-		ServicePrincipalToken: servicePrincipalToken,
+		ServicePrincipalToken: clientSecret.GetToken,
 		tokenCache:            newCache(),
-	}
+	}, nil
 }
 
 // ServicePrincipalAuthorization returns an HTTP Authorization-header value which
 // represents the service principal.
 func (c *ServiceCredentials) ServicePrincipalAuthorization(ctx context.Context) (string, error) {
-	token, err := c.ServicePrincipalToken(ctx)
+	token, err := c.tokenCache.getOrSet(ctx, "", func(ctx context.Context, _ string) (token string, expire time.Time, err error) {
+		r, err := c.ServicePrincipalToken(ctx, azcore.TokenRequestOptions{
+			Scopes: []string{"https://kusto.kusto.windows.net/.default"},
+		})
+		return r.Token, r.ExpiresOn, err
+	})
 	if err != nil {
 		return "", fmt.Errorf("service principal token unavailable: %w", err)
 	}
@@ -122,7 +156,7 @@ func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (
 	reqBody := strings.NewReader(params.Encode())
 
 	// https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints
-	tokenURL := fmt.Sprintf("https://%s%s/oauth2/v2.0/token", tokenprovider.AuthorityBaseURL(c.AzureCloud), url.PathEscape(c.TenantID))
+	tokenURL := fmt.Sprintf("https://%s%s/oauth2/v2.0/token", authorityBaseURL(c.AzureCloud), url.PathEscape(c.TenantID))
 	req, err := http.NewRequestWithContext(ctx, "POST", tokenURL, reqBody)
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("on-behalf-of grant request <%q> instantiation: %w", tokenURL, err)
