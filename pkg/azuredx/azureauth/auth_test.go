@@ -86,6 +86,7 @@ func TestQueryDataAuthorization(t *testing.T) {
 		c := &ServiceCredentials{HTTPDo: g.HTTPDoMock}
 		c.TenantID = "0AF0528A-F473-4E0C-891F-3FF8ACDC4E5F"
 		c.OnBehalfOf = true
+		c.tokenCache = newCache()
 		auth, err := c.QueryDataAuthorization(context.Background(), &req)
 		switch {
 		case err != nil:

@@ -39,6 +39,16 @@ type ServiceCredentials struct {
 	HTTPDo func(req *http.Request) (*http.Response, error)
 	// ServicePrincipalToken resolves service credentials.
 	ServicePrincipalToken func(context.Context) (token string, err error)
+	tokenCache            *cache
+}
+
+func NewServiceCredentials(settings *models.DatasourceSettings, client *http.Client, servicePrincipalToken func(context.Context) (token string, err error)) *ServiceCredentials {
+	return &ServiceCredentials{
+		DatasourceSettings:    *settings,
+		HTTPDo:                client.Do,
+		ServicePrincipalToken: servicePrincipalToken,
+		tokenCache:            newCache(),
+	}
 }
 
 // ServicePrincipalAuthorization returns an HTTP Authorization-header value which
@@ -87,7 +97,7 @@ func (c *ServiceCredentials) queryDataOnBehalfOf(ctx context.Context, req *backe
 		return "", errors.New("ID token absent for data request")
 	}
 
-	onBehalfOfToken, err := c.onBehalfOf(ctx, userToken)
+	onBehalfOfToken, err := c.tokenCache.getOrSet(ctx, userToken, c.onBehalfOf)
 	if err != nil {
 		backend.Logger.Error(err.Error(), "user", user.Login)
 		// Don't leak any context to the end-user.
@@ -101,7 +111,7 @@ func (c *ServiceCredentials) queryDataOnBehalfOf(ctx context.Context, req *backe
 // OnBehalfOf resolves a token which impersonates the subject of userToken.
 // UserToken has to be an ID token. See the following link for more detail.
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow
-func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (onBehalfOfToken string, err error) {
+func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (onBehalfOfToken string, expire time.Time, err error) {
 	params := make(url.Values)
 	params.Set("client_id", c.ClientID)
 	params.Set("client_secret", c.Secret)
@@ -115,7 +125,7 @@ func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (
 	tokenURL := fmt.Sprintf("https://%s%s/oauth2/v2.0/token", tokenprovider.AuthorityBaseURL(c.AzureCloud), url.PathEscape(c.TenantID))
 	req, err := http.NewRequestWithContext(ctx, "POST", tokenURL, reqBody)
 	if err != nil {
-		return "", fmt.Errorf("on-behalf-of grant request <%q> instantiation: %w", tokenURL, err)
+		return "", time.Time{}, fmt.Errorf("on-behalf-of grant request <%q> instantiation: %w", tokenURL, err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
@@ -124,11 +134,11 @@ func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (
 	reqStart := time.Now()
 	resp, err := c.HTTPDo(req)
 	if err != nil {
-		return "", fmt.Errorf("on-behalf-of grant POST <%q>: %w", tokenURL, err)
+		return "", time.Time{}, fmt.Errorf("on-behalf-of grant POST <%q>: %w", tokenURL, err)
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("on-behalf-of grant POST <%q> response: %w", tokenURL, err)
+		return "", time.Time{}, fmt.Errorf("on-behalf-of grant POST <%q> response: %w", tokenURL, err)
 	}
 	onBehalfOfLatencySeconds.WithLabelValues(strconv.Itoa(resp.StatusCode)).Observe(float64(time.Since(reqStart)) / float64(time.Second))
 	if resp.StatusCode/100 != 2 {
@@ -136,18 +146,18 @@ func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (
 			Desc string `json:"error_description"`
 		}
 		_ = json.Unmarshal(body, &deny)
-		return "", fmt.Errorf("on-behalf-of grant POST <%q> status %q: %q", tokenURL, resp.Status, deny.Desc)
+		return "", time.Time{}, fmt.Errorf("on-behalf-of grant POST <%q> status %q: %q", tokenURL, resp.Status, deny.Desc)
 	}
 
 	// Parse Essentials
 	var grant struct {
-		Token string `json:"access_token"`
+		Token  string `json:"access_token"`
+		Expire int    `json:"expires_in"`
 	}
 	if err := json.Unmarshal(body, &grant); err != nil {
-		return "", fmt.Errorf("malformed response from on-behalf-of grant POST <%q>: %w", tokenURL, err)
+		return "", time.Time{}, fmt.Errorf("malformed response from on-behalf-of grant POST <%q>: %w", tokenURL, err)
 	}
-	if grant.Token == "" {
-		return "", fmt.Errorf("missing access_token in on-behalf-of grant response <%q>", tokenURL)
-	}
-	return grant.Token, nil
+
+	expire = time.Now().Add(time.Duration(grant.Expire) * time.Second)
+	return grant.Token, expire, nil
 }

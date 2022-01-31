@@ -8,8 +8,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 	"github.com/stretchr/testify/require"
+
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/azureauth"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
 
 func TestResourceHandler(t *testing.T) {
@@ -37,9 +39,10 @@ func TestResourceHandler(t *testing.T) {
 		setup()
 		adx.client = &failingClient{}
 		adx.settings = &models.DatasourceSettings{ClusterURL: "some-baseurl"}
-		adx.serviceCredentials.ServicePrincipalToken = func(context.Context) (token string, err error) {
-			return "test-token", nil
-		}
+		adx.serviceCredentials = azureauth.NewServiceCredentials(adx.settings, http.DefaultClient,
+			func(context.Context) (token string, err error) {
+				return "test-token", nil
+			})
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusInternalServerError, res.Code)
 		httpError := models.HttpError{}
@@ -54,9 +57,10 @@ func TestResourceHandler(t *testing.T) {
 		setup()
 		adx.client = &workingClient{}
 		adx.settings = &models.DatasourceSettings{ClusterURL: "some-baseurl"}
-		adx.serviceCredentials.ServicePrincipalToken = func(context.Context) (token string, err error) {
-			return "test-token", nil
-		}
+		adx.serviceCredentials = azureauth.NewServiceCredentials(adx.settings, http.DefaultClient,
+			func(context.Context) (token string, err error) {
+				return "test-token", nil
+			})
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusOK, res.Code)
 		tableResponse := models.TableResponse{}

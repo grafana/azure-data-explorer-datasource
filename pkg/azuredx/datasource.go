@@ -26,7 +26,7 @@ type AzureDataExplorer struct {
 	backend.CallResourceHandler
 	client             client.AdxClient
 	settings           *models.DatasourceSettings
-	serviceCredentials azureauth.ServiceCredentials
+	serviceCredentials *azureauth.ServiceCredentials
 }
 
 var tokenCache = tokenprovider.NewConcurrentTokenCache()
@@ -59,11 +59,8 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 	adx.client = client.New(httpClient)
 
-	adx.serviceCredentials = azureauth.ServiceCredentials{
-		DatasourceSettings:    *datasourceSettings,
-		HTTPDo:                httpClient.Do,
-		ServicePrincipalToken: tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"}).GetAccessToken,
-	}
+	adx.serviceCredentials = azureauth.NewServiceCredentials(datasourceSettings, httpClient,
+		tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"}).GetAccessToken)
 
 	mux := http.NewServeMux()
 	adx.registerRoutes(mux)
