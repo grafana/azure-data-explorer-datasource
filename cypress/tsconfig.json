@@ -5,6 +5,7 @@
     "types": [
       "cypress",
       "@grafana/e2e/cypress/support"
-    ]
+    ],
+    "resolveJsonModule": true
   }
 }
