@@ -1,7 +1,9 @@
 # On-Behalf-Of Authorization
 
+⚠️ Only compatible with Grafana 8.3.4 or later above.
+
 The feature can be enabled with the checkbox from the plugin configuration screen.
-⚠️ When provisioning, you also need to set `oauthPassThru` to `true`, such as the following example has done.
+When provisioning, you also need to set `oauthPassThru` to `true`, such as the following example has done.
 
 ```yaml
 apiVersion: 1
@@ -28,17 +30,18 @@ datasources:
     version: 1
 ```
 
-⚠️ Only compatible with Grafana 8.3.4 or later above.
-⚠️ Grafana alert-rules do not work with on-behalf-of authorization.
+**note***: Grafana alert-rules do not work with on-behalf-of authorization.
 
 
 ## Setup
 
-Configure Grafana to use OAuth2 with Azure Active Directory as [documented](https://grafana.com/docs/grafana/latest/auth/azuread/). The `[auth.azuread]` `scopes` (or `$GF_AUTH_AZUREAD_SCOPES`) must contain “openid email profile”.
+1. Configure Grafana to use OAuth2 with Azure Active Directory as [documented](https://grafana.com/docs/grafana/latest/auth/azuread/). The `[auth.azuread]` `scopes` (or `$GF_AUTH_AZUREAD_SCOPES`) must contain “openid email profile”.
 
-ID tokens must be enabled with a checkbox found on the [Azure portal](https://portal.azure.com/) under “App Registrations” → the respective application → “Manage” → “Authentication”.
+2. ID tokens must be enabled with a checkbox found on the [Azure portal](https://portal.azure.com/) under “App Registrations” → the respective application → “Manage” → “Authentication”.
 
-In addition to the “Microsoft Graph” `User.Read`, a special “Azure Data Explorer” `user_impersonation` permission must be enabled on the [Azure portal](https://portal.azure.com/)  under “App Registrations” → the respective application → “Manage” → “API permissions”. ⚠️ “Admin consent” is required.
+3. In addition to the “Microsoft Graph” `User.Read`, a special “Azure Data Explorer” `user_impersonation` permission must be enabled on the [Azure portal](https://portal.azure.com/)  under “App Registrations” → the respective application → “Manage” → “API permissions”.
+
+4. Enable “Admin consent” under “App Registrations” → the respective application → “Security” → “Permissions”.
 
 
 ## Monitoring
