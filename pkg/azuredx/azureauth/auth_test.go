@@ -33,7 +33,7 @@ func TestQueryDataAuthorization(t *testing.T) {
 		// happy flow
 		0: {Want: "Bearer test.exchange.token", WantErr: "",
 			HTTPDoMock: func(req *http.Request) (*http.Response, error) {
-				const wantURL = "https://https//login.microsoftonline.com/0AF0528A-F473-4E0C-891F-3FF8ACDC4E5F/oauth2/v2.0/token"
+				const wantURL = "https://login.microsoftonline.com/0AF0528A-F473-4E0C-891F-3FF8ACDC4E5F/oauth2/v2.0/token"
 				if s := req.URL.String(); s != wantURL {
 					return nil, fmt.Errorf("got URL %q, want %q", s, wantURL)
 				}

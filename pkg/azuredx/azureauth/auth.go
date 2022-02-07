@@ -155,7 +155,7 @@ func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (
 	reqBody := strings.NewReader(params.Encode())
 
 	// https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints
-	tokenURL := fmt.Sprintf("https://%s%s/oauth2/v2.0/token", authorityBaseURL(c.AzureCloud), url.PathEscape(c.TenantID))
+	tokenURL := fmt.Sprintf("%s%s/oauth2/v2.0/token", authorityBaseURL(c.AzureCloud), url.PathEscape(c.TenantID))
 	req, err := http.NewRequestWithContext(ctx, "POST", tokenURL, reqBody)
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("on-behalf-of grant request <%q> instantiation: %w", tokenURL, err)
