@@ -26,7 +26,11 @@ it('renders the component', async () => {
 it('forward expressions', async () => {
   const onChange = jest.fn();
   const children = jest.fn((props) => <input data-testid="foo" onChange={props.onChange} />);
-  render(<QueryEditorRepeater {...props} onChange={onChange} children={children} />);
+  render(
+    <QueryEditorRepeater {...props} onChange={onChange}>
+      {children}
+    </QueryEditorRepeater>
+  );
 
   const c = await screen.findByTestId('foo');
   fireEvent.change(c, { target: { value: 'bar' } });
