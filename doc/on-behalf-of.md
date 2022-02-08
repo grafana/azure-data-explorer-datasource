@@ -32,6 +32,8 @@ datasources:
     version: 1
 ```
 
+**note***: Private clouds (like "chinaazuremonitor" or "govazuremonitor") are unsupported with on-behalf-of authorization. They may, or may not work.
+
 **note***: It is not recommended to setup alerts when the data source is configured to use on-behalf-of authorization. This is because the alert rule will no longer work as soon as the user that created the rule is logged out from Grafana.
 
 
