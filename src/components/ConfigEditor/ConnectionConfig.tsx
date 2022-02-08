@@ -187,6 +187,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
           value={jsonData.onBehalfOf}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('onBehalfOf', ev.target.checked)}
         />
+        <span>⚠️ This feature is in beta</span>
       </InlineField>
     </FieldSet>
   );

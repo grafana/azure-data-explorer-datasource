@@ -1,5 +1,7 @@
 # On-Behalf-Of Authorization
 
+**note***: The feature is in beta, which means changes to the API and the user experience might occur.
+
 ⚠️ Only compatible with Grafana 8.3.4 or later above.
 
 The feature can be enabled with the checkbox from the plugin configuration screen.
