@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
-import { QueryEditorExpression, QueryEditorArrayExpression } from '../expressions';
+
+import { QueryEditorArrayExpression, QueryEditorExpression } from '../expressions';
 
 interface Props {
   id: string;
@@ -35,7 +36,7 @@ export const QueryEditorRepeater: React.FC<Props> = (props) => {
         if ('expressions' in v) {
           return (v as QueryEditorArrayExpression).expressions.length > 0;
         }
-        return false;
+        return true;
       });
 
       propsOnChange({
