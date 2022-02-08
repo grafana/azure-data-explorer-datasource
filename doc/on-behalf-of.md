@@ -32,7 +32,7 @@ datasources:
     version: 1
 ```
 
-**note***: Grafana alert-rules do not work with on-behalf-of authorization.
+**note***: It is not recommended to setup alerts when the data source is configured to use on-behalf-of authorization. This is because the alert rule will no longer work as soon as the user that created the rule is logged out from Grafana.
 
 
 ## Setup
