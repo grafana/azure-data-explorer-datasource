@@ -1,5 +1,5 @@
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
-import { FieldSet, InlineField, InlineSwitch, Input, LegacyForms, Select } from '@grafana/ui';
+import { FieldSet, HorizontalGroup, InlineField, InlineSwitch, Input, LegacyForms, Select } from '@grafana/ui';
 import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AzureCloudType } from 'types';
 import { selectors } from 'test/selectors';
@@ -182,12 +182,14 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
           </>
         }
       >
-        <InlineSwitch
-          id="adx-on-behalf-of"
-          value={jsonData.onBehalfOf}
-          onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('onBehalfOf', ev.target.checked)}
-        />
-        <span>⚠️ This feature is in beta</span>
+        <HorizontalGroup>
+          <InlineSwitch
+            id="adx-on-behalf-of"
+            value={jsonData.onBehalfOf}
+            onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('onBehalfOf', ev.target.checked)}
+          />
+          <span>⚠️ This feature is in beta</span>
+        </HorizontalGroup>
       </InlineField>
     </FieldSet>
   );
