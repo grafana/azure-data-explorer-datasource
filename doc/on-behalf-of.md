@@ -46,6 +46,7 @@ datasources:
 3. In addition to the “Microsoft Graph” `User.Read`, a special “Azure Data Explorer” `user_impersonation` permission must be enabled on the [Azure portal](https://portal.azure.com/)  under “App Registrations” → the respective application → “Manage” → “API permissions”.
 
 4. Enable “Admin consent” under “App Registrations” → the respective application → “Security” → “Permissions”.
+Enabling “Admin consent” will grant consent on behalf of all users in the current tenant, ensuring the users will not be required to consent when using the application.
 
 
 ## Monitoring
