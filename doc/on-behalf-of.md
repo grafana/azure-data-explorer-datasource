@@ -1,11 +1,11 @@
 # On-Behalf-Of Authorization
 
-**note***: The feature is in beta, which means changes to the API and the user experience might occur.
+**Note***: The feature is in beta, which means changes to the API and the user experience might occur.
 
-⚠️ Only compatible with Grafana 8.3.4 or later above.
+⚠️ Only compatible with Grafana 8.3.4 or above.
 
-The feature can be enabled with the checkbox from the plugin configuration screen.
-When provisioning, you also need to set `oauthPassThru` to `true`, such as the following example has done.
+You can enable this feature by selecting the checkbox in the plugin configuration screen.
+When provisioning, set the `oauthPassThru` property to `true` as shown in the following example.
 
 ```yaml
 apiVersion: 1
@@ -32,9 +32,9 @@ datasources:
     version: 1
 ```
 
-**note***: Private clouds (like "chinaazuremonitor" or "govazuremonitor") are unsupported with on-behalf-of authorization. They may, or may not work.
+We do not support on-behalf-of authorization for private clouds (like "chinaazuremonitor" or "govazuremonitor") at this time.
 
-**note***: It is not recommended to setup alerts when the data source is configured to use on-behalf-of authorization. This is because the alert rule will no longer work as soon as the user that created the rule is logged out from Grafana.
+**Note:***: Do not set up alerts when your data source is configured to use the on-behalf-of authorization. Alert rules will not work once the user who created the rule logs off from Grafana. 
 
 
 ## Setup
