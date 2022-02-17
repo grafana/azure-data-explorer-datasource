@@ -10,6 +10,7 @@ require (
 	github.com/json-iterator/go v1.1.11
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
+	github.com/prometheus/client_golang v1.10.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/xorcare/pointer v1.1.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
