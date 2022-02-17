@@ -1,5 +1,13 @@
 # Change Log
 
+## [3.7.0-beta1]
+
+- Feature: Add On-Behalf-Of Token Authorization
+- Bugfix: Eliminate Client ID Panic
+- Bugfix: Append azure error to query unsuccessful message
+- Bugfix: Fix macro regex on columns with hyphens
+- Internal: Update plugin dependencies
+
 ## [3.6.1]
 
 - Reverted change made in 3.6.0 and reuse the previous code editor until we fix the related issues.
