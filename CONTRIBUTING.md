@@ -53,16 +53,4 @@ You need to have commit rights to the GitHub repository to publish a release.
 1. Update the version number in the `package.json` file.
 2. Update the `CHANGELOG.md` with the changes contained in the release.
 3. Commit the changes to master and push to GitHub.
-4. Create a tag locally that follows the convention v(major).(minor).(patch). For example:
-
-   ```bash
-   git tag v3.3.0
-   ```
-
-5. Push the new tag to GitHub
-
-   ```bash
-   git push origin master --tags
-   ```
-
-6. Follow the Drone release process that you can find [here](https://github.com/grafana/integrations-team/wiki/Plugin-Release-Process#drone-release-process)
+4. Follow the Drone release process that you can find [here](https://github.com/grafana/integrations-team/wiki/Plugin-Release-Process#drone-release-process)
