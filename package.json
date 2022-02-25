@@ -5,6 +5,8 @@
   "scripts": {
     "build": "grafana-toolkit plugin:build",
     "test": "jest --notify --watch",
+    "test:coverage": "jest --coverage",
+    "test:coverage:changes": "jest --coverage --changedSince=origin/master",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch",
     "sign": "grafana-toolkit plugin:sign",
