@@ -1,5 +1,9 @@
 # Change Log
 
+## [3.7.0]
+
+- Chore: Added test coverage script
+
 ## [3.7.0-beta1]
 
 - Feature: Add On-Behalf-Of Token Authorization
