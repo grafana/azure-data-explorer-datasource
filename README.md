@@ -13,7 +13,7 @@ This plugin requires Grafana 7.1.0 or newer as of version 3.0.0. Plugin versions
 If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can sign up for one [here](https://grafana.com/cloud/grafana).
 
 1. Click on the `Install Now` button on the [Azure Data Explorer page on Grafana.com](https://grafana.com/plugins/grafana-azure-data-explorer-datasource/?tab=installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
-   ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/grafana_cloud_install.png)
+   ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/grafana_cloud_install.png)
 
 2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Data Explorer datasource will be installed.
 

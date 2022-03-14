@@ -52,5 +52,5 @@ You need to have commit rights to the GitHub repository to publish a release.
 
 1. Update the version number in the `package.json` file.
 2. Update the `CHANGELOG.md` with the changes contained in the release.
-3. Commit the changes to master and push to GitHub.
+3. Commit the changes to main and push to GitHub.
 4. Follow the Drone release process that you can find [here](https://github.com/grafana/integrations-team/wiki/Plugin-Release-Process#drone-release-process)
