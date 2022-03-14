@@ -1,5 +1,9 @@
 # Change Log
 
+## [3.7.1]
+
+- Bugfix: Fix scope for national clouds
+
 ## [3.7.0]
 
 - Chore: Added test coverage script
