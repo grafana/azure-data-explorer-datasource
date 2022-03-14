@@ -60,6 +60,7 @@ type ServiceCredentials struct {
 	// ServicePrincipalToken is the azidentity.ClientSecretCredential GetToken method.
 	ServicePrincipalToken func(ctx context.Context, opts azcore.TokenRequestOptions) (*azcore.AccessToken, error)
 	tokenCache            *cache
+	scope                 string
 }
 
 func NewServiceCredentials(settings *models.DatasourceSettings, client *http.Client) (*ServiceCredentials, error) {
@@ -76,6 +77,7 @@ func NewServiceCredentials(settings *models.DatasourceSettings, client *http.Cli
 		HTTPDo:                client.Do,
 		ServicePrincipalToken: clientSecret.GetToken,
 		tokenCache:            newCache(),
+		scope:                 getCloudScope(settings.AzureCloud, settings.ClusterURL),
 	}, nil
 }
 
@@ -84,9 +86,12 @@ func NewServiceCredentials(settings *models.DatasourceSettings, client *http.Cli
 func (c *ServiceCredentials) ServicePrincipalAuthorization(ctx context.Context) (string, error) {
 	token, err := c.tokenCache.getOrSet(ctx, "", func(ctx context.Context, _ string) (token string, expire time.Time, err error) {
 		r, err := c.ServicePrincipalToken(ctx, azcore.TokenRequestOptions{
-			Scopes: []string{"https://kusto.kusto.windows.net/.default"},
+			Scopes: []string{c.scope},
 		})
-		return r.Token, r.ExpiresOn, err
+		if err != nil {
+			return "", time.Time{}, err
+		}
+		return r.Token, r.ExpiresOn, nil
 	})
 	if err != nil {
 		return "", fmt.Errorf("service principal token unavailable: %w", err)
@@ -111,6 +116,17 @@ func (c *ServiceCredentials) QueryDataAuthorization(ctx context.Context, req *ba
 		backend.Logger.Debug("using service principal token for data request")
 		return c.ServicePrincipalAuthorization(ctx)
 	}
+}
+
+func getCloudScope(cloudName string, clusterUrl string) string {
+	switch cloudName {
+	case azureChina:
+		return "https://kusto.kusto.chinacloudapi.cn/.default"
+	case azureUSGovernment:
+		return clusterUrl + "/.default"
+	}
+
+	return "https://kusto.kusto.windows.net/.default"
 }
 
 func (c *ServiceCredentials) queryDataOnBehalfOf(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
