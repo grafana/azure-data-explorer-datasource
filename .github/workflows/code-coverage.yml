@@ -1,0 +1,7 @@
+name: Code Coverage
+on:
+  pull_request:
+    branches-ignore: [dependabot/**]
+jobs:
+  workflow-call:
+    uses: grafana/code-coverage/.github/workflows/code-coverage.yml@v0.1.0
