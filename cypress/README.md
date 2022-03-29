@@ -39,3 +39,7 @@ docker run --rm  -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSI
 
 ### 5. Run the e2e tests
 - Run one of the e2e scripts in package.json, e.g. `yarn run e2e:open`
+
+## Troubleshooting
+
+If you run into issues while following these steps, and especially if you already had the plugin installed and built from before, try removing the `node_modules` and `dist` folder and repeating steps 2 and 3. 
