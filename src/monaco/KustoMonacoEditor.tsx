@@ -11,7 +11,6 @@ import React from 'react';
 import { AdxSchema } from '../types';
 import KustoCodeEditor from './kusto_code_editor';
 
-
 interface Props {
   content: string;
   defaultTimeField: string;
