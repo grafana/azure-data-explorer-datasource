@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import { SelectableValue } from '@grafana/data';
 import { InlineFormLabel, Select, stylesFactory } from '@grafana/ui';
+import React, { useCallback } from 'react';
 
 interface Props {
   format: string;

@@ -1,31 +1,32 @@
-import React, { useMemo, useCallback } from 'react';
-import { useAsync } from 'react-use';
-import { css } from 'emotion';
-import { KustoQuery, AdxSchema, AdxColumnSchema, defaultQuery } from '../types';
-import { columnsToDefinition } from '../schema/mapper';
+import { css } from '@emotion/css';
+import { SelectableValue } from '@grafana/data';
+import { getTemplateSrv } from '@grafana/runtime';
+import { stylesFactory, TextArea } from '@grafana/ui';
 import {
-  QueryEditorExpressionType,
-  QueryEditorPropertyExpression,
-  QueryEditorExpression,
   QueryEditorArrayExpression,
+  QueryEditorExpression,
+  QueryEditorExpressionType,
   QueryEditorOperatorExpression,
+  QueryEditorPropertyExpression,
 } from 'editor/expressions';
-import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
-import {
-  KustoPropertyEditorSection,
-  KustoWhereEditorSection,
-  KustoValueColumnEditorSection,
-  KustoGroupByEditorSection,
-} from './VisualQueryEditorSections';
+import React, { useCallback, useMemo } from 'react';
+import { useAsync } from 'react-use';
+
+import { QueryEditorResultFormat, selectResultFormat } from '../components/QueryEditorResultFormat';
+import { SchemaError, SchemaLoading, SchemaWarning } from '../components/SchemaMessages';
+import { AdxDataSource } from '../datasource';
 import { definitionToProperty } from '../editor/components/field/QueryEditorField';
 import { isFieldExpression } from '../editor/guards';
-import { AdxDataSource } from '../datasource';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import { AdxSchemaResolver } from '../schema/AdxSchemaResolver';
-import { QueryEditorResultFormat, selectResultFormat } from '../components/QueryEditorResultFormat';
-import { TextArea, stylesFactory } from '@grafana/ui';
-import { SelectableValue } from '@grafana/data';
-import { SchemaLoading, SchemaError, SchemaWarning } from '../components/SchemaMessages';
-import { getTemplateSrv } from '@grafana/runtime';
+import { columnsToDefinition } from '../schema/mapper';
+import { AdxColumnSchema, AdxSchema, defaultQuery, KustoQuery } from '../types';
+import {
+  KustoGroupByEditorSection,
+  KustoPropertyEditorSection,
+  KustoValueColumnEditorSection,
+  KustoWhereEditorSection,
+} from './VisualQueryEditorSections';
 
 interface Props {
   database: string;

@@ -1,21 +1,22 @@
-import React, { PureComponent } from 'react';
-import { css } from 'emotion';
-import { Select, stylesFactory, Button } from '@grafana/ui';
+import { css } from '@emotion/css';
 import { SelectableValue } from '@grafana/data';
-import { ExpressionSuggestor } from '../types';
+import { Button, Select, stylesFactory } from '@grafana/ui';
+import React, { PureComponent } from 'react';
+
+import { isBoolOperator, isDateTimeOperator, isMultiOperator, isNumberOperator, isSingleOperator } from '../../guards';
 import {
-  QueryEditorOperatorDefinition,
   QueryEditorOperator,
+  QueryEditorOperatorDefinition,
   QueryEditorProperty,
   QueryEditorPropertyType,
 } from '../../types';
-import { QueryEditorMultiOperator } from './QueryEditorMultiOperator';
-import { QueryEditorSingleOperator } from './QueryEditorSingleOperator';
-import { QueryEditorBoolOperator } from './QueryEditorBoolOperator';
-import { isMultiOperator, isBoolOperator, isSingleOperator, isDateTimeOperator, isNumberOperator } from '../../guards';
+import { ExpressionSuggestor } from '../types';
 import { parseOperatorValue } from './parser';
-import { QueryEditorStringOperator } from './QueryEditorStringOperator';
+import { QueryEditorBoolOperator } from './QueryEditorBoolOperator';
+import { QueryEditorMultiOperator } from './QueryEditorMultiOperator';
 import { QueryEditorNumberOperator } from './QueryEditorNumberOperator';
+import { QueryEditorSingleOperator } from './QueryEditorSingleOperator';
+import { QueryEditorStringOperator } from './QueryEditorStringOperator';
 
 interface Props {
   value?: QueryEditorOperator;
