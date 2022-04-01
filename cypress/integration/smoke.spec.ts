@@ -37,6 +37,18 @@ function addCommonProvisioningADXDatasource(ADXProvisions: ADXProvision[]) {
 }
 
 e2e.scenario({
+  describeName: 'Add ADX datasource',
+  itName: 'fills out datasource connection configuration',
+  scenario: () => {
+    e2e()
+      .readProvisions(['datasources/adx.yaml'])
+      .then((ADXProvisions: ADXProvision[]) => {
+        addCommonProvisioningADXDatasource(ADXProvisions);
+      });
+  },
+});
+
+e2e.scenario({
   describeName: 'Import dashboard',
   itName: 'fills out datasource connection configuration, imports JSON dashboard, adds panel and run query',
   scenario: () => {
