@@ -36,21 +36,21 @@ function addCommonProvisioningADXDatasource(ADXProvisions: ADXProvision[]) {
   });
 }
 
-e2e.scenario({
-  describeName: 'Add ADX datasource',
-  itName: 'fills out datasource connection configuration',
-  scenario: () => {
-    e2e()
-      .readProvisions(['datasources/adx.yaml'])
-      .then((ADXProvisions: ADXProvision[]) => {
-        addCommonProvisioningADXDatasource(ADXProvisions);
-      });
-  },
-});
+// e2e.scenario({
+//   describeName: 'Add ADX datasource',
+//   itName: 'fills out datasource connection configuration',
+//   scenario: () => {
+//     e2e()
+//       .readProvisions(['datasources/adx.yaml'])
+//       .then((ADXProvisions: ADXProvision[]) => {
+//         addCommonProvisioningADXDatasource(ADXProvisions);
+//       });
+//   },
+// });
 
 e2e.scenario({
   describeName: 'Import dashboard',
-  itName: 'adds JSON',
+  itName: 'fills out datasource connection configuration, imports JSON dashboard, Adds panel',
   scenario: () => {
     e2e()
       .readProvisions(['datasources/adx.yaml'])
@@ -58,6 +58,23 @@ e2e.scenario({
         addCommonProvisioningADXDatasource(ADXProvisions);
 
         e2e.flows.importDashboard(TEST_DASHBOARD);
+
+        e2e.flows.addPanel({
+          matchScreenshot: false,
+          visitDashboardAtStart: false,
+          queriesForm: () => {
+            e2eSelectors.queryEditor.editKQL.button().click({ force: true });
+            // e2eSelectors.queryEditor.codeEditor
+            //   .container()
+            //   .click({ force: true })
+            //   .type(
+            //     `PerfTest
+            //     | where $__timeFilter(_Timestamp_)
+            //     | order by _Timestamp_ asc`
+            //   );
+            e2eSelectors.queryEditor.runQuery.button().click({ force: true });
+          },
+        });
       });
   },
 });

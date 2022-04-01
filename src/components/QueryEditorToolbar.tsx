@@ -52,11 +52,11 @@ export const QueryEditorToolbar: React.FC<Props> = (props) => {
       <div className="gf-form gf-form--grow">
         <div className="gf-form-label--grow" />
       </div>
-      <Button variant="secondary" onClick={onToggleMode}>
+      <Button variant="secondary" aria-label="Edit KQL" onClick={onToggleMode}>
         {props.editorMode === EditorMode.Visual ? 'Edit KQL' : 'Switch to builder'}
       </Button>
       <div className={styles.spacing} />
-      <Button variant={props.dirty ? 'primary' : 'secondary'} onClick={props.onRunQuery}>
+      <Button variant={props.dirty ? 'primary' : 'secondary'} aria-label="Run Query" onClick={props.onRunQuery}>
         Run Query
       </Button>
       <ConfirmModal

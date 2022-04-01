@@ -18,6 +18,17 @@ export const components = {
       input: 'data-testid client-secret',
     },
   },
+  queryEditor: {
+    editKQL: {
+      button: 'Edit KQL',
+    },
+    runQuery: {
+      button: 'Run Query',
+    },
+    codeEditor: {
+      container: 'Editor content;Press Alt+F1 for Accessibility Options.',
+    },
+  },
 };
 
 export const selectors: { components: E2ESelectors<typeof components> } = {
