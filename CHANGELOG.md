@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.0.0]
+
+_Not released yet_
+
+- Breaking Change: Azure Data Explorer plugin now requires Grafana 8.0+ to run.
+
 ## [3.7.1]
 
 - Bugfix: Fix scope for national clouds
