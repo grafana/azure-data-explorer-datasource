@@ -1,7 +1,7 @@
+import { css } from '@emotion/css';
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { Button, InlineFormLabel, Select, useStyles2 } from '@grafana/ui';
 import { isFieldAndOperator, isOrExpression } from 'editor/guards';
-import { css } from 'emotion';
 import React from 'react';
 
 import {

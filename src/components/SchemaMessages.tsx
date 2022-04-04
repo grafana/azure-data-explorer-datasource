@@ -1,6 +1,6 @@
+import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { Icon, useStyles2 } from '@grafana/ui';
-import { css } from 'emotion';
 import React from 'react';
 
 export const SchemaLoading: React.FC<{}> = (props) => {

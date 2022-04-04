@@ -1,6 +1,6 @@
+import { css } from '@emotion/css';
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { InlineFormLabel, useStyles2 } from '@grafana/ui';
-import { css } from 'emotion';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {

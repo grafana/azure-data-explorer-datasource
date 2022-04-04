@@ -1,3 +1,4 @@
+import { css } from '@emotion/css';
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
 import { TextArea, useStyles2 } from '@grafana/ui';
@@ -8,7 +9,6 @@ import {
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
 } from 'editor/expressions';
-import { css } from 'emotion';
 import React, { useCallback, useMemo } from 'react';
 import { useAsync } from 'react-use';
 

@@ -1,6 +1,6 @@
+import { css } from '@emotion/css';
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { Button, useStyles2 } from '@grafana/ui';
-import { css } from 'emotion';
 import React from 'react';
 
 import { QueryEditorArrayExpression, QueryEditorExpression } from '../../expressions';

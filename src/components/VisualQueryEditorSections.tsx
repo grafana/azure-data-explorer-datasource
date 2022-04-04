@@ -1,10 +1,9 @@
 import {
   buildFieldQueryEditorSection,
   buildFilterQueryEditorSection,
-  buildReduceQueryEditorSection,
   buildGroupByQueryEditorSection,
+  buildReduceQueryEditorSection,
 } from '../editor';
-
 import { QueryEditorPropertyType } from '../editor/types';
 
 export const KustoPropertyEditorSection = buildFieldQueryEditorSection((fieldSection) => fieldSection.build());
@@ -43,12 +42,20 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection((filterSect
         .add();
 
       operator('>')
-        .supportTypes([QueryEditorPropertyType.Number, QueryEditorPropertyType.DateTime])
+        .supportTypes([
+          QueryEditorPropertyType.Number,
+          QueryEditorPropertyType.DateTime,
+          QueryEditorPropertyType.TimeSpan,
+        ])
         .withDescription('greater than')
         .add();
 
       operator('<')
-        .supportTypes([QueryEditorPropertyType.Number, QueryEditorPropertyType.DateTime])
+        .supportTypes([
+          QueryEditorPropertyType.Number,
+          QueryEditorPropertyType.DateTime,
+          QueryEditorPropertyType.TimeSpan,
+        ])
         .withDescription('less than')
         .add();
 

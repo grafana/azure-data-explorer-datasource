@@ -1,6 +1,7 @@
-import { AdxTableSchema, AdxColumnSchema, AdxDatabaseSchema } from '../types';
-import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import { SelectableValue } from '@grafana/data';
+
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
+import { AdxColumnSchema, AdxDatabaseSchema, AdxTableSchema } from '../types';
 
 export const tableToDefinition = (table: AdxTableSchema): QueryEditorPropertyDefinition => {
   return {
@@ -66,6 +67,8 @@ const toPropertyType = (kustoType: string): QueryEditorPropertyType => {
       return QueryEditorPropertyType.DateTime;
     case 'bool':
       return QueryEditorPropertyType.Boolean;
+    case 'timespan':
+      return QueryEditorPropertyType.TimeSpan;
     default:
       return QueryEditorPropertyType.String;
   }

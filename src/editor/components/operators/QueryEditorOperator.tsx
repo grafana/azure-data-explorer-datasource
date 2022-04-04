@@ -1,6 +1,6 @@
+import { css } from '@emotion/css';
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { Button, Select, useStyles2 } from '@grafana/ui';
-import { css } from 'emotion';
 import React, { PureComponent } from 'react';
 
 import { isBoolOperator, isDateTimeOperator, isMultiOperator, isNumberOperator, isSingleOperator } from '../../guards';

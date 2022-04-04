@@ -1,7 +1,7 @@
+import { css } from '@emotion/css';
 import { DataSourceApi, GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { Icon, useStyles2 } from '@grafana/ui';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
-import { css } from 'emotion';
 import config from 'grafana/app/core/config';
 import React, { useState } from 'react';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
