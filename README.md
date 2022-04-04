@@ -158,7 +158,7 @@ If the command succeeds you should get a result like this:
 
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
 
-[on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/master/doc/on-behalf-of.md)
+[on-behalf-of documentation](/doc/on-behalf-of.md)
 
 ## Writing Queries
 
