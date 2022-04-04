@@ -1,21 +1,22 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { InlineFormLabel, useStyles2 } from '@grafana/ui';
 import { css } from 'emotion';
-import { InlineFormLabel, stylesFactory } from '@grafana/ui';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
 import {
-  QueryEditorPropertyDefinition,
+  QueryEditorExpressionType,
+  QueryEditorFunctionParameterExpression,
+  QueryEditorReduceExpression,
+} from '../../expressions';
+import {
   QueryEditorFunctionDefinition,
   QueryEditorFunctionParameter,
-  QueryEditorPropertyType,
   QueryEditorProperty,
+  QueryEditorPropertyDefinition,
+  QueryEditorPropertyType,
 } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
-import { SelectableValue } from '@grafana/data';
 import { QueryEditorFunctionParameterSection } from '../field/QueryEditorFunctionParameterSection';
-import {
-  QueryEditorReduceExpression,
-  QueryEditorFunctionParameterExpression,
-  QueryEditorExpressionType,
-} from '../../expressions';
 
 interface Props {
   fields: QueryEditorPropertyDefinition[];
@@ -32,7 +33,7 @@ export const QueryEditorReduce: React.FC<Props> = (props) => {
   const [reduce, setReduce] = useState(props.value?.reduce);
   const [parameters, setParameters] = useState(props.value?.parameters);
   const applyOnField = useApplyOnField(reduce, props.functions);
-  const styles = getStyles();
+  const styles = useStyles2(getStyles);
 
   const onChangeField = useCallback(
     (property: QueryEditorProperty) => {
@@ -126,16 +127,14 @@ export const QueryEditorReduce: React.FC<Props> = (props) => {
   );
 };
 
-const getStyles = stylesFactory(() => {
-  return {
-    container: css`
-      display: flex;
-      flex-direction: row;
-    `,
-    params: css`
-      margin-right: 4px;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  container: css`
+    display: flex;
+    flex-direction: row;
+  `,
+  params: css`
+    margin-right: 4px;
+  `,
 });
 
 const getParameters = (

@@ -1,13 +1,14 @@
-import React from 'react';
-import { css } from 'emotion';
-import { QueryEditorFunctionDefinition, QueryEditorPropertyDefinition } from '../../types';
-import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
-import { SelectableValue } from '@grafana/data';
-import { QueryEditorExpression, QueryEditorArrayExpression } from '../../expressions';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Button, useStyles2 } from '@grafana/ui';
 import { isReduceExpression } from 'editor/guards';
-import { QueryEditorReduce } from './QueryEditorReduce';
-import { Button, stylesFactory } from '@grafana/ui';
+import { css } from 'emotion';
+import React from 'react';
+
+import { QueryEditorArrayExpression, QueryEditorExpression } from '../../expressions';
+import { QueryEditorFunctionDefinition, QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorRepeater } from '../QueryEditorRepeater';
+import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
+import { QueryEditorReduce } from './QueryEditorReduce';
 
 interface ReduceSectionConfiguration {
   defaultValue: QueryEditorExpression;
@@ -25,7 +26,7 @@ export const QueryEditorReduceSection = (
   config: ReduceSectionConfiguration
 ): React.FC<QueryEditorReduceSectionProps> => {
   return function F(props) {
-    const styles = getStyles();
+    const styles = useStyles2(getStyles);
 
     if (props.value.expressions.length === 0) {
       return (
@@ -80,7 +81,7 @@ export const QueryEditorReduceSection = (
   };
 };
 
-const getStyles = stylesFactory(() => {
+const getStyles = (theme: GrafanaTheme2) => {
   const row = css`
     display: flex;
     flex-direction: row;
@@ -100,4 +101,4 @@ const getStyles = stylesFactory(() => {
       margin-right: 4px;
     `,
   };
-});
+};

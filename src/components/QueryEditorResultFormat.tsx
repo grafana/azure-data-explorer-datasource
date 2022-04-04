@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { InlineFormLabel, Select, useStyles2 } from '@grafana/ui';
 import { css } from 'emotion';
-import { SelectableValue } from '@grafana/data';
-import { InlineFormLabel, Select, stylesFactory } from '@grafana/ui';
+import React, { useCallback } from 'react';
 
 interface Props {
   format: string;
@@ -31,7 +31,7 @@ export const QueryEditorResultFormat: React.FC<Props> = (props) => {
     [onChangeFormat]
   );
 
-  const styles = getStyles();
+  const styles = useStyles2(getStyles);
 
   return (
     <div className={styles.container}>
@@ -47,14 +47,12 @@ export const QueryEditorResultFormat: React.FC<Props> = (props) => {
   );
 };
 
-const getStyles = stylesFactory(() => {
-  return {
-    container: css`
-      display: flex;
-      flex-direction: row;
-      margin-right: 4px;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  container: css`
+    display: flex;
+    flex-direction: row;
+    margin-right: 4px;
+  `,
 });
 
 export const selectResultFormat = (format?: string, includeAdxFormat?: boolean): string => {

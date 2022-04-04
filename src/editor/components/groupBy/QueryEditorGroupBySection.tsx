@@ -1,12 +1,13 @@
-import React from 'react';
-import { SelectableValue } from '@grafana/data';
-import { Button, stylesFactory } from '@grafana/ui';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Button, useStyles2 } from '@grafana/ui';
 import { css } from 'emotion';
-import { QueryEditorPropertyDefinition } from '../../types';
-import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
-import { QueryEditorExpression, QueryEditorArrayExpression } from '../../expressions';
-import { QueryEditorRepeater } from '../QueryEditorRepeater';
+import React from 'react';
+
+import { QueryEditorArrayExpression, QueryEditorExpression } from '../../expressions';
 import { isGroupBy } from '../../guards';
+import { QueryEditorPropertyDefinition } from '../../types';
+import { QueryEditorRepeater } from '../QueryEditorRepeater';
+import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { QueryEditorGroupBy } from './QueryEditorGroupBy';
 
 interface GroupBySectionConfiguration {
@@ -25,7 +26,7 @@ export const QueryEditorGroupBySection = (
   config: GroupBySectionConfiguration
 ): React.FC<QueryEditorGroupBySectionProps> => {
   return function F(props) {
-    const styles = getStyles();
+    const styles = useStyles2(getStyles);
 
     if (props.value.expressions.length === 0) {
       return (
@@ -80,7 +81,7 @@ export const QueryEditorGroupBySection = (
   };
 };
 
-const getStyles = stylesFactory(() => {
+const getStyles = (theme: GrafanaTheme2) => {
   const row = css`
     display: flex;
     flex-direction: row;
@@ -100,4 +101,4 @@ const getStyles = stylesFactory(() => {
       margin-right: 4px;
     `,
   };
-});
+};

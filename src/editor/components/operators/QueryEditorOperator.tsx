@@ -1,21 +1,22 @@
-import React, { PureComponent } from 'react';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Button, Select, useStyles2 } from '@grafana/ui';
 import { css } from 'emotion';
-import { Select, stylesFactory, Button } from '@grafana/ui';
-import { SelectableValue } from '@grafana/data';
-import { ExpressionSuggestor } from '../types';
+import React, { PureComponent } from 'react';
+
+import { isBoolOperator, isDateTimeOperator, isMultiOperator, isNumberOperator, isSingleOperator } from '../../guards';
 import {
-  QueryEditorOperatorDefinition,
   QueryEditorOperator,
+  QueryEditorOperatorDefinition,
   QueryEditorProperty,
   QueryEditorPropertyType,
 } from '../../types';
-import { QueryEditorMultiOperator } from './QueryEditorMultiOperator';
-import { QueryEditorSingleOperator } from './QueryEditorSingleOperator';
-import { QueryEditorBoolOperator } from './QueryEditorBoolOperator';
-import { isMultiOperator, isBoolOperator, isSingleOperator, isDateTimeOperator, isNumberOperator } from '../../guards';
+import { ExpressionSuggestor } from '../types';
 import { parseOperatorValue } from './parser';
-import { QueryEditorStringOperator } from './QueryEditorStringOperator';
+import { QueryEditorBoolOperator } from './QueryEditorBoolOperator';
+import { QueryEditorMultiOperator } from './QueryEditorMultiOperator';
 import { QueryEditorNumberOperator } from './QueryEditorNumberOperator';
+import { QueryEditorSingleOperator } from './QueryEditorSingleOperator';
+import { QueryEditorStringOperator } from './QueryEditorStringOperator';
 
 interface Props {
   value?: QueryEditorOperator;
@@ -83,7 +84,7 @@ export class QueryEditorOperatorComponent extends PureComponent<Props> {
 
   render() {
     const { operators, value, getSuggestions, templateVariableOptions, property } = this.props;
-    const styles = getStyles();
+    const styles = useStyles2(getStyles);
     const definition = operators.find((o) => o.value === value?.name);
 
     return (
@@ -129,7 +130,7 @@ const renderOperatorInput = (
     return null;
   }
 
-  const styles = getStyles();
+  const styles = useStyles2(getStyles);
 
   if (isDateTimeOperator(operator, propertyType)) {
     return (
@@ -186,28 +187,26 @@ const renderOperatorInput = (
   return null;
 };
 
-const getStyles = stylesFactory(() => {
-  return {
-    container: css`
-      margin-right: 4px;
-      /* when Grafanas Select has labels */
-      div[class*='grafana-select-option-description'] {
-        white-space: nowrap;
-      }
-      /* fallback until Grafanas Select has labels */
-      [aria-label*='Select options menu'] {
+const getStyles = (theme: GrafanaTheme2) => ({
+  container: css`
+    margin-right: 4px;
+    /* when Grafanas Select has labels */
+    div[class*='grafana-select-option-description'] {
+      white-space: nowrap;
+    }
+    /* fallback until Grafanas Select has labels */
+    [aria-label*='Select options menu'] {
+      div {
         div {
           div {
             div {
               div {
-                div {
-                  white-space: nowrap;
-                }
+                white-space: nowrap;
               }
             }
           }
         }
       }
-    `,
-  };
+    }
+  `,
 });

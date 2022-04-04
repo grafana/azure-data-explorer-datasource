@@ -1,20 +1,20 @@
-import React, { PureComponent } from 'react';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { useStyles2 } from '@grafana/ui';
+import debounce from 'debounce-promise';
 import { css } from 'emotion';
-import _ from 'lodash';
-import { stylesFactory } from '@grafana/ui';
-import { SkippableExpressionSuggestor } from '../types';
+import React, { PureComponent } from 'react';
+
+import { QueryEditorExpressionType, QueryEditorOperatorExpression } from '../../expressions';
 import {
-  QueryEditorPropertyDefinition,
+  QueryEditorOperator,
   QueryEditorOperatorDefinition,
   QueryEditorProperty,
-  QueryEditorOperator,
+  QueryEditorPropertyDefinition,
 } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
-import { QueryEditorOperatorComponent, definitionToOperator } from '../operators/QueryEditorOperator';
-import { SelectableValue } from '@grafana/data';
-import { QueryEditorExpressionType, QueryEditorOperatorExpression } from '../../expressions';
 import { parseOperatorValue } from '../operators/parser';
-import debounce from 'debounce-promise';
+import { definitionToOperator, QueryEditorOperatorComponent } from '../operators/QueryEditorOperator';
+import { SkippableExpressionSuggestor } from '../types';
 
 interface Props {
   value?: QueryEditorOperatorExpression;
@@ -118,7 +118,7 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
     const { value, fields, templateVariableOptions } = this.props;
     const { operators } = this.state;
 
-    const styles = getStyles();
+    const styles = useStyles2(getStyles);
     const showOperators = value?.operator || value?.property;
 
     return (
@@ -145,13 +145,11 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
   }
 }
 
-const getStyles = stylesFactory(() => {
-  return {
-    container: css`
-      display: flex;
-      flex-direction: row;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  container: css`
+    display: flex;
+    flex-direction: row;
+  `,
 });
 
 const createFilter = (property: QueryEditorProperty, value: string): QueryEditorOperatorExpression => {

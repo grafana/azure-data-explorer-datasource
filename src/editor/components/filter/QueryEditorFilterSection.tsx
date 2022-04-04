@@ -1,18 +1,19 @@
-import React from 'react';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Button, InlineFormLabel, Select, useStyles2 } from '@grafana/ui';
+import { isFieldAndOperator, isOrExpression } from 'editor/guards';
 import { css } from 'emotion';
-import { QueryEditorOperatorDefinition, QueryEditorPropertyDefinition } from '../../types';
-import { QueryEditorSectionProps, QueryEditorSection } from '../QueryEditorSection';
-import { SelectableValue } from '@grafana/data';
-import { SearchExpressionSuggestor, SkippableExpressionSuggestor } from '../types';
+import React from 'react';
+
 import {
   QueryEditorArrayExpression,
-  QueryEditorOperatorExpression,
   QueryEditorExpressionType,
+  QueryEditorOperatorExpression,
 } from '../../expressions';
-import { isFieldAndOperator, isOrExpression } from 'editor/guards';
-import { QueryEditorFieldAndOperator } from './QueryEditorFieldAndOperator';
-import { Button, Select, stylesFactory, InlineFormLabel } from '@grafana/ui';
+import { QueryEditorOperatorDefinition, QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorRepeater } from '../QueryEditorRepeater';
+import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
+import { SearchExpressionSuggestor, SkippableExpressionSuggestor } from '../types';
+import { QueryEditorFieldAndOperator } from './QueryEditorFieldAndOperator';
 
 interface FilterSectionConfiguration {
   operators: QueryEditorOperatorDefinition[];
@@ -31,7 +32,7 @@ export const QueryEditorFilterSection = (
   config: FilterSectionConfiguration
 ): React.FC<QueryEditorFilterSectionProps> => {
   return function F(props) {
-    const styles = getStyles();
+    const styles = useStyles2(getStyles);
 
     const getSuggestions = (index: string): SkippableExpressionSuggestor => {
       return (search: QueryEditorOperatorExpression) => props.getSuggestions(index, search);
@@ -166,7 +167,7 @@ export const QueryEditorFilterSection = (
   };
 };
 
-const getStyles = stylesFactory(() => {
+const getStyles = (theme: GrafanaTheme2) => {
   const row = css`
     display: flex;
     flex-direction: row;
@@ -186,4 +187,4 @@ const getStyles = stylesFactory(() => {
       margin-right: 4px;
     `,
   };
-});
+};
