@@ -48,6 +48,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
   const tableName = getTemplateSrv().replace(table?.property.name ?? '');
   const tableMapping = getSchemaMapper().getMappingByValue(table?.property.name);
   const timeshiftOptions = useTimeshiftOptions();
+  const styles = useStyles2(getStyles);
 
   const tableSchema = useAsync(async () => {
     if (!table || !table.property) {
@@ -256,8 +257,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
       </>
     );
   }
-
-  const styles = useStyles2(getStyles);
 
   return (
     <>

@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { Button, Select, useStyles2 } from '@grafana/ui';
-import React, { PureComponent } from 'react';
+import React from 'react';
 
 import { isBoolOperator, isDateTimeOperator, isMultiOperator, isNumberOperator, isSingleOperator } from '../../guards';
 import {
@@ -54,18 +54,18 @@ export const definitionToOperator = (definition: QueryEditorOperatorDefinition):
   return defaultValue;
 };
 
-export class QueryEditorOperatorComponent extends PureComponent<Props> {
-  onChangeOperator = (selectable: SelectableValue<string>) => {
+export const QueryEditorOperatorComponent: React.FC<Props> = (props: Props) => {
+  const onChangeOperator = (selectable: SelectableValue<string>) => {
     if (selectable && selectable.value) {
-      const { property, value } = this.props;
-      const definition = this.props.operators.find((o) => o.value === selectable.value);
+      const { property, value } = props;
+      const definition = props.operators.find((o) => o.value === selectable.value);
 
       if (!definition || !property) {
         return;
       }
 
       if (!value) {
-        this.props.onChange(definitionToOperator(definition));
+        props.onChange(definitionToOperator(definition));
         return;
       }
 
@@ -74,49 +74,48 @@ export class QueryEditorOperatorComponent extends PureComponent<Props> {
       const currentValue = value.value;
       operator.value = parseOperatorValue(property, definition, currentValue, defaultValue);
 
-      this.props.onChange(operator);
+      props.onChange(operator);
     }
   };
 
-  onChangeValue = (operator: QueryEditorOperator) => {
-    this.props.onChange(operator);
+  const onChangeValue = (operator: QueryEditorOperator) => {
+    props.onChange(operator);
   };
 
-  render() {
-    const { operators, value, getSuggestions, templateVariableOptions, property } = this.props;
-    const styles = useStyles2(getStyles);
-    const definition = operators.find((o) => o.value === value?.name);
+  const { operators, value, getSuggestions, templateVariableOptions, property } = props;
+  const styles = useStyles2(getStyles);
+  const definition = operators.find((o) => o.value === value?.name);
 
-    return (
-      <>
-        <div className={styles.container}>
-          <Select
-            isSearchable={true}
-            options={operators}
-            value={definition?.value}
-            onChange={this.onChangeOperator}
-            menuPlacement="bottom"
-            renderControl={React.forwardRef(function F({ value, isOpen, invalid, ...otherProps }, ref) {
-              return (
-                <Button {...otherProps} ref={ref} variant="secondary">
-                  {definition?.label || definition?.value || '?'}
-                </Button>
-              );
-            })}
-          />
-        </div>
-        {renderOperatorInput(
-          definition,
-          value,
-          this.onChangeValue,
-          getSuggestions,
-          templateVariableOptions,
-          property?.type
-        )}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <div className={styles.container}>
+        <Select
+          isSearchable={true}
+          options={operators}
+          value={definition?.value}
+          onChange={onChangeOperator}
+          menuPlacement="bottom"
+          renderControl={React.forwardRef(function F({ value, isOpen, invalid, ...otherProps }, ref) {
+            return (
+              <Button {...otherProps} ref={ref} variant="secondary">
+                {definition?.label || definition?.value || '?'}
+              </Button>
+            );
+          })}
+        />
+      </div>
+      {renderOperatorInput(
+        definition,
+        value,
+        onChangeValue,
+        getSuggestions,
+        templateVariableOptions,
+        styles,
+        property?.type
+      )}
+    </>
+  );
+};
 
 const renderOperatorInput = (
   definition: QueryEditorOperatorDefinition | undefined,
@@ -124,13 +123,12 @@ const renderOperatorInput = (
   onChangeValue: (expression: QueryEditorOperator) => void,
   getSuggestions: ExpressionSuggestor,
   templateVariableOptions: SelectableValue<string>,
+  styles: { [constainer: string]: string },
   propertyType: QueryEditorPropertyType | undefined
 ) => {
   if (!definition) {
     return null;
   }
-
-  const styles = useStyles2(getStyles);
 
   if (isDateTimeOperator(operator, propertyType)) {
     return (
