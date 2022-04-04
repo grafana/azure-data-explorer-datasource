@@ -73,7 +73,7 @@ e2e.scenario({
           queriesForm: () => {
             e2eSelectors.queryEditor.editKQL.button().click({ force: true });
             // Wait for the selectors to load
-            e2eSelectors.queryEditor.codeEditor.container().click({ force: true }).type(
+            e2eSelectors.queryEditor.codeEditor.container().type(
               `PerfTest
                   | where $__timeFilter(_Timestamp_)
                   | order by _Timestamp_ asc`

@@ -57,7 +57,11 @@ export const QueryEditorToolbar: React.FC<Props> = (props) => {
         {props.editorMode === EditorMode.Visual ? 'Edit KQL' : 'Switch to builder'}
       </Button>
       <div className={styles.spacing} />
-      <Button variant={props.dirty ? 'primary' : 'secondary'} aria-label={selectors.components.queryEditor.runQuery.button} onClick={props.onRunQuery}>
+      <Button
+        variant={props.dirty ? 'primary' : 'secondary'}
+        aria-label={selectors.components.queryEditor.runQuery.button}
+        onClick={props.onRunQuery}
+      >
         Run Query
       </Button>
       <ConfirmModal
