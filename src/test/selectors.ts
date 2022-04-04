@@ -22,11 +22,11 @@ export const components = {
     editKQL: {
       button: 'Edit KQL',
     },
-    runQuery: {
-      button: 'Run Query',
-    },
     codeEditor: {
       container: 'Editor content;Press Alt+F1 for Accessibility Options.',
+    },
+    runQuery: {
+      button: 'Run Query',
     },
   },
 };

@@ -1,4 +1,5 @@
 import { e2e } from '@grafana/e2e';
+
 import { selectors } from '../../src/test/selectors';
 import TEST_DASHBOARD from '../dashboards/example.json';
 
@@ -34,36 +35,49 @@ function addCommonProvisioningADXDatasource(ADXProvisions: ADXProvision[]) {
     },
     expectedAlertMessage: 'Success',
   });
-}
+};
 
 e2e.scenario({
   describeName: 'Add ADX datasource',
-  itName: 'fills out datasource connection configuration',
+  itName: 'fills out datasource connection configuration and imports JSON dashboard',
   scenario: () => {
     e2e()
       .readProvisions(['datasources/adx.yaml'])
       .then((ADXProvisions: ADXProvision[]) => {
         addCommonProvisioningADXDatasource(ADXProvisions);
+        e2e.flows.importDashboard(TEST_DASHBOARD);
       });
   },
 });
 
 e2e.scenario({
   describeName: 'Import dashboard',
-  itName: 'fills out datasource connection configuration, imports JSON dashboard, adds panel and run query',
+  itName: 'fills out datasource connection configuration, adds panel and runs query',
   scenario: () => {
     e2e()
       .readProvisions(['datasources/adx.yaml'])
       .then((ADXProvisions: ADXProvision[]) => {
         addCommonProvisioningADXDatasource(ADXProvisions);
 
-        e2e.flows.importDashboard(TEST_DASHBOARD);
+        e2e.flows.addDashboard({
+          timeRange: {
+            from: '2019-10-05 19:00:00',
+            to: '2019-10-10 19:00:00',
+          },
+          variables: [],
+        });
 
         e2e.flows.addPanel({
           matchScreenshot: false,
           visitDashboardAtStart: false,
           queriesForm: () => {
-            e2eSelectors.queryEditor.editKQL.button().click({ timeout: 5000 });
+            e2eSelectors.queryEditor.editKQL.button().click({ force: true });
+            // Wait for the selectors to load
+            e2eSelectors.queryEditor.codeEditor.container().click({ force: true }).type(
+              `PerfTest
+                  | where $__timeFilter(_Timestamp_)
+                  | order by _Timestamp_ asc`
+            );
             e2eSelectors.queryEditor.runQuery.button().click({ force: true });
           },
         });
