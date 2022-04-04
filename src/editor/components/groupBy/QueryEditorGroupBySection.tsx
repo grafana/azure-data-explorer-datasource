@@ -1,12 +1,13 @@
-import React from 'react';
+import { css } from '@emotion/css';
 import { SelectableValue } from '@grafana/data';
 import { Button, stylesFactory } from '@grafana/ui';
-import { css } from 'emotion';
-import { QueryEditorPropertyDefinition } from '../../types';
-import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
-import { QueryEditorExpression, QueryEditorArrayExpression } from '../../expressions';
-import { QueryEditorRepeater } from '../QueryEditorRepeater';
+import React from 'react';
+
+import { QueryEditorArrayExpression, QueryEditorExpression } from '../../expressions';
 import { isGroupBy } from '../../guards';
+import { QueryEditorPropertyDefinition } from '../../types';
+import { QueryEditorRepeater } from '../QueryEditorRepeater';
+import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
 import { QueryEditorGroupBy } from './QueryEditorGroupBy';
 
 interface GroupBySectionConfiguration {

@@ -3,14 +3,13 @@
 ///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
 /* tslint:enable */
 /* eslint-enable */
-
+import { css } from '@emotion/css';
+import { stylesFactory } from '@grafana/ui';
+import config from 'grafana/app/core/config';
 import React from 'react';
+
 import { AdxSchema } from '../types';
 import KustoCodeEditor from './kusto_code_editor';
-import { css } from 'emotion';
-import { stylesFactory } from '@grafana/ui';
-
-import config from 'grafana/app/core/config';
 
 interface Props {
   content: string;

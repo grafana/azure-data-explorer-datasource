@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import { css } from 'emotion';
-import { Select, Button, stylesFactory, ConfirmModal } from '@grafana/ui';
+import { css } from '@emotion/css';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorSection } from '../editor/components/QueryEditorSection';
+import { Button, ConfirmModal, Select, stylesFactory } from '@grafana/ui';
+import React, { useCallback, useState } from 'react';
 import { EditorMode } from 'types';
+
+import { QueryEditorSection } from '../editor/components/QueryEditorSection';
 
 interface Props {
   database: string;

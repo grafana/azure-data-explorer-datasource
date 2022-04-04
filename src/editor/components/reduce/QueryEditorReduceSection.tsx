@@ -1,13 +1,14 @@
-import React from 'react';
-import { css } from 'emotion';
-import { QueryEditorFunctionDefinition, QueryEditorPropertyDefinition } from '../../types';
-import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
+import { css } from '@emotion/css';
 import { SelectableValue } from '@grafana/data';
-import { QueryEditorExpression, QueryEditorArrayExpression } from '../../expressions';
-import { isReduceExpression } from 'editor/guards';
-import { QueryEditorReduce } from './QueryEditorReduce';
 import { Button, stylesFactory } from '@grafana/ui';
+import { isReduceExpression } from 'editor/guards';
+import React from 'react';
+
+import { QueryEditorArrayExpression, QueryEditorExpression } from '../../expressions';
+import { QueryEditorFunctionDefinition, QueryEditorPropertyDefinition } from '../../types';
 import { QueryEditorRepeater } from '../QueryEditorRepeater';
+import { QueryEditorSection, QueryEditorSectionProps } from '../QueryEditorSection';
+import { QueryEditorReduce } from './QueryEditorReduce';
 
 interface ReduceSectionConfiguration {
   defaultValue: QueryEditorExpression;

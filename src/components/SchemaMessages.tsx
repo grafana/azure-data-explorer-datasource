@@ -1,7 +1,7 @@
-import React from 'react';
-import { css } from 'emotion';
-import { Icon, stylesFactory, useTheme } from '@grafana/ui';
+import { css } from '@emotion/css';
 import { GrafanaTheme } from '@grafana/data';
+import { Icon, stylesFactory, useTheme } from '@grafana/ui';
+import React from 'react';
 
 export const SchemaLoading: React.FC<{}> = (props) => {
   const theme = useTheme();

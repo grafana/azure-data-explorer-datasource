@@ -1,20 +1,20 @@
-import React, { PureComponent } from 'react';
-import { css } from 'emotion';
-import _ from 'lodash';
+import { css } from '@emotion/css';
+import { SelectableValue } from '@grafana/data';
 import { stylesFactory } from '@grafana/ui';
-import { SkippableExpressionSuggestor } from '../types';
+import debounce from 'debounce-promise';
+import React, { PureComponent } from 'react';
+
+import { QueryEditorExpressionType, QueryEditorOperatorExpression } from '../../expressions';
 import {
-  QueryEditorPropertyDefinition,
+  QueryEditorOperator,
   QueryEditorOperatorDefinition,
   QueryEditorProperty,
-  QueryEditorOperator,
+  QueryEditorPropertyDefinition,
 } from '../../types';
 import { QueryEditorField } from '../field/QueryEditorField';
-import { QueryEditorOperatorComponent, definitionToOperator } from '../operators/QueryEditorOperator';
-import { SelectableValue } from '@grafana/data';
-import { QueryEditorExpressionType, QueryEditorOperatorExpression } from '../../expressions';
 import { parseOperatorValue } from '../operators/parser';
-import debounce from 'debounce-promise';
+import { definitionToOperator, QueryEditorOperatorComponent } from '../operators/QueryEditorOperator';
+import { SkippableExpressionSuggestor } from '../types';
 
 interface Props {
   value?: QueryEditorOperatorExpression;
