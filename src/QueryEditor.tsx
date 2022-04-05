@@ -12,7 +12,6 @@ import { AdxDataSource } from './datasource';
 import { QueryEditorPropertyDefinition } from './editor/types';
 import { databaseToDefinition } from './schema/mapper';
 
-// Hack for issue: https://github.com/grafana/grafana/issues/26512
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = (props) => {
