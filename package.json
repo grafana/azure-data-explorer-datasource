@@ -44,5 +44,8 @@
     "react-select-event": "^5.2.0",
     "react-use": "^15.3.3",
     "tslib": "^2.3.1"
+  },
+  "resolutions": {
+    "rxjs": "6.6.3"
   }
 }

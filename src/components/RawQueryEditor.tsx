@@ -1,14 +1,15 @@
 import { css } from '@emotion/css';
-import { DataSourceApi, GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
-import { Icon, useStyles2 } from '@grafana/ui';
+import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
+import { config } from '@grafana/runtime';
+import { CodeEditor, Icon, useStyles2 } from '@grafana/ui';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
-import config from 'grafana/app/core/config';
+import { AdxDataSource } from 'datasource';
 import React, { useState } from 'react';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
 import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
 
-type Props = QueryEditorProps<DataSourceApi<KustoQuery, AdxDataSourceOptions>, KustoQuery, AdxDataSourceOptions>;
+type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface RawQueryEditorProps extends Props {
   dirty?: boolean;
@@ -63,14 +64,30 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   return (
     <div>
-      <KustoMonacoEditor
-        defaultTimeField="Timestamp"
-        pluginBaseUrl={baseUrl}
-        content={query.query || defaultQuery}
-        getSchema={async () => schema}
-        onChange={onRawQueryChange}
-        onExecute={props.onRunQuery}
-      />
+      {config.featureToggles.adxNewCodeEditor ? (
+        <div data-testid="code-editor">
+          <CodeEditor
+            language="kusto"
+            value={query.query || defaultQuery}
+            onBlur={onRawQueryChange}
+            showMiniMap={false}
+            showLineNumbers={true}
+            // getSuggestions={() => TBD}
+            height="240px"
+          />
+        </div>
+      ) : (
+        <div data-testid="legacy-editor">
+          <KustoMonacoEditor
+            defaultTimeField="Timestamp"
+            pluginBaseUrl={baseUrl}
+            content={query.query || defaultQuery}
+            getSchema={async () => schema}
+            onChange={onRawQueryChange}
+            onExecute={props.onRunQuery}
+          />
+        </div>
+      )}
 
       <div className={styles.toolbar}>
         <QueryEditorResultFormat

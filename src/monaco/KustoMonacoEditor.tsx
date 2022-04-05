@@ -4,8 +4,8 @@
 /* tslint:enable */
 /* eslint-enable */
 import { css } from '@emotion/css';
+import { config } from '@grafana/runtime';
 import { stylesFactory } from '@grafana/ui';
-import config from 'grafana/app/core/config';
 import React from 'react';
 
 import { AdxSchema } from '../types';
