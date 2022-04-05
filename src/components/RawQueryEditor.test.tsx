@@ -7,7 +7,7 @@ import { RawQueryEditor } from './RawQueryEditor';
 
 jest.mock('../monaco/KustoMonacoEditor', () => {
   return {
-    KustoMonacoEditor: () => {
+    KustoMonacoEditor: function C() {
       return <></>;
     },
   };
