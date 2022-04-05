@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
-import { SelectableValue } from '@grafana/data';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
-import { stylesFactory, TextArea } from '@grafana/ui';
+import { TextArea, useStyles2 } from '@grafana/ui';
 import {
   QueryEditorArrayExpression,
   QueryEditorExpression,
@@ -48,6 +48,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
   const tableName = getTemplateSrv().replace(table?.property.name ?? '');
   const tableMapping = getSchemaMapper().getMappingByValue(table?.property.name);
   const timeshiftOptions = useTimeshiftOptions();
+  const styles = useStyles2(getStyles);
 
   const tableSchema = useAsync(async () => {
     if (!table || !table.property) {
@@ -257,8 +258,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
     );
   }
 
-  const styles = getStyles();
-
   return (
     <>
       <KustoPropertyEditorSection
@@ -312,12 +311,10 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
   );
 };
 
-const getStyles = stylesFactory(() => {
-  return {
-    query: css`
-      margin-top: 12px;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  query: css`
+    margin-top: 12px;
+  `,
 });
 
 const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {

@@ -1,11 +1,10 @@
 import { css } from '@emotion/css';
-import { GrafanaTheme } from '@grafana/data';
-import { Icon, stylesFactory, useTheme } from '@grafana/ui';
+import { GrafanaTheme2 } from '@grafana/data';
+import { Icon, useStyles2 } from '@grafana/ui';
 import React from 'react';
 
 export const SchemaLoading: React.FC<{}> = (props) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = useStyles2(getStyles);
 
   return (
     <div className={styles.container}>
@@ -22,8 +21,7 @@ interface ErrorProps {
 }
 
 export const SchemaError: React.FC<ErrorProps> = (props) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = useStyles2(getStyles);
 
   return (
     <div className={styles.container}>
@@ -36,8 +34,7 @@ export const SchemaError: React.FC<ErrorProps> = (props) => {
 };
 
 export const SchemaWarning: React.FC<ErrorProps> = (props) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = useStyles2(getStyles);
 
   return (
     <div className={styles.container}>
@@ -49,21 +46,19 @@ export const SchemaWarning: React.FC<ErrorProps> = (props) => {
   );
 };
 
-const getStyles = stylesFactory((theme: GrafanaTheme) => {
-  return {
-    container: css`
-      margin-top: 10px;
-      display: flex;
-      flex-direction: row;
-    `,
-    icon: css`
-      margin-right: 4px;
-    `,
-    error: css`
-      color: ${theme.colors.formInputBorderInvalid};
-    `,
-    warning: css`
-      color: ${theme.palette.yellow};
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  container: css`
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+  `,
+  icon: css`
+    margin-right: 4px;
+  `,
+  error: css`
+    color: ${theme.v1.colors.formInputBorderInvalid};
+  `,
+  warning: css`
+    color: ${theme.v1.palette.yellow};
+  `,
 });

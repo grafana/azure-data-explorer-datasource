@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
-import { SelectableValue } from '@grafana/data';
-import { stylesFactory } from '@grafana/ui';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { useStyles2 } from '@grafana/ui';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { QueryEditorExpressionType, QueryEditorGroupByExpression } from '../../expressions';
@@ -19,7 +19,7 @@ export const QueryEditorGroupBy: React.FC<Props> = (props) => {
   const { intervals, onChange } = props;
   const [field, setField] = useState(props.value?.property);
   const [interval, setInterval] = useState(props.value?.interval);
-  const styles = getStyles();
+  const styles = useStyles2(getStyles);
 
   const onChangeField = useCallback(
     (property: QueryEditorProperty) => {
@@ -78,11 +78,9 @@ export const QueryEditorGroupBy: React.FC<Props> = (props) => {
   );
 };
 
-const getStyles = stylesFactory(() => {
-  return {
-    container: css`
-      display: flex;
-      flex-direction: row;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  container: css`
+    display: flex;
+    flex-direction: row;
+  `,
 });

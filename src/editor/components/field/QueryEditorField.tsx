@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
 import { css } from '@emotion/css';
-import { stylesFactory, AsyncSelect } from '@grafana/ui';
-import { SelectableValue } from '@grafana/data';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { AsyncSelect, useStyles2 } from '@grafana/ui';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { QueryEditorPropertyDefinition, QueryEditorProperty, QueryEditorPropertyType } from '../../types';
+import { QueryEditorProperty, QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../../types';
 
 interface Props {
   fields: QueryEditorPropertyDefinition[];
@@ -31,7 +31,7 @@ export const QueryEditorField: React.FC<Props> = (props) => {
     onChange: propsOnChange,
   } = props;
   const [prevValue, setPrevValue] = useState<QueryEditorProperty>(null as unknown as QueryEditorProperty);
-  const styles = getStyles();
+  const styles = useStyles2(getStyles);
   const options = useOptions(fields);
   const value = useMemo(() => options.find((option) => option.value === propsValue?.name), [options, propsValue]);
   const loadOptions = useMemo(
@@ -66,12 +66,10 @@ export const QueryEditorField: React.FC<Props> = (props) => {
   );
 };
 
-const getStyles = stylesFactory(() => {
-  return {
-    container: css`
-      margin-right: 4px;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  container: css`
+    margin-right: 4px;
+  `,
 });
 
 // Should remove this when I have fixed the underlying issue in the select component

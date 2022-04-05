@@ -1,8 +1,9 @@
-import { css } from '@emotion/css';
-import { SelectableValue } from '@grafana/data';
-import { stylesFactory } from '@grafana/ui';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { useStyles2 } from '@grafana/ui';
 import debounce from 'debounce-promise';
-import React, { PureComponent } from 'react';
+import { css } from 'emotion';
+import React, { useState } from 'react';
+import { useEffectOnce } from 'react-use';
 
 import { QueryEditorExpressionType, QueryEditorOperatorExpression } from '../../expressions';
 import {
@@ -25,80 +26,76 @@ interface Props {
   getSuggestions: SkippableExpressionSuggestor;
 }
 
-interface State {
+export const QueryEditorFieldAndOperator: React.FC<Props> = (props: Props) => {
   // operators we can use for the field
-  operators: QueryEditorOperatorDefinition[];
-}
-
-export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
-  state: State = { operators: [] };
-
-  componentDidMount = () => {
-    const field = this.props.value?.property;
-    if (field) {
-      this.updateOperators(field);
-    }
-  };
+  const [operators, setOperators] = useState<QueryEditorOperatorDefinition[]>([]);
 
   // Find the valid operators to the given field and save it in state
-  updateOperators = (field: QueryEditorProperty): QueryEditorOperatorDefinition[] => {
+  const updateOperators = (field: QueryEditorProperty): QueryEditorOperatorDefinition[] => {
     const operators: QueryEditorOperatorDefinition[] = [];
-    for (const op of this.props.operators) {
+    for (const op of props.operators) {
       if (op.supportTypes.includes(field.type)) {
         operators.push(op);
       }
     }
-    this.setState({ operators });
+    setOperators(operators);
     return operators;
   };
 
-  onFieldChanged = (property: QueryEditorProperty) => {
+  useEffectOnce(() => {
+    const field = props.value?.property;
+    if (field) {
+      updateOperators(field);
+    }
+  });
+
+  const onFieldChanged = (property: QueryEditorProperty) => {
     let next: QueryEditorOperatorExpression = {
-      ...this.props.value!,
+      ...props.value!,
       property,
     };
 
-    const operators = this.updateOperators(property);
+    const operators = updateOperators(property);
     const currentOperator = next.operator?.name;
     const definition = operators.find((op) => op.value === currentOperator);
 
     if (operators.length && !definition) {
       next.operator = definitionToOperator(operators[0]);
       const defaultValue = next.operator.value;
-      const currentValue = this.props.value?.operator.value;
+      const currentValue = props.value?.operator.value;
       next.operator.value = parseOperatorValue(next.property, operators[0], currentValue, defaultValue);
     }
 
     if (!definition) {
-      return this.props.onChange(next);
+      return props.onChange(next);
     }
 
     // Give it default values
     next.operator = definitionToOperator(definition);
     const defaultValue = next.operator.value;
-    const currentValue = this.props.value?.operator.value;
+    const currentValue = props.value?.operator.value;
     next.operator.value = parseOperatorValue(next.property, definition, currentValue, defaultValue);
-    this.props.onChange(next);
+    props.onChange(next);
   };
 
-  onOperatorChange = (operator: QueryEditorOperator) => {
-    this.props.onChange({
-      ...this.props.value!,
+  const onOperatorChange = (operator: QueryEditorOperator) => {
+    props.onChange({
+      ...props.value!,
       operator,
     });
   };
 
-  getSuggestions = debounce(
+  const getSuggestions = debounce(
     async (txt: string) => {
-      if (!this.props.value) {
+      if (!props.value) {
         return [];
       }
 
-      const filter = createFilter(this.props.value.property, txt);
-      const results = await this.props.getSuggestions(filter);
+      const filter = createFilter(props.value.property, txt);
+      const results = await props.getSuggestions(filter);
 
-      if (Array.isArray(this.props.templateVariableOptions?.options)) {
-        const variables = this.props.templateVariableOptions.options.filter((v) => {
+      if (Array.isArray(props.templateVariableOptions?.options)) {
+        const variables = props.templateVariableOptions.options.filter((v) => {
           if (typeof v?.value === 'string') {
             return v.value.indexOf(txt) > -1;
           }
@@ -114,44 +111,39 @@ export class QueryEditorFieldAndOperator extends PureComponent<Props, State> {
     { leading: false }
   );
 
-  render() {
-    const { value, fields, templateVariableOptions } = this.props;
-    const { operators } = this.state;
+  const { value, fields, templateVariableOptions } = props;
 
-    const styles = getStyles();
-    const showOperators = value?.operator || value?.property;
+  const styles = useStyles2(getStyles);
+  const showOperators = value?.operator || value?.property;
 
-    return (
-      <div className={styles.container}>
-        <QueryEditorField
-          value={value?.property}
-          fields={fields}
+  return (
+    <div className={styles.container}>
+      <QueryEditorField
+        value={value?.property}
+        fields={fields}
+        templateVariableOptions={templateVariableOptions}
+        onChange={onFieldChanged}
+        placeholder="Choose column..."
+      />
+      {showOperators && (
+        <QueryEditorOperatorComponent
+          value={value?.operator}
+          operators={operators}
+          onChange={onOperatorChange}
+          getSuggestions={getSuggestions}
+          property={value?.property}
           templateVariableOptions={templateVariableOptions}
-          onChange={this.onFieldChanged}
-          placeholder="Choose column..."
         />
-        {showOperators && (
-          <QueryEditorOperatorComponent
-            value={value?.operator}
-            operators={operators}
-            onChange={this.onOperatorChange}
-            getSuggestions={this.getSuggestions}
-            property={value?.property}
-            templateVariableOptions={templateVariableOptions}
-          />
-        )}
-      </div>
-    );
-  }
-}
+      )}
+    </div>
+  );
+};
 
-const getStyles = stylesFactory(() => {
-  return {
-    container: css`
-      display: flex;
-      flex-direction: row;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  container: css`
+    display: flex;
+    flex-direction: row;
+  `,
 });
 
 const createFilter = (property: QueryEditorProperty, value: string): QueryEditorOperatorExpression => {

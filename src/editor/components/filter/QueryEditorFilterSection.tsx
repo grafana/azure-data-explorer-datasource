@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
-import { SelectableValue } from '@grafana/data';
-import { Button, InlineFormLabel, Select, stylesFactory } from '@grafana/ui';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Button, InlineFormLabel, Select, useStyles2 } from '@grafana/ui';
 import { isFieldAndOperator, isOrExpression } from 'editor/guards';
 import React from 'react';
 
@@ -32,7 +32,7 @@ export const QueryEditorFilterSection = (
   config: FilterSectionConfiguration
 ): React.FC<QueryEditorFilterSectionProps> => {
   return function F(props) {
-    const styles = getStyles();
+    const styles = useStyles2(getStyles);
 
     const getSuggestions = (index: string): SkippableExpressionSuggestor => {
       return (search: QueryEditorOperatorExpression) => props.getSuggestions(index, search);
@@ -167,7 +167,7 @@ export const QueryEditorFilterSection = (
   };
 };
 
-const getStyles = stylesFactory(() => {
+const getStyles = (theme: GrafanaTheme2) => {
   const row = css`
     display: flex;
     flex-direction: row;
@@ -187,4 +187,4 @@ const getStyles = stylesFactory(() => {
       margin-right: 4px;
     `,
   };
-});
+};

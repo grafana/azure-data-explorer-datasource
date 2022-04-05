@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
-import { SelectableValue } from '@grafana/data';
-import { Button, ConfirmModal, Select, stylesFactory } from '@grafana/ui';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Button, ConfirmModal, Select, useStyles2 } from '@grafana/ui';
 import React, { useCallback, useState } from 'react';
 import { EditorMode } from 'types';
 
@@ -27,7 +27,7 @@ export const QueryEditorToolbar: React.FC<Props> = (props) => {
     setShowConfirm(true);
   }, [setShowConfirm, onToggleEditorMode, dirty, editorMode]);
 
-  const styles = getStyles();
+  const styles = useStyles2(getStyles);
 
   return (
     <QueryEditorSection label="Database">
@@ -76,10 +76,8 @@ export const QueryEditorToolbar: React.FC<Props> = (props) => {
   );
 };
 
-const getStyles = stylesFactory(() => {
-  return {
-    spacing: css`
-      margin-right: 4px;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  spacing: css`
+    margin-right: 4px;
+  `,
 });

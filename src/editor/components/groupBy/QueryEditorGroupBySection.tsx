@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
-import { SelectableValue } from '@grafana/data';
-import { Button, stylesFactory } from '@grafana/ui';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Button, useStyles2 } from '@grafana/ui';
 import React from 'react';
 
 import { QueryEditorArrayExpression, QueryEditorExpression } from '../../expressions';
@@ -26,7 +26,7 @@ export const QueryEditorGroupBySection = (
   config: GroupBySectionConfiguration
 ): React.FC<QueryEditorGroupBySectionProps> => {
   return function F(props) {
-    const styles = getStyles();
+    const styles = useStyles2(getStyles);
 
     if (props.value.expressions.length === 0) {
       return (
@@ -81,7 +81,7 @@ export const QueryEditorGroupBySection = (
   };
 };
 
-const getStyles = stylesFactory(() => {
+const getStyles = (theme: GrafanaTheme2) => {
   const row = css`
     display: flex;
     flex-direction: row;
@@ -101,4 +101,4 @@ const getStyles = stylesFactory(() => {
       margin-right: 4px;
     `,
   };
-});
+};

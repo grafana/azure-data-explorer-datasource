@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
-import { SelectableValue } from '@grafana/data';
-import { InlineFormLabel, stylesFactory } from '@grafana/ui';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { InlineFormLabel, useStyles2 } from '@grafana/ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
@@ -33,7 +33,7 @@ export const QueryEditorReduce: React.FC<Props> = (props) => {
   const [reduce, setReduce] = useState(props.value?.reduce);
   const [parameters, setParameters] = useState(props.value?.parameters);
   const applyOnField = useApplyOnField(reduce, props.functions);
-  const styles = getStyles();
+  const styles = useStyles2(getStyles);
 
   const onChangeField = useCallback(
     (property: QueryEditorProperty) => {
@@ -127,16 +127,14 @@ export const QueryEditorReduce: React.FC<Props> = (props) => {
   );
 };
 
-const getStyles = stylesFactory(() => {
-  return {
-    container: css`
-      display: flex;
-      flex-direction: row;
-    `,
-    params: css`
-      margin-right: 4px;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  container: css`
+    display: flex;
+    flex-direction: row;
+  `,
+  params: css`
+    margin-right: 4px;
+  `,
 });
 
 const getParameters = (

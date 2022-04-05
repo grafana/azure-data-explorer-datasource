@@ -1,9 +1,9 @@
 import { css } from '@emotion/css';
-import { DataSourceApi, QueryEditorProps, SelectableValue } from '@grafana/data';
-import { Icon, stylesFactory } from '@grafana/ui';
+import { DataSourceApi, GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
+import { Icon, useStyles2 } from '@grafana/ui';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 import config from 'grafana/app/core/config';
-import React, { PureComponent } from 'react';
+import React, { useState } from 'react';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
 import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
@@ -20,10 +20,6 @@ interface RawQueryEditorProps extends Props {
   templateVariableOptions: SelectableValue<string>;
 }
 
-interface State {
-  showLastQuery?: boolean;
-  showHelp?: boolean;
-}
 const defaultQuery = [
   '//change this to create your own time series query',
   '',
@@ -33,99 +29,95 @@ const defaultQuery = [
   '// | order by Timestamp asc',
 ].join('\n');
 
-export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
-  state: State = {};
+export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
+  const [showLastQuery, setShowLastQuery] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
-  onRawQueryChange = (kql: string) => {
-    const resultFormat = selectResultFormat(this.props.query.resultFormat, true);
+  const onRawQueryChange = (kql: string) => {
+    const resultFormat = selectResultFormat(props.query.resultFormat, true);
 
-    this.props.onChange({
-      ...this.props.query,
+    props.onChange({
+      ...props.query,
       query: kql,
-      database: this.props.database,
+      database: props.database,
       resultFormat,
     });
   };
 
-  onChangeResultFormat = (format: string) => {
-    this.props.onChange({
-      ...this.props.query,
+  const onChangeResultFormat = (format: string) => {
+    props.onChange({
+      ...props.query,
       resultFormat: format,
     });
   };
 
-  render() {
-    const { query, datasource, lastQueryError, lastQuery, timeNotASC, schema } = this.props;
-    const { showLastQuery, showHelp } = this.state;
-    const resultFormat = selectResultFormat(query.resultFormat, true);
-    const baseUrl = `${config.appSubUrl}/${datasource.meta.baseUrl}`;
+  const { query, datasource, lastQueryError, lastQuery, timeNotASC, schema } = props;
+  const resultFormat = selectResultFormat(query.resultFormat, true);
+  const baseUrl = `${config.appSubUrl}/${datasource.meta.baseUrl}`;
 
-    const styles = getStyles();
+  const styles = useStyles2(getStyles);
 
-    if (!schema) {
-      return null;
-    }
+  if (!schema) {
+    return null;
+  }
 
-    return (
-      <div>
-        <KustoMonacoEditor
-          defaultTimeField="Timestamp"
-          pluginBaseUrl={baseUrl}
-          content={query.query || defaultQuery}
-          getSchema={async () => schema}
-          onChange={this.onRawQueryChange}
-          onExecute={this.props.onRunQuery}
+  return (
+    <div>
+      <KustoMonacoEditor
+        defaultTimeField="Timestamp"
+        pluginBaseUrl={baseUrl}
+        content={query.query || defaultQuery}
+        getSchema={async () => schema}
+        onChange={onRawQueryChange}
+        onExecute={props.onRunQuery}
+      />
+
+      <div className={styles.toolbar}>
+        <QueryEditorResultFormat
+          includeAdxTimeFormat={true}
+          format={resultFormat}
+          onChangeFormat={onChangeResultFormat}
         />
-
-        <div className={styles.toolbar}>
-          <QueryEditorResultFormat
-            includeAdxTimeFormat={true}
-            format={resultFormat}
-            onChangeFormat={this.onChangeResultFormat}
-          />
-          <div className="gf-form">
-            <label className="gf-form-label query-keyword" onClick={() => this.setState({ showHelp: !showHelp })}>
-              Show Help <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
-            </label>
-          </div>
-          <div className="gf-form" ng-show="ctrl.lastQuery">
-            <label
-              className="gf-form-label query-keyword"
-              onClick={() => this.setState({ showLastQuery: !showLastQuery })}
-            >
-              Raw Query <Icon name={showLastQuery ? 'angle-down' : 'angle-right'} />
-            </label>
-          </div>
-
-          <div className="gf-form gf-form--grow">
-            <div className="gf-form-label gf-form-label--grow"></div>
-          </div>
+        <div className="gf-form">
+          <label className="gf-form-label query-keyword" onClick={() => setShowHelp(!showHelp)}>
+            Show Help <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
+          </label>
+        </div>
+        <div className="gf-form" ng-show="ctrl.lastQuery">
+          <label className="gf-form-label query-keyword" onClick={() => setShowLastQuery(!showLastQuery)}>
+            Raw Query <Icon name={showLastQuery ? 'angle-down' : 'angle-right'} />
+          </label>
         </div>
 
-        {showLastQuery && (
-          <div className="gf-form">
-            <pre className="gf-form-pre">{lastQuery}</pre>
-          </div>
-        )}
+        <div className="gf-form gf-form--grow">
+          <div className="gf-form-label gf-form-label--grow"></div>
+        </div>
+      </div>
 
-        {lastQueryError && (
-          <div className="gf-form">
-            <pre className="gf-form-pre alert alert-error">{lastQueryError}</pre>
-          </div>
-        )}
+      {showLastQuery && (
+        <div className="gf-form">
+          <pre className="gf-form-pre">{lastQuery}</pre>
+        </div>
+      )}
 
-        {timeNotASC && (
-          <div className="gf-form">
-            <pre className="gf-form-pre alert alert-warning">
-              Data is not sorted ascending by Time. Recommend adding an order by clause.
-            </pre>
-          </div>
-        )}
+      {lastQueryError && (
+        <div className="gf-form">
+          <pre className="gf-form-pre alert alert-error">{lastQueryError}</pre>
+        </div>
+      )}
 
-        {showHelp && (
-          <div className="gf-form">
-            <pre className="gf-form-pre alert alert-info">
-              {`
+      {timeNotASC && (
+        <div className="gf-form">
+          <pre className="gf-form-pre alert alert-warning">
+            Data is not sorted ascending by Time. Recommend adding an order by clause.
+          </pre>
+        </div>
+      )}
+
+      {showHelp && (
+        <div className="gf-form">
+          <pre className="gf-form-pre alert alert-info">
+            {`
   Format as Table:
   - Can return any set of columns.
 
@@ -169,20 +161,17 @@ export class RawQueryEditor extends PureComponent<RawQueryEditorProps, State> {
   - ¡ where $__timeFilter()
   - | where TimeGenerated &ge; $__timeFrom() and TimeGenerated &le; $__timeTo()
   - | summarize count() by Category, bin(TimeGenerated, $__timeInterval)`}
-            </pre>
-          </div>
-        )}
-      </div>
-    );
-  }
-}
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+};
 
-const getStyles = stylesFactory(() => {
-  return {
-    toolbar: css`
-      display: flex;
-      flex-direction: row;
-      margin-top: 4px;
-    `,
-  };
+const getStyles = (theme: GrafanaTheme2) => ({
+  toolbar: css`
+    display: flex;
+    flex-direction: row;
+    margin-top: 4px;
+  `,
 });
