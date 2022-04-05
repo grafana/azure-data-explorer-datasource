@@ -4,4 +4,4 @@ on:
     branches-ignore: [dependabot/**]
 jobs:
   workflow-call:
-    uses: grafana/code-coverage/.github/workflows/code-coverage.yml@v0.1.1
+    uses: grafana/code-coverage/.github/workflows/code-coverage.yml@v0.1.2
