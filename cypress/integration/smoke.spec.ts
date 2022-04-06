@@ -38,7 +38,7 @@ function addCommonProvisioningADXDatasource(ADXProvisions: ADXProvision[]) {
 };
 
 e2e.scenario({
-  describeName: 'Add ADX datasource',
+  describeName: 'Add ADX datasource Import Dashoard',
   itName: 'fills out datasource connection configuration and imports JSON dashboard',
   scenario: () => {
     e2e()
@@ -51,7 +51,7 @@ e2e.scenario({
 });
 
 e2e.scenario({
-  describeName: 'Import dashboard',
+  describeName: 'Creates Panel run KQL query',
   itName: 'fills out datasource connection configuration, adds panel and runs query',
   scenario: () => {
     e2e()
@@ -74,7 +74,7 @@ e2e.scenario({
             e2eSelectors.queryEditor.editKQL.button().click({ force: true });
             e2eSelectors.queryEditor.database.input().click({ force: true });
             cy.contains('PerfTest').click();
-            e2eSelectors.queryEditor.codeEditor
+            e2eSelectors.queryEditor.codeEditorLegacy
               .container()
               .click({ force: true })
               .type(`{selectall} {backspace} PerfTest | where $__timeFilter(_Timestamp_) | order by _Timestamp_ asc`);

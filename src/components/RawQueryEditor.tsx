@@ -74,7 +74,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   return (
     <div>
       {config.featureToggles.adxNewCodeEditor ? (
-        <div data-testid="code-editor">
+        <div data-testid={selectors.components.queryEditor.codeEditor.container}>
           <CodeEditor
             language="kusto"
             value={query.query || defaultQuery}
@@ -86,7 +86,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
           />
         </div>
       ) : (
-        <div data-testid={selectors.components.queryEditor.codeEditor.container}>
+        <div data-testid={selectors.components.queryEditor.codeEditorLegacy.container}>
           <KustoMonacoEditor
             defaultTimeField="Timestamp"
             pluginBaseUrl={baseUrl}

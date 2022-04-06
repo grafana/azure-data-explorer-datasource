@@ -22,6 +22,9 @@ export const components = {
     editKQL: {
       button: 'Edit KQL',
     },
+    codeEditorLegacy: {
+      container: 'data-testid code-editor',
+    },
     codeEditor: {
       container: 'data-testid legacy-editor',
     },
