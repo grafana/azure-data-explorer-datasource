@@ -59,16 +59,16 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   const styles = useStyles2(getStyles);
 
-  if (!schema) {
-    return null;
-  }
-
   const handleEditorMount = useCallback((editor: MonacoEditor, monaco: Monaco) => {
     monaco.languages.registerCompletionItemProvider('kusto', {
       triggerCharacters: ['.', ' '],
       provideCompletionItems: getSuggestions,
     });
   }, []);
+
+  if (!schema) {
+    return null;
+  }
 
   return (
     <div>
