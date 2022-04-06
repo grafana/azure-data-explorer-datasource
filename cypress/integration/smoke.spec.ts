@@ -72,13 +72,15 @@ e2e.scenario({
           visitDashboardAtStart: false,
           queriesForm: () => {
             e2eSelectors.queryEditor.editKQL.button().click({ force: true });
-            // Wait for the selectors to load
-            e2eSelectors.queryEditor.codeEditor.container().type(
-              `PerfTest
-                  | where $__timeFilter(_Timestamp_)
-                  | order by _Timestamp_ asc`
-            );
+            e2eSelectors.queryEditor.database.input().click({ force: true });
+            cy.contains('PerfTest').click();
+            e2eSelectors.queryEditor.codeEditor
+              .container()
+              .click({ force: true })
+              .type(`{selectall} {backspace} PerfTest | where $__timeFilter(_Timestamp_) | order by _Timestamp_ asc`);
             e2eSelectors.queryEditor.runQuery.button().click({ force: true });
+            cy.get('.panel-loading');
+            cy.get('.panel-loading', { timeout: 10000 }).should('not.exist');
           },
         });
       });

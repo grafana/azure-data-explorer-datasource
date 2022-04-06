@@ -23,7 +23,10 @@ export const components = {
       button: 'Edit KQL',
     },
     codeEditor: {
-      container: 'Editor content;Press Alt+F1 for Accessibility Options.',
+      container: 'data-testid legacy-editor',
+    },
+    database: {
+      input: 'Database',
     },
     runQuery: {
       button: 'Run Query',

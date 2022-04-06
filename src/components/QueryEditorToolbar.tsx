@@ -36,6 +36,7 @@ export const QueryEditorToolbar: React.FC<Props> = (props) => {
         width={30}
         options={props.databases}
         placeholder="Select database"
+        aria-label={selectors.components.queryEditor.database.input}
         value={props.database}
         onChange={(selected) => {
           if (!selected || !selected.value) {

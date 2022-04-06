@@ -5,6 +5,7 @@ import { CodeEditor, Icon, Monaco, MonacoEditor, useStyles2 } from '@grafana/ui'
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 import { AdxDataSource } from 'datasource';
 import React, { useCallback, useState } from 'react';
+import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
 import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
@@ -85,7 +86,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
           />
         </div>
       ) : (
-        <div data-testid="legacy-editor">
+        <div data-testid={selectors.components.queryEditor.codeEditor.container}>
           <KustoMonacoEditor
             defaultTimeField="Timestamp"
             pluginBaseUrl={baseUrl}
