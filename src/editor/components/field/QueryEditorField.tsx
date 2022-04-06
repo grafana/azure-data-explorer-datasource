@@ -12,6 +12,7 @@ interface Props {
   onChange: (property: QueryEditorProperty) => void;
   placeholder?: string;
   allowCustom?: boolean;
+  'aria-label'?: string;
 }
 
 export const definitionToProperty = (definition: QueryEditorPropertyDefinition): QueryEditorProperty => {
@@ -61,6 +62,7 @@ export const QueryEditorField: React.FC<Props> = (props) => {
         backspaceRemovesValue={true}
         isClearable={true}
         onCloseMenu={onCloseMenu}
+        aria-label={props['aria-label']}
       />
     </div>
   );

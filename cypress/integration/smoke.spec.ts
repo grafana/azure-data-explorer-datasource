@@ -75,12 +75,49 @@ e2e.scenario({
             e2eSelectors.queryEditor.database.input().click({ force: true });
             cy.contains('PerfTest').click();
             e2eSelectors.queryEditor.codeEditorLegacy
-              .container()
-              .click({ force: true })
-              .type(`{selectall} {backspace} PerfTest | where $__timeFilter(_Timestamp_) | order by _Timestamp_ asc`);
+              .textarea()
+              .should('be.visible')
+              .clear()
+              .click()
+              .type(`PerfTest | where $__timeFilter(_Timestamp_) | order by _Timestamp_ asc`);
             e2eSelectors.queryEditor.runQuery.button().click({ force: true });
             cy.get('.panel-loading');
             cy.get('.panel-loading', { timeout: 10000 }).should('not.exist');
+          },
+        });
+      });
+  },
+});
+
+e2e.scenario({
+  describeName: 'Creates Panel run query via builder',
+  itName: 'fills out datasource connection configuration, adds panel and runs query via builder',
+  scenario: () => {
+    e2e()
+      .readProvisions(['datasources/adx.yaml'])
+      .then((ADXProvisions: ADXProvision[]) => {
+        addCommonProvisioningADXDatasource(ADXProvisions);
+
+        e2e.flows.addDashboard({
+          timeRange: {
+            from: '2022-01-05 19:00:00',
+            to: '2022-01-10 19:00:00',
+          },
+          variables: [],
+        });
+
+        e2e.flows.addPanel({
+          matchScreenshot: false,
+          visitDashboardAtStart: false,
+          queriesForm: () => {
+            e2eSelectors.queryEditor.database.input().click({ force: true });
+            cy.contains('PerfTest').click();
+
+            e2eSelectors.queryEditor.tableFrom.input().click({ force: true });
+            cy.contains('events.all').click();
+
+            e2eSelectors.queryEditor.runQuery.button().click({ force: true });
+            cy.contains('No graphable fields').should('exist');
           },
         });
       });

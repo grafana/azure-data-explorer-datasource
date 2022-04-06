@@ -24,12 +24,16 @@ export const components = {
     },
     codeEditorLegacy: {
       container: 'data-testid code-editor',
+      textarea: 'Editor content;Press Alt+F1 for Accessibility Options.',
     },
     codeEditor: {
       container: 'data-testid legacy-editor',
     },
     database: {
       input: 'Database',
+    },
+    tableFrom: {
+      input: 'From table',
     },
     runQuery: {
       button: 'Run Query',
