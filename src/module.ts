@@ -6,7 +6,7 @@ import { QueryEditor } from './QueryEditor';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, KustoQuery } from './types';
 
 export const plugin = new DataSourcePlugin<AdxDataSource, KustoQuery, AdxDataSourceOptions, AdxDataSourceSecureOptions>(
-  AdxDataSource as any
+  AdxDataSource
 )
   .setConfigEditor(ConfigEditor)
   .setQueryEditor(QueryEditor);
