@@ -1,19 +1,18 @@
-import React, { useMemo, useCallback, useEffect } from 'react';
-import { useAsync } from 'react-use';
-import { QueryEditorProps, PanelData, DataSourceApi } from '@grafana/data';
-// Hack for issue: https://github.com/grafana/grafana/issues/26512
-import {} from '@emotion/core';
-import { AdxDataSource } from './datasource';
-import { KustoQuery, AdxDataSourceOptions, AdxSchema, EditorMode } from 'types';
-import { QueryEditorPropertyDefinition } from './editor/types';
-import { RawQueryEditor } from './components/RawQueryEditor';
-import { databaseToDefinition } from './schema/mapper';
-import { VisualQueryEditor } from './components/VisualQueryEditor';
-import { QueryEditorToolbar } from './components/QueryEditorToolbar';
+import { PanelData, QueryEditorProps } from '@grafana/data';
 import { SchemaLoading } from 'components/SchemaMessages';
-import { needsToBeMigrated, migrateQuery } from 'migrations/query';
+import { migrateQuery, needsToBeMigrated } from 'migrations/query';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useAsync } from 'react-use';
+import { AdxDataSourceOptions, AdxSchema, EditorMode, KustoQuery } from 'types';
 
-type Props = QueryEditorProps<DataSourceApi<KustoQuery, AdxDataSourceOptions>, KustoQuery, AdxDataSourceOptions>;
+import { QueryEditorToolbar } from './components/QueryEditorToolbar';
+import { RawQueryEditor } from './components/RawQueryEditor';
+import { VisualQueryEditor } from './components/VisualQueryEditor';
+import { AdxDataSource } from './datasource';
+import { QueryEditorPropertyDefinition } from './editor/types';
+import { databaseToDefinition } from './schema/mapper';
+
+type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = (props) => {
   const { datasource, onChange, onRunQuery, query } = props;

@@ -42,6 +42,7 @@ export const QueryEditorResultFormat: React.FC<Props> = (props) => {
         options={props.includeAdxTimeFormat ? [...formats, adxTimeFormat] : formats}
         value={props.format}
         onChange={onFormatChange}
+        menuShouldPortal
       />
     </div>
   );
