@@ -44,6 +44,4 @@ docker run --rm  -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSI
 
 If you run into issues while following these steps, and especially if you already had the plugin installed and built from before, try removing the `node_modules` and `dist` folder and repeating steps 2 and 3. 
 
-There could also be an issue with tests not properly cleaned up, meaning a datasource with the same name cannot be added. You can remove it manually.
-
-Finally, if you have results inconsistent locally and on drone, and if you have permissions, you can check the CI generated mp4 here: https://console.cloud.google.com/storage/browser/plugins-ci/drone/grafana/azure-data-explorer-datasource/pull-requests;tab=objects?authuser=0&project=grafanalabs-global&prefix=&forceOnObjectsSortingFiltering=false . Select the folder with your PR number then click on `artifacts`.
+Finally, if you have results inconsistent locally and on drone, and if you have permissions, you can check the CI generated mp4: go to google cloud console, select grafanalabs-global project, go to Cloud Storage, plugin-ci bucket and search for the plugin name and the PR number. Finally check the artifacts to see the video executing the e2e tests.
