@@ -71,18 +71,17 @@ e2e.scenario({
           matchScreenshot: false,
           visitDashboardAtStart: false,
           queriesForm: () => {
-            e2eSelectors.queryEditor.editKQL.button().click({ force: true });
             e2eSelectors.queryEditor.database.input().click({ force: true });
             cy.contains('PerfTest').click();
+            e2eSelectors.queryEditor.editKQL.button().click({ force: true });
             e2eSelectors.queryEditor.codeEditorLegacy
               .textarea()
               .should('be.visible')
-              .clear()
-              .click()
+              .click({ force: true })
+              .type('{del}'.repeat(100))
               .type(`PerfTest | where $__timeFilter(_Timestamp_) | order by _Timestamp_ asc`);
             e2eSelectors.queryEditor.runQuery.button().click({ force: true });
-            cy.get('.panel-loading');
-            cy.get('.panel-loading', { timeout: 10000 }).should('not.exist');
+            cy.contains('Lonely period range deg');
           },
         });
       });
