@@ -6,6 +6,7 @@ describe('getCompletionItems', () => {
   let completionItems;
   let lineContent;
   let model;
+  const wordPosition = { startColumn: 1, endColumn: 2 };
 
   beforeEach(() => {
     (window as any).monaco = {
@@ -19,7 +20,7 @@ describe('getCompletionItems', () => {
       getLineCount: () => 3,
       getValueInRange: () => 'atable/n' + lineContent,
       getLineContent: () => lineContent,
-      getWordUntilPosition: () => ({ startColumn: 1, endColumn: 2 }),
+      getWordUntilPosition: () => wordPosition,
     };
   });
 
@@ -71,6 +72,25 @@ describe('getCompletionItems', () => {
 
       expect(completionItems.suggestions[3].label).toBe('$__timeInterval');
       expect(completionItems.suggestions[3].insertText).toBe('$__timeInterval');
+    });
+  });
+
+  describe('when half a macro is already written', () => {
+    beforeEach(() => {
+      lineContent = '| where $__time';
+      const position = { lineNumber: 2, column: 3 } as monacoTypes.Position;
+      model.getValueInRange = jest
+        .fn()
+        // First return the previous letter
+        .mockReturnValueOnce('$')
+        // Then return the whole content
+        .mockReturnValueOnce('atable/n' + lineContent);
+      completionItems = getSuggestions(model, position);
+    });
+
+    it('should return the position of the previous character', () => {
+      expect(completionItems.suggestions.length).toBe(4);
+      expect(completionItems.suggestions[0].range.startColumn).toBe(wordPosition.startColumn - 1);
     });
   });
 });

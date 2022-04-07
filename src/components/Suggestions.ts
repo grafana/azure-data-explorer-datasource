@@ -5,10 +5,16 @@ const defaultTimeField = 'Timestamp';
 
 export function getSuggestions(model: monacoTypes.editor.ITextModel, position: monacoTypes.Position) {
   const word = model.getWordUntilPosition(position);
-  const range: monaco.IRange = {
+  const prevChar = model.getValueInRange({
     startLineNumber: position.lineNumber,
     endLineNumber: position.lineNumber,
-    startColumn: word.startColumn,
+    startColumn: word.startColumn - 1,
+    endColumn: word.startColumn,
+  });
+  const replaceRange: monaco.IRange = {
+    startLineNumber: position.lineNumber,
+    endLineNumber: position.lineNumber,
+    startColumn: prevChar === '$' ? word.startColumn - 1 : word.startColumn,
     endColumn: word.endColumn,
   };
   const textUntilPosition = model.getValueInRange({
@@ -30,7 +36,7 @@ export function getSuggestions(model: monacoTypes.editor.ITextModel, position: m
         ' column\n\n' +
         '- `$__timeFilter(datetimeColumn)` ->  Uses the specified datetime column to build the query.',
     },
-    range,
+    range: replaceRange,
   };
 
   if (!includes(textUntilPosition, '|')) {
@@ -62,7 +68,7 @@ export function getSuggestions(model: monacoTypes.editor.ITextModel, position: m
               defaultTimeField +
               ' > $__from` ',
           },
-          range,
+          range: replaceRange,
         },
         {
           label: '$__to',
@@ -75,7 +81,7 @@ export function getSuggestions(model: monacoTypes.editor.ITextModel, position: m
               defaultTimeField +
               ' < $__to` ',
           },
-          range,
+          range: replaceRange,
         },
         {
           label: '$__timeInterval',
@@ -89,7 +95,7 @@ export function getSuggestions(model: monacoTypes.editor.ITextModel, position: m
               ', $__timeInterval)` \n\n' +
               '[Grafana docs](http://docs.grafana.org/reference/templating/#the-interval-variable)',
           },
-          range,
+          range: replaceRange,
         },
       ],
     };
