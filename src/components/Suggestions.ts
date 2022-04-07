@@ -105,3 +105,41 @@ export function getSuggestions(model: monacoTypes.editor.ITextModel, position: m
     suggestions: [],
   };
 }
+
+export function getSignatureHelp(
+  model: monacoTypes.editor.ITextModel,
+  position: monacoTypes.Position
+): monacoTypes.languages.ProviderResult<monacoTypes.languages.SignatureHelpResult> {
+  const word = model.getWordUntilPosition(position.delta(0, -1));
+  const textUntilPosition = model.getValueInRange({
+    startLineNumber: position.lineNumber,
+    startColumn: word.startColumn - 1,
+    endLineNumber: position.lineNumber,
+    endColumn: position.column,
+  });
+
+  if (textUntilPosition !== '$__timeFilter(') {
+    return { value: {} as monaco.languages.SignatureHelp, dispose: () => {} };
+  }
+
+  const signature: monaco.languages.SignatureHelp = {
+    activeParameter: 0,
+    activeSignature: 0,
+    signatures: [
+      {
+        label: '$__timeFilter(timeColumn)',
+        parameters: [
+          {
+            label: 'timeColumn',
+            documentation:
+              'Default is ' +
+              defaultTimeField +
+              ' column. Datetime column to filter data using the selected date range. ',
+          },
+        ],
+      },
+    ],
+  };
+
+  return { value: signature, dispose: () => {} };
+}

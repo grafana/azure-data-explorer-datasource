@@ -8,7 +8,7 @@ import React, { useCallback, useState } from 'react';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
 import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
-import { getSuggestions } from './Suggestions';
+import { getSignatureHelp, getSuggestions } from './Suggestions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -63,6 +63,10 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
     monaco.languages.registerCompletionItemProvider('kusto', {
       triggerCharacters: ['.', ' '],
       provideCompletionItems: getSuggestions,
+    });
+    monaco.languages.registerSignatureHelpProvider('kusto', {
+      signatureHelpTriggerCharacters: ['(', ')'],
+      provideSignatureHelp: getSignatureHelp,
     });
   }, []);
 
