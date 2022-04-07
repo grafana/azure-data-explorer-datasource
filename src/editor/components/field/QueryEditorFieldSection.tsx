@@ -1,5 +1,5 @@
-import React from 'react';
 import { SelectableValue } from '@grafana/data';
+import React from 'react';
 
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorPropertyExpression } from '../../expressions';
 import { isFieldExpression } from '../../guards';
@@ -17,6 +17,7 @@ export interface QueryEditorFieldSectionProps extends React.PropsWithChildren<Qu
   value?: QueryEditorExpression;
   onChange: (value: QueryEditorExpression) => void;
   allowCustom?: boolean;
+  'aria-label'?: string;
 }
 
 export const QueryEditorFieldSection = (config: FieldSectionConfiguration): React.FC<QueryEditorFieldSectionProps> => {
@@ -36,6 +37,7 @@ export const QueryEditorFieldSection = (config: FieldSectionConfiguration): Reac
           onChange={onChange(propsOnChange)}
           value={expression.property}
           allowCustom={props.allowCustom}
+          aria-label={props['aria-label']}
         />
         {props.children}
       </QueryEditorSection>

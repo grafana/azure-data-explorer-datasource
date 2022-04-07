@@ -11,6 +11,7 @@ import {
 } from 'editor/expressions';
 import React, { useCallback, useMemo } from 'react';
 import { useAsync } from 'react-use';
+import { selectors } from 'test/selectors';
 
 import { QueryEditorResultFormat, selectResultFormat } from '../components/QueryEditorResultFormat';
 import { SchemaError, SchemaLoading, SchemaWarning } from '../components/SchemaMessages';
@@ -213,16 +214,23 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
     [onChangeQuery, query, resultFormat, database, table, parseExpression, tableSchema.value]
   );
 
+  const KustoTable = (kustoTableProps: { children?: React.ReactElement }) => (
+    <KustoPropertyEditorSection
+      templateVariableOptions={props.templateVariableOptions}
+      label="From"
+      value={table}
+      fields={tables}
+      onChange={onChangeTable}
+      aria-label={selectors.components.queryEditor.tableFrom.input}
+    >
+      {kustoTableProps.children}
+    </KustoPropertyEditorSection>
+  );
+
   if (tableSchema.loading) {
     return (
       <>
-        <KustoPropertyEditorSection
-          templateVariableOptions={props.templateVariableOptions}
-          label="From"
-          value={table}
-          fields={tables}
-          onChange={onChangeTable}
-        />
+        <KustoTable />
         <SchemaLoading />
       </>
     );
@@ -231,13 +239,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
   if (tableSchema.error) {
     return (
       <>
-        <KustoPropertyEditorSection
-          templateVariableOptions={props.templateVariableOptions}
-          label="From"
-          value={table}
-          fields={tables}
-          onChange={onChangeTable}
-        />
+        <KustoTable />
         <SchemaError message={`Could not load table schema: ${tableSchema.error?.message}`} />
       </>
     );
@@ -246,13 +248,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
   if (tableSchema.value?.length === 0) {
     return (
       <>
-        <KustoPropertyEditorSection
-          templateVariableOptions={props.templateVariableOptions}
-          label="From"
-          value={table}
-          fields={tables}
-          onChange={onChangeTable}
-        />
+        <KustoTable />
         <SchemaWarning message="Table schema loaded successfully but without any columns" />
       </>
     );
@@ -260,19 +256,13 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
 
   return (
     <>
-      <KustoPropertyEditorSection
-        templateVariableOptions={props.templateVariableOptions}
-        label="From"
-        value={table}
-        fields={tables}
-        onChange={onChangeTable}
-      >
+      <KustoTable>
         <QueryEditorResultFormat
           format={resultFormat}
           includeAdxTimeFormat={false}
           onChangeFormat={onChangeResultFormat}
         />
-      </KustoPropertyEditorSection>
+      </KustoTable>
       <KustoWhereEditorSection
         templateVariableOptions={props.templateVariableOptions}
         label="Where (filter)"

@@ -5,6 +5,7 @@ import React, { useCallback, useState } from 'react';
 import { EditorMode } from 'types';
 
 import { QueryEditorSection } from '../editor/components/QueryEditorSection';
+import { selectors } from '../test/selectors';
 
 interface Props {
   database: string;
@@ -35,6 +36,7 @@ export const QueryEditorToolbar: React.FC<Props> = (props) => {
         width={30}
         options={props.databases}
         placeholder="Select database"
+        aria-label={selectors.components.queryEditor.database.input}
         value={props.database}
         onChange={(selected) => {
           if (!selected || !selected.value) {
@@ -52,11 +54,15 @@ export const QueryEditorToolbar: React.FC<Props> = (props) => {
       <div className="gf-form gf-form--grow">
         <div className="gf-form-label--grow" />
       </div>
-      <Button variant="secondary" onClick={onToggleMode}>
+      <Button variant="secondary" aria-label={selectors.components.queryEditor.editKQL.button} onClick={onToggleMode}>
         {props.editorMode === EditorMode.Visual ? 'Edit KQL' : 'Switch to builder'}
       </Button>
       <div className={styles.spacing} />
-      <Button variant={props.dirty ? 'primary' : 'secondary'} onClick={props.onRunQuery}>
+      <Button
+        variant={props.dirty ? 'primary' : 'secondary'}
+        aria-label={selectors.components.queryEditor.runQuery.button}
+        onClick={props.onRunQuery}
+      >
         Run Query
       </Button>
       <ConfirmModal
