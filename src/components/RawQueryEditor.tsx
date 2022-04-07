@@ -1,13 +1,14 @@
 import { css } from '@emotion/css';
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { config } from '@grafana/runtime';
-import { CodeEditor, Icon, useStyles2 } from '@grafana/ui';
+import { CodeEditor, Icon, Monaco, MonacoEditor, useStyles2 } from '@grafana/ui';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 import { AdxDataSource } from 'datasource';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
 import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
+import { getSuggestions } from './Suggestions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -58,6 +59,13 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   const styles = useStyles2(getStyles);
 
+  const handleEditorMount = useCallback((editor: MonacoEditor, monaco: Monaco) => {
+    monaco.languages.registerCompletionItemProvider('kusto', {
+      triggerCharacters: ['.', ' '],
+      provideCompletionItems: getSuggestions,
+    });
+  }, []);
+
   if (!schema) {
     return null;
   }
@@ -72,8 +80,8 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
             onBlur={onRawQueryChange}
             showMiniMap={false}
             showLineNumbers={true}
-            // getSuggestions={() => TBD}
             height="240px"
+            onEditorDidMount={handleEditorMount}
           />
         </div>
       ) : (
