@@ -43,3 +43,5 @@ docker run --rm  -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSI
 ## Troubleshooting
 
 If you run into issues while following these steps, and especially if you already had the plugin installed and built from before, try removing the `node_modules` and `dist` folder and repeating steps 2 and 3. 
+
+Finally, if you have results inconsistent locally and on drone, and if you have permissions, you can check the CI generated mp4: go to google cloud console, select grafanalabs-global project, go to Cloud Storage, plugin-ci bucket and search for the plugin name and the PR number. Finally check the artifacts to see the video executing the e2e tests.
