@@ -4,18 +4,18 @@ import { includes } from 'lodash';
 const defaultTimeField = 'Timestamp';
 
 export function getSuggestions(model: monacoTypes.editor.ITextModel, position: monacoTypes.Position) {
-  const word = model.getWordUntilPosition(position);
+  const wordPosition = model.getWordUntilPosition(position);
   const prevChar = model.getValueInRange({
     startLineNumber: position.lineNumber,
     endLineNumber: position.lineNumber,
-    startColumn: word.startColumn - 1,
-    endColumn: word.startColumn,
+    startColumn: wordPosition.startColumn - 1,
+    endColumn: wordPosition.startColumn,
   });
   const replaceRange: monaco.IRange = {
     startLineNumber: position.lineNumber,
     endLineNumber: position.lineNumber,
-    startColumn: prevChar === '$' ? word.startColumn - 1 : word.startColumn,
-    endColumn: word.endColumn,
+    startColumn: prevChar === '$' ? wordPosition.startColumn - 1 : wordPosition.startColumn,
+    endColumn: wordPosition.endColumn,
   };
   const textUntilPosition = model.getValueInRange({
     startLineNumber: 1,
@@ -110,16 +110,12 @@ export function getSignatureHelp(
   model: monacoTypes.editor.ITextModel,
   position: monacoTypes.Position
 ): monacoTypes.languages.ProviderResult<monacoTypes.languages.SignatureHelpResult> {
-  const word = model.getWordUntilPosition(position.delta(0, -1));
-  const textUntilPosition = model.getValueInRange({
-    startLineNumber: position.lineNumber,
-    startColumn: word.startColumn - 1,
-    endLineNumber: position.lineNumber,
-    endColumn: position.column,
-  });
-
-  if (textUntilPosition !== '$__timeFilter(') {
-    return { value: {} as monaco.languages.SignatureHelp, dispose: () => {} };
+  // The current position is the position of the parenthesis `(`
+  // So we need to get the function name using the previous character
+  const funcPosition = position.delta(0, -1);
+  const { word } = model.getWordUntilPosition(funcPosition);
+  if (word !== '__timeFilter') {
+    return { value: { activeParameter: 0, activeSignature: 0, signatures: [] }, dispose: () => {} };
   }
 
   const signature: monaco.languages.SignatureHelp = {

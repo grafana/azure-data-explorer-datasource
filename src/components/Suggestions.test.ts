@@ -99,22 +99,20 @@ describe('Suggestions', () => {
   describe('getSignatureHelp', () => {
     describe('when the function is not a time filter', () => {
       beforeEach(() => {
-        lineContent = '$__foo(';
-        model.getValueInRange = () => lineContent;
+        model.getWordUntilPosition = () => ({ word: '__foo' });
         const position = { lineNumber: 2, column: 2 } as monacoTypes.Position;
         position.delta = jest.fn().mockReturnValue(position);
         signatureHelp = getSignatureHelp(model, position);
       });
 
       it('should not return any signature', () => {
-        expect(signatureHelp.value.signatures).toBe(undefined);
+        expect(signatureHelp.value.signatures.length).toBe(0);
       });
     });
 
     describe('when the function is a time filter', () => {
       beforeEach(() => {
-        lineContent = '$__timeFilter(';
-        model.getValueInRange = () => lineContent;
+        model.getWordUntilPosition = () => ({ word: '__timeFilter' });
         const position = { lineNumber: 2, column: 2 } as monacoTypes.Position;
         position.delta = jest.fn().mockReturnValue(position);
         signatureHelp = getSignatureHelp(model, position);
