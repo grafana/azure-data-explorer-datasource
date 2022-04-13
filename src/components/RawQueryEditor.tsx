@@ -4,11 +4,11 @@ import { config } from '@grafana/runtime';
 import { CodeEditor, Icon, Monaco, MonacoEditor, useStyles2 } from '@grafana/ui';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 import { AdxDataSource } from 'datasource';
+import { KustoMonacoEditor } from 'monaco/KustoMonacoEditor';
 import React, { useCallback, useState } from 'react';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
-import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
 import { getSignatureHelp, getSuggestions } from './Suggestions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
@@ -60,7 +60,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   const styles = useStyles2(getStyles);
 
-  const handleEditorMount = useCallback((editor: MonacoEditor, monaco: Monaco) => {
+  const handleEditorMount = useCallback(async (editor: MonacoEditor, monaco: Monaco) => {
     monaco.languages.registerCompletionItemProvider('kusto', {
       triggerCharacters: ['.', ' '],
       provideCompletionItems: getSuggestions,
@@ -69,6 +69,17 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
       signatureHelpTriggerCharacters: ['(', ')'],
       provideSignatureHelp: getSignatureHelp,
     });
+    monaco.languages['kusto']
+      .getKustoWorker()
+      .then((kusto) => {
+        const model = editor.getModel();
+        return model && kusto(model.uri);
+      })
+      .then((worker) => {
+        if (schema) {
+          worker?.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
+        }
+      });
   }, []);
 
   if (!schema) {

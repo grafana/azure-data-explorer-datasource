@@ -1,12 +1,13 @@
-const packageJson = require('../package.json');
-
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
+
 import {
-  QueryEditorPropertyExpression,
   QueryEditorArrayExpression,
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
+  QueryEditorPropertyExpression,
 } from './editor/expressions';
+
+const packageJson = require('../package.json');
 
 export interface QueryExpression {
   from?: QueryEditorPropertyExpression;
@@ -125,6 +126,8 @@ export interface AdxTableSchema {
 export interface AdxColumnSchema {
   Name: string;
   CslType: string;
+  Type?: string;
+  CslDefaultValue?: string;
 }
 
 export interface AdxFunctionSchema {
@@ -133,6 +136,7 @@ export interface AdxFunctionSchema {
   Name: string;
   InputParameters: AdxFunctionInputParameterSchema[];
   OutputColumns: AdxColumnSchema[];
+  DocString?: string;
 }
 
 export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
