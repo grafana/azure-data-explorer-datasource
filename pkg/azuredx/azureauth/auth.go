@@ -1,4 +1,3 @@
-// Package azureauth provides authorization utilities for the Azure cloud.
 package azureauth
 
 import (
@@ -13,32 +12,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
+	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/aztokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
-
-// The configuration names must be kept in synch with the Azure cloud options in
-// ConfigEditor.tsx.
-const (
-	azureChina        = "chinaazuremonitor"
-	azureUSGovernment = "govazuremonitor"
-)
-
-// AuthorityBaseURL returns the OAuth2 root, including tailing slash.
-func authorityBaseURL(cloudName string) string {
-	switch cloudName {
-	case azureChina:
-		return azidentity.AzureChina
-	case azureUSGovernment:
-		return azidentity.AzureGovernment
-	default:
-		return azidentity.AzurePublicCloud
-	}
-}
 
 var onBehalfOfLatencySeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Namespace: "grafana",
@@ -53,55 +35,74 @@ func init() {
 }
 
 // ServiceCredentials provides authorization for cloud service usage.
-type ServiceCredentials struct {
-	models.DatasourceSettings
-	// HTTPDo is the http.Client Do method.
-	HTTPDo func(req *http.Request) (*http.Response, error)
-	// ServicePrincipalToken is the azidentity.ClientSecretCredential GetToken method.
-	ServicePrincipalToken func(ctx context.Context, opts azcore.TokenRequestOptions) (*azcore.AccessToken, error)
-	tokenCache            *cache
-	scope                 string
+type ServiceCredentials interface {
+	ServicePrincipalAuthorization(ctx context.Context) (string, error)
+	QueryDataAuthorization(ctx context.Context, req *backend.QueryDataRequest) (string, error)
 }
 
-func NewServiceCredentials(settings *models.DatasourceSettings, client *http.Client) (*ServiceCredentials, error) {
-	options := &azidentity.ClientSecretCredentialOptions{
-		AuthorityHost: authorityBaseURL(settings.AzureCloud),
-	}
-	clientSecret, err := azidentity.NewClientSecretCredential(settings.TenantID, settings.ClientID, settings.Secret, options)
+type ServiceCredentialsImpl struct {
+	models.DatasourceSettings
+	// HTTPDo is the http.Client Do method.
+	HTTPDo        func(req *http.Request) (*http.Response, error)
+	authority     azidentity.AuthorityHost
+	tokenProvider aztokenprovider.AzureTokenProvider
+	tokenCache    *cache
+	scopes        []string
+}
+
+func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings,
+	client *http.Client) (ServiceCredentials, error) {
+	azureCloud, err := normalizeAzureCloud(settings.AzureCloud)
 	if err != nil {
-		return nil, fmt.Errorf("unusable client secret: %w", err)
+		return nil, fmt.Errorf("invalid Azure credentials: %s", err)
 	}
 
-	return &ServiceCredentials{
-		DatasourceSettings:    *settings,
-		HTTPDo:                client.Do,
-		ServicePrincipalToken: clientSecret.GetToken,
-		tokenCache:            newCache(),
-		scope:                 getCloudScope(settings.AzureCloud, settings.ClusterURL),
+	authority, err := resolveAuthorityForCloud(azureCloud)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Azure credentials: %s", err)
+	}
+
+	credentials := &azcredentials.AzureClientSecretCredentials{
+		AzureCloud:   azureCloud,
+		TenantId:     settings.TenantID,
+		ClientId:     settings.ClientID,
+		ClientSecret: settings.Secret,
+	}
+
+	tokenProvider, err := aztokenprovider.NewAzureAccessTokenProvider(azureSettings, credentials)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Azure configuration: %w", err)
+	}
+
+	scopes, err := getAzureScopes(credentials, settings.ClusterURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Azure configuration: %w", err)
+	}
+
+	return &ServiceCredentialsImpl{
+		DatasourceSettings: *settings,
+		HTTPDo:             client.Do,
+		authority:          authority,
+		tokenProvider:      tokenProvider,
+		tokenCache:         newCache(),
+		scopes:             scopes,
 	}, nil
 }
 
 // ServicePrincipalAuthorization returns an HTTP Authorization-header value which
 // represents the service principal.
-func (c *ServiceCredentials) ServicePrincipalAuthorization(ctx context.Context) (string, error) {
-	token, err := c.tokenCache.getOrSet(ctx, "", func(ctx context.Context, _ string) (token string, expire time.Time, err error) {
-		r, err := c.ServicePrincipalToken(ctx, azcore.TokenRequestOptions{
-			Scopes: []string{c.scope},
-		})
-		if err != nil {
-			return "", time.Time{}, err
-		}
-		return r.Token, r.ExpiresOn, nil
-	})
+func (c *ServiceCredentialsImpl) ServicePrincipalAuthorization(ctx context.Context) (string, error) {
+	token, err := c.tokenProvider.GetAccessToken(ctx, c.scopes)
 	if err != nil {
 		return "", fmt.Errorf("service principal token unavailable: %w", err)
 	}
+
 	return "Bearer " + token, nil
 }
 
 // QueryDataAuthorization returns an HTTP Authorization-header value which
 // represents the respective request.
-func (c *ServiceCredentials) QueryDataAuthorization(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
+func (c *ServiceCredentialsImpl) QueryDataAuthorization(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
 	if c.QueryTimeout != 0 {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, c.QueryTimeout)
@@ -118,18 +119,7 @@ func (c *ServiceCredentials) QueryDataAuthorization(ctx context.Context, req *ba
 	}
 }
 
-func getCloudScope(cloudName string, clusterUrl string) string {
-	switch cloudName {
-	case azureChina:
-		return "https://kusto.kusto.chinacloudapi.cn/.default"
-	case azureUSGovernment:
-		return clusterUrl + "/.default"
-	}
-
-	return "https://kusto.kusto.windows.net/.default"
-}
-
-func (c *ServiceCredentials) queryDataOnBehalfOf(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
+func (c *ServiceCredentialsImpl) queryDataOnBehalfOf(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
 	user := req.PluginContext.User // do nil-check once for all
 	if user == nil {
 		return "", errors.New("non-user requests not permitted with on-behalf-of configuration")
@@ -160,18 +150,18 @@ func (c *ServiceCredentials) queryDataOnBehalfOf(ctx context.Context, req *backe
 // OnBehalfOf resolves a token which impersonates the subject of userToken.
 // UserToken has to be an ID token. See the following link for more detail.
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow
-func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (onBehalfOfToken string, expire time.Time, err error) {
+func (c *ServiceCredentialsImpl) onBehalfOf(ctx context.Context, userToken string) (onBehalfOfToken string, expire time.Time, err error) {
 	params := make(url.Values)
 	params.Set("client_id", c.ClientID)
 	params.Set("client_secret", c.Secret)
 	params.Set("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
 	params.Set("assertion", userToken)
-	params.Set("scope", c.ClusterURL+"/.default")
+	params.Set("scope", strings.Join(c.scopes, " "))
 	params.Set("requested_token_use", "on_behalf_of")
 	reqBody := strings.NewReader(params.Encode())
 
 	// https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints
-	tokenURL := fmt.Sprintf("%s%s/oauth2/v2.0/token", authorityBaseURL(c.AzureCloud), url.PathEscape(c.TenantID))
+	tokenURL := fmt.Sprintf("%s%s/oauth2/v2.0/token", c.authority, url.PathEscape(c.TenantID))
 	req, err := http.NewRequestWithContext(ctx, "POST", tokenURL, reqBody)
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("on-behalf-of grant request <%q> instantiation: %w", tokenURL, err)
@@ -209,4 +199,19 @@ func (c *ServiceCredentials) onBehalfOf(ctx context.Context, userToken string) (
 
 	expire = time.Now().Add(time.Duration(grant.Expire) * time.Second)
 	return grant.Token, expire, nil
+}
+
+func resolveAuthorityForCloud(cloudName string) (azidentity.AuthorityHost, error) {
+	// Known Azure clouds
+	switch cloudName {
+	case azsettings.AzurePublic:
+		return azidentity.AzurePublicCloud, nil
+	case azsettings.AzureChina:
+		return azidentity.AzureChina, nil
+	case azsettings.AzureUSGovernment:
+		return azidentity.AzureGovernment, nil
+	default:
+		err := fmt.Errorf("the Azure cloud '%s' not supported", cloudName)
+		return "", err
+	}
 }
