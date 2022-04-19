@@ -1,12 +1,13 @@
-const packageJson = require('../package.json');
-
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
+
 import {
-  QueryEditorPropertyExpression,
   QueryEditorArrayExpression,
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
+  QueryEditorPropertyExpression,
 } from './editor/expressions';
+
+const packageJson = require('../package.json');
 
 export interface QueryExpression {
   from?: QueryEditorPropertyExpression;

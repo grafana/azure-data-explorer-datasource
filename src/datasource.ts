@@ -1,33 +1,34 @@
 import {
-  MetricFindValue,
-  DataSourceInstanceSettings,
-  DataQueryRequest,
-  ScopedVar,
-  TimeRange,
   DataFrame,
+  DataQueryRequest,
+  DataSourceInstanceSettings,
+  MetricFindValue,
+  ScopedVar,
   ScopedVars,
+  TimeRange,
 } from '@grafana/data';
-import { map } from 'lodash';
-import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
-import { ResponseParser, DatabaseItem, KustoDatabaseList } from './response_parser';
-import {
-  AdxDataSourceOptions,
-  KustoQuery,
-  AdxSchema,
-  AdxColumnSchema,
-  defaultQuery,
-  QueryExpression,
-  EditorMode,
-  AutoCompleteQuery,
-} from './types';
-import interpolateKustoQuery from './query_builder';
-import { migrateAnnotation } from './migrations/annotation';
+import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
 import { QueryEditorOperator } from 'editor/types';
-import { cache } from 'schema/cache';
 import { KustoExpressionParser } from 'KustoExpressionParser';
+import { map } from 'lodash';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
+import { cache } from 'schema/cache';
+
+import { migrateAnnotation } from './migrations/annotation';
+import interpolateKustoQuery from './query_builder';
+import { DatabaseItem, KustoDatabaseList, ResponseParser } from './response_parser';
+import {
+  AdxColumnSchema,
+  AdxDataSourceOptions,
+  AdxSchema,
+  AutoCompleteQuery,
+  defaultQuery,
+  EditorMode,
+  KustoQuery,
+  QueryExpression,
+} from './types';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
