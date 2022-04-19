@@ -126,8 +126,6 @@ export interface AdxTableSchema {
 export interface AdxColumnSchema {
   Name: string;
   CslType: string;
-  Type?: string;
-  CslDefaultValue?: string;
 }
 
 export interface AdxFunctionSchema {
@@ -136,7 +134,6 @@ export interface AdxFunctionSchema {
   Name: string;
   InputParameters: AdxFunctionInputParameterSchema[];
   OutputColumns: AdxColumnSchema[];
-  DocString?: string;
 }
 
 export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
