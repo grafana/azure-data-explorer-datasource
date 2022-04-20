@@ -126,6 +126,8 @@ export interface AdxTableSchema {
 export interface AdxColumnSchema {
   Name: string;
   CslType: string;
+  Type: string;
+  CslDefaultValue?: string;
 }
 
 export interface AdxFunctionSchema {
@@ -134,6 +136,7 @@ export interface AdxFunctionSchema {
   Name: string;
   InputParameters: AdxFunctionInputParameterSchema[];
   OutputColumns: AdxColumnSchema[];
+  DocString?: string;
 }
 
 export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
@@ -143,4 +146,12 @@ export enum AzureCloudType {
   AzurePublic = 'azuremonitor',
   AzureUSGovernment = 'govazuremonitor',
   AzureChina = 'chinaazuremonitor',
+}
+
+export interface ScalarParameter {
+  name: string;
+  type?: string;
+  cslType?: string;
+  docstring?: string;
+  cslDefaultValue?: string;
 }
