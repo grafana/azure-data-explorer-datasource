@@ -147,11 +147,3 @@ export enum AzureCloudType {
   AzureUSGovernment = 'govazuremonitor',
   AzureChina = 'chinaazuremonitor',
 }
-
-export interface ScalarParameter {
-  name: string;
-  type?: string;
-  cslType?: string;
-  docstring?: string;
-  cslDefaultValue?: string;
-}
