@@ -5,7 +5,7 @@ import { CodeEditor, Icon, Monaco, MonacoEditor, useStyles2 } from '@grafana/ui'
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 import { AdxDataSource } from 'datasource';
 import { KustoMonacoEditor } from 'monaco/KustoMonacoEditor';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
@@ -61,7 +61,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   const styles = useStyles2(getStyles);
 
-  const handleEditorMount = useCallback((editor: MonacoEditor, monaco: Monaco) => {
+  const handleEditorMount = (editor: MonacoEditor, monaco: Monaco) => {
     monaco.languages.registerSignatureHelpProvider('kusto', {
       signatureHelpTriggerCharacters: ['(', ')'],
       provideSignatureHelp: getSignatureHelp,
@@ -81,7 +81,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
           worker?.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
         }
       });
-  }, []);
+  };
 
   if (!schema) {
     return null;
