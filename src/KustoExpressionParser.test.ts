@@ -1,17 +1,18 @@
-import { KustoExpressionParser } from './KustoExpressionParser';
-import { QueryEditorPropertyType } from './editor/types';
 import { TemplateSrv } from '@grafana/runtime';
+import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
+
 import {
-  QueryEditorPropertyExpression,
-  QueryEditorOperatorExpression,
-  QueryEditorExpressionType,
   QueryEditorArrayExpression,
   QueryEditorExpression,
-  QueryEditorReduceExpression,
-  QueryEditorGroupByExpression,
+  QueryEditorExpressionType,
   QueryEditorFunctionParameterExpression,
+  QueryEditorGroupByExpression,
+  QueryEditorOperatorExpression,
+  QueryEditorPropertyExpression,
+  QueryEditorReduceExpression,
 } from './editor/expressions';
-import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
+import { QueryEditorPropertyType } from './editor/types';
+import { KustoExpressionParser } from './KustoExpressionParser';
 
 describe('KustoExpressionParser', () => {
   const templateSrv: TemplateSrv = { getVariables: jest.fn(), replace: jest.fn() };
@@ -111,6 +112,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column.type',
           CslType: 'string',
+          Type: 'System.string',
         },
       ];
 
@@ -147,10 +149,12 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column.type',
           CslType: 'string',
+          Type: 'System.string',
         },
         {
           Name: 'StartTime',
           CslType: 'datetime',
+          Type: 'System.string',
         },
       ];
 
@@ -274,6 +278,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'StartTime',
           CslType: 'datetime',
+          Type: 'System.string',
         },
       ];
 
@@ -294,10 +299,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
         {
           Name: 'EndTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -319,6 +326,7 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'Column.StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -340,10 +348,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'Column.StartTime',
+          Type: '',
           CslType: 'datetime',
         },
         {
           Name: 'SavedTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -423,6 +433,7 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.level.active',
+          Type: '',
           CslType: 'int',
         },
       ];
@@ -444,10 +455,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.level.active',
+          Type: '',
           CslType: 'int',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -470,10 +483,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.level.active',
+          Type: '',
           CslType: 'int',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -497,10 +512,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.level.active',
+          Type: '',
           CslType: 'int',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -524,10 +541,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.level.active',
+          Type: '',
           CslType: 'int',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -551,10 +570,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.level.active',
+          Type: '',
           CslType: 'int',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -578,14 +599,17 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.level.active',
+          Type: '',
           CslType: 'int',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
         {
           Name: 'EndTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -609,14 +633,17 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.level.active',
+          Type: '',
           CslType: 'int',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
         {
           Name: 'column.EndTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -640,10 +667,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.type',
+          Type: '',
           CslType: 'string',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -682,10 +711,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.type',
+          Type: '',
           CslType: 'string',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -708,10 +739,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.type',
+          Type: '',
           CslType: 'string',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -734,10 +767,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.type',
+          Type: '',
           CslType: 'string',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -760,10 +795,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.type',
+          Type: '',
           CslType: 'string',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -786,10 +823,12 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'column.type',
+          Type: '',
           CslType: 'string',
         },
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -812,6 +851,7 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -845,6 +885,7 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -866,6 +907,7 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -889,6 +931,7 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -909,6 +952,7 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -929,6 +973,7 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
@@ -949,6 +994,7 @@ describe('KustoExpressionParser', () => {
       const tableSchema: AdxColumnSchema[] = [
         {
           Name: 'StartTime',
+          Type: '',
           CslType: 'datetime',
         },
       ];
