@@ -345,7 +345,6 @@ const functionSchemaParser = (frames: DataFrame[]): AdxColumnSchema[] => {
       result.push({
         Name: frame.fields[nameIndex].values.get(index),
         CslType: frame.fields[typeIndex].values.get(index),
-        Type: frame.fields[typeIndex].values.get(index),
       });
     }
   }
@@ -388,7 +387,6 @@ const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]
       result.push({
         Name: key,
         CslType: schema[name],
-        Type: schema[name],
       });
       continue;
     }
