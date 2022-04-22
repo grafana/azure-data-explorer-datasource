@@ -1,15 +1,15 @@
 import { css } from '@emotion/css';
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
-import { config } from '@grafana/runtime';
+import { config, getTemplateSrv } from '@grafana/runtime';
 import { CodeEditor, Icon, Monaco, MonacoEditor, useStyles2 } from '@grafana/ui';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 import { AdxDataSource } from 'datasource';
 import { KustoMonacoEditor } from 'monaco/KustoMonacoEditor';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
-import { getSignatureHelp, getSuggestions } from './Suggestions';
+import { getFunctions, getSignatureHelp } from './Suggestions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -35,6 +35,7 @@ const defaultQuery = [
 export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [showLastQuery, setShowLastQuery] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const templateSrv = getTemplateSrv();
 
   const onRawQueryChange = (kql: string) => {
     const resultFormat = selectResultFormat(props.query.resultFormat, true);
@@ -60,11 +61,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   const styles = useStyles2(getStyles);
 
-  const handleEditorMount = useCallback((editor: MonacoEditor, monaco: Monaco) => {
-    monaco.languages.registerCompletionItemProvider('kusto', {
-      triggerCharacters: ['.', ' '],
-      provideCompletionItems: getSuggestions,
-    });
+  const handleEditorMount = (editor: MonacoEditor, monaco: Monaco) => {
     monaco.languages.registerSignatureHelpProvider('kusto', {
       signatureHelpTriggerCharacters: ['(', ')'],
       provideSignatureHelp: getSignatureHelp,
@@ -77,10 +74,14 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
       })
       .then((worker) => {
         if (schema) {
+          // Populate Database schema with macros
+          Object.keys(schema.Databases).forEach((db) =>
+            Object.assign(schema.Databases[db].Functions, getFunctions(templateSrv.getVariables()))
+          );
           worker?.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
         }
       });
-  }, []);
+  };
 
   if (!schema) {
     return null;
