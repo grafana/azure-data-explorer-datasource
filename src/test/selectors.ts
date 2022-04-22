@@ -23,11 +23,11 @@ export const components = {
       button: 'Edit KQL',
     },
     codeEditorLegacy: {
-      container: 'data-testid code-editor',
+      container: 'data-testid legacy-editor',
       textarea: 'Editor content;Press Alt+F1 for Accessibility Options.',
     },
     codeEditor: {
-      container: 'data-testid legacy-editor',
+      container: 'data-testid code-editor',
     },
     database: {
       input: 'Database',

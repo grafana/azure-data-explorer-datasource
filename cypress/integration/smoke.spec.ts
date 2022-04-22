@@ -74,12 +74,20 @@ e2e.scenario({
             e2eSelectors.queryEditor.database.input().click({ force: true });
             cy.contains('PerfTest').click({ force: true });
             e2eSelectors.queryEditor.editKQL.button().click({ force: true });
-            e2eSelectors.queryEditor.codeEditorLegacy
-              .textarea()
-              .should('be.visible')
+            // Wait for the schema to load
+            cy.get('.Table', { timeout: 10000 });
+            e2eSelectors.queryEditor.codeEditor
+              .container()
               .click({ force: true })
-              .type('{del}'.repeat(100))
-              .type(`PerfTest | where $__timeFilter(_Timestamp_) | order by _Timestamp_ asc`);
+              .type('{selectall}{del}')
+              .type('PerfTest | where ');
+            // It should trigger auto-completion suggestions
+            cy.contains('$__timeFilter');
+            // complete the query
+            e2eSelectors.queryEditor.codeEditor
+              .container()
+              .click({ force: true })
+              .type('$__timeFilter(_Timestamp_) | order by _Timestamp_ asc');
             e2eSelectors.queryEditor.runQuery.button().click({ force: true });
             cy.contains('Lonely period range deg');
           },
