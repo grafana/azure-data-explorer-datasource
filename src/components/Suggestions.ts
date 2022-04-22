@@ -15,7 +15,7 @@ export function getFunctions(variables: VariableModel[]): Record<string, AdxFunc
           Name: 'timeColumn',
           CslType: 'string',
           Type: 'System.String',
-          CslDefaultValue: 'TimeGenerated',
+          CslDefaultValue: '""',
         },
       ],
       OutputColumns: [],

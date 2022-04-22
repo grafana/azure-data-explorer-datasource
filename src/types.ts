@@ -126,7 +126,7 @@ export interface AdxTableSchema {
 export interface AdxColumnSchema {
   Name: string;
   CslType: string;
-  Type: string;
+  Type?: string;
   CslDefaultValue?: string;
 }
 
