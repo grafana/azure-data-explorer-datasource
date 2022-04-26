@@ -98,7 +98,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
       );
       worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
     }
-  }, [worker, schema, props.database]);
+  }, [worker, schema, variables, props.database]);
 
   if (!schema) {
     return null;
