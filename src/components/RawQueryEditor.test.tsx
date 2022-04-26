@@ -16,7 +16,12 @@ jest.mock('../monaco/KustoMonacoEditor', () => {
 let mockedRuntime;
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
-  mockedRuntime = { ...original };
+  mockedRuntime = {
+    ...original,
+    getTemplateSrv: () => ({
+      getVariables: () => [],
+    }),
+  };
   mockedRuntime.config.buildInfo.version = '8.1.0';
 
   return mockedRuntime;
