@@ -48,7 +48,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [showLastQuery, setShowLastQuery] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [worker, setWorker] = useState<Worker>();
-  const templateSrv = getTemplateSrv();
+  const [variables] = useState(getTemplateSrv().getVariables());
 
   const onRawQueryChange = (kql: string) => {
     const resultFormat = selectResultFormat(props.query.resultFormat, true);
@@ -94,7 +94,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
     if (worker && schema) {
       // Populate Database schema with macros
       Object.keys(schema.Databases).forEach((db) =>
-        Object.assign(schema.Databases[db].Functions, getFunctions(templateSrv.getVariables()))
+        Object.assign(schema.Databases[db].Functions, getFunctions(variables))
       );
       worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
     }
