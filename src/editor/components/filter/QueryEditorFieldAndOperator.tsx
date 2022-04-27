@@ -1,7 +1,7 @@
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { useStyles2 } from '@grafana/ui';
 import debounce from 'debounce-promise';
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'react-use';
 

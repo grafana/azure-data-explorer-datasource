@@ -5,12 +5,12 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { useAsync } from 'react-use';
 import { AdxDataSourceOptions, AdxSchema, EditorMode, KustoQuery } from 'types';
 
-import { QueryEditorToolbar } from './components/QueryEditorToolbar';
-import { RawQueryEditor } from './components/RawQueryEditor';
-import { VisualQueryEditor } from './components/VisualQueryEditor';
-import { AdxDataSource } from './datasource';
-import { QueryEditorPropertyDefinition } from './editor/types';
-import { databaseToDefinition } from './schema/mapper';
+import { QueryEditorToolbar } from './QueryEditorToolbar';
+import { RawQueryEditor } from './RawQueryEditor';
+import { VisualQueryEditor } from './VisualQueryEditor';
+import { AdxDataSource } from '../datasource';
+import { QueryEditorPropertyDefinition } from '../editor/types';
+import { databaseToDefinition } from '../schema/mapper';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
