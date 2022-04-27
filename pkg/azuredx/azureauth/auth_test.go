@@ -85,13 +85,10 @@ func TestQueryDataAuthorization(t *testing.T) {
 		}
 
 		// setup & test
-		authority, err := resolveAuthorityForCloud(azsettings.AzurePublic)
-		require.NoError(t, err)
-
 		c := &ServiceCredentialsImpl{HTTPDo: g.HTTPDoMock}
 		c.TenantID = "0AF0528A-F473-4E0C-891F-3FF8ACDC4E5F"
 		c.OnBehalfOf = true
-		c.authority = authority
+		c.authority = azidentity.AzurePublicCloud
 		c.tokenCache = newCache()
 		auth, err := c.QueryDataAuthorization(context.Background(), &req)
 		switch {
