@@ -4,14 +4,6 @@ import { QueryEditor } from './QueryEditor';
 
 import { mockDatasource, mockQuery } from './__fixtures__/Datasource';
 
-// jest.mock('../monaco/KustoMonacoEditor', () => {
-//   return {
-//     KustoMonacoEditor: function C() {
-//       return <></>;
-//     },
-//   };
-// });
-
 let mockedRuntime;
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
