@@ -294,6 +294,16 @@ MyLogs
 | project Timestamp, Text=Message , Tags="tag1,tag2"
 ```
 
+## Query Builder - Data Types
+
+The query builder provides an easy to use interface to query Azure Data Explorer. However, there are limitations on the supported data types that a column can possess. Currently, if a column is typed as `dynamic` it is filtered as an option for the following operations: `Where`, `Aggregate`, `Group by`. The reason for this is that columns of type `dynamic` can potentially contain values that have any of the primitive data types, but also arrays (where the array can then have values of any type) and JSON objects. The query builder does not currently support querying values that are either arrays or JSON objects.
+
+See the below documentation for further details on how to handle dynamic columns appropriately via the KQL editor.
+
+[Kusto Data Types](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/) - Documentation on data types supported by Kusto.
+
+[Dynamic Data Type](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic) - Detailed documentation on the dynamic data type.
+
 ## CHANGELOG
 
 See the [Changelog](https://github.com/grafana/azure-data-explorer-datasource/blob/master/CHANGELOG.md).
