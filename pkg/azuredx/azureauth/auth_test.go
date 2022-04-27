@@ -9,9 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/stretchr/testify/require"
 )
 
 func TestQueryDataAuthorization(t *testing.T) {
