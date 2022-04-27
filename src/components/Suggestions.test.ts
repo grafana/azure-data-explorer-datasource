@@ -1,9 +1,8 @@
 import { monacoTypes } from '@grafana/ui';
 
-import { getSignatureHelp, getSuggestions } from './Suggestions';
+import { getFunctions, getSignatureHelp } from './Suggestions';
 
 describe('Suggestions', () => {
-  let completionItems;
   let lineContent;
   let model;
   let signatureHelp;
@@ -24,75 +23,13 @@ describe('Suggestions', () => {
       getWordUntilPosition: () => wordPosition,
     };
   });
-  describe('getCompletionItems', () => {
-    describe('when no where clause and no | in model text', () => {
-      beforeEach(() => {
-        lineContent = ' ';
-        const position = { lineNumber: 2, column: 2 } as monacoTypes.Position;
-        completionItems = getSuggestions(model, position);
-      });
-
-      it('should not return any grafana macros', () => {
-        expect(completionItems.suggestions.length).toBe(0);
-      });
+  describe('getFunctions', () => {
+    it('should return macros as functions', () => {
+      expect(Object.keys(getFunctions([]))).toEqual(['$__timeFilter', '$__from', '$__to', '$__timeInterval']);
     });
 
-    describe('when no where clause in model text', () => {
-      beforeEach(() => {
-        lineContent = '| ';
-        const position = { lineNumber: 2, column: 3 } as monacoTypes.Position;
-        completionItems = getSuggestions(model, position);
-      });
-
-      it('should return grafana macros for where and timefilter', () => {
-        expect(completionItems.suggestions.length).toBe(1);
-
-        expect(completionItems.suggestions[0].label).toBe('where $__timeFilter(timeColumn)');
-        expect(completionItems.suggestions[0].insertText).toBe('where $__timeFilter(Timestamp)');
-      });
-    });
-
-    describe('when on line with where clause', () => {
-      beforeEach(() => {
-        lineContent = '| where Test == 2 and ';
-        const position = { lineNumber: 2, column: 23 } as monacoTypes.Position;
-        completionItems = getSuggestions(model, position);
-      });
-
-      it('should return grafana macros and variables', () => {
-        expect(completionItems.suggestions.length).toBe(4);
-
-        expect(completionItems.suggestions[0].label).toBe('$__timeFilter(timeColumn)');
-        expect(completionItems.suggestions[0].insertText).toBe('$__timeFilter(Timestamp)');
-
-        expect(completionItems.suggestions[1].label).toBe('$__from');
-        expect(completionItems.suggestions[1].insertText).toBe('$__from');
-
-        expect(completionItems.suggestions[2].label).toBe('$__to');
-        expect(completionItems.suggestions[2].insertText).toBe('$__to');
-
-        expect(completionItems.suggestions[3].label).toBe('$__timeInterval');
-        expect(completionItems.suggestions[3].insertText).toBe('$__timeInterval');
-      });
-    });
-
-    describe('when half a macro is already written', () => {
-      beforeEach(() => {
-        lineContent = '| where $__time';
-        const position = { lineNumber: 2, column: 3 } as monacoTypes.Position;
-        model.getValueInRange = jest
-          .fn()
-          // First return the previous letter
-          .mockReturnValueOnce('$')
-          // Then return the whole content
-          .mockReturnValueOnce('atable/n' + lineContent);
-        completionItems = getSuggestions(model, position);
-      });
-
-      it('should return the position of the previous character', () => {
-        expect(completionItems.suggestions.length).toBe(4);
-        expect(completionItems.suggestions[0].range.startColumn).toBe(wordPosition.startColumn - 1);
-      });
+    it('should return template variables as functions', () => {
+      expect(Object.keys(getFunctions([{ type: 'query', name: 'foo', label: 'foo' }]))).toContain('$foo');
     });
   });
 

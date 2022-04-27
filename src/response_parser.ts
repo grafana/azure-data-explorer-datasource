@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { AdxSchema } from 'types';
 
 export interface DataTarget {

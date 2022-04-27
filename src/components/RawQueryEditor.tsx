@@ -1,15 +1,16 @@
 import { css } from '@emotion/css';
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
-import { config } from '@grafana/runtime';
+import { config, getTemplateSrv } from '@grafana/runtime';
 import { CodeEditor, Icon, Monaco, MonacoEditor, useStyles2 } from '@grafana/ui';
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 import { AdxDataSource } from 'datasource';
-import React, { useCallback, useState } from 'react';
+import { KustoMonacoEditor } from 'monaco/KustoMonacoEditor';
+import React, { useEffect, useState } from 'react';
+import { gte, valid } from 'semver';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
-import { KustoMonacoEditor } from '../monaco/KustoMonacoEditor';
-import { getSignatureHelp, getSuggestions } from './Suggestions';
+import { getFunctions, getSignatureHelp } from './Suggestions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -32,9 +33,22 @@ const defaultQuery = [
   '// | order by Timestamp asc',
 ].join('\n');
 
+interface Worker {
+  setSchemaFromShowSchema: (schema: AdxSchema, url: string, database: string) => void;
+}
+
+// Since Grafana 8.5, the query editor includes a version of the Monaco editor for Kusto
+// that includes fixes required for auto-completion to work.
+// Remove this code once Grafana 8.5 is the minimal version supported
+function gtGrafana8_5() {
+  return valid(config.buildInfo.version) && gte(config.buildInfo.version, '8.5.0');
+}
+
 export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [showLastQuery, setShowLastQuery] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [worker, setWorker] = useState<Worker>();
+  const [variables] = useState(getTemplateSrv().getVariables());
 
   const onRawQueryChange = (kql: string) => {
     const resultFormat = selectResultFormat(props.query.resultFormat, true);
@@ -60,16 +74,31 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   const styles = useStyles2(getStyles);
 
-  const handleEditorMount = useCallback((editor: MonacoEditor, monaco: Monaco) => {
-    monaco.languages.registerCompletionItemProvider('kusto', {
-      triggerCharacters: ['.', ' '],
-      provideCompletionItems: getSuggestions,
-    });
+  const handleEditorMount = (editor: MonacoEditor, monaco: Monaco) => {
     monaco.languages.registerSignatureHelpProvider('kusto', {
       signatureHelpTriggerCharacters: ['(', ')'],
       provideSignatureHelp: getSignatureHelp,
     });
-  }, []);
+    monaco.languages['kusto']
+      .getKustoWorker()
+      .then((kusto) => {
+        const model = editor.getModel();
+        return model && kusto(model.uri);
+      })
+      .then((worker) => {
+        setWorker(worker);
+      });
+  };
+
+  useEffect(() => {
+    if (worker && schema) {
+      // Populate Database schema with macros
+      Object.keys(schema.Databases).forEach((db) =>
+        Object.assign(schema.Databases[db].Functions, getFunctions(variables))
+      );
+      worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
+    }
+  }, [worker, schema, variables, props.database]);
 
   if (!schema) {
     return null;
@@ -77,7 +106,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   return (
     <div>
-      {config.featureToggles.adxNewCodeEditor ? (
+      {gtGrafana8_5() ? (
         <div data-testid={selectors.components.queryEditor.codeEditor.container}>
           <CodeEditor
             language="kusto"

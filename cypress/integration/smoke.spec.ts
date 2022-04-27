@@ -35,7 +35,7 @@ function addCommonProvisioningADXDatasource(ADXProvisions: ADXProvision[]) {
     },
     expectedAlertMessage: 'Success',
   });
-};
+}
 
 e2e.scenario({
   describeName: 'Add ADX datasource Import Dashoard',
@@ -72,7 +72,7 @@ e2e.scenario({
           visitDashboardAtStart: false,
           queriesForm: () => {
             e2eSelectors.queryEditor.database.input().click({ force: true });
-            cy.contains('PerfTest').click();
+            cy.contains('PerfTest').click({ force: true });
             e2eSelectors.queryEditor.editKQL.button().click({ force: true });
             e2eSelectors.queryEditor.codeEditorLegacy
               .textarea()
@@ -110,10 +110,10 @@ e2e.scenario({
           visitDashboardAtStart: false,
           queriesForm: () => {
             e2eSelectors.queryEditor.database.input().click({ force: true });
-            cy.contains('PerfTest').click();
+            cy.contains('PerfTest').click({ force: true });
 
             e2eSelectors.queryEditor.tableFrom.input().click({ force: true });
-            cy.contains('events.all').click();
+            cy.contains('events.all').click({ force: true });
 
             e2eSelectors.queryEditor.runQuery.button().click({ force: true });
             cy.contains('No graphable fields').should('exist');

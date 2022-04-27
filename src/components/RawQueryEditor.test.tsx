@@ -1,4 +1,3 @@
-import { config } from '@grafana/runtime';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { selectors } from 'test/selectors';
@@ -14,6 +13,20 @@ jest.mock('../monaco/KustoMonacoEditor', () => {
   };
 });
 
+let mockedRuntime;
+jest.mock('@grafana/runtime', () => {
+  const original = jest.requireActual('@grafana/runtime');
+  mockedRuntime = {
+    ...original,
+    getTemplateSrv: () => ({
+      getVariables: () => [],
+    }),
+  };
+  mockedRuntime.config.buildInfo.version = '8.1.0';
+
+  return mockedRuntime;
+});
+
 const defaultProps = {
   database: 'default',
   templateVariableOptions: {},
@@ -25,21 +38,21 @@ const defaultProps = {
 };
 
 describe('RawQueryEditor', () => {
-  const featureToggles = { ...config.featureToggles };
-
-  afterEach(() => {
-    config.featureToggles = featureToggles;
+  describe('when the Grafana version is <8.5', () => {
+    it('should render legacy editor', () => {
+      render(<RawQueryEditor {...defaultProps} />);
+      expect(screen.getByTestId(selectors.components.queryEditor.codeEditorLegacy.container)).toBeInTheDocument();
+    });
   });
 
-  it('should render legacy editor', () => {
-    render(<RawQueryEditor {...defaultProps} />);
-    expect(screen.getByTestId(selectors.components.queryEditor.codeEditorLegacy.container)).toBeInTheDocument();
-  });
-
-  it('should render the new code editor', async () => {
-    config.featureToggles.adxNewCodeEditor = true;
-    render(<RawQueryEditor {...defaultProps} />);
-    expect(screen.getByTestId(selectors.components.queryEditor.codeEditor.container)).toBeInTheDocument();
-    await screen.findByText('Loading...');
+  describe('when the Grafana version is >=8.5', () => {
+    beforeEach(() => {
+      mockedRuntime.config.buildInfo.version = '8.5.0';
+    });
+    it('should render the new code editor', async () => {
+      render(<RawQueryEditor {...defaultProps} />);
+      expect(screen.getByTestId(selectors.components.queryEditor.codeEditor.container)).toBeInTheDocument();
+      await screen.findByText('Loading...');
+    });
   });
 });

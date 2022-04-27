@@ -1,109 +1,82 @@
+import { VariableModel } from '@grafana/data';
 import { monacoTypes } from '@grafana/ui';
-import { includes } from 'lodash';
+import { AdxFunctionSchema } from 'types';
 
-const defaultTimeField = 'Timestamp';
+const defaultTimeField = 'TimeGenerated';
 
-export function getSuggestions(model: monacoTypes.editor.ITextModel, position: monacoTypes.Position) {
-  const wordPosition = model.getWordUntilPosition(position);
-  const prevChar = model.getValueInRange({
-    startLineNumber: position.lineNumber,
-    endLineNumber: position.lineNumber,
-    startColumn: wordPosition.startColumn - 1,
-    endColumn: wordPosition.startColumn,
-  });
-  const replaceRange: monaco.IRange = {
-    startLineNumber: position.lineNumber,
-    endLineNumber: position.lineNumber,
-    startColumn: prevChar === '$' ? wordPosition.startColumn - 1 : wordPosition.startColumn,
-    endColumn: wordPosition.endColumn,
-  };
-  const textUntilPosition = model.getValueInRange({
-    startLineNumber: 1,
-    startColumn: 1,
-    endLineNumber: position.lineNumber,
-    endColumn: position.column,
-  });
-
-  const timeFilterSuggestion = {
-    label: 'where $__timeFilter(timeColumn)',
-    kind: monaco.languages.CompletionItemKind.Keyword,
-    insertText: 'where $__timeFilter(' + defaultTimeField + ')',
-    documentation: {
-      value:
+export function getFunctions(variables: VariableModel[]): Record<string, AdxFunctionSchema> {
+  const functions = {
+    $__timeFilter: {
+      Name: '$__timeFilter',
+      Body: '{ true }',
+      FunctionKind: 'Unknown',
+      InputParameters: [
+        {
+          Name: 'timeColumn',
+          CslType: 'string',
+          Type: 'System.String',
+          CslDefaultValue: '""',
+        },
+      ],
+      OutputColumns: [],
+      DocString:
         '##### Macro that uses the selected timerange in Grafana to filter the query.\n\n' +
         '- `$__timeFilter()` -> Uses the ' +
         defaultTimeField +
         ' column\n\n' +
         '- `$__timeFilter(datetimeColumn)` ->  Uses the specified datetime column to build the query.',
     },
-    range: replaceRange,
+    $__from: {
+      Name: '$__from',
+      Body: '{ datetime(2018-06-05T18:09:58.907Z) }',
+      FunctionKind: 'Unknown',
+      DocString:
+        'Built-in variable that returns the from value of the selected timerange in Grafana.\n\n' +
+        'Example: `where ' +
+        defaultTimeField +
+        ' > $__from` ',
+      InputParameters: [],
+      OutputColumns: [],
+    },
+    $__to: {
+      Name: '$__to',
+      Body: '{ datetime(2018-06-05T18:09:58.907Z) }',
+      FunctionKind: 'Unknown',
+      DocString:
+        'Built-in variable that returns the to value of the selected timerange in Grafana.\n\n' +
+        'Example: `where ' +
+        defaultTimeField +
+        ' < $__to` ',
+      InputParameters: [],
+      OutputColumns: [],
+    },
+    $__timeInterval: {
+      Name: '$__timeInterval',
+      Body: '{ 1s }',
+      FunctionKind: 'Unknown',
+      DocString:
+        '##### Built-in variable that returns an automatic time grain suitable for the current timerange.\n\n' +
+        'Used with the bin() function - `bin(' +
+        defaultTimeField +
+        ', $__timeInterval)` \n\n' +
+        '[Grafana docs](http://docs.grafana.org/reference/templating/#the-interval-variable)',
+      InputParameters: [],
+      OutputColumns: [],
+    },
   };
 
-  if (!includes(textUntilPosition, '|')) {
-    return { suggestions: [] };
-  }
-
-  if (!includes(textUntilPosition.toLowerCase(), 'where')) {
-    return {
-      suggestions: [timeFilterSuggestion],
+  // Add template variables
+  variables.forEach((v) => {
+    functions[`$${v.name}`] = {
+      Name: `$${v.name}`,
+      Body: '{}',
+      FunctionKind: 'Unknown',
+      InputParameters: [],
+      OutputColumns: [],
     };
-  }
+  });
 
-  if (includes(model.getLineContent(position.lineNumber).toLowerCase(), 'where')) {
-    return {
-      suggestions: [
-        {
-          ...timeFilterSuggestion,
-          label: '$__timeFilter(timeColumn)',
-          insertText: '$__timeFilter(' + defaultTimeField + ')',
-        },
-        {
-          label: '$__from',
-          kind: monaco.languages.CompletionItemKind.Keyword,
-          insertText: `$__from`,
-          documentation: {
-            value:
-              'Built-in variable that returns the from value of the selected timerange in Grafana.\n\n' +
-              'Example: `where ' +
-              defaultTimeField +
-              ' > $__from` ',
-          },
-          range: replaceRange,
-        },
-        {
-          label: '$__to',
-          kind: monaco.languages.CompletionItemKind.Keyword,
-          insertText: `$__to`,
-          documentation: {
-            value:
-              'Built-in variable that returns the to value of the selected timerange in Grafana.\n\n' +
-              'Example: `where ' +
-              defaultTimeField +
-              ' < $__to` ',
-          },
-          range: replaceRange,
-        },
-        {
-          label: '$__timeInterval',
-          kind: monaco.languages.CompletionItemKind.Keyword,
-          insertText: `$__timeInterval`,
-          documentation: {
-            value:
-              '##### Built-in variable that returns an automatic time grain suitable for the current timerange.\n\n' +
-              'Used with the bin() function - `bin(' +
-              defaultTimeField +
-              ', $__timeInterval)` \n\n' +
-              '[Grafana docs](http://docs.grafana.org/reference/templating/#the-interval-variable)',
-          },
-          range: replaceRange,
-        },
-      ],
-    };
-  }
-
-  return {
-    suggestions: [],
-  };
+  return functions;
 }
 
 export function getSignatureHelp(
