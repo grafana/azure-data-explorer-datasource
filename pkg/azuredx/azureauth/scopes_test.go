@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetAzureScopes(t *testing.T) {
+func TestGetAzureScopes_KnownClouds(t *testing.T) {
 	tests := []struct {
 		description   string
 		credentials   *azcredentials.AzureClientSecretCredentials
@@ -52,4 +52,14 @@ func TestGetAzureScopes(t *testing.T) {
 			assert.Equal(t, tt.expectedScope, scopes[0])
 		})
 	}
+}
+
+func TestGetAzureScopes_UnknownClouds(t *testing.T) {
+	t.Run("should fail when cloud is unknown", func(t *testing.T) {
+		credentials := &azcredentials.AzureClientSecretCredentials{AzureCloud: "Unknown"}
+		clusterUrl := "https://abc.northeurope.unknown.net"
+
+		_, err := getAzureScopes(credentials, clusterUrl)
+		assert.Error(t, err)
+	})
 }

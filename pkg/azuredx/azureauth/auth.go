@@ -54,12 +54,12 @@ func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *a
 	client *http.Client) (ServiceCredentials, error) {
 	azureCloud, err := normalizeAzureCloud(settings.AzureCloud)
 	if err != nil {
-		return nil, fmt.Errorf("invalid Azure credentials: %s", err)
+		return nil, fmt.Errorf("invalid Azure credentials: %w", err)
 	}
 
 	authority, err := resolveAuthorityForCloud(azureCloud)
 	if err != nil {
-		return nil, fmt.Errorf("invalid Azure credentials: %s", err)
+		return nil, fmt.Errorf("invalid Azure credentials: %w", err)
 	}
 
 	credentials := &azcredentials.AzureClientSecretCredentials{

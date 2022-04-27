@@ -21,6 +21,8 @@ func normalizeAzureCloud(cloudName string) (string, error) {
 		return azsettings.AzureChina, nil
 	case azureMonitorUSGovernment:
 		return azsettings.AzureUSGovernment, nil
+	case "":
+		return azsettings.AzurePublic, nil
 	default:
 		err := fmt.Errorf("the cloud '%s' not supported", cloudName)
 		return "", err
