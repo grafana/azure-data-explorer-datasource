@@ -50,11 +50,18 @@ export default class KustoCodeEditor {
       },
     });
 
-    monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
-      includeControlCommands: true,
-      newlineAfterPipe: true,
-      useIntellisenseV2: false,
-    });
+    try {
+      monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
+        includeControlCommands: true,
+        newlineAfterPipe: true,
+        useIntellisenseV2: false,
+      });
+    } catch (e) {
+      console.error(
+        'Unable to load Kusto language. Try refreshing the page or upgrade to the latest version of Grafana and the ADX plugin.',
+        e
+      );
+    }
 
     this.codeEditor = monaco.editor.create(this.containerDiv, {
       value: content || 'Write your query here',
