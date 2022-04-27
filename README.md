@@ -296,7 +296,7 @@ MyLogs
 
 ## Query Builder - Data Types
 
-The query builder provides an easy to use interface to query Azure Data Explorer. However, there are limitations on the supported data types that a column can possess. Currently, if a column is typed as `dynamic` it is filtered as an option for the following operations: `Where`, `Aggregate`, `Group by`. The reason for this is that columns of type `dynamic` can potentially contain values that have any of the primitive data types, but also arrays (where the array can then have values of any type) and JSON objects. The query builder does not currently support querying values that are either arrays or JSON objects.
+The query builder provides an easy to use interface to query Azure Data Explorer. However, there are limitations on the supported data types that a column can possess. Currently, if a column is typed as `dynamic` it is not included as an option for the following operations: `Where`, `Aggregate`, `Group by`. The reason for this is that columns of type `dynamic` can potentially contain values that have any of the primitive data types, but also arrays (where the array can then have values of any type) and JSON objects. The query builder does not currently support querying values that are either arrays or JSON objects.
 
 See the below documentation for further details on how to handle dynamic columns appropriately via the KQL editor.
 

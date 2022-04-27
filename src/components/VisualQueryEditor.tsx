@@ -96,7 +96,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
   const groupable = useGroupableColumns(columns);
 
   const columnTooltip =
-    "Some columns may not be visible for selection. This is due to the type of the column. The visual query editor does not currently support columns of type 'dynamic'";
+    "Some columns may not be visible for selection. The visual query editor does not currently support columns of type 'dynamic'";
 
   const onChangeTable = useCallback(
     (expression: QueryEditorExpression) => {
