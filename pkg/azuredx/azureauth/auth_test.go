@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/stretchr/testify/require"
 )
 
 func TestQueryDataAuthorization(t *testing.T) {
@@ -84,9 +84,10 @@ func TestQueryDataAuthorization(t *testing.T) {
 		}
 
 		// setup & test
-		c := &ServiceCredentials{HTTPDo: g.HTTPDoMock}
+		c := &ServiceCredentialsImpl{HTTPDo: g.HTTPDoMock}
 		c.TenantID = "0AF0528A-F473-4E0C-891F-3FF8ACDC4E5F"
 		c.OnBehalfOf = true
+		c.authority = azidentity.AzurePublicCloud
 		c.tokenCache = newCache()
 		auth, err := c.QueryDataAuthorization(context.Background(), &req)
 		switch {
@@ -104,45 +105,5 @@ func TestQueryDataAuthorization(t *testing.T) {
 		case auth != g.Want:
 			t.Errorf("%d: got authorization %q, want %q", index, auth, g.Want)
 		}
-	}
-}
-
-func TestCloudScope(t *testing.T) {
-	tests := []struct {
-		description   string
-		cloudName     string
-		clusterUrl    string
-		expectedScope string
-	}{
-		{
-			description:   "test public cloud",
-			cloudName:     "azuremonitor",
-			clusterUrl:    "https://abc.northeurope.kusto.windows.net",
-			expectedScope: "https://kusto.kusto.windows.net/.default",
-		},
-		{
-			description:   "test US gov cloud texas",
-			cloudName:     "govazuremonitor",
-			clusterUrl:    "https://abc.gov-texas.kusto.windows.net",
-			expectedScope: "https://abc.gov-texas.kusto.windows.net/.default",
-		},
-		{
-			description:   "test US gov cloud",
-			cloudName:     "govazuremonitor",
-			clusterUrl:    "https://abc.gov-virginia.kusto.windows.net",
-			expectedScope: "https://abc.gov-virginia.kusto.windows.net/.default",
-		},
-		{
-			description:   "test Mooncake cloud",
-			cloudName:     "chinaazuremonitor",
-			clusterUrl:    "https://abc.china.kusto.windows.net",
-			expectedScope: "https://kusto.kusto.chinacloudapi.cn/.default",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			scope := getCloudScope(tt.cloudName, tt.clusterUrl)
-			require.Equal(t, tt.expectedScope, scope)
-		})
 	}
 }
