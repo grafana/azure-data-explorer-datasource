@@ -22,6 +22,7 @@ export default class KustoCodeEditor {
   ) {}
 
   initMonaco(content: string) {
+    let error: Error | undefined;
     const themeName = this.config.bootData.user.lightTheme ? 'grafana-light' : 'vs-dark';
 
     monaco.editor.defineTheme('grafana-light', {
@@ -57,10 +58,10 @@ export default class KustoCodeEditor {
         useIntellisenseV2: false,
       });
     } catch (e) {
-      console.error(
-        'Unable to load Kusto language. Try refreshing the page or upgrade to the latest version of Grafana and the ADX plugin.',
-        e
+      error = new Error(
+        'Unable to load Kusto language. Try refreshing the page or upgrading to Grafana +8.5 and ADX plugin +4.0'
       );
+      console.error(error, e);
     }
 
     this.codeEditor = monaco.editor.create(this.containerDiv, {
@@ -121,6 +122,8 @@ export default class KustoCodeEditor {
         });
       });
     });
+
+    return error;
   }
 
   resize() {
