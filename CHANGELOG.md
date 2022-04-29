@@ -5,6 +5,7 @@
 _Not released yet_
 
 - Breaking Change: Azure Data Explorer plugin now requires Grafana 8.0+ to run.
+- Bugfix: Filter dynamic columns from Where/Aggregate/Group by clauses to prevent syntax errors.
 
 ## [3.7.1]
 
