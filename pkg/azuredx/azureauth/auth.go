@@ -35,7 +35,9 @@ type ServiceCredentials interface {
 }
 
 type ServiceCredentialsImpl struct {
-	models.DatasourceSettings
+	OnBehalfOf   bool
+	QueryTimeout time.Duration
+
 	tokenProvider aztokenprovider.AzureTokenProvider
 	tokenCache    *cache
 	aadClient     aadClient
@@ -72,11 +74,12 @@ func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *a
 	}
 
 	return &ServiceCredentialsImpl{
-		DatasourceSettings: *settings,
-		tokenProvider:      tokenProvider,
-		tokenCache:         newCache(),
-		aadClient:          aadClient,
-		scopes:             scopes,
+		OnBehalfOf:    settings.OnBehalfOf,
+		QueryTimeout:  settings.QueryTimeout,
+		tokenProvider: tokenProvider,
+		tokenCache:    newCache(),
+		aadClient:     aadClient,
+		scopes:        scopes,
 	}, nil
 }
 
