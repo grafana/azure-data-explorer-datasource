@@ -2,17 +2,11 @@ package azureauth
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
-	"strconv"
-	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/aztokenprovider"
@@ -42,22 +36,15 @@ type ServiceCredentials interface {
 
 type ServiceCredentialsImpl struct {
 	models.DatasourceSettings
-	// HTTPDo is the http.Client Do method.
-	HTTPDo        func(req *http.Request) (*http.Response, error)
-	authority     azidentity.AuthorityHost
 	tokenProvider aztokenprovider.AzureTokenProvider
 	tokenCache    *cache
+	aadClient     aadClient
 	scopes        []string
 }
 
 func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings,
-	client *http.Client) (ServiceCredentials, error) {
+	httpClient *http.Client) (ServiceCredentials, error) {
 	azureCloud, err := normalizeAzureCloud(settings.AzureCloud)
-	if err != nil {
-		return nil, fmt.Errorf("invalid Azure credentials: %w", err)
-	}
-
-	authority, err := resolveAuthorityForCloud(azureCloud)
 	if err != nil {
 		return nil, fmt.Errorf("invalid Azure credentials: %w", err)
 	}
@@ -74,6 +61,11 @@ func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *a
 		return nil, fmt.Errorf("invalid Azure configuration: %w", err)
 	}
 
+	aadClient, err := newAADClient(credentials, httpClient)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Azure configuration: %w", err)
+	}
+
 	scopes, err := getAzureScopes(credentials, settings.ClusterURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid Azure configuration: %w", err)
@@ -81,10 +73,9 @@ func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *a
 
 	return &ServiceCredentialsImpl{
 		DatasourceSettings: *settings,
-		HTTPDo:             client.Do,
-		authority:          authority,
 		tokenProvider:      tokenProvider,
 		tokenCache:         newCache(),
+		aadClient:          aadClient,
 		scopes:             scopes,
 	}, nil
 }
@@ -147,71 +138,10 @@ func (c *ServiceCredentialsImpl) queryDataOnBehalfOf(ctx context.Context, req *b
 	return "Bearer " + onBehalfOfToken, nil
 }
 
-// OnBehalfOf resolves a token which impersonates the subject of userToken.
-// UserToken has to be an ID token. See the following link for more detail.
-// https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow
-func (c *ServiceCredentialsImpl) onBehalfOf(ctx context.Context, userToken string) (onBehalfOfToken string, expire time.Time, err error) {
-	params := make(url.Values)
-	params.Set("client_id", c.ClientID)
-	params.Set("client_secret", c.Secret)
-	params.Set("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
-	params.Set("assertion", userToken)
-	params.Set("scope", strings.Join(c.scopes, " "))
-	params.Set("requested_token_use", "on_behalf_of")
-	reqBody := strings.NewReader(params.Encode())
-
-	// https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints
-	tokenURL := fmt.Sprintf("%s%s/oauth2/v2.0/token", c.authority, url.PathEscape(c.TenantID))
-	req, err := http.NewRequestWithContext(ctx, "POST", tokenURL, reqBody)
+func (c *ServiceCredentialsImpl) onBehalfOf(ctx context.Context, idToken string) (onBehalfOfToken string, expire time.Time, err error) {
+	result, err := c.aadClient.AcquireTokenOnBehalfOf(ctx, idToken, c.scopes)
 	if err != nil {
-		return "", time.Time{}, fmt.Errorf("on-behalf-of grant request <%q> instantiation: %w", tokenURL, err)
+		return "", time.Time{}, err
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Accept", "application/json")
-
-	// HTTP Exchange
-	reqStart := time.Now()
-	resp, err := c.HTTPDo(req)
-	if err != nil {
-		return "", time.Time{}, fmt.Errorf("on-behalf-of grant POST <%q>: %w", tokenURL, err)
-	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", time.Time{}, fmt.Errorf("on-behalf-of grant POST <%q> response: %w", tokenURL, err)
-	}
-	onBehalfOfLatencySeconds.WithLabelValues(strconv.Itoa(resp.StatusCode)).Observe(float64(time.Since(reqStart)) / float64(time.Second))
-	if resp.StatusCode/100 != 2 {
-		var deny struct {
-			Desc string `json:"error_description"`
-		}
-		_ = json.Unmarshal(body, &deny)
-		return "", time.Time{}, fmt.Errorf("on-behalf-of grant POST <%q> status %q: %q", tokenURL, resp.Status, deny.Desc)
-	}
-
-	// Parse Essentials
-	var grant struct {
-		Token  string `json:"access_token"`
-		Expire int    `json:"expires_in"`
-	}
-	if err := json.Unmarshal(body, &grant); err != nil {
-		return "", time.Time{}, fmt.Errorf("malformed response from on-behalf-of grant POST <%q>: %w", tokenURL, err)
-	}
-
-	expire = time.Now().Add(time.Duration(grant.Expire) * time.Second)
-	return grant.Token, expire, nil
-}
-
-func resolveAuthorityForCloud(cloudName string) (azidentity.AuthorityHost, error) {
-	// Known Azure clouds
-	switch cloudName {
-	case azsettings.AzurePublic:
-		return azidentity.AzurePublicCloud, nil
-	case azsettings.AzureChina:
-		return azidentity.AzureChina, nil
-	case azsettings.AzureUSGovernment:
-		return azidentity.AzureGovernment, nil
-	default:
-		err := fmt.Errorf("the Azure cloud '%s' not supported", cloudName)
-		return "", err
-	}
+	return result.AccessToken, result.ExpiresOn.UTC(), nil
 }
