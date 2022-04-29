@@ -53,6 +53,8 @@ describe('Test schema resolution', () => {
       { Name: 'timespan', CslType: 'timespan', Type: 'System.TimeSpan' },
       { Name: 'decimal', CslType: 'decimal', Type: 'System.Data.SqlTypes.SqlDecimal' },
     ];
+    const schema = createMockSchema();
+    datasource.getSchema = jest.fn().mockResolvedValue(schema);
     schema.Databases['testdb'].Tables = {
       ...schema.Databases['testdb'].Tables,
       ...{
