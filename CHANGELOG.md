@@ -5,7 +5,10 @@
 _Not released yet_
 
 - Breaking Change: Azure Data Explorer plugin now requires Grafana 8.0+ to run.
+- Breaking Change: obo_latency_seconds metric was removed
 - Bugfix: Filter dynamic columns from Where/Aggregate/Group by clauses to prevent syntax errors.
+- Internal: Client secret authentication via Grafana Azure SDK
+- Internal: OBO authentication via MSAL for Go
 
 ## [3.7.1]
 

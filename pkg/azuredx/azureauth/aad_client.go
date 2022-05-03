@@ -35,9 +35,9 @@ func newAADClient(credentials *azcredentials.AzureClientSecretCredentials, httpC
 	}
 
 	authorityOpts := confidential.WithAuthority(runtime.JoinPaths(string(authority), credentials.TenantId))
-	httpClientOPts := confidential.WithHTTPClient(httpClient)
+	httpClientOpts := confidential.WithHTTPClient(httpClient)
 
-	client, err := confidential.New(credentials.ClientId, clientCredential, authorityOpts, httpClientOPts)
+	client, err := confidential.New(credentials.ClientId, clientCredential, authorityOpts, httpClientOpts)
 	if err != nil {
 		return nil, err
 	}

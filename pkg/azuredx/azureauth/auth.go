@@ -7,26 +7,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/aztokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/prometheus/client_golang/prometheus"
-
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
-
-var onBehalfOfLatencySeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-	Namespace: "grafana",
-	Subsystem: "plugin_adx",
-	Name:      "obo_latency_seconds",
-	Help:      "On-behalf-of token exchange duration.",
-	Buckets:   []float64{0.01, 0.05, 0.10, 0.20, 0.40, 1.00},
-}, []string{"http_status"})
-
-func init() {
-	prometheus.MustRegister(onBehalfOfLatencySeconds)
-}
 
 // ServiceCredentials provides authorization for cloud service usage.
 type ServiceCredentials interface {
