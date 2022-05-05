@@ -3,6 +3,7 @@ module github.com/grafana/azure-data-explorer-datasource
 go 1.17
 
 require (
+	github.com/AzureAD/microsoft-authentication-library-for-go v0.4.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.13.2
 	github.com/google/go-cmp v0.5.7
 	github.com/grafana/grafana-azure-sdk-go v1.1.0
@@ -17,7 +18,6 @@ require (
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.22.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.9.1 // indirect
-	github.com/AzureAD/microsoft-authentication-library-for-go v0.4.0 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
