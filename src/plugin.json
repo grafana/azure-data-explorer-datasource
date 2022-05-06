@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "grafanaDependency": ">=8.0.0",
-    "grafanaVersion": "8.0.x",
     "plugins": []
   },
   "metrics": true,
