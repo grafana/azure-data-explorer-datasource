@@ -5,7 +5,8 @@ import { CodeEditor, Icon, Monaco, MonacoEditor, useStyles2 } from '@grafana/ui'
 import { QueryEditorResultFormat, selectResultFormat } from 'components/QueryEditorResultFormat';
 import { AdxDataSource } from 'datasource';
 import { KustoMonacoEditor } from 'monaco/KustoMonacoEditor';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { gte, valid } from 'semver';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
@@ -32,10 +33,22 @@ const defaultQuery = [
   '// | order by Timestamp asc',
 ].join('\n');
 
+interface Worker {
+  setSchemaFromShowSchema: (schema: AdxSchema, url: string, database: string) => void;
+}
+
+// Since Grafana 8.5, the query editor includes a version of the Monaco editor for Kusto
+// that includes fixes required for auto-completion to work.
+// Remove this code once Grafana 8.5 is the minimal version supported
+function gtGrafana8_5() {
+  return valid(config.buildInfo.version) && gte(config.buildInfo.version, '8.5.0');
+}
+
 export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [showLastQuery, setShowLastQuery] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const templateSrv = getTemplateSrv();
+  const [worker, setWorker] = useState<Worker>();
+  const [variables] = useState(getTemplateSrv().getVariables());
 
   const onRawQueryChange = (kql: string) => {
     const resultFormat = selectResultFormat(props.query.resultFormat, true);
@@ -73,15 +86,19 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
         return model && kusto(model.uri);
       })
       .then((worker) => {
-        if (schema) {
-          // Populate Database schema with macros
-          Object.keys(schema.Databases).forEach((db) =>
-            Object.assign(schema.Databases[db].Functions, getFunctions(templateSrv.getVariables()))
-          );
-          worker?.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
-        }
+        setWorker(worker);
       });
   };
+
+  useEffect(() => {
+    if (worker && schema) {
+      // Populate Database schema with macros
+      Object.keys(schema.Databases).forEach((db) =>
+        Object.assign(schema.Databases[db].Functions, getFunctions(variables))
+      );
+      worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
+    }
+  }, [worker, schema, variables, props.database]);
 
   if (!schema) {
     return null;
@@ -89,7 +106,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   return (
     <div>
-      {config.featureToggles.adxNewCodeEditor ? (
+      {gtGrafana8_5() ? (
         <div data-testid={selectors.components.queryEditor.codeEditor.container}>
           <CodeEditor
             language="kusto"

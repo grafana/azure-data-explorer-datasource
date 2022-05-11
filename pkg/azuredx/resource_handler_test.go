@@ -8,10 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/stretchr/testify/require"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/azureauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
 
@@ -43,16 +42,11 @@ func TestResourceHandler(t *testing.T) {
 			ClusterURL: "some-baseurl",
 			TenantID:   "9a2ddabe-90c0-4e09-bf28-a91111a56ed7",
 		}
-		var err error
-		adx.serviceCredentials, err = azureauth.NewServiceCredentials(adx.settings, http.DefaultClient)
-		require.Nil(t, err)
-		adx.serviceCredentials.ServicePrincipalToken = func(ctx context.Context, opts azcore.TokenRequestOptions) (*azcore.AccessToken, error) {
-			return &azcore.AccessToken{Token: "test-token"}, nil
-		}
+		adx.serviceCredentials = &FakeServiceCredentials{}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusInternalServerError, res.Code)
 		httpError := models.HttpError{}
-		err = json.NewDecoder(res.Body).Decode(&httpError)
+		err := json.NewDecoder(res.Body).Decode(&httpError)
 		require.Nil(t, err)
 		require.Equal(t, http.StatusInternalServerError, httpError.StatusCode)
 		require.Contains(t, httpError.Error, fmt.Sprintf("HTTP error: %v", http.StatusBadRequest))
@@ -66,16 +60,11 @@ func TestResourceHandler(t *testing.T) {
 			ClusterURL: "some-baseurl",
 			TenantID:   "9a2ddabe-90c0-4e09-bf28-a91111a56ed7",
 		}
-		var err error
-		adx.serviceCredentials, err = azureauth.NewServiceCredentials(adx.settings, http.DefaultClient)
-		require.Nil(t, err)
-		adx.serviceCredentials.ServicePrincipalToken = func(ctx context.Context, opts azcore.TokenRequestOptions) (*azcore.AccessToken, error) {
-			return &azcore.AccessToken{Token: "test-token"}, nil
-		}
+		adx.serviceCredentials = &FakeServiceCredentials{}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusOK, res.Code)
 		tableResponse := models.TableResponse{}
-		err = json.NewDecoder(res.Body).Decode(&tableResponse)
+		err := json.NewDecoder(res.Body).Decode(&tableResponse)
 		require.Nil(t, err)
 		require.Len(t, tableResponse.Tables, 1)
 		require.Len(t, tableResponse.Tables[0].Columns, 2)
@@ -119,4 +108,15 @@ func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, 
 			},
 		},
 	}, nil
+}
+
+type FakeServiceCredentials struct {
+}
+
+func (c *FakeServiceCredentials) ServicePrincipalAuthorization(ctx context.Context) (string, error) {
+	return "Bearer test-token", nil
+}
+
+func (c *FakeServiceCredentials) QueryDataAuthorization(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
+	return c.ServicePrincipalAuthorization(ctx)
 }

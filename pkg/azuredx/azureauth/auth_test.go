@@ -2,147 +2,96 @@ package azureauth
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"io"
-	"net/http"
-	"strings"
 	"testing"
 
+	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/confidential"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/stretchr/testify/require"
 )
 
-func TestQueryDataAuthorization(t *testing.T) {
-	// reusables
-	const testToken = "some.test.token"
-	wantNoHTTP := func(*http.Request) (*http.Response, error) {
-		return nil, errors.New("unwanted HTTP invocation")
-	}
-
+func TestOnBehalfOf(t *testing.T) {
 	golden := []struct {
-		Want    string
-		WantErr string
+		RequestUser                *backend.User
+		RequestAuthorizationHeader string
+		RequestIDTokenHeader       string
 
-		// HTTP client representation
-		HTTPDoMock func(*http.Request) (*http.Response, error)
-
-		*backend.User
-		AuthHeader    string
-		IDTokenHeader string
+		ShouldRequestToken bool
+		ExpectedError      string
 	}{
 		// happy flow
-		0: {Want: "Bearer test.exchange.token", WantErr: "",
-			HTTPDoMock: func(req *http.Request) (*http.Response, error) {
-				const wantURL = "https://login.microsoftonline.com/0AF0528A-F473-4E0C-891F-3FF8ACDC4E5F/oauth2/v2.0/token"
-				if s := req.URL.String(); s != wantURL {
-					return nil, fmt.Errorf("got URL %q, want %q", s, wantURL)
-				}
+		0: {
+			RequestUser:          &backend.User{Login: "alice"},
+			RequestIDTokenHeader: "ID-TOKEN",
+			ShouldRequestToken:   true,
+			ExpectedError:        "",
+		},
 
-				if err := req.ParseForm(); err != nil {
-					return nil, fmt.Errorf("test form values: %w", err)
-				}
-				if s := req.PostForm.Get("assertion"); s != testToken {
-					return nil, fmt.Errorf("POST with assertion pramameter %q, want %q", s, testToken)
-				}
+		1: {
+			RequestUser:          nil,
+			RequestIDTokenHeader: "ID-TOKEN",
+			ShouldRequestToken:   false,
+			ExpectedError:        "non-user requests not permitted with on-behalf-of configuration",
+		},
 
-				return &http.Response{
-					StatusCode: 200,
-					Body: io.NopCloser(strings.NewReader(`{
-						"access_token": "test.exchange.token"
-					}`)),
-				}, nil
-			},
-			IDTokenHeader: testToken,
-			User:          &backend.User{Login: "alice"}},
+		2: {
+			RequestUser:        &backend.User{Login: "alice"},
+			ShouldRequestToken: false,
+			ExpectedError:      "system accounts are denied with on-behalf-of configuration",
+		},
 
-		1: {Want: "", WantErr: "non-user requests not permitted with on-behalf-of configuration",
-			HTTPDoMock:    wantNoHTTP,
-			IDTokenHeader: testToken,
-			User:          nil},
-
-		2: {Want: "", WantErr: "system accounts are denied with on-behalf-of configuration",
-			HTTPDoMock: wantNoHTTP,
-			User:       &backend.User{Login: "alice"}},
-
-		3: {Want: "", WantErr: "ID token absent for data request",
-			HTTPDoMock: wantNoHTTP,
-			AuthHeader: "arbitrary",
-			User:       &backend.User{Login: "alice"}},
+		3: {
+			RequestUser:                &backend.User{Login: "alice"},
+			RequestAuthorizationHeader: "arbitrary",
+			ShouldRequestToken:         false,
+			ExpectedError:              "ID token absent for data request",
+		},
 	}
 
 	for index, g := range golden {
 		// compose request
 		var req backend.QueryDataRequest
-		req.PluginContext.User = g.User
+		req.PluginContext.User = g.RequestUser
 		req.Headers = make(map[string]string)
-		if g.AuthHeader != "" {
-			req.Headers["Authorization"] = g.AuthHeader
+		if g.RequestAuthorizationHeader != "" {
+			req.Headers["Authorization"] = g.RequestAuthorizationHeader
 		}
-		if g.IDTokenHeader != "" {
-			req.Headers["X-ID-Token"] = g.IDTokenHeader
+		if g.RequestIDTokenHeader != "" {
+			req.Headers["X-ID-Token"] = g.RequestIDTokenHeader
 		}
 
 		// setup & test
-		c := &ServiceCredentials{HTTPDo: g.HTTPDoMock}
-		c.TenantID = "0AF0528A-F473-4E0C-891F-3FF8ACDC4E5F"
+		fakeAADClient := &FakeAADClient{}
+
+		c := &ServiceCredentialsImpl{
+			tokenCache: newCache(),
+			aadClient:  fakeAADClient,
+		}
 		c.OnBehalfOf = true
-		c.tokenCache = newCache()
+
 		auth, err := c.QueryDataAuthorization(context.Background(), &req)
+
 		switch {
 		case err != nil:
 			switch {
-			case g.WantErr == "":
+			case g.ExpectedError == "":
 				t.Errorf("%d: got error %q", index, err)
-			case err.Error() != g.WantErr:
-				t.Errorf("%d: got error %q, want %q", index, err, g.WantErr)
+			case err.Error() != g.ExpectedError:
+				t.Errorf("%d: got error %q, expected %q", index, err, g.ExpectedError)
 			}
 
-		case g.WantErr != "":
-			t.Errorf("%d: got authorization %q, want error %q", index, auth, g.WantErr)
+		case g.ExpectedError != "":
+			t.Errorf("%d: got authorization %q, want error %q", index, auth, g.ExpectedError)
 
-		case auth != g.Want:
-			t.Errorf("%d: got authorization %q, want %q", index, auth, g.Want)
+		case g.ShouldRequestToken != fakeAADClient.TokenRequested:
+			t.Errorf("%d: should request token = %t, requested = %t", index, g.ShouldRequestToken, fakeAADClient.TokenRequested)
 		}
 	}
 }
 
-func TestCloudScope(t *testing.T) {
-	tests := []struct {
-		description   string
-		cloudName     string
-		clusterUrl    string
-		expectedScope string
-	}{
-		{
-			description:   "test public cloud",
-			cloudName:     "azuremonitor",
-			clusterUrl:    "https://abc.northeurope.kusto.windows.net",
-			expectedScope: "https://kusto.kusto.windows.net/.default",
-		},
-		{
-			description:   "test US gov cloud texas",
-			cloudName:     "govazuremonitor",
-			clusterUrl:    "https://abc.gov-texas.kusto.windows.net",
-			expectedScope: "https://abc.gov-texas.kusto.windows.net/.default",
-		},
-		{
-			description:   "test US gov cloud",
-			cloudName:     "govazuremonitor",
-			clusterUrl:    "https://abc.gov-virginia.kusto.windows.net",
-			expectedScope: "https://abc.gov-virginia.kusto.windows.net/.default",
-		},
-		{
-			description:   "test Mooncake cloud",
-			cloudName:     "chinaazuremonitor",
-			clusterUrl:    "https://abc.china.kusto.windows.net",
-			expectedScope: "https://kusto.kusto.chinacloudapi.cn/.default",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.description, func(t *testing.T) {
-			scope := getCloudScope(tt.cloudName, tt.clusterUrl)
-			require.Equal(t, tt.expectedScope, scope)
-		})
-	}
+type FakeAADClient struct {
+	TokenRequested bool
+}
+
+func (c *FakeAADClient) AcquireTokenOnBehalfOf(_ context.Context, _ string, _ []string) (confidential.AuthResult, error) {
+	c.TokenRequested = true
+	return confidential.AuthResult{}, nil
 }

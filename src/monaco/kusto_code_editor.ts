@@ -22,6 +22,7 @@ export default class KustoCodeEditor {
   ) {}
 
   initMonaco(content: string) {
+    let error: Error | undefined;
     const themeName = this.config.bootData.user.lightTheme ? 'grafana-light' : 'vs-dark';
 
     monaco.editor.defineTheme('grafana-light', {
@@ -50,11 +51,18 @@ export default class KustoCodeEditor {
       },
     });
 
-    monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
-      includeControlCommands: true,
-      newlineAfterPipe: true,
-      useIntellisenseV2: false,
-    });
+    try {
+      monaco.languages['kusto'].kustoDefaults.setLanguageSettings({
+        includeControlCommands: true,
+        newlineAfterPipe: true,
+        useIntellisenseV2: false,
+      });
+    } catch (e) {
+      error = new Error(
+        'Unable to load Kusto language. Try refreshing the page or upgrading to Grafana +8.5 and ADX plugin +4.0'
+      );
+      console.error(error, e);
+    }
 
     this.codeEditor = monaco.editor.create(this.containerDiv, {
       value: content || 'Write your query here',
@@ -114,6 +122,8 @@ export default class KustoCodeEditor {
         });
       });
     });
+
+    return error;
   }
 
   resize() {

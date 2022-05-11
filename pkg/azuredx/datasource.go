@@ -6,14 +6,16 @@ import (
 	"math/rand"
 	"net/http"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/azureauth"
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
+	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/azureauth"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 
 	// 100% compatible drop-in replacement of "encoding/json"
 	json "github.com/json-iterator/go"
@@ -25,15 +27,13 @@ type AzureDataExplorer struct {
 	backend.CallResourceHandler
 	client             client.AdxClient
 	settings           *models.DatasourceSettings
-	serviceCredentials *azureauth.ServiceCredentials
+	serviceCredentials azureauth.ServiceCredentials
 }
 
-const AdxScope = "https://kusto.kusto.windows.net/.default"
-
-func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	adx := &AzureDataExplorer{}
 	datasourceSettings := &models.DatasourceSettings{}
-	err := datasourceSettings.Load(settings)
+	err := datasourceSettings.Load(instanceSettings)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,13 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 	adx.settings = datasourceSettings
 
-	httpClientOptions, err := settings.HTTPClientOptions()
+	// TODO: #357 Azure settings should be received from the Grafana host
+	azureSettings := &azsettings.AzureSettings{
+		Cloud:                  azsettings.AzurePublic,
+		ManagedIdentityEnabled: false,
+	}
+
+	httpClientOptions, err := instanceSettings.HTTPClientOptions()
 	if err != nil {
 		backend.Logger.Error("failed to create HTTP client options", "error", err.Error())
 		return nil, err
@@ -56,7 +62,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	}
 	adx.client = client.New(httpClient)
 
-	adx.serviceCredentials, err = azureauth.NewServiceCredentials(datasourceSettings, httpClient)
+	adx.serviceCredentials, err = azureauth.NewServiceCredentials(datasourceSettings, azureSettings, httpClient)
 	if err != nil {
 		return nil, err
 	}

@@ -30,7 +30,7 @@ export const QueryEditorReduceSection = (
 
     if (props.value.expressions.length === 0) {
       return (
-        <QueryEditorSection label={props.label}>
+        <QueryEditorSection label={props.label} tooltip={props.tooltip}>
           <Button
             variant="secondary"
             onClick={() => {
@@ -47,7 +47,7 @@ export const QueryEditorReduceSection = (
     }
 
     return (
-      <QueryEditorSection label={props.label}>
+      <QueryEditorSection label={props.label} tooltip={props.tooltip}>
         <div className={styles.container}>
           <QueryEditorRepeater id="reduce" onChange={props.onChange} value={props.value}>
             {(childProps) => {

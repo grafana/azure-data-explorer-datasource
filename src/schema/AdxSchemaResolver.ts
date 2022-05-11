@@ -80,14 +80,17 @@ export class AdxSchemaResolver {
       );
 
       return schema.OrderedColumns.reduce((columns: AdxColumnSchema[], column) => {
-        const schemaForDynamicColumn = schemaByColumn[column.Name];
+        if (column.CslType !== 'dynamic') {
+          const schemaForDynamicColumn = schemaByColumn[column.Name];
 
-        if (!Array.isArray(schemaForDynamicColumn)) {
-          columns.push(column);
+          if (!Array.isArray(schemaForDynamicColumn)) {
+            columns.push(column);
+            return columns;
+          }
+
+          Array.prototype.push.apply(columns, schemaForDynamicColumn);
           return columns;
         }
-
-        Array.prototype.push.apply(columns, schemaForDynamicColumn);
         return columns;
       }, []);
     });
