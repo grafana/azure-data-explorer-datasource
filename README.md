@@ -13,7 +13,6 @@ This plugin requires Grafana 7.1.0 or newer as of version 3.0.0. Plugin versions
 If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can sign up for one [here](https://grafana.com/cloud/grafana).
 
 1. Click on the `Install Now` button on the [Azure Data Explorer page on Grafana.com](https://grafana.com/plugins/grafana-azure-data-explorer-datasource/?tab=installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
-   ![GrafanaCloud Install](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/grafana_cloud_install.png)
 
 2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Data Explorer datasource will be installed.
 
@@ -23,10 +22,6 @@ If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can
 - [Installing on RPM-based Linux (CentOS, Fedora, OpenSuse, RedHat)](http://docs.grafana.org/installation/rpm/)
 - [Installing on Windows](http://docs.grafana.org/installation/windows/)
 - [Installing on Mac](http://docs.grafana.org/installation/mac/)
-
-### Metric Naming & Aliasing
-
-TODO: link to document on names in grafana 7.1+
 
 ### Docker
 
@@ -252,13 +247,13 @@ Create the variable in the dashboard settings. Usually you will need to write a 
 
 5. Use the variable in your query (in this case the variable is named `level`):
 
-   ```sql
+   ```kusto
    MyLogs | where Level == '$level'
    ```
 
    For variables where multiple values are allowed then use the `in` operator instead:
 
-   ```sql
+   ```kusto
    MyLogs | where Level in ($level)
    ```
 
