@@ -1,9 +1,19 @@
 import { AdxDataSource, sortStartsWithValuesFirst } from './datasource';
 import { dateTime } from '@grafana/data';
-import { TemplateSrv } from './test/template_srv';
 import _ from 'lodash';
-import { setBackendSrv, BackendSrv, BackendSrvRequest, setTemplateSrv } from '@grafana/runtime';
+import { setBackendSrv, BackendSrv, BackendSrvRequest } from '@grafana/runtime';
 import { EditorMode } from 'types';
+
+jest.mock('@grafana/runtime', () => {
+  const original = jest.requireActual('@grafana/runtime');
+  return {
+    ...original,
+    getTemplateSrv: () => ({
+      getVariables: () => [],
+      replace: (s: string) => s,
+    }),
+  };
+});
 
 describe('AdxDataSource', () => {
   const ctx: any = {};
@@ -13,8 +23,6 @@ describe('AdxDataSource', () => {
       url: 'http://kustodb.com',
       jsonData: {},
     };
-
-    setTemplateSrv(new TemplateSrv());
   });
 
   describe('when performing getDatabases', () => {
@@ -213,7 +221,7 @@ describe('AdxDataSource', () => {
 
       try {
         ctx.ds.getCacheTtl(ctx.instanceSettings);
-      } catch (err) {
+      } catch (err: any) {
         expect(err.message).toContain('Minimal cache must be greater than or equal to 1.');
       }
     });

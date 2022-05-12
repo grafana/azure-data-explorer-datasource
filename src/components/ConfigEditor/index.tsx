@@ -47,7 +47,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
 
       setSchema(schemaData);
       setSchemaError(undefined);
-    } catch (err) {
+    } catch (err: any) {
       // TODO: make sure err.data is the format we are expecting
       setSchemaError(err.data);
     }
