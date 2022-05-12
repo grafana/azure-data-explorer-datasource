@@ -123,7 +123,7 @@ e2e.scenario({
             cy.contains('events.all').click({ force: true });
 
             e2eSelectors.queryEditor.runQuery.button().click({ force: true });
-            cy.contains('No graphable fields').should('exist');
+            cy.contains('Data is missing a number field').should('exist');
           },
         });
       });
