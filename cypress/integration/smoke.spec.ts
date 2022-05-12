@@ -24,7 +24,6 @@ function addCommonProvisioningADXDatasource(ADXProvisions: ADXProvision[]) {
   const datasource = ADXProvisions[0].datasources[0];
 
   e2e.flows.addDataSource({
-    name: 'e2e-azure-data-explorer-datasource',
     type: 'Azure Data Explorer Datasource',
     form: () => {
       e2eSelectors.configEditor.azureCloud.input().type('Azure');
@@ -45,7 +44,7 @@ e2e.scenario({
       .readProvisions(['datasources/adx.yaml'])
       .then((ADXProvisions: ADXProvision[]) => {
         addCommonProvisioningADXDatasource(ADXProvisions);
-        e2e.flows.importDashboard(TEST_DASHBOARD);
+        e2e.flows.importDashboard(TEST_DASHBOARD, undefined, true);
       });
   },
 });
