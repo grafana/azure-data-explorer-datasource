@@ -165,6 +165,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
       />
 
       <InlineField
+        interactive={true}
         label="Use On-Behalf-Of"
         labelWidth={26}
         tooltip={

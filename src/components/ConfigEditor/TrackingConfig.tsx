@@ -15,7 +15,6 @@ const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData
     <FieldSet label="Tracking">
       <InlineField
         label="Send username header to host"
-        labelWidth={26}
         tooltip={
           <p>
             With this feature enabled, Grafana will pass the logged in user&#39;s username in the{' '}
