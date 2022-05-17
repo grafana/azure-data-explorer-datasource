@@ -2,8 +2,6 @@
 
 ## [4.0.0]
 
-_Not released yet_
-
 - Breaking Change: Azure Data Explorer plugin now requires Grafana 8.0+ to run.
 - Breaking Change: obo_latency_seconds metric was removed.
 - Bugfix: Included new Kusto query editor. **NOTE**: This new editor will be only available if used with Grafana 8.5 or later. Fixes #325.
