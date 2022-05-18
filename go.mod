@@ -3,20 +3,19 @@ module github.com/grafana/azure-data-explorer-datasource
 go 1.17
 
 require (
-	github.com/AzureAD/microsoft-authentication-library-for-go v0.4.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.22.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.13.2
+	github.com/AzureAD/microsoft-authentication-library-for-go v0.4.0
 	github.com/google/go-cmp v0.5.7
-	github.com/grafana/grafana-azure-sdk-go v1.1.0
+	github.com/grafana/grafana-azure-sdk-go v1.2.0
 	github.com/grafana/grafana-plugin-sdk-go v0.129.0
 	github.com/json-iterator/go v1.1.12
-	github.com/prometheus/client_golang v1.12.1
 	github.com/stretchr/testify v1.7.0
 	github.com/xorcare/pointer v1.1.0
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
 )
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.22.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.9.1 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -59,6 +58,7 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.8 // indirect
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect

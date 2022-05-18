@@ -43,10 +43,10 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 	}
 	adx.settings = datasourceSettings
 
-	// TODO: #357 Azure settings should be received from the Grafana host
-	azureSettings := &azsettings.AzureSettings{
-		Cloud:                  azsettings.AzurePublic,
-		ManagedIdentityEnabled: false,
+	azureSettings, err := azsettings.ReadFromEnv()
+	if err != nil {
+		backend.Logger.Error("failed to read Azure settings from Grafana", "error", err.Error())
+		return nil, err
 	}
 
 	httpClientOptions, err := instanceSettings.HTTPClientOptions()
