@@ -130,7 +130,7 @@ A real example with a client/app id and tenant id:
 
 If the command succeeds you should get a result like this:
 
-![Azure Data Web Explorer Add result](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_3_web_ui.png)
+![Azure Data Web Explorer Add result](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/config_3_web_ui.png)
 
 ### Configuring Grafana
 
@@ -138,7 +138,7 @@ If the command succeeds you should get a result like this:
 
 2. Select Azure Data Explorer Datasource from the datasource list:
 
-   ![Data Source Type](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_1_select_type.png)
+   ![Data Source Type](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/config_1_select_type.png)
 
 3. In the name field, a default name is filled in automatically but it can be changed to anything.
 
@@ -149,11 +149,11 @@ If the command succeeds you should get a result like this:
    - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
 
 5. Paste these three items into the fields in the Azure Data Explorer API Details section:
-   ![Azure Data Explorer API Details](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/config_2_azure_data_explorer_api_details.png)
+   ![Azure Data Explorer API Details](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/config_2_azure_data_explorer_api_details.png)
 
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
 
-[on-behalf-of documentation](/doc/on-behalf-of.md)
+[on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
 
 ## Writing Queries
 
@@ -239,11 +239,11 @@ Create the variable in the dashboard settings. Usually you will need to write a 
 2. In the Query Options section, choose the `Azure Data Explorer` datasource in the `Data source` dropdown.
 3. Write the query in the `Query` field. Use `project` to specify one column - the result should be a list of string values.
 
-   ![Template Query](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/templating_1.png)
+   ![Template Query](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/templating_1.png)
 
 4. At the bottom, you will see a preview of the values returned from the query:
 
-   ![Template Query Preview](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/master/src/img/templating_2.png)
+   ![Template Query Preview](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/templating_2.png)
 
 5. Use the variable in your query (in this case the variable is named `level`):
 
@@ -301,4 +301,4 @@ See the below documentation for further details on how to handle dynamic columns
 
 ## CHANGELOG
 
-See the [Changelog](https://github.com/grafana/azure-data-explorer-datasource/blob/master/CHANGELOG.md).
+See the [Changelog](https://github.com/grafana/azure-data-explorer-datasource/blob/main/CHANGELOG.md).
