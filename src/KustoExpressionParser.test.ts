@@ -14,7 +14,12 @@ import {
 import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
 
 describe('KustoExpressionParser', () => {
-  const templateSrv: TemplateSrv = { getVariables: jest.fn(), replace: jest.fn() };
+  const templateSrv: TemplateSrv = {
+    getVariables: jest.fn(),
+    replace: jest.fn(),
+    containsTemplate: jest.fn(),
+    updateTimeRange: jest.fn(),
+  };
   const parser = new KustoExpressionParser(templateSrv);
 
   describe('toAutoCompleteQuery', () => {
@@ -669,6 +674,8 @@ describe('KustoExpressionParser', () => {
           },
         ]),
         replace: jest.fn(),
+        containsTemplate: jest.fn(),
+        updateTimeRange: jest.fn(),
       };
 
       const parser = new KustoExpressionParser(templateSrv);

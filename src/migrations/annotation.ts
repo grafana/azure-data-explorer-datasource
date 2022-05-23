@@ -1,7 +1,8 @@
+import { DataSourceRef } from '@grafana/data';
 import { KustoQuery, defaultQuery } from 'types';
 
 type inputAnnotation = {
-  datasource: string;
+  datasource: DataSourceRef | null | undefined;
   database: string;
   enable: boolean;
   name: string;

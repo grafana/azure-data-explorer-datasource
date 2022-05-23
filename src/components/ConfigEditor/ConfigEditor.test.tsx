@@ -18,6 +18,7 @@ describe('ConfigEditor', () => {
       get: jest.fn().mockReturnValue({ url: Chance().url() }),
       getList: jest.fn(),
       getInstanceSettings: jest.fn(),
+      reload: jest.fn(),
     });
   });
 

@@ -4,6 +4,7 @@ import { selectors } from 'test/selectors';
 
 import { mockDatasource, mockQuery } from './__fixtures__/Datasource';
 import { RawQueryEditor } from './RawQueryEditor';
+import { config } from '@grafana/runtime';
 
 jest.mock('../monaco/KustoMonacoEditor', () => {
   return {
@@ -13,18 +14,21 @@ jest.mock('../monaco/KustoMonacoEditor', () => {
   };
 });
 
-let mockedRuntime;
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
-  mockedRuntime = {
+  return {
     ...original,
     getTemplateSrv: () => ({
       getVariables: () => [],
     }),
+    config: {
+      ...original.config,
+      buildInfo: {
+        ...original.config.buildInfo,
+        version: '8.1.0',
+      },
+    },
   };
-  mockedRuntime.config.buildInfo.version = '8.1.0';
-
-  return mockedRuntime;
 });
 
 const defaultProps = {
@@ -47,7 +51,7 @@ describe('RawQueryEditor', () => {
 
   describe('when the Grafana version is >=8.5', () => {
     beforeEach(() => {
-      mockedRuntime.config.buildInfo.version = '8.5.0';
+      config.buildInfo.version = '8.5.0';
     });
     it('should render the new code editor', async () => {
       render(<RawQueryEditor {...defaultProps} />);

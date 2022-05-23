@@ -3,7 +3,7 @@ import { migrateAnnotation } from './annotation';
 
 const OLD_ANNOTATION = {
   database: 'PerfTest',
-  datasource: 'Azure Data Explorer Datasource',
+  datasource: null,
   enable: true,
   iconColor: 'red',
   name: 'New annotation',
@@ -13,7 +13,7 @@ const OLD_ANNOTATION = {
 
 const NEW_ANNOTATION = {
   database: 'PerfTest',
-  datasource: 'Azure Data Explorer Datasource',
+  datasource: null,
   enable: true,
   iconColor: 'red',
   name: 'New annotation',

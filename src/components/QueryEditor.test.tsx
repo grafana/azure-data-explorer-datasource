@@ -4,19 +4,22 @@ import { QueryEditor } from './QueryEditor';
 
 import { mockDatasource, mockQuery } from './__fixtures__/Datasource';
 
-let mockedRuntime;
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
-  mockedRuntime = {
+  return {
     ...original,
     getTemplateSrv: () => ({
       getVariables: () => [],
       replace: (s: string) => s,
     }),
+    config: {
+      ...original.config,
+      buildInfo: {
+        ...original.config.buildInfo,
+        version: '8.5.0',
+      },
+    },
   };
-  mockedRuntime.config.buildInfo.version = '8.5.0';
-
-  return mockedRuntime;
 });
 
 const defaultProps = {
