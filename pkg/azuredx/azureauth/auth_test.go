@@ -106,11 +106,13 @@ func TestOnBehalfOfDisabled(t *testing.T) {
 
 	auth, err := c.QueryDataAuthorization(context.Background(), &req)
 
-	if err != nil:
+	if err != nil {
 		t.Errorf("got error %q", err)
+	}
 
-	if auth != "Bearer "
-		t.Errorf("got %q, expected 'Bearer '", auth)
+	if !fakeTokenProvider.TokenRequested {
+		t.Errorf("got %q, expected 'TokenRequested", auth)
+	}
 }
 
 type FakeAADClient struct {
@@ -126,7 +128,7 @@ type FakeTokenProvider struct {
 	TokenRequested bool
 }
 
-func (tp *FakeTokenProvider) GetAccessToken(_ context.Context, []string) (confidential.AuthResult, error) {
+func (tp *FakeTokenProvider) GetAccessToken(_ context.Context, _ []string) (string, error) {
 	tp.TokenRequested = true
-	return confidential.AuthResult{}, nil
+	return "Bearer ok", nil
 }
