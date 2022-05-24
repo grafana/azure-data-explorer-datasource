@@ -87,11 +87,45 @@ func TestOnBehalfOf(t *testing.T) {
 	}
 }
 
+func TestOnBehalfOfDisabled(t *testing.T) {
+	// compose request
+	var req backend.QueryDataRequest
+	req.PluginContext.User = &backend.User{Login: "alice"}
+	req.Headers = make(map[string]string)
+	req.Headers["X-ID-Token"] = "ID-TOKEN"
+
+	// setup & test
+	fakeTokenProvider := &FakeTokenProvider{}
+
+	c := &ServiceCredentialsImpl{
+		tokenCache: newCache(),
+		tokenProvider:  fakeTokenProvider,
+	}
+	c.OnBehalfOf = false
+
+	auth, err := c.QueryDataAuthorization(context.Background(), &req)
+
+	if err != nil:
+		t.Errorf("got error %q", err)
+
+	if auth != "Bearer "
+		t.Errorf("got %q, expected 'Bearer '", auth)
+}
+
 type FakeAADClient struct {
 	TokenRequested bool
 }
 
 func (c *FakeAADClient) AcquireTokenOnBehalfOf(_ context.Context, _ string, _ []string) (confidential.AuthResult, error) {
 	c.TokenRequested = true
+	return confidential.AuthResult{}, nil
+}
+
+type FakeTokenProvider struct {
+	TokenRequested bool
+}
+
+func (tp *FakeTokenProvider) GetAccessToken(_ context.Context, []string) (confidential.AuthResult, error) {
+	tp.TokenRequested = true
 	return confidential.AuthResult{}, nil
 }
