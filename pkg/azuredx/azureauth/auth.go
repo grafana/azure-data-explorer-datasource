@@ -12,6 +12,7 @@ import (
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/aztokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 )
 
 // ServiceCredentials provides authorization for cloud service usage.
@@ -90,7 +91,7 @@ func (c *ServiceCredentialsImpl) QueryDataAuthorization(ctx context.Context, req
 	}
 
 	switch {
-	case c.OnBehalfOf:
+	case c.OnBehalfOf && e.features.IsEnabled(featuremgmt.FlagAdxOnBehalfOf):
 		return c.queryDataOnBehalfOf(ctx, req)
 
 	default:
