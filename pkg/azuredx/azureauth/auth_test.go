@@ -62,8 +62,7 @@ func TestOnBehalfOf(t *testing.T) {
 		fakeAADClient := &FakeAADClient{}
 
 		c := &ServiceCredentialsImpl{
-			tokenCache: newCache(),
-			aadClient:  fakeAADClient,
+			aadClient: fakeAADClient,
 		}
 		c.OnBehalfOf = true
 
