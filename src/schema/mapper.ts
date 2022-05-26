@@ -50,11 +50,24 @@ export const columnsToDefinition = (columns: AdxColumnSchema[]): QueryEditorProp
     return [];
   }
 
-  return columns.map((column) => ({
-    value: column.Name,
-    label: column.Name,
-    type: toPropertyType(column.CslType),
-  }));
+  return columns.map((column) => {
+    if (column.Name.includes('>')) {
+      const groups = column.Name.split('>');
+      const colName = groups[0];
+      const nestedProps = groups.splice(1).map((p) => `["${p}"]`);
+      return {
+        label: column.Name.replace(/>/g, ' > '),
+        value: `todynamic(${colName})${nestedProps.join('')}`,
+        type: toPropertyType(column.CslType),
+      };
+    }
+
+    return {
+      value: column.Name,
+      label: column.Name,
+      type: toPropertyType(column.CslType),
+    };
+  });
 };
 
 const toPropertyType = (kustoType: string): QueryEditorPropertyType => {
