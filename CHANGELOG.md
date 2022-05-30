@@ -1,5 +1,9 @@
 # Change Log
 
+## [4.0.1]
+
+- Bugfix: Remove custom token cache used for On-Behalf-Of flow (Beta) and rely on Microsoft Authentication Library to keep a local cache.
+
 ## [4.0.0]
 
 - Breaking Change: Azure Data Explorer plugin now requires Grafana 8.0+ to run.

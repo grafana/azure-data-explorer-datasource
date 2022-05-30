@@ -25,7 +25,6 @@ type ServiceCredentialsImpl struct {
 	QueryTimeout time.Duration
 
 	tokenProvider aztokenprovider.AzureTokenProvider
-	tokenCache    *cache
 	aadClient     aadClient
 	scopes        []string
 }
@@ -63,7 +62,6 @@ func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *a
 		OnBehalfOf:    settings.OnBehalfOf,
 		QueryTimeout:  settings.QueryTimeout,
 		tokenProvider: tokenProvider,
-		tokenCache:    newCache(),
 		aadClient:     aadClient,
 		scopes:        scopes,
 	}, nil
@@ -116,7 +114,7 @@ func (c *ServiceCredentialsImpl) queryDataOnBehalfOf(ctx context.Context, req *b
 		return "", errors.New("ID token absent for data request")
 	}
 
-	onBehalfOfToken, err := c.tokenCache.getOrSet(ctx, userToken, c.onBehalfOf)
+	onBehalfOfToken, err := c.onBehalfOf(ctx, userToken)
 	if err != nil {
 		backend.Logger.Error(err.Error(), "user", user.Login)
 		// Don't leak any context to the end-user.
@@ -127,10 +125,10 @@ func (c *ServiceCredentialsImpl) queryDataOnBehalfOf(ctx context.Context, req *b
 	return "Bearer " + onBehalfOfToken, nil
 }
 
-func (c *ServiceCredentialsImpl) onBehalfOf(ctx context.Context, idToken string) (onBehalfOfToken string, expire time.Time, err error) {
+func (c *ServiceCredentialsImpl) onBehalfOf(ctx context.Context, idToken string) (onBehalfOfToken string, err error) {
 	result, err := c.aadClient.AcquireTokenOnBehalfOf(ctx, idToken, c.scopes)
 	if err != nil {
-		return "", time.Time{}, err
+		return "", err
 	}
-	return result.AccessToken, result.ExpiresOn.UTC(), nil
+	return result.AccessToken, nil
 }
