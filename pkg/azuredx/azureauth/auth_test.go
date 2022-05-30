@@ -97,7 +97,6 @@ func TestOnBehalfOfDisabled(t *testing.T) {
 	fakeTokenProvider := &FakeTokenProvider{}
 
 	c := &ServiceCredentialsImpl{
-		tokenCache: newCache(),
 		tokenProvider:  fakeTokenProvider,
 	}
 	c.OnBehalfOf = false
