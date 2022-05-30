@@ -86,7 +86,6 @@ func TestOnBehalfOf(t *testing.T) {
 	}
 }
 
-// TODO test feature flag disabled too -> should have same result
 func TestOnBehalfOfDisabled(t *testing.T) {
 	// compose request
 	var req backend.QueryDataRequest
