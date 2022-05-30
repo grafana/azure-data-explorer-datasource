@@ -1,5 +1,9 @@
 # Change Log
 
+## [4.1.0]
+
+- Breaking Change on Beta feature: On-Behalf-Of flow is now disabled by default 
+
 ## [4.0.1]
 
 - Bugfix: Remove custom token cache used for On-Behalf-Of flow (Beta) and rely on Microsoft Authentication Library to keep a local cache.
