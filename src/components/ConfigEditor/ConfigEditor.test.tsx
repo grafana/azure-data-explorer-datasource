@@ -70,4 +70,21 @@ describe('ConfigEditor', () => {
     // reset config to not impact future tests
     grafanaRuntime.config.featureToggles.adxOnBehalfOf = originalConfigValue;
   });
+
+  it('should set the jsonData for onBehalfOf to false if it was true and the feature flag is disabled', async () => {
+    const originalConfigValue = grafanaRuntime.config.featureToggles.adxOnBehalfOf;
+
+    grafanaRuntime.config.featureToggles.adxOnBehalfOf = false;
+
+    const updateJson = jest.fn();
+
+    render(<ConfigEditor {...mockConfigEditorProps({ onOptionsChange: updateJson })} />);
+
+    await waitFor(() => expect(screen.queryByLabelText('Use On-Behalf-Of')).not.toBeInTheDocument());
+
+    expect(updateJson).toHaveBeenCalledTimes(1);
+
+    // reset config to not impact future tests
+    grafanaRuntime.config.featureToggles.adxOnBehalfOf = originalConfigValue;
+  });
 });

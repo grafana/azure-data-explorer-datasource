@@ -28,6 +28,9 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
   // Set some default values
   useEffect(() => {
+    if (jsonData.onBehalfOf && !config.featureToggles.adxOnBehalfOf) {
+      updateJsonData('onBehalfOf', false);
+    }
     if (!jsonData.azureCloud) {
       updateJsonData('azureCloud', AzureCloudType.AzurePublic);
     }
