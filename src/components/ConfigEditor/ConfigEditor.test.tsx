@@ -6,10 +6,15 @@ import * as grafanaRuntime from '@grafana/runtime';
 import { Chance } from 'chance';
 import { mockConfigEditorProps } from 'components/__fixtures__/ConfigEditor.fixtures';
 
+const originalConfigValue = grafanaRuntime.config.featureToggles.adxOnBehalfOf;
+
 describe('ConfigEditor', () => {
   let refreshSchemaSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    // reset config
+    grafanaRuntime.config.featureToggles.adxOnBehalfOf = originalConfigValue;
+
     refreshSchemaSpy = jest
       .spyOn(refreshSchema, 'refreshSchema')
       .mockResolvedValue({ databases: [], schemaMappingOptions: [] });
@@ -46,34 +51,22 @@ describe('ConfigEditor', () => {
   });
 
   it('should shows the beta OBO toggle if feature gate enabled', async () => {
-    const originalConfigValue = grafanaRuntime.config.featureToggles.adxOnBehalfOf;
-
     grafanaRuntime.config.featureToggles.adxOnBehalfOf = true;
 
     render(<ConfigEditor {...mockConfigEditorProps()} />);
 
     await waitFor(() => expect(screen.getByLabelText('Use On-Behalf-Of')).toBeInTheDocument());
-
-    // reset config to not impact future tests
-    grafanaRuntime.config.featureToggles.adxOnBehalfOf = originalConfigValue;
   });
 
   it('should not show the beta OBO toggle if feature gate disabled', async () => {
-    const originalConfigValue = grafanaRuntime.config.featureToggles.adxOnBehalfOf;
-
     grafanaRuntime.config.featureToggles.adxOnBehalfOf = false;
 
     render(<ConfigEditor {...mockConfigEditorProps()} />);
 
     await waitFor(() => expect(screen.queryByLabelText('Use On-Behalf-Of')).not.toBeInTheDocument());
-
-    // reset config to not impact future tests
-    grafanaRuntime.config.featureToggles.adxOnBehalfOf = originalConfigValue;
   });
 
   it('should set the jsonData for onBehalfOf to false if it was true and the feature flag is disabled', async () => {
-    const originalConfigValue = grafanaRuntime.config.featureToggles.adxOnBehalfOf;
-
     grafanaRuntime.config.featureToggles.adxOnBehalfOf = false;
 
     const updateJson = jest.fn();
@@ -83,8 +76,5 @@ describe('ConfigEditor', () => {
     await waitFor(() => expect(screen.queryByLabelText('Use On-Behalf-Of')).not.toBeInTheDocument());
 
     expect(updateJson).toHaveBeenCalledTimes(1);
-
-    // reset config to not impact future tests
-    grafanaRuntime.config.featureToggles.adxOnBehalfOf = originalConfigValue;
   });
 });

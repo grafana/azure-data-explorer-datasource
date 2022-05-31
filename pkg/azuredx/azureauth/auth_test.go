@@ -6,7 +6,7 @@ import (
 
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/confidential"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestOnBehalfOf(t *testing.T) {
@@ -14,9 +14,9 @@ func TestOnBehalfOf(t *testing.T) {
 		RequestUser                *backend.User
 		RequestAuthorizationHeader string
 		RequestIDTokenHeader       string
-
-		ShouldRequestToken bool
-		ExpectedError      string
+		ShouldRequestToken 		   bool
+		ExpectedError      		   string
+		OnBehalfOfDisabled		   bool
 	}{
 		// happy flow
 		0: {
@@ -45,6 +45,12 @@ func TestOnBehalfOf(t *testing.T) {
 			ShouldRequestToken:         false,
 			ExpectedError:              "ID token absent for data request",
 		},
+
+		4: {
+			RequestUser:                &backend.User{Login: "alice"},
+			RequestIDTokenHeader: 		"ID-TOKEN",
+			OnBehalfOfDisabled: 		true,
+		},
 	}
 
 	for index, g := range golden {
@@ -61,11 +67,13 @@ func TestOnBehalfOf(t *testing.T) {
 
 		// setup & test
 		fakeAADClient := &FakeAADClient{}
+		fakeTokenProvider := &FakeTokenProvider{}
 
 		c := &ServiceCredentialsImpl{
 			aadClient: fakeAADClient,
+			tokenProvider:  fakeTokenProvider,
 		}
-		c.OnBehalfOf = true
+		c.OnBehalfOf = !g.OnBehalfOfDisabled
 
 		auth, err := c.QueryDataAuthorization(context.Background(), &req)
 
@@ -81,33 +89,16 @@ func TestOnBehalfOf(t *testing.T) {
 		case g.ExpectedError != "":
 			t.Errorf("%d: got authorization %q, want error %q", index, auth, g.ExpectedError)
 
+		case g.OnBehalfOfDisabled:
+			assert.Equal(t, fakeTokenProvider.TokenRequested, true)
+			assert.Equal(t, fakeAADClient.TokenRequested, false)
+
 		case g.ShouldRequestToken != fakeAADClient.TokenRequested:
 			t.Errorf("%d: should request token = %t, requested = %t", index, g.ShouldRequestToken, fakeAADClient.TokenRequested)
+
+		default:
+			assert.Equal(t, fakeTokenProvider.TokenRequested, false)
 		}
-	}
-}
-
-func TestOnBehalfOfDisabled(t *testing.T) {
-	// compose request
-	var req backend.QueryDataRequest
-	req.PluginContext.User = &backend.User{Login: "alice"}
-	req.Headers = make(map[string]string)
-	req.Headers["X-ID-Token"] = "ID-TOKEN"
-
-	// setup & test
-	fakeTokenProvider := &FakeTokenProvider{}
-
-	c := &ServiceCredentialsImpl{
-		tokenProvider:  fakeTokenProvider,
-	}
-	c.OnBehalfOf = false
-
-	auth, err := c.QueryDataAuthorization(context.Background(), &req)
-
-	require.NoError(t, err)
-
-	if !fakeTokenProvider.TokenRequested {
-		t.Errorf("got %q, expected 'TokenRequested", auth)
 	}
 }
 
