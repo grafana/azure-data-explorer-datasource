@@ -4,6 +4,13 @@
 
 ⚠️ Only compatible with Grafana 8.3.4 or above.
 
+Since 3.7.0, we provide OBO flow for Token Authorization. To be used, this feature needs to be enabled explicitely in Grafana's config:
+
+```ini
+# On-Behalf-Of functionality for the ADX data source
+adxOnBehalfOf = true
+```
+
 You can enable this feature by selecting the checkbox in the plugin configuration screen.
 When provisioning, set the `oauthPassThru` property to `true` as shown in the following example.
 

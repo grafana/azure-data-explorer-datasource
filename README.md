@@ -154,15 +154,8 @@ If the command succeeds you should get a result like this:
 
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
 
-changes to ### On-Behalf-Of (Beta)
+### Configuring On-Behalf-Of authentication (Beta) 
 ⚠️ _This feature is in Beta and subject to breaking changes_
-
-Since 3.7.0, we provide OBO flow for Token Authorization. To be used, this feature needs to be enabled explicitely in Grafana's config:
-
-```ini
-# On-Behalf-Of functionality for the ADX data source
-adxOnBehalfOf = true
-```
 
 For information about setting up and using the OBO flow: [on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
 
