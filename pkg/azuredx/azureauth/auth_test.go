@@ -6,6 +6,7 @@ import (
 
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/confidential"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/stretchr/testify/require"
 )
 
 func TestOnBehalfOf(t *testing.T) {
@@ -103,9 +104,7 @@ func TestOnBehalfOfDisabled(t *testing.T) {
 
 	auth, err := c.QueryDataAuthorization(context.Background(), &req)
 
-	if err != nil {
-		t.Errorf("got error %q", err)
-	}
+	require.NoError(t, err)
 
 	if !fakeTokenProvider.TokenRequested {
 		t.Errorf("got %q, expected 'TokenRequested", auth)
