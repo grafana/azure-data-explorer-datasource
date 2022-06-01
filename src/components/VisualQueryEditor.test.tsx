@@ -45,7 +45,7 @@ const schema = {
 };
 
 describe('VisualQueryEditor', () => {
-  xit('should render the VisualQueryEditor', async () => {
+  it('should render the VisualQueryEditor', async () => {
     render(<VisualQueryEditor {...defaultProps} />);
     await waitFor(() => screen.getByText('Table schema loaded successfully but without any columns'));
   });
