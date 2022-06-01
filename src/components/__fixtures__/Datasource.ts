@@ -48,35 +48,36 @@ export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<
   onOptionsChange: jest.fn(),
 };
 
-export const mockDatasource = new AdxDataSource({
-  id: 1,
-  uid: 'adx-id',
-  type: 'adx-datasource',
-  name: 'ADX Data Source',
-  access: 'proxy',
-  jsonData: mockDatasourceOptions.options.jsonData,
-  meta: {
-    id: 'adx-datasource',
+export const mockDatasource = () =>
+  new AdxDataSource({
+    id: 1,
+    uid: 'adx-id',
+    type: 'adx-datasource',
     name: 'ADX Data Source',
-    type: PluginType.datasource,
-    module: '',
-    baseUrl: '',
-    info: {
-      description: '',
-      screenshots: [],
-      updated: '',
-      version: '',
-      logos: {
-        small: '',
-        large: '',
+    access: 'proxy',
+    jsonData: mockDatasourceOptions.options.jsonData,
+    meta: {
+      id: 'adx-datasource',
+      name: 'ADX Data Source',
+      type: PluginType.datasource,
+      module: '',
+      baseUrl: '',
+      info: {
+        description: '',
+        screenshots: [],
+        updated: '',
+        version: '',
+        logos: {
+          small: '',
+          large: '',
+        },
+        author: {
+          name: '',
+        },
+        links: [],
       },
-      author: {
-        name: '',
-      },
-      links: [],
     },
-  },
-});
+  });
 
 export const mockQuery: KustoQuery = {
   refId: 'A',

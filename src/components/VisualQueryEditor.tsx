@@ -320,6 +320,7 @@ const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEdi
       .filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String)
       .map((c) => ({
         ...c,
+        // Transform dynamic values to string so they can be grouped
         value: c.dynamic ? `tostring(${c.value})` : c.value,
       }));
   }, [columns]);
@@ -331,7 +332,8 @@ const useAggregableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEd
       .filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String)
       .map((c) => ({
         ...c,
-        value: c.dynamic ? `tolong(${c.value})` : c.value,
+        // Transform dynamic values to long so they can be used by math functions
+        value: c.value.includes('[') ? `tolong(${c.value})` : c.value,
       }));
   }, [columns]);
 };

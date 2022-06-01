@@ -18,7 +18,7 @@ const defaultProps = {
   database: '',
   query: mockQuery,
   onChangeQuery: jest.fn(),
-  datasource: mockDatasource,
+  datasource: mockDatasource(),
   templateVariableOptions: {},
 };
 
@@ -51,7 +51,7 @@ describe('VisualQueryEditor', () => {
   });
 
   it('should render the VisualQueryEditor with a schema', async () => {
-    const datasource = mockDatasource;
+    const datasource = mockDatasource();
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
     render(<VisualQueryEditor {...defaultProps} datasource={datasource} database="foo" schema={schema} />);
     await waitFor(() => screen.getByText('bar'));
