@@ -94,6 +94,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
 
   const columns = useColumnOptions(tableSchema.value);
   const groupable = useGroupableColumns(columns);
+  const aggregable = useAggregableColumns(columns);
 
   const columnTooltip =
     "Some columns may not be visible for selection. The visual query editor does not currently support columns of type 'dynamic'";
@@ -279,7 +280,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
         templateVariableOptions={props.templateVariableOptions}
         label="Aggregate"
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
-        fields={columns}
+        fields={aggregable}
         onChange={onReduceChange}
         tooltip={columnTooltip}
       />
@@ -315,7 +316,23 @@ const getStyles = (theme: GrafanaTheme2) => ({
 
 const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns.filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
+    return columns
+      .filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String)
+      .map((c) => ({
+        ...c,
+        value: c.dynamic ? `tostring(${c.value})` : c.value,
+      }));
+  }, [columns]);
+};
+
+const useAggregableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
+  return useMemo(() => {
+    return columns
+      .filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String)
+      .map((c) => ({
+        ...c,
+        value: c.dynamic ? `tolong(${c.value})` : c.value,
+      }));
   }, [columns]);
 };
 

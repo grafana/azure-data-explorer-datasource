@@ -34,6 +34,7 @@ export interface QueryEditorPropertyDefinition {
   value: string;
   type: QueryEditorPropertyType;
   label?: string;
+  dynamic?: boolean;
 }
 
 export interface QueryEditorFunctionDefinition extends QueryEditorPropertyDefinition {

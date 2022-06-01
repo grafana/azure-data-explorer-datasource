@@ -59,6 +59,7 @@ export const columnsToDefinition = (columns: AdxColumnSchema[]): QueryEditorProp
         label: column.Name.replace(/>/g, ' > '),
         value: `todynamic(${colName})${nestedProps.join('')}`,
         type: toPropertyType(column.CslType),
+        dynamic: true,
       };
     }
 
