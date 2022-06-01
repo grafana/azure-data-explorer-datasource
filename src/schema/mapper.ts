@@ -57,7 +57,7 @@ export const columnsToDefinition = (columns: AdxColumnSchema[]): QueryEditorProp
       const nestedProps = groups.splice(1).map((p) => `["${p}"]`);
       return {
         label: column.Name.replace(/>/g, ' > '),
-        value: `todynamic(${colName})${nestedProps.join('')}`,
+        value: `${colName}${nestedProps.join('')}`,
         type: toPropertyType(column.CslType),
         dynamic: true,
       };

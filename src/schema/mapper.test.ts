@@ -16,7 +16,7 @@ describe('columnsToDefinition', () => {
       {
         label: 'foo > bar',
         type: 'string',
-        value: 'todynamic(foo)["bar"]',
+        value: 'foo["bar"]',
         dynamic: true,
       },
     ]);
