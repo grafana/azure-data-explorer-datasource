@@ -5,7 +5,7 @@ import createMockSchema from 'components/__fixtures__/schema';
 import { AdxSchemaResolver } from './AdxSchemaResolver';
 
 describe('Test schema resolution', () => {
-  const datasource = mockDatasource;
+  const datasource = mockDatasource();
   const schemaResolver = new AdxSchemaResolver(datasource);
   const schema = createMockSchema();
   const originalFeatureToggles = config.featureToggles;

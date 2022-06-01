@@ -25,7 +25,7 @@ jest.mock('@grafana/runtime', () => {
 const defaultProps = {
   onChange: jest.fn(),
   onRunQuery: jest.fn(),
-  datasource: mockDatasource,
+  datasource: mockDatasource(),
   query: mockQuery,
 };
 
@@ -38,13 +38,13 @@ describe('QueryEditor', () => {
   });
 
   describe('there is a schema error', () => {
-    const getSchema = mockDatasource.getSchema;
+    const getSchema = defaultProps.datasource.getSchema;
     beforeEach(() => {
-      mockDatasource.getSchema = getSchema;
+      defaultProps.datasource.getSchema = getSchema;
     });
 
     it('should render the encoded message', async () => {
-      mockDatasource.getSchema = jest.fn().mockRejectedValue({
+      defaultProps.datasource.getSchema = jest.fn().mockRejectedValue({
         data: {
           Message: 'Boom!',
         },
@@ -54,7 +54,7 @@ describe('QueryEditor', () => {
     });
 
     it('should render the error', async () => {
-      mockDatasource.getSchema = jest.fn().mockRejectedValue('Boom!');
+      defaultProps.datasource.getSchema = jest.fn().mockRejectedValue('Boom!');
       render(<QueryEditor {...defaultProps} />);
       await waitFor(() => screen.getByText('Could not load datasource schema: Boom!'));
     });
@@ -62,13 +62,13 @@ describe('QueryEditor', () => {
 
   describe('when there is a schema', () => {
     it('should render a no databases warning', async () => {
-      mockDatasource.getSchema = jest.fn().mockResolvedValue({});
+      defaultProps.datasource.getSchema = jest.fn().mockResolvedValue({});
       render(<QueryEditor {...defaultProps} />);
       await waitFor(() => screen.getByText(/Datasource schema loaded but without any databases/i));
     });
 
     it('should render a visual editor', async () => {
-      mockDatasource.getSchema = jest.fn().mockResolvedValue({
+      defaultProps.datasource.getSchema = jest.fn().mockResolvedValue({
         Databases: {
           foo: {},
         },
@@ -78,7 +78,7 @@ describe('QueryEditor', () => {
     });
 
     it('should render a raw editor', async () => {
-      mockDatasource.getSchema = jest.fn().mockResolvedValue({
+      defaultProps.datasource.getSchema = jest.fn().mockResolvedValue({
         Databases: {
           foo: {},
         },

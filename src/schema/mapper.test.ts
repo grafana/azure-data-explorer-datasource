@@ -10,15 +10,4 @@ describe('columnsToDefinition', () => {
       },
     ]);
   });
-
-  it('should parse a dynamic column', () => {
-    expect(columnsToDefinition([{ Name: 'foo>bar', CslType: 'string' }])).toEqual([
-      {
-        label: 'foo > bar',
-        type: 'string',
-        value: 'foo["bar"]',
-        dynamic: true,
-      },
-    ]);
-  });
 });

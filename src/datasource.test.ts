@@ -1,8 +1,9 @@
 import { AdxDataSource, sortStartsWithValuesFirst } from './datasource';
-import { dateTime } from '@grafana/data';
+import { dateTime, toDataFrame } from '@grafana/data';
 import _ from 'lodash';
 import { setBackendSrv, BackendSrv, BackendSrvRequest } from '@grafana/runtime';
 import { EditorMode } from 'types';
+import { mockDatasource } from 'components/__fixtures__/Datasource';
 
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
@@ -328,6 +329,41 @@ describe('AdxDataSource', () => {
       const datasource = new AdxDataSource(instanceSettings);
 
       expect(datasource.getDefaultEditorMode()).toEqual(EditorMode.Visual);
+    });
+  });
+
+  describe('when getting a dynamic schema', () => {
+    it('should return valid accessors', async () => {
+      const datasource = mockDatasource();
+      datasource.query = jest.fn().mockReturnValue({
+        toPromise: jest.fn().mockResolvedValue({
+          data: [
+            toDataFrame({
+              fields: [
+                {
+                  name: 'schema_Teams',
+                  type: 'string',
+                  typeInfo: {
+                    frame: 'string',
+                  },
+                  config: {},
+                  values: ['{"18":{"TeamID":"long"}}'],
+                  entities: {},
+                },
+              ],
+            }),
+          ],
+        }),
+      });
+
+      expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
+        Teams: [
+          {
+            CslType: 'long',
+            Name: 'Teams["18"]["TeamID"]',
+          },
+        ],
+      });
     });
   });
 });

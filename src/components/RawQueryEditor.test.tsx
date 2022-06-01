@@ -36,7 +36,7 @@ const defaultProps = {
   templateVariableOptions: {},
   onChange: jest.fn(),
   onRunQuery: jest.fn(),
-  datasource: mockDatasource,
+  datasource: mockDatasource(),
   query: mockQuery,
   schema: { Databases: {} },
 };

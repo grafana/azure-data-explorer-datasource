@@ -381,9 +381,9 @@ const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]
   }
 
   for (const name of Object.keys(schema)) {
-    // Using > as a key separator since it's not a valid character for an identifier
-    // https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/schema-entities/entity-names#identifier-naming-rules
-    const key = `${columnName}>${name}`;
+    // Generate a valid accessor for a dynamic type
+    // https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic#dynamic-object-accessors
+    const key = `${columnName}["${name}"]`;
 
     if (typeof schema[name] === 'string') {
       result.push({
