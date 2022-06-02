@@ -317,35 +317,23 @@ const getStyles = (theme: GrafanaTheme2) => ({
 
 const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns
-      .filter(
-        (c) =>
-          (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
-          // TODO: Add support dynamic arrays
-          !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
-      )
-      .map((c) => ({
-        ...c,
-        // Transform dynamic values to string so they can be grouped
-        value: c.dynamic ? `tostring(${c.value})` : c.value,
-      }));
+    return columns.filter(
+      (c) =>
+        (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
+        // TODO: Add support dynamic arrays
+        !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
+    );
   }, [columns]);
 };
 
 const useAggregableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns
-      .filter(
-        (c) =>
-          (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
-          // TODO: Add support dynamic arrays
-          !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
-      )
-      .map((c) => ({
-        ...c,
-        // Transform dynamic values to long so they can be used by math functions
-        value: c.value.includes('[') ? `tolong(${c.value})` : c.value,
-      }));
+    return columns.filter(
+      (c) =>
+        (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
+        // TODO: Add support dynamic arrays
+        !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
+    );
   }, [columns]);
 };
 

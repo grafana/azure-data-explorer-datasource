@@ -195,6 +195,7 @@ export class KustoExpressionParser {
       const func = expression.reduce.name;
       const parameters = expression.parameters;
       const column = context.castIfDynamic(expression.property.name);
+      // column = column.includes('[') ? `tolong(${column})` : column;
       columns.push(column);
 
       if (Array.isArray(parameters)) {
@@ -235,7 +236,11 @@ export class KustoExpressionParser {
 
     if (reduceParts.length > 0) {
       if (groupByParts.length > 0) {
-        parts.push(`summarize ${reduceParts.join(', ')} by ${groupByParts.join(', ')}`);
+        parts.push(
+          `summarize ${reduceParts.join(', ')} by ${groupByParts
+            .map((c) => (c.includes('[') ? `tostring(${c})` : c))
+            .join(', ')}`
+        );
         return;
       }
       parts.push(`summarize ${reduceParts.join(', ')}`);
@@ -358,7 +363,7 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
   }
 
   const firstLevelColumn = columns?.find((col) => {
-    return col.CslType === 'datetime' && col.Name.indexOf('.') === -1;
+    return col.CslType === 'datetime' && col.Name.indexOf('[') === -1;
   });
 
   if (firstLevelColumn) {
@@ -371,11 +376,11 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
     return column;
   }
 
-  return toDynamic(column);
+  return toType(column);
 };
 
 const isDynamic = (column: string): boolean => {
-  return !!(column && column.indexOf('.') > -1) || !!(column && column.indexOf('todynamic') > -1);
+  return !!(column && column.indexOf('[') > -1) || !!(column && column.indexOf('todynamic') > -1);
 };
 
 const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[]): string => {
@@ -389,23 +394,11 @@ const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[]): string 
     return column;
   }
 
-  return toDynamic(columnSchema);
+  return toType(columnSchema);
 };
 
-const toDynamic = (column: AdxColumnSchema): string => {
-  const parts = column.Name.split('.');
-
-  return parts.reduce((result: string, part, index) => {
-    if (!result) {
-      return `todynamic(${part})`;
-    }
-
-    if (index + 1 === parts.length) {
-      return `to${column.CslType}(${result}.${part})`;
-    }
-
-    return `todynamic(${result}.${part})`;
-  }, '');
+const toType = (column: AdxColumnSchema): string => {
+  return `to${column.CslType}(${column.Name})`;
 };
 
 const replaceByIndex = (

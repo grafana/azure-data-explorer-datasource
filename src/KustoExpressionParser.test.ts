@@ -99,7 +99,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([
           createOperator('eventType', '==', 'ThunderStorm'),
           createArray(
-            [createOperator('column.type', '==', ''), createOperator('eventType', '==', 'Ligthning')],
+            [createOperator('column["type"]', '==', ''), createOperator('eventType', '==', 'Ligthning')],
             QueryEditorExpressionType.Or
           ),
         ]),
@@ -107,14 +107,14 @@ describe('KustoExpressionParser', () => {
 
       const acQuery: AutoCompleteQuery = {
         expression,
-        search: createOperator('column.type', 'contains', 'TEXAS'),
+        search: createOperator('column["type"]', 'contains', 'TEXAS'),
         index: '1-0',
         database: 'Samples',
       };
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.type',
+          Name: 'column["type"]',
           CslType: 'string',
         },
       ];
@@ -122,9 +122,9 @@ describe('KustoExpressionParser', () => {
       expect(parser.toAutoCompleteQuery(acQuery, tableSchema)).toEqual(
         'StormEvents' +
           "\n| where eventType == 'ThunderStorm'" +
-          "\n| where column.type contains 'TEXAS' or eventType == 'Ligthning'" +
+          "\n| where column[\"type\"] contains 'TEXAS' or eventType == 'Ligthning'" +
           '\n| take 50000' +
-          '\n| distinct tostring(todynamic(column).type)' +
+          '\n| distinct tostring(column["type"])' +
           '\n| take 251'
       );
     });
@@ -135,7 +135,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([
           createOperator('eventType', '==', 'ThunderStorm'),
           createArray(
-            [createOperator('column.type', '==', ''), createOperator('eventType', '==', 'Ligthning')],
+            [createOperator('column["type"]', '==', ''), createOperator('eventType', '==', 'Ligthning')],
             QueryEditorExpressionType.Or
           ),
         ]),
@@ -143,14 +143,14 @@ describe('KustoExpressionParser', () => {
 
       const acQuery: AutoCompleteQuery = {
         expression,
-        search: createOperator('column.type', 'contains', 'TEXAS'),
+        search: createOperator('column["type"]', 'contains', 'TEXAS'),
         index: '1-0',
         database: 'Samples',
       };
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.type',
+          Name: 'column["type"]',
           CslType: 'string',
         },
         {
@@ -163,9 +163,9 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           "\n| where eventType == 'ThunderStorm'" +
-          "\n| where column.type contains 'TEXAS' or eventType == 'Ligthning'" +
+          "\n| where column[\"type\"] contains 'TEXAS' or eventType == 'Ligthning'" +
           '\n| take 50000' +
-          '\n| distinct tostring(todynamic(column).type)' +
+          '\n| distinct tostring(column["type"])' +
           '\n| take 251'
       );
     });
@@ -323,16 +323,16 @@ describe('KustoExpressionParser', () => {
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'Column.StartTime',
+          Name: 'Column["StartTime"]',
           CslType: 'datetime',
         },
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where todatetime(todynamic(Column).StartTime) between ($__timeFrom .. $__timeTo)' +
+          '\n| where todatetime(Column["StartTime"]) between ($__timeFrom .. $__timeTo)' +
           '\n| where isActive == true' +
-          `\n| order by todatetime(todynamic(Column).StartTime) asc`
+          `\n| order by todatetime(Column["StartTime"]) asc`
       );
     });
 
@@ -344,7 +344,7 @@ describe('KustoExpressionParser', () => {
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'Column.StartTime',
+          Name: 'Column["StartTime"]',
           CslType: 'datetime',
         },
         {
@@ -364,91 +364,89 @@ describe('KustoExpressionParser', () => {
     it('should parse expression with when filter on dynamic column', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where column.isActive == true');
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where column["isActive"] == true');
     });
 
     it('should parse expression with summarize of sum(active)', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
         reduce: createArray([createReduce('active', 'sum')]),
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize sum(active)`
+        'StormEvents' + '\n| where column["isActive"] == true' + `\n| summarize sum(active)`
       );
     });
 
     it('should parse expression with summarize of count', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
         reduce: createArray([createReduce('active', 'count')]),
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize count()`
+        'StormEvents' + '\n| where column["isActive"] == true' + `\n| summarize count()`
       );
     });
 
     it('should parse expression with summarize of count', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
         reduce: createArray([createReduce('', 'count')]),
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize count()`
+        'StormEvents' + '\n| where column["isActive"] == true' + `\n| summarize count()`
       );
     });
 
     it('should parse expression with summarize of multiple count', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
         reduce: createArray([createReduce('active', 'count'), createReduce('total', 'count')]),
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where column.isActive == true' + `\n| summarize count()`
+        'StormEvents' + '\n| where column["isActive"] == true' + `\n| summarize count()`
       );
     });
 
     it('should parse expression with summarize of sum on dynamic column', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
-        reduce: createArray([createReduce('column.level.active', 'sum')]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
+        reduce: createArray([createReduce('column["level"]["active"]', 'sum')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.level.active',
+          Name: 'column["level"]["active"]',
           CslType: 'int',
         },
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
-        'StormEvents' +
-          '\n| where column.isActive == true' +
-          `\n| summarize sum(toint(todynamic(todynamic(column).level).active))`
+        'StormEvents' + '\n| where column["isActive"] == true' + `\n| summarize sum(toint(column["level"]["active"]))`
       );
     });
 
     it('should parse expression with project when no group by and no reduce functions', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
-        reduce: createArray([createReduce('column.level.active', 'none'), createReduce('active', 'none')]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
+        reduce: createArray([createReduce('column["level"]["active"]', 'none'), createReduce('active', 'none')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.level.active',
+          Name: 'column["level"]["active"]',
           CslType: 'int',
         },
         {
@@ -460,21 +458,21 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          '\n| where column.isActive == true' +
-          `\n| project toint(todynamic(todynamic(column).level).active), active`
+          '\n| where column["isActive"] == true' +
+          `\n| project toint(column["level"]["active"]), active`
       );
     });
 
     it('should parse expression with summarize when no group by and mixed none and reduce functions', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
-        reduce: createArray([createReduce('column.level.active', 'sum'), createReduce('active', 'none')]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
+        reduce: createArray([createReduce('column["level"]["active"]', 'sum'), createReduce('active', 'none')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.level.active',
+          Name: 'column["level"]["active"]',
           CslType: 'int',
         },
         {
@@ -486,22 +484,22 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          '\n| where column.isActive == true' +
-          `\n| summarize sum(toint(todynamic(todynamic(column).level).active))`
+          '\n| where column["isActive"] == true' +
+          `\n| summarize sum(toint(column["level"]["active"]))`
       );
     });
 
     it('should parse expression to summarize and bin size when it has group by and reduce functions', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
-        reduce: createArray([createReduce('column.level.active', 'sum')]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
+        reduce: createArray([createReduce('column["level"]["active"]', 'sum')]),
         groupBy: createArray([createGroupBy('StartTime', '1h')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.level.active',
+          Name: 'column["level"]["active"]',
           CslType: 'int',
         },
         {
@@ -513,8 +511,8 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          '\n| where column.isActive == true' +
-          `\n| summarize sum(toint(todynamic(todynamic(column).level).active)) by bin(StartTime, 1h)` +
+          '\n| where column["isActive"] == true' +
+          `\n| summarize sum(toint(column["level"]["active"])) by bin(StartTime, 1h)` +
           `\n| order by StartTime asc`
       );
     });
@@ -522,13 +520,13 @@ describe('KustoExpressionParser', () => {
     it('should parse expression to summarize and bin size when it has group by', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
         groupBy: createArray([createGroupBy('StartTime', '1h')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.level.active',
+          Name: 'column["level"]["active"]',
           CslType: 'int',
         },
         {
@@ -540,7 +538,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          '\n| where column.isActive == true' +
+          '\n| where column["isActive"] == true' +
           `\n| summarize by bin(StartTime, 1h)` +
           `\n| order by StartTime asc`
       );
@@ -549,13 +547,13 @@ describe('KustoExpressionParser', () => {
     it('should parse expression to summarize and bin size when it has group by multiple fields', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
         groupBy: createArray([createGroupBy('StartTime', '1h'), createGroupBy('type')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.level.active',
+          Name: 'column["level"]["active"]',
           CslType: 'int',
         },
         {
@@ -567,7 +565,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          '\n| where column.isActive == true' +
+          '\n| where column["isActive"] == true' +
           `\n| summarize by bin(StartTime, 1h), type` +
           `\n| order by StartTime asc`
       );
@@ -576,13 +574,13 @@ describe('KustoExpressionParser', () => {
     it('should parse expression and replace default time column with group by time if available', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
         groupBy: createArray([createGroupBy('EndTime', '1h'), createGroupBy('type')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.level.active',
+          Name: 'column["level"]["active"]',
           CslType: 'int',
         },
         {
@@ -598,7 +596,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(EndTime)' +
-          '\n| where column.isActive == true' +
+          '\n| where column["isActive"] == true' +
           `\n| summarize by bin(EndTime, 1h), type` +
           `\n| order by EndTime asc`
       );
@@ -607,13 +605,13 @@ describe('KustoExpressionParser', () => {
     it('should parse expression and replace default time column with group by as dynamic column', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
-        groupBy: createArray([createGroupBy('column.EndTime', '1h'), createGroupBy('type')]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
+        groupBy: createArray([createGroupBy('column["EndTime"]', '1h'), createGroupBy('type')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.level.active',
+          Name: 'column["level"]["active"]',
           CslType: 'int',
         },
         {
@@ -621,30 +619,30 @@ describe('KustoExpressionParser', () => {
           CslType: 'datetime',
         },
         {
-          Name: 'column.EndTime',
+          Name: 'column["EndTime"]',
           CslType: 'datetime',
         },
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where todatetime(todynamic(column).EndTime) between ($__timeFrom .. $__timeTo)' +
-          '\n| where column.isActive == true' +
-          `\n| summarize by bin(todatetime(todynamic(column).EndTime), 1h), type` +
-          `\n| order by todatetime(todynamic(column).EndTime) asc`
+          '\n| where todatetime(column["EndTime"]) between ($__timeFrom .. $__timeTo)' +
+          '\n| where column["isActive"] == true' +
+          `\n| summarize by bin(todatetime(column["EndTime"]), 1h), type` +
+          `\n| order by todatetime(column["EndTime"]) asc`
       );
     });
 
     it('should parse expression and summarize by dynamic column', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.isActive', '==', true)]),
-        groupBy: createArray([createGroupBy('column.type')]),
+        where: createArray([createOperator('column["isActive"]', '==', true)]),
+        groupBy: createArray([createGroupBy('column["type"]')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.type',
+          Name: 'column["type"]',
           CslType: 'string',
         },
         {
@@ -656,8 +654,8 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          '\n| where column.isActive == true' +
-          `\n| summarize by tostring(todynamic(column).type)`
+          '\n| where column["isActive"] == true' +
+          `\n| summarize by tostring(column["type"])`
       );
     });
 
@@ -682,13 +680,13 @@ describe('KustoExpressionParser', () => {
 
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.country', '==', '$country')]),
-        groupBy: createArray([createGroupBy('column.type')]),
+        where: createArray([createOperator('column["country"]', '==', '$country')]),
+        groupBy: createArray([createGroupBy('column["type"]')]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.type',
+          Name: 'column["type"]',
           CslType: 'string',
         },
         {
@@ -700,21 +698,21 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          '\n| where column.country == $country' +
-          `\n| summarize by tostring(todynamic(column).type)`
+          '\n| where column["country"] == $country' +
+          `\n| summarize by tostring(column["type"])`
       );
     });
 
     it('should parse expression with summarize function that takes a parameter', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.country', '==', 'sweden')]),
+        where: createArray([createOperator('column["country"]', '==', 'sweden')]),
         reduce: createArray([createReduceWithParameter('amount', 'percentile', [1])]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.type',
+          Name: 'column["type"]',
           CslType: 'string',
         },
         {
@@ -726,7 +724,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          "\n| where column.country == 'sweden'" +
+          '\n| where column["country"] == \'sweden\'' +
           `\n| summarize percentile(amount, 1)`
       );
     });
@@ -734,13 +732,13 @@ describe('KustoExpressionParser', () => {
     it('should parse expression with summarize function that takes multiple parameter', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.country', '==', 'sweden')]),
+        where: createArray([createOperator('column["country"]', '==', 'sweden')]),
         reduce: createArray([createReduceWithParameter('amount', 'percentile', [1, 2])]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.type',
+          Name: 'column["type"]',
           CslType: 'string',
         },
         {
@@ -752,7 +750,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          "\n| where column.country == 'sweden'" +
+          '\n| where column["country"] == \'sweden\'' +
           `\n| summarize percentile(amount, 1, 2)`
       );
     });
@@ -760,13 +758,13 @@ describe('KustoExpressionParser', () => {
     it('should parse expression with summarize function that takes a parameter', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.country', '==', 'sweden')]),
+        where: createArray([createOperator('column["country"]', '==', 'sweden')]),
         reduce: createArray([createReduceWithParameter('amount', 'percentile', [1])]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.type',
+          Name: 'column["type"]',
           CslType: 'string',
         },
         {
@@ -778,7 +776,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          "\n| where column.country == 'sweden'" +
+          '\n| where column["country"] == \'sweden\'' +
           `\n| summarize percentile(amount, 1)`
       );
     });
@@ -786,13 +784,13 @@ describe('KustoExpressionParser', () => {
     it('should parse expression with summarize function that takes multiple parameter of different types', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column.country', '==', 'sweden')]),
+        where: createArray([createOperator('column["country"]', '==', 'sweden')]),
         reduce: createArray([createReduceWithParameter('amount', 'percentile', [1, '2'])]),
       });
 
       const tableSchema: AdxColumnSchema[] = [
         {
-          Name: 'column.type',
+          Name: 'column["type"]',
           CslType: 'string',
         },
         {
@@ -804,7 +802,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          "\n| where column.country == 'sweden'" +
+          '\n| where column["country"] == \'sweden\'' +
           `\n| summarize percentile(amount, 1, '2')`
       );
     });
