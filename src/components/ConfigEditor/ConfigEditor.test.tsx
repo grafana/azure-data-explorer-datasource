@@ -50,7 +50,7 @@ describe('ConfigEditor', () => {
     await waitFor(() => expect(refreshSchemaSpy).toHaveBeenCalledTimes(2));
   });
 
-  it('should shows the beta OBO toggle if feature gate enabled', async () => {
+  it('should show the beta OBO toggle if feature gate enabled', async () => {
     grafanaRuntime.config.featureToggles.adxOnBehalfOf = true;
 
     render(<ConfigEditor {...mockConfigEditorProps()} />);
