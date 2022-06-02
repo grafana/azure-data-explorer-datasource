@@ -9,7 +9,7 @@ import {
 import { AdxDataSource } from '../datasource';
 import { cache } from './cache';
 import { config } from '@grafana/runtime';
-import { ARRAY_DELIMITER } from 'KustoExpressionParser';
+import { DYNAMIC_TYPE_ARRAY_DELIMITER } from 'KustoExpressionParser';
 
 const schemaKey = 'AdxSchemaResolver';
 
@@ -98,7 +98,7 @@ export class AdxSchemaResolver {
 
         // TODO: Ignoring arrays with multiple nested arrays
         const schemaForDynamicColumnWithoutMultipleArrays = schemaForDynamicColumn.filter(
-          (c) => c.Name.split(ARRAY_DELIMITER).length <= 2
+          (c) => c.Name.split(DYNAMIC_TYPE_ARRAY_DELIMITER).length <= 2
         );
 
         // Plain objects

@@ -9,7 +9,7 @@ import {
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
 } from 'editor/expressions';
-import { ARRAY_DELIMITER } from 'KustoExpressionParser';
+import { DYNAMIC_TYPE_ARRAY_DELIMITER } from 'KustoExpressionParser';
 import React, { useCallback, useMemo } from 'react';
 import { useAsync } from 'react-use';
 import { selectors } from 'test/selectors';
@@ -322,7 +322,7 @@ const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEdi
         (c) =>
           (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
           // TODO: Add support dynamic arrays
-          !c.value.includes(ARRAY_DELIMITER)
+          !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
       )
       .map((c) => ({
         ...c,
@@ -339,7 +339,7 @@ const useAggregableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEd
         (c) =>
           (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
           // TODO: Add support dynamic arrays
-          !c.value.includes(ARRAY_DELIMITER)
+          !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
       )
       .map((c) => ({
         ...c,

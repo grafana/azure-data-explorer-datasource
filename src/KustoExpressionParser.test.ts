@@ -1,4 +1,4 @@
-import { ARRAY_DELIMITER, KustoExpressionParser } from './KustoExpressionParser';
+import { DYNAMIC_TYPE_ARRAY_DELIMITER, KustoExpressionParser } from './KustoExpressionParser';
 import { QueryEditorPropertyType } from './editor/types';
 import { TemplateSrv } from '@grafana/runtime';
 import {
@@ -971,7 +971,7 @@ describe('KustoExpressionParser', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createArray(
-          [createOperator(`eventType${ARRAY_DELIMITER}`, '==', 'ThunderStorm')],
+          [createOperator(`eventType${DYNAMIC_TYPE_ARRAY_DELIMITER}`, '==', 'ThunderStorm')],
           QueryEditorExpressionType.Or
         ),
       });
@@ -985,7 +985,10 @@ describe('KustoExpressionParser', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createArray(
-          [createOperator(`eventType${ARRAY_DELIMITER}`, '==', 'ThunderStorm'), createOperator(`foo`, '==', 'bar')],
+          [
+            createOperator(`eventType${DYNAMIC_TYPE_ARRAY_DELIMITER}`, '==', 'ThunderStorm'),
+            createOperator(`foo`, '==', 'bar'),
+          ],
           QueryEditorExpressionType.Or
         ),
       });

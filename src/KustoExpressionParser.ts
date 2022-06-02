@@ -22,7 +22,7 @@ interface ParseContext {
   castIfDynamic: (column: string) => string;
 }
 
-export const ARRAY_DELIMITER = '["`indexer`"]';
+export const DYNAMIC_TYPE_ARRAY_DELIMITER = '["`indexer`"]';
 
 export class KustoExpressionParser {
   constructor(private templateSrv: TemplateSrv = getTemplateSrv()) {}
@@ -296,12 +296,12 @@ export class KustoExpressionParser {
   }
 
   private filtersContainArray(orParts: string[]) {
-    return orParts.some((p) => p.includes(ARRAY_DELIMITER));
+    return orParts.some((p) => p.includes(DYNAMIC_TYPE_ARRAY_DELIMITER));
   }
 
   private formatArrayFilter(orParts: string[]) {
-    const arrayElemIndex = orParts.findIndex((p) => p.includes(ARRAY_DELIMITER));
-    const arrayElemParts = orParts[arrayElemIndex].split(ARRAY_DELIMITER);
+    const arrayElemIndex = orParts.findIndex((p) => p.includes(DYNAMIC_TYPE_ARRAY_DELIMITER));
+    const arrayElemParts = orParts[arrayElemIndex].split(DYNAMIC_TYPE_ARRAY_DELIMITER);
     orParts[arrayElemIndex] = `element${arrayElemParts[1]}`;
     return `mv-apply element = ${arrayElemParts[0]} on (where ${orParts.join(' or ')})`;
   }

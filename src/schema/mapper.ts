@@ -1,5 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { ARRAY_DELIMITER } from 'KustoExpressionParser';
+import { DYNAMIC_TYPE_ARRAY_DELIMITER } from 'KustoExpressionParser';
 
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import { AdxColumnSchema, AdxDatabaseSchema, AdxTableSchema } from '../types';
@@ -54,7 +54,7 @@ export const columnsToDefinition = (columns: AdxColumnSchema[]): QueryEditorProp
   return columns.map((column) => {
     return {
       value: column.Name,
-      label: column.Name.replace(ARRAY_DELIMITER, '[ ]'),
+      label: column.Name.replace(DYNAMIC_TYPE_ARRAY_DELIMITER, '[ ]'),
       type: toPropertyType(column.CslType),
     };
   });
