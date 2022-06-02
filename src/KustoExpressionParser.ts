@@ -235,11 +235,7 @@ export class KustoExpressionParser {
 
     if (reduceParts.length > 0) {
       if (groupByParts.length > 0) {
-        parts.push(
-          `summarize ${reduceParts.join(', ')} by ${groupByParts
-            .map((c) => (c.includes('[') ? `tostring(${c})` : c))
-            .join(', ')}`
-        );
+        parts.push(`summarize ${reduceParts.join(', ')} by ${groupByParts.join(', ')}`);
         return;
       }
       parts.push(`summarize ${reduceParts.join(', ')}`);
