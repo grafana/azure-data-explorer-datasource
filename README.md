@@ -6,7 +6,8 @@
 
 ## Installation
 
-This plugin requires Grafana 7.1.0 or newer as of version 3.0.0. Plugin versions prior to 3.0.0 require Grafana 6.3.6.
+This plugin requires Grafana 8.0.0 or newer as of version 4.0.0 , it requires Grafana 7.1.0 or newer as of version 3.0.0. 
+Plugin versions prior to 3.0.0 require Grafana 6.3.6.
 
 ## Grafana Cloud
 
@@ -153,7 +154,10 @@ If the command succeeds you should get a result like this:
 
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
 
-[on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
+### Configuring On-Behalf-Of authentication (Beta) 
+⚠️ _This feature is in Beta and subject to breaking changes_
+
+For information about setting up and using the OBO flow: [on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
 
 ## Writing Queries
 
