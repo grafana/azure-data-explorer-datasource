@@ -195,7 +195,6 @@ export class KustoExpressionParser {
       const func = expression.reduce.name;
       const parameters = expression.parameters;
       const column = context.castIfDynamic(expression.property.name);
-      // column = column.includes('[') ? `tolong(${column})` : column;
       columns.push(column);
 
       if (Array.isArray(parameters)) {
