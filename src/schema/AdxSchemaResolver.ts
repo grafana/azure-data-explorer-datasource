@@ -9,6 +9,7 @@ import {
 import { AdxDataSource } from '../datasource';
 import { cache } from './cache';
 import { config } from '@grafana/runtime';
+import { ARRAY_DELIMITER } from 'KustoExpressionParser';
 
 const schemaKey = 'AdxSchemaResolver';
 
@@ -95,13 +96,13 @@ export class AdxSchemaResolver {
           return columns;
         }
 
-        // TODO: Ignoring arrays, for the moment
-        if (schemaForDynamicColumn.some((c) => c.Name.includes('`indexer`'))) {
-          return columns;
-        }
+        // TODO: Ignoring arrays with multiple nested arrays
+        const schemaForDynamicColumnWithoutMultipleArrays = schemaForDynamicColumn.filter(
+          (c) => c.Name.split(ARRAY_DELIMITER).length <= 2
+        );
 
         // Plain objects
-        Array.prototype.push.apply(columns, schemaForDynamicColumn);
+        Array.prototype.push.apply(columns, schemaForDynamicColumnWithoutMultipleArrays);
         return columns;
       }, []);
     });

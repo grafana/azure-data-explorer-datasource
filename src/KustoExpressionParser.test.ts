@@ -1,4 +1,4 @@
-import { KustoExpressionParser } from './KustoExpressionParser';
+import { ARRAY_DELIMITER, KustoExpressionParser } from './KustoExpressionParser';
 import { QueryEditorPropertyType } from './editor/types';
 import { TemplateSrv } from '@grafana/runtime';
 import {
@@ -964,6 +964,34 @@ describe('KustoExpressionParser', () => {
         'StormEvents($__from, $__to)' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| summarize dcount(country) by continents'
+      );
+    });
+
+    it('should parse expression with an array', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray(
+          [createOperator(`eventType${ARRAY_DELIMITER}`, '==', 'ThunderStorm')],
+          QueryEditorExpressionType.Or
+        ),
+      });
+
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' + "\n| mv-apply element = eventType on (where element == 'ThunderStorm')"
+      );
+    });
+
+    it('should parse expression with an array and other "or" operators', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray(
+          [createOperator(`eventType${ARRAY_DELIMITER}`, '==', 'ThunderStorm'), createOperator(`foo`, '==', 'bar')],
+          QueryEditorExpressionType.Or
+        ),
+      });
+
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' + "\n| mv-apply element = eventType on (where element == 'ThunderStorm' or foo == 'bar')"
       );
     });
   });

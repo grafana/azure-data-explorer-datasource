@@ -9,6 +9,7 @@ import {
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
 } from 'editor/expressions';
+import { ARRAY_DELIMITER } from 'KustoExpressionParser';
 import React, { useCallback, useMemo } from 'react';
 import { useAsync } from 'react-use';
 import { selectors } from 'test/selectors';
@@ -317,7 +318,12 @@ const getStyles = (theme: GrafanaTheme2) => ({
 const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
     return columns
-      .filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String)
+      .filter(
+        (c) =>
+          (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
+          // TODO: Add support dynamic arrays
+          !c.value.includes(ARRAY_DELIMITER)
+      )
       .map((c) => ({
         ...c,
         // Transform dynamic values to string so they can be grouped
@@ -329,7 +335,12 @@ const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEdi
 const useAggregableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
     return columns
-      .filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String)
+      .filter(
+        (c) =>
+          (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
+          // TODO: Add support dynamic arrays
+          !c.value.includes(ARRAY_DELIMITER)
+      )
       .map((c) => ({
         ...c,
         // Transform dynamic values to long so they can be used by math functions

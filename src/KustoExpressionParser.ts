@@ -21,6 +21,9 @@ interface ParseContext {
   timeColumn?: string;
   castIfDynamic: (column: string) => string;
 }
+
+export const ARRAY_DELIMITER = '["`indexer`"]';
+
 export class KustoExpressionParser {
   constructor(private templateSrv: TemplateSrv = getTemplateSrv()) {}
 
@@ -162,6 +165,9 @@ export class KustoExpressionParser {
       if (orParts.length === 0) {
         return;
       }
+      if (this.filtersContainArray(orParts)) {
+        return parts.push(this.formatArrayFilter(orParts));
+      }
       return parts.push(`where ${orParts.join(' or ')}`);
     }
 
@@ -287,6 +293,17 @@ export class KustoExpressionParser {
       default:
         return `'${value}'`;
     }
+  }
+
+  private filtersContainArray(orParts: string[]) {
+    return orParts.some((p) => p.includes(ARRAY_DELIMITER));
+  }
+
+  private formatArrayFilter(orParts: string[]) {
+    const arrayElemIndex = orParts.findIndex((p) => p.includes(ARRAY_DELIMITER));
+    const arrayElemParts = orParts[arrayElemIndex].split(ARRAY_DELIMITER);
+    orParts[arrayElemIndex] = `element${arrayElemParts[1]}`;
+    return `mv-apply element = ${arrayElemParts[0]} on (where ${orParts.join(' or ')})`;
   }
 
   private appendProperty(context: ParseContext, expression: QueryEditorPropertyExpression, parts: string[]) {
