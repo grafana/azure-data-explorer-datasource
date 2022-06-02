@@ -19,7 +19,7 @@ import { cloneDeep } from 'lodash';
 
 interface ParseContext {
   timeColumn?: string;
-  castIfDynamic: (column: string) => string;
+  castIfDynamic: (column: string, arrayIndex?: number) => string;
 }
 
 export const DYNAMIC_TYPE_ARRAY_DELIMITER = '["`indexer`"]';
@@ -34,7 +34,7 @@ export class KustoExpressionParser {
 
     const context: ParseContext = {
       timeColumn: defaultTimeColumn(tableSchema, query?.expression),
-      castIfDynamic: (column: string) => castIfDynamic(column, tableSchema),
+      castIfDynamic: (column: string, arrayIndex?: number) => castIfDynamic(column, tableSchema, arrayIndex),
     };
 
     const parts: string[] = [];
@@ -59,7 +59,7 @@ export class KustoExpressionParser {
 
     const context: ParseContext = {
       timeColumn: defaultTimeColumn(tableSchema, expression),
-      castIfDynamic: (column: string) => castIfDynamic(column, tableSchema),
+      castIfDynamic: (column: string, arrayIndex?: number) => castIfDynamic(column, tableSchema, arrayIndex),
     };
 
     const parts: string[] = [];
@@ -185,6 +185,7 @@ export class KustoExpressionParser {
     let countAddedInReduce = false;
     const reduceParts: string[] = [];
     const groupByParts: string[] = [];
+    const expandParts: string[] = [];
     const columns: string[] = [];
 
     for (const expression of reduce?.expressions ?? []) {
@@ -194,7 +195,11 @@ export class KustoExpressionParser {
 
       const func = expression.reduce.name;
       const parameters = expression.parameters;
-      const column = context.castIfDynamic(expression.property.name);
+      if (expression.property.name.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)) {
+        const arrayElemParts = expression.property.name.split(DYNAMIC_TYPE_ARRAY_DELIMITER);
+        expandParts.push(arrayElemParts[0]);
+      }
+      const column = context.castIfDynamic(expression.property.name, expandParts.length);
       columns.push(column);
 
       if (Array.isArray(parameters)) {
@@ -222,7 +227,11 @@ export class KustoExpressionParser {
         continue;
       }
 
-      const column = context.castIfDynamic(expression.property.name);
+      if (expression.property.name.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)) {
+        const arrayElemParts = expression.property.name.split(DYNAMIC_TYPE_ARRAY_DELIMITER);
+        expandParts.push(arrayElemParts[0]);
+      }
+      const column = context.castIfDynamic(expression.property.name, expandParts.length);
 
       if (expression.interval) {
         const interval = expression.interval.name;
@@ -231,6 +240,10 @@ export class KustoExpressionParser {
       }
 
       groupByParts.push(column);
+    }
+
+    if (expandParts.length > 0) {
+      expandParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${p}`));
     }
 
     if (reduceParts.length > 0) {
@@ -378,7 +391,7 @@ const isDynamic = (column: string): boolean => {
   return !!(column && column.indexOf('[') > -1) || !!(column && column.indexOf('todynamic') > -1);
 };
 
-const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[]): string => {
+const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[], arrayIndex?: number): string => {
   if (!isDynamic(column) || !Array.isArray(tableSchema)) {
     return column;
   }
@@ -389,7 +402,13 @@ const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[]): string 
     return column;
   }
 
-  return toType(columnSchema);
+  const typedColumn = toType(columnSchema);
+  if (column.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)) {
+    const arrayElemParts = column.split(DYNAMIC_TYPE_ARRAY_DELIMITER);
+    return typedColumn.replace(`${arrayElemParts[0]}${DYNAMIC_TYPE_ARRAY_DELIMITER}`, `array_${arrayIndex}`);
+  }
+
+  return typedColumn;
 };
 
 const toType = (column: AdxColumnSchema): string => {

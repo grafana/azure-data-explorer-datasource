@@ -9,7 +9,6 @@ import {
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
 } from 'editor/expressions';
-import { DYNAMIC_TYPE_ARRAY_DELIMITER } from 'KustoExpressionParser';
 import React, { useCallback, useMemo } from 'react';
 import { useAsync } from 'react-use';
 import { selectors } from 'test/selectors';
@@ -317,23 +316,13 @@ const getStyles = (theme: GrafanaTheme2) => ({
 
 const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns.filter(
-      (c) =>
-        (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
-        // TODO: Add support dynamic arrays
-        !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
-    );
+    return columns.filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
   }, [columns]);
 };
 
 const useAggregableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns.filter(
-      (c) =>
-        (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
-        // TODO: Add support dynamic arrays
-        !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
-    );
+    return columns.filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
   }, [columns]);
 };
 

@@ -807,6 +807,31 @@ describe('KustoExpressionParser', () => {
       );
     });
 
+    it('should parse expression with summarize function in an array', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        reduce: createArray([createReduceWithParameter('column["`indexer`"]', 'percentile', [1, '2'])]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column["`indexer`"]',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| mv-expand array_1 = column' +
+          `\n| summarize percentile(tostring(array_1), 1, '2')`
+      );
+    });
+
     it('should parse expression with timeshift', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
@@ -962,6 +987,31 @@ describe('KustoExpressionParser', () => {
         'StormEvents($__from, $__to)' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| summarize dcount(country) by continents'
+      );
+    });
+
+    it('should parse expression with a grouped array', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        groupBy: createArray([createGroupBy('column["`indexer`"]')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column["`indexer`"]',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| mv-expand array_1 = column' +
+          '\n| summarize by tostring(array_1)'
       );
     });
 
