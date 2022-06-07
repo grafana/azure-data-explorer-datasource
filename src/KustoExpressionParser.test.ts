@@ -807,6 +807,59 @@ describe('KustoExpressionParser', () => {
       );
     });
 
+    it('should parse expression with summarize function in an array', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        reduce: createArray([createReduceWithParameter('column["`indexer`"]', 'percentile', [1, '2'])]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column["`indexer`"]',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| mv-expand array_1 = column' +
+          `\n| summarize percentile(tostring(array_1), 1, '2')`
+      );
+    });
+
+    it('should parse expression with summarize function in a nested array', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        reduce: createArray([
+          createReduceWithParameter('column["`indexer`"]["foo"]["`indexer`"]', 'percentile', [1, '2']),
+        ]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column["`indexer`"]["foo"]["`indexer`"]',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| mv-expand array_1 = column' +
+          '\n| mv-expand array_2 = array_1["foo"]' +
+          `\n| summarize percentile(tostring(array_2), 1, '2')`
+      );
+    });
+
     it('should parse expression with timeshift', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
@@ -965,6 +1018,57 @@ describe('KustoExpressionParser', () => {
       );
     });
 
+    it('should parse expression with a grouped array', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        groupBy: createArray([createGroupBy('column["`indexer`"]')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column["`indexer`"]',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| mv-expand array_1 = column' +
+          '\n| summarize by tostring(array_1)'
+      );
+    });
+
+    it('should parse expression with a grouped nested array', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        groupBy: createArray([createGroupBy('column["`indexer`"]["foo"]["`indexer`"]')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column["`indexer`"]["foo"]["`indexer`"]',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| mv-expand array_1 = column' +
+          '\n| mv-expand array_2 = array_1["foo"]' +
+          '\n| summarize by tostring(array_2)'
+      );
+    });
+
     it('should parse expression with an array', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
@@ -975,7 +1079,10 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + "\n| mv-apply element = eventType on (where element == 'ThunderStorm')"
+        'StormEvents' +
+          '\n| mv-expand array_1 = eventType' +
+          "\n| where array_1 == 'ThunderStorm'" +
+          '\n| project-away array_1'
       );
     });
 
@@ -992,7 +1099,59 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + "\n| mv-apply element = eventType on (where element == 'ThunderStorm' or foo == 'bar')"
+        'StormEvents' +
+          '\n| mv-expand array_1 = eventType' +
+          "\n| where array_1 == 'ThunderStorm' or foo == 'bar'" +
+          '\n| project-away array_1'
+      );
+    });
+
+    it('should parse expression with nested arrays', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray(
+          [
+            createOperator(
+              `eventType${DYNAMIC_TYPE_ARRAY_DELIMITER}["obj"]${DYNAMIC_TYPE_ARRAY_DELIMITER}`,
+              '==',
+              'ThunderStorm'
+            ),
+          ],
+          QueryEditorExpressionType.Or
+        ),
+      });
+
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' +
+          '\n| mv-expand array_1 = eventType' +
+          '\n| mv-expand array_2 = array_1["obj"]' +
+          "\n| where array_2 == 'ThunderStorm'" +
+          '\n| project-away array_1, array_2'
+      );
+    });
+
+    it('should parse expression with an array and other "or" operators', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray(
+          [
+            createOperator(
+              `eventType${DYNAMIC_TYPE_ARRAY_DELIMITER}["obj"]${DYNAMIC_TYPE_ARRAY_DELIMITER}`,
+              '==',
+              'ThunderStorm'
+            ),
+            createOperator(`foo`, '==', 'bar'),
+          ],
+          QueryEditorExpressionType.Or
+        ),
+      });
+
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' +
+          '\n| mv-expand array_1 = eventType' +
+          '\n| mv-expand array_2 = array_1["obj"]' +
+          "\n| where array_2 == 'ThunderStorm' or foo == 'bar'" +
+          '\n| project-away array_1, array_2'
       );
     });
   });

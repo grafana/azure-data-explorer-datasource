@@ -19,7 +19,7 @@ import { cloneDeep } from 'lodash';
 
 interface ParseContext {
   timeColumn?: string;
-  castIfDynamic: (column: string) => string;
+  castIfDynamic: (column: string, schemaName?: string) => string;
 }
 
 export const DYNAMIC_TYPE_ARRAY_DELIMITER = '["`indexer`"]';
@@ -34,7 +34,7 @@ export class KustoExpressionParser {
 
     const context: ParseContext = {
       timeColumn: defaultTimeColumn(tableSchema, query?.expression),
-      castIfDynamic: (column: string) => castIfDynamic(column, tableSchema),
+      castIfDynamic: (column: string, schemaName?: string) => castIfDynamic(column, tableSchema, schemaName),
     };
 
     const parts: string[] = [];
@@ -59,7 +59,7 @@ export class KustoExpressionParser {
 
     const context: ParseContext = {
       timeColumn: defaultTimeColumn(tableSchema, expression),
-      castIfDynamic: (column: string) => castIfDynamic(column, tableSchema),
+      castIfDynamic: (column: string, schemaName?: string) => castIfDynamic(column, tableSchema, schemaName),
     };
 
     const parts: string[] = [];
@@ -149,30 +149,35 @@ export class KustoExpressionParser {
     context: ParseContext,
     expression: QueryEditorExpression | undefined,
     parts: string[],
-    prefix?: string
+    prefix?: string,
+    expandParts?: string[]
   ) {
     if (!expression) {
       return;
     }
+    const eParts = expandParts ? expandParts : [];
 
     if (isAndExpression(expression)) {
-      return expression.expressions.forEach((exp) => this.appendWhere(context, exp, parts, prefix));
+      return expression.expressions.forEach((exp) => this.appendWhere(context, exp, parts, prefix, eParts));
     }
 
     if (isOrExpression(expression)) {
       const orParts: string[] = [];
-      expression.expressions.map((exp) => this.appendWhere(context, exp, orParts));
+      expression.expressions.map((exp) => this.appendWhere(context, exp, orParts, undefined, eParts));
       if (orParts.length === 0) {
         return;
       }
-      if (this.filtersContainArray(orParts)) {
-        return parts.push(this.formatArrayFilter(orParts));
+      eParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${p}`));
+      parts.push(`where ${orParts.join(' or ')}`);
+      if (eParts.length) {
+        // mv-expand creates a new column that we need to delete from the result
+        const arrayCols = eParts.map((p, i) => `array_${i + 1}`);
+        parts.push(`project-away ${arrayCols.join(', ')}`);
       }
-      return parts.push(`where ${orParts.join(' or ')}`);
     }
 
     if (isFieldAndOperator(expression)) {
-      return this.appendOperator(context, expression, parts, prefix);
+      return this.appendOperator(expression, parts, eParts, prefix);
     }
   }
 
@@ -185,6 +190,7 @@ export class KustoExpressionParser {
     let countAddedInReduce = false;
     const reduceParts: string[] = [];
     const groupByParts: string[] = [];
+    const expandParts: string[] = [];
     const columns: string[] = [];
 
     for (const expression of reduce?.expressions ?? []) {
@@ -194,7 +200,8 @@ export class KustoExpressionParser {
 
       const func = expression.reduce.name;
       const parameters = expression.parameters;
-      const column = context.castIfDynamic(expression.property.name);
+      const name = this.appendMvExpandIfNeeded(expression.property.name, expandParts);
+      const column = context.castIfDynamic(name, expression.property.name);
       columns.push(column);
 
       if (Array.isArray(parameters)) {
@@ -222,7 +229,8 @@ export class KustoExpressionParser {
         continue;
       }
 
-      const column = context.castIfDynamic(expression.property.name);
+      const name = this.appendMvExpandIfNeeded(expression.property.name, expandParts);
+      const column = context.castIfDynamic(name, expression.property.name);
 
       if (expression.interval) {
         const interval = expression.interval.name;
@@ -231,6 +239,10 @@ export class KustoExpressionParser {
       }
 
       groupByParts.push(column);
+    }
+
+    if (expandParts.length > 0) {
+      expandParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${p}`));
     }
 
     if (reduceParts.length > 0) {
@@ -254,9 +266,9 @@ export class KustoExpressionParser {
   }
 
   private appendOperator(
-    context: ParseContext,
     expression: QueryEditorOperatorExpression,
     parts: string[],
+    expandParts: string[],
     prefix?: string
   ) {
     const { property, operator } = expression;
@@ -272,7 +284,8 @@ export class KustoExpressionParser {
 
       default:
         const value = this.formatValue(operator.value, property.type);
-        parts.push(withPrefix(`${property.name} ${operator.name} ${value}`, prefix));
+        const name = this.appendMvExpandIfNeeded(property.name, expandParts);
+        parts.push(withPrefix(`${name} ${operator.name} ${value}`, prefix));
         break;
     }
   }
@@ -295,15 +308,17 @@ export class KustoExpressionParser {
     }
   }
 
-  private filtersContainArray(orParts: string[]) {
-    return orParts.some((p) => p.includes(DYNAMIC_TYPE_ARRAY_DELIMITER));
-  }
-
-  private formatArrayFilter(orParts: string[]) {
-    const arrayElemIndex = orParts.findIndex((p) => p.includes(DYNAMIC_TYPE_ARRAY_DELIMITER));
-    const arrayElemParts = orParts[arrayElemIndex].split(DYNAMIC_TYPE_ARRAY_DELIMITER);
-    orParts[arrayElemIndex] = `element${arrayElemParts[1]}`;
-    return `mv-apply element = ${arrayElemParts[0]} on (where ${orParts.join(' or ')})`;
+  private appendMvExpandIfNeeded(name: string, parts: string[]) {
+    if (name.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)) {
+      const arrayElemParts = name.split(DYNAMIC_TYPE_ARRAY_DELIMITER);
+      const arrayLength = parts.push(arrayElemParts[0]);
+      const res = name.replace(`${parts[arrayLength - 1]}${DYNAMIC_TYPE_ARRAY_DELIMITER}`, `array_${arrayLength}`);
+      if (res.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)) {
+        return this.appendMvExpandIfNeeded(res, parts);
+      }
+      return res;
+    }
+    return name;
   }
 
   private appendProperty(context: ParseContext, expression: QueryEditorPropertyExpression, parts: string[]) {
@@ -371,29 +386,29 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
     return column;
   }
 
-  return toType(column);
+  return toType(column.CslType, column.Name);
 };
 
 const isDynamic = (column: string): boolean => {
   return !!(column && column.indexOf('[') > -1) || !!(column && column.indexOf('todynamic') > -1);
 };
 
-const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[]): string => {
-  if (!isDynamic(column) || !Array.isArray(tableSchema)) {
+const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[], schemaName?: string): string => {
+  if (!isDynamic(schemaName || column) || !Array.isArray(tableSchema)) {
     return column;
   }
 
-  const columnSchema = tableSchema.find((c) => c.Name === column);
+  const columnSchema = tableSchema.find((c) => c.Name === (schemaName || column));
 
   if (!columnSchema) {
     return column;
   }
 
-  return toType(columnSchema);
+  return toType(columnSchema.CslType, column);
 };
 
-const toType = (column: AdxColumnSchema): string => {
-  return `to${column.CslType}(${column.Name})`;
+const toType = (type: string, name: string): string => {
+  return `to${type}(${name})`;
 };
 
 const replaceByIndex = (

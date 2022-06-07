@@ -9,7 +9,6 @@ import {
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
 } from 'editor/expressions';
-import { DYNAMIC_TYPE_ARRAY_DELIMITER } from 'KustoExpressionParser';
 import React, { useCallback, useMemo } from 'react';
 import { useAsync } from 'react-use';
 import { selectors } from 'test/selectors';
@@ -96,9 +95,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
   const columns = useColumnOptions(tableSchema.value);
   const groupable = useGroupableColumns(columns);
   const aggregable = useAggregableColumns(columns);
-
-  const columnTooltip =
-    "Some columns may not be visible for selection. The visual query editor does not currently support columns of type 'dynamic'";
 
   const onChangeTable = useCallback(
     (expression: QueryEditorExpression) => {
@@ -275,7 +271,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
         fields={columns}
         onChange={onWhereChange}
         getSuggestions={onAutoComplete}
-        tooltip={columnTooltip}
       />
       <KustoValueColumnEditorSection
         templateVariableOptions={props.templateVariableOptions}
@@ -283,7 +278,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
         fields={aggregable}
         onChange={onReduceChange}
-        tooltip={columnTooltip}
       />
       <KustoGroupByEditorSection
         templateVariableOptions={props.templateVariableOptions}
@@ -291,7 +285,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
         value={query.expression?.groupBy ?? defaultQuery.expression?.groupBy}
         fields={groupable}
         onChange={onGroupByChange}
-        tooltip={columnTooltip}
       />
       <hr />
       <KustoPropertyEditorSection
@@ -317,23 +310,13 @@ const getStyles = (theme: GrafanaTheme2) => ({
 
 const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns.filter(
-      (c) =>
-        (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
-        // TODO: Add support dynamic arrays
-        !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
-    );
+    return columns.filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
   }, [columns]);
 };
 
 const useAggregableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns.filter(
-      (c) =>
-        (c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String) &&
-        // TODO: Add support dynamic arrays
-        !c.value.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)
-    );
+    return columns.filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
   }, [columns]);
 };
 
