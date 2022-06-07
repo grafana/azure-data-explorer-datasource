@@ -96,9 +96,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
   const groupable = useGroupableColumns(columns);
   const aggregable = useAggregableColumns(columns);
 
-  const columnTooltip =
-    "Some columns may not be visible for selection. The visual query editor does not currently support columns of type 'dynamic'";
-
   const onChangeTable = useCallback(
     (expression: QueryEditorExpression) => {
       if (!isFieldExpression(expression) || !table) {
@@ -274,7 +271,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
         fields={columns}
         onChange={onWhereChange}
         getSuggestions={onAutoComplete}
-        tooltip={columnTooltip}
       />
       <KustoValueColumnEditorSection
         templateVariableOptions={props.templateVariableOptions}
@@ -282,7 +278,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
         value={query.expression?.reduce ?? defaultQuery.expression?.reduce}
         fields={aggregable}
         onChange={onReduceChange}
-        tooltip={columnTooltip}
       />
       <KustoGroupByEditorSection
         templateVariableOptions={props.templateVariableOptions}
@@ -290,7 +285,6 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
         value={query.expression?.groupBy ?? defaultQuery.expression?.groupBy}
         fields={groupable}
         onChange={onGroupByChange}
-        tooltip={columnTooltip}
       />
       <hr />
       <KustoPropertyEditorSection
@@ -316,25 +310,13 @@ const getStyles = (theme: GrafanaTheme2) => ({
 
 const useGroupableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns
-      .filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String)
-      .map((c) => ({
-        ...c,
-        // Transform dynamic values to string so they can be grouped
-        value: c.dynamic ? `tostring(${c.value})` : c.value,
-      }));
+    return columns.filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
   }, [columns]);
 };
 
 const useAggregableColumns = (columns: QueryEditorPropertyDefinition[]): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    return columns
-      .filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String)
-      .map((c) => ({
-        ...c,
-        // Transform dynamic values to long so they can be used by math functions
-        value: c.value.includes('[') ? `tolong(${c.value})` : c.value,
-      }));
+    return columns.filter((c) => c.type === QueryEditorPropertyType.DateTime || QueryEditorPropertyType.String);
   }, [columns]);
 };
 

@@ -8,7 +8,6 @@ import {
 } from '../types';
 import { AdxDataSource } from '../datasource';
 import { cache } from './cache';
-import { config } from '@grafana/runtime';
 
 const schemaKey = 'AdxSchemaResolver';
 
@@ -89,18 +88,6 @@ export class AdxSchemaResolver {
         }
 
         // Handling dynamic columns
-
-        // Adding a feature flag while we polish things up
-        if (!config.featureToggles.adxQueryBuilderDynamicTypes) {
-          return columns;
-        }
-
-        // TODO: Ignoring arrays, for the moment
-        if (schemaForDynamicColumn.some((c) => c.Name.includes('`indexer`'))) {
-          return columns;
-        }
-
-        // Plain objects
         Array.prototype.push.apply(columns, schemaForDynamicColumn);
         return columns;
       }, []);

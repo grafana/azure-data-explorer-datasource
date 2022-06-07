@@ -1,4 +1,3 @@
-import { config } from '@grafana/runtime';
 import { mockDatasource } from 'components/__fixtures__/Datasource';
 import createMockSchema from 'components/__fixtures__/schema';
 
@@ -8,15 +7,10 @@ describe('Test schema resolution', () => {
   const datasource = mockDatasource();
   const schemaResolver = new AdxSchemaResolver(datasource);
   const schema = createMockSchema();
-  const originalFeatureToggles = config.featureToggles;
 
   beforeEach(() => {
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
     datasource.getDynamicSchema = jest.fn().mockResolvedValue([{ Name: 'testprop', CslType: 'string' }]);
-    config.featureToggles = {
-      ...originalFeatureToggles,
-      adxQueryBuilderDynamicTypes: true,
-    };
   });
 
   it('Will correctly retrieve databases', async () => {
@@ -49,7 +43,7 @@ describe('Test schema resolution', () => {
     expect(columns).toEqual(schema.Databases['testdb'].Tables['testtable'].OrderedColumns);
   });
 
-  it('Will correctly filter out columns with type "dynamic" and containing arrays', async () => {
+  it('Will correctly include columns with type "dynamic" and containing arrays', async () => {
     const testColumns = [
       { Name: 'boolean', CslType: 'bool', Type: 'System.Boolean' },
       { Name: 'datetime', CslType: 'datetime', Type: 'System.DateTime' },
@@ -64,7 +58,7 @@ describe('Test schema resolution', () => {
       { Name: 'dynamic', CslType: 'dynamic', Type: 'System.Object' },
     ];
     datasource.getDynamicSchema = jest.fn().mockResolvedValue({
-      dynamic: [{ Name: 'Modes>`indexer`', CslType: 'string' }],
+      dynamic: [{ Name: 'Modes["`indexer`"]', CslType: 'string' }],
     });
     const schema = createMockSchema();
     schema.Databases['testdb'].Tables = {
@@ -78,10 +72,41 @@ describe('Test schema resolution', () => {
     };
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
     const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictable');
-    expect(columns).toHaveLength(testColumns.length - 1);
-    expect(columns).not.toEqual(
-      expect.arrayContaining([{ Name: 'dynamic', CslType: 'dynamic', Type: 'System.Object' }])
-    );
+    expect(columns).toHaveLength(testColumns.length);
+    expect(columns).toEqual(expect.arrayContaining([{ CslType: 'string', Name: 'Modes["`indexer`"]' }]));
+  });
+
+  it('Will correctly include columns with type "dynamic" and containing nested arrays', async () => {
+    const testColumns = [
+      { Name: 'boolean', CslType: 'bool', Type: 'System.Boolean' },
+      { Name: 'datetime', CslType: 'datetime', Type: 'System.DateTime' },
+      { Name: 'guid', CslType: 'guid', Type: 'System.Guid' },
+      { Name: 'int', CslType: 'int', Type: 'System.Int32' },
+      { Name: 'long', CslType: 'long', Type: 'System.Int64' },
+      { Name: 'real', CslType: 'real', Type: 'System.Double' },
+      { Name: 'string', CslType: 'string', Type: 'System.String' },
+      { Name: 'timespan', CslType: 'timespan', Type: 'System.TimeSpan' },
+      { Name: 'decimal', CslType: 'decimal', Type: 'System.Data.SqlTypes.SqlDecimal' },
+      // Dynamic column
+      { Name: 'dynamic', CslType: 'dynamic', Type: 'System.Object' },
+    ];
+    datasource.getDynamicSchema = jest.fn().mockResolvedValue({
+      dynamic: [{ Name: 'Modes["`indexer`"]["`indexer`"]', CslType: 'string' }],
+    });
+    const schema = createMockSchema();
+    schema.Databases['testdb'].Tables = {
+      ...schema.Databases['testdb'].Tables,
+      ...{
+        testdynamictable: {
+          Name: 'testdynamictable',
+          OrderedColumns: testColumns,
+        },
+      },
+    };
+    datasource.getSchema = jest.fn().mockResolvedValue(schema);
+    const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictable');
+    expect(columns).toHaveLength(testColumns.length);
+    expect(columns).toEqual(expect.arrayContaining([{ CslType: 'string', Name: 'Modes["`indexer`"]' }]));
   });
 
   it('Will correctly include columns with type "dynamic" and simple properties', async () => {
@@ -99,7 +124,7 @@ describe('Test schema resolution', () => {
       { Name: 'dynamic', CslType: 'dynamic', Type: 'System.Object' },
     ];
     datasource.getDynamicSchema = jest.fn().mockResolvedValue({
-      dynamic: [{ Name: 'Teams>Score', CslType: 'long' }],
+      dynamic: [{ Name: 'Teams["Score"]', CslType: 'long' }],
     });
     const schema = createMockSchema();
     schema.Databases['testdb'].Tables = {
@@ -114,6 +139,6 @@ describe('Test schema resolution', () => {
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
     const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictableobj');
     expect(columns).toHaveLength(testColumns.length);
-    expect(columns).toEqual(expect.arrayContaining([{ CslType: 'long', Name: 'Teams>Score' }]));
+    expect(columns).toEqual(expect.arrayContaining([{ CslType: 'long', Name: 'Teams["Score"]' }]));
   });
 });
