@@ -167,13 +167,9 @@ export class KustoExpressionParser {
       if (orParts.length === 0) {
         return;
       }
-      eParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${p}`));
+      this.appendMvExpand(eParts, parts);
       parts.push(`where ${orParts.join(' or ')}`);
-      if (eParts.length) {
-        // mv-expand creates a new column that we need to delete from the result
-        const arrayCols = eParts.map((p, i) => `array_${i + 1}`);
-        parts.push(`project-away ${arrayCols.join(', ')}`);
-      }
+      this.appendProjectAway(eParts, parts);
     }
 
     if (isFieldAndOperator(expression)) {
@@ -200,7 +196,7 @@ export class KustoExpressionParser {
 
       const func = expression.reduce.name;
       const parameters = expression.parameters;
-      const name = this.appendMvExpandIfNeeded(expression.property.name, expandParts);
+      const name = this.addExpanPartsdIfNeeded(expression.property.name, expandParts);
       const column = context.castIfDynamic(name, expression.property.name);
       columns.push(column);
 
@@ -229,7 +225,7 @@ export class KustoExpressionParser {
         continue;
       }
 
-      const name = this.appendMvExpandIfNeeded(expression.property.name, expandParts);
+      const name = this.addExpanPartsdIfNeeded(expression.property.name, expandParts);
       const column = context.castIfDynamic(name, expression.property.name);
 
       if (expression.interval) {
@@ -241,9 +237,7 @@ export class KustoExpressionParser {
       groupByParts.push(column);
     }
 
-    if (expandParts.length > 0) {
-      expandParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${p}`));
-    }
+    this.appendMvExpand(expandParts, parts);
 
     if (reduceParts.length > 0) {
       if (groupByParts.length > 0) {
@@ -284,7 +278,7 @@ export class KustoExpressionParser {
 
       default:
         const value = this.formatValue(operator.value, property.type);
-        const name = this.appendMvExpandIfNeeded(property.name, expandParts);
+        const name = this.addExpanPartsdIfNeeded(property.name, expandParts);
         parts.push(withPrefix(`${name} ${operator.name} ${value}`, prefix));
         break;
     }
@@ -308,17 +302,29 @@ export class KustoExpressionParser {
     }
   }
 
-  private appendMvExpandIfNeeded(name: string, parts: string[]) {
+  private addExpanPartsdIfNeeded(name: string, parts: string[]) {
     if (name.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)) {
       const arrayElemParts = name.split(DYNAMIC_TYPE_ARRAY_DELIMITER);
       const arrayLength = parts.push(arrayElemParts[0]);
       const res = name.replace(`${parts[arrayLength - 1]}${DYNAMIC_TYPE_ARRAY_DELIMITER}`, `array_${arrayLength}`);
       if (res.includes(DYNAMIC_TYPE_ARRAY_DELIMITER)) {
-        return this.appendMvExpandIfNeeded(res, parts);
+        return this.addExpanPartsdIfNeeded(res, parts);
       }
       return res;
     }
     return name;
+  }
+
+  private appendMvExpand(expandParts: string[], parts: string[]) {
+    expandParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${p}`));
+  }
+
+  private appendProjectAway(expandParts: string[], parts: string[]) {
+    if (expandParts.length) {
+      // mv-expand creates a new column that we need to delete from the result
+      const arrayCols = expandParts.map((p, i) => `array_${i + 1}`);
+      parts.push(`project-away ${arrayCols.join(', ')}`);
+    }
   }
 
   private appendProperty(context: ParseContext, expression: QueryEditorPropertyExpression, parts: string[]) {
