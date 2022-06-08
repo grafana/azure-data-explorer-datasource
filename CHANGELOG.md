@@ -1,8 +1,12 @@
 # Change Log
 
+## [4.1.0]
+
+- New Feature: The visual query editor now supports `dynamic` columns. This includes columns with one or more arrays of `dynamic` values.
+
 ## [4.0.2]
 
-- Breaking Change on Beta feature: On-Behalf-Of flow is now disabled by default 
+- Breaking Change on Beta feature: On-Behalf-Of flow is now disabled by default
 
 ## [4.0.1]
 
