@@ -348,7 +348,7 @@ export class KustoExpressionParser {
     }
 
     return !!this.templateSrv.getVariables().find((variable: any) => {
-      return `$${variable?.id}` === value;
+      return `$${variable?.id}` === value || value.startsWith(`\$\{${variable?.id}:`);
     });
   }
 }

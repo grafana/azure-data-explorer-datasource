@@ -88,6 +88,7 @@ export class QueryEditorSingleOperator extends PureComponent<Props, State> {
         backspaceRemovesValue
         isClearable
         noOptionsMessage="No options found"
+        aria-label="select value"
       />
     );
   }
