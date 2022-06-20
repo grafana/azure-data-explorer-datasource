@@ -6,8 +6,8 @@ import { SelectableValue } from '@grafana/data';
 import { isStringArray } from 'editor/guards';
 
 interface Props {
-  values: string[] | SelectableValue<string>[] | undefined;
-  onChange: (expression: QueryEditorOperator<string[] | SelectableValue<string>[]>) => void;
+  values: string[] | Array<SelectableValue<string>> | undefined;
+  onChange: (expression: QueryEditorOperator<string[] | Array<SelectableValue<string>>>) => void;
   operator: QueryEditorOperatorDefinition;
   getSuggestions: ExpressionSuggestor;
   templateVariableOptions: SelectableValue<string>;
@@ -72,7 +72,7 @@ export class QueryEditorMultiOperator extends PureComponent<Props, State> {
 
   render() {
     const values = this.props.values || [];
-    let current: SelectableValue<string>[];
+    let current: Array<SelectableValue<string>>;
     if (isStringArray(values)) {
       current = values.map((v) => {
         return { label: v, value: v };

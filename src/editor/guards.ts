@@ -69,7 +69,7 @@ export const isStringArray = (value: any): value is string[] => {
 
 export const isMultiOperator = (
   operator?: QueryEditorOperator
-): operator is QueryEditorOperator<string[] | SelectableValue<string>[]> => {
+): operator is QueryEditorOperator<string[] | Array<SelectableValue<string>>> => {
   return Array.isArray(operator?.value);
 };
 
