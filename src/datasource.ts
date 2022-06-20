@@ -385,6 +385,13 @@ const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]
     // https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic#dynamic-object-accessors
     const key = `${columnName}["${name}"]`;
 
+    if (Array.isArray(schema[name])) {
+      // If a field can have different types (e.g. long and double)
+      // we select the first for simplicity
+      result.push({ Name: key, CslType: schema[name][0] });
+      continue;
+    }
+
     if (typeof schema[name] === 'string') {
       result.push({
         Name: key,

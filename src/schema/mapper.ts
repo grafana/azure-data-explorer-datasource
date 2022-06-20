@@ -66,6 +66,8 @@ const toPropertyType = (kustoType: string): QueryEditorPropertyType => {
     case 'real':
     case 'int':
     case 'long':
+    case 'double':
+    case 'decimal':
       return QueryEditorPropertyType.Number;
     case 'datetime':
       return QueryEditorPropertyType.DateTime;

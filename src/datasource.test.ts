@@ -365,6 +365,39 @@ describe('AdxDataSource', () => {
         ],
       });
     });
+
+    it('should return select the first type if multiple types are returned', async () => {
+      const datasource = mockDatasource();
+      datasource.query = jest.fn().mockReturnValue({
+        toPromise: jest.fn().mockResolvedValue({
+          data: [
+            toDataFrame({
+              fields: [
+                {
+                  name: 'schema_Teams',
+                  type: 'string',
+                  typeInfo: {
+                    frame: 'string',
+                  },
+                  config: {},
+                  values: ['{"18":{"TeamID":["long","double"]}}'],
+                  entities: {},
+                },
+              ],
+            }),
+          ],
+        }),
+      });
+
+      expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
+        Teams: [
+          {
+            CslType: 'long',
+            Name: 'Teams["18"]["TeamID"]',
+          },
+        ],
+      });
+    });
   });
 });
 
