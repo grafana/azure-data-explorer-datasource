@@ -33,9 +33,8 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = (props: Props) => {
   // If the value is a string, template variable can be quoted when used as values
   const templateVariableOptionsValues = cloneDeep(props.templateVariableOptions);
   if (Array.isArray(props.templateVariableOptions.options) && props.value?.property.type === 'string') {
-    props.templateVariableOptions.options.forEach((op: SelectableValue<string>) => {
-      const v = op.value?.replace(/\$(.*)/, '${$1:singlequote}');
-      templateVariableOptionsValues.options.push({ label: v, value: v });
+    templateVariableOptionsValues.options = props.templateVariableOptions.options.map((op: SelectableValue<string>) => {
+      return { label: op.value, value: `'${op.value}'` };
     });
   }
 

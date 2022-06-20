@@ -16,6 +16,7 @@ import {
   QueryEditorPropertyExpression,
 } from './editor/expressions';
 import { cloneDeep } from 'lodash';
+import { SelectableValue } from '@grafana/data';
 
 interface ParseContext {
   timeColumn?: string;
@@ -289,16 +290,17 @@ export class KustoExpressionParser {
       return `(${value.map((v) => this.formatValue(v, type)).join(', ')})`;
     }
 
-    if (this.isTemplateVariable(value)) {
-      return value;
+    const val = typeof value === 'object' ? value.value : value;
+    if (this.isTemplateVariable(val)) {
+      return val;
     }
 
     switch (type) {
       case QueryEditorPropertyType.Number:
       case QueryEditorPropertyType.Boolean:
-        return value;
+        return val;
       default:
-        return `'${value}'`;
+        return `'${val}'`;
     }
   }
 
@@ -342,13 +344,15 @@ export class KustoExpressionParser {
     return property;
   }
 
-  private isTemplateVariable(value: string): boolean {
+  private isTemplateVariable(value: string | SelectableValue<string>): boolean {
     if (!Array.isArray(this.templateSrv.getVariables())) {
       return false;
     }
 
+    const val = typeof value === 'string' ? value : value.value || '';
+
     return !!this.templateSrv.getVariables().find((variable: any) => {
-      return `$${variable?.id}` === value || value.startsWith(`\$\{${variable?.id}:`);
+      return val.includes(`$${variable?.id}`) || val.startsWith(`\$\{${variable?.id}:`);
     });
   }
 }

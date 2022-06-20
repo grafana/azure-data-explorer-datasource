@@ -36,7 +36,7 @@ describe('QueryEditorFieldAndOperator', () => {
     expect(screen.getByText('Choose column...')).toBeInTheDocument();
   });
 
-  it('should add an option to quote variables if it targets a string', async () => {
+  it('should quote variables if it targets a string', async () => {
     const value: QueryEditorOperatorExpression = {
       property: {
         type: QueryEditorPropertyType.String,
@@ -53,11 +53,7 @@ describe('QueryEditorFieldAndOperator', () => {
 
     const sel = screen.getByLabelText('choose column');
     openMenu(sel);
-    const templateVariableGroup = screen.getByText('Template Variables');
-    templateVariableGroup.click();
-    // The template variables for the keys should not be expanded
-    expect(screen.getByText('$foo')).toBeInTheDocument();
-    expect(screen.queryByText('${foo:singlequote}')).not.toBeInTheDocument();
+    // select a column
     screen.getByText(defaultProps.fields[0].value).click();
 
     const valueSel = screen.getByLabelText('select value');
@@ -65,10 +61,10 @@ describe('QueryEditorFieldAndOperator', () => {
     const valueTemplateVariableGroup = screen.getByText('Template Variables');
     valueTemplateVariableGroup.click();
     expect(screen.getByText('$foo')).toBeInTheDocument();
-    screen.getByText('${foo:singlequote}').click();
+    screen.getByText('$foo').click();
 
     expect(onChange).toBeCalledWith({
-      operator: { name: '==', value: '${foo:singlequote}' },
+      operator: { name: '==', value: `'$foo'`, labelValue: '$foo' },
       property: { name: 'myvar', type: 'string' },
       type: 'or',
     });

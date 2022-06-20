@@ -703,7 +703,7 @@ describe('KustoExpressionParser', () => {
       );
     });
 
-    it('should parse expression with a template variable with custom format', () => {
+    it('should parse expression with template variable as an object', () => {
       const templateSrv: TemplateSrv = {
         getVariables: jest.fn().mockReturnValue([
           {
@@ -724,7 +724,7 @@ describe('KustoExpressionParser', () => {
 
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createArray([createOperator('column["country"]', '==', '${country:singlequote}')]),
+        where: createArray([createOperator('column["country"]', '==', { label: '$country', value: `'$country'` })]),
         groupBy: createArray([createGroupBy('column["type"]')]),
       });
 
@@ -742,7 +742,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
-          '\n| where column["country"] == ${country:singlequote}' +
+          '\n| where column["country"] == \'$country\'' +
           `\n| summarize by tostring(column["type"])`
       );
     });
