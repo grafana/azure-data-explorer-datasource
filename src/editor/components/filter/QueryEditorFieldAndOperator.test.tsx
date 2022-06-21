@@ -51,7 +51,7 @@ describe('QueryEditorFieldAndOperator', () => {
     const onChange = jest.fn();
     render(<QueryEditorFieldAndOperator {...defaultProps} value={value} onChange={onChange} />);
 
-    const sel = screen.getByLabelText('choose column');
+    const sel = screen.getByLabelText('choose column for where filter');
     openMenu(sel);
     // select a column
     screen.getByText(defaultProps.fields[0].value).click();

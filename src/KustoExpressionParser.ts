@@ -352,7 +352,7 @@ export class KustoExpressionParser {
     const val = typeof value === 'string' ? value : value.value || '';
 
     return !!this.templateSrv.getVariables().find((variable: any) => {
-      return val.includes(`$${variable?.id}`) || val.startsWith(`\$\{${variable?.id}:`);
+      return `$${variable?.id}` === val || `'$${variable?.id}'` === val || val.startsWith(`\$\{${variable?.id}:`);
     });
   }
 }

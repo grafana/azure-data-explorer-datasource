@@ -105,7 +105,7 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = (props: Props) => {
       if (Array.isArray(templateVariableOptionsValues)) {
         const variables = templateVariableOptionsValues.filter((v) => {
           if (typeof v?.value === 'string') {
-            return v.value.indexOf(txt) > -1;
+            return v.value.includes(txt);
           }
           return false;
         });
@@ -132,7 +132,7 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = (props: Props) => {
         templateVariableOptions={props.templateVariableOptions}
         onChange={onFieldChanged}
         placeholder="Choose column..."
-        aria-label="choose column"
+        aria-label="choose column for where filter"
       />
       {showOperators && (
         <QueryEditorOperatorComponent
