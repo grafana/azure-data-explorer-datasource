@@ -61,11 +61,13 @@ export const columnsToDefinition = (columns: AdxColumnSchema[]): QueryEditorProp
   });
 };
 
-const toPropertyType = (kustoType: string): QueryEditorPropertyType => {
+export const toPropertyType = (kustoType: string): QueryEditorPropertyType => {
   switch (kustoType) {
     case 'real':
     case 'int':
     case 'long':
+    case 'double':
+    case 'decimal':
       return QueryEditorPropertyType.Number;
     case 'datetime':
       return QueryEditorPropertyType.DateTime;

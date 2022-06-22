@@ -365,6 +365,60 @@ describe('AdxDataSource', () => {
         ],
       });
     });
+
+    describe('when there are multiple types returned', () => {
+      [
+        { schema: '{"TeamID":["long","double"]}', expected: { Name: `Teams["TeamID"]`, CslType: 'double' } },
+        { schema: '{"TeamID":["long","real"]}', expected: { Name: `Teams["TeamID"]`, CslType: 'real' } },
+        { schema: '{"TeamID":["long","int"]}', expected: { Name: `Teams["TeamID"]`, CslType: 'long' } },
+        {
+          schema: '{"TeamID":["string","bool"]}',
+          expected: { Name: `Teams["TeamID"]`, CslType: 'string' },
+          warn: true,
+        },
+        {
+          schema: '{"TeamID":[{"a":"string"},"bool"]}',
+          expected: { Name: `Teams["TeamID"]["a"]`, CslType: 'string' },
+          warn: true,
+        },
+      ].forEach((t) => {
+        const consoleWarn = console.warn;
+        beforeEach(() => {
+          console.warn = jest.fn();
+        });
+        afterEach(() => {
+          console.warn = consoleWarn;
+        });
+        it(`should return ${t.expected} type`, async () => {
+          const datasource = mockDatasource();
+          datasource.query = jest.fn().mockReturnValue({
+            toPromise: jest.fn().mockResolvedValue({
+              data: [
+                toDataFrame({
+                  fields: [
+                    {
+                      name: 'schema_Teams',
+                      type: 'string',
+                      typeInfo: { frame: 'string' },
+                      config: {},
+                      values: [t.schema],
+                      entities: {},
+                    },
+                  ],
+                }),
+              ],
+            }),
+          });
+
+          expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
+            Teams: [t.expected],
+          });
+          if (t.warn) {
+            expect(console.warn).toBeCalled();
+          }
+        });
+      });
+    });
   });
 });
 

@@ -10,11 +10,12 @@ import {
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
-import { QueryEditorOperator } from 'editor/types';
+import { QueryEditorOperator, QueryEditorPropertyType } from 'editor/types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { map } from 'lodash';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
 import { cache } from 'schema/cache';
+import { toPropertyType } from 'schema/mapper';
 
 import { migrateAnnotation } from './migrations/annotation';
 import interpolateKustoQuery from './query_builder';
@@ -384,6 +385,25 @@ const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]
     // Generate a valid accessor for a dynamic type
     // https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic#dynamic-object-accessors
     const key = `${columnName}["${name}"]`;
+
+    if (Array.isArray(schema[name])) {
+      // If a field can have different types (e.g. long and double)
+      // we select the first, assuming they are interchangeable
+      const defaultCslType = schema[name][0];
+      if (schema[name].every((t: string) => toPropertyType(t) === QueryEditorPropertyType.Number)) {
+        // If all the types are numbers, the double takes precedence since it has more precission.
+        const cslType = schema[name].find((t: string) => t === 'double' || t === 'real') || defaultCslType;
+        result.push({ Name: key, CslType: cslType });
+      } else {
+        console.warn(`schema ${name} may contain different types, assuming ${defaultCslType}`);
+        if (typeof defaultCslType === 'object') {
+          recordSchema(key, schema[name][0], result);
+        } else {
+          result.push({ Name: key, CslType: defaultCslType });
+        }
+      }
+      continue;
+    }
 
     if (typeof schema[name] === 'string') {
       result.push({
