@@ -366,36 +366,53 @@ describe('AdxDataSource', () => {
       });
     });
 
-    it('should return select the first type if multiple types are returned', async () => {
-      const datasource = mockDatasource();
-      datasource.query = jest.fn().mockReturnValue({
-        toPromise: jest.fn().mockResolvedValue({
-          data: [
-            toDataFrame({
-              fields: [
-                {
-                  name: 'schema_Teams',
-                  type: 'string',
-                  typeInfo: {
-                    frame: 'string',
-                  },
-                  config: {},
-                  values: ['{"18":{"TeamID":["long","double"]}}'],
-                  entities: {},
-                },
+    describe('when there are multiple types returned', () => {
+      [
+        { input: '"long","double"', expected: 'double' },
+        { input: '"long","real"', expected: 'real' },
+        { input: '"long","int"', expected: 'long' },
+        { input: '"string","bool"', expected: 'string', warn: true },
+      ].forEach((t) => {
+        const consoleWarn = console.warn;
+        beforeEach(() => {
+          console.warn = jest.fn();
+        });
+        afterEach(() => {
+          console.warn = consoleWarn;
+        });
+        it(`should return ${t.expected} type`, async () => {
+          const datasource = mockDatasource();
+          datasource.query = jest.fn().mockReturnValue({
+            toPromise: jest.fn().mockResolvedValue({
+              data: [
+                toDataFrame({
+                  fields: [
+                    {
+                      name: 'schema_Teams',
+                      type: 'string',
+                      typeInfo: { frame: 'string' },
+                      config: {},
+                      values: [`{"TeamID":[${t.input}]}`],
+                      entities: {},
+                    },
+                  ],
+                }),
               ],
             }),
-          ],
-        }),
-      });
+          });
 
-      expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
-        Teams: [
-          {
-            CslType: 'long',
-            Name: 'Teams["18"]["TeamID"]',
-          },
-        ],
+          expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
+            Teams: [
+              {
+                CslType: t.expected,
+                Name: 'Teams["TeamID"]',
+              },
+            ],
+          });
+          if (t.warn) {
+            expect(console.warn).toBeCalled();
+          }
+        });
       });
     });
   });

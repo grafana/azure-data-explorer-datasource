@@ -10,11 +10,12 @@ import {
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
-import { QueryEditorOperator } from 'editor/types';
+import { QueryEditorOperator, QueryEditorPropertyType } from 'editor/types';
 import { KustoExpressionParser } from 'KustoExpressionParser';
 import { map } from 'lodash';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
 import { cache } from 'schema/cache';
+import { toPropertyType } from 'schema/mapper';
 
 import { migrateAnnotation } from './migrations/annotation';
 import interpolateKustoQuery from './query_builder';
@@ -387,8 +388,15 @@ const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]
 
     if (Array.isArray(schema[name])) {
       // If a field can have different types (e.g. long and double)
-      // we select the first for simplicity
-      result.push({ Name: key, CslType: schema[name][0] });
+      // we select the first, assuming they are interchangeable
+      if (schema[name].every((t: string) => toPropertyType(t) === QueryEditorPropertyType.Number)) {
+        // If all the types are numbers, the double takes precedence since it has more precission.
+        const cslType = schema[name].find((t: string) => t === 'double' || t === 'real') || schema[name][0];
+        result.push({ Name: key, CslType: cslType });
+      } else {
+        console.warn(`schema ${name} may contain different types, assuming ${schema[name][0]}`);
+        result.push({ Name: key, CslType: schema[name][0] });
+      }
       continue;
     }
 

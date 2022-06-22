@@ -61,7 +61,7 @@ export const columnsToDefinition = (columns: AdxColumnSchema[]): QueryEditorProp
   });
 };
 
-const toPropertyType = (kustoType: string): QueryEditorPropertyType => {
+export const toPropertyType = (kustoType: string): QueryEditorPropertyType => {
   switch (kustoType) {
     case 'real':
     case 'int':
