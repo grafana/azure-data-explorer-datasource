@@ -368,10 +368,19 @@ describe('AdxDataSource', () => {
 
     describe('when there are multiple types returned', () => {
       [
-        { input: '"long","double"', expected: 'double' },
-        { input: '"long","real"', expected: 'real' },
-        { input: '"long","int"', expected: 'long' },
-        { input: '"string","bool"', expected: 'string', warn: true },
+        { schema: '{"TeamID":["long","double"]}', expected: { Name: `Teams["TeamID"]`, CslType: 'double' } },
+        { schema: '{"TeamID":["long","real"]}', expected: { Name: `Teams["TeamID"]`, CslType: 'real' } },
+        { schema: '{"TeamID":["long","int"]}', expected: { Name: `Teams["TeamID"]`, CslType: 'long' } },
+        {
+          schema: '{"TeamID":["string","bool"]}',
+          expected: { Name: `Teams["TeamID"]`, CslType: 'string' },
+          warn: true,
+        },
+        {
+          schema: '{"TeamID":[{"a":"string"},"bool"]}',
+          expected: { Name: `Teams["TeamID"]["a"]`, CslType: 'string' },
+          warn: true,
+        },
       ].forEach((t) => {
         const consoleWarn = console.warn;
         beforeEach(() => {
@@ -392,7 +401,7 @@ describe('AdxDataSource', () => {
                       type: 'string',
                       typeInfo: { frame: 'string' },
                       config: {},
-                      values: [`{"TeamID":[${t.input}]}`],
+                      values: [t.schema],
                       entities: {},
                     },
                   ],
@@ -402,12 +411,7 @@ describe('AdxDataSource', () => {
           });
 
           expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
-            Teams: [
-              {
-                CslType: t.expected,
-                Name: 'Teams["TeamID"]',
-              },
-            ],
+            Teams: [t.expected],
           });
           if (t.warn) {
             expect(console.warn).toBeCalled();

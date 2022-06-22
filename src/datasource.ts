@@ -389,13 +389,18 @@ const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]
     if (Array.isArray(schema[name])) {
       // If a field can have different types (e.g. long and double)
       // we select the first, assuming they are interchangeable
+      const defaultCslType = schema[name][0];
       if (schema[name].every((t: string) => toPropertyType(t) === QueryEditorPropertyType.Number)) {
         // If all the types are numbers, the double takes precedence since it has more precission.
-        const cslType = schema[name].find((t: string) => t === 'double' || t === 'real') || schema[name][0];
+        const cslType = schema[name].find((t: string) => t === 'double' || t === 'real') || defaultCslType;
         result.push({ Name: key, CslType: cslType });
       } else {
-        console.warn(`schema ${name} may contain different types, assuming ${schema[name][0]}`);
-        result.push({ Name: key, CslType: schema[name][0] });
+        console.warn(`schema ${name} may contain different types, assuming ${defaultCslType}`);
+        if (typeof defaultCslType === 'object') {
+          recordSchema(key, schema[name][0], result);
+        } else {
+          result.push({ Name: key, CslType: defaultCslType });
+        }
       }
       continue;
     }
