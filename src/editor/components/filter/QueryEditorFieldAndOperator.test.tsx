@@ -56,7 +56,7 @@ describe('QueryEditorFieldAndOperator', () => {
     // select a column
     screen.getByText(defaultProps.fields[0].value).click();
 
-    const valueSel = screen.getByLabelText('select value');
+    const valueSel = screen.getByLabelText('select value for where filter');
     openMenu(valueSel);
     const valueTemplateVariableGroup = screen.getByText('Template Variables');
     valueTemplateVariableGroup.click();
