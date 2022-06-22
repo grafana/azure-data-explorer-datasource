@@ -174,6 +174,7 @@ const renderOperatorInput = (
         <QueryEditorSingleOperator
           operator={definition}
           value={operator?.value}
+          labelValue={operator?.labelValue}
           onChange={onChangeValue}
           getSuggestions={getSuggestions}
           templateVariableOptions={templateVariableOptions}

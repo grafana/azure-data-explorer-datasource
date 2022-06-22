@@ -1,3 +1,5 @@
+import { SelectableValue } from '@grafana/data';
+
 export enum QueryEditorPropertyType {
   Number = 'number',
   String = 'string',
@@ -13,12 +15,13 @@ export interface QueryEditorProperty {
   name: string;
 }
 
-export type QueryEditorOperatorType = string | boolean | number;
+export type QueryEditorOperatorType = string | boolean | number | SelectableValue<string>;
 type QueryEditorOperatorValueType = QueryEditorOperatorType | QueryEditorOperatorType[];
 
 export interface QueryEditorOperator<T = QueryEditorOperatorValueType> {
   name: string;
   value: T;
+  labelValue?: string;
 }
 
 export interface QueryEditorOperatorDefinition {

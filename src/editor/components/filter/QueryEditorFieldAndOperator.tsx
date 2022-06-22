@@ -16,6 +16,7 @@ import { QueryEditorField } from '../field/QueryEditorField';
 import { parseOperatorValue } from '../operators/parser';
 import { definitionToOperator, QueryEditorOperatorComponent } from '../operators/QueryEditorOperator';
 import { SkippableExpressionSuggestor } from '../types';
+import { cloneDeep } from 'lodash';
 
 interface Props {
   value?: QueryEditorOperatorExpression;
@@ -29,6 +30,13 @@ interface Props {
 export const QueryEditorFieldAndOperator: React.FC<Props> = (props: Props) => {
   // operators we can use for the field
   const [operators, setOperators] = useState<QueryEditorOperatorDefinition[]>([]);
+  // If the value is a string, template variable can be quoted when used as values
+  const templateVariableOptionsValues = cloneDeep(props.templateVariableOptions);
+  if (Array.isArray(props.templateVariableOptions.options) && props.value?.property.type === 'string') {
+    templateVariableOptionsValues.options = props.templateVariableOptions.options.map((op: SelectableValue<string>) => {
+      return { label: op.value, value: `'${op.value}'` };
+    });
+  }
 
   // Find the valid operators to the given field and save it in state
   const updateOperators = (field: QueryEditorProperty): QueryEditorOperatorDefinition[] => {
@@ -94,10 +102,10 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = (props: Props) => {
       const filter = createFilter(props.value.property, txt);
       const results = await props.getSuggestions(filter);
 
-      if (Array.isArray(props.templateVariableOptions?.options)) {
-        const variables = props.templateVariableOptions.options.filter((v) => {
+      if (Array.isArray(templateVariableOptionsValues)) {
+        const variables = templateVariableOptionsValues.filter((v) => {
           if (typeof v?.value === 'string') {
-            return v.value.indexOf(txt) > -1;
+            return v.value.includes(txt);
           }
           return false;
         });
@@ -111,7 +119,7 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = (props: Props) => {
     { leading: false }
   );
 
-  const { value, fields, templateVariableOptions } = props;
+  const { value, fields } = props;
 
   const styles = useStyles2(getStyles);
   const showOperators = value?.operator || value?.property;
@@ -121,9 +129,10 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = (props: Props) => {
       <QueryEditorField
         value={value?.property}
         fields={fields}
-        templateVariableOptions={templateVariableOptions}
+        templateVariableOptions={props.templateVariableOptions}
         onChange={onFieldChanged}
         placeholder="Choose column..."
+        aria-label="choose column for where filter"
       />
       {showOperators && (
         <QueryEditorOperatorComponent
@@ -132,7 +141,7 @@ export const QueryEditorFieldAndOperator: React.FC<Props> = (props: Props) => {
           onChange={onOperatorChange}
           getSuggestions={getSuggestions}
           property={value?.property}
-          templateVariableOptions={templateVariableOptions}
+          templateVariableOptions={templateVariableOptionsValues}
         />
       )}
     </div>

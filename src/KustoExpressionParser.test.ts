@@ -703,6 +703,50 @@ describe('KustoExpressionParser', () => {
       );
     });
 
+    it('should parse expression with template variable as an object', () => {
+      const templateSrv: TemplateSrv = {
+        getVariables: jest.fn().mockReturnValue([
+          {
+            id: 'country',
+            current: {
+              text: 'usa',
+              value: 'USA',
+            },
+            multi: false,
+          },
+        ]),
+        replace: jest.fn(),
+        containsTemplate: jest.fn(),
+        updateTimeRange: jest.fn(),
+      };
+
+      const parser = new KustoExpressionParser(templateSrv);
+
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('column["country"]', '==', { label: '$country', value: `'$country'` })]),
+        groupBy: createArray([createGroupBy('column["type"]')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'column["type"]',
+          CslType: 'string',
+        },
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(StartTime)' +
+          '\n| where column["country"] == \'$country\'' +
+          `\n| summarize by tostring(column["type"])`
+      );
+    });
+
     it('should parse expression with summarize function that takes a parameter', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),

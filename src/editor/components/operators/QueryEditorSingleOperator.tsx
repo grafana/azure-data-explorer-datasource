@@ -10,6 +10,7 @@ interface Props {
   operator: QueryEditorOperatorDefinition;
   getSuggestions: ExpressionSuggestor;
   templateVariableOptions: SelectableValue<string>;
+  labelValue?: string;
 }
 
 interface State {
@@ -36,8 +37,9 @@ export class QueryEditorSingleOperator extends PureComponent<Props, State> {
       return;
     }
     this.props.onChange({
-      value: `${evt.value}`, // Currently strings only
+      value: evt.value,
       name: this.props.operator.value,
+      labelValue: evt.label,
     });
   };
 
@@ -65,20 +67,16 @@ export class QueryEditorSingleOperator extends PureComponent<Props, State> {
   };
 
   render() {
-    const { value } = this.props;
-    const current = value
-      ? {
-          label: value,
-          value,
-        }
-      : undefined;
+    const { value, labelValue } = this.props;
+    const label = labelValue || value;
+    const current = value ? { label, value } : undefined;
 
     return (
       <AsyncSelect
         width={30}
         placeholder="Start typing to add filters..."
         loadOptions={this.getSuggestions}
-        onOpenMenu={() => this.getSuggestions(value ?? '')}
+        onOpenMenu={() => this.getSuggestions(label ?? '')}
         defaultOptions={this.state.defaultOptions}
         isLoading={this.state.isLoading}
         value={current}
@@ -88,6 +86,7 @@ export class QueryEditorSingleOperator extends PureComponent<Props, State> {
         backspaceRemovesValue
         isClearable
         noOptionsMessage="No options found"
+        aria-label="select value for where filter"
       />
     );
   }

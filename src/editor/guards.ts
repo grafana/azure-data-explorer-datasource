@@ -1,3 +1,4 @@
+import { SelectableValue } from '@grafana/data';
 import {
   QueryEditorReduceExpression,
   QueryEditorPropertyExpression,
@@ -54,7 +55,13 @@ export const isDateTimeOperator = (
   return propertyType === QueryEditorPropertyType.DateTime && typeof operator?.value === 'string';
 };
 
-export const isMultiOperator = (operator?: QueryEditorOperator): operator is QueryEditorOperator<string[]> => {
+export const isStringArray = (value: any): value is string[] => {
+  return value instanceof Array && value.every((item) => typeof item === 'string');
+};
+
+export const isMultiOperator = (
+  operator?: QueryEditorOperator
+): operator is QueryEditorOperator<string[] | Array<SelectableValue<string>>> => {
   return Array.isArray(operator?.value);
 };
 
