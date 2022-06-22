@@ -1,5 +1,13 @@
 # Change Log
 
+## [4.1.1]
+
+Several bug fixes for the visual query builder:
+
+- Add materialized views as tables.
+- Fix template variable quoting.
+- Fix syntax dynamic fields with multiple types.
+
 ## [4.1.0]
 
 - New Feature: The visual query editor now supports `dynamic` columns. This includes columns with one or more arrays of `dynamic` values.
