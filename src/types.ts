@@ -1,4 +1,4 @@
-import { DataQuery, DataSourceJsonData } from '@grafana/data';
+import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
 
 import {
   QueryEditorArrayExpression,
@@ -147,3 +147,5 @@ export enum AzureCloudType {
   AzureUSGovernment = 'govazuremonitor',
   AzureChina = 'chinaazuremonitor',
 }
+
+export type AdxDataSourceSettings = DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>;
