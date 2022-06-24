@@ -8,6 +8,8 @@ interface TrackingConfigProps
   updateJsonData: <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => void;
 }
 
+const LABEL_WIDTH = 27;
+
 const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData }) => {
   const { jsonData } = options;
 
@@ -15,7 +17,7 @@ const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData
     <FieldSet label="Tracking">
       <InlineField
         label="Send username header to host"
-        labelWidth={26}
+        labelWidth={LABEL_WIDTH}
         tooltip={
           <p>
             With this feature enabled, Grafana will pass the logged in user&#39;s username in the{' '}

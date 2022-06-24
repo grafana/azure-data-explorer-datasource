@@ -32,6 +32,8 @@ function formatMappingValue(mapping): string {
   }
 }
 
+const LABEL_WIDTH = 18;
+
 const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, updateJsonData, onRefresh }) => {
   const { jsonData } = options;
   const mappings = useMemo(() => jsonData.schemaMappings ?? [], [jsonData.schemaMappings]);
@@ -76,7 +78,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
 
   return (
     <FieldSet label="Database schema settings">
-      <InlineField label="Default database" labelWidth={26}>
+      <InlineField label="Default database" labelWidth={LABEL_WIDTH}>
         <Select
           width={45}
           options={schema.databases}
@@ -85,7 +87,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
         />
       </InlineField>
 
-      <InlineField label="Use managed schema" labelWidth={26}>
+      <InlineField label="Use managed schema" labelWidth={LABEL_WIDTH}>
         <InlineSwitch
           id="adx-use-schema-mapping"
           value={jsonData.useSchemaMapping}
@@ -94,7 +96,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
       </InlineField>
 
       {jsonData.useSchemaMapping && (
-        <InlineField label="Schema mappings" labelWidth={26}>
+        <InlineField label="Schema mappings" labelWidth={LABEL_WIDTH}>
           <VerticalGroup spacing="xs">
             {mappings.map((mapping, index) => (
               <HorizontalGroup spacing="xs" key={index}>
