@@ -18,6 +18,8 @@ interface ConnectionConfigProps
   handleClearClientSecret: () => void;
 }
 
+const LABEL_WIDTH = 18;
+
 const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
   options,
   onOptionsChange,
@@ -70,7 +72,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
     <FieldSet label="Connection Details">
       <InlineField
         label="Azure cloud"
-        labelWidth={26}
+        labelWidth={LABEL_WIDTH}
         tooltip="Select an Azure Cloud."
         required
         data-testid={selectors.components.configEditor.azureCloud.input}
@@ -88,7 +90,11 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         />
       </InlineField>
 
-      <InlineField label="Cluster URL" labelWidth={26} tooltip="The cluster url for your Azure Data Explorer database.">
+      <InlineField
+        label="Cluster URL"
+        labelWidth={LABEL_WIDTH}
+        tooltip="The cluster url for your Azure Data Explorer database."
+      >
         <Input
           data-testid={selectors.components.configEditor.clusterURL.input}
           value={jsonData.clusterUrl}
@@ -101,7 +107,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
       <InlineField
         label="Tenant ID"
-        labelWidth={26}
+        labelWidth={LABEL_WIDTH}
         tooltip={
           <>
             In the Azure Portal, navigate to Azure Active Directory {'🡒'} Properties {'🡒'} Directory ID.
@@ -128,7 +134,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
       <InlineField
         label="Client ID"
-        labelWidth={26}
+        labelWidth={LABEL_WIDTH}
         tooltip={
           <>
             In the Azure Portal, navigate to Azure Active Directory {'🡒'} App Registrations {'🡒'} Choose your app {'🡒'}
@@ -159,20 +165,21 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         aria-label="Client secret"
         data-testid={selectors.components.configEditor.clientSecret.input}
         value={secureJsonData?.clientSecret || undefined}
-        labelWidth={13}
+        labelWidth={9}
         inputWidth={30}
         placeholder=""
         onReset={() => handleClearClientSecret()}
         onChange={handleClientSecretChange}
         isConfigured={!!secureJsonFields?.clientSecret}
         tooltip={clientSecretTooltip}
+        style={{ marginBottom: '4px' }}
       />
 
       {config.featureToggles.adxOnBehalfOf && (
         <InlineField
           label="Use On-Behalf-Of"
           htmlFor="adx-on-behalf-of"
-          labelWidth={26}
+          labelWidth={LABEL_WIDTH}
           tooltip={
             <>
               Propagate Grafana client credentials to ADX with a token exchange. When enabled the service account
