@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import ConfigHelp from 'components/ConfigEditor/ConfigHelp';
-import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
 import ConnectionConfig from './ConnectionConfig';
 import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
@@ -11,17 +11,8 @@ export interface ConfigEditorProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {}
 
 const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
-  const { options, onOptionsChange: _onOptionsChange } = props;
-  const [saved, setSaved] = useState(true);
+  const { options, onOptionsChange } = props;
   const { jsonData } = options;
-
-  const onOptionsChange = useCallback(
-    (options: AdxDataSourceSettings) => {
-      setSaved(false);
-      _onOptionsChange(options);
-    },
-    [setSaved, _onOptionsChange]
-  );
 
   const updateJsonData = useCallback(
     <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => {
@@ -63,13 +54,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
 
       <QueryConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
 
-      <DatabaseConfig
-        options={options}
-        onOptionsChange={onOptionsChange}
-        updateJsonData={updateJsonData}
-        saved={saved}
-        setSaved={setSaved}
-      />
+      <DatabaseConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
 
       <TrackingConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
     </div>

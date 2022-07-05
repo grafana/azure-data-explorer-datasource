@@ -22,8 +22,6 @@ import { refreshSchema, Schema } from './refreshSchema';
 interface DatabaseConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
   updateJsonData: <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => void;
-  saved: boolean;
-  setSaved: (s: boolean) => void;
 }
 
 function formatMappingValue(mapping): string {
@@ -38,7 +36,7 @@ function formatMappingValue(mapping): string {
 
 const LABEL_WIDTH = 18;
 
-export function isFetchError(e: unknown): e is FetchError {
+function isFetchError(e: unknown): e is FetchError {
   return typeof e === 'object' && e !== null && 'status' in e && 'data' in e;
 }
 
@@ -49,7 +47,7 @@ type FetchErrorResponse = FetchResponse<{
 }>;
 
 const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProps) => {
-  const { options, updateJsonData, saved, setSaved } = props;
+  const { options, updateJsonData } = props;
   const { jsonData, secureJsonData, secureJsonFields } = options;
   const mappings = useMemo(() => jsonData.schemaMappings ?? [], [jsonData.schemaMappings]);
   const [schema, setSchema] = useState<Schema>({ databases: [], schemaMappingOptions: [] });
@@ -101,23 +99,10 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
 
   const canGetSchema = () => {
     const requiredJsonData = [jsonData.clusterUrl, jsonData.tenantId, jsonData.clientId];
-    return requiredJsonData.every((d) => d!!) && (secureJsonData?.clientSecret || secureJsonFields.clientSecret);
+    return requiredJsonData.every((d) => d!!) && !!(secureJsonData?.clientSecret || secureJsonFields.clientSecret);
   };
 
   const updateSchema = async () => {
-    if (!saved) {
-      // Save latest changes in the datasource so we can retrieve the schema
-      await getBackendSrv()
-        .put(baseURL, props.options)
-        .then((result: { datasource: AdxDataSourceSettings }) => {
-          props.onOptionsChange({
-            ...props.options,
-            version: result.datasource.version,
-          });
-        });
-      setSaved(true);
-    }
-
     try {
       const datasource = await getDatasource();
       const schemaData = await refreshSchema(datasource);
@@ -134,6 +119,20 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
       }
     }
   };
+
+  const saveAndUpdateSchema = useCallback(async () => {
+    // Save latest changes in the datasource so we can retrieve the schema
+    await getBackendSrv()
+      .put(baseURL, props.options)
+      .then((result: { datasource: AdxDataSourceSettings }) => {
+        props.onOptionsChange({
+          ...props.options,
+          version: result.datasource.version,
+        });
+      });
+
+    updateSchema();
+  }, [props.options]);
 
   useEffectOnce(() => {
     if (options.id && canGetSchema()) {
@@ -215,7 +214,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
         </Alert>
       )}
 
-      <Button variant="primary" onClick={updateSchema} type="button" icon="sync">
+      <Button variant="primary" onClick={saveAndUpdateSchema} disabled={!canGetSchema()} type="button" icon="sync">
         Reload schema
       </Button>
     </FieldSet>
