@@ -154,6 +154,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
           options={schema.databases}
           value={schema.databases.find((v) => v.value === jsonData.defaultDatabase)}
           onChange={(change: SelectableValue<string>) => updateJsonData('defaultDatabase', change.value || '')}
+          aria-label="choose default database"
         />
       </InlineField>
 
