@@ -120,7 +120,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
     }
   };
 
-  const saveAndUpdateSchema = useCallback(async () => {
+  const saveAndUpdateSchema = async () => {
     // Save latest changes in the datasource so we can retrieve the schema
     await getBackendSrv()
       .put(baseURL, props.options)
@@ -132,7 +132,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
       });
 
     updateSchema();
-  }, [props.options]);
+  };
 
   useEffectOnce(() => {
     if (options.id && canGetSchema()) {
