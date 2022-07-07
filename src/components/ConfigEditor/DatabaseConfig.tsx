@@ -1,5 +1,7 @@
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
+import { FetchError, FetchResponse, getBackendSrv, getDataSourceSrv } from '@grafana/runtime';
 import {
+  Alert,
   Button,
   FieldSet,
   HorizontalGroup,
@@ -11,15 +13,15 @@ import {
   Select,
   VerticalGroup,
 } from '@grafana/ui';
-import React, { useCallback, useMemo } from 'react';
-import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
-import { Schema } from './refreshSchema';
+import { AdxDataSource } from 'datasource';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { useEffectOnce } from 'react-use';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
+import { refreshSchema, Schema } from './refreshSchema';
 
 interface DatabaseConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
-  schema: Schema;
   updateJsonData: <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => void;
-  onRefresh: () => void;
 }
 
 function formatMappingValue(mapping): string {
@@ -34,9 +36,28 @@ function formatMappingValue(mapping): string {
 
 const LABEL_WIDTH = 18;
 
-const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, updateJsonData, onRefresh }) => {
-  const { jsonData } = options;
+function isFetchError(e: unknown): e is FetchError {
+  return typeof e === 'object' && e !== null && 'status' in e && 'data' in e;
+}
+
+type FetchErrorResponse = FetchResponse<{
+  error?: string;
+  message?: string;
+  response?: string;
+}>;
+
+const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProps) => {
+  const { options, updateJsonData } = props;
+  const { jsonData, secureJsonData, secureJsonFields } = options;
   const mappings = useMemo(() => jsonData.schemaMappings ?? [], [jsonData.schemaMappings]);
+  const [schema, setSchema] = useState<Schema>({ databases: [], schemaMappingOptions: [] });
+  const [schemaError, setSchemaError] = useState<FetchErrorResponse['data']>();
+  const baseURL = `/api/datasources/${options.id}`;
+
+  const getDatasource = async (): Promise<AdxDataSource> => {
+    const datasource = await getDataSourceSrv().get(options.name);
+    return datasource as unknown as AdxDataSource;
+  };
 
   const handleAddNewMapping = useCallback(() => {
     updateJsonData('schemaMappings', [...mappings, {}]);
@@ -76,6 +97,55 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
     updateJsonData('schemaMappings', newMappings);
   };
 
+  const canGetSchema = () => {
+    const requiredJsonData = [jsonData.clusterUrl, jsonData.tenantId, jsonData.clientId];
+    return requiredJsonData.every((d) => d!!) && !!(secureJsonData?.clientSecret || secureJsonFields.clientSecret);
+  };
+
+  const updateSchema = async () => {
+    try {
+      const datasource = await getDatasource();
+      const schemaData = await refreshSchema(datasource);
+      if (!schemaData) {
+        return;
+      }
+
+      setSchema(schemaData);
+      setSchemaError(undefined);
+    } catch (err: unknown) {
+      if (isFetchError(err)) {
+        setSchemaError(err.data);
+        setSchema({ databases: [], schemaMappingOptions: [] });
+      }
+    }
+  };
+
+  const saveAndUpdateSchema = async () => {
+    // Save latest changes in the datasource so we can retrieve the schema
+    await getBackendSrv()
+      .put(baseURL, props.options)
+      .then((result: { datasource: AdxDataSourceSettings }) => {
+        props.onOptionsChange({
+          ...props.options,
+          version: result.datasource.version,
+        });
+      });
+
+    updateSchema();
+  };
+
+  useEffectOnce(() => {
+    if (options.id && canGetSchema()) {
+      updateSchema();
+    }
+  });
+
+  useEffect(() => {
+    if (!jsonData.defaultDatabase && schema?.databases.length) {
+      updateJsonData('defaultDatabase', schema?.databases[0].value);
+    }
+  }, [schema?.databases, jsonData.defaultDatabase, updateJsonData]);
+
   return (
     <FieldSet label="Database schema settings">
       <InlineField label="Default database" labelWidth={LABEL_WIDTH}>
@@ -84,6 +154,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
           options={schema.databases}
           value={schema.databases.find((v) => v.value === jsonData.defaultDatabase)}
           onChange={(change: SelectableValue<string>) => updateJsonData('defaultDatabase', change.value || '')}
+          aria-label="choose default database"
         />
       </InlineField>
 
@@ -138,7 +209,13 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = ({ options, schema, update
 
       <br />
 
-      <Button variant="primary" onClick={onRefresh} type="button" icon="sync">
+      {schemaError && (
+        <Alert severity="error" title="Error updating Azure Data Explorer schema">
+          {schemaError.message}
+        </Alert>
+      )}
+
+      <Button variant="primary" onClick={saveAndUpdateSchema} disabled={!canGetSchema()} type="button" icon="sync">
         Reload schema
       </Button>
     </FieldSet>
