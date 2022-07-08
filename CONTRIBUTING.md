@@ -17,7 +17,7 @@ Make sure you have the following dependencies installed first:
 1. Install dependencies
 
    ```bash
-   yarn install --pure-lockfile
+   yarn install --pure-lockfile 
    ```
 
 2. Build plugin in development mode or run in watch mode
