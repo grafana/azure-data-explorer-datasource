@@ -141,6 +141,8 @@ export interface AdxFunctionSchema {
 
 export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
 
+export type AdxSchemaDefinition = string | AdxSchemaDefinition[] | { [k: string]: AdxSchemaDefinition };
+
 // must be in synch with clouds.go
 export enum AzureCloudType {
   AzurePublic = 'azuremonitor',

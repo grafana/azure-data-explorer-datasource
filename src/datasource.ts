@@ -24,6 +24,7 @@ import {
   AdxColumnSchema,
   AdxDataSourceOptions,
   AdxSchema,
+  AdxSchemaDefinition,
   AutoCompleteQuery,
   defaultQuery,
   EditorMode,
@@ -375,47 +376,52 @@ const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchem
   return result;
 };
 
-const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]) => {
+const recordSchemaArray = (name: string, types: AdxSchemaDefinition[], result: AdxColumnSchema[]) => {
+  // If a field can have different types (e.g. long and double)
+  // we select the first, assuming they are interchangeable
+  const defaultCslType = types[0];
+  if (types.every((t) => typeof t === 'string' && toPropertyType(t) === QueryEditorPropertyType.Number)) {
+    // If all the types are numbers, the double takes precedence since it has more precission.
+    const cslType = types.find((t) => typeof t === 'string' && (t === 'double' || t === 'real')) || defaultCslType;
+    result.push({ Name: name, CslType: cslType as string });
+  } else {
+    console.warn(`schema ${name} may contain different types, assuming ${defaultCslType}`);
+    if (typeof defaultCslType === 'object') {
+      recordSchema(name, types[0], result);
+    } else {
+      result.push({ Name: name, CslType: defaultCslType });
+    }
+  }
+};
+
+const recordSchema = (columnName: string, schema: AdxSchemaDefinition, result: AdxColumnSchema[]) => {
   if (!schema) {
     console.log('error with column', columnName);
     return;
   }
 
+  // Case: schema is a single type: e.g. 'long'
+  if (typeof schema === 'string') {
+    result.push({
+      Name: columnName,
+      CslType: schema,
+    });
+    return;
+  }
+
+  // Case: schema is a multiple type: e.g. ['long', 'double']
+  if (Array.isArray(schema)) {
+    recordSchemaArray(columnName, schema, result);
+    return;
+  }
+
+  // Case: schema is an object: e.g. {"a": "long"}
   for (const name of Object.keys(schema)) {
     // Generate a valid accessor for a dynamic type
     // https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic#dynamic-object-accessors
     const key = `${columnName}["${name}"]`;
-
-    if (Array.isArray(schema[name])) {
-      // If a field can have different types (e.g. long and double)
-      // we select the first, assuming they are interchangeable
-      const defaultCslType = schema[name][0];
-      if (schema[name].every((t: string) => toPropertyType(t) === QueryEditorPropertyType.Number)) {
-        // If all the types are numbers, the double takes precedence since it has more precission.
-        const cslType = schema[name].find((t: string) => t === 'double' || t === 'real') || defaultCslType;
-        result.push({ Name: key, CslType: cslType });
-      } else {
-        console.warn(`schema ${name} may contain different types, assuming ${defaultCslType}`);
-        if (typeof defaultCslType === 'object') {
-          recordSchema(key, schema[name][0], result);
-        } else {
-          result.push({ Name: key, CslType: defaultCslType });
-        }
-      }
-      continue;
-    }
-
-    if (typeof schema[name] === 'string') {
-      result.push({
-        Name: key,
-        CslType: schema[name],
-      });
-      continue;
-    }
-
-    if (typeof schema[name] === 'object') {
-      recordSchema(key, schema[name], result);
-    }
+    const subSchema = schema[name];
+    recordSchema(key, subSchema, result);
   }
 };
 
