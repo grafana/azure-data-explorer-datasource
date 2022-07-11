@@ -21,6 +21,13 @@ export const QueryEditorGroupBy: React.FC<Props> = (props) => {
   const [interval, setInterval] = useState(props.value?.interval);
   const styles = useStyles2(getStyles);
 
+  useEffect(() => {
+    if (props.value) {
+      setField(props.value.property);
+      setInterval(props.value.interval);
+    }
+  }, [props.value]);
+
   const onChangeField = useCallback(
     (property: QueryEditorProperty) => {
       setField(property);
