@@ -35,6 +35,14 @@ export const QueryEditorReduce: React.FC<Props> = (props) => {
   const applyOnField = useApplyOnField(reduce, props.functions);
   const styles = useStyles2(getStyles);
 
+  useEffect(() => {
+    if (props.value) {
+      setField(props.value.property);
+      setReduce(props.value.reduce);
+      setParameters(props.value.parameters);
+    }
+  }, [props.value]);
+
   const onChangeField = useCallback(
     (property: QueryEditorProperty) => {
       setField(property);
