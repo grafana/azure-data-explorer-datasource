@@ -140,6 +140,7 @@ const useSelectedDatabase = (
   query: KustoQuery,
   datasource: AdxDataSource
 ): string => {
+  const defaultDB = useAsync(() => datasource.getDefaultOrFirstDatabase(), [datasource]);
   const variables = datasource.getVariables();
 
   return useMemo(() => {
@@ -156,11 +157,15 @@ const useSelectedDatabase = (
     }
 
     if (options.length > 0) {
-      return options[0].value;
+      const result = options.find((x) => x.value === defaultDB.value);
+
+      if (result) {
+        return result.value;
+      }
     }
 
     return '';
-  }, [options, variables, query.database]);
+  }, [options, variables, query.database, defaultDB.value]);
 };
 
 const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[] => {
