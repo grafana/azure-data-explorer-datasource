@@ -181,7 +181,40 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where eventType == 'ThunderStorm'");
     });
 
-    it('should parse expression with a space', () => {
+    it('should parse where operator with a space', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('event type', '==', 'ThunderStorm')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' +
+          '\n| where ["event type"] == \'ThunderStorm\''      );
+    });
+
+    it('should parse reduce expression with a space', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        reduce: createArray([createReduce('reduce thing', 'none')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' +
+          '\n| project ["reduce thing"]');
+    });
+
+    it('should parse reduce with a function expression with a space', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        reduce: createArray([createReduce('reduce thing 2', 'sum')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' +
+          '\n| summarize sum(["reduce thing 2"])');
+    });
+    
+    it('should parse xreduce expression with a space', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createArray([createOperator('event type', '==', 'ThunderStorm')]),

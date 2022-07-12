@@ -202,7 +202,7 @@ export class KustoExpressionParser {
       const func = expression.reduce.name;
       const parameters = expression.parameters;
       const name = this.addExpanPartsdIfNeeded(expression.property.name, expandParts);
-      const column = context.castIfDynamic(name, expression.property.name);
+      const column = this.escapeColumn(context.castIfDynamic(name, expression.property.name));
       columns.push(column);
 
       if (Array.isArray(parameters)) {
@@ -264,6 +264,10 @@ export class KustoExpressionParser {
     }
   }
 
+  private escapeColumn(column: string) {
+    return column.includes(' ') ? `["${column}"]` : column
+  }
+
   private appendOperator(
     expression: QueryEditorOperatorExpression,
     parts: string[],
@@ -275,7 +279,7 @@ export class KustoExpressionParser {
     if (!property.name || !operator.name) {
       return;
     }
-    const propertyName = property.name.includes(' ') ? `["${property.name}"]` : property.name
+    const propertyName = this.escapeColumn(property.name)
 
     switch (operator.name) {
       case 'isnotempty':
