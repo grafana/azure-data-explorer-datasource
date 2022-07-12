@@ -158,6 +158,10 @@ export class KustoExpressionParser {
     }
     const eParts = expandParts ? expandParts : [];
 
+    console.log('context ', context);
+    console.log('expression ', expression);
+    console.log('parts ', parts);
+
     if (isAndExpression(expression)) {
       return expression.expressions.forEach((exp) => this.appendWhere(context, exp, parts, prefix, eParts));
     }

@@ -181,6 +181,15 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where eventType == 'ThunderStorm'");
     });
 
+    it('should parse expression with where equal to string value', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('event type', '==', 'ThunderStorm')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["event type"] == \'ThunderStorm\'');
+    });
+
     it('should parse an expression with a table name that contains special characters', () => {
       const expression = createQueryExpression({
         from: createProperty('events.all'),
