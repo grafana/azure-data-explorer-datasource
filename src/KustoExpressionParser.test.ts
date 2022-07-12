@@ -185,9 +185,17 @@ describe('KustoExpressionParser', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createArray([createOperator('event type', '==', 'ThunderStorm')]),
+        reduce: createArray([createReduce('reduce thing', 'none'), createReduce('reduce thing 2', 'sum')]),
+        groupBy: createArray([createGroupBy('Start Time', '1h')]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["event type"] == \'ThunderStorm\'');
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' +
+          '\n| where ["event type"] == \'ThunderStorm\'' +
+          '\n| project ["reduce thing"]' +
+          '\n| summarize sum(["reduce thing 2"])' +
+          '\n| order by ["Start Time"] asc'
+      );
     });
 
     it('should parse an expression with a table name that contains special characters', () => {
