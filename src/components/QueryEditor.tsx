@@ -161,6 +161,8 @@ const useSelectedDatabase = (
 
       if (result) {
         return result.value;
+      } else {
+        return options[0].value;
       }
     }
 
