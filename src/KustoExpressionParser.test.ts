@@ -181,7 +181,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where eventType == 'ThunderStorm'");
     });
 
-    it('should parse expression with where equal to string value', () => {
+    it('should parse expression with a space', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createArray([createOperator('event type', '==', 'ThunderStorm')]),

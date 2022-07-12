@@ -275,15 +275,16 @@ export class KustoExpressionParser {
     if (!property.name || !operator.name) {
       return;
     }
+    const propertyName = property.name.includes(' ') ? `["${property.name}"]` : property.name
 
     switch (operator.name) {
       case 'isnotempty':
-        parts.push(withPrefix(`${operator.name}(${property.name})`, prefix));
+        parts.push(withPrefix(`${operator.name}(${propertyName})`, prefix));
         break;
 
       default:
         const value = this.formatValue(operator.value, property.type);
-        const name = this.addExpanPartsdIfNeeded(property.name, expandParts);
+        const name = this.addExpanPartsdIfNeeded(propertyName, expandParts);
         parts.push(withPrefix(`${name} ${operator.name} ${value}`, prefix));
         break;
     }
