@@ -1,5 +1,14 @@
 # Change Log
 
+## [4.1.2]
+
+This release include several bug fixes:
+
+- Fix reload schema button in configuration.
+- Fix dynamic resolution for simple types in the query builder.
+- Fix "Aggregate" and "Group by" removal logic also for the builder.
+- Return configured default database instead of the first one.
+
 ## [4.1.1]
 
 Several bug fixes for the visual query builder:
