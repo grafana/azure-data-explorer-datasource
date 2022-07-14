@@ -4,4 +4,7 @@ on:
     branches-ignore: [dependabot/**]
 jobs:
   workflow-call:
-    uses: grafana/code-coverage/.github/workflows/code-coverage.yml@v0.1.2
+    uses: grafana/code-coverage/.github/workflows/code-coverage.yml@v0.1.6
+    with:
+      frontend-path-regexp: src
+      backend-path-regexp: pkg
