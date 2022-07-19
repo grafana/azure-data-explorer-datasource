@@ -399,16 +399,22 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
   return toType(column.CslType, column.Name);
 };
 
-const isDynamic = (column: string): boolean => {
-  return !!(column && column.indexOf('[') > -1) || !!(column && column.indexOf('todynamic') > -1);
+const isDynamic = (column: string | AdxColumnSchema | undefined): boolean => {
+  if (column && typeof column === 'object') {
+    return column.Type === 'dynamic';
+  } else if (typeof column === 'string') {
+    return !!(column && column.indexOf('[') > -1) || !!(column && column.indexOf('todynamic') > -1);
+  } else {
+    return false;
+  }
 };
 
 const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[], schemaName?: string): string => {
-  if (!isDynamic(schemaName || column) || !Array.isArray(tableSchema)) {
+  const columnSchema = tableSchema?.find((c) => c.Name === (schemaName || column));
+
+  if (!isDynamic(columnSchema || schemaName || column) || !Array.isArray(tableSchema)) {
     return column;
   }
-
-  const columnSchema = tableSchema.find((c) => c.Name === (schemaName || column));
 
   if (!columnSchema) {
     return column;
