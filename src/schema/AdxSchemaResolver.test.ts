@@ -58,7 +58,7 @@ describe('Test schema resolution', () => {
       { Name: 'dynamic', CslType: 'dynamic', Type: 'System.Object' },
     ];
     datasource.getDynamicSchema = jest.fn().mockResolvedValue({
-      dynamic: [{ Name: 'Modes["`indexer`"]', CslType: 'string' }],
+      dynamic: [{ Name: 'Modes["`indexer`"]', CslType: 'string', Type: 'dynamic' }],
     });
     const schema = createMockSchema();
     schema.Databases['testdb'].Tables = {
@@ -73,7 +73,9 @@ describe('Test schema resolution', () => {
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
     const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictable');
     expect(columns).toHaveLength(testColumns.length);
-    expect(columns).toEqual(expect.arrayContaining([{ CslType: 'string', Name: 'Modes["`indexer`"]' }]));
+    expect(columns).toEqual(
+      expect.arrayContaining([{ CslType: 'string', Name: 'Modes["`indexer`"]', Type: 'dynamic' }])
+    );
   });
 
   it('Will correctly include columns with type "dynamic" and containing nested arrays', async () => {
@@ -106,7 +108,9 @@ describe('Test schema resolution', () => {
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
     const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictable');
     expect(columns).toHaveLength(testColumns.length);
-    expect(columns).toEqual(expect.arrayContaining([{ CslType: 'string', Name: 'Modes["`indexer`"]' }]));
+    expect(columns).toEqual(
+      expect.arrayContaining([{ CslType: 'string', Name: 'Modes["`indexer`"]', Type: 'dynamic' }])
+    );
   });
 
   it('Will correctly include columns with type "dynamic" and simple properties', async () => {
