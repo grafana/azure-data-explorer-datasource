@@ -108,13 +108,7 @@ export class KustoExpressionParser {
       return;
     }
 
-    let columnName = context.timeColumn;
     if (context.timeColumn.includes('todatetime')) {
-      columnName = context.timeColumn.replace('todatetime(', '').replace(')', '');
-    }
-    const columnSchema = tableSchema?.find((c) => c.Name === columnName);
-
-    if (isDynamic(columnSchema)) {
       parts.push(`where ${context.timeColumn} between ($__timeFrom .. $__timeTo)`);
       return;
     }
@@ -406,18 +400,10 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
   return toType(column.CslType, column.Name);
 };
 
-const isDynamic = (column: AdxColumnSchema | undefined): boolean => {
-  if (column && column.isDynamic) {
-    return column.isDynamic;
-  } else {
-    return false;
-  }
-};
-
 const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[], schemaName?: string): string => {
   const columnSchema = tableSchema?.find((c) => c.Name === (schemaName || column));
 
-  if (!isDynamic(columnSchema) || !Array.isArray(tableSchema)) {
+  if (!columnSchema?.isDynamic || !Array.isArray(tableSchema)) {
     return column;
   }
 
