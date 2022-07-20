@@ -405,7 +405,7 @@ const recordSchema = (columnName: string, schema: AdxSchemaDefinition, result: A
     result.push({
       Name: columnName,
       CslType: schema,
-      Type: 'dynamic',
+      isDynamic: true,
     });
     return;
   }
