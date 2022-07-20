@@ -158,7 +158,7 @@ describe('AdxDataSource', () => {
           {
             CslType: 'long',
             Name: 'Teams["18"]["TeamID"]',
-            Type: 'dynamic',
+            isDynamic: true,
           },
         ],
       });
@@ -168,28 +168,28 @@ describe('AdxDataSource', () => {
       [
         {
           schema: '{"TeamID":["long","double"]}',
-          expected: { Name: `Teams["TeamID"]`, CslType: 'double', Type: 'dynamic' },
+          expected: { Name: `Teams["TeamID"]`, CslType: 'double', isDynamic: true },
         },
         {
           schema: '{"TeamID":["long","real"]}',
-          expected: { Name: `Teams["TeamID"]`, CslType: 'real', Type: 'dynamic' },
+          expected: { Name: `Teams["TeamID"]`, CslType: 'real', isDynamic: true },
         },
         {
           schema: '{"TeamID":["long","int"]}',
-          expected: { Name: `Teams["TeamID"]`, CslType: 'long', Type: 'dynamic' },
+          expected: { Name: `Teams["TeamID"]`, CslType: 'long', isDynamic: true },
         },
         {
           schema: '{"TeamID":["string","bool"]}',
-          expected: { Name: `Teams["TeamID"]`, CslType: 'string', Type: 'dynamic' },
+          expected: { Name: `Teams["TeamID"]`, CslType: 'string', isDynamic: true },
           warn: true,
         },
         {
           schema: '{"TeamID":[{"a":"string"},"bool"]}',
-          expected: { Name: `Teams["TeamID"]["a"]`, CslType: 'string', Type: 'dynamic' },
+          expected: { Name: `Teams["TeamID"]["a"]`, CslType: 'string', isDynamic: true },
           warn: true,
         },
-        { schema: '["long","double"]', expected: { Name: `Teams`, CslType: 'double', Type: 'dynamic' } },
-        { schema: '"long"', expected: { Name: `Teams`, CslType: 'long', Type: 'dynamic' } },
+        { schema: '["long","double"]', expected: { Name: `Teams`, CslType: 'double', isDynamic: true } },
+        { schema: '"long"', expected: { Name: `Teams`, CslType: 'long', isDynamic: true } },
       ].forEach((t) => {
         const consoleWarn = console.warn;
         beforeEach(() => {
