@@ -158,6 +158,7 @@ describe('AdxDataSource', () => {
           {
             CslType: 'long',
             Name: 'Teams["18"]["TeamID"]',
+            Type: 'dynamic',
           },
         ],
       });
@@ -165,21 +166,30 @@ describe('AdxDataSource', () => {
 
     describe('when there are multiple types returned', () => {
       [
-        { schema: '{"TeamID":["long","double"]}', expected: { Name: `Teams["TeamID"]`, CslType: 'double' } },
-        { schema: '{"TeamID":["long","real"]}', expected: { Name: `Teams["TeamID"]`, CslType: 'real' } },
-        { schema: '{"TeamID":["long","int"]}', expected: { Name: `Teams["TeamID"]`, CslType: 'long' } },
+        {
+          schema: '{"TeamID":["long","double"]}',
+          expected: { Name: `Teams["TeamID"]`, CslType: 'double', Type: 'dynamic' },
+        },
+        {
+          schema: '{"TeamID":["long","real"]}',
+          expected: { Name: `Teams["TeamID"]`, CslType: 'real', Type: 'dynamic' },
+        },
+        {
+          schema: '{"TeamID":["long","int"]}',
+          expected: { Name: `Teams["TeamID"]`, CslType: 'long', Type: 'dynamic' },
+        },
         {
           schema: '{"TeamID":["string","bool"]}',
-          expected: { Name: `Teams["TeamID"]`, CslType: 'string' },
+          expected: { Name: `Teams["TeamID"]`, CslType: 'string', Type: 'dynamic' },
           warn: true,
         },
         {
           schema: '{"TeamID":[{"a":"string"},"bool"]}',
-          expected: { Name: `Teams["TeamID"]["a"]`, CslType: 'string' },
+          expected: { Name: `Teams["TeamID"]["a"]`, CslType: 'string', Type: 'dynamic' },
           warn: true,
         },
-        { schema: '["long","double"]', expected: { Name: `Teams`, CslType: 'double' } },
-        { schema: '"long"', expected: { Name: `Teams`, CslType: 'long' } },
+        { schema: '["long","double"]', expected: { Name: `Teams`, CslType: 'double', Type: 'dynamic' } },
+        { schema: '"long"', expected: { Name: `Teams`, CslType: 'long', Type: 'dynamic' } },
       ].forEach((t) => {
         const consoleWarn = console.warn;
         beforeEach(() => {
