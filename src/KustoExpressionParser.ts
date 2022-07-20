@@ -40,7 +40,7 @@ export class KustoExpressionParser {
 
     const parts: string[] = [];
     this.appendProperty(context, query.expression.from, parts);
-    this.appendTimeFilter(context, undefined, parts);
+    this.appendTimeFilter(context, undefined, parts, tableSchema);
 
     const where = replaceByIndex(query.index, query.expression.where, query.search);
     const column = query.search.property.name;
@@ -65,7 +65,7 @@ export class KustoExpressionParser {
 
     const parts: string[] = [];
     this.appendProperty(context, expression.from, parts);
-    this.appendTimeFilter(context, expression.timeshift, parts);
+    this.appendTimeFilter(context, expression.timeshift, parts, tableSchema);
     this.appendWhere(context, expression?.where, parts, 'where');
     this.appendTimeshift(context, expression.timeshift, parts);
     this.appendSummarize(context, expression.reduce, expression.groupBy, parts);
@@ -94,7 +94,8 @@ export class KustoExpressionParser {
   private appendTimeFilter(
     context: ParseContext,
     expression: QueryEditorPropertyExpression | undefined,
-    parts: string[]
+    parts: string[],
+    tableSchema?: AdxColumnSchema[]
   ) {
     if (!context.timeColumn) {
       return;
@@ -107,7 +108,13 @@ export class KustoExpressionParser {
       return;
     }
 
-    if (isDynamic(context.timeColumn)) {
+    let columnName = context.timeColumn;
+    if (context.timeColumn.includes('todatetime')) {
+      columnName = context.timeColumn.replace('todatetime(', '').replace(')', '');
+    }
+    const columnSchema = tableSchema?.find((c) => c.Name === columnName);
+
+    if (isDynamic(columnSchema)) {
       parts.push(`where ${context.timeColumn} between ($__timeFrom .. $__timeTo)`);
       return;
     }
@@ -399,11 +406,9 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
   return toType(column.CslType, column.Name);
 };
 
-const isDynamic = (column: string | AdxColumnSchema | undefined): boolean => {
-  if (column && typeof column === 'object') {
-    return column.Type === 'dynamic';
-  } else if (typeof column === 'string') {
-    return !!(column && column.indexOf('[') > -1) || !!(column && column.indexOf('todynamic') > -1);
+const isDynamic = (column: AdxColumnSchema | undefined): boolean => {
+  if (column && column.isDynamic) {
+    return column.isDynamic;
   } else {
     return false;
   }
@@ -412,7 +417,7 @@ const isDynamic = (column: string | AdxColumnSchema | undefined): boolean => {
 const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[], schemaName?: string): string => {
   const columnSchema = tableSchema?.find((c) => c.Name === (schemaName || column));
 
-  if (!isDynamic(columnSchema || schemaName || column) || !Array.isArray(tableSchema)) {
+  if (!isDynamic(columnSchema) || !Array.isArray(tableSchema)) {
     return column;
   }
 
