@@ -177,10 +177,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return functionSchemaParser(response.data as DataFrame[]);
   }
 
-  // private escapeColumn(column: string) {
-  //   return column.match(/[\s\.-]/) ? `["${column}"]` : column;
-  // }
-
   async getDynamicSchema(
     database: string,
     source: string,

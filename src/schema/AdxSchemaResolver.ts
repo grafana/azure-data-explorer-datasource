@@ -73,15 +73,11 @@ export class AdxSchemaResolver {
         (column) => column.Name
       );
 
-      console.log('dynamic columns ', dynamicColumns);
-
       const schemaByColumn = await this.datasource.getDynamicSchema(
         databaseName,
         mapping?.name ?? tableName,
         dynamicColumns
       );
-
-      console.log('schemaByColumn ', schemaByColumn);
 
       return schema.OrderedColumns.reduce((columns: AdxColumnSchema[], column) => {
         const schemaForDynamicColumn = schemaByColumn[column.Name];
