@@ -187,9 +187,7 @@ describe('KustoExpressionParser', () => {
         where: createArray([createOperator('event type', '==', 'ThunderStorm')]),
       });
 
-      expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' +
-          '\n| where ["event type"] == \'ThunderStorm\''      );
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["event type"] == \'ThunderStorm\'');
     });
 
     it('should parse reduce expression with a space', () => {
@@ -198,9 +196,7 @@ describe('KustoExpressionParser', () => {
         reduce: createArray([createReduce('reduce thing', 'none')]),
       });
 
-      expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' +
-          '\n| project ["reduce thing"]');
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| project ["reduce thing"]');
     });
 
     it('should parse reduce with a function expression with a space', () => {
@@ -209,24 +205,22 @@ describe('KustoExpressionParser', () => {
         reduce: createArray([createReduce('reduce thing 2', 'sum')]),
       });
 
-      expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' +
-          '\n| summarize sum(["reduce thing 2"])');
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| summarize sum(["reduce thing 2"])');
     });
-    
-    it('should parse xreduce expression with a space', () => {
+
+    it('should parse a expression with spaces in multiple places', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createArray([createOperator('event type', '==', 'ThunderStorm')]),
-        reduce: createArray([createReduce('reduce thing', 'none'), createReduce('reduce thing 2', 'sum')]),
+        reduce: createArray([createReduce('reduce thing', 'sum')]),
         groupBy: createArray([createGroupBy('Start Time', '1h')]),
       });
 
       expect(parser.toQuery(expression)).toEqual(
         'StormEvents' +
+          '\n| where $__timeFilter(["Start Time"])' +
           '\n| where ["event type"] == \'ThunderStorm\'' +
-          '\n| project ["reduce thing"]' +
-          '\n| summarize sum(["reduce thing 2"])' +
+          '\n| summarize sum(["reduce thing"]) by bin(["Start Time"], 1h)' +
           '\n| order by ["Start Time"] asc'
       );
     });

@@ -84,6 +84,17 @@ func TestMacroData_Interpolate(t *testing.T) {
 			returnVal: fmt.Sprintf("CatCount >= %v and CatCount <= %v", fromString, toString),
 		},
 		{
+			name: "should parse $__timeFilter([\"Cat Count\"])",
+			macroData: NewMacroData(&backend.TimeRange{
+				From: fromTime,
+				To:   toTime,
+			}, 0),
+			errorIs:   assert.NoError,
+			query:     "$__timeFilter([\"Cat Count\"])",
+			returnIs:  assert.Equal,
+			returnVal: fmt.Sprintf(`["Cat Count"] >= %v and ["Cat Count"] <= %v`, fromString, toString),
+		},
+		{
 			name: "should parse and quote identifier with space",
 			macroData: NewMacroData(&backend.TimeRange{
 				From: fromTime,

@@ -100,19 +100,20 @@ export class KustoExpressionParser {
       return;
     }
 
+    const timeColumn = this.escapeColumn(context.timeColumn);
     const timeshift = detectTimeshift(context, expression);
 
     if (timeshift) {
-      parts.push(`where ${context.timeColumn} between (($__timeFrom - ${timeshift}) .. ($__timeTo - ${timeshift}))`);
+      parts.push(`where ${timeColumn} between (($__timeFrom - ${timeshift}) .. ($__timeTo - ${timeshift}))`);
       return;
     }
 
     if (isDynamic(context.timeColumn)) {
-      parts.push(`where ${context.timeColumn} between ($__timeFrom .. $__timeTo)`);
+      parts.push(`where ${timeColumn} between ($__timeFrom .. $__timeTo)`);
       return;
     }
 
-    parts.push(`where $__timeFilter(${context.timeColumn})`);
+    parts.push(`where $__timeFilter(${timeColumn})`);
   }
 
   private appendOrderBy(
@@ -125,11 +126,12 @@ export class KustoExpressionParser {
       return;
     }
 
+    const timeColumn = this.escapeColumn(context.timeColumn);
     const noGroupBy = Array.isArray(groupBy.expressions) && groupBy.expressions.length === 0;
     const noReduce = Array.isArray(reduce.expressions) && reduce.expressions.length === 0;
 
     if (noGroupBy && noReduce) {
-      parts.push(`order by ${context.timeColumn} asc`);
+      parts.push(`order by ${timeColumn} asc`);
       return;
     }
 
@@ -141,7 +143,7 @@ export class KustoExpressionParser {
     });
 
     if (hasInterval) {
-      parts.push(`order by ${context.timeColumn} asc`);
+      parts.push(`order by ${timeColumn} asc`);
       return;
     }
   }
@@ -157,10 +159,6 @@ export class KustoExpressionParser {
       return;
     }
     const eParts = expandParts ? expandParts : [];
-
-    console.log('context ', context);
-    console.log('expression ', expression);
-    console.log('parts ', parts);
 
     if (isAndExpression(expression)) {
       return expression.expressions.forEach((exp) => this.appendWhere(context, exp, parts, prefix, eParts));
@@ -231,7 +229,7 @@ export class KustoExpressionParser {
       }
 
       const name = this.addExpanPartsdIfNeeded(expression.property.name, expandParts);
-      const column = context.castIfDynamic(name, expression.property.name);
+      const column = this.escapeColumn(context.castIfDynamic(name, expression.property.name));
 
       if (expression.interval) {
         const interval = expression.interval.name;
@@ -265,7 +263,7 @@ export class KustoExpressionParser {
   }
 
   private escapeColumn(column: string) {
-    return column.includes(' ') ? `["${column}"]` : column
+    return column.match(/[\s\.-]/) ? `["${column}"]` : column;
   }
 
   private appendOperator(
@@ -279,7 +277,7 @@ export class KustoExpressionParser {
     if (!property.name || !operator.name) {
       return;
     }
-    const propertyName = this.escapeColumn(property.name)
+    const propertyName = this.escapeColumn(property.name);
 
     switch (operator.name) {
       case 'isnotempty':
