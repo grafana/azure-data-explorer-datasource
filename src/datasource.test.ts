@@ -164,6 +164,46 @@ describe('AdxDataSource', () => {
       });
     });
 
+    it('should build a correct query if the column includes a space', async () => {
+      const datasource = mockDatasource();
+      datasource.query = jest.fn().mockReturnValue({
+        toPromise: jest.fn().mockResolvedValue({
+          data: [
+            toDataFrame({
+              fields: [
+                {
+                  name: 'schema_Teams',
+                  type: 'string',
+                  typeInfo: {
+                    frame: 'string',
+                  },
+                  config: {},
+                  values: ['{"18":{"TeamID":"long"}}'],
+                  entities: {},
+                },
+              ],
+            }),
+          ],
+        }),
+      });
+
+      expect(await datasource.getDynamicSchema('foo', 'bar', ['col name'])).toEqual({
+        Teams: [
+          {
+            CslType: 'long',
+            Name: 'Teams["18"]["TeamID"]',
+            isDynamic: true,
+          },
+        ],
+      });
+      expect(datasource.query).toHaveBeenCalledTimes(1);
+      expect((datasource.query as jest.Mock).mock.calls[0][0].targets[0].query).toEqual(`bar
+ | take 50000
+ | where isnotnull([\"col name\"])
+ | project [\"col name\"]
+ | summarize buildschema([\"col name\"])`);
+    });
+
     describe('when there are multiple types returned', () => {
       [
         {
