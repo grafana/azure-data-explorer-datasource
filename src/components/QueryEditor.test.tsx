@@ -86,5 +86,21 @@ describe('QueryEditor', () => {
       render(<QueryEditor {...defaultProps} query={{ ...defaultProps.query, rawMode: true }} />);
       await waitFor(() => screen.getByText(/Raw Query/i));
     });
+
+    it('should render with the default database selected', async () => {
+      defaultProps.datasource.getDefaultOrFirstDatabase = jest.fn().mockResolvedValue('bar');
+      defaultProps.datasource.getSchema = jest.fn().mockResolvedValue({
+        Databases: {
+          foo: {
+            Name: 'foo',
+          },
+          bar: {
+            Name: 'bar',
+          },
+        },
+      });
+      render(<QueryEditor {...defaultProps} />);
+      await waitFor(() => screen.getByText(/bar/));
+    });
   });
 });

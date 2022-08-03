@@ -383,13 +383,13 @@ const recordSchemaArray = (name: string, types: AdxSchemaDefinition[], result: A
   if (types.every((t) => typeof t === 'string' && toPropertyType(t) === QueryEditorPropertyType.Number)) {
     // If all the types are numbers, the double takes precedence since it has more precission.
     const cslType = types.find((t) => typeof t === 'string' && (t === 'double' || t === 'real')) || defaultCslType;
-    result.push({ Name: name, CslType: cslType as string });
+    result.push({ Name: name, CslType: cslType as string, isDynamic: true });
   } else {
     console.warn(`schema ${name} may contain different types, assuming ${defaultCslType}`);
     if (typeof defaultCslType === 'object') {
       recordSchema(name, types[0], result);
     } else {
-      result.push({ Name: name, CslType: defaultCslType });
+      result.push({ Name: name, CslType: defaultCslType, isDynamic: true });
     }
   }
 };
@@ -405,6 +405,7 @@ const recordSchema = (columnName: string, schema: AdxSchemaDefinition, result: A
     result.push({
       Name: columnName,
       CslType: schema,
+      isDynamic: true,
     });
     return;
   }

@@ -116,6 +116,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["type"]',
           CslType: 'string',
+          isDynamic: true,
         },
       ];
 
@@ -152,6 +153,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["type"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -369,6 +371,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'Column["StartTime"]',
           CslType: 'datetime',
+          isDynamic: true,
         },
       ];
 
@@ -390,6 +393,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'Column["StartTime"]',
           CslType: 'datetime',
+          isDynamic: true,
         },
         {
           Name: 'SavedTime',
@@ -473,6 +477,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["level"]["active"]',
           CslType: 'int',
+          isDynamic: true,
         },
       ];
 
@@ -492,6 +497,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["level"]["active"]',
           CslType: 'int',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -518,6 +524,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["level"]["active"]',
           CslType: 'int',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -545,6 +552,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["level"]["active"]',
           CslType: 'int',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -572,6 +580,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["level"]["active"]',
           CslType: 'int',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -599,6 +608,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["level"]["active"]',
           CslType: 'int',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -626,6 +636,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["level"]["active"]',
           CslType: 'int',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -657,6 +668,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["level"]["active"]',
           CslType: 'int',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -665,6 +677,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["EndTime"]',
           CslType: 'datetime',
+          isDynamic: true,
         },
       ];
 
@@ -688,6 +701,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["type"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -732,6 +746,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["type"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -776,6 +791,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["type"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -802,6 +818,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["type"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -828,6 +845,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["type"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -854,6 +872,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["type"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -880,6 +899,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["type"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -905,6 +925,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["`indexer`"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -932,6 +953,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["`indexer`"]["foo"]["`indexer`"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -1116,6 +1138,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["`indexer`"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',
@@ -1141,6 +1164,7 @@ describe('KustoExpressionParser', () => {
         {
           Name: 'column["`indexer`"]["foo"]["`indexer`"]',
           CslType: 'string',
+          isDynamic: true,
         },
         {
           Name: 'StartTime',

@@ -128,6 +128,7 @@ export interface AdxColumnSchema {
   CslType: string;
   Type?: string;
   CslDefaultValue?: string;
+  isDynamic?: boolean;
 }
 
 export interface AdxFunctionSchema {
