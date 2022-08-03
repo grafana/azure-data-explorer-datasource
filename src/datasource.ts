@@ -11,7 +11,7 @@ import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, Templ
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyExpression } from 'editor/expressions';
 import { QueryEditorOperator, QueryEditorPropertyType } from 'editor/types';
-import { KustoExpressionParser } from 'KustoExpressionParser';
+import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
 import { map } from 'lodash';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
 import { cache } from 'schema/cache';
@@ -177,6 +177,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return functionSchemaParser(response.data as DataFrame[]);
   }
 
+  // private escapeColumn(column: string) {
+  //   return column.match(/[\s\.-]/) ? `["${column}"]` : column;
+  // }
+
   async getDynamicSchema(
     database: string,
     source: string,
@@ -188,9 +192,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     const queryParts: string[] = [];
 
     const take = 'take 50000';
-    const where = `where ${columns.map((column) => `isnotnull(${column})`).join(' and ')}`;
-    const project = `project ${columns.map((column) => column).join(', ')}`;
-    const summarize = `summarize ${columns.map((column) => `buildschema(${column})`).join(', ')}`;
+    const where = `where ${columns.map((column) => `isnotnull(${escapeColumn(column)})`).join(' and ')}`;
+    const project = `project ${columns.map((column) => escapeColumn(column)).join(', ')}`;
+    const summarize = `summarize ${columns.map((column) => `buildschema(${escapeColumn(column)})`).join(', ')}`;
 
     queryParts.push(source);
     queryParts.push(take);

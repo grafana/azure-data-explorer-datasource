@@ -25,6 +25,10 @@ interface ParseContext {
 
 export const DYNAMIC_TYPE_ARRAY_DELIMITER = '["`indexer`"]';
 
+export const escapeColumn = (column: string) => {
+  return column.match(/[\s\.-]/) ? `["${column}"]` : column;
+};
+
 export class KustoExpressionParser {
   constructor(private templateSrv: TemplateSrv = getTemplateSrv()) {}
 
@@ -35,7 +39,7 @@ export class KustoExpressionParser {
 
     const context: ParseContext = {
       timeColumn: defaultTimeColumn(tableSchema, query?.expression),
-      castIfDynamic: (column: string, schemaName?: string) => castIfDynamic(column, tableSchema, schemaName),
+      castIfDynamic: (column: string, schemaName?: string) => escapeAndCastIfDynamic(column, tableSchema, schemaName),
     };
 
     const parts: string[] = [];
@@ -60,7 +64,7 @@ export class KustoExpressionParser {
 
     const context: ParseContext = {
       timeColumn: defaultTimeColumn(tableSchema, expression),
-      castIfDynamic: (column: string, schemaName?: string) => castIfDynamic(column, tableSchema, schemaName),
+      castIfDynamic: (column: string, schemaName?: string) => escapeAndCastIfDynamic(column, tableSchema, schemaName),
     };
 
     const parts: string[] = [];
@@ -101,20 +105,19 @@ export class KustoExpressionParser {
       return;
     }
 
-    const timeColumn = this.escapeColumn(context.timeColumn);
     const timeshift = detectTimeshift(context, expression);
 
     if (timeshift) {
-      parts.push(`where ${timeColumn} between (($__timeFrom - ${timeshift}) .. ($__timeTo - ${timeshift}))`);
+      parts.push(`where ${context.timeColumn} between (($__timeFrom - ${timeshift}) .. ($__timeTo - ${timeshift}))`);
       return;
     }
 
     if (context.timeColumn.includes('todatetime')) {
-      parts.push(`where ${timeColumn} between ($__timeFrom .. $__timeTo)`);
+      parts.push(`where ${context.timeColumn} between ($__timeFrom .. $__timeTo)`);
       return;
     }
 
-    parts.push(`where $__timeFilter(${timeColumn})`);
+    parts.push(`where $__timeFilter(${context.timeColumn})`);
   }
 
   private appendOrderBy(
@@ -127,12 +130,11 @@ export class KustoExpressionParser {
       return;
     }
 
-    const timeColumn = this.escapeColumn(context.timeColumn);
     const noGroupBy = Array.isArray(groupBy.expressions) && groupBy.expressions.length === 0;
     const noReduce = Array.isArray(reduce.expressions) && reduce.expressions.length === 0;
 
     if (noGroupBy && noReduce) {
-      parts.push(`order by ${timeColumn} asc`);
+      parts.push(`order by ${context.timeColumn} asc`);
       return;
     }
 
@@ -144,7 +146,7 @@ export class KustoExpressionParser {
     });
 
     if (hasInterval) {
-      parts.push(`order by ${timeColumn} asc`);
+      parts.push(`order by ${context.timeColumn} asc`);
       return;
     }
   }
@@ -201,7 +203,7 @@ export class KustoExpressionParser {
       const func = expression.reduce.name;
       const parameters = expression.parameters;
       const name = this.addExpanPartsdIfNeeded(expression.property.name, expandParts);
-      const column = this.escapeColumn(context.castIfDynamic(name, expression.property.name));
+      const column = context.castIfDynamic(name, expression.property.name);
       columns.push(column);
 
       if (Array.isArray(parameters)) {
@@ -230,7 +232,7 @@ export class KustoExpressionParser {
       }
 
       const name = this.addExpanPartsdIfNeeded(expression.property.name, expandParts);
-      const column = this.escapeColumn(context.castIfDynamic(name, expression.property.name));
+      const column = context.castIfDynamic(name, expression.property.name);
 
       if (expression.interval) {
         const interval = expression.interval.name;
@@ -263,10 +265,6 @@ export class KustoExpressionParser {
     }
   }
 
-  private escapeColumn(column: string) {
-    return column.match(/[\s\.-]/) ? `["${column}"]` : column;
-  }
-
   private appendOperator(
     expression: QueryEditorOperatorExpression,
     parts: string[],
@@ -278,7 +276,7 @@ export class KustoExpressionParser {
     if (!property.name || !operator.name) {
       return;
     }
-    const propertyName = this.escapeColumn(property.name);
+    const propertyName = escapeColumn(property.name);
 
     switch (operator.name) {
       case 'isnotempty':
@@ -382,7 +380,7 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
     });
 
     if (isGroupBy(groupByTimeColumn)) {
-      return castIfDynamic(groupByTimeColumn.property.name, columns);
+      return escapeAndCastIfDynamic(groupByTimeColumn.property.name, columns);
     }
   }
 
@@ -407,22 +405,22 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
   return toType(column.CslType, column.Name);
 };
 
-const castIfDynamic = (column: string, tableSchema?: AdxColumnSchema[], schemaName?: string): string => {
+const escapeAndCastIfDynamic = (column: string, tableSchema?: AdxColumnSchema[], schemaName?: string): string => {
   const columnSchema = tableSchema?.find((c) => c.Name === (schemaName || column));
 
   if (!columnSchema?.isDynamic || !Array.isArray(tableSchema)) {
-    return column;
+    return escapeColumn(column);
   }
 
   if (!columnSchema) {
-    return column;
+    return escapeColumn(column);
   }
 
   return toType(columnSchema.CslType, column);
 };
 
 const toType = (type: string, name: string): string => {
-  return `to${type}(${name})`;
+  return `to${type}(${escapeColumn(name)})`;
 };
 
 const replaceByIndex = (
