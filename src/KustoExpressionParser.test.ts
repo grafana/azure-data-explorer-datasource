@@ -171,6 +171,32 @@ describe('KustoExpressionParser', () => {
           '\n| take 251'
       );
     });
+
+    it('should parse expression and exclude current filter with spaces', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([
+          createOperator('event type', '==', 'ThunderStorm'),
+          createOperator('state name', '==', ''),
+        ]),
+      });
+
+      const acQuery: AutoCompleteQuery = {
+        expression,
+        search: createOperator('state name', 'contains', 'TEXAS'),
+        index: '1',
+        database: 'Samples',
+      };
+
+      expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
+        'StormEvents' +
+          '\n| where ["event type"] == \'ThunderStorm\'' +
+          '\n| where ["state name"] contains \'TEXAS\'' +
+          '\n| take 50000' +
+          '\n| distinct ["state name"]' +
+          '\n| take 251'
+      );
+    });
   });
 
   describe('toQuery', () => {
@@ -181,6 +207,69 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where eventType == 'ThunderStorm'");
+    });
+
+    it('should parse where operator with a space', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('event type', '==', 'ThunderStorm')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["event type"] == \'ThunderStorm\'');
+    });
+
+    it('should parse reduce expression with a space', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        reduce: createArray([createReduce('reduce thing', 'none')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| project ["reduce thing"]');
+    });
+
+    it('should parse reduce with a function expression with a space', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        reduce: createArray([createReduce('reduce thing 2', 'sum')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| summarize sum(["reduce thing 2"])');
+    });
+
+    it('should parse reduce with a function expression with a space and a dynamic column', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        reduce: createArray([createReduce('reduce thing', 'sum')]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'reduce thing',
+          CslType: 'long',
+          isDynamic: true,
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' + '\n| summarize sum(tolong(["reduce thing"]))'
+      );
+    });
+
+    it('should parse a expression with spaces in multiple places', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('event type', '==', 'ThunderStorm')]),
+        reduce: createArray([createReduce('reduce thing', 'sum')]),
+        groupBy: createArray([createGroupBy('Start Time', '1h')]),
+      });
+
+      expect(parser.toQuery(expression)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(["Start Time"])' +
+          '\n| where ["event type"] == \'ThunderStorm\'' +
+          '\n| summarize sum(["reduce thing"]) by bin(["Start Time"], 1h)' +
+          '\n| order by ["Start Time"] asc'
+      );
     });
 
     it('should parse an expression with a table name that contains special characters', () => {
