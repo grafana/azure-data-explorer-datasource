@@ -10,8 +10,8 @@ interface Props {
 }
 
 const formats: Array<SelectableValue<string>> = [
-  { label: 'Time series', value: 'time_series' },
   { label: 'Table', value: 'table' },
+  { label: 'Time series', value: 'time_series' },
 ];
 
 const adxTimeFormat: SelectableValue<string> = {
