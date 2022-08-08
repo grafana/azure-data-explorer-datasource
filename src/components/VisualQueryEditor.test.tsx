@@ -56,4 +56,32 @@ describe('VisualQueryEditor', () => {
     render(<VisualQueryEditor {...defaultProps} datasource={datasource} database="foo" schema={schema} />);
     await waitFor(() => screen.getByText('bar'));
   });
+
+  it('should update the query if all the properties are set', async () => {
+    const datasource = mockDatasource();
+    datasource.getSchema = jest.fn().mockResolvedValue(schema);
+    const onChange = jest.fn();
+    render(
+      <VisualQueryEditor
+        {...defaultProps}
+        datasource={datasource}
+        database="foo"
+        schema={schema}
+        onChangeQuery={onChange}
+      />
+    );
+    await waitFor(() => screen.getByText('bar'));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        database: 'foo',
+        expression: {
+          from: { property: { name: 'bar', type: 'string' }, type: 'property' },
+          groupBy: { expressions: [], type: 'and' },
+          reduce: { expressions: [], type: 'and' },
+          where: { expressions: [], type: 'and' },
+        },
+        resultFormat: 'table',
+      })
+    );
+  });
 });

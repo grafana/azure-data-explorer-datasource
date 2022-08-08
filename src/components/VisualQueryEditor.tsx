@@ -9,7 +9,7 @@ import {
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
 } from 'editor/expressions';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import { useAsync } from 'react-use';
 import { selectors } from 'test/selectors';
 
@@ -50,6 +50,27 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
   const tableMapping = getSchemaMapper().getMappingByValue(table?.property.name);
   const timeshiftOptions = useTimeshiftOptions();
   const styles = useStyles2(getStyles);
+
+  // Set initial data
+  useEffect(() => {
+    if (database && resultFormat && table?.property.name && !query.expression.from) {
+      onChangeQuery({
+        ...query,
+        database,
+        resultFormat,
+        expression: {
+          ...query.expression,
+          from: {
+            type: QueryEditorExpressionType.Property,
+            property: {
+              name: table.property.name,
+              type: QueryEditorPropertyType.String,
+            },
+          },
+        },
+      });
+    }
+  }, [database, resultFormat, table?.property.name, query, onChangeQuery]);
 
   const tableSchema = useAsync(async () => {
     if (!table || !table.property) {
