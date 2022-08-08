@@ -1,5 +1,10 @@
 # Change Log
 
+## [4.1.4]
+
+- Change the default format to table data to avoid accidental high consumption of memory.
+- Fix: Quote columns with spaces in the query builder.
+
 ## [4.1.3]
 
 - Fix: Correctly cast dynamically typed columns in the query builder.
