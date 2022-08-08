@@ -88,7 +88,7 @@ e2e.scenario({
               .click({ force: true })
               .type('$__timeFilter(_Timestamp_) | order by _Timestamp_ asc');
             e2eSelectors.queryEditor.runQuery.button().click({ force: true });
-            cy.contains('Lonely period range deg');
+            cy.contains('_val1_');
           },
         });
       });
