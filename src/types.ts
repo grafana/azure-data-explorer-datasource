@@ -5,7 +5,7 @@ import {
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
-} from './editor/expressions';
+} from './components/LegacyQueryEditor/editor/expressions';
 
 const packageJson = require('../package.json');
 

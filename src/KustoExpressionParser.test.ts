@@ -1,5 +1,5 @@
 import { DYNAMIC_TYPE_ARRAY_DELIMITER, KustoExpressionParser } from './KustoExpressionParser';
-import { QueryEditorPropertyType } from './editor/types';
+import { QueryEditorPropertyType } from './schema/types';
 import { TemplateSrv } from '@grafana/runtime';
 import {
   QueryEditorPropertyExpression,
@@ -10,7 +10,7 @@ import {
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
   QueryEditorFunctionParameterExpression,
-} from './editor/expressions';
+} from './components/LegacyQueryEditor/editor/expressions';
 import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
 
 describe('KustoExpressionParser', () => {

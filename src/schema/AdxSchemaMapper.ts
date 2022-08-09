@@ -1,4 +1,4 @@
-import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from './types';
 import { AdxDatabaseSchema, AdxSchema, SchemaMapping, SchemaMappingType } from '../types';
 import { tableToDefinition } from './mapper';
 

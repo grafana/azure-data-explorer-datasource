@@ -1,7 +1,7 @@
 import { DataSourcePluginOptionsEditorProps, PluginType } from '@grafana/data';
 
 import { AdxDataSource } from '../../datasource';
-import { QueryEditorExpressionType } from '../../editor/expressions';
+import { QueryEditorExpressionType } from '../LegacyQueryEditor/editor/expressions';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, EditorMode, KustoQuery } from '../../types';
 
 export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<
@@ -90,5 +90,5 @@ export const mockQuery: KustoQuery = {
     groupBy: { expressions: [], type: QueryEditorExpressionType.And },
   },
   querySource: 'raw',
-  pluginVersion: '',
+  pluginVersion: '1',
 };

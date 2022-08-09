@@ -8,8 +8,8 @@ import {
   QueryEditorPropertyExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
-} from 'editor/expressions';
-import { QueryEditorPropertyType, QueryEditorProperty } from 'editor/types';
+} from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorPropertyType, QueryEditorProperty } from '../schema/types';
 
 export const migrateExpression = (version: string | undefined, expression: any): QueryExpression => {
   if (looksLikeV2(expression)) {
