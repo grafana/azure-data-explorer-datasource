@@ -1,5 +1,5 @@
 import { QueryExpression, AdxColumnSchema, AutoCompleteQuery } from './types';
-import { QueryEditorPropertyType } from 'editor/types';
+import { QueryEditorPropertyType } from './schema/types';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import {
   isReduceExpression,
@@ -8,13 +8,13 @@ import {
   isOrExpression,
   isAndExpression,
   isArrayExpression,
-} from './editor/guards';
+} from './components/LegacyQueryEditor/editor/guards';
 import {
   QueryEditorExpression,
   QueryEditorOperatorExpression,
   QueryEditorArrayExpression,
   QueryEditorPropertyExpression,
-} from './editor/expressions';
+} from './components/LegacyQueryEditor/editor/expressions';
 import { cloneDeep } from 'lodash';
 import { SelectableValue } from '@grafana/data';
 

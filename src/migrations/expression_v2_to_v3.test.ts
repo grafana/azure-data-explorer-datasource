@@ -5,8 +5,8 @@ import {
   QueryEditorArrayExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
-} from 'editor/expressions';
-import { QueryEditorPropertyType } from 'editor/types';
+} from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorPropertyType } from '../schema/types';
 import { migrateExpression } from './expression';
 
 // we started to save the version in v3.

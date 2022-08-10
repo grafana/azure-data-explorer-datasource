@@ -9,8 +9,8 @@ import {
 } from '@grafana/data';
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
-import { QueryEditorPropertyExpression } from 'editor/expressions';
-import { QueryEditorOperator, QueryEditorPropertyType } from 'editor/types';
+import { QueryEditorPropertyExpression } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorOperator, QueryEditorPropertyType } from './schema/types';
 import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
 import { map } from 'lodash';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';

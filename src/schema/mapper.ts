@@ -2,7 +2,7 @@ import { SelectableValue } from '@grafana/data';
 import { DYNAMIC_TYPE_ARRAY_DELIMITER } from 'KustoExpressionParser';
 import { escapeRegExp } from 'lodash';
 
-import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from './types';
 import { AdxColumnSchema, AdxDatabaseSchema, AdxTableSchema } from '../types';
 
 export const tableToDefinition = (table: AdxTableSchema): QueryEditorPropertyDefinition => {
