@@ -10,8 +10,8 @@ export default class EditorHelp extends PureComponent<QueryEditorHelpProps<Kusto
         <h3>ADX query editor help</h3>
         <h5>Format</h5>
         <p>
-          It's possible to modify the format of the data returned by ADX with the "Format as" selector. Here are more
-          details of each option:
+          It&apos;s possible to modify the format of the data returned by ADX with the &quot;Format as&quot; selector.
+          Here are more details of each option:
         </p>
         <p>
           <span>Format as Table:</span>
@@ -21,8 +21,8 @@ export default class EditorHelp extends PureComponent<QueryEditorHelpProps<Kusto
         <p>
           <span>Format as Time series:</span>
           <li>
-            Requires exactly one column of Kusto type datetime. (tip: can use Kusto's project-away operator to remove
-            columns).
+            Requires exactly one column of Kusto type datetime. (tip: can use Kusto&apos;s project-away operator to
+            remove columns).
           </li>
           <li>Requires at least one value column of a number type. Each value column is considered a metric.</li>
           <li>
@@ -46,8 +46,10 @@ export default class EditorHelp extends PureComponent<QueryEditorHelpProps<Kusto
 
         <p>
           <span>Format as ADX Time series:</span>
-          <li>Used for queries that return Kusto's "time series" type, such as the make-series operator</li>
-          <li>Must have a datetime column named "Timestamp"</li>
+          <li>
+            Used for queries that return Kusto&apos;s &quot;time series&quot; type, such as the make-series operator
+          </li>
+          <li>Must have a datetime column named &quot;Timestamp&quot;</li>
           <li>Example ADX Time series query:</li>
           <pre>
             {`let T = range Timestamp from $__timeFrom to $__timeTo step $__timeInterval * 4
@@ -75,7 +77,9 @@ T | make-series avg(HatInventory) on Timestamp from $__timeFrom to $__timeTo ste
           </li>
           <li>$__timeFrom: datetime(2018-06-05T18:09:58.907Z). The start time of the query</li>
           <li>$__timeTo: datetime(2018-06-05T20:09:58.907Z). The end time of the query</li>
-          <li>$__timeInterval: 5000ms. Grafana's recommended bin size based on the timespan of the query, in ms</li>
+          <li>
+            $__timeInterval: 5000ms. Grafana&apos;s recommended bin size based on the timespan of the query, in ms
+          </li>
         </p>
 
         <p>
