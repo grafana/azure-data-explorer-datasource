@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 
 import { EditorHeader, FlexItem, InlineSelect, RadioButtonGroup } from '@grafana/ui';
 
@@ -8,6 +8,7 @@ import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition } from 'schema/types';
 import { useAsync } from 'react-use';
 import { databaseToDefinition } from 'schema/mapper';
+import { SelectableValue } from '@grafana/data';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
@@ -21,10 +22,36 @@ const EDITOR_MODES = [
   { label: 'KQL', value: EditorMode.Raw },
 ];
 
+const EDITOR_FORMATS: Array<SelectableValue<string>> = [
+  { label: 'Table', value: 'table' },
+  { label: 'Time series', value: 'time_series' },
+];
+
+const adxTimeFormat: SelectableValue<string> = {
+  label: 'ADX Time series',
+  value: 'time_series_adx_series',
+};
+
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const { query, onChange, schema, datasource } = props;
+  const { rawMode } = query;
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query, datasource);
+  const [formats, setFormats] = useState(EDITOR_FORMATS);
+  useEffect(() => {
+    if (rawMode) {
+      setFormats(EDITOR_FORMATS.concat(adxTimeFormat));
+    } else {
+      setFormats(EDITOR_FORMATS);
+    }
+  }, [rawMode]);
+
+  useEffect(() => {
+    if (query.resultFormat === adxTimeFormat.value && !formats.includes(adxTimeFormat)) {
+      // Fallback to Time Series since time_series_adx_series is not available
+      onChange({ ...query, resultFormat: 'time_series' });
+    }
+  }, [query, formats, onChange]);
 
   return (
     <EditorHeader>
@@ -35,6 +62,14 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         isLoading={schema.loading}
         onChange={({ value }) => {
           onChange({ ...query, database: value! });
+        }}
+      />
+      <InlineSelect
+        label="Format as"
+        options={formats}
+        value={query.resultFormat}
+        onChange={({ value }) => {
+          onChange({ ...query, resultFormat: value! });
         }}
       />
       <FlexItem grow={1} />
