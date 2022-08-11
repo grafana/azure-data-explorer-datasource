@@ -1,5 +1,9 @@
 # Change Log
 
+## [4.1.5]
+
+- Fix: Update table in the KQL expression when changing the database.
+
 ## [4.1.4]
 
 - Change the default format to table data to avoid accidental high consumption of memory.
