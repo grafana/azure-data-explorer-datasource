@@ -69,6 +69,7 @@ e2e.scenario({
         e2e.flows.addPanel({
           matchScreenshot: false,
           visitDashboardAtStart: false,
+          dataSourceName: '', // avoid issue selecting the data source before the editor is fully loaded
           queriesForm: () => {
             e2eSelectors.queryEditor.database.input().click({ force: true });
             cy.contains('PerfTest').click({ force: true });
@@ -115,6 +116,7 @@ e2e.scenario({
         e2e.flows.addPanel({
           matchScreenshot: false,
           visitDashboardAtStart: false,
+          dataSourceName: '', // avoid issue selecting the data source before the editor is fully loaded
           queriesForm: () => {
             e2eSelectors.queryEditor.database.input().click({ force: true });
             cy.contains('PerfTest').click({ force: true });
