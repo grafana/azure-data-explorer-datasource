@@ -43,12 +43,15 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       setFormats(EDITOR_FORMATS.concat(adxTimeFormat));
     } else {
       setFormats(EDITOR_FORMATS);
-      if (query.resultFormat === adxTimeFormat.value) {
-        // Fallback to Time Series since time_series_adx_series is not available
-        onChange({ ...query, resultFormat: 'time_series' });
-      }
     }
   }, [rawMode]);
+
+  useEffect(() => {
+    if (query.resultFormat === adxTimeFormat.value && !formats.includes(adxTimeFormat)) {
+      // Fallback to Time Series since time_series_adx_series is not available
+      onChange({ ...query, resultFormat: 'time_series' });
+    }
+  }, [query, formats, onChange]);
 
   return (
     <EditorHeader>
