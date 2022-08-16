@@ -1,5 +1,9 @@
 # Change Log
 
+## [4.1.6]
+
+- Fix: Appropriately parse boolean configuration variables when instantiating datasource.
+
 ## [4.1.5]
 
 - Fix: Update table in the KQL expression when changing the database.

@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -42,10 +43,67 @@ type DatasourceSettings struct {
 // It also sets the QueryTimeout and ServerTimeoutValues by parsing QueryTimeoutRaw.
 func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) error {
 	var err error
+	var jsonData map[string]interface{}
 	if config.JSONData != nil && len(config.JSONData) > 1 {
-		if err := json.Unmarshal(config.JSONData, d); err != nil {
+		if err := json.Unmarshal(config.JSONData, &jsonData); err != nil {
 			return fmt.Errorf("could not unmarshal DatasourceSettings json: %w", err)
 		}
+	}
+
+	if jsonData["clientId"] != nil {
+		d.ClientID = jsonData["clientId"].(string)
+	}
+	if jsonData["tenantId"] != nil {
+		d.TenantID = jsonData["tenantId"].(string)
+	}
+	if jsonData["clusterUrl"] != nil {
+		d.ClusterURL = jsonData["clusterUrl"].(string)
+	}
+	if jsonData["defaultDatabase"] != nil {
+		d.DefaultDatabase = jsonData["defaultDatabase"].(string)
+	}
+	if jsonData["dataConsistency"] != nil {
+		d.DataConsistency = jsonData["dataConsistency"].(string)
+	}
+	if jsonData["cacheMaxAge"] != nil {
+		d.CacheMaxAge = jsonData["cacheMaxAge"].(string)
+	}
+	if jsonData["dynamicCaching"] != nil {
+		if dynamicCaching, err := strconv.ParseBool(jsonData["dynamicCaching"].(string)); err == nil {
+			d.DynamicCaching = dynamicCaching
+		} else {
+			return fmt.Errorf("could not parse DynamicCaching value: %w", err)
+		}
+
+	}
+	if jsonData["enableUserTracking"] != nil {
+		if enableUserTracking, err := strconv.ParseBool(jsonData["enableUserTracking"].(string)); err == nil {
+			d.EnableUserTracking = enableUserTracking
+		} else {
+			return fmt.Errorf("could not parse EnableUserTracking value: %w", err)
+		}
+
+	}
+	if jsonData["onBehalfOf"] != nil {
+		if onBehalfOf, err := strconv.ParseBool(jsonData["onBehalfOf"].(string)); err == nil {
+			d.OnBehalfOf = onBehalfOf
+		} else {
+			return fmt.Errorf("could not parse OnBehalf of value: %w", err)
+		}
+	}
+	if jsonData["oauthPassThru"] != nil {
+		if oauthPassThru, err := strconv.ParseBool(jsonData["oauthPassThru"].(string)); err == nil {
+			d.OAuthPassThru = oauthPassThru
+		} else {
+			return fmt.Errorf("could not parse OAuthPassThru value: %w", err)
+		}
+
+	}
+	if jsonData["azureCloud"] != nil {
+		d.AzureCloud = jsonData["azureCloud"].(string)
+	}
+	if jsonData["queryTimeout"] != nil {
+		d.QueryTimeoutRaw = jsonData["queryTimeout"].(string)
 	}
 
 	if d.QueryTimeoutRaw == "" {
