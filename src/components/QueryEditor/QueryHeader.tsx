@@ -26,6 +26,8 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query, datasource);
 
+  // TODO: Handle dirty status when using the raw editor and switching
+
   return (
     <EditorHeader>
       <InlineSelect
