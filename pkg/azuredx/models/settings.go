@@ -69,35 +69,44 @@ func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) err
 		d.CacheMaxAge = jsonData["cacheMaxAge"].(string)
 	}
 	if jsonData["dynamicCaching"] != nil {
-		if dynamicCaching, err := strconv.ParseBool(jsonData["dynamicCaching"].(string)); err == nil {
-			d.DynamicCaching = dynamicCaching
+		if dynamicCaching, ok := jsonData["dynamicCaching"].(string); ok {
+			d.DynamicCaching, err = strconv.ParseBool(dynamicCaching)
+			if err != nil {
+				return fmt.Errorf("could not parse dynamicCaching value: %w", err)
+			}
 		} else {
-			return fmt.Errorf("could not parse DynamicCaching value: %w", err)
+			d.DynamicCaching = jsonData["dynamicCaching"].(bool)
 		}
-
 	}
 	if jsonData["enableUserTracking"] != nil {
-		if enableUserTracking, err := strconv.ParseBool(jsonData["enableUserTracking"].(string)); err == nil {
-			d.EnableUserTracking = enableUserTracking
+		if enableUserTracking, ok := jsonData["enableUserTracking"].(string); ok {
+			d.EnableUserTracking, err = strconv.ParseBool(enableUserTracking)
+			if err != nil {
+				return fmt.Errorf("could not parse enableUserTracking value: %w", err)
+			}
 		} else {
-			return fmt.Errorf("could not parse EnableUserTracking value: %w", err)
+			d.EnableUserTracking = jsonData["enableUserTracking"].(bool)
 		}
-
 	}
 	if jsonData["onBehalfOf"] != nil {
-		if onBehalfOf, err := strconv.ParseBool(jsonData["onBehalfOf"].(string)); err == nil {
-			d.OnBehalfOf = onBehalfOf
+		if onBehalfOf, ok := jsonData["onBehalfOf"].(string); ok {
+			d.OnBehalfOf, err = strconv.ParseBool(onBehalfOf)
+			if err != nil {
+				return fmt.Errorf("could not parse onBehalfOf value: %w", err)
+			}
 		} else {
-			return fmt.Errorf("could not parse OnBehalf of value: %w", err)
+			d.OnBehalfOf = jsonData["onBehalfOf"].(bool)
 		}
 	}
 	if jsonData["oauthPassThru"] != nil {
-		if oauthPassThru, err := strconv.ParseBool(jsonData["oauthPassThru"].(string)); err == nil {
-			d.OAuthPassThru = oauthPassThru
+		if oauthPassThru, ok := jsonData["oauthPassThru"].(string); ok {
+			d.OAuthPassThru, err = strconv.ParseBool(oauthPassThru)
+			if err != nil {
+				return fmt.Errorf("could not parse OAuthPassThru value: %w", err)
+			}
 		} else {
-			return fmt.Errorf("could not parse OAuthPassThru value: %w", err)
+			d.OAuthPassThru = jsonData["oauthPassThru"].(bool)
 		}
-
 	}
 	if jsonData["azureCloud"] != nil {
 		d.AzureCloud = jsonData["azureCloud"].(string)
