@@ -11,13 +11,10 @@ import { getFunctions, getSignatureHelp } from './Suggestions';
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface RawQueryEditorProps extends Props {
-  dirty?: boolean;
-  lastQueryError?: string;
-  lastQuery?: string;
-  timeNotASC?: boolean;
   schema?: AdxSchema;
   database: string;
   templateVariableOptions: SelectableValue<string>;
+  setDirty: () => void;
 }
 
 interface Worker {
@@ -29,6 +26,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [variables] = useState(getTemplateSrv().getVariables());
 
   const onRawQueryChange = (kql: string) => {
+    props.setDirty();
     props.onChange({
       ...props.query,
       query: kql,

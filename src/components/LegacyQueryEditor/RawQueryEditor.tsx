@@ -10,7 +10,7 @@ import { gte, valid } from 'semver';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
-import { getFunctions, getSignatureHelp } from './Suggestions';
+import { getFunctions, getSignatureHelp } from '../QueryEditor/Suggestions';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 

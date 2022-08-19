@@ -2,7 +2,7 @@ import { QueryEditorProps } from '@grafana/data';
 import { Alert } from '@grafana/ui';
 import { get } from 'lodash';
 import { migrateQuery, needsToBeMigrated } from 'migrations/query';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useAsync, useEffectOnce } from 'react-use';
 import { AdxDataSourceOptions, EditorMode, KustoQuery } from 'types';
 
@@ -16,6 +16,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
   const { onChange, onRunQuery, query, datasource } = props;
   const schema = useAsync(() => datasource.getSchema(false), [datasource.id]);
   const templateVariables = useTemplateVariables(datasource);
+  const [dirty, setDirty] = useState(false);
 
   useEffectOnce(() => {
     let processedQuery = query;
@@ -36,13 +37,21 @@ export const QueryEditor: React.FC<Props> = (props) => {
   return (
     <>
       {schema.error && <Alert title="Could not load datasource schema">{parseSchemaError(schema.error)}</Alert>}
-      <QueryHeader query={query} onChange={onChange} schema={schema} datasource={datasource} />
+      <QueryHeader
+        query={query}
+        onChange={onChange}
+        schema={schema}
+        datasource={datasource}
+        dirty={dirty}
+        setDirty={setDirty}
+      />
       {query.rawMode ? (
         <RawQueryEditor
           {...props}
           schema={schema.value}
           database={query.database}
           templateVariableOptions={templateVariables}
+          setDirty={() => !dirty && setDirty(true)}
         />
       ) : (
         <>[VISUAL EDITOR] To be implemented</>
