@@ -97,4 +97,30 @@ describe('QueryEditor', () => {
       expect(setDirty).toHaveBeenCalledWith(false);
     });
   });
+
+  describe('format selector', () => {
+    it('should select a format', async () => {
+      const onChange = jest.fn();
+      render(<QueryHeader {...defaultProps} onChange={onChange} />);
+      const sel = await waitFor(() => screen.getByLabelText('Format as:'));
+      openMenu(sel);
+      screen.getByText('Time series').click();
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'time_series' }));
+    });
+
+    it('should select handle ADX time series format', async () => {
+      const onChange = jest.fn();
+      let query = { ...defaultProps.query, rawMode: true };
+      const { rerender } = render(<QueryHeader {...defaultProps} onChange={onChange} query={query} />);
+      const sel = await waitFor(() => screen.getByLabelText('Format as:'));
+      openMenu(sel);
+      screen.getByText('ADX Time series').click();
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'time_series_adx_series' }));
+      // simulate change of mode
+      query = { ...defaultProps.query, rawMode: false, resultFormat: 'time_series_adx_series' };
+      rerender(<QueryHeader {...defaultProps} onChange={onChange} query={query} />);
+      // it should change to time_series since it's using the visual editor
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'time_series' }));
+    });
+  });
 });
