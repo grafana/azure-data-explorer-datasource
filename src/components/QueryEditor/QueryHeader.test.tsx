@@ -32,6 +32,8 @@ const defaultProps = {
   datasource: mockDatasource(),
   query: mockQuery,
   schema: defaultSchema,
+  dirty: false,
+  setDirty: jest.fn(),
 };
 
 describe('QueryEditor', () => {
@@ -68,6 +70,31 @@ describe('QueryEditor', () => {
       openMenu(sel);
       screen.getByText('bar').click();
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ database: 'bar' }));
+    });
+
+    it('should show a warning if switching from raw mode', async () => {
+      const onChange = jest.fn();
+      const setDirty = jest.fn();
+      render(
+        <QueryHeader
+          {...defaultProps}
+          query={{
+            ...mockQuery,
+            rawMode: true,
+          }}
+          schema={schema}
+          onChange={onChange}
+          dirty={true}
+          setDirty={setDirty}
+        />
+      );
+      const s = await waitFor(() => screen.getByLabelText('Builder'));
+      s.click();
+      await waitFor(() => screen.getByText('Are you sure?'));
+      const b = screen.getByText('Confirm');
+      b.click();
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ rawMode: false }));
+      expect(setDirty).toHaveBeenCalledWith(false);
     });
   });
 

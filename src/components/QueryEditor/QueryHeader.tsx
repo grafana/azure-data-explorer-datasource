@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { EditorHeader, FlexItem, InlineSelect, RadioButtonGroup } from '@grafana/ui';
+import { ConfirmModal, EditorHeader, FlexItem, InlineSelect, RadioButtonGroup } from '@grafana/ui';
 
 import { AdxSchema, EditorMode, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
@@ -14,6 +14,8 @@ export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
   query: KustoQuery;
   schema: AsyncState<AdxSchema>;
+  dirty: boolean;
+  setDirty: (b: boolean) => void;
   onChange: (value: KustoQuery) => void;
 }
 
@@ -33,11 +35,21 @@ const adxTimeFormat: SelectableValue<string> = {
 };
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
-  const { query, onChange, schema, datasource } = props;
+  const { query, onChange, schema, datasource, dirty, setDirty } = props;
   const { rawMode } = query;
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query, datasource);
   const [formats, setFormats] = useState(EDITOR_FORMATS);
+  const [showWarning, setShowWarning] = useState(false);
+
+  const changeEditorMode = (value: EditorMode) => {
+    if (value === EditorMode.Visual && dirty) {
+      setShowWarning(true);
+    } else {
+      onChange({ ...query, rawMode: value === EditorMode.Raw });
+    }
+  };
+
   useEffect(() => {
     if (rawMode) {
       setFormats(EDITOR_FORMATS.concat(adxTimeFormat));
@@ -55,6 +67,20 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
 
   return (
     <EditorHeader>
+      <ConfirmModal
+        isOpen={showWarning}
+        title="Are you sure?"
+        body="You will lose manual changes done to the query if you go back to the visual builder."
+        confirmText="Confirm"
+        onConfirm={() => {
+          setShowWarning(false);
+          onChange({ ...query, rawMode: false });
+          setDirty(false);
+        }}
+        onDismiss={() => {
+          setShowWarning(false);
+        }}
+      ></ConfirmModal>
       <InlineSelect
         label="Database"
         options={databases}
@@ -77,12 +103,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         size="sm"
         options={EDITOR_MODES}
         value={query.rawMode ? EditorMode.Raw : EditorMode.Visual}
-        onChange={(value) => {
-          onChange({
-            ...query,
-            rawMode: value === EditorMode.Raw,
-          });
-        }}
+        onChange={changeEditorMode}
       />
     </EditorHeader>
   );
