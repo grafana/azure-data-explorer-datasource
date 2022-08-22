@@ -9,6 +9,7 @@ import { AdxDataSourceOptions, EditorMode, KustoQuery } from 'types';
 import { AdxDataSource } from '../../datasource';
 import { QueryHeader } from './QueryHeader';
 import { RawQueryEditor } from './RawQueryEditor';
+import { VisualQueryEditor } from './VisualQueryEditor';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -54,7 +55,12 @@ export const QueryEditor: React.FC<Props> = (props) => {
           setDirty={() => !dirty && setDirty(true)}
         />
       ) : (
-        <>[VISUAL EDITOR] To be implemented</>
+        <VisualQueryEditor
+          {...props}
+          schema={schema.value}
+          database={query.database}
+          templateVariableOptions={templateVariables}
+        />
       )}
     </>
   );
