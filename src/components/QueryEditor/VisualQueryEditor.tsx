@@ -24,7 +24,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
   const databaseName = templateSrv.replace(database);
   const tables = useTableOptions(schema, databaseName, datasource);
   const table = useSelectedTable(tables, query, datasource);
-  const tableOptions = (tables as SelectableValue<string>[]).concat(templateVariableOptions);
+  const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateVariableOptions);
   const tableName = getTemplateSrv().replace(table?.value ?? '');
   const tableMapping = getSchemaMapper().getMappingByValue(table?.value);
   const tableSchema = useAsync(async () => {
