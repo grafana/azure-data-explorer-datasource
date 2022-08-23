@@ -59,16 +59,16 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
 
   return (
     <EditorRows>
+      {tableSchema.error && (
+        <Alert severity="error" title="Could not load table schema">
+          {tableSchema.error?.message}
+        </Alert>
+      )}
+      {!tableSchema.loading && tableSchema.value?.length === 0 && (
+        <Alert severity="warning" title="Table schema loaded successfully but without any columns" />
+      )}
       <EditorRow>
         <EditorFieldGroup>
-          {tableSchema.error && (
-            <Alert severity="error" title="Could not load table schema">
-              {tableSchema.error?.message}
-            </Alert>
-          )}
-          {!tableSchema.loading && tableSchema.value?.length === 0 && (
-            <Alert severity="warning" title="Table schema loaded successfully but without any columns" />
-          )}
           <EditorField label="Table" width={16}>
             <Select
               aria-label="Table"
