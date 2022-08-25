@@ -1,9 +1,9 @@
 package client
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -95,7 +95,7 @@ func TestClient(t *testing.T) {
 }
 
 func loadTestFile(path string) ([]byte, error) {
-	jsonBody, err := ioutil.ReadFile(path)
+	jsonBody, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
