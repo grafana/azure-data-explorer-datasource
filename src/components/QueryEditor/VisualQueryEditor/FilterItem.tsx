@@ -2,7 +2,7 @@ import React from 'react';
 import { useAsyncFn } from 'react-use';
 
 import { SelectableValue, toOption } from '@grafana/data';
-import { AccessoryButton, AutoSizeInput, InputGroup, Select } from '@grafana/ui';
+import { AccessoryButton, Input, InputGroup, Select } from '@grafana/ui';
 
 import { AdxDataSource } from '../../../datasource';
 import { AdxColumnSchema, KustoQuery } from '../../../types';
@@ -64,6 +64,9 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
 
   const [state, loadOptions] = useAsyncFn(loadValues, [query, filter.property]);
 
+  const isNumber = filter.property?.type === QueryEditorPropertyType.Number;
+  const isDatetime = filter.property?.type === QueryEditorPropertyType.DateTime;
+  const isOther = !isNumber && !isDatetime;
   return (
     <InputGroup>
       <Select
@@ -81,17 +84,26 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
         options={toOperatorOptions(filter.property?.type)}
         onChange={({ value }) => value && onChange(setOperatorExpressionName(filter, value))}
       />
-      <div hidden={filter.property?.type !== QueryEditorPropertyType.Number}>
-        <AutoSizeInput
+      <div hidden={!isDatetime}>
+        <Input
+          aria-label="column datetime value"
+          value={typeof filter.operator?.value === 'string' ? filter.operator.value : ''}
+          onChange={(e) => {
+            onChange(setOperatorExpressionValue(filter, e.currentTarget.value));
+          }}
+        />
+      </div>
+      <div hidden={!isNumber}>
+        <Input
           aria-label="column number value"
-          value={(filter.operator?.value && parseInt(filter.operator.value.toString(), 10)) || 0}
+          value={typeof filter.operator?.value === 'number' ? filter.operator.value : 0}
           type="number"
-          onCommitChange={(e) => {
+          onChange={(e) => {
             onChange(setOperatorExpressionValue(filter, parseInt(e.currentTarget.value, 10)));
           }}
         />
       </div>
-      <div hidden={filter.property?.type === QueryEditorPropertyType.Number}>
+      <div hidden={!isOther}>
         <Select
           aria-label="column value"
           width="auto"

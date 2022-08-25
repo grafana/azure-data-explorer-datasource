@@ -7,6 +7,17 @@ import { isUndefined } from 'lodash';
 import { QueryEditorOperatorValueType, QueryEditorPropertyType } from 'schema/types';
 import { isMulti, OPERATORS } from './operators';
 
+function zeroValue(type: QueryEditorPropertyType) {
+  switch (type) {
+    case QueryEditorPropertyType.String:
+      return '';
+    case QueryEditorPropertyType.Boolean:
+      return false;
+    default:
+      return 0;
+  }
+}
+
 /** Sets the left hand side (InstanceId) in an OperatorExpression
  * Accepts a partial expression to use in an editor
  */
@@ -16,13 +27,18 @@ export function setOperatorExpressionProperty(
   type: QueryEditorPropertyType
 ): QueryEditorOperatorExpression {
   let operatorName = '==';
-  if (expression.operator?.name && OPERATORS[type].map((op) => op.Operator).includes(expression.operator.name)) {
+  if (
+    expression.operator?.name &&
+    OPERATORS(type)
+      .map((op) => op.Operator)
+      .includes(expression.operator.name)
+  ) {
     operatorName = expression.operator.name;
   }
   return {
     type: QueryEditorExpressionType.Operator,
     property: { name, type },
-    operator: { name: operatorName, value: '' },
+    operator: { name: operatorName, value: zeroValue(type) },
   };
 }
 
@@ -60,7 +76,7 @@ export function setOperatorExpressionName(
  */
 export function setOperatorExpressionValue(
   expression: Partial<QueryEditorOperatorExpression>,
-  e: SelectableValue<string> | Array<SelectableValue<string>> | number
+  e: SelectableValue<string> | Array<SelectableValue<string>> | number | string
 ): QueryEditorOperatorExpression {
   let value: string | string[] | number;
   if (typeof e === 'object' && !Array.isArray(e)) {

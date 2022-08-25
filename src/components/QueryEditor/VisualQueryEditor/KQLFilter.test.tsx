@@ -57,7 +57,7 @@ describe('KQLFilter', () => {
     expect(onChange.mock.calls[0][0].expression.where.expressions.length).toBe(0);
   });
 
-  it('should update filters if props change', () => {
+  it('should update filters if props change', async () => {
     const onChange = jest.fn();
     const query = {
       ...mockQuery,
@@ -98,7 +98,7 @@ describe('KQLFilter', () => {
     };
     const { rerender } = render(<KQLFilter {...defaultProps} onChange={onChange} index={1} query={query} />);
     expect(screen.getByText('Other')).toBeInTheDocument();
-    query.expression.where.expressions.pop();
+    screen.getByLabelText('remove').click();
     rerender(<KQLFilter {...defaultProps} onChange={onChange} index={0} query={query} />);
     expect(screen.getByText('ActivityName')).toBeInTheDocument();
   });

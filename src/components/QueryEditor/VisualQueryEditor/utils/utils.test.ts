@@ -42,7 +42,7 @@ describe('setOperatorExpressionProperty', () => {
     ).toEqual({
       type: QueryEditorExpressionType.Operator,
       property: { name: 'ID', type: QueryEditorPropertyType.Number },
-      operator: { name: '==', value: '' },
+      operator: { name: '==', value: 0 },
     });
   });
 });

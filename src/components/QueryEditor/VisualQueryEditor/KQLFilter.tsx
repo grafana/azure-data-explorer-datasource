@@ -37,8 +37,10 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
   const [filters, setFilters] = useState(expressions);
 
   useEffect(() => {
-    setFilters(expressions);
-  }, [expressions]);
+    if (!filters.length && expressions?.length) {
+      setFilters(expressions);
+    }
+  }, [filters.length, expressions]);
 
   const onChange = (newItems: Array<Partial<QueryEditorOperatorExpression>>) => {
     // As new (empty object) items come in, with need to make sure they have the correct type
