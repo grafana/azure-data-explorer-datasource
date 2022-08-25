@@ -81,7 +81,7 @@ describe('FilterItem', () => {
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: "'$foo'" } }));
   });
 
-  it('should select a template variable', async () => {
+  it('type a numeric value', async () => {
     const datasource = mockDatasource();
     datasource.autoCompleteQuery = jest.fn().mockResolvedValue([]);
     const onChange = jest.fn();
