@@ -16,7 +16,7 @@ export interface QueryEditorProperty {
 }
 
 export type QueryEditorOperatorType = string | boolean | number | SelectableValue<string>;
-type QueryEditorOperatorValueType = QueryEditorOperatorType | QueryEditorOperatorType[];
+export type QueryEditorOperatorValueType = QueryEditorOperatorType | QueryEditorOperatorType[];
 
 export interface QueryEditorOperator<T = QueryEditorOperatorValueType> {
   name: string;

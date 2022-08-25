@@ -47,6 +47,13 @@ export const tablesToDefinition = (tables: AdxTableSchema[]): QueryEditorPropert
   }));
 };
 
+export const valueToDefinition = (name: string) => {
+  return {
+    value: name,
+    label: name.replace(new RegExp(escapeRegExp(DYNAMIC_TYPE_ARRAY_DELIMITER), 'g'), '[ ]'),
+  };
+};
+
 export const columnsToDefinition = (columns: AdxColumnSchema[]): QueryEditorPropertyDefinition[] => {
   if (!Array.isArray(columns)) {
     return [];
