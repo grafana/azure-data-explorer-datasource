@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { SelectableValue } from '@grafana/data';
 import { EditorList } from '@grafana/ui';
@@ -33,9 +33,12 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
   templateVariableOptions,
 }) => {
   // Each expression is a group of several OR statements
-  const [filters, setFilters] = useState(
-    (query.expression.where.expressions[index] as QueryEditorArrayExpression)?.expressions
-  );
+  const expressions = (query.expression.where.expressions[index] as QueryEditorArrayExpression)?.expressions;
+  const [filters, setFilters] = useState(expressions);
+
+  useEffect(() => {
+    setFilters(expressions);
+  }, [expressions]);
 
   const onChange = (newItems: Array<Partial<QueryEditorOperatorExpression>>) => {
     // As new (empty object) items come in, with need to make sure they have the correct type

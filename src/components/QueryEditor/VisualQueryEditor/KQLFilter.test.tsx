@@ -56,4 +56,50 @@ describe('KQLFilter', () => {
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange.mock.calls[0][0].expression.where.expressions.length).toBe(0);
   });
+
+  it('should update filters if props change', () => {
+    const onChange = jest.fn();
+    const query = {
+      ...mockQuery,
+      expression: {
+        ...mockQuery.expression,
+        where: {
+          expressions: [
+            {
+              expressions: [
+                {
+                  operator: { name: '==', value: 'foo' },
+                  property: {
+                    name: 'ActivityName',
+                    type: QueryEditorPropertyType.String,
+                  },
+                  type: QueryEditorExpressionType.Operator,
+                },
+              ],
+              type: QueryEditorExpressionType.Or,
+            },
+            {
+              expressions: [
+                {
+                  operator: { name: '==', value: 'bar' },
+                  property: {
+                    name: 'Other',
+                    type: QueryEditorPropertyType.String,
+                  },
+                  type: QueryEditorExpressionType.Operator,
+                },
+              ],
+              type: QueryEditorExpressionType.Or,
+            },
+          ],
+          type: QueryEditorExpressionType.And,
+        },
+      },
+    };
+    const { rerender } = render(<KQLFilter {...defaultProps} onChange={onChange} index={1} query={query} />);
+    expect(screen.getByText('Other')).toBeInTheDocument();
+    query.expression.where.expressions.pop();
+    rerender(<KQLFilter {...defaultProps} onChange={onChange} index={0} query={query} />);
+    expect(screen.getByText('ActivityName')).toBeInTheDocument();
+  });
 });
