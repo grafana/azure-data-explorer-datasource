@@ -1,9 +1,10 @@
-package azureauth
+package adxauth
 
 import (
 	"fmt"
 	"strings"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 )
@@ -16,9 +17,12 @@ var (
 	}
 )
 
-func getAzureScopes(credentials *azcredentials.AzureClientSecretCredentials, clusterUrl string) ([]string, error) {
-	azureCloud := credentials.AzureCloud
-
+func getAzureScopes(settings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials, clusterUrl string) ([]string, error) {
+	// Extract cloud from credentials
+	azureCloud, err := adxcredentials.GetAzureCloud(settings, credentials)
+	if err != nil {
+		return nil, err
+	}
 	// Get scopes for the given cloud
 	if scopeTmpl, ok := azureDataExplorerScopes[azureCloud]; !ok {
 		err := fmt.Errorf("the Azure cloud '%s' not supported by Azure Data Explorer datasource", azureCloud)

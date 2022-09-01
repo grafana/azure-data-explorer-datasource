@@ -1,4 +1,4 @@
-package azureauth
+package adxauth
 
 import (
 	"testing"
@@ -11,6 +11,10 @@ import (
 )
 
 func TestGetAzureScopes_KnownClouds(t *testing.T) {
+	settings := &azsettings.AzureSettings{
+		Cloud: azsettings.AzurePublic,
+	}
+
 	tests := []struct {
 		description   string
 		credentials   *azcredentials.AzureClientSecretCredentials
@@ -45,7 +49,7 @@ func TestGetAzureScopes_KnownClouds(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			scopes, err := getAzureScopes(tt.credentials, tt.clusterUrl)
+			scopes, err := getAzureScopes(settings, tt.credentials, tt.clusterUrl)
 			require.NoError(t, err)
 
 			assert.Len(t, scopes, 1)
@@ -55,11 +59,15 @@ func TestGetAzureScopes_KnownClouds(t *testing.T) {
 }
 
 func TestGetAzureScopes_UnknownClouds(t *testing.T) {
+	settings := &azsettings.AzureSettings{
+		Cloud: azsettings.AzurePublic,
+	}
+
 	t.Run("should fail when cloud is unknown", func(t *testing.T) {
 		credentials := &azcredentials.AzureClientSecretCredentials{AzureCloud: "Unknown"}
 		clusterUrl := "https://abc.northeurope.unknown.net"
 
-		_, err := getAzureScopes(credentials, clusterUrl)
+		_, err := getAzureScopes(settings, credentials, clusterUrl)
 		assert.Error(t, err)
 	})
 }

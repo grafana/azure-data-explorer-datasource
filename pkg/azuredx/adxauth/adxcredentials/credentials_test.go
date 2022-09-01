@@ -1,4 +1,4 @@
-package azureauth
+package adxcredentials
 
 import (
 	"testing"

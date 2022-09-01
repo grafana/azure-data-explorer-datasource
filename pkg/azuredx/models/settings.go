@@ -11,18 +11,12 @@ import (
 // DatasourceSettings holds the datasource configuration information for Azure Data Explorer's API
 // that is needed to execute a request against Azure's Data Explorer API.
 type DatasourceSettings struct {
-	ClientID           string `json:"clientId"`
-	TenantID           string `json:"tenantId"`
 	ClusterURL         string `json:"clusterUrl"`
 	DefaultDatabase    string `json:"defaultDatabase"`
-	Secret             string `json:"-"`
 	DataConsistency    string `json:"dataConsistency"`
 	CacheMaxAge        string `json:"cacheMaxAge"`
 	DynamicCaching     bool   `json:"dynamicCaching"`
 	EnableUserTracking bool   `json:"enableUserTracking"`
-	OnBehalfOf         bool   `json:"onBehalfOf"`
-	OAuthPassThru      bool   `json:"oauthPassThru"`
-	AzureCloud         string `json:"azureCloud"`
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
 	// to the server execution timeout.
@@ -59,8 +53,6 @@ func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) err
 	if d.ServerTimeoutValue, err = formatTimeout(d.QueryTimeout); err != nil {
 		return err
 	}
-
-	d.Secret = config.DecryptedSecureJSONData["clientSecret"]
 
 	return nil
 }
