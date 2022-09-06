@@ -1,4 +1,4 @@
-import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from './types';
 import { AdxDatabaseSchema, AdxSchema, SchemaMapping, SchemaMappingType } from '../types';
 import { tableToDefinition } from './mapper';
 
@@ -52,10 +52,15 @@ export class AdxSchemaMapper {
     }
 
     if (!this.enabled) {
-      return Object.keys(database.Tables).map((key) => {
+      const tables = Object.keys(database.Tables).map((key) => {
         const table = database.Tables[key];
         return tableToDefinition(table);
       });
+      const materializedViews = Object.keys(database.MaterializedViews).map((key) => {
+        const table = database.MaterializedViews[key];
+        return tableToDefinition(table);
+      });
+      return tables.concat(materializedViews);
     }
 
     const mappings = this.mappingsByDatabase[databaseName];

@@ -33,6 +33,8 @@ export const mockConfigEditorProps = (optionsOverrides?: Partial<ConfigEditorPro
       clusterUrl: Chance().url(),
       tenantId: Chance().guid(),
       clientId: Chance().guid(),
+      onBehalfOf: false,
+      oauthPassThru: false,
     },
     readOnly: true,
     withCredentials: true,

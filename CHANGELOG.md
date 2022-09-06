@@ -1,5 +1,73 @@
 # Change Log
 
+## [4.1.5]
+
+- Fix: Update table in the KQL expression when changing the database.
+
+## [4.1.4]
+
+- Change the default format to table data to avoid accidental high consumption of memory.
+- Fix: Quote columns with spaces in the query builder.
+
+## [4.1.3]
+
+- Fix: Correctly cast dynamically typed columns in the query builder.
+
+## [4.1.2]
+
+This release include several bug fixes:
+
+- Fix reload schema button in configuration.
+- Fix dynamic resolution for simple types in the query builder.
+- Fix "Aggregate" and "Group by" removal logic also for the builder.
+- Return configured default database instead of the first one.
+
+## [4.1.1]
+
+Several bug fixes for the visual query builder:
+
+- Add materialized views as tables.
+- Fix template variable quoting.
+- Fix syntax dynamic fields with multiple types.
+
+## [4.1.0]
+
+- New Feature: The visual query editor now supports `dynamic` columns. This includes columns with one or more arrays of `dynamic` values.
+
+## [4.0.2]
+
+- Breaking Change on Beta feature: On-Behalf-Of flow is now disabled by default
+
+## [4.0.1]
+
+- Bugfix: Remove custom token cache used for On-Behalf-Of flow (Beta) and rely on Microsoft Authentication Library to keep a local cache.
+
+## [4.0.0]
+
+- Breaking Change: Azure Data Explorer plugin now requires Grafana 8.0+ to run.
+- Breaking Change: obo_latency_seconds metric was removed.
+- Bugfix: Included new Kusto query editor. **NOTE**: This new editor will be only available if used with Grafana 8.5 or later. Fixes #325.
+- Bugfix: Filter dynamic columns from Where/Aggregate/Group by clauses to prevent syntax errors.
+- Bugfix: Add logical operators for timespan types in the query builder.
+- Internal: Client secret authentication via Grafana Azure SDK.
+- Internal: OBO authentication via MSAL for Go.
+
+## [3.7.1]
+
+- Bugfix: Fix scope for national clouds
+
+## [3.7.0]
+
+- Chore: Added test coverage script
+
+## [3.7.0-beta1]
+
+- Feature: Add On-Behalf-Of Token Authorization
+- Bugfix: Eliminate Client ID Panic
+- Bugfix: Append azure error to query unsuccessful message
+- Bugfix: Fix macro regex on columns with hyphens
+- Internal: Update plugin dependencies
+
 ## [3.6.1]
 
 - Reverted change made in 3.6.0 and reuse the previous code editor until we fix the related issues.

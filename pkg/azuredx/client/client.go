@@ -12,9 +12,11 @@ import (
 )
 
 type AdxClient interface {
-	TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties) error
+	TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
 	KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
 }
+
+var _ AdxClient = new(Client) // validates interfarce conformance
 
 // Client is an http.Client used for API requests.
 type Client struct {
@@ -27,9 +29,8 @@ func New(client *http.Client) *Client {
 }
 
 // TestRequest handles a data source test request in Grafana's Datasource configuration UI.
-func (c *Client) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties) error {
-	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(models.RequestPayload{
+func (c *Client) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
+	buf, err := json.Marshal(models.RequestPayload{
 		CSL:        ".show databases schema",
 		DB:         datasourceSettings.DefaultDatabase,
 		Properties: properties,
@@ -37,7 +38,17 @@ func (c *Client) TestRequest(datasourceSettings *models.DatasourceSettings, prop
 	if err != nil {
 		return err
 	}
-	resp, err := c.httpClient.Post(datasourceSettings.ClusterURL+"/v1/rest/query", "application/json", &buf)
+
+	req, err := http.NewRequest("POST", datasourceSettings.ClusterURL+"/v1/rest/query", bytes.NewReader(buf))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	for key, value := range additionalHeaders {
+		req.Header.Set(key, value)
+	}
+
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}

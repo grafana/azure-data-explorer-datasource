@@ -3,14 +3,13 @@
 ///<reference path="../../node_modules/monaco-editor/monaco.d.ts" />
 /* tslint:enable */
 /* eslint-enable */
-
+import { css } from '@emotion/css';
+import { config } from '@grafana/runtime';
+import { Alert, stylesFactory } from '@grafana/ui';
 import React from 'react';
+
 import { AdxSchema } from '../types';
 import KustoCodeEditor from './kusto_code_editor';
-import { css } from 'emotion';
-import { stylesFactory } from '@grafana/ui';
-
-import config from 'grafana/app/core/config';
 
 interface Props {
   content: string;
@@ -21,7 +20,9 @@ interface Props {
   onExecute: () => void;
 }
 
-interface MonacoState {}
+interface MonacoState {
+  error?: Error;
+}
 
 export class KustoMonacoEditor extends React.Component<Props, MonacoState> {
   monacoRef: React.RefObject<HTMLDivElement>;
@@ -32,9 +33,7 @@ export class KustoMonacoEditor extends React.Component<Props, MonacoState> {
     super(props);
     this.styles = this.getStyles();
     this.monacoRef = React.createRef<HTMLDivElement>();
-    this.state = {
-      content: props.content,
-    };
+    this.state = {};
 
     if (!window.hasOwnProperty('monaco')) {
       // using the standard import() here causes issues with webpack/babel/typescript because monaco is just so large
@@ -58,7 +57,10 @@ export class KustoMonacoEditor extends React.Component<Props, MonacoState> {
       config
     );
 
-    this.kustoCodeEditor.initMonaco(this.props.content);
+    const error = this.kustoCodeEditor.initMonaco(this.props.content);
+    if (error) {
+      this.setState({ error });
+    }
 
     /* tslint:disable:no-bitwise */
     this.kustoCodeEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
@@ -92,6 +94,15 @@ export class KustoMonacoEditor extends React.Component<Props, MonacoState> {
   }));
 
   render() {
-    return <div id="content" tabIndex={0} className={this.styles.editor} ref={this.monacoRef}></div>;
+    return (
+      <>
+        {this.state.error && (
+          <Alert title="Error loading editor" severity="warning">
+            {this.state.error.message}
+          </Alert>
+        )}
+        <div id="content" tabIndex={0} className={this.styles.editor} ref={this.monacoRef}></div>
+      </>
+    );
   }
 }

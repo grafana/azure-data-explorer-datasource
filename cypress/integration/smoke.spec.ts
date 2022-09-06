@@ -1,4 +1,5 @@
 import { e2e } from '@grafana/e2e';
+
 import { selectors } from '../../src/test/selectors';
 import TEST_DASHBOARD from '../dashboards/example.json';
 
@@ -23,7 +24,6 @@ function addCommonProvisioningADXDatasource(ADXProvisions: ADXProvision[]) {
   const datasource = ADXProvisions[0].datasources[0];
 
   e2e.flows.addDataSource({
-    name: 'e2e-azure-data-explorer-datasource',
     type: 'Azure Data Explorer Datasource',
     form: () => {
       e2eSelectors.configEditor.azureCloud.input().type('Azure');
@@ -37,27 +37,97 @@ function addCommonProvisioningADXDatasource(ADXProvisions: ADXProvision[]) {
 }
 
 e2e.scenario({
-  describeName: 'Add ADX datasource',
-  itName: 'fills out datasource connection configuration',
+  describeName: 'Add ADX datasource Import Dashoard',
+  itName: 'fills out datasource connection configuration and imports JSON dashboard',
   scenario: () => {
     e2e()
       .readProvisions(['datasources/adx.yaml'])
       .then((ADXProvisions: ADXProvision[]) => {
         addCommonProvisioningADXDatasource(ADXProvisions);
+        e2e.flows.importDashboard(TEST_DASHBOARD, undefined, true);
       });
   },
 });
 
 e2e.scenario({
-  describeName: 'Import dashboard',
-  itName: 'adds JSON',
+  describeName: 'Creates Panel run KQL query',
+  itName: 'fills out datasource connection configuration, adds panel and runs query',
   scenario: () => {
     e2e()
       .readProvisions(['datasources/adx.yaml'])
       .then((ADXProvisions: ADXProvision[]) => {
         addCommonProvisioningADXDatasource(ADXProvisions);
 
-        e2e.flows.importDashboard(TEST_DASHBOARD);
+        e2e.flows.addDashboard({
+          timeRange: {
+            from: '2019-10-05 19:00:00',
+            to: '2019-10-10 19:00:00',
+          },
+          variables: [],
+        });
+
+        e2e.flows.addPanel({
+          matchScreenshot: false,
+          visitDashboardAtStart: false,
+          dataSourceName: '', // avoid issue selecting the data source before the editor is fully loaded
+          queriesForm: () => {
+            e2eSelectors.queryEditor.database.input().click({ force: true });
+            cy.contains('PerfTest').click({ force: true });
+            e2eSelectors.queryEditor.editKQL.button().click({ force: true });
+            // Wait for the schema to load
+            cy.get('.Table', { timeout: 10000 });
+            e2eSelectors.queryEditor.codeEditor
+              .container()
+              .click({ force: true })
+              .type('{selectall}{del}')
+              .type('PerfTest | where ');
+            // It should trigger auto-completion suggestions
+            cy.contains('$__timeFilter');
+            // complete the query
+            e2eSelectors.queryEditor.codeEditor
+              .container()
+              .click({ force: true })
+              .type('$__timeFilter(_Timestamp_) | order by _Timestamp_ asc');
+            e2eSelectors.queryEditor.runQuery.button().click({ force: true });
+            cy.contains('_val1_');
+          },
+        });
+      });
+  },
+});
+
+e2e.scenario({
+  describeName: 'Creates Panel run query via builder',
+  itName: 'fills out datasource connection configuration, adds panel and runs query via builder',
+  scenario: () => {
+    e2e()
+      .readProvisions(['datasources/adx.yaml'])
+      .then((ADXProvisions: ADXProvision[]) => {
+        addCommonProvisioningADXDatasource(ADXProvisions);
+
+        e2e.flows.addDashboard({
+          timeRange: {
+            from: '2022-01-05 19:00:00',
+            to: '2022-01-10 19:00:00',
+          },
+          variables: [],
+        });
+
+        e2e.flows.addPanel({
+          matchScreenshot: false,
+          visitDashboardAtStart: false,
+          dataSourceName: '', // avoid issue selecting the data source before the editor is fully loaded
+          queriesForm: () => {
+            e2eSelectors.queryEditor.database.input().click({ force: true });
+            cy.contains('PerfTest').click({ force: true });
+
+            e2eSelectors.queryEditor.tableFrom.input().click({ force: true });
+            cy.contains('events.all').click({ force: true });
+
+            e2eSelectors.queryEditor.runQuery.button().click({ force: true });
+            cy.contains('Data is missing a number field').should('exist');
+          },
+        });
       });
   },
 });

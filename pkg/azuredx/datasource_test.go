@@ -45,14 +45,14 @@ func TestDatasource(t *testing.T) {
 			require.Contains(t, additionalHeaders["x-ms-client-request-id"], UserLogin)
 			return table, nil
 		}
-		res := adx.handleQuery(query, &backend.User{Login: UserLogin})
+		res := adx.handleQuery(query, &backend.User{Login: UserLogin}, "")
 		require.NoError(t, res.Error)
 	})
 }
 
 type fakeClient struct{}
 
-func (c *fakeClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties) error {
+func (c *fakeClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
 	panic("not implemented")
 }
 

@@ -20,7 +20,7 @@
       },
       {
         "name": "Apache License",
-        "url": "https://github.com/grafana/azure-data-explorer-datasource/blob/master/LICENSE"
+        "url": "https://github.com/grafana/azure-data-explorer-datasource/blob/main/LICENSE"
       }
     ],
     "screenshots": [],
@@ -28,8 +28,7 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": ">=7.4.0",
-    "grafanaVersion": "7.4.x",
+    "grafanaDependency": ">=8.0.0",
     "plugins": []
   },
   "metrics": true,

@@ -1,6 +1,9 @@
-import { AdxTableSchema, AdxColumnSchema, AdxDatabaseSchema } from '../types';
-import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from '../editor/types';
 import { SelectableValue } from '@grafana/data';
+import { DYNAMIC_TYPE_ARRAY_DELIMITER } from 'KustoExpressionParser';
+import { escapeRegExp } from 'lodash';
+
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from './types';
+import { AdxColumnSchema, AdxDatabaseSchema, AdxTableSchema } from '../types';
 
 export const tableToDefinition = (table: AdxTableSchema): QueryEditorPropertyDefinition => {
   return {
@@ -49,23 +52,29 @@ export const columnsToDefinition = (columns: AdxColumnSchema[]): QueryEditorProp
     return [];
   }
 
-  return columns.map((column) => ({
-    value: column.Name,
-    label: column.Name,
-    type: toPropertyType(column.CslType),
-  }));
+  return columns.map((column) => {
+    return {
+      value: column.Name,
+      label: column.Name.replace(new RegExp(escapeRegExp(DYNAMIC_TYPE_ARRAY_DELIMITER), 'g'), '[ ]'),
+      type: toPropertyType(column.CslType),
+    };
+  });
 };
 
-const toPropertyType = (kustoType: string): QueryEditorPropertyType => {
+export const toPropertyType = (kustoType: string): QueryEditorPropertyType => {
   switch (kustoType) {
     case 'real':
     case 'int':
     case 'long':
+    case 'double':
+    case 'decimal':
       return QueryEditorPropertyType.Number;
     case 'datetime':
       return QueryEditorPropertyType.DateTime;
     case 'bool':
       return QueryEditorPropertyType.Boolean;
+    case 'timespan':
+      return QueryEditorPropertyType.TimeSpan;
     default:
       return QueryEditorPropertyType.String;
   }

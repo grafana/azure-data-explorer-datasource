@@ -1,18 +1,21 @@
 package azuredx
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/tokenprovider"
+	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/azureauth"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 
 	// 100% compatible drop-in replacement of "encoding/json"
 	json "github.com/json-iterator/go"
@@ -22,45 +25,47 @@ import (
 // AzureDataExplorer stores reference to plugin and logger
 type AzureDataExplorer struct {
 	backend.CallResourceHandler
-	client   client.AdxClient
-	settings *models.DatasourceSettings
+	client             client.AdxClient
+	settings           *models.DatasourceSettings
+	serviceCredentials azureauth.ServiceCredentials
 }
 
-var tokenCache = tokenprovider.NewConcurrentTokenCache()
-
-const AdxScope = "https://kusto.kusto.windows.net/.default"
-
-func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	adx := &AzureDataExplorer{}
 	datasourceSettings := &models.DatasourceSettings{}
-	err := datasourceSettings.Load(settings)
+	err := datasourceSettings.Load(instanceSettings)
 	if err != nil {
 		return nil, err
 	}
+	// TODO(pascaldekloe): We need a way to set oauthPassThru in the plugin instead.
+	if datasourceSettings.OnBehalfOf && !datasourceSettings.OAuthPassThru {
+		return nil, errors.New("Azure datasource provisioned with onBehalfOf: true, and no oauthPassThru: true")
+	}
 	adx.settings = datasourceSettings
 
-	tokenProvider := tokenprovider.NewAccessTokenProvider(tokenCache, datasourceSettings.ClientID, datasourceSettings.TenantID, datasourceSettings.AzureCloud, datasourceSettings.Secret, []string{"https://kusto.kusto.windows.net/.default"})
+	azureSettings, err := azsettings.ReadFromEnv()
+	if err != nil {
+		backend.Logger.Error("failed to read Azure settings from Grafana", "error", err.Error())
+		return nil, err
+	}
 
-	httpClientProvider := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{
-		Middlewares: []sdkhttpclient.Middleware{
-			client.AuthMiddleware(tokenProvider),
-		},
-	})
-
-	httpClientOptions, err := settings.HTTPClientOptions()
+	httpClientOptions, err := instanceSettings.HTTPClientOptions()
 	if err != nil {
 		backend.Logger.Error("failed to create HTTP client options", "error", err.Error())
 		return nil, err
 	}
-
 	httpClientOptions.Timeouts.Timeout = datasourceSettings.QueryTimeout
-
-	httpClient, err := httpClientProvider.New(httpClientOptions)
+	httpClient, err := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{}).New(httpClientOptions)
 	if err != nil {
 		backend.Logger.Error("failed to create HTTP client", "error", err.Error())
 		return nil, err
 	}
 	adx.client = client.New(httpClient)
+
+	adx.serviceCredentials, err = azureauth.NewServiceCredentials(datasourceSettings, azureSettings, httpClient)
+	if err != nil {
+		return nil, err
+	}
 
 	mux := http.NewServeMux()
 	adx.registerRoutes(mux)
@@ -69,17 +74,18 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 	return adx, nil
 }
 
-func (adx *AzureDataExplorer) Dispose() {
-	tokenCache.Purge()
-}
-
 // QueryData is the primary method called by grafana-server
 func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
 	res := backend.NewQueryDataResponse()
 
+	authorization, err := adx.serviceCredentials.QueryDataAuthorization(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = adx.handleQuery(q, req.PluginContext.User)
+		res.Responses[q.RefID] = adx.handleQuery(q, req.PluginContext.User, authorization)
 	}
 
 	return res, nil
@@ -87,7 +93,12 @@ func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryD
 
 // CheckHealth handles health checks
 func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	err := adx.client.TestRequest(adx.settings, models.NewConnectionProperties(adx.settings, nil))
+	authorization, err := adx.serviceCredentials.ServicePrincipalAuthorization(ctx)
+	if err != nil {
+		return nil, err
+	}
+	headers := map[string]string{"Authorization": authorization}
+	err = adx.client.TestRequest(adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
@@ -101,7 +112,7 @@ func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.Chec
 	}, nil
 }
 
-func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.User) backend.DataResponse {
+func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.User, authorization string) backend.DataResponse {
 	var qm models.QueryModel
 	err := json.Unmarshal(q.JSON, &qm)
 	if err != nil {
@@ -115,7 +126,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	}
 	props := models.NewConnectionProperties(adx.settings, cs)
 
-	resp, err := adx.modelQuery(qm, props, user)
+	resp, err := adx.modelQuery(qm, props, user, authorization)
 	if err != nil {
 		resp.Frames = append(resp.Frames, &data.Frame{
 			RefID: q.RefID,
@@ -126,8 +137,8 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	return resp
 }
 
-func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User) (backend.DataResponse, error) {
-	headers := map[string]string{}
+func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User, authorization string) (backend.DataResponse, error) {
+	headers := map[string]string{"Authorization": authorization}
 	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", q.QuerySource, rand.Uint64())
 	if adx.settings.EnableUserTracking {
 		if user != nil {

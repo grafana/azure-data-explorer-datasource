@@ -1,5 +1,6 @@
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
-import { FieldSet, InlineField, Input, LegacyForms, Select } from '@grafana/ui';
+import { config } from '@grafana/runtime';
+import { FieldSet, HorizontalGroup, InlineField, InlineSwitch, Input, LegacyForms, Select } from '@grafana/ui';
 import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AzureCloudType } from 'types';
 import { selectors } from 'test/selectors';
@@ -17,6 +18,8 @@ interface ConnectionConfigProps
   handleClearClientSecret: () => void;
 }
 
+const LABEL_WIDTH = 18;
+
 const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
   options,
   onOptionsChange,
@@ -27,10 +30,16 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
   // Set some default values
   useEffect(() => {
+    if (jsonData.onBehalfOf && !config.featureToggles.adxOnBehalfOf) {
+      updateJsonData('onBehalfOf', false);
+    }
     if (!jsonData.azureCloud) {
       updateJsonData('azureCloud', AzureCloudType.AzurePublic);
     }
-  }, [jsonData.azureCloud, updateJsonData]);
+    if (!!jsonData.oauthPassThru !== !!jsonData.onBehalfOf) {
+      updateJsonData('oauthPassThru', !!jsonData.onBehalfOf);
+    }
+  }, [jsonData.azureCloud, jsonData.oauthPassThru, jsonData.onBehalfOf, updateJsonData]);
 
   const handleClientSecretChange = (ev?: React.ChangeEvent<HTMLInputElement>) => {
     onOptionsChange({
@@ -63,7 +72,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
     <FieldSet label="Connection Details">
       <InlineField
         label="Azure cloud"
-        labelWidth={26}
+        labelWidth={LABEL_WIDTH}
         tooltip="Select an Azure Cloud."
         required
         data-testid={selectors.components.configEditor.azureCloud.input}
@@ -81,7 +90,11 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         />
       </InlineField>
 
-      <InlineField label="Cluster URL" labelWidth={26} tooltip="The cluster url for your Azure Data Explorer database.">
+      <InlineField
+        label="Cluster URL"
+        labelWidth={LABEL_WIDTH}
+        tooltip="The cluster url for your Azure Data Explorer database."
+      >
         <Input
           data-testid={selectors.components.configEditor.clusterURL.input}
           value={jsonData.clusterUrl}
@@ -94,7 +107,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
       <InlineField
         label="Tenant ID"
-        labelWidth={26}
+        labelWidth={LABEL_WIDTH}
         tooltip={
           <>
             In the Azure Portal, navigate to Azure Active Directory {'🡒'} Properties {'🡒'} Directory ID.
@@ -121,7 +134,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
 
       <InlineField
         label="Client ID"
-        labelWidth={26}
+        labelWidth={LABEL_WIDTH}
         tooltip={
           <>
             In the Azure Portal, navigate to Azure Active Directory {'🡒'} App Registrations {'🡒'} Choose your app {'🡒'}
@@ -152,14 +165,46 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
         aria-label="Client secret"
         data-testid={selectors.components.configEditor.clientSecret.input}
         value={secureJsonData?.clientSecret || undefined}
-        labelWidth={13}
+        labelWidth={9}
         inputWidth={30}
         placeholder=""
         onReset={() => handleClearClientSecret()}
         onChange={handleClientSecretChange}
         isConfigured={!!secureJsonFields?.clientSecret}
         tooltip={clientSecretTooltip}
+        style={{ marginBottom: '4px' }}
       />
+
+      {config.featureToggles.adxOnBehalfOf && (
+        <InlineField
+          label="Use On-Behalf-Of"
+          htmlFor="adx-on-behalf-of"
+          labelWidth={LABEL_WIDTH}
+          tooltip={
+            <>
+              Propagate Grafana client credentials to ADX with a token exchange. When enabled the service account
+              (Client ID) impersonates the user by augmenting the access token. See the{' '}
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow"
+              >
+                developer documentation
+              </a>{' '}
+              for detail on the concept. This feature requires a Grafana version 8.3.4 or later.
+            </>
+          }
+        >
+          <HorizontalGroup>
+            <InlineSwitch
+              id="adx-on-behalf-of"
+              value={jsonData.onBehalfOf}
+              onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('onBehalfOf', ev.target.checked)}
+            />
+            <span>⚠️ This feature is in beta</span>
+          </HorizontalGroup>
+        </InlineField>
+      )}
     </FieldSet>
   );
 };

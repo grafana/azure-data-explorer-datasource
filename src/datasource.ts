@@ -1,33 +1,36 @@
 import {
-  MetricFindValue,
-  DataSourceInstanceSettings,
-  DataQueryRequest,
-  ScopedVar,
-  TimeRange,
   DataFrame,
+  DataQueryRequest,
+  DataSourceInstanceSettings,
+  MetricFindValue,
+  ScopedVar,
   ScopedVars,
+  TimeRange,
 } from '@grafana/data';
-import { map } from 'lodash';
-import { getBackendSrv, BackendSrv, getTemplateSrv, TemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
-import { ResponseParser, DatabaseItem, KustoDatabaseList } from './response_parser';
-import {
-  AdxDataSourceOptions,
-  KustoQuery,
-  AdxSchema,
-  AdxColumnSchema,
-  defaultQuery,
-  QueryExpression,
-  EditorMode,
-  AutoCompleteQuery,
-} from './types';
-import interpolateKustoQuery from './query_builder';
-import { migrateAnnotation } from './migrations/annotation';
+import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
-import { QueryEditorPropertyExpression } from 'editor/expressions';
-import { QueryEditorOperator } from 'editor/types';
-import { cache } from 'schema/cache';
-import { KustoExpressionParser } from 'KustoExpressionParser';
+import { QueryEditorPropertyExpression } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorOperator, QueryEditorPropertyType } from './schema/types';
+import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
+import { map } from 'lodash';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
+import { cache } from 'schema/cache';
+import { toPropertyType } from 'schema/mapper';
+
+import { migrateAnnotation } from './migrations/annotation';
+import interpolateKustoQuery from './query_builder';
+import { DatabaseItem, KustoDatabaseList, ResponseParser } from './response_parser';
+import {
+  AdxColumnSchema,
+  AdxDataSourceOptions,
+  AdxSchema,
+  AdxSchemaDefinition,
+  AutoCompleteQuery,
+  defaultQuery,
+  EditorMode,
+  KustoQuery,
+  QueryExpression,
+} from './types';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -185,9 +188,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     const queryParts: string[] = [];
 
     const take = 'take 50000';
-    const where = `where ${columns.map((column) => `isnotnull(${column})`).join(' and ')}`;
-    const project = `project ${columns.map((column) => column).join(', ')}`;
-    const summarize = `summarize ${columns.map((column) => `buildschema(${column})`).join(', ')}`;
+    const where = `where ${columns.map((column) => `isnotnull(${escapeColumn(column)})`).join(' and ')}`;
+    const project = `project ${columns.map((column) => escapeColumn(column)).join(', ')}`;
+    const summarize = `summarize ${columns.map((column) => `buildschema(${escapeColumn(column)})`).join(', ')}`;
 
     queryParts.push(source);
     queryParts.push(take);
@@ -373,26 +376,53 @@ const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchem
   return result;
 };
 
-const recordSchema = (columnName: string, schema: any, result: AdxColumnSchema[]) => {
+const recordSchemaArray = (name: string, types: AdxSchemaDefinition[], result: AdxColumnSchema[]) => {
+  // If a field can have different types (e.g. long and double)
+  // we select the first, assuming they are interchangeable
+  const defaultCslType = types[0];
+  if (types.every((t) => typeof t === 'string' && toPropertyType(t) === QueryEditorPropertyType.Number)) {
+    // If all the types are numbers, the double takes precedence since it has more precission.
+    const cslType = types.find((t) => typeof t === 'string' && (t === 'double' || t === 'real')) || defaultCslType;
+    result.push({ Name: name, CslType: cslType as string, isDynamic: true });
+  } else {
+    console.warn(`schema ${name} may contain different types, assuming ${defaultCslType}`);
+    if (typeof defaultCslType === 'object') {
+      recordSchema(name, types[0], result);
+    } else {
+      result.push({ Name: name, CslType: defaultCslType, isDynamic: true });
+    }
+  }
+};
+
+const recordSchema = (columnName: string, schema: AdxSchemaDefinition, result: AdxColumnSchema[]) => {
   if (!schema) {
     console.log('error with column', columnName);
     return;
   }
 
+  // Case: schema is a single type: e.g. 'long'
+  if (typeof schema === 'string') {
+    result.push({
+      Name: columnName,
+      CslType: schema,
+      isDynamic: true,
+    });
+    return;
+  }
+
+  // Case: schema is a multiple type: e.g. ['long', 'double']
+  if (Array.isArray(schema)) {
+    recordSchemaArray(columnName, schema, result);
+    return;
+  }
+
+  // Case: schema is an object: e.g. {"a": "long"}
   for (const name of Object.keys(schema)) {
-    const key = `${columnName}.${name}`;
-
-    if (typeof schema[name] === 'string') {
-      result.push({
-        Name: key,
-        CslType: schema[name],
-      });
-      continue;
-    }
-
-    if (typeof schema[name] === 'object') {
-      recordSchema(key, schema[name], result);
-    }
+    // Generate a valid accessor for a dynamic type
+    // https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic#dynamic-object-accessors
+    const key = `${columnName}["${name}"]`;
+    const subSchema = schema[name];
+    recordSchema(key, subSchema, result);
   }
 };
 

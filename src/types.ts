@@ -1,12 +1,13 @@
-const packageJson = require('../package.json');
+import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
 
-import { DataQuery, DataSourceJsonData } from '@grafana/data';
 import {
-  QueryEditorPropertyExpression,
   QueryEditorArrayExpression,
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
-} from './editor/expressions';
+  QueryEditorPropertyExpression,
+} from './components/LegacyQueryEditor/editor/expressions';
+
+const packageJson = require('../package.json');
 
 export interface QueryExpression {
   from?: QueryEditorPropertyExpression;
@@ -97,6 +98,8 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   clusterUrl: string;
   tenantId: string;
   clientId: string;
+  onBehalfOf: boolean;
+  oauthPassThru: boolean; // required for onBehalfOf
 }
 
 export interface AdxDataSourceSecureOptions {
@@ -123,6 +126,9 @@ export interface AdxTableSchema {
 export interface AdxColumnSchema {
   Name: string;
   CslType: string;
+  Type?: string;
+  CslDefaultValue?: string;
+  isDynamic?: boolean;
 }
 
 export interface AdxFunctionSchema {
@@ -131,9 +137,12 @@ export interface AdxFunctionSchema {
   Name: string;
   InputParameters: AdxFunctionInputParameterSchema[];
   OutputColumns: AdxColumnSchema[];
+  DocString?: string;
 }
 
 export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
+
+export type AdxSchemaDefinition = string | AdxSchemaDefinition[] | { [k: string]: AdxSchemaDefinition };
 
 // must be in synch with clouds.go
 export enum AzureCloudType {
@@ -141,3 +150,5 @@ export enum AzureCloudType {
   AzureUSGovernment = 'govazuremonitor',
   AzureChina = 'chinaazuremonitor',
 }
+
+export type AdxDataSourceSettings = DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>;

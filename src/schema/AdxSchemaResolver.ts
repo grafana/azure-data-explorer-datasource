@@ -87,6 +87,7 @@ export class AdxSchemaResolver {
           return columns;
         }
 
+        // Handling dynamic columns
         Array.prototype.push.apply(columns, schemaForDynamicColumn);
         return columns;
       }, []);

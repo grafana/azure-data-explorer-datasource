@@ -18,6 +18,8 @@ const editorModeOptions: Array<{ value: EditorMode; label: string }> = [
   { value: EditorMode.Raw, label: 'Raw' },
 ];
 
+const LABEL_WIDTH = 20;
+
 const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) => {
   const { jsonData } = options;
 
@@ -33,7 +35,11 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
 
   return (
     <FieldSet label="Query Optimizations">
-      <InlineField label="Query timeout" labelWidth={26} tooltip="This value controls the client query timeout.">
+      <InlineField
+        label="Query timeout"
+        labelWidth={LABEL_WIDTH}
+        tooltip="This value controls the client query timeout."
+      >
         <Input
           value={jsonData.queryTimeout}
           id="adx-query-timeout"
@@ -45,7 +51,7 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
 
       <InlineField
         label="Use dynamic caching"
-        labelWidth={26}
+        labelWidth={LABEL_WIDTH}
         tooltip="By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored.<br /><br />For time series queries we will use the bin size to widen the time range but also as cache max age."
       >
         <InlineSwitch
@@ -58,7 +64,7 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
 
       <InlineField
         label="Cache max age"
-        labelWidth={26}
+        labelWidth={LABEL_WIDTH}
         tooltip="By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live."
       >
         <Input
@@ -70,7 +76,7 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
         />
       </InlineField>
 
-      <InlineField label="Data consistency" labelWidth={26} tooltip="Defaults to Strong">
+      <InlineField label="Data consistency" labelWidth={LABEL_WIDTH} tooltip="Defaults to Strong">
         <Select
           options={dataConsistencyOptions}
           value={dataConsistencyOptions.find((v) => v.value === jsonData.dataConsistency)}
@@ -82,7 +88,7 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
         />
       </InlineField>
 
-      <InlineField label="Default editor mode" labelWidth={26} tooltip="Defaults to Visual">
+      <InlineField label="Default editor mode" labelWidth={LABEL_WIDTH} tooltip="Defaults to Visual">
         <Select
           options={editorModeOptions}
           value={editorModeOptions.find((v) => v.value === jsonData.defaultEditorMode)}
