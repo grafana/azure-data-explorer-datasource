@@ -3,6 +3,7 @@ import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import ConfigHelp from './ConfigHelp';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import ConnectionConfig from './ConnectionConfig';
 import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
 import TrackingConfig from './TrackingConfig';
@@ -39,6 +40,12 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
   return (
     <div data-testid="azure-data-explorer-config-editor">
       <ConfigHelp />
+
+      <ConnectionConfig
+        options={options}
+        onOptionsChange={onOptionsChange}
+        updateJsonData={updateJsonData}
+      />
 
       <h3 className="page-heading">Authentication</h3>
       <AzureCredentialsForm
