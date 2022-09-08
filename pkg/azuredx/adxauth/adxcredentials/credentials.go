@@ -19,6 +19,15 @@ func (credentials *AzureClientSecretOboCredentials) AzureAuthType() string {
 	return AzureAuthClientSecretObo
 }
 
+func GetDefaultCredentials(settings *azsettings.AzureSettings) azcredentials.AzureCredentials {
+	if settings.ManagedIdentityEnabled {
+		return &azcredentials.AzureManagedIdentityCredentials{}
+	} else {
+		azureCloud := getDefaultAzureCloud(settings)
+		return &azcredentials.AzureClientSecretCredentials{AzureCloud: azureCloud}
+	}
+}
+
 func GetAzureCloud(settings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (string, error) {
 	switch c := credentials.(type) {
 	case *azcredentials.AzureManagedIdentityCredentials:
