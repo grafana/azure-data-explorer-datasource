@@ -88,6 +88,7 @@ export function updateCredentials(
           azureCredentials: {
             authType: 'msi',
           },
+          oauthPassThru: undefined,
         },
       };
 
@@ -105,6 +106,7 @@ export function updateCredentials(
             tenantId: credentials.tenantId,
             clientId: credentials.clientId,
           },
+          oauthPassThru: credentials.authType === 'clientsecret-obo' ? true : undefined,
         },
         secureJsonData: {
           ...options.secureJsonData,
