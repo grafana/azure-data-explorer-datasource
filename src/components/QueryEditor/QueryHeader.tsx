@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { ConfirmModal, EditorHeader, FlexItem, InlineSelect, RadioButtonGroup } from '@grafana/ui';
+import { ConfirmModal, RadioButtonGroup } from '@grafana/ui';
+import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
 
 import { AdxSchema, EditorMode, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';

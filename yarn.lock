@@ -2314,13 +2314,13 @@
     uplot "1.6.19"
     xss "1.0.11"
 
-"@grafana/data@9.1.0-beta1":
-  version "9.1.0-beta1"
-  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.1.0-beta1.tgz#1e6f85de497bf420a53dcab715aa349d5a238153"
-  integrity sha512-BaM2LIQMrKhZ1JzM4OjeaZfscLplde+F42ThD10p9E3OVyb0kZ5IrjPfMa9hNEvt81OpL/ShtBOtts93LGXkRg==
+"@grafana/data@9.1.3":
+  version "9.1.3"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-9.1.3.tgz#0bdc92c108ebed1616c39101dfd5c8f4a5189d2b"
+  integrity sha512-Vva9Am5nZRbZmPpv+qlkBVir9tUdO4pp4iNU4x9nUanIemvR0xAvEyvFo2jKCrHlHOqBwN+LmS9jQ11CtD6Ruw==
   dependencies:
     "@braintree/sanitize-url" "6.0.0"
-    "@grafana/schema" "9.1.0-beta1"
+    "@grafana/schema" "9.1.3"
     "@types/d3-interpolate" "^1.4.0"
     d3-interpolate "1.4.0"
     date-fns "2.29.1"
@@ -2348,10 +2348,10 @@
     tslib "2.3.1"
     typescript "4.4.4"
 
-"@grafana/e2e-selectors@9.1.0-beta1":
-  version "9.1.0-beta1"
-  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-9.1.0-beta1.tgz#8a57d6723c2f6d34f6671f97534db51079701817"
-  integrity sha512-1KlhNcOZ0yiMYQoJy3eHvDa6xnKXelN7gXia4Kcx7fG1tLwPPCo3KZUWL9zN1V3BLCzM3nZieb7QUNka5GtP6A==
+"@grafana/e2e-selectors@9.1.3":
+  version "9.1.3"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-9.1.3.tgz#e45f5b9c435bca83dcbcbdb46e03f5c35e666104"
+  integrity sha512-/ivt5F52YRg3uWRK5Avqsge+7GpPsmtR64yEoFfHZJMRNcEubiLc57uZoWdlYGsw5acE7Eg9ZE4i5Ldo7I8evQ==
   dependencies:
     "@grafana/tsconfig" "^1.2.0-rc1"
     tslib "2.4.0"
@@ -2403,6 +2403,14 @@
     prettier "2.5.1"
     typescript "4.4.4"
 
+"@grafana/experimental@0.0.2-canary.35":
+  version "0.0.2-canary.35"
+  resolved "https://registry.yarnpkg.com/@grafana/experimental/-/experimental-0.0.2-canary.35.tgz#b1d9e0759f4b8a718cef59cd1e321cfd098cd48c"
+  integrity sha512-afD9RdcMXjmA1f82XyhOn4lrrmuAETqvJcLV7cyZrKplqQl94Ma12BVHK7I153avCxAXjwbFLX135KNU6OkW1Q==
+  dependencies:
+    "@types/uuid" "^8.3.3"
+    uuid "^8.3.2"
+
 "@grafana/runtime@8.5.2":
   version "8.5.2"
   resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-8.5.2.tgz#dcd5c7fa047d757f73bafc4a1d5a5e5f319576b4"
@@ -2427,10 +2435,10 @@
   dependencies:
     tslib "2.3.1"
 
-"@grafana/schema@9.1.0-beta1":
-  version "9.1.0-beta1"
-  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.1.0-beta1.tgz#7aa748beeeadc57718633cf09488cf2c15b3f6d9"
-  integrity sha512-+7rEkdkVTo1qSQzmtE0FtH8shXMCLIqIXEeU2WZR7lhfSeI8bshIzSWSgkTvxJKRdkkPLsmjf4YhnowAMDYfnA==
+"@grafana/schema@9.1.3":
+  version "9.1.3"
+  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-9.1.3.tgz#ef6fdddebbe36ff5a598c7b11efd55432a0757a6"
+  integrity sha512-LKQPUAAPKz1DzbUlLU7bM+ur0zXJT2RpSNf1Vl2ZuTjRIJxOQbPD/hxYHo05InR8pG0fcRM4IHRuKvQlVO13/Q==
   dependencies:
     tslib "2.4.0"
 
@@ -2612,16 +2620,16 @@
     uplot "1.6.19"
     uuid "8.3.2"
 
-"@grafana/ui@9.1.0-beta1":
-  version "9.1.0-beta1"
-  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-9.1.0-beta1.tgz#b52c828745627521d9d862e1da762fceb8a6ff7f"
-  integrity sha512-0eMZOD2CqpVoXIWEClSpp8babo4a+zKEZ72S/wNLXnSHXKM34QOsi1PujTE0lPmSDMjZb1aPLONc80t8bZMevw==
+"@grafana/ui@9.1.3":
+  version "9.1.3"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-9.1.3.tgz#3c5d791c538114c2064bebffc658c338cd6ef7e7"
+  integrity sha512-g1f0qD5oRDOvfq+xDkJMW7+8fz+7EWTCJ+UhqMCgZ8TGBJ8IggzqxyZt0HZb8qz2gD8XHNhg0dKIJiG7wGDm3Q==
   dependencies:
     "@emotion/css" "11.9.0"
     "@emotion/react" "11.9.3"
-    "@grafana/data" "9.1.0-beta1"
-    "@grafana/e2e-selectors" "9.1.0-beta1"
-    "@grafana/schema" "9.1.0-beta1"
+    "@grafana/data" "9.1.3"
+    "@grafana/e2e-selectors" "9.1.3"
+    "@grafana/schema" "9.1.3"
     "@grafana/slate-react" "0.22.10-grafana"
     "@monaco-editor/react" "4.3.1"
     "@popperjs/core" "2.11.5"
@@ -4408,6 +4416,11 @@
   integrity sha512-O3MmRAk6ZuAKa9CHgg0Pr0+lUOqoMLpc9AS4R8ano2auvsg7IE8syF3Xh/NPr26TWklxYcqoEEFdzLLs1fV9PQ==
   dependencies:
     source-map "^0.6.1"
+
+"@types/uuid@^8.3.3":
+  version "8.3.4"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-8.3.4.tgz#bd86a43617df0594787d38b735f55c805becf1bc"
+  integrity sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==
 
 "@types/webpack-dev-server@^3":
   version "3.11.6"

@@ -1,6 +1,7 @@
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
-import { Alert, EditorField, EditorFieldGroup, EditorRow, EditorRows, Select } from '@grafana/ui';
+import { Alert, Select } from '@grafana/ui';
+import { EditorField, EditorFieldGroup, EditorRow, EditorRows } from '@grafana/experimental';
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { AdxDataSource } from 'datasource';
 import React, { useMemo } from 'react';
