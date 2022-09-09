@@ -33,7 +33,7 @@ export interface AutoCompleteQuery {
   database: string;
   search: QueryEditorOperatorExpression;
   expression: QueryExpression;
-  index: string;
+  index?: string;
 }
 
 export enum EditorMode {

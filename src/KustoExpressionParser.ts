@@ -46,9 +46,11 @@ export class KustoExpressionParser {
     this.appendProperty(context, query.expression.from, parts);
     this.appendTimeFilter(context, undefined, parts, tableSchema);
 
-    const where = replaceByIndex(query.index, query.expression.where, query.search);
+    if (query.index) {
+      const where = replaceByIndex(query.index, query.expression.where, query.search);
+      this.appendWhere(context, where, parts, 'where');
+    }
     const column = query.search.property.name;
-    this.appendWhere(context, where, parts, 'where');
 
     parts.push('take 50000');
     parts.push(`distinct ${context.castIfDynamic(column)}`);

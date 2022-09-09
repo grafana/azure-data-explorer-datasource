@@ -9,6 +9,7 @@ import { useAsync } from 'react-use';
 import { AdxSchemaResolver } from 'schema/AdxSchemaResolver';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { AdxDataSourceOptions, AdxSchema, defaultQuery, KustoQuery } from 'types';
+import FilterSection from './VisualQueryEditor/FilterSection';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -93,6 +94,9 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
           </EditorField>
         </EditorFieldGroup>
       </EditorRow>
+      <FilterSection {...props} tableSchema={tableSchema} />
+      {/* TODO: Use proper preview component */}
+      <pre>{query.query}</pre>
     </EditorRows>
   );
 };
