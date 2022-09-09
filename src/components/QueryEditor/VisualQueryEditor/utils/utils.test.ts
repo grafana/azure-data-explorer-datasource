@@ -1,8 +1,10 @@
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { QueryEditorOperator, QueryEditorPropertyType } from 'schema/types';
+import { AggregateFunctions } from '../AggregateItem';
 import {
   getOperatorExpressionOptions,
   getOperatorExpressionValue,
+  sanitizeAggregate,
   sanitizeOperator,
   setOperatorExpressionName,
   setOperatorExpressionProperty,
@@ -199,5 +201,71 @@ describe('sanitizeOperator', () => {
       operator: { name: '==', value: false },
     };
     expect(sanitizeOperator(op)).toEqual({ type: QueryEditorExpressionType.Operator, ...op });
+  });
+});
+
+describe('sanitizeAggregate', () => {
+  it('ignores an expression with a missing reduce name', () => {
+    expect(
+      sanitizeAggregate({
+        property: { name: '', type: QueryEditorPropertyType.String },
+        reduce: { name: '', type: QueryEditorPropertyType.Function },
+        type: QueryEditorExpressionType.Reduce,
+      })
+    ).toBeUndefined();
+  });
+
+  it('ignores an expression with a missing column name', () => {
+    expect(
+      sanitizeAggregate({
+        property: { name: '', type: QueryEditorPropertyType.String },
+        reduce: { name: AggregateFunctions.Avg, type: QueryEditorPropertyType.Function },
+        type: QueryEditorExpressionType.Reduce,
+      })
+    ).toBeUndefined();
+  });
+
+  it('returns a valid aggregation', () => {
+    const op = {
+      property: { name: 'col', type: QueryEditorPropertyType.String },
+      reduce: { name: AggregateFunctions.Avg, type: QueryEditorPropertyType.Function },
+      type: QueryEditorExpressionType.Reduce,
+    };
+    expect(sanitizeAggregate(op)).toEqual(op);
+  });
+
+  it('returns a valid aggregation (count)', () => {
+    const op = {
+      property: { name: '', type: QueryEditorPropertyType.String },
+      reduce: { name: AggregateFunctions.Count, type: QueryEditorPropertyType.Function },
+      type: QueryEditorExpressionType.Reduce,
+    };
+    expect(sanitizeAggregate(op)).toEqual(op);
+  });
+
+  it('ignores an invalid percentile aggregation', () => {
+    const op = {
+      property: { name: 'col', type: QueryEditorPropertyType.String },
+      reduce: { name: AggregateFunctions.Percentile, type: QueryEditorPropertyType.Function },
+      type: QueryEditorExpressionType.Reduce,
+    };
+    expect(sanitizeAggregate(op)).toBeUndefined();
+  });
+
+  it('returns a valid percentile aggregation', () => {
+    const op = {
+      property: { name: 'col', type: QueryEditorPropertyType.String },
+      reduce: { name: AggregateFunctions.Percentile, type: QueryEditorPropertyType.Function },
+      parameters: [
+        {
+          type: QueryEditorExpressionType.FunctionParameter,
+          fieldType: QueryEditorPropertyType.Number,
+          value: '1',
+          name: 'percentileParam',
+        },
+      ],
+      type: QueryEditorExpressionType.Reduce,
+    };
+    expect(sanitizeAggregate(op)).toEqual(op);
   });
 });
