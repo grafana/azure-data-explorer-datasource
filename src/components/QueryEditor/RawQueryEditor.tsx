@@ -26,12 +26,13 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [variables] = useState(getTemplateSrv().getVariables());
 
   const onRawQueryChange = (kql: string) => {
-    props.setDirty();
-    props.onChange({
-      ...props.query,
-      query: kql,
-    });
-    props.onRunQuery();
+    if (kql !== props.query.query) {
+      props.setDirty();
+      props.onChange({
+        ...props.query,
+        query: kql,
+      });
+    }
   };
 
   const { query, schema } = props;

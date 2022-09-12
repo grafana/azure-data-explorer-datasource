@@ -34,6 +34,7 @@ const defaultProps = {
   schema: defaultSchema,
   dirty: false,
   setDirty: jest.fn(),
+  onRunQuery: jest.fn(),
 };
 
 describe('QueryEditor', () => {
@@ -103,6 +104,14 @@ describe('QueryEditor', () => {
       b.click();
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ rawMode: false }));
       expect(setDirty).toHaveBeenCalledWith(false);
+    });
+
+    it('runs a query', async () => {
+      const onRunQuery = jest.fn();
+      render(<QueryHeader {...defaultProps} schema={schema} onRunQuery={onRunQuery} />);
+      await waitFor(() => screen.getByText('foo'));
+      screen.getByText('Run query').click();
+      expect(onRunQuery).toHaveBeenCalledTimes(1);
     });
   });
 
