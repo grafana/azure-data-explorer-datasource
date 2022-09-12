@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { ConfirmModal, RadioButtonGroup } from '@grafana/ui';
+import { Button, ConfirmModal, RadioButtonGroup } from '@grafana/ui';
 import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
 
 import { AdxSchema, EditorMode, KustoQuery } from '../../types';
@@ -18,6 +18,7 @@ export interface QueryEditorHeaderProps {
   dirty: boolean;
   setDirty: (b: boolean) => void;
   onChange: (value: KustoQuery) => void;
+  onRunQuery: () => void;
 }
 
 const EDITOR_MODES = [
@@ -36,7 +37,7 @@ const adxTimeFormat: SelectableValue<string> = {
 };
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
-  const { query, onChange, schema, datasource, dirty, setDirty } = props;
+  const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery } = props;
   const { rawMode } = query;
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query, datasource);
@@ -100,6 +101,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         }}
       />
       <FlexItem grow={1} />
+      <Button variant="primary" icon="play" size="sm" onClick={() => onRunQuery()}>
+        Run
+      </Button>
       <RadioButtonGroup
         size="sm"
         options={EDITOR_MODES}

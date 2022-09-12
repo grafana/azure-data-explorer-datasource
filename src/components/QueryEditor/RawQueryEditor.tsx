@@ -31,7 +31,6 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
       ...props.query,
       query: kql,
     });
-    props.onRunQuery();
   };
 
   const { query, schema } = props;
