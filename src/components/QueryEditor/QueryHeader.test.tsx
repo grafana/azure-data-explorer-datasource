@@ -55,6 +55,14 @@ describe('QueryEditor', () => {
         },
       },
     };
+
+    it('should select a database by default', async () => {
+      const onChange = jest.fn();
+      render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />);
+      await waitFor(() => screen.getByText('foo'));
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ database: 'foo' }));
+    });
+
     it('should render with the default database selected', async () => {
       const ds = mockDatasource();
       ds.getDefaultOrFirstDatabase = jest.fn().mockResolvedValue('bar');
