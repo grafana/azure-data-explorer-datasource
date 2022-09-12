@@ -4,7 +4,6 @@ import { SelectableValue } from '@grafana/data';
 import { Select } from '@grafana/ui';
 import { AccessoryButton, InputGroup } from '@grafana/experimental';
 
-import { AdxDataSource } from '../../../datasource';
 import { AdxColumnSchema, KustoQuery } from '../../../types';
 import {
   QueryEditorExpressionType,
@@ -14,7 +13,6 @@ import { columnsToDefinition, toPropertyType, valueToDefinition } from 'schema/m
 import { QueryEditorPropertyType } from 'schema/types';
 
 interface GroupByItemProps {
-  datasource: AdxDataSource;
   query: KustoQuery;
   groupBy: Partial<QueryEditorGroupByExpression>;
   columns: AdxColumnSchema[] | undefined;
