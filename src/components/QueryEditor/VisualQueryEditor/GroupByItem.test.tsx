@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
+import { mockQuery } from 'components/__fixtures__/Datasource';
 import { AdxColumnSchema } from 'types';
 import React from 'react';
 import { openMenu } from 'react-select-event';
@@ -7,7 +7,6 @@ import { QueryEditorPropertyType } from 'schema/types';
 import GroupByItem from './GroupByItem';
 
 const defaultProps = {
-  datasource: mockDatasource(),
   query: mockQuery,
   groupBy: {},
   columns: [],
@@ -35,21 +34,12 @@ describe('GroupByItem', () => {
   });
 
   it('should select a template variable', async () => {
-    const datasource = mockDatasource();
-    datasource.autoCompleteQuery = jest.fn().mockResolvedValue([]);
     const onChange = jest.fn();
     const templateVariableOptions = {
       label: 'Template Variables',
       options: [{ label: '$foo', value: '$foo' }],
     };
-    render(
-      <GroupByItem
-        {...defaultProps}
-        datasource={datasource}
-        onChange={onChange}
-        templateVariableOptions={templateVariableOptions}
-      />
-    );
+    render(<GroupByItem {...defaultProps} onChange={onChange} templateVariableOptions={templateVariableOptions} />);
     const sel = screen.getByLabelText('column');
     openMenu(sel);
     (await screen.findByText('Template Variables')).click();

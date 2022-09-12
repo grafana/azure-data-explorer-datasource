@@ -75,7 +75,7 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
             <EditorList
               items={groupBys}
               onChange={onChange}
-              renderItem={makeRenderGroupBy(datasource, query, tableSchema.value, templateVariableOptions)}
+              renderItem={makeRenderGroupBy(query, tableSchema.value, templateVariableOptions)}
             />
           </EditorField>
         </EditorFieldGroup>
@@ -87,7 +87,6 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
 // Making component functions in the render body is not recommended, but it works for now.
 // If some problems arise (perhaps with state going missing), consider this to be a potential cause
 function makeRenderGroupBy(
-  datasource: AdxDataSource,
   query: KustoQuery,
   columns: AdxColumnSchema[] | undefined,
   templateVariableOptions: SelectableValue<string>
@@ -99,7 +98,6 @@ function makeRenderGroupBy(
   ) {
     return (
       <GroupByItem
-        datasource={datasource}
         query={query}
         groupBy={item}
         onChange={onChange}
