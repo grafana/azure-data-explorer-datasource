@@ -11,6 +11,7 @@ import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/t
 import { AdxDataSourceOptions, AdxSchema, defaultQuery, KustoQuery } from 'types';
 import FilterSection from './VisualQueryEditor/FilterSection';
 import AggregateSection from './VisualQueryEditor/AggregateSection';
+import GroupBySection from './VisualQueryEditor/GroupBySection';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -97,6 +98,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
       </EditorRow>
       <FilterSection {...props} tableSchema={tableSchema} />
       <AggregateSection {...props} tableSchema={tableSchema} />
+      <GroupBySection {...props} tableSchema={tableSchema} />
       {/* TODO: Use proper preview component */}
       <pre>{query.query}</pre>
     </EditorRows>

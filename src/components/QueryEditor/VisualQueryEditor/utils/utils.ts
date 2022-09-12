@@ -1,6 +1,7 @@
 import { SelectableValue, toOption } from '@grafana/data';
 import {
   QueryEditorExpressionType,
+  QueryEditorGroupByExpression,
   QueryEditorOperatorExpression,
   QueryEditorReduceExpression,
 } from 'components/LegacyQueryEditor/editor/expressions';
@@ -171,6 +172,24 @@ export function sanitizeAggregate(expression: QueryEditorReduceExpression): Quer
         if (column) {
           return expression;
         }
+    }
+  }
+
+  return undefined;
+}
+
+/** Given a partial aggregation expression, return a non-partial if it's valid, or undefined */
+export function sanitizeGroupBy(expression: QueryEditorGroupByExpression): QueryEditorGroupByExpression | undefined {
+  const column = expression.property?.name;
+  const type = expression.property?.type;
+
+  if (column) {
+    if (
+      type !== QueryEditorPropertyType.DateTime ||
+      // DateTime columns require an interval
+      (type === QueryEditorPropertyType.DateTime && expression.interval?.name)
+    ) {
+      return expression;
     }
   }
 

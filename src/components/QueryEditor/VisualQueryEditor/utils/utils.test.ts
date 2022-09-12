@@ -5,6 +5,7 @@ import {
   getOperatorExpressionOptions,
   getOperatorExpressionValue,
   sanitizeAggregate,
+  sanitizeGroupBy,
   sanitizeOperator,
   setOperatorExpressionName,
   setOperatorExpressionProperty,
@@ -267,5 +268,34 @@ describe('sanitizeAggregate', () => {
       type: QueryEditorExpressionType.Reduce,
     };
     expect(sanitizeAggregate(op)).toEqual(op);
+  });
+});
+
+describe('sanitizeGroupBy', () => {
+  it('ignores an expression with a missing column', () => {
+    expect(
+      sanitizeGroupBy({
+        property: { name: '', type: QueryEditorPropertyType.String },
+        type: QueryEditorExpressionType.GroupBy,
+      })
+    ).toBeUndefined();
+  });
+
+  it('ignores an expression with a missing interval for a DateTime', () => {
+    expect(
+      sanitizeGroupBy({
+        property: { name: 'Time', type: QueryEditorPropertyType.DateTime },
+        interval: { name: '', type: QueryEditorPropertyType.Interval },
+        type: QueryEditorExpressionType.GroupBy,
+      })
+    ).toBeUndefined();
+  });
+
+  it('returns a valid group', () => {
+    const op = {
+      property: { name: 'col', type: QueryEditorPropertyType.String },
+      type: QueryEditorExpressionType.GroupBy,
+    };
+    expect(sanitizeGroupBy(op)).toEqual(op);
   });
 });
