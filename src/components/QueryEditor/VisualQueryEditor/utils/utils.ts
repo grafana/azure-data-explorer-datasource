@@ -2,9 +2,11 @@ import { SelectableValue, toOption } from '@grafana/data';
 import {
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
+  QueryEditorReduceExpression,
 } from 'components/LegacyQueryEditor/editor/expressions';
 import { isUndefined } from 'lodash';
 import { QueryEditorOperatorValueType, QueryEditorPropertyType } from 'schema/types';
+import { AggregateFunctions } from '../AggregateItem';
 import { isMulti, OPERATORS } from './operators';
 
 function zeroValue(type: QueryEditorPropertyType) {
@@ -143,6 +145,33 @@ export function sanitizeOperator(
         name: operator,
       },
     };
+  }
+
+  return undefined;
+}
+
+/** Given a partial aggregation expression, return a non-partial if it's valid, or undefined */
+export function sanitizeAggregate(expression: QueryEditorReduceExpression): QueryEditorReduceExpression | undefined {
+  const func = expression.reduce?.name;
+  const column = expression.property?.name;
+
+  if (func) {
+    switch (func) {
+      case AggregateFunctions.Count:
+        // Count function does not require a column
+        return expression;
+      case AggregateFunctions.Percentile:
+        // Percentile requires a column and a parameter
+        if (column && expression.parameters?.length) {
+          return expression;
+        }
+        break;
+      default:
+        // All the other functions require a column
+        if (column) {
+          return expression;
+        }
+    }
   }
 
   return undefined;
