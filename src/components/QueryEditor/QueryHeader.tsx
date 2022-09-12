@@ -101,8 +101,8 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         }}
       />
       <FlexItem grow={1} />
-      <Button variant="primary" icon="play" size="sm" onClick={() => onRunQuery()}>
-        Run
+      <Button variant="primary" icon="play" size="sm" onClick={onRunQuery}>
+        Run query
       </Button>
       <RadioButtonGroup
         size="sm"

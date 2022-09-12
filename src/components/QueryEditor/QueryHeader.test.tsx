@@ -102,7 +102,7 @@ describe('QueryEditor', () => {
       const onRunQuery = jest.fn();
       render(<QueryHeader {...defaultProps} schema={schema} onRunQuery={onRunQuery} />);
       await waitFor(() => screen.getByText('foo'));
-      screen.getByRole('button').click();
+      screen.getByText('Run query').click();
       expect(onRunQuery).toHaveBeenCalledTimes(1);
     });
   });
