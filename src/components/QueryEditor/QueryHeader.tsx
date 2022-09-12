@@ -52,6 +52,12 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   };
 
   useEffect(() => {
+    if (!query.database && database) {
+      onChange({ ...query, database });
+    }
+  }, [query, database, onChange]);
+
+  useEffect(() => {
     if (rawMode) {
       setFormats(EDITOR_FORMATS.concat(adxTimeFormat));
     } else {
