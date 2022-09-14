@@ -40,7 +40,6 @@ func TestResourceHandler(t *testing.T) {
 		adx.client = &failingClient{}
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
-			TenantID:   "9a2ddabe-90c0-4e09-bf28-a91111a56ed7",
 		}
 		adx.serviceCredentials = &FakeServiceCredentials{}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
@@ -58,7 +57,6 @@ func TestResourceHandler(t *testing.T) {
 		adx.client = &workingClient{}
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
-			TenantID:   "9a2ddabe-90c0-4e09-bf28-a91111a56ed7",
 		}
 		adx.serviceCredentials = &FakeServiceCredentials{}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
