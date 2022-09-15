@@ -57,6 +57,13 @@ describe('QueryEditor', () => {
       },
     };
 
+    it('should select a format by default', async () => {
+      const onChange = jest.fn();
+      render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />);
+      await waitFor(() => screen.getByText('foo'));
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'table' }));
+    });
+
     it('should select a database by default', async () => {
       const onChange = jest.fn();
       render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />);

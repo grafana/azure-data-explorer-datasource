@@ -41,19 +41,18 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
     const name = tableMapping?.value ?? tableName;
     const schema = await getTableSchema(datasource, databaseName, name);
     const expression = query.expression ?? defaultQuery.expression;
+    const newExpression = {
+      ...expression,
+      from: {
+        type: QueryEditorExpressionType.Property,
+        property: { type: QueryEditorPropertyType.String, name: table.value },
+      },
+    };
 
     onChange({
       ...query,
-      query: parseExpression(
-        {
-          ...expression,
-          from: {
-            type: QueryEditorExpressionType.Property,
-            property: { type: QueryEditorPropertyType.String, name: table.value },
-          },
-        },
-        schema
-      ),
+      expression: newExpression,
+      query: parseExpression(newExpression, schema),
     });
 
     return schema;

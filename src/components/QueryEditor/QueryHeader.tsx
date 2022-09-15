@@ -67,6 +67,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   }, [rawMode]);
 
   useEffect(() => {
+    if (!query.resultFormat) {
+      onChange({ ...query, resultFormat: 'table' });
+    }
     if (query.resultFormat === adxTimeFormat.value && !formats.includes(adxTimeFormat)) {
       // Fallback to Time Series since time_series_adx_series is not available
       onChange({ ...query, resultFormat: 'time_series' });
