@@ -63,4 +63,34 @@ describe('AggregateSection', () => {
       })
     );
   });
+
+  it('cleans up the when the table changes', () => {
+    const query = {
+      ...defaultProps.query,
+      expression: {
+        ...defaultProps.query.expression,
+        from: {
+          type: QueryEditorExpressionType.Property,
+          property: { type: QueryEditorPropertyType.String, name: 'mytable' },
+        },
+        reduce: {
+          expressions: [
+            {
+              parameters: undefined,
+              property: { name: 'foo', type: QueryEditorPropertyType.String },
+              reduce: { name: AggregateFunctions.Avg, type: QueryEditorPropertyType.String },
+              type: QueryEditorExpressionType.Reduce,
+            },
+          ],
+          type: QueryEditorExpressionType.And,
+        },
+      },
+    };
+    const { rerender } = render(<AggregateSection {...defaultProps} query={query} />);
+    expect(screen.getByText('foo')).toBeInTheDocument();
+    query.expression.from!.property.name = 'other';
+    query.expression.reduce.expressions = [];
+    rerender(<AggregateSection {...defaultProps} query={query} />);
+    expect(screen.queryByText('foo')).not.toBeInTheDocument();
+  });
 });
