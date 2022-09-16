@@ -408,13 +408,13 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
 };
 
 const escapeAndCastIfDynamic = (column: string, tableSchema?: AdxColumnSchema[], schemaName?: string): string => {
-  const columnSchema = tableSchema?.find((c) => c.Name === (schemaName || column));
-
-  if (!columnSchema?.isDynamic || !Array.isArray(tableSchema)) {
+  const columnSchemas = tableSchema?.filter((c) => c.Name === (schemaName || column));
+  if (!columnSchemas || columnSchemas.length == 0 || !Array.isArray(tableSchema)) {
     return escapeColumn(column);
   }
 
-  if (!columnSchema) {
+  const columnSchema = columnSchemas?.find((c) => c.CslType === 'double') ?? columnSchemas[0];
+  if (!columnSchema.isDynamic) {
     return escapeColumn(column);
   }
 

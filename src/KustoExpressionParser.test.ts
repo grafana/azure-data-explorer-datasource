@@ -511,7 +511,7 @@ describe('KustoExpressionParser', () => {
       );
     });
 
-    it('should parse expression with summarize of sum on dynamic column', () => {
+    it('should parse expression with summarize of sum with cast to double on dynamic column with integer and double types', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createArray([createOperator('column["isActive"]', '==', true)]),
@@ -524,10 +524,17 @@ describe('KustoExpressionParser', () => {
           CslType: 'int',
           isDynamic: true,
         },
+        {
+          Name: 'column["level"]["active"]',
+          CslType: 'double',
+          isDynamic: true,
+        },
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
-        'StormEvents' + '\n| where column["isActive"] == true' + `\n| summarize sum(toint(column["level"]["active"]))`
+        'StormEvents' +
+          '\n| where column["isActive"] == true' +
+          `\n| summarize sum(todouble(column["level"]["active"]))`
       );
     });
 
