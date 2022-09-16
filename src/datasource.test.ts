@@ -224,6 +224,11 @@ describe('AdxDataSource', () => {
           warn: true,
         },
         {
+          schema: '{"TeamID":["string","double"]}',
+          expected: { Name: `Teams["TeamID"]`, CslType: 'double', isDynamic: true },
+          warn: true,
+        },
+        {
           schema: '{"TeamID":[{"a":"string"},"bool"]}',
           expected: { Name: `Teams["TeamID"]["a"]`, CslType: 'string', isDynamic: true },
           warn: true,
