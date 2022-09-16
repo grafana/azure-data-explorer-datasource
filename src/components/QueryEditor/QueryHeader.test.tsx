@@ -42,7 +42,8 @@ describe('QueryEditor', () => {
     it('should render a loading message', async () => {
       const schema: AsyncState<AdxSchema> = { loading: true };
       render(<QueryHeader {...defaultProps} schema={schema} />);
-      await waitFor(() => screen.getByTestId('Spinner'));
+      await waitFor(() => screen.getByText('Database:'));
+      expect(screen.getByTestId('Spinner')).toBeInTheDocument();
     });
   });
 
@@ -143,6 +144,7 @@ describe('QueryEditor', () => {
       // simulate change of mode
       query = { ...defaultProps.query, rawMode: false, resultFormat: 'time_series_adx_series' };
       rerender(<QueryHeader {...defaultProps} onChange={onChange} query={query} />);
+      await waitFor(() => screen.getByText('Format as:'));
       // it should change to time_series since it's using the visual editor
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'time_series' }));
     });
