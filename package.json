@@ -25,7 +25,7 @@
     "@grafana/toolkit": "9.1.5",
     "@grafana/ui": "9.1.5",
     "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "12.1.4",
+    "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^13.1.9",
     "@types/chance": "^1.1.2",
     "@types/debounce-promise": "^3.1.2",
@@ -40,12 +40,12 @@
     "emotion": "^11.0.0",
     "monaco-editor": "0.17.0",
     "prismjs": "1.29.0",
-    "ts-jest": "28.0.7"
+    "react-select-event": "^5.2.0",
+    "ts-jest": "^26.4.3"
   },
   "dependencies": {
     "@grafana/experimental": "0.0.2-canary.35",
     "debounce-promise": "^3.1.2",
-    "react-select-event": "^5.2.0",
     "react-use": "^15.3.3",
     "tslib": "^2.3.1"
   },
