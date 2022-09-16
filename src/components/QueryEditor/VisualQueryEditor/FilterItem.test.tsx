@@ -87,8 +87,7 @@ describe('FilterItem', () => {
     const onChange = jest.fn();
     const filter = { property: { name: 'col', type: QueryEditorPropertyType.Number } };
     render(<FilterItem {...defaultProps} datasource={datasource} onChange={onChange} filter={filter} />);
-    const input = screen.getByLabelText('column number value');
-    userEvent.type(input, '1');
+    await userEvent.type(screen.getByLabelText('column number value'), '1');
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: 1 } }));
   });
 
@@ -98,8 +97,7 @@ describe('FilterItem', () => {
     const onChange = jest.fn();
     const filter = { property: { name: 'col', type: QueryEditorPropertyType.DateTime } };
     render(<FilterItem {...defaultProps} datasource={datasource} onChange={onChange} filter={filter} />);
-    const input = screen.getByLabelText('column datetime value');
-    userEvent.type(input, '1');
+    await userEvent.type(screen.getByLabelText('column datetime value'), '1');
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: '1' } }));
   });
 });
