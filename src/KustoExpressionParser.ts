@@ -409,7 +409,7 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
 
 const escapeAndCastIfDynamic = (column: string, tableSchema?: AdxColumnSchema[], schemaName?: string): string => {
   const columnSchemas = tableSchema?.filter((c) => c.Name === (schemaName || column));
-  if (!columnSchemas || columnSchemas.length == 0 || !Array.isArray(tableSchema)) {
+  if (!columnSchemas || columnSchemas.length === 0 || !Array.isArray(tableSchema)) {
     return escapeColumn(column);
   }
 
