@@ -88,7 +88,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
                     ...defaultQuery.expression,
                     from: {
                       type: QueryEditorExpressionType.Property,
-                      property: { type: QueryEditorPropertyType.String, name: value },
+                      property: { type: QueryEditorPropertyType.String, name: value || '' },
                     },
                   },
                 });
