@@ -122,10 +122,10 @@ e2e.scenario({
             cy.contains('PerfTest').click({ force: true });
 
             e2eSelectors.queryEditor.tableFrom.input().click({ force: true });
-            cy.contains('events.all').click({ force: true });
+            cy.contains('PerfTest').click({ force: true });
 
             e2eSelectors.queryEditor.runQuery.button().click({ force: true });
-            cy.contains('Data is missing a number field').should('exist');
+            cy.contains('_val1_').should('exist');
           },
         });
       });
