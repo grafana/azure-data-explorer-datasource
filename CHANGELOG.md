@@ -1,5 +1,9 @@
 # Change Log
 
+## [4.1.6]
+
+- Change default logic for dynamic columns: Cast to double if type exists in schema
+
 ## [4.1.5]
 
 - Fix: Update table in the KQL expression when changing the database.
