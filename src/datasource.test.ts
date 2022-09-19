@@ -243,7 +243,7 @@ describe('AdxDataSource', () => {
         afterEach(() => {
           console.warn = consoleWarn;
         });
-        it(`should return ${t.expected} type`, async () => {
+        it(`should return ${t.expected.CslType} type for ${t.expected.Name}`, async () => {
           const datasource = mockDatasource();
           datasource.query = jest.fn().mockReturnValue({
             toPromise: jest.fn().mockResolvedValue({

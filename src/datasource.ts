@@ -381,18 +381,16 @@ const recordSchemaArray = (name: string, types: AdxSchemaDefinition[], result: A
   // we select double if it exists as it's the one with more precision, otherwise we take the first
   const defaultCslType = types.find((t) => typeof t === 'string' && (t === 'double' || t === 'real')) || types[0];
   if (
-    types.length < 2 ||
-    types.every((t) => typeof t === 'string' && toPropertyType(t) === QueryEditorPropertyType.Number)
+    types.length > 1 &&
+    !types.every((t) => typeof t === 'string' && toPropertyType(t) === QueryEditorPropertyType.Number)
   ) {
-    // If all the types are numbers or there is just one type
-    result.push({ Name: name, CslType: defaultCslType as string, isDynamic: true });
-  } else {
+    // If there is more than one type and not all types are numbers
     console.warn(`schema ${name} may contain different types, assuming ${defaultCslType}`);
-    if (typeof defaultCslType === 'object') {
-      recordSchema(name, types[0], result);
-    } else {
-      result.push({ Name: name, CslType: defaultCslType, isDynamic: true });
-    }
+  }
+  if (typeof defaultCslType === 'object') {
+    recordSchema(name, types[0], result);
+  } else {
+    result.push({ Name: name, CslType: defaultCslType, isDynamic: true });
   }
 };
 
