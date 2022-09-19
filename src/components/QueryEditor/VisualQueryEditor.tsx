@@ -54,6 +54,8 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
         query: parseExpression(query.expression, tableSchema.value),
       });
     }
+    // We are only interested on re-parsing if the expression changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query.expression, tableSchema.value]);
 
   if (!schema) {
