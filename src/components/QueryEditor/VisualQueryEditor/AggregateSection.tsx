@@ -7,7 +7,6 @@ import {
 } from 'components/LegacyQueryEditor/editor/expressions';
 import { AdxDataSource } from 'datasource';
 import React, { useState, useEffect } from 'react';
-import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeAggregate } from './utils/utils';
@@ -16,7 +15,7 @@ import AggregateItem from './AggregateItem';
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface AggregateSectionProps extends Props {
-  tableSchema: AsyncState<AdxColumnSchema[]>;
+  columns: AdxColumnSchema[];
   database: string;
   templateVariableOptions: SelectableValue<string>;
 }
@@ -24,7 +23,7 @@ interface AggregateSectionProps extends Props {
 const AggregateSection: React.FC<AggregateSectionProps> = ({
   query,
   datasource,
-  tableSchema,
+  columns,
   templateVariableOptions,
   onChange: onQueryChange,
 }) => {
@@ -64,24 +63,23 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
     onQueryChange({
       ...query,
       expression: newExpression,
-      query: datasource.parseExpression(newExpression, tableSchema.value),
     });
   };
 
   return (
-    <>
+    <div data-testid="aggregate-section">
       <EditorRow>
         <EditorFieldGroup>
           <EditorField label="Aggregate" optional={true}>
             <EditorList
               items={aggregates}
               onChange={onChange}
-              renderItem={makeRenderAggregate(datasource, query, tableSchema.value, templateVariableOptions)}
+              renderItem={makeRenderAggregate(datasource, query, columns, templateVariableOptions)}
             />
           </EditorField>
         </EditorFieldGroup>
       </EditorRow>
-    </>
+    </div>
   );
 };
 

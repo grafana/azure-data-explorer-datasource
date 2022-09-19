@@ -4,14 +4,13 @@ import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental'
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { AdxDataSource } from 'datasource';
 import React from 'react';
-import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import KQLFilter from './KQLFilter';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface FilterSectionProps extends Props {
-  tableSchema: AsyncState<AdxColumnSchema[]>;
+  columns: AdxColumnSchema[];
   database: string;
   templateVariableOptions: SelectableValue<string>;
 }
@@ -20,7 +19,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   query,
   onChange,
   datasource,
-  tableSchema,
+  columns,
   templateVariableOptions,
 }) => {
   return (
@@ -38,7 +37,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 query={query}
                 onChange={onChange}
                 datasource={datasource}
-                columns={tableSchema.value}
+                columns={columns}
                 templateVariableOptions={templateVariableOptions}
               />
             </EditorField>

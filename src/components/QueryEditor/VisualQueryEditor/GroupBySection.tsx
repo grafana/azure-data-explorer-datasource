@@ -7,7 +7,6 @@ import {
 } from 'components/LegacyQueryEditor/editor/expressions';
 import { AdxDataSource } from 'datasource';
 import React, { useState, useEffect } from 'react';
-import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeGroupBy } from './utils/utils';
@@ -16,7 +15,7 @@ import GroupByItem from './GroupByItem';
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 interface GroupBySectionProps extends Props {
-  tableSchema: AsyncState<AdxColumnSchema[]>;
+  columns: AdxColumnSchema[];
   database: string;
   templateVariableOptions: SelectableValue<string>;
 }
@@ -24,7 +23,7 @@ interface GroupBySectionProps extends Props {
 const GroupBySection: React.FC<GroupBySectionProps> = ({
   query,
   datasource,
-  tableSchema,
+  columns,
   templateVariableOptions,
   onChange: onQueryChange,
 }) => {
@@ -63,7 +62,6 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
     onQueryChange({
       ...query,
       expression: newExpression,
-      query: datasource.parseExpression(newExpression, tableSchema.value),
     });
   };
 
@@ -75,7 +73,7 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
             <EditorList
               items={groupBys}
               onChange={onChange}
-              renderItem={makeRenderGroupBy(query, tableSchema.value, templateVariableOptions)}
+              renderItem={makeRenderGroupBy(query, columns, templateVariableOptions)}
             />
           </EditorField>
         </EditorFieldGroup>

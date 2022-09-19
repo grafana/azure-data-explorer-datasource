@@ -200,6 +200,18 @@ describe('KustoExpressionParser', () => {
   });
 
   describe('toQuery', () => {
+    it('should parse expression with columns', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        columns: {
+          type: QueryEditorExpressionType.Property,
+          columns: ['foo', 'bar'],
+        },
+      });
+
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| project foo, bar');
+    });
+
     it('should parse expression with where equal to string value', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
@@ -207,6 +219,18 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where eventType == 'ThunderStorm'");
+    });
+
+    it('should parse expression with columns with spaces', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        columns: {
+          type: QueryEditorExpressionType.Property,
+          columns: ['foo bar'],
+        },
+      });
+
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| project ["foo bar"]');
     });
 
     it('should parse where operator with a space', () => {
@@ -379,6 +403,25 @@ describe('KustoExpressionParser', () => {
           '\n| where isActive == true' +
           `\n| order by StartTime asc`
       );
+    });
+
+    it('should parse expression without a time filter if the selected columns does not include the time column', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        columns: {
+          type: QueryEditorExpressionType.Property,
+          columns: ['foo'],
+        },
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'StartTime',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual('StormEvents' + '\n| project foo');
     });
 
     it('should parse expression with time filter when schema contains multiple time columns', () => {

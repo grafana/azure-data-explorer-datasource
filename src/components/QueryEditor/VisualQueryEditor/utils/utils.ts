@@ -1,5 +1,6 @@
 import { SelectableValue, toOption } from '@grafana/data';
 import {
+  QueryEditorColumnsExpression,
   QueryEditorExpressionType,
   QueryEditorGroupByExpression,
   QueryEditorOperatorExpression,
@@ -7,6 +8,7 @@ import {
 } from 'components/LegacyQueryEditor/editor/expressions';
 import { isUndefined } from 'lodash';
 import { QueryEditorOperatorValueType, QueryEditorPropertyType } from 'schema/types';
+import { AdxColumnSchema } from 'types';
 import { AggregateFunctions } from '../AggregateItem';
 import { isMulti, OPERATORS } from './operators';
 
@@ -194,4 +196,15 @@ export function sanitizeGroupBy(expression: QueryEditorGroupByExpression): Query
   }
 
   return undefined;
+}
+
+export function filterColumns(
+  tableSchema?: AdxColumnSchema[],
+  expression?: QueryEditorColumnsExpression
+): AdxColumnSchema[] | undefined {
+  return expression?.columns?.length
+    ? // filter columns with the same name or under the same dynamic column
+      // e.g. MyCol or MyCol["Inner"]
+      tableSchema?.filter((c) => expression?.columns?.includes(c.Name.split('[')[0]))
+    : tableSchema;
 }
