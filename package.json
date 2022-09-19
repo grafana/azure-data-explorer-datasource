@@ -19,8 +19,8 @@
   "devDependencies": {
     "@emotion/core": "^11.0.0",
     "@grafana/data": "9.1.5",
-    "@grafana/e2e": "8.5.2",
-    "@grafana/e2e-selectors": "8.5.2",
+    "@grafana/e2e": "9.1.5",
+    "@grafana/e2e-selectors": "9.1.5",
     "@grafana/runtime": "9.1.5",
     "@grafana/toolkit": "8.5.2",
     "@grafana/ui": "9.1.3",
