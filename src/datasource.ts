@@ -378,19 +378,19 @@ const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchem
 
 const recordSchemaArray = (name: string, types: AdxSchemaDefinition[], result: AdxColumnSchema[]) => {
   // If a field can have different types (e.g. long and double)
-  // we select the first, assuming they are interchangeable
-  const defaultCslType = types[0];
-  if (types.every((t) => typeof t === 'string' && toPropertyType(t) === QueryEditorPropertyType.Number)) {
-    // If all the types are numbers, the double takes precedence since it has more precission.
-    const cslType = types.find((t) => typeof t === 'string' && (t === 'double' || t === 'real')) || defaultCslType;
-    result.push({ Name: name, CslType: cslType as string, isDynamic: true });
-  } else {
+  // we select double if it exists as it's the one with more precision, otherwise we take the first
+  const defaultCslType = types.find((t) => typeof t === 'string' && (t === 'double' || t === 'real')) || types[0];
+  if (
+    types.length > 1 &&
+    !types.every((t) => typeof t === 'string' && toPropertyType(t) === QueryEditorPropertyType.Number)
+  ) {
+    // If there is more than one type and not all types are numbers
     console.warn(`schema ${name} may contain different types, assuming ${defaultCslType}`);
-    if (typeof defaultCslType === 'object') {
-      recordSchema(name, types[0], result);
-    } else {
-      result.push({ Name: name, CslType: defaultCslType, isDynamic: true });
-    }
+  }
+  if (typeof defaultCslType === 'object') {
+    recordSchema(name, types[0], result);
+  } else {
+    result.push({ Name: name, CslType: defaultCslType, isDynamic: true });
   }
 };
 

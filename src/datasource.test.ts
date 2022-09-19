@@ -224,6 +224,11 @@ describe('AdxDataSource', () => {
           warn: true,
         },
         {
+          schema: '{"TeamID":["string","double"]}',
+          expected: { Name: `Teams["TeamID"]`, CslType: 'double', isDynamic: true },
+          warn: true,
+        },
+        {
           schema: '{"TeamID":[{"a":"string"},"bool"]}',
           expected: { Name: `Teams["TeamID"]["a"]`, CslType: 'string', isDynamic: true },
           warn: true,
@@ -238,7 +243,7 @@ describe('AdxDataSource', () => {
         afterEach(() => {
           console.warn = consoleWarn;
         });
-        it(`should return ${t.expected} type`, async () => {
+        it(`should return ${t.expected.CslType} type for ${t.expected.Name}`, async () => {
           const datasource = mockDatasource();
           datasource.query = jest.fn().mockReturnValue({
             toPromise: jest.fn().mockResolvedValue({
