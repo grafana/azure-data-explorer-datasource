@@ -48,7 +48,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
   }, [tableSchema.value, query.expression?.columns]);
 
   useEffect(() => {
-    if (tableSchema.value) {
+    if (tableSchema.value?.length) {
       onChange({
         ...query,
         query: parseExpression(query.expression, tableSchema.value),
