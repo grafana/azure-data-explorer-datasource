@@ -24,6 +24,10 @@ interface KQLFilterProps {
   onChange: (query: KustoQuery) => void;
 }
 
+export interface FilterExpression extends QueryEditorOperatorExpression {
+  index: number;
+}
+
 const KQLFilter: React.FC<KQLFilterProps> = ({
   index,
   query,
@@ -34,21 +38,22 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
 }) => {
   // Each expression is a group of several OR statements
   const expressions = (query.expression.where.expressions[index] as QueryEditorArrayExpression)?.expressions;
-  const [filters, setFilters] = useState(expressions);
+  const [filters, setFilters] = useState<FilterExpression[]>(expressions.map((e, i) => ({ ...e, index: i })));
 
   useEffect(() => {
     if (!filters.length && expressions?.length) {
-      setFilters(expressions);
+      setFilters(expressions.map((e, i) => ({ ...e, index: i })));
     }
   }, [filters.length, expressions]);
 
   const onChange = (newItems: Array<Partial<QueryEditorOperatorExpression>>) => {
     // As new (empty object) items come in, with need to make sure they have the correct type
     const cleaned = newItems.map(
-      (v): QueryEditorOperatorExpression => ({
+      (v, i): FilterExpression => ({
         type: QueryEditorExpressionType.Operator,
         property: v.property ?? { type: QueryEditorPropertyType.String, name: '' },
         operator: v.operator ?? { name: '==', value: '' },
+        index: i,
       })
     );
     setFilters(cleaned);
@@ -80,7 +85,7 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
     <EditorList
       items={filters}
       onChange={onChange}
-      renderItem={makeRenderFilter(datasource, query, columns, templateVariableOptions)}
+      renderItem={makeRenderFilter(datasource, query, columns, templateVariableOptions, filters.length)}
     />
   );
 };
@@ -91,7 +96,8 @@ function makeRenderFilter(
   datasource: AdxDataSource,
   query: KustoQuery,
   columns: AdxColumnSchema[] | undefined,
-  templateVariableOptions: SelectableValue<string>
+  templateVariableOptions: SelectableValue<string>,
+  filtersLength: number
 ) {
   function renderFilter(
     item: Partial<QueryEditorExpression>,
@@ -107,6 +113,7 @@ function makeRenderFilter(
         onDelete={onDelete}
         columns={columns}
         templateVariableOptions={templateVariableOptions}
+        filtersLength={filtersLength}
       />
     );
   }
