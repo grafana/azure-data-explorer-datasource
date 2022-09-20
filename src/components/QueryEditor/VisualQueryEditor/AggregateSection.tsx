@@ -30,12 +30,22 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
 }) => {
   const expressions = query.expression.reduce.expressions;
   const [aggregates, setAggregates] = useState(expressions);
+  const [currentTable, setCurrentTable] = useState(query.expression.from?.property.name);
 
   useEffect(() => {
     if (!aggregates.length && expressions?.length) {
       setAggregates(expressions);
     }
   }, [aggregates.length, expressions]);
+
+  useEffect(() => {
+    // New table
+    if (currentTable !== query.expression.from?.property.name) {
+      // Reset state
+      setAggregates([]);
+      setCurrentTable(query.expression.from?.property.name);
+    }
+  }, [currentTable, query.expression.from?.property.name]);
 
   const onChange = (newItems: Array<Partial<QueryEditorReduceExpression>>) => {
     const cleaned = newItems.map(

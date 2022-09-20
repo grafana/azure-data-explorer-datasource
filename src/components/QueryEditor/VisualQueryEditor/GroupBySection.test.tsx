@@ -49,4 +49,32 @@ describe('GroupBySection', () => {
       })
     );
   });
+
+  it('cleans up the when the table changes', () => {
+    const query = {
+      ...defaultProps.query,
+      expression: {
+        ...defaultProps.query.expression,
+        from: {
+          type: QueryEditorExpressionType.Property,
+          property: { type: QueryEditorPropertyType.String, name: 'mytable' },
+        },
+        groupBy: {
+          expressions: [
+            {
+              property: { name: 'foo', type: QueryEditorPropertyType.String },
+              type: QueryEditorExpressionType.GroupBy,
+            },
+          ],
+          type: QueryEditorExpressionType.And,
+        },
+      },
+    };
+    const { rerender } = render(<GroupBySection {...defaultProps} query={query} />);
+    expect(screen.getByText('foo')).toBeInTheDocument();
+    query.expression.from!.property.name = 'other';
+    query.expression.groupBy.expressions = [];
+    rerender(<GroupBySection {...defaultProps} query={query} />);
+    expect(screen.queryByText('foo')).not.toBeInTheDocument();
+  });
 });
