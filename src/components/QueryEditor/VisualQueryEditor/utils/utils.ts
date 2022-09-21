@@ -43,7 +43,7 @@ export function setOperatorExpressionProperty(
     type: QueryEditorExpressionType.Operator,
     property: { name, type },
     operator: { name: operatorName, value: zeroValue(type) },
-    index: expression.index!,
+    index: Number(expression.index),
   };
 }
 
@@ -70,7 +70,7 @@ export function setOperatorExpressionName(expression: Partial<FilterExpression>,
       name,
       value: opValue,
     },
-    index: expression.index!,
+    index: Number(expression.index),
   };
 }
 
@@ -101,7 +101,7 @@ export function setOperatorExpressionValue(
       name: expression.operator?.name ?? '==',
       value,
     },
-    index: expression.index!,
+    index: Number(expression.index),
   };
 }
 
