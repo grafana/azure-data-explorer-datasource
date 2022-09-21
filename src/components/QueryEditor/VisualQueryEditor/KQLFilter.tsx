@@ -38,7 +38,9 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
 }) => {
   // Each expression is a group of several OR statements
   const expressions = (query.expression.where.expressions[index] as QueryEditorArrayExpression)?.expressions;
-  const [filters, setFilters] = useState<FilterExpression[]>(expressions.map((e, i) => ({ ...e, index: i })));
+  const [filters, setFilters] = useState<FilterExpression[]>(
+    expressions ? expressions.map((e, i) => ({ ...e, index: i })) : []
+  );
 
   useEffect(() => {
     if (!filters.length && expressions?.length) {
