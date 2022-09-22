@@ -37,14 +37,14 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
   templateVariableOptions,
 }) => {
   // Each expression is a group of several OR statements
-  const expressions = (query.expression.where.expressions[index] as QueryEditorArrayExpression)?.expressions;
-  const [filters, setFilters] = useState<FilterExpression[]>(
-    expressions ? expressions.map((e, i) => ({ ...e, index: i })) : []
-  );
+  const expressions: FilterExpression[] = (
+    query.expression.where.expressions[index] as QueryEditorArrayExpression
+  )?.expressions.map((e, i) => ({ ...e, index: i }));
+  const [filters, setFilters] = useState<FilterExpression[]>(expressions);
 
   useEffect(() => {
     if (!filters.length && expressions?.length) {
-      setFilters(expressions.map((e, i) => ({ ...e, index: i })));
+      setFilters(expressions);
     }
   }, [filters.length, expressions]);
 
