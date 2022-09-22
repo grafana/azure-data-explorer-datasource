@@ -18,7 +18,7 @@ const defaultProps = {
 };
 
 describe('FilterSection', () => {
-  it('should render a filter group per where expression', () => {
+  it('should join filter groups with an AND label', () => {
     const query = {
       ...mockQuery,
       expression: {
@@ -57,7 +57,7 @@ describe('FilterSection', () => {
       },
     };
     render(<FilterSection {...defaultProps} query={query} />);
-    expect(screen.getAllByText('Filter group')).toHaveLength(2);
+    expect(screen.getByText('AND')).toBeInTheDocument();
   });
 
   it('should add a filter group', () => {
