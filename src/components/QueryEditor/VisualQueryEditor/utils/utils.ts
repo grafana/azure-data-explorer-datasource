@@ -10,6 +10,7 @@ import { isUndefined } from 'lodash';
 import { QueryEditorOperatorValueType, QueryEditorPropertyType } from 'schema/types';
 import { AdxColumnSchema } from 'types';
 import { AggregateFunctions } from '../AggregateItem';
+import { FilterExpression } from '../KQLFilter';
 import { isMulti, OPERATORS } from './operators';
 
 function zeroValue(type: QueryEditorPropertyType) {
@@ -27,10 +28,10 @@ function zeroValue(type: QueryEditorPropertyType) {
  * Accepts a partial expression to use in an editor
  */
 export function setOperatorExpressionProperty(
-  expression: Partial<QueryEditorOperatorExpression>,
+  expression: Partial<FilterExpression>,
   name: string,
   type: QueryEditorPropertyType
-): QueryEditorOperatorExpression {
+): FilterExpression {
   let operatorName = '==';
   if (
     expression.operator?.name &&
@@ -44,16 +45,14 @@ export function setOperatorExpressionProperty(
     type: QueryEditorExpressionType.Operator,
     property: { name, type },
     operator: { name: operatorName, value: zeroValue(type) },
+    index: Number(expression.index),
   };
 }
 
 /** Sets the operator ("==") in an OperatorExpression
  * Accepts a partial expression to use in an editor
  */
-export function setOperatorExpressionName(
-  expression: Partial<QueryEditorOperatorExpression>,
-  name: string
-): QueryEditorOperatorExpression {
+export function setOperatorExpressionName(expression: Partial<FilterExpression>, name: string): FilterExpression {
   let opValue = expression.operator?.value ?? '';
   if (isMulti(name) && !Array.isArray(opValue)) {
     // Handle the case in which the operator now points to an multi value
@@ -73,6 +72,7 @@ export function setOperatorExpressionName(
       name,
       value: opValue,
     },
+    index: Number(expression.index),
   };
 }
 
@@ -80,9 +80,9 @@ export function setOperatorExpressionName(
  * Accepts a partial expression to use in an editor
  */
 export function setOperatorExpressionValue(
-  expression: Partial<QueryEditorOperatorExpression>,
+  expression: Partial<FilterExpression>,
   e: SelectableValue<string> | Array<SelectableValue<string>> | number | string
-): QueryEditorOperatorExpression {
+): FilterExpression {
   let value: string | string[] | number;
   if (typeof e === 'object' && !Array.isArray(e)) {
     value = e.value || '';
@@ -103,6 +103,7 @@ export function setOperatorExpressionValue(
       name: expression.operator?.name ?? '==',
       value,
     },
+    index: Number(expression.index),
   };
 }
 

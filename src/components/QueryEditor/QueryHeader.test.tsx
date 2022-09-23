@@ -5,7 +5,7 @@ import { openMenu } from 'react-select-event';
 
 import { mockDatasource, mockQuery } from '../__fixtures__/Datasource';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
-import { AdxSchema } from 'types';
+import { AdxSchema, defaultQuery } from 'types';
 
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
@@ -85,7 +85,9 @@ describe('QueryEditor', () => {
       const sel = screen.getByLabelText('Database:');
       openMenu(sel);
       screen.getByText('bar').click();
-      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ database: 'bar' }));
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({ database: 'bar', expression: defaultQuery.expression })
+      );
     });
 
     it('should show a warning if switching from raw mode', async () => {

@@ -15,6 +15,7 @@ const defaultProps = {
   templateVariableOptions: {},
   onChange: jest.fn(),
   onDelete: jest.fn(),
+  filtersLength: 0,
 };
 
 describe('FilterItem', () => {

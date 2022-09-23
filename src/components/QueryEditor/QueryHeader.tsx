@@ -3,7 +3,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Button, ConfirmModal, RadioButtonGroup } from '@grafana/ui';
 import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
 
-import { AdxSchema, EditorMode, KustoQuery } from '../../types';
+import { AdxSchema, defaultQuery, EditorMode, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition } from 'schema/types';
@@ -98,7 +98,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         value={database}
         isLoading={schema.loading}
         onChange={({ value }) => {
-          onChange({ ...query, database: value! });
+          onChange({ ...query, database: value!, expression: defaultQuery.expression });
         }}
       />
       <InlineSelect

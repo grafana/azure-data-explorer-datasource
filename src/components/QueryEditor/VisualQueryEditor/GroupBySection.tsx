@@ -29,12 +29,22 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
 }) => {
   const expressions = query.expression.groupBy.expressions;
   const [groupBys, setGroupBys] = useState(expressions);
+  const [currentTable, setCurrentTable] = useState(query.expression.from?.property.name);
 
   useEffect(() => {
     if (!groupBys.length && expressions?.length) {
       setGroupBys(expressions);
     }
   }, [groupBys.length, expressions]);
+
+  useEffect(() => {
+    // New table
+    if (currentTable !== query.expression.from?.property.name) {
+      // Reset state
+      setGroupBys([]);
+      setCurrentTable(query.expression.from?.property.name);
+    }
+  }, [currentTable, query.expression.from?.property.name]);
 
   const onChange = (newItems: Array<Partial<QueryEditorGroupByExpression>>) => {
     const cleaned = newItems.map(
