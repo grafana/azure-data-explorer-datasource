@@ -41,30 +41,28 @@ export const QueryEditorGroupBy: React.FC<Props> = (props) => {
           name: intervals[0].value,
         });
       }
+      onChange({
+        type: QueryEditorExpressionType.GroupBy,
+        property,
+        interval,
+      });
     },
-    [setField, intervals]
+    [setField, onChange, interval, intervals]
   );
 
   const onChangeInterval = useCallback(
     (property: QueryEditorProperty) => {
       setInterval(property);
+      if (field) {
+        onChange({
+          type: QueryEditorExpressionType.GroupBy,
+          property: field,
+          interval: property,
+        });
+      }
     },
-    [setInterval]
+    [setInterval, field, onChange]
   );
-
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    if (field) {
-      const payload: QueryEditorGroupByExpression = {
-        type: QueryEditorExpressionType.GroupBy,
-        property: field,
-        interval,
-      };
-
-      onChange(payload); // adding onChange to dependency array below causes maximum call depth error
-    }
-  }, [field, interval]);
-  /* eslint-enable react-hooks/exhaustive-deps */
 
   return (
     <div className={styles.container}>
