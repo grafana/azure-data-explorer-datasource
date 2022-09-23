@@ -26,18 +26,20 @@ interface KQLFilterProps {
   onChange: (query: KustoQuery) => void;
 }
 
-export interface FilterItem {
+export interface FilterListItem {
   type: string;
   expression?: QueryEditorOperatorExpression;
 }
 
-function expressionsToFilterItems(expressions?: QueryEditorExpression[] | QueryEditorArrayExpression[]): FilterItem[] {
-  const f: FilterItem[] = expressions?.map((e) => ({ type: 'expression', expression: e })) || [];
-  const c: FilterItem[] = fill(Array(Math.max(f.length - 1, 0)), { type: 'condition' });
+function expressionsToFilterItems(
+  expressions?: QueryEditorExpression[] | QueryEditorArrayExpression[]
+): FilterListItem[] {
+  const f: FilterListItem[] = expressions?.map((e) => ({ type: 'expression', expression: e })) || [];
+  const c: FilterListItem[] = fill(Array(Math.max(f.length - 1, 0)), { type: 'condition' });
   return compact(zip(f, c).flat());
 }
 
-function sanitizeFilterItemList(list: FilterItem[]): FilterItem[] {
+function sanitizeFilterItemList(list: FilterListItem[]): FilterListItem[] {
   const exprs = list.filter((item) => item.type === 'expression').map((item) => item.expression!);
   return expressionsToFilterItems(exprs);
 }
@@ -60,9 +62,9 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
     }
   }, [filters.length, expressions]);
 
-  const onChange = (newItems: Array<Partial<FilterItem>>) => {
+  const onChange = (newItems: Array<Partial<FilterListItem>>) => {
     // As new (empty object) items come in, with need to make sure they have the correct type
-    const cleaned: FilterItem[] = sanitizeFilterItemList(
+    const cleaned: FilterListItem[] = sanitizeFilterItemList(
       newItems.map((v, i) => {
         if (!v.type || v.type === 'expression') {
           return {
@@ -119,7 +121,7 @@ function makeRenderFilter(
   columns: AdxColumnSchema[] | undefined,
   templateVariableOptions: SelectableValue<string>
 ) {
-  function renderFilter(item: Partial<FilterItem>, onChange: (item: FilterItem) => void, onDelete: () => void) {
+  function renderFilter(item: Partial<FilterListItem>, onChange: (item: FilterListItem) => void, onDelete: () => void) {
     if (item.type === 'condition') {
       return <Label style={{ paddingTop: '9px' }}>OR</Label>;
     }

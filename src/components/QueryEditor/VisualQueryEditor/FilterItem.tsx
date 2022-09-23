@@ -21,7 +21,7 @@ import {
 import { isMulti, toOperatorOptions } from './utils/operators';
 import { columnsToDefinition, valueToDefinition } from 'schema/mapper';
 import { QueryEditorPropertyType } from 'schema/types';
-import { FilterItem } from './KQLFilter';
+import { FilterListItem } from './KQLFilter';
 
 interface FilterItemProps {
   datasource: AdxDataSource;
@@ -29,7 +29,7 @@ interface FilterItemProps {
   filter: Partial<QueryEditorOperatorExpression>;
   columns: AdxColumnSchema[] | undefined;
   templateVariableOptions: SelectableValue<string>;
-  onChange: (item: FilterItem) => void;
+  onChange: (item: FilterListItem) => void;
   onDelete: () => void;
 }
 
