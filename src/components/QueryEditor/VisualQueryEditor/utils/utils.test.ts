@@ -14,18 +14,17 @@ import {
 
 describe('setOperatorExpressionProperty', () => {
   it('should set a property from an empty expression', () => {
-    expect(setOperatorExpressionProperty({ index: 0 }, 'ActivityName', QueryEditorPropertyType.String)).toEqual({
+    expect(setOperatorExpressionProperty({}, 'ActivityName', QueryEditorPropertyType.String)).toEqual({
       type: QueryEditorExpressionType.Operator,
       property: { name: 'ActivityName', type: QueryEditorPropertyType.String },
       operator: { name: '==', value: '' },
-      index: 0,
     });
   });
 
   it('should keep the operator name if defined', () => {
     expect(
       setOperatorExpressionProperty(
-        { operator: { name: '!=', value: 'c' }, index: 0 },
+        { operator: { name: '!=', value: 'c' } },
         'ActivityName',
         QueryEditorPropertyType.String
       )
@@ -33,14 +32,13 @@ describe('setOperatorExpressionProperty', () => {
       type: QueryEditorExpressionType.Operator,
       property: { name: 'ActivityName', type: QueryEditorPropertyType.String },
       operator: { name: '!=', value: '' },
-      index: 0,
     });
   });
 
   it('change the operator name if the new type does not support it', () => {
     expect(
       setOperatorExpressionProperty(
-        { operator: { name: 'startswith', value: 'c' }, index: 0 },
+        { operator: { name: 'startswith', value: 'c' } },
         'ID',
         QueryEditorPropertyType.Number
       )
@@ -48,45 +46,40 @@ describe('setOperatorExpressionProperty', () => {
       type: QueryEditorExpressionType.Operator,
       property: { name: 'ID', type: QueryEditorPropertyType.Number },
       operator: { name: '==', value: 0 },
-      index: 0,
     });
   });
 });
 
 describe('setOperatorExpressionName', () => {
   it('should set a expression name (operator)', () => {
-    expect(setOperatorExpressionName({ index: 0 }, '!=')).toEqual({
+    expect(setOperatorExpressionName({}, '!=')).toEqual({
       type: QueryEditorExpressionType.Operator,
       property: { name: '', type: QueryEditorPropertyType.String },
       operator: { name: '!=', value: '' },
-      index: 0,
     });
   });
 
   it('should keep the current comparison value', () => {
-    expect(setOperatorExpressionName({ operator: { name: '==', value: 'foo' }, index: 0 }, '!=')).toEqual({
+    expect(setOperatorExpressionName({ operator: { name: '==', value: 'foo' } }, '!=')).toEqual({
       type: QueryEditorExpressionType.Operator,
       property: { name: '', type: QueryEditorPropertyType.String },
       operator: { name: '!=', value: 'foo' },
-      index: 0,
     });
   });
 
   it('should convert a value to an array', () => {
-    expect(setOperatorExpressionName({ operator: { name: '==', value: 'foo' }, index: 0 }, 'in')).toEqual({
+    expect(setOperatorExpressionName({ operator: { name: '==', value: 'foo' } }, 'in')).toEqual({
       type: QueryEditorExpressionType.Operator,
       property: { name: '', type: QueryEditorPropertyType.String },
       operator: { name: 'in', value: ['foo'] },
-      index: 0,
     });
   });
 
   it('should convert an array to a string', () => {
-    expect(setOperatorExpressionName({ operator: { name: 'in', value: ['foo'] }, index: 0 }, '!=')).toEqual({
+    expect(setOperatorExpressionName({ operator: { name: 'in', value: ['foo'] } }, '!=')).toEqual({
       type: QueryEditorExpressionType.Operator,
       property: { name: '', type: QueryEditorPropertyType.String },
       operator: { name: '!=', value: 'foo' },
-      index: 0,
     });
   });
 });
@@ -95,14 +88,13 @@ describe('setOperatorExpressionValue', () => {
   it('should set a single value', () => {
     expect(
       setOperatorExpressionValue(
-        { property: { type: QueryEditorPropertyType.String, name: 'ActivityName' }, index: 0 },
+        { property: { type: QueryEditorPropertyType.String, name: 'ActivityName' } },
         { value: 'foo' }
       )
     ).toEqual({
       type: QueryEditorExpressionType.Operator,
       property: { type: QueryEditorPropertyType.String, name: 'ActivityName' },
       operator: { name: '==', value: 'foo' },
-      index: 0,
     });
   });
 
@@ -112,7 +104,6 @@ describe('setOperatorExpressionValue', () => {
         {
           property: { type: QueryEditorPropertyType.String, name: 'ActivityName' },
           operator: { name: '!=', value: 'bar' },
-          index: 0,
         },
         { value: 'foo' }
       )
@@ -120,21 +111,19 @@ describe('setOperatorExpressionValue', () => {
       type: QueryEditorExpressionType.Operator,
       property: { type: QueryEditorPropertyType.String, name: 'ActivityName' },
       operator: { name: '!=', value: 'foo' },
-      index: 0,
     });
   });
 
   it('should set an array of values', () => {
     expect(
-      setOperatorExpressionValue(
-        { property: { type: QueryEditorPropertyType.String, name: 'ActivityName' }, index: 0 },
-        [{ value: 'foo' }, { value: 'bar' }]
-      )
+      setOperatorExpressionValue({ property: { type: QueryEditorPropertyType.String, name: 'ActivityName' } }, [
+        { value: 'foo' },
+        { value: 'bar' },
+      ])
     ).toEqual({
       type: QueryEditorExpressionType.Operator,
       property: { type: QueryEditorPropertyType.String, name: 'ActivityName' },
       operator: { name: '==', value: ['foo', 'bar'] },
-      index: 0,
     });
   });
 });

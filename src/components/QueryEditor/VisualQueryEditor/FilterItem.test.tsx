@@ -15,7 +15,6 @@ const defaultProps = {
   templateVariableOptions: {},
   onChange: jest.fn(),
   onDelete: jest.fn(),
-  filtersLength: 0,
 };
 
 describe('FilterItem', () => {
@@ -32,7 +31,9 @@ describe('FilterItem', () => {
     openMenu(sel);
     screen.getByText('foo').click();
     expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ property: { name: 'foo', type: QueryEditorPropertyType.String } })
+      expect.objectContaining({
+        expression: expect.objectContaining({ property: { name: 'foo', type: QueryEditorPropertyType.String } }),
+      })
     );
   });
 
@@ -42,7 +43,9 @@ describe('FilterItem', () => {
     const sel = screen.getByLabelText('operator');
     openMenu(sel);
     screen.getByText('!=').click();
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '!=', value: '' } }));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ expression: expect.objectContaining({ operator: { name: '!=', value: '' } }) })
+    );
   });
 
   it('should select a value', async () => {
@@ -54,7 +57,9 @@ describe('FilterItem', () => {
     const sel = screen.getByLabelText('column value');
     openMenu(sel);
     (await screen.findByText('foo')).click();
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: 'foo' } }));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ expression: expect.objectContaining({ operator: { name: '==', value: 'foo' } }) })
+    );
   });
 
   it('should select a template variable', async () => {
@@ -79,7 +84,9 @@ describe('FilterItem', () => {
     openMenu(sel);
     (await screen.findByText('Template Variables')).click();
     (await screen.findByText('$foo')).click();
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: "'$foo'" } }));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ expression: expect.objectContaining({ operator: { name: '==', value: "'$foo'" } }) })
+    );
   });
 
   it('type a numeric value', async () => {
@@ -90,7 +97,9 @@ describe('FilterItem', () => {
     render(<FilterItem {...defaultProps} datasource={datasource} onChange={onChange} filter={filter} />);
     const input = screen.getByLabelText('column number value');
     userEvent.type(input, '1');
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: 1 } }));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ expression: expect.objectContaining({ operator: { name: '==', value: 1 } }) })
+    );
   });
 
   it('type a datetime value', async () => {
@@ -101,6 +110,8 @@ describe('FilterItem', () => {
     render(<FilterItem {...defaultProps} datasource={datasource} onChange={onChange} filter={filter} />);
     const input = screen.getByLabelText('column datetime value');
     userEvent.type(input, '1');
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: '1' } }));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ expression: expect.objectContaining({ operator: { name: '==', value: '1' } }) })
+    );
   });
 });

@@ -1,14 +1,16 @@
 import React from 'react';
 import { useAsyncFn } from 'react-use';
-import { css } from '@emotion/css';
 
-import { GrafanaTheme2, SelectableValue, toOption } from '@grafana/data';
-import { Input, Label, Select, useStyles2 } from '@grafana/ui';
+import { SelectableValue, toOption } from '@grafana/data';
+import { Input, Select } from '@grafana/ui';
 import { AccessoryButton, InputGroup } from '@grafana/experimental';
 
 import { AdxDataSource } from '../../../datasource';
 import { AdxColumnSchema, KustoQuery } from '../../../types';
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import {
+  QueryEditorExpressionType,
+  QueryEditorOperatorExpression,
+} from 'components/LegacyQueryEditor/editor/expressions';
 import {
   getOperatorExpressionOptions,
   getOperatorExpressionValue,
@@ -19,22 +21,20 @@ import {
 import { isMulti, toOperatorOptions } from './utils/operators';
 import { columnsToDefinition, valueToDefinition } from 'schema/mapper';
 import { QueryEditorPropertyType } from 'schema/types';
-import { FilterExpression } from './KQLFilter';
+import { FilterItem } from './KQLFilter';
 
 interface FilterItemProps {
   datasource: AdxDataSource;
   query: KustoQuery;
-  filter: Partial<FilterExpression>;
+  filter: Partial<QueryEditorOperatorExpression>;
   columns: AdxColumnSchema[] | undefined;
   templateVariableOptions: SelectableValue<string>;
-  onChange: (item: FilterExpression) => void;
+  onChange: (item: FilterItem) => void;
   onDelete: () => void;
-  filtersLength: number;
 }
 
 const FilterItem: React.FC<FilterItemProps> = (props) => {
-  const { datasource, query, filter, onChange, onDelete, columns, templateVariableOptions, filtersLength } = props;
-  const styles = useStyles2(getStyles);
+  const { datasource, query, filter, onChange, onDelete, columns, templateVariableOptions } = props;
 
   const loadValues = async () => {
     if (!filter.property?.name) {
@@ -77,21 +77,26 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
         value={filter.property?.name ? valueToDefinition(filter.property?.name) : null}
         options={columns ? columnsToDefinition(columns) : []}
         allowCustomValue
-        onChange={(e) => e.value && onChange(setOperatorExpressionProperty(filter, e.value, e.type))}
+        onChange={(e) =>
+          e.value &&
+          onChange({ type: 'expression', expression: setOperatorExpressionProperty(filter, e.value, e.type) })
+        }
       />
       <Select
         aria-label="operator"
         width="auto"
         value={filter.operator?.name && toOption(filter.operator.name)}
         options={toOperatorOptions(filter.property?.type)}
-        onChange={({ value }) => value && onChange(setOperatorExpressionName(filter, value))}
+        onChange={({ value }) =>
+          value && onChange({ type: 'expression', expression: setOperatorExpressionName(filter, value) })
+        }
       />
       <div hidden={!isDatetime}>
         <Input
           aria-label="column datetime value"
           value={typeof filter.operator?.value === 'string' ? filter.operator.value : ''}
           onChange={(e) => {
-            onChange(setOperatorExpressionValue(filter, e.currentTarget.value));
+            onChange({ type: 'expression', expression: setOperatorExpressionValue(filter, e.currentTarget.value) });
           }}
         />
       </div>
@@ -101,7 +106,10 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
           value={typeof filter.operator?.value === 'number' ? filter.operator.value : 0}
           type="number"
           onChange={(e) => {
-            onChange(setOperatorExpressionValue(filter, parseInt(e.currentTarget.value, 10)));
+            onChange({
+              type: 'expression',
+              expression: setOperatorExpressionValue(filter, parseInt(e.currentTarget.value, 10)),
+            });
           }}
         />
       </div>
@@ -115,24 +123,14 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
           allowCustomValue
           onOpenMenu={loadOptions}
           onChange={(e: SelectableValue<string> | Array<SelectableValue<string>>) =>
-            onChange(setOperatorExpressionValue(filter, e))
+            onChange({ type: 'expression', expression: setOperatorExpressionValue(filter, e) })
           }
           isMulti={isMulti(filter.operator?.name)}
         />
       </div>
       <AccessoryButton aria-label="remove" icon="times" variant="secondary" onClick={onDelete} />
-      {Number(filter.index) < filtersLength - 1 ? <Label className={styles.orLabel}>OR</Label> : null}
     </InputGroup>
   );
-};
-
-const getStyles = (theme: GrafanaTheme2) => {
-  return {
-    orLabel: css({
-      paddingTop: '9px',
-      paddingLeft: '14px',
-    }),
-  };
 };
 
 export default FilterItem;
