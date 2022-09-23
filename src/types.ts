@@ -2,6 +2,7 @@ import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data
 
 import {
   QueryEditorArrayExpression,
+  QueryEditorColumnsExpression,
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
@@ -11,6 +12,7 @@ const packageJson = require('../package.json');
 
 export interface QueryExpression {
   from?: QueryEditorPropertyExpression;
+  columns?: QueryEditorColumnsExpression;
   where: QueryEditorArrayExpression;
   reduce: QueryEditorArrayExpression;
   groupBy: QueryEditorArrayExpression;

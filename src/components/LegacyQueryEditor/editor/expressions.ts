@@ -38,6 +38,10 @@ export interface QueryEditorGroupByExpression extends QueryEditorExpression {
   interval?: QueryEditorProperty;
 }
 
+export interface QueryEditorColumnsExpression extends QueryEditorExpression {
+  columns?: string[];
+}
+
 export interface QueryEditorArrayExpression extends QueryEditorExpression {
   expressions: QueryEditorExpression[] | QueryEditorArrayExpression[];
 }

@@ -1,19 +1,20 @@
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
-import { Alert, Select } from '@grafana/ui';
-import { EditorField, EditorFieldGroup, EditorRow, EditorRows } from '@grafana/experimental';
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { Alert } from '@grafana/ui';
+import { EditorRows } from '@grafana/experimental';
 import { AdxDataSource } from 'datasource';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useAsync } from 'react-use';
 import { AdxSchemaResolver } from 'schema/AdxSchemaResolver';
-import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
-import { AdxDataSourceOptions, AdxSchema, defaultQuery, KustoQuery } from 'types';
+import { QueryEditorPropertyDefinition } from 'schema/types';
+import { AdxColumnSchema, AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 import FilterSection from './VisualQueryEditor/FilterSection';
 import AggregateSection from './VisualQueryEditor/AggregateSection';
 import GroupBySection from './VisualQueryEditor/GroupBySection';
 import KQLPreview from './VisualQueryEditor/KQLPreview';
 import Timeshift from './VisualQueryEditor/Timeshift';
+import TableSection from './VisualQueryEditor/TableSection';
+import { filterColumns } from './VisualQueryEditor/utils/utils';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -25,12 +26,11 @@ interface VisualQueryEditorProps extends Props {
 
 export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
   const templateSrv = getTemplateSrv();
-  const { schema, database, datasource, query, onChange, templateVariableOptions } = props;
+  const { schema, database, datasource, query, onChange } = props;
   const { id: datasourceId, parseExpression, getSchemaMapper } = datasource;
   const databaseName = templateSrv.replace(database);
   const tables = useTableOptions(schema, databaseName, datasource);
   const table = useSelectedTable(tables, query, datasource);
-  const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateVariableOptions);
   const tableName = getTemplateSrv().replace(table?.value ?? '');
   const tableMapping = getSchemaMapper().getMappingByValue(table?.value);
   const tableSchema = useAsync(async () => {
@@ -39,24 +39,24 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
     }
 
     const name = tableMapping?.value ?? tableName;
-    const schema = await getTableSchema(datasource, databaseName, name);
-    const expression = query.expression ?? defaultQuery.expression;
-    const newExpression = {
-      ...expression,
-      from: {
-        type: QueryEditorExpressionType.Property,
-        property: { type: QueryEditorPropertyType.String, name: table.value },
-      },
-    };
-
-    onChange({
-      ...query,
-      expression: newExpression,
-      query: parseExpression(newExpression, schema),
-    });
-
-    return schema;
+    return await getTableSchema(datasource, databaseName, name);
   }, [datasourceId, databaseName, tableName, tableMapping?.value]);
+  const [tableColumns, setTableColumns] = useState<AdxColumnSchema[]>([]);
+
+  useEffect(() => {
+    setTableColumns(filterColumns(tableSchema.value, query.expression?.columns) || []);
+  }, [tableSchema.value, query.expression?.columns]);
+
+  useEffect(() => {
+    if (tableSchema.value?.length) {
+      onChange({
+        ...query,
+        query: parseExpression(query.expression, tableSchema.value),
+      });
+    }
+    // We are only interested on re-parsing if the expression changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query.expression, tableSchema.value]);
 
   if (!schema) {
     return null;
@@ -72,35 +72,11 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
       {!tableSchema.loading && tableSchema.value?.length === 0 && (
         <Alert severity="warning" title="Table schema loaded successfully but without any columns" />
       )}
-      <EditorRow>
-        <EditorFieldGroup>
-          <EditorField label="Table" width={16}>
-            <Select
-              aria-label="Table"
-              isLoading={tableSchema.loading}
-              value={table}
-              options={tableOptions}
-              allowCustomValue
-              onChange={({ value }) => {
-                onChange({
-                  ...query,
-                  expression: {
-                    ...defaultQuery.expression,
-                    from: {
-                      type: QueryEditorExpressionType.Property,
-                      property: { type: QueryEditorPropertyType.String, name: value },
-                    },
-                  },
-                });
-              }}
-            />
-          </EditorField>
-        </EditorFieldGroup>
-      </EditorRow>
-      <FilterSection {...props} tableSchema={tableSchema} />
-      <AggregateSection {...props} tableSchema={tableSchema} />
-      <GroupBySection {...props} tableSchema={tableSchema} />
-      <Timeshift {...props} tableSchema={tableSchema} />
+      <TableSection {...props} tableSchema={tableSchema} tables={tables} table={table} />
+      <FilterSection {...props} columns={tableColumns} />
+      <AggregateSection {...props} columns={tableColumns} />
+      <GroupBySection {...props} columns={tableColumns} />
+      <Timeshift {...props} />
       <KQLPreview query={props.query.query} />
     </EditorRows>
   );

@@ -1,12 +1,14 @@
 import { SelectableValue, toOption } from '@grafana/data';
 import {
+  QueryEditorColumnsExpression,
   QueryEditorExpressionType,
   QueryEditorGroupByExpression,
   QueryEditorOperatorExpression,
   QueryEditorReduceExpression,
 } from 'components/LegacyQueryEditor/editor/expressions';
-import { isUndefined } from 'lodash';
+import { isUndefined, uniq } from 'lodash';
 import { QueryEditorOperatorValueType, QueryEditorPropertyType } from 'schema/types';
+import { AdxColumnSchema } from 'types';
 import { AggregateFunctions } from '../AggregateItem';
 import { FilterExpression } from '../KQLFilter';
 import { isMulti, OPERATORS } from './operators';
@@ -195,4 +197,26 @@ export function sanitizeGroupBy(expression: QueryEditorGroupByExpression): Query
   }
 
   return undefined;
+}
+
+// extract the column name, ignoring inner objects for dynamic columns
+// e.g. MyCol["Inner"] => MyCol
+export function toColumnName(column: AdxColumnSchema) {
+  return column.Name.split('[')[0];
+}
+
+export function toColumnNames(columns: AdxColumnSchema[]) {
+  return uniq(columns.map((c) => toColumnName(c)));
+}
+
+// return columns defined in the expression (if any)
+export function filterColumns(
+  tableSchema?: AdxColumnSchema[],
+  expression?: QueryEditorColumnsExpression
+): AdxColumnSchema[] | undefined {
+  return expression?.columns?.length
+    ? // filter columns with the same name or under the same dynamic column
+      // e.g. MyCol or MyCol["Inner"]
+      tableSchema?.filter((c) => expression?.columns?.includes(toColumnName(c)))
+    : tableSchema;
 }

@@ -11,15 +11,7 @@ const defaultProps = {
   datasource: mockDatasource(),
   query: mockQuery,
   templateVariableOptions: {},
-  tableSchema: {
-    loading: false,
-    value: [
-      {
-        Name: 'foo',
-        CslType: 'string',
-      },
-    ],
-  },
+  columns: [{ Name: 'foo', CslType: 'string' }],
   database: 'db',
   onChange: jest.fn(),
   onRunQuery: jest.fn(),

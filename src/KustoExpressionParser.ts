@@ -17,6 +17,7 @@ import {
 } from './components/LegacyQueryEditor/editor/expressions';
 import { cloneDeep } from 'lodash';
 import { SelectableValue } from '@grafana/data';
+import { filterColumns } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 
 interface ParseContext {
   timeColumn?: string;
@@ -64,14 +65,16 @@ export class KustoExpressionParser {
       return '';
     }
 
+    const columns = filterColumns(tableSchema, expression.columns);
     const context: ParseContext = {
-      timeColumn: defaultTimeColumn(tableSchema, expression),
+      timeColumn: defaultTimeColumn(columns, expression),
       castIfDynamic: (column: string, schemaName?: string) => escapeAndCastIfDynamic(column, tableSchema, schemaName),
     };
 
     const parts: string[] = [];
     this.appendProperty(context, expression.from, parts);
-    this.appendTimeFilter(context, expression.timeshift, parts, tableSchema);
+    this.appendProject(expression.columns?.columns, parts);
+    this.appendTimeFilter(context, expression.timeshift, parts, columns);
     this.appendWhere(context, expression?.where, parts, 'where');
     this.appendTimeshift(context, expression.timeshift, parts);
     this.appendSummarize(context, expression.reduce, expression.groupBy, parts);
@@ -329,6 +332,12 @@ export class KustoExpressionParser {
     expandParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${p}`));
   }
 
+  private appendProject(columns: string[] | undefined, parts: string[]) {
+    if (columns?.length) {
+      parts.push(`project ${columns.map(escapeColumn).join(', ')}`);
+    }
+  }
+
   private appendProjectAway(expandParts: string[], parts: string[]) {
     if (expandParts.length) {
       // mv-expand creates a new column that we need to delete from the result
@@ -373,7 +382,7 @@ const withPrefix = (value: string, prefix?: string): string => {
 };
 
 const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpression): string | undefined => {
-  if (Array.isArray(expression?.groupBy.expressions)) {
+  if (Array.isArray(expression?.groupBy.expressions) && expression?.groupBy.expressions.length) {
     const groupByTimeColumn = expression?.groupBy.expressions.find((exp) => {
       if (!isGroupBy(exp)) {
         return false;

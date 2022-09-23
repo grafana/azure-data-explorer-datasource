@@ -3,21 +3,17 @@ import React, { useState } from 'react';
 import { Button, Select } from '@grafana/ui';
 import { AccessoryButton, EditorField, EditorFieldGroup, EditorRow, InputGroup } from '@grafana/experimental';
 
-import { AdxColumnSchema, KustoQuery } from '../../../types';
+import { KustoQuery } from '../../../types';
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { QueryEditorPropertyType } from 'schema/types';
-import { AdxDataSource } from 'datasource';
-import { AsyncState } from 'react-use/lib/useAsyncFn';
 
 interface TimeshiftProps {
-  datasource: AdxDataSource;
   query: KustoQuery;
-  tableSchema: AsyncState<AdxColumnSchema[]>;
   onChange: (query: KustoQuery) => void;
 }
 
 const Timeshift: React.FC<TimeshiftProps> = (props) => {
-  const { datasource, query, onChange, tableSchema } = props;
+  const { query, onChange } = props;
   const [displaySelect, setDisplaySelect] = useState(false);
   const onChangeValue = (value?: string) => {
     const newExpression = {
@@ -33,7 +29,6 @@ const Timeshift: React.FC<TimeshiftProps> = (props) => {
     onChange({
       ...query,
       expression: newExpression,
-      query: datasource.parseExpression(newExpression, tableSchema.value),
     });
   };
 
