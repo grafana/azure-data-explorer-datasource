@@ -7,7 +7,7 @@ import { AdxColumnSchema, AdxDataSourceOptions, defaultQuery, KustoQuery } from 
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { Select } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
-import { uniq } from 'lodash';
+import { toColumnNames } from './utils/utils';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -73,7 +73,7 @@ const TableSection: React.FC<TableSectionProps> = ({
             aria-label="Columns"
             isMulti
             value={query.expression.columns?.columns ? query.expression.columns.columns : []}
-            options={uniq(tableSchema.value?.map((c) => c.Name.split('[')[0])).map((c) => ({ label: c, value: c }))}
+            options={toColumnNames(tableSchema.value || []).map((c) => ({ label: c, value: c }))}
             placeholder="All"
             onChange={(e) => {
               onChange({
