@@ -1,14 +1,16 @@
 import { SelectableValue, toOption } from '@grafana/data';
 import {
+  QueryEditorArrayExpression,
   QueryEditorColumnsExpression,
   QueryEditorExpressionType,
   QueryEditorGroupByExpression,
   QueryEditorOperatorExpression,
   QueryEditorReduceExpression,
 } from 'components/LegacyQueryEditor/editor/expressions';
-import { isUndefined, uniq } from 'lodash';
+import { intersection, isUndefined, uniq } from 'lodash';
+import { toPropertyType } from 'schema/mapper';
 import { QueryEditorOperatorValueType, QueryEditorPropertyType } from 'schema/types';
-import { AdxColumnSchema } from 'types';
+import { AdxColumnSchema, QueryExpression } from 'types';
 import { AggregateFunctions } from '../AggregateItem';
 import { FilterExpression } from '../KQLFilter';
 import { isMulti, OPERATORS } from './operators';
@@ -219,4 +221,53 @@ export function filterColumns(
       // e.g. MyCol or MyCol["Inner"]
       tableSchema?.filter((c) => expression?.columns?.includes(toColumnName(c)))
     : tableSchema;
+}
+
+// return columns in use by an expression. If none has been specified, return the first
+// time and number columns from the table definition
+export function defaultTimeSeriesColumns(expression: QueryExpression, tableColumns: AdxColumnSchema[]): string[] {
+  const res: string[] = [];
+  if (expression.where.expressions?.length) {
+    (expression.where.expressions as QueryEditorArrayExpression[]).forEach((exp) => {
+      if (exp.expressions.length) {
+        (exp.expressions as QueryEditorOperatorExpression[]).forEach((e) => {
+          if (!res.includes(e.property.name)) {
+            res.push(e.property.name);
+          }
+        });
+      }
+    });
+  }
+  if (expression.reduce.expressions?.length) {
+    (expression.reduce.expressions as QueryEditorReduceExpression[]).forEach((exp) => {
+      if (!res.includes(exp.property.name)) {
+        res.push(exp.property.name);
+      }
+    });
+  }
+  if (expression.groupBy.expressions?.length) {
+    (expression.groupBy.expressions as QueryEditorGroupByExpression[]).forEach((exp) => {
+      if (!res.includes(exp.property.name)) {
+        res.push(exp.property.name);
+      }
+    });
+  }
+
+  const timeCols = tableColumns
+    .filter((cc) => toPropertyType(cc.CslType) === QueryEditorPropertyType.DateTime)
+    .map((c) => c.Name);
+  if (timeCols.length && intersection(res, timeCols).length === 0) {
+    // No time column in use, add the first one
+    res.push(timeCols[0]);
+  }
+
+  const valCols = tableColumns
+    .filter((cc) => toPropertyType(cc.CslType) === QueryEditorPropertyType.Number)
+    .map((c) => c.Name);
+  if (valCols.length && intersection(res, valCols).length === 0) {
+    // No value column in use, add the first one
+    res.push(valCols[0]);
+  }
+
+  return res;
 }
