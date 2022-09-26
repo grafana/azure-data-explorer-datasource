@@ -41,6 +41,16 @@ describe('QueryBuilder', () => {
     });
   });
 
+  describe('when $__contains and multi template variable contains parentheses', () => {
+    it('should generate a where..in clause', () => {
+      const query = interpolateKustoQuery(
+        `query=Tablename | where $__contains(col, 'test (with parentheses)','test without parentheses')`
+      );
+
+      expect(query).toContain(`where col in ('test (with parentheses)','test without parentheses')`);
+    });
+  });
+
   describe('when using $__escape and multi template variable has one selected value', () => {
     it('should replace $__escape(val) with KQL style escaped string', () => {
       const query = interpolateKustoQuery(`$__escapeMulti('\\grafana-vm\Network(eth0)\Total Bytes Received')`);
