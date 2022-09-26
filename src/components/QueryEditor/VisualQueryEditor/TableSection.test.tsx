@@ -62,4 +62,36 @@ describe('TableSection', () => {
       })
     );
   });
+
+  it('should pre-select some columns for the time series format', () => {
+    const onChange = jest.fn();
+    const tableSchema = {
+      loading: false,
+      value: [
+        {
+          Name: 'time',
+          CslType: 'datetime',
+        },
+        {
+          Name: 'measure',
+          CslType: 'long',
+        },
+      ],
+    };
+    const query = {
+      ...mockQuery,
+      resultFormat: 'time_series',
+    };
+    render(<TableSection {...defaultProps} onChange={onChange} tableSchema={tableSchema} query={query} />);
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expression: expect.objectContaining({
+          columns: {
+            type: QueryEditorExpressionType.Property,
+            columns: ['time', 'measure'],
+          },
+        }),
+      })
+    );
+  });
 });

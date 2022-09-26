@@ -43,7 +43,7 @@ const TableSection: React.FC<TableSectionProps> = ({
         },
       });
     }
-  }, [table?.value, query]);
+  }, [table?.value, query, onChange]);
 
   useEffect(() => {
     if (tableSchema.value?.length) {
@@ -66,7 +66,7 @@ const TableSection: React.FC<TableSectionProps> = ({
         },
       });
     }
-  }, [tableColumns, query]);
+  }, [tableColumns, query, onChange]);
 
   return (
     <EditorRow>
