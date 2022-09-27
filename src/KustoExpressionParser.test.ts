@@ -197,6 +197,35 @@ describe('KustoExpressionParser', () => {
           '\n| take 251'
       );
     });
+
+    it('should parse expression with summarize function in an array', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createArray([createOperator('foo["`indexer`"]', '==', '')]),
+      });
+      const acQuery: AutoCompleteQuery = {
+        expression,
+        search: createOperator('column["`indexer`"]', 'isnotempty', ''),
+        index: '0',
+        database: 'StormEvents',
+      };
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'Modes["`indexer`"]',
+          CslType: 'string',
+          isDynamic: true,
+        },
+      ];
+      expect(parser.toAutoCompleteQuery(acQuery, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| mv-expand array_1 = column' +
+          '\n| where isnotempty(array_1)' +
+          '\n| take 50000' +
+          '\n| distinct array_1' +
+          '\n| take 251'
+      );
+    });
   });
 
   describe('toQuery', () => {

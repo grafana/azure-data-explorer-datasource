@@ -43,17 +43,25 @@ export class KustoExpressionParser {
     };
 
     const parts: string[] = [];
+    const isDynamic = query.search.property.name.includes(DYNAMIC_TYPE_ARRAY_DELIMITER);
+    const name: string = this.addExpanPartsdIfNeeded(query.search.property.name, parts);
     this.appendProperty(context, query.expression.from, parts);
     this.appendTimeFilter(context, undefined, parts, tableSchema);
 
-    if (query.index) {
+    //query.index is used by the legacy query editor
+    if (query.index && !isDynamic) {
       const where = replaceByIndex(query.index, query.expression.where, query.search);
       this.appendWhere(context, where, parts, 'where');
     }
-    const column = query.search.property.name;
+
+    if (isDynamic) {
+      parts.push(`mv-expand ${name} = ${parts[0]}`);
+      parts.push(`where ${query.search.operator.name}(${name})`);
+      parts.shift();
+    }
 
     parts.push('take 50000');
-    parts.push(`distinct ${context.castIfDynamic(column)}`);
+    parts.push(`distinct ${context.castIfDynamic(name, query.search.property.name)}`);
     parts.push('take 251');
 
     return parts.join('\n| ');
