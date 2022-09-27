@@ -1,13 +1,13 @@
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxColumnSchema, AdxDataSourceOptions, defaultQuery, KustoQuery } from 'types';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { Select } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
-import { toColumnNames } from './utils/utils';
+import { defaultTimeSeriesColumns, toColumnNames } from './utils/utils';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -27,6 +27,7 @@ const TableSection: React.FC<TableSectionProps> = ({
   onChange,
 }) => {
   const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateVariableOptions);
+  const [tableColumns, setTableColumns] = useState(tableSchema.value);
 
   useEffect(() => {
     if (table?.value && !query.expression.from) {
@@ -42,7 +43,30 @@ const TableSection: React.FC<TableSectionProps> = ({
         },
       });
     }
-  });
+  }, [table?.value, query, onChange]);
+
+  useEffect(() => {
+    if (tableSchema.value?.length) {
+      setTableColumns(tableSchema.value);
+    }
+  }, [tableSchema.value]);
+
+  useEffect(() => {
+    // For time_series queries, pre-select a set of columns to avoid hitting performance issues when too many
+    // columns are selected.
+    if (query.resultFormat === 'time_series' && query.expression.columns === undefined && tableColumns?.length) {
+      onChange({
+        ...query,
+        expression: {
+          ...query.expression,
+          columns: {
+            type: QueryEditorExpressionType.Property,
+            columns: defaultTimeSeriesColumns(query.expression, tableColumns),
+          },
+        },
+      });
+    }
+  }, [tableColumns, query, onChange]);
 
   return (
     <EditorRow>
@@ -65,10 +89,28 @@ const TableSection: React.FC<TableSectionProps> = ({
                   },
                 },
               });
+              // Clean up columns in the state while it reloads
+              setTableColumns([]);
             }}
           />
         </EditorField>
-        <EditorField label="Columns" tooltip={'Select a subset of columns for faster queries'}>
+        <EditorField
+          label="Columns"
+          tooltip={
+            <>
+              Select a subset of columns for faster results. Time series requires both time and number values, other
+              columns are rendered as{' '}
+              <a
+                href="https://grafana.com/docs/grafana/latest/basics/timeseries-dimensions/"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                dimensions
+              </a>
+              .
+            </>
+          }
+        >
           <Select
             aria-label="Columns"
             isMulti

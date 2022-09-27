@@ -1,7 +1,9 @@
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpression, QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { QueryEditorOperator, QueryEditorPropertyType } from 'schema/types';
+import { defaultQuery } from 'types';
 import { AggregateFunctions } from '../AggregateItem';
 import {
+  defaultTimeSeriesColumns,
   getOperatorExpressionOptions,
   getOperatorExpressionValue,
   sanitizeAggregate,
@@ -308,5 +310,93 @@ describe('sanitizeGroupBy', () => {
       type: QueryEditorExpressionType.GroupBy,
     };
     expect(sanitizeGroupBy(op)).toEqual(op);
+  });
+});
+
+describe('defaultTimeSeriesColumns', () => {
+  it('should return a time and numeric value', () => {
+    expect(
+      defaultTimeSeriesColumns(defaultQuery.expression, [
+        { Name: 'time', CslType: 'datetime' },
+        { Name: 'measure', CslType: 'long' },
+      ])
+    ).toEqual(['time', 'measure']);
+  });
+
+  it('should include a column used in a filter', () => {
+    expect(
+      defaultTimeSeriesColumns(
+        {
+          ...defaultQuery.expression,
+          where: {
+            type: QueryEditorExpressionType.And,
+            expressions: [
+              {
+                type: QueryEditorExpressionType.Operator,
+                expressions: [
+                  {
+                    type: QueryEditorExpressionType.Property,
+                    property: { name: 'foo', type: QueryEditorPropertyType.DateTime },
+                  },
+                ],
+              } as QueryEditorExpression,
+            ],
+          },
+        },
+        [
+          { Name: 'time', CslType: 'datetime' },
+          { Name: 'measure', CslType: 'long' },
+          { Name: 'foo', CslType: 'datetime' },
+        ]
+      )
+    ).toEqual(['foo', 'measure']);
+  });
+
+  it('should include a column used in an aggregation', () => {
+    expect(
+      defaultTimeSeriesColumns(
+        {
+          ...defaultQuery.expression,
+          reduce: {
+            type: QueryEditorExpressionType.And,
+            expressions: [
+              {
+                type: QueryEditorExpressionType.Operator,
+                property: { name: 'foo', type: QueryEditorPropertyType.TimeSpan },
+              } as QueryEditorExpression,
+            ],
+          },
+        },
+        [
+          { Name: 'time', CslType: 'datetime' },
+          { Name: 'measure', CslType: 'long' },
+          { Name: 'foo', CslType: 'timespan' },
+        ]
+      )
+    ).toEqual(['foo', 'time', 'measure']);
+  });
+
+  it('should include a column used in a group by', () => {
+    expect(
+      defaultTimeSeriesColumns(
+        {
+          ...defaultQuery.expression,
+          groupBy: {
+            type: QueryEditorExpressionType.And,
+            expressions: [
+              {
+                type: QueryEditorExpressionType.Operator,
+                property: { name: 'foo', type: QueryEditorPropertyType.TimeSpan },
+              } as QueryEditorExpression,
+            ],
+          },
+        },
+        [
+          { Name: 'time', CslType: 'datetime' },
+          { Name: 'measure', CslType: 'long' },
+          { Name: 'foo', CslType: 'timespan' },
+        ]
+      )
+    ).toEqual(['foo', 'time', 'measure']);
   });
 });
