@@ -98,7 +98,7 @@ const TableSection: React.FC<TableSectionProps> = ({
           label="Columns"
           tooltip={
             <>
-              Select a subset of columns for faster results. Time series requires a time and number values, other
+              Select a subset of columns for faster results. Time series requires both time and number values, other
               columns are rendered as{' '}
               <a
                 href="https://grafana.com/docs/grafana/latest/basics/timeseries-dimensions/"

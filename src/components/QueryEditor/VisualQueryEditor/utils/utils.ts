@@ -253,17 +253,23 @@ export function defaultTimeSeriesColumns(expression: QueryExpression, tableColum
     });
   }
 
-  const timeCols = tableColumns
-    .filter((cc) => toPropertyType(cc.CslType) === QueryEditorPropertyType.DateTime)
-    .map((c) => c.Name);
+  const timeCols = tableColumns.reduce<string[]>((cols, col) => {
+    if (toPropertyType(col.CslType) === QueryEditorPropertyType.DateTime) {
+      cols.push(col.Name);
+    }
+    return cols;
+  }, []);
   if (timeCols.length && intersection(res, timeCols).length === 0) {
     // No time column in use, add the first one
     res.push(timeCols[0]);
   }
 
-  const valCols = tableColumns
-    .filter((cc) => toPropertyType(cc.CslType) === QueryEditorPropertyType.Number)
-    .map((c) => c.Name);
+  const valCols = tableColumns.reduce<string[]>((cols, col) => {
+    if (toPropertyType(col.CslType) === QueryEditorPropertyType.Number) {
+      cols.push(col.Name);
+    }
+    return cols;
+  }, []);
   if (valCols.length && intersection(res, valCols).length === 0) {
     // No value column in use, add the first one
     res.push(valCols[0]);
