@@ -4,7 +4,7 @@ export default function interpolateKustoQuery(query: string, scopedVars?: Scoped
   if (!query) {
     return '';
   }
-  const macroRegexp = /\$__([_a-zA-Z0-9]+)\((.*)\)/gi;
+  const macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\|]*)\)/gi;
   const intervalRegexp = /\$(__interval|__interval_ms)/gi;
 
   query = query.replace(macroRegexp, (match, p1, p2) => {
