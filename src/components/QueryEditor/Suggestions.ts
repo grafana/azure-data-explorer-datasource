@@ -63,6 +63,32 @@ export function getFunctions(variables: VariableModel[]): Record<string, AdxFunc
       InputParameters: [],
       OutputColumns: [],
     },
+    $__contains: {
+      Name: '$__contains',
+      Body: `{ colName in ('value1','value2') }`,
+      FunctionKind: 'Unknown',
+      DocString:
+        '##### Used with multi-value template variables.\n\n' +
+        'If `$myVar` has the value `value1`,`value2`, it expands to: `colName in (value1,value2)`.' +
+        'If using the `All` option, then check the `Include All Option` checkbox and in the `Custom all value` field type in the value `all`. If `$myVar` has value `all` then the macro will instead expand to `1 == 1`.' +
+        'For template variables with a lot of options, this will increase the query performance by not building a large "where..in" clause.' +
+        '[Grafana docs](https://grafana.com/docs/grafana/latest/datasources/azuremonitor/#querying-azure-monitor-logs)',
+      InputParameters: [
+        {
+          Name: 'colName',
+          Type: 'System.String',
+          CslType: 'string',
+          CslDefaultValue: 'colName',
+        },
+        {
+          Name: '$myVar',
+          Type: 'System.String',
+          CslType: 'string',
+          CslDefaultValue: '$myVar',
+        },
+      ],
+      OutputColumns: [],
+    },
   };
 
   // Add template variables
