@@ -215,7 +215,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return this.templateSrv.getVariables().map((v) => `$${v.name}`);
   }
 
-  // Used for annotations and templage variables
+  // Used for annotations and template variables
   private buildQuery(query: string, options: any, database: string): KustoQuery {
     if (!options) {
       options = {};
