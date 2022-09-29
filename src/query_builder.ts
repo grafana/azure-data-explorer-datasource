@@ -1,6 +1,12 @@
 import { ScopedVars } from '@grafana/data';
+import { TemplateSrv } from '@grafana/runtime';
 
-export default function interpolateKustoQuery(query: string, scopedVars?: ScopedVars): string {
+export default function interpolateKustoQuery(
+  query: string,
+  templateSrv: TemplateSrv,
+  interpolateVariable: (value: any, variable: any) => string | number,
+  scopedVars?: ScopedVars
+): string {
   if (!query) {
     return '';
   }
@@ -9,7 +15,8 @@ export default function interpolateKustoQuery(query: string, scopedVars?: Scoped
 
   query = query.replace(macroRegexp, (match, p1, p2) => {
     if (p1 === 'contains') {
-      return getMultiContains(p2);
+      const replaced = templateSrv.replace(p2, scopedVars, interpolateVariable);
+      return getMultiContains(replaced);
     }
     return match;
   });
