@@ -1,21 +1,19 @@
 import { ScopedVars } from '@grafana/data';
-import { TemplateSrv } from '@grafana/runtime';
 
 export default function interpolateKustoQuery(
   query: string,
-  templateSrv: TemplateSrv,
-  interpolateVariable: (value: any, variable: any) => string | number,
+  replace: (val: string) => string,
   scopedVars?: ScopedVars
 ): string {
   if (!query) {
     return '';
   }
-  const macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\|]*)\)/gi;
+  const macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\|]*[^\)])\)/gi;
   const intervalRegexp = /\$(__interval|__interval_ms)/gi;
 
   query = query.replace(macroRegexp, (match, p1, p2) => {
     if (p1 === 'contains') {
-      const replaced = templateSrv.replace(p2, scopedVars, interpolateVariable);
+      const replaced = replace(p2);
       return getMultiContains(replaced);
     }
     return match;
@@ -29,7 +27,7 @@ export default function interpolateKustoQuery(
     return values?.value ?? match;
   });
 
-  return query.replace(/\$__escapeMulti\(('[^]*')\)/gi, (match, p1) => escape(p1));
+  return query.replace(/\$__escapeMulti\(([^\|]*[^\)])\)/gi, (match, p1) => escape(replace(p1)));
 }
 
 function getMultiContains(inputs: string) {
