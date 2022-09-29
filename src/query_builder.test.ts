@@ -22,8 +22,9 @@ describe('QueryBuilder', () => {
     ['$test6_b', { ...variableProps('test6_b', { text: ['test 2 (with parentheses)'] }) }],
   ]);
   const interpolateVariable = jest.fn().mockImplementation((value: any) => {
-    if (value.length === 1 && value[0] === 'All') return value;
-    else {
+    if (value.length === 1 && value[0] === 'All') {
+      return value;
+    } else {
       return value.map((val) => "'" + escapeSpecial(val) + "'").join(',');
     }
   });
@@ -31,7 +32,6 @@ describe('QueryBuilder', () => {
     replace: jest.fn().mockImplementation((target: string, _scopedVars = undefined, format) => {
       const split = target.split(',');
       const variable = split[1].trim();
-      console.log(variable, variables.get(variable));
       return `${split[0]}, ${format(variables.get(variable).text)}`;
     }),
     getVariables: jest.fn(),
