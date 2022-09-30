@@ -58,13 +58,19 @@ describe('QueryBuilder', () => {
     }
   });
   const containsReplace = jest.fn().mockImplementation((target: string, _scopedVars = undefined, format) => {
-    const split = target.split(',');
-    const variable = split[1].trim();
-    return `${split[0]}, ${format(variables.get(variable).text)}`;
+    if (target.includes('$')) {
+      const split = target.split(',');
+      const variable = split[1].trim();
+      return `${split[0]}, ${format(variables.get(variable).text)}`;
+    }
+    return target;
   });
-  const escapeReplace = jest
-    .fn()
-    .mockImplementation((target: string, _scopedVars = undefined, format) => format(variables.get(target).text));
+  const escapeReplace = jest.fn().mockImplementation((target: string, _scopedVars = undefined, format) => {
+    if (target.includes('$')) {
+      return format(variables.get(target).text);
+    }
+    return target;
+  });
   const templateSrv: TemplateSrv = {
     replace: containsReplace,
     getVariables: jest.fn(),

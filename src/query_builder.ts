@@ -31,7 +31,7 @@ export default function interpolateKustoQuery(
     return values?.value ?? match;
   });
 
-  return query;
+  return replace(query);
 }
 
 function getMultiContains(inputs: string) {

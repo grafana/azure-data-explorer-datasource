@@ -94,7 +94,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
     return {
       ...target,
-      query: this.templateSrv.replace(query, scopedVars, this.interpolateVariable),
+      query,
       database: this.templateSrv.replace(target.database, scopedVars),
     };
   }
@@ -230,14 +230,13 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       (val: string) => this.templateSrv.replace(val, options.scopedVars, this.interpolateVariable),
       options.scopedVars
     );
-    const replacedQuery = this.templateSrv.replace(interpolatedQuery, options.scopedVars, this.interpolateVariable);
 
     return {
       ...defaultQuery,
-      refId: `adx-${replacedQuery}`,
+      refId: `adx-${interpolatedQuery}`,
       resultFormat: 'table',
       rawMode: true,
-      query: replacedQuery,
+      query: interpolatedQuery,
       database,
     };
   }
