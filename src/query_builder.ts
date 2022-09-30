@@ -16,6 +16,10 @@ export default function interpolateKustoQuery(
       const replaced = replace(p2);
       return getMultiContains(replaced);
     }
+    if (p1 === 'escapeMulti') {
+      const replaced = replace(p2);
+      return escape(replaced);
+    }
     return match;
   });
 
@@ -27,7 +31,7 @@ export default function interpolateKustoQuery(
     return values?.value ?? match;
   });
 
-  return query.replace(/\$__escapeMulti\(([^\)]*)\)/gi, (match, p1) => escape(replace(p1)));
+  return query;
 }
 
 function getMultiContains(inputs: string) {
