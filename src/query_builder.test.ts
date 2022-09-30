@@ -13,21 +13,42 @@ describe('QueryBuilder', () => {
   });
   const variables = new Map<string, any>([
     ['$__all', { ...variableProps('__all', { text: ['All'] }) }],
-    ['$test1', { ...variableProps('test1', { text: ['val1'] }) }],
-    ['$test2', { ...variableProps('test2', { text: ['val1', 'val2'] }) }],
-    ['$test3', { ...variableProps('test3', { text: ["'val1'"] }) }],
-    ['$test4', { ...variableProps('test4', { text: ["'val1'", "'val2'"] }) }],
-    ['$test5', { ...variableProps('test5', { text: ['test (with parentheses)', 'test without parentheses'] }) }],
-    ['$test6_a', { ...variableProps('test6_a', { text: ['test (with parentheses)', 'test without parentheses'] }) }],
-    ['$test6_b', { ...variableProps('test6_b', { text: ['test 2 (with parentheses)'] }) }],
-    ['$test7', { ...variableProps('test7', { text: ['\\grafana-vmNetwork(eth0)Total Bytes Received'] }) }],
+    ['$test_single_var', { ...variableProps('test_single_var', { text: ['val1'] }) }],
+    ['$test_multi_var', { ...variableProps('test_multi_var', { text: ['val1', 'val2'] }) }],
+    ['$test_quoted_var', { ...variableProps('test_quoted_var', { text: ["'val1'"] }) }],
+    ['$test_multi_quoted_var', { ...variableProps('test_multi_quoted_var', { text: ["'val1'", "'val2'"] }) }],
     [
-      '$test8',
-      { ...variableProps('test8', { text: ['\\grafana-vmNetwork(eth0)Total', '\\grafana-vmNetwork(eth0)Total'] }) },
+      '$test_with_parentheses',
+      { ...variableProps('test_with_parentheses', { text: ['test (with parentheses)', 'test without parentheses'] }) },
     ],
-    ['$test9', { ...variableProps('test9', { text: ['\\grafana-vm,Network(eth0)Total Bytes Received'] }) }],
-    ['$test10', { ...variableProps('test10', { text: ['\\grafana-vm,Network(eth0)Total Bytes Received'] }) }],
-    ['$test11', { ...variableProps('test11', { text: ['\\grafana-vmNetwork(eth0)Total'] }) }],
+    [
+      '$test_multi_statement_a',
+      { ...variableProps('test_multi_statement_a', { text: ['test (with parentheses)', 'test without parentheses'] }) },
+    ],
+    [
+      '$test_multi_statement_b',
+      { ...variableProps('test_multi_statement_b', { text: ['test 2 (with parentheses)'] }) },
+    ],
+    [
+      '$test_escape_single',
+      { ...variableProps('test_escape_single', { text: ['\\grafana-vmNetwork(eth0)Total Bytes Received'] }) },
+    ],
+    [
+      '$test_escape_multi',
+      {
+        ...variableProps('test_escape_multi', {
+          text: ['\\grafana-vmNetwork(eth0)Total', '\\grafana-vmNetwork(eth0)Total'],
+        }),
+      },
+    ],
+    [
+      '$test_escape_with_comma',
+      { ...variableProps('test_escape_with_comma', { text: ['\\grafana-vm,Network(eth0)Total Bytes Received'] }) },
+    ],
+    [
+      '$test_escape_multi_statement',
+      { ...variableProps('test_escape_multi_statement', { text: ['\\grafana-vmNetwork(eth0)Total'] }) },
+    ],
   ]);
   const interpolateVariable = jest.fn().mockImplementation((value: any) => {
     if (value.length === 1 && value[0] === 'All') {
@@ -64,8 +85,9 @@ describe('QueryBuilder', () => {
 
     describe('when $__contains and multi template variable has one selected value without quotes', () => {
       it('should generate a where..in clause', () => {
-        const query = interpolateKustoQuery(`query=Tablename | where $__contains(col, $test1)`, (val: string) =>
-          templateSrv.replace(val, undefined, interpolateVariable)
+        const query = interpolateKustoQuery(
+          `query=Tablename | where $__contains(col, $test_single_var)`,
+          (val: string) => templateSrv.replace(val, undefined, interpolateVariable)
         );
 
         expect(query).toContain("where col in ('val1')");
@@ -74,8 +96,9 @@ describe('QueryBuilder', () => {
 
     describe('when $__contains and multi template variable has multiple selected values without quotes', () => {
       it('should generate a where..in clause', () => {
-        const query = interpolateKustoQuery(`query=Tablename | where $__contains(col, $test2)`, (val: string) =>
-          templateSrv.replace(val, undefined, interpolateVariable)
+        const query = interpolateKustoQuery(
+          `query=Tablename | where $__contains(col, $test_multi_var)`,
+          (val: string) => templateSrv.replace(val, undefined, interpolateVariable)
         );
 
         expect(query).toContain("where col in ('val1','val2')");
@@ -84,8 +107,9 @@ describe('QueryBuilder', () => {
 
     describe('when $__contains and multi template variable has one selected value', () => {
       it('should generate a where..in clause', () => {
-        const query = interpolateKustoQuery(`query=Tablename | where $__contains(col, $test3)`, (val: string) =>
-          templateSrv.replace(val, undefined, interpolateVariable)
+        const query = interpolateKustoQuery(
+          `query=Tablename | where $__contains(col, $test_quoted_var)`,
+          (val: string) => templateSrv.replace(val, undefined, interpolateVariable)
         );
 
         expect(query).toContain("where col in ('\\'val1\\'')");
@@ -94,8 +118,9 @@ describe('QueryBuilder', () => {
 
     describe('when $__contains and multi template variable has multiple selected values', () => {
       it('should generate a where..in clause', () => {
-        const query = interpolateKustoQuery(`query=Tablename | where $__contains(col, $test4)`, (val: string) =>
-          templateSrv.replace(val, undefined, interpolateVariable)
+        const query = interpolateKustoQuery(
+          `query=Tablename | where $__contains(col, $test_multi_quoted_var)`,
+          (val: string) => templateSrv.replace(val, undefined, interpolateVariable)
         );
 
         expect(query).toContain("where col in ('\\'val1\\'','\\'val2\\'')");
@@ -104,8 +129,9 @@ describe('QueryBuilder', () => {
 
     describe('when $__contains and multi template variable contains parentheses', () => {
       it('should generate a where..in clause', () => {
-        const query = interpolateKustoQuery(`query=Tablename | where $__contains(col, $test5)`, (val: string) =>
-          templateSrv.replace(val, undefined, interpolateVariable)
+        const query = interpolateKustoQuery(
+          `query=Tablename | where $__contains(col, $test_with_parentheses)`,
+          (val: string) => templateSrv.replace(val, undefined, interpolateVariable)
         );
 
         expect(query).toContain("where col in ('test (with parentheses)','test without parentheses')");
@@ -115,7 +141,7 @@ describe('QueryBuilder', () => {
     describe('when $__contains and multiple multi template variable with parentheses', () => {
       it('should generate multiple where..in clauses', () => {
         const query = interpolateKustoQuery(
-          `query=Tablename | where $__contains(col, $test6_a) | where $__contains(col2, $test6_b)`,
+          `query=Tablename | where $__contains(col, $test_multi_statement_a) | where $__contains(col2, $test_multi_statement_b)`,
           (val: string) => templateSrv.replace(val, undefined, interpolateVariable)
         );
 
@@ -130,18 +156,20 @@ describe('QueryBuilder', () => {
     beforeAll(() => {
       templateSrv.replace = escapeReplace;
     });
+
     describe('when using $__escape and multi template variable has one selected value', () => {
       it('should replace $__escape(val) with KQL style escaped string', () => {
         templateSrv.replace = escapeReplace;
-        const query = interpolateKustoQuery(`$__escapeMulti($test7)`, (val: string) =>
+        const query = interpolateKustoQuery(`$__escapeMulti($test_escape_single)`, (val: string) =>
           templateSrv.replace(val, undefined, interpolateVariable)
         );
         expect(query).toContain(`@'\\grafana-vmNetwork(eth0)Total Bytes Received'`);
       });
     });
+
     describe('when using $__escape and multi template variable has multiple selected values', () => {
       it('should replace $__escape(val) with multiple KQL style escaped string', () => {
-        const query = interpolateKustoQuery(`CounterPath in ($__escapeMulti($test8))`, (val: string) =>
+        const query = interpolateKustoQuery(`CounterPath in ($__escapeMulti($test_escape_multi))`, (val: string) =>
           templateSrv.replace(val, undefined, interpolateVariable)
         );
         expect(query).toContain(
@@ -149,18 +177,20 @@ describe('QueryBuilder', () => {
         );
       });
     });
+
     describe('when using $__escape and multi template variable has one selected value that contains comma', () => {
       it('should replace $__escape(val) with KQL style escaped string', () => {
-        const query = interpolateKustoQuery(`$__escapeMulti($test9)`, (val: string) =>
+        const query = interpolateKustoQuery(`$__escapeMulti($test_escape_with_comma)`, (val: string) =>
           templateSrv.replace(val, undefined, interpolateVariable)
         );
         expect(query).toContain(`@'\\grafana-vm,Network(eth0)Total Bytes Received'`);
       });
     });
+
     describe(`when using $__escape and multiple multi template variable`, () => {
       it('should correctly replace both macros', () => {
         const query = interpolateKustoQuery(
-          `CounterPath in ($__escapeMulti($test11)) | CounterPath2 in ($__escapeMulti($test11))`,
+          `CounterPath in ($__escapeMulti($test_escape_multi_statement)) | CounterPath2 in ($__escapeMulti($test_escape_multi_statement))`,
           (val: string) => templateSrv.replace(val, undefined, interpolateVariable)
         );
         expect(query).toContain(

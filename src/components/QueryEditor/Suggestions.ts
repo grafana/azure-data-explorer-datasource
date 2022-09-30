@@ -72,7 +72,7 @@ export function getFunctions(variables: VariableModel[]): Record<string, AdxFunc
         'If `$myVar` has the value `value1`,`value2`, it expands to: `colName in (value1,value2)`.' +
         'If using the `All` option, then check the `Include All Option` checkbox and in the `Custom all value` field type in the value `all`. If `$myVar` has value `all` then the macro will instead expand to `1 == 1`.' +
         'For template variables with a lot of options, this will increase the query performance by not building a large "where..in" clause.' +
-        '[Grafana docs](https://grafana.com/docs/grafana/latest/datasources/azuremonitor/#querying-azure-monitor-logs)',
+        '[Grafana docs](https://grafana.com/grafana/plugins/grafana-azure-data-explorer-datasource/)',
       InputParameters: [
         {
           Name: 'colName',

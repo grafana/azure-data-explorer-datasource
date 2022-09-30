@@ -8,7 +8,7 @@ export default function interpolateKustoQuery(
   if (!query) {
     return '';
   }
-  const macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\|]*[^\)])\)/gi;
+  const macroRegexp = /\$__([_a-zA-Z0-9]+)\(([^\)]*)\)/gi;
   const intervalRegexp = /\$(__interval|__interval_ms)/gi;
 
   query = query.replace(macroRegexp, (match, p1, p2) => {
@@ -27,7 +27,7 @@ export default function interpolateKustoQuery(
     return values?.value ?? match;
   });
 
-  return query.replace(/\$__escapeMulti\(([^\|]*[^\)])\)/gi, (match, p1) => escape(replace(p1)));
+  return query.replace(/\$__escapeMulti\(([^\)]*)\)/gi, (match, p1) => escape(replace(p1)));
 }
 
 function getMultiContains(inputs: string) {
