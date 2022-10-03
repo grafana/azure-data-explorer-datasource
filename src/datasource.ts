@@ -86,8 +86,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
-    let query = interpolateKustoQuery(
-      this.templateSrv.replace(target.query, scopedVars, this.interpolateVariable),
+    const query = interpolateKustoQuery(
+      target.query,
+      (val: string) => this.templateSrv.replace(val, scopedVars, this.interpolateVariable),
       scopedVars as ScopedVars
     );
 
@@ -215,7 +216,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return this.templateSrv.getVariables().map((v) => `$${v.name}`);
   }
 
-  // Used for annotations and templage variables
+  // Used for annotations and template variables
   private buildQuery(query: string, options: any, database: string): KustoQuery {
     if (!options) {
       options = {};
@@ -224,8 +225,11 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       options.scopedVars = {};
     }
 
-    const replacedQuery = this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable);
-    const interpolatedQuery = interpolateKustoQuery(replacedQuery, options.scopedVars);
+    const interpolatedQuery = interpolateKustoQuery(
+      query,
+      (val: string) => this.templateSrv.replace(val, options.scopedVars, this.interpolateVariable),
+      options.scopedVars
+    );
 
     return {
       ...defaultQuery,
@@ -442,7 +446,7 @@ const includeTimeRange = (option: any): any => {
   };
 };
 
-const escapeSpecial = (value: string): string => {
+export const escapeSpecial = (value: string): string => {
   return value.replace(/\'/gim, "\\'");
 };
 

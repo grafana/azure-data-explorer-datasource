@@ -25,7 +25,13 @@ describe('Suggestions', () => {
   });
   describe('getFunctions', () => {
     it('should return macros as functions', () => {
-      expect(Object.keys(getFunctions([]))).toEqual(['$__timeFilter', '$__from', '$__to', '$__timeInterval']);
+      expect(Object.keys(getFunctions([]))).toEqual([
+        '$__timeFilter',
+        '$__from',
+        '$__to',
+        '$__timeInterval',
+        '$__contains',
+      ]);
     });
 
     it('should return template variables as functions', () => {
