@@ -43,25 +43,30 @@ export class KustoExpressionParser {
     };
 
     const parts: string[] = [];
-    const isDynamic = query.search.property.name.includes(DYNAMIC_TYPE_ARRAY_DELIMITER);
-    const name: string = this.addExpanPartsdIfNeeded(query.search.property.name, parts);
+    const expandParts: string[] = [];
+    const isDynamicArray = query.search.property.name.includes(DYNAMIC_TYPE_ARRAY_DELIMITER);
+    const name: string = this.addExpanPartsdIfNeeded(query.search.property.name, expandParts);
+    const column = context.castIfDynamic(name, query.search.property.name);
     this.appendProperty(context, query.expression.from, parts);
     this.appendTimeFilter(context, undefined, parts, tableSchema);
+    this.appendMvExpand(expandParts, parts);
 
-    //query.index is used by the legacy query editor
-    if (query.index && !isDynamic) {
-      const where = replaceByIndex(query.index, query.expression.where, query.search);
-      this.appendWhere(context, where, parts, 'where');
+    if (expandParts.length) {
+      // Replace the column name in the search expression with the "expanded" column name
+      query.search.property.name = name;
     }
 
-    if (isDynamic) {
-      parts.push(`mv-expand ${name} = ${parts[0]}`);
-      parts.push(`where ${query.search.operator.name}(${name})`);
-      parts.shift();
+    //query.index is used by the legacy query editor
+    //isDynamicArray keeps the old behavior of the legacy query editor for non dynamic arrays
+    if (query.index && !isDynamicArray) {
+      const where = replaceByIndex(query.index, query.expression.where, query.search);
+      this.appendWhere(context, where, parts, 'where');
+    } else {
+      this.appendWhere(context, query.search, parts, 'where');
     }
 
     parts.push('take 50000');
-    parts.push(`distinct ${context.castIfDynamic(name, query.search.property.name)}`);
+    parts.push(`distinct ${column}`);
     parts.push('take 251');
 
     return parts.join('\n| ');
