@@ -57,7 +57,7 @@ export class KustoExpressionParser {
     }
 
     //query.index is used by the legacy query editor
-    //isDynamicArray keeps the old behavior of the legacy query editor for non dynamic arrays
+    //!isDynamicArray is needed for when the legacy query editor is used with a non-dynamic value and we need to replace by index
     if (query.index && !isDynamicArray) {
       const where = replaceByIndex(query.index, query.expression.where, query.search);
       this.appendWhere(context, where, parts, 'where');
