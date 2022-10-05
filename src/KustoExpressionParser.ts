@@ -44,7 +44,6 @@ export class KustoExpressionParser {
 
     const parts: string[] = [];
     const expandParts: string[] = [];
-    const isDynamicArray = query.search.property.name.includes(DYNAMIC_TYPE_ARRAY_DELIMITER);
     const name: string = this.addExpanPartsdIfNeeded(query.search.property.name, expandParts);
     const column = context.castIfDynamic(name, query.search.property.name);
     this.appendProperty(context, query.expression.from, parts);
@@ -57,8 +56,7 @@ export class KustoExpressionParser {
     }
 
     //query.index is used by the legacy query editor
-    //!isDynamicArray is needed for when the legacy query editor is used with a non-dynamic value and we need to replace by index
-    if (query.index && !isDynamicArray) {
+    if (query.index) {
       const where = replaceByIndex(query.index, query.expression.where, query.search);
       this.appendWhere(context, where, parts, 'where');
     } else {
