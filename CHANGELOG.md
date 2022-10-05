@@ -1,5 +1,12 @@
 # Change Log
 
+## [4.1.7]
+
+- Fix state changes in useEffect
+- Pre-select columns for new queries
+- Update flow for variable interpolation
+- Fix: autocomplete now works with dynamic values
+
 ## [4.1.6]
 
 - Change default logic for dynamic columns: Cast to double if type exists in schema
