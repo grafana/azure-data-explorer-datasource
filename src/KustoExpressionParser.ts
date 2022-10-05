@@ -44,17 +44,28 @@ export class KustoExpressionParser {
     };
 
     const parts: string[] = [];
+    const expandParts: string[] = [];
+    const name: string = this.addExpanPartsdIfNeeded(query.search.property.name, expandParts);
+    const column = context.castIfDynamic(name, query.search.property.name);
     this.appendProperty(context, query.expression.from, parts);
     this.appendTimeFilter(context, undefined, parts, tableSchema);
+    this.appendMvExpand(expandParts, parts);
 
+    if (expandParts.length) {
+      // Replace the column name in the search expression with the "expanded" column name
+      query.search.property.name = name;
+    }
+
+    //query.index is used by the legacy query editor
     if (query.index) {
       const where = replaceByIndex(query.index, query.expression.where, query.search);
       this.appendWhere(context, where, parts, 'where');
+    } else {
+      this.appendWhere(context, query.search, parts, 'where');
     }
-    const column = query.search.property.name;
 
     parts.push('take 50000');
-    parts.push(`distinct ${context.castIfDynamic(column)}`);
+    parts.push(`distinct ${column}`);
     parts.push('take 251');
 
     return parts.join('\n| ');
