@@ -2,10 +2,9 @@
 
 ## [4.1.7]
 
-- Fix state changes in useEffect
-- Pre-select columns for new queries
-- Update flow for variable interpolation
-- Fix: autocomplete now works with dynamic values
+- Fix crash when creating Alerts
+- Autocomplete now works with dynamic values
+- Fix template variables for values containing parentheses
 
 ## [4.1.6]
 
