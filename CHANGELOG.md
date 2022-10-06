@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.1.7]
+
+- Fix crash when creating Alerts
+- Autocomplete now works with dynamic values
+- Fix template variables for values containing parentheses
+
 ## [4.1.6]
 
 - Change default logic for dynamic columns: Cast to double if type exists in schema
