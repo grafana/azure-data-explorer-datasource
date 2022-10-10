@@ -3,7 +3,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Button, ConfirmModal, RadioButtonGroup } from '@grafana/ui';
 import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
 
-import { AdxSchema, defaultQuery, EditorMode, KustoQuery } from '../../types';
+import { AdxSchema, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition } from 'schema/types';
@@ -27,13 +27,13 @@ const EDITOR_MODES = [
 ];
 
 const EDITOR_FORMATS: Array<SelectableValue<string>> = [
-  { label: 'Table', value: 'table' },
-  { label: 'Time series', value: 'time_series' },
+  { label: 'Table', value: FormatOptions.table },
+  { label: 'Time series', value: FormatOptions.timeSeries },
 ];
 
 const adxTimeFormat: SelectableValue<string> = {
   label: 'ADX Time series',
-  value: 'time_series_adx_series',
+  value: FormatOptions.adxTimeSeries,
 };
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
