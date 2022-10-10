@@ -153,4 +153,10 @@ export enum AzureCloudType {
   AzureChina = 'chinaazuremonitor',
 }
 
+export enum FormatOptions {
+  table = 'table',
+  timeSeries = 'time_series',
+  adxTimeSeries = 'time_series_adx_series',
+}
+
 export type AdxDataSourceSettings = DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>;
