@@ -21,7 +21,7 @@ getAppEvents().subscribe<DashboardLoadedEvent<KustoQuery>>(
   DashboardLoadedEvent,
   ({ payload: { dashboardId, orgId, grafanaVersion, queries } }) => {
     const adxQueries = queries[pluginJson.id]?.filter((q) => !q.hide);
-    if (!adxQueries?.length) {
+    if (adxQueries && adxQueries.length > 0) {
       return;
     }
     const counters = {
@@ -46,14 +46,12 @@ getAppEvents().subscribe<DashboardLoadedEvent<KustoQuery>>(
       query.rawMode ? counters.raw_queries++ : counters.query_builder_queries++;
     });
 
-    if (adxQueries && adxQueries.length > 0) {
-      trackADXMonitorDashboardLoaded({
-        adx_plugin_version: pluginJson.info.version,
-        grafana_version: grafanaVersion,
-        dashboard_id: dashboardId,
-        org_id: orgId,
-        ...counters,
-      });
-    }
+    trackADXMonitorDashboardLoaded({
+      adx_plugin_version: pluginJson.info.version,
+      grafana_version: grafanaVersion,
+      dashboard_id: dashboardId,
+      org_id: orgId,
+      ...counters,
+    });
   }
 );
