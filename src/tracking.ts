@@ -16,7 +16,6 @@ import { AdxDataSourceOptions, EditorMode, FormatOptions, KustoQuery } from 'typ
  * - 4.1.7: Initial version
  */
 export const trackADXMonitorDashboardLoaded = (props: ADXDashboardLoadedProps) => {
-  console.log('ADXMonitorDashboardLoaded', props);
   reportInteraction('grafana_ds_adx_dashboard_loaded', props);
 };
 
