@@ -85,7 +85,8 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
     // Data source features
     let dsSettings = datasources[JSON.stringify(query.datasource)];
     if (!dsSettings) {
-      datasources[JSON.stringify(query.datasource)] = datasourceSrv.getInstanceSettings(query.datasource);
+      dsSettings = datasourceSrv.getInstanceSettings(query.datasource);
+      datasources[JSON.stringify(query.datasource)] = dsSettings;
     }
     if (dsSettings) {
       if (dsSettings.jsonData?.onBehalfOf) {
