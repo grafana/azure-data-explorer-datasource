@@ -1,5 +1,9 @@
 # Change Log
 
+## [4.1.8]
+
+- Report interaction on dashboard load for feature tracking
+
 ## [4.1.7]
 
 - Fix crash when creating Alerts
