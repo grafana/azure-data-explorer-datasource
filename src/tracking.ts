@@ -1,4 +1,6 @@
-import { reportInteraction } from '@grafana/runtime';
+import { DataSourceInstanceSettings } from '@grafana/data';
+import { DataSourceSrv, reportInteraction } from '@grafana/runtime';
+import { AdxDataSourceOptions, EditorMode, FormatOptions, KustoQuery } from 'types';
 
 /**
  * Loaded the first time a dashboard containing ADX queries is loaded (not on every render)
@@ -13,15 +15,11 @@ import { reportInteraction } from '@grafana/runtime';
  * Changelog:
  * - 4.1.7: Initial version
  */
-export const trackADXMonitorDashboardLoaded = (props: ADXMonitorDashboardLoadedProps) => {
+export const trackADXMonitorDashboardLoaded = (props: ADXDashboardLoadedProps) => {
   reportInteraction('grafana_ds_adx_dashboard_loaded', props);
 };
 
-export type ADXMonitorDashboardLoadedProps = {
-  adx_plugin_version?: string;
-  grafana_version?: string;
-  dashboard_id: string;
-  org_id?: number;
+export type ADXCounters = {
   /** number of queries using the "Table" format  */
   table_queries: number;
   /** number of queries using the "Time Series" format  */
@@ -32,4 +30,85 @@ export type ADXMonitorDashboardLoadedProps = {
   query_builder_queries: number;
   /** number of queries using the Kusto editor  */
   raw_queries: number;
+  /** number of queries using On-Behalf-Of authentication */
+  on_behalf_of_queries: number;
+  /** number of queries using a timeout different than the default */
+  queries_with_custom_timeout: number;
+  /** number of queries using ADX dynamic caching */
+  dynamic_caching_queries: number;
+  /** number of queries using weak data consistency (not default) */
+  weak_data_consistency_queries: number;
+  /** number of queries using the Kusto editor by default (not default) */
+  queries_with_default_raw_editor: number;
+  /** number of queries using a custom schema mapping */
+  queries_with_managed_schema: number;
+};
+
+export interface ADXDashboardLoadedProps extends ADXCounters {
+  adx_plugin_version?: string;
+  grafana_version?: string;
+  dashboard_id: string;
+  org_id?: number;
+}
+
+export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceSrv): ADXCounters => {
+  const counters = {
+    table_queries: 0,
+    time_series_queries: 0,
+    adx_time_series_queries: 0,
+    query_builder_queries: 0,
+    raw_queries: 0,
+    on_behalf_of_queries: 0,
+    queries_with_custom_timeout: 0,
+    dynamic_caching_queries: 0,
+    weak_data_consistency_queries: 0,
+    queries_with_default_raw_editor: 0,
+    queries_with_managed_schema: 0,
+  };
+
+  const datasources: { [key: string]: DataSourceInstanceSettings<Partial<AdxDataSourceOptions>> | undefined } = {};
+  queries.forEach((query) => {
+    // Query features
+    switch (query.resultFormat) {
+      case FormatOptions.table:
+        counters.table_queries++;
+        break;
+      case FormatOptions.timeSeries:
+        counters.time_series_queries++;
+        break;
+      case FormatOptions.adxTimeSeries:
+        counters.adx_time_series_queries++;
+        break;
+    }
+    query.rawMode ? counters.raw_queries++ : counters.query_builder_queries++;
+
+    // Data source features
+    let dsSettings = datasources[JSON.stringify(query.datasource)];
+    if (!dsSettings) {
+      dsSettings = datasourceSrv.getInstanceSettings(query.datasource);
+      datasources[JSON.stringify(query.datasource)] = dsSettings;
+    }
+    if (dsSettings) {
+      if (dsSettings.jsonData?.onBehalfOf) {
+        counters.on_behalf_of_queries++;
+      }
+      if (dsSettings.jsonData?.queryTimeout) {
+        counters.queries_with_custom_timeout++;
+      }
+      if (dsSettings.jsonData?.dynamicCaching) {
+        counters.dynamic_caching_queries++;
+      }
+      if (dsSettings.jsonData?.dataConsistency === 'weakconsistency') {
+        counters.weak_data_consistency_queries++;
+      }
+      if (dsSettings.jsonData?.defaultEditorMode === EditorMode.Raw) {
+        counters.queries_with_default_raw_editor++;
+      }
+      if (dsSettings.jsonData?.useSchemaMapping) {
+        counters.queries_with_managed_schema++;
+      }
+    }
+  });
+
+  return counters;
 };
