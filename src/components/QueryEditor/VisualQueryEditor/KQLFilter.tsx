@@ -6,10 +6,10 @@ import { EditorList } from '@grafana/experimental';
 import { AdxDataSource } from '../../../datasource';
 import { AdxColumnSchema, KustoQuery } from '../../../types';
 import {
-  QueryEditorArrayExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
+  QueryEditorWhereExpression,
 } from 'components/LegacyQueryEditor/editor/expressions';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeOperator } from './utils/utils';
@@ -28,13 +28,22 @@ export interface FilterExpression extends QueryEditorOperatorExpression {
   index: number;
 }
 
-function extractExpressions(whereExpressions: QueryEditorExpression | QueryEditorArrayExpression) {
+function extractExpressions(whereExpressions: QueryEditorOperatorExpression | QueryEditorWhereExpression) {
   let expressions: FilterExpression[] = [];
   if (whereExpressions && 'expressions' in whereExpressions) {
-    expressions = whereExpressions.expressions.map((e, i) => ({
-      ...e,
-      index: i,
-    }));
+    expressions = whereExpressions.expressions.map((e, i) => {
+      return {
+        ...e,
+        index: i,
+      };
+    });
+  } else if (whereExpressions) {
+    expressions = [
+      {
+        ...whereExpressions,
+        index: 0,
+      },
+    ];
   }
   return expressions;
 }

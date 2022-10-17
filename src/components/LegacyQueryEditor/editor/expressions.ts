@@ -50,8 +50,12 @@ export interface QueryEditorColumnsExpression extends QueryEditorExpression {
   columns?: string[];
 }
 
+export interface QueryEditorWhereExpression extends QueryEditorExpression {
+  expressions: QueryEditorOperatorExpression[];
+}
+
 export interface QueryEditorWhereArrayExpression extends QueryEditorExpression {
-  expressions: Array<QueryEditorOperatorExpression | QueryEditorWhereArrayExpression>;
+  expressions: Array<QueryEditorOperatorExpression | QueryEditorWhereExpression>;
 }
 
 export interface QueryEditorArrayExpression extends QueryEditorExpression {

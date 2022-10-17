@@ -11,6 +11,7 @@ import {
   QueryEditorReduceExpressionArray,
   QueryEditorGroupByExpressionArray,
   QueryEditorWhereArrayExpression,
+  QueryEditorWhereExpression,
 } from './components/LegacyQueryEditor/editor/expressions';
 import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
 
@@ -70,7 +71,7 @@ describe('KustoExpressionParser', () => {
         from: createProperty('StormEvents'),
         where: createWhereArray([
           createOperator('eventType', '==', 'ThunderStorm'),
-          createWhereArray(
+          createWhereExpressions(
             [createOperator('state', '==', ''), createOperator('eventType', '==', 'Ligthning')],
             QueryEditorExpressionType.Or
           ),
@@ -99,7 +100,7 @@ describe('KustoExpressionParser', () => {
         from: createProperty('StormEvents'),
         where: createWhereArray([
           createOperator('eventType', '==', 'ThunderStorm'),
-          createWhereArray(
+          createWhereExpressions(
             [createOperator('column["type"]', '==', ''), createOperator('eventType', '==', 'Ligthning')],
             QueryEditorExpressionType.Or
           ),
@@ -136,7 +137,7 @@ describe('KustoExpressionParser', () => {
         from: createProperty('StormEvents'),
         where: createWhereArray([
           createOperator('eventType', '==', 'ThunderStorm'),
-          createWhereArray(
+          createWhereExpressions(
             [createOperator('column["type"]', '==', ''), createOperator('eventType', '==', 'Ligthning')],
             QueryEditorExpressionType.Or
           ),
@@ -390,7 +391,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([
           createOperator('isActive', '==', true),
           createOperator('events', 'in', ['triggered', 'closed']),
-          createWhereArray(
+          createWhereExpressions(
             [createOperator('state', '==', 'TEXAS'), createOperator('state', '==', 'FLORIDA')],
             QueryEditorExpressionType.Or
           ),
@@ -1189,7 +1190,7 @@ describe('KustoExpressionParser', () => {
     it('should parse expression with where array containg empty or', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
-        where: createWhereArray([createWhereArray([], QueryEditorExpressionType.Or)]),
+        where: createWhereArray([createWhereExpressions([], QueryEditorExpressionType.Or)]),
         reduce: createReduceArray([createReduce('country', 'dcount')]),
         groupBy: createGroupByArray([createGroupBy('continents')]),
       });
@@ -1489,8 +1490,18 @@ const valueToPropertyType = (value: any): QueryEditorPropertyType => {
   }
 };
 
+const createWhereExpressions = (
+  expressions: QueryEditorOperatorExpression[],
+  type: QueryEditorExpressionType = QueryEditorExpressionType.And
+): QueryEditorWhereExpression => {
+  return {
+    type: type,
+    expressions: expressions,
+  };
+};
+
 const createWhereArray = (
-  expressions: Array<QueryEditorOperatorExpression | QueryEditorWhereArrayExpression>,
+  expressions: Array<QueryEditorOperatorExpression | QueryEditorWhereExpression>,
   type: QueryEditorExpressionType = QueryEditorExpressionType.And
 ): QueryEditorWhereArrayExpression => {
   return {
