@@ -6,8 +6,11 @@ import {
   QueryEditorArrayExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
+  QueryEditorGroupByExpressionArray,
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
+  QueryEditorReduceExpressionArray,
+  QueryEditorWhereArrayExpression,
 } from 'components/LegacyQueryEditor/editor/expressions';
 import React, { useCallback, useMemo, useEffect } from 'react';
 import { useAsync } from 'react-use';
@@ -142,7 +145,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
       const next = {
         ...query.expression,
         from: table,
-        where: expression,
+        where: expression as QueryEditorWhereArrayExpression,
       };
 
       onChangeQuery({
@@ -161,7 +164,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
       const next = {
         ...query.expression,
         from: table,
-        reduce: expression,
+        reduce: expression as QueryEditorReduceExpressionArray,
       };
 
       onChangeQuery({
@@ -180,7 +183,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
       const next = {
         ...query.expression,
         from: table,
-        groupBy: expression,
+        groupBy: expression as QueryEditorGroupByExpressionArray,
       };
 
       onChangeQuery({

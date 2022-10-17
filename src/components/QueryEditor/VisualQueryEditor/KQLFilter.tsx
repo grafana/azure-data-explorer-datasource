@@ -28,6 +28,17 @@ export interface FilterExpression extends QueryEditorOperatorExpression {
   index: number;
 }
 
+function extractExpressions(whereExpressions: QueryEditorExpression | QueryEditorArrayExpression) {
+  let expressions: FilterExpression[] = [];
+  if (whereExpressions && 'expressions' in whereExpressions) {
+    expressions = whereExpressions.expressions.map((e, i) => ({
+      ...e,
+      index: i,
+    }));
+  }
+  return expressions;
+}
+
 const KQLFilter: React.FC<KQLFilterProps> = ({
   index,
   query,
@@ -37,9 +48,7 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
   templateVariableOptions,
 }) => {
   // Each expression is a group of several OR statements
-  const expressions: FilterExpression[] = (
-    query.expression.where.expressions[index] as QueryEditorArrayExpression
-  )?.expressions.map((e, i) => ({ ...e, index: i }));
+  const expressions = extractExpressions(query.expression.where.expressions[index]);
   const [filters, setFilters] = useState<FilterExpression[]>(expressions);
 
   useEffect(() => {
@@ -71,7 +80,7 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
 
     const where = { ...query.expression.where };
     if (newItems.length) {
-      (where.expressions[index] as QueryEditorArrayExpression).expressions = validExpressions;
+      where.expressions[index] = { ...where.expressions[index], expressions: validExpressions };
     } else {
       // The expression is empty, remove it
       const expr = where.expressions;

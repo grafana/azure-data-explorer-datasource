@@ -33,13 +33,25 @@ export interface QueryEditorReduceExpression extends QueryEditorExpression {
   parameters?: QueryEditorFunctionParameterExpression[];
 }
 
+export interface QueryEditorReduceExpressionArray extends QueryEditorExpression {
+  expressions: QueryEditorReduceExpression[];
+}
+
 export interface QueryEditorGroupByExpression extends QueryEditorExpression {
   property: QueryEditorProperty;
   interval?: QueryEditorProperty;
 }
 
+export interface QueryEditorGroupByExpressionArray extends QueryEditorExpression {
+  expressions: QueryEditorGroupByExpression[];
+}
+
 export interface QueryEditorColumnsExpression extends QueryEditorExpression {
   columns?: string[];
+}
+
+export interface QueryEditorWhereArrayExpression extends QueryEditorExpression {
+  expressions: Array<QueryEditorOperatorExpression | QueryEditorWhereArrayExpression>;
 }
 
 export interface QueryEditorArrayExpression extends QueryEditorExpression {

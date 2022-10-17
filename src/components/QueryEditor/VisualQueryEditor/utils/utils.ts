@@ -239,14 +239,14 @@ export function defaultTimeSeriesColumns(expression: QueryExpression, tableColum
     });
   }
   if (expression.reduce.expressions?.length) {
-    (expression.reduce.expressions as QueryEditorReduceExpression[]).forEach((exp) => {
+    expression.reduce.expressions.forEach((exp) => {
       if (!res.includes(exp.property.name)) {
         res.push(exp.property.name);
       }
     });
   }
   if (expression.groupBy.expressions?.length) {
-    (expression.groupBy.expressions as QueryEditorGroupByExpression[]).forEach((exp) => {
+    expression.groupBy.expressions.forEach((exp) => {
       if (!res.includes(exp.property.name)) {
         res.push(exp.property.name);
       }

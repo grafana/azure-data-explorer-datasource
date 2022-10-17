@@ -58,7 +58,7 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
     setAggregates(cleaned);
 
     // Only save valid and complete filters into the query state
-    const validExpressions: QueryEditorExpression[] = [];
+    const validExpressions: QueryEditorReduceExpression[] = [];
     for (const operatorExpression of cleaned) {
       const validated = sanitizeAggregate(operatorExpression);
       if (validated) {
