@@ -9,8 +9,7 @@ import {
 } from '@grafana/data';
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
-import { QueryEditorPropertyExpression } from 'components/LegacyQueryEditor/editor/expressions';
-import { QueryEditorOperator, QueryEditorPropertyType } from './schema/types';
+import { QueryEditorPropertyType } from './schema/types';
 import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
 import { map } from 'lodash';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
@@ -73,7 +72,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return true; // anything else we can check
     }
 
-    const tableExpr = target.expression?.from as QueryEditorPropertyExpression;
+    const tableExpr = target.expression?.from;
     if (!tableExpr) {
       return false;
     }
@@ -325,9 +324,13 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     }
 
     const results = response.data[0].fields[0].values.toArray();
-    const operator: QueryEditorOperator<string> = query.search.operator as QueryEditorOperator<string>; // why is this always T = QueryEditorOperatorValueType
+    const operator = query.search.operator;
 
-    return operator.name === 'contains' ? sortStartsWithValuesFirst(results, operator.value) : results;
+    let searchTerm = '';
+    if (typeof operator.value === 'string') {
+      searchTerm = operator.value;
+    }
+    return operator.name === 'contains' ? sortStartsWithValuesFirst(results, searchTerm) : results;
   }
 }
 

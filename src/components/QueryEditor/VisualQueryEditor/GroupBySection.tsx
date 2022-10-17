@@ -57,7 +57,7 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
     setGroupBys(cleaned);
 
     // Only save valid and complete filters into the query state
-    const validExpressions: QueryEditorExpression[] = [];
+    const validExpressions: QueryEditorGroupByExpression[] = [];
     for (const operatorExpression of cleaned) {
       const validated = sanitizeGroupBy(operatorExpression);
       if (validated) {

@@ -1,11 +1,13 @@
 import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
 
 import {
-  QueryEditorArrayExpression,
   QueryEditorColumnsExpression,
   QueryEditorExpressionType,
+  QueryEditorGroupByExpressionArray,
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
+  QueryEditorReduceExpressionArray,
+  QueryEditorWhereArrayExpression,
 } from './components/LegacyQueryEditor/editor/expressions';
 
 const packageJson = require('../package.json');
@@ -13,9 +15,9 @@ const packageJson = require('../package.json');
 export interface QueryExpression {
   from?: QueryEditorPropertyExpression;
   columns?: QueryEditorColumnsExpression;
-  where: QueryEditorArrayExpression;
-  reduce: QueryEditorArrayExpression;
-  groupBy: QueryEditorArrayExpression;
+  where: QueryEditorWhereArrayExpression;
+  reduce: QueryEditorReduceExpressionArray;
+  groupBy: QueryEditorGroupByExpressionArray;
   timeshift?: QueryEditorPropertyExpression;
 }
 

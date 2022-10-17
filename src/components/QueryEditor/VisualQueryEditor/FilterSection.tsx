@@ -55,7 +55,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 onClick={() => {
                   const expr = query.expression.where.expressions.concat({
                     type: QueryEditorExpressionType.Or,
-                    expressions: [{ type: QueryEditorExpressionType.Or, expressions: [] }],
+                    expressions: [],
                   });
                   onChange({
                     ...query,
