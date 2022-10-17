@@ -337,6 +337,7 @@ describe('defaultTimeSeriesColumns', () => {
                   {
                     type: QueryEditorExpressionType.Property,
                     property: { name: 'foo', type: QueryEditorPropertyType.DateTime },
+                    operator: { name: '==', value: 'bar' },
                   },
                 ],
               },
