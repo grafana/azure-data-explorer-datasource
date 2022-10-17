@@ -8,10 +8,14 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: '16'
       - name: Install dependencies
         run: yarn install
       - name: Build plugin
         run: yarn build
       - name: Compatibility check
-        run: npx @grafana/levitate@latest is-compatible --path src/module.ts --target @grafana/data,@grafana/ui,@grafana/runtime
+        uses: grafana/plugin-actions/is-compatible@v1
+        with:
+          module: './src/module.ts'
+          comment-pr: 'yes'
+          fail-if-incompatible: 'no'
