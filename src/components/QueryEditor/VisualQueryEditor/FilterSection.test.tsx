@@ -66,7 +66,7 @@ describe('FilterSection', () => {
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({
-          where: { expressions: [{ expressions: [{ expressions: [], type: 'or' }], type: 'or' }], type: 'and' },
+          where: { expressions: [{ expressions: [], type: 'or' }], type: 'and' },
         }),
       })
     );
