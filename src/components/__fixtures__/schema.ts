@@ -1,8 +1,7 @@
-import { DeepPartial } from '@grafana/data/themes/types';
 import { AdxSchema } from 'types';
 
-export default function createMockSchema(overrides?: DeepPartial<AdxSchema>) {
-  const _mockSchema: DeepPartial<AdxSchema> = {
+export default function createMockSchema(overrides?: AdxSchema) {
+  const _mockSchema: AdxSchema = {
     Databases: {
       testdb: {
         Name: 'testdb',
@@ -15,6 +14,7 @@ export default function createMockSchema(overrides?: DeepPartial<AdxSchema>) {
         ExternalTables: {},
         Functions: {
           testfunction: {
+            Name: '',
             Body: 'Body',
             DocString: 'Doc String',
             FunctionKind: 'scalar',
