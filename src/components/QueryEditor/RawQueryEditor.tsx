@@ -5,6 +5,7 @@ import { AdxDataSource } from 'datasource';
 import React, { useEffect, useState } from 'react';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
+import { cloneDeep } from 'lodash';
 
 import { getFunctions, getSignatureHelp } from './Suggestions';
 
@@ -22,8 +23,10 @@ interface Worker {
 }
 
 export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
+  const { query, schema } = props;
   const [worker, setWorker] = useState<Worker>();
   const [variables] = useState(getTemplateSrv().getVariables());
+  const [stateSchema, setStateSchema] = useState(cloneDeep(schema));
 
   const onRawQueryChange = (kql: string) => {
     if (kql !== props.query.query) {
@@ -35,7 +38,11 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
     }
   };
 
-  const { query, schema } = props;
+  useEffect(() => {
+    if (schema && !stateSchema) {
+      setStateSchema(cloneDeep(schema));
+    }
+  }, [schema, stateSchema]);
 
   const handleEditorMount = (editor: MonacoEditor, monaco: Monaco) => {
     monaco.languages.registerSignatureHelpProvider('kusto', {
@@ -54,16 +61,16 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   };
 
   useEffect(() => {
-    if (worker && schema) {
+    if (worker && stateSchema) {
       // Populate Database schema with macros
-      Object.keys(schema.Databases).forEach((db) =>
-        Object.assign(schema.Databases[db].Functions, getFunctions(variables))
+      Object.keys(stateSchema.Databases).forEach((db) =>
+        Object.assign(stateSchema.Databases[db].Functions, getFunctions(variables))
       );
-      worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
+      worker.setSchemaFromShowSchema(stateSchema, 'https://help.kusto.windows.net', props.database);
     }
-  }, [worker, schema, variables, props.database]);
+  }, [worker, stateSchema, variables, props.database]);
 
-  if (!schema) {
+  if (!stateSchema) {
     return null;
   }
 
