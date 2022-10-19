@@ -117,7 +117,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
         } as DataQueryRequest<KustoQuery>).toPromise()
       )
       .then((response) => {
-        if (response.data && response.data.length) {
+        if (response?.data && response.data.length) {
           return firstStringFieldToMetricFindValue(response.data[0]);
         }
         return [];
@@ -175,7 +175,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       ],
     } as DataQueryRequest<KustoQuery>).toPromise();
 
-    return functionSchemaParser(response.data as DataFrame[]);
+    return functionSchemaParser(response?.data as DataFrame[]);
   }
 
   async getDynamicSchema(
@@ -209,7 +209,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       ],
     } as DataQueryRequest<KustoQuery>).toPromise();
 
-    return dynamicSchemaParser(response.data as DataFrame[]);
+    return dynamicSchemaParser(response?.data as DataFrame[]);
   }
 
   getVariables() {
@@ -316,15 +316,15 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       }) as DataQueryRequest<KustoQuery>
     ).toPromise();
 
-    if (!Array.isArray(response?.data) || response.data.length === 0) {
+    if (!Array.isArray(response?.data) || response?.data.length === 0) {
       return [];
     }
 
-    if (!Array.isArray(response.data[0].fields) || response.data[0].fields.length === 0) {
+    if (!Array.isArray(response?.data[0].fields) || response?.data[0].fields.length === 0) {
       return [];
     }
 
-    const results = response.data[0].fields[0].values.toArray();
+    const results = response?.data[0].fields[0].values.toArray();
     const operator: QueryEditorOperator<string> = query.search.operator as QueryEditorOperator<string>; // why is this always T = QueryEditorOperatorValueType
 
     return operator.name === 'contains' ? sortStartsWithValuesFirst(results, operator.value) : results;
