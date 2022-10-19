@@ -6,10 +6,10 @@ import { EditorList } from '@grafana/experimental';
 import { AdxDataSource } from '../../../datasource';
 import { AdxColumnSchema, KustoQuery } from '../../../types';
 import {
-  QueryEditorArrayExpression,
   QueryEditorExpression,
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
+  QueryEditorWhereExpression,
 } from 'components/LegacyQueryEditor/editor/expressions';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeOperator } from './utils/utils';
@@ -28,6 +28,26 @@ export interface FilterExpression extends QueryEditorOperatorExpression {
   index: number;
 }
 
+function extractExpressions(whereExpressions: QueryEditorOperatorExpression | QueryEditorWhereExpression) {
+  let expressions: FilterExpression[] = [];
+  if (whereExpressions && 'expressions' in whereExpressions) {
+    expressions = whereExpressions.expressions.map((e, i) => {
+      return {
+        ...e,
+        index: i,
+      };
+    });
+  } else if (whereExpressions) {
+    expressions = [
+      {
+        ...whereExpressions,
+        index: 0,
+      },
+    ];
+  }
+  return expressions;
+}
+
 const KQLFilter: React.FC<KQLFilterProps> = ({
   index,
   query,
@@ -37,9 +57,7 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
   templateVariableOptions,
 }) => {
   // Each expression is a group of several OR statements
-  const expressions: FilterExpression[] = (
-    query.expression.where.expressions[index] as QueryEditorArrayExpression
-  )?.expressions.map((e, i) => ({ ...e, index: i }));
+  const expressions = extractExpressions(query.expression.where.expressions[index]);
   const [filters, setFilters] = useState<FilterExpression[]>(expressions);
 
   useEffect(() => {
@@ -71,7 +89,7 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
 
     const where = { ...query.expression.where };
     if (newItems.length) {
-      (where.expressions[index] as QueryEditorArrayExpression).expressions = validExpressions;
+      where.expressions[index] = { ...where.expressions[index], expressions: validExpressions };
     } else {
       // The expression is empty, remove it
       const expr = where.expressions;

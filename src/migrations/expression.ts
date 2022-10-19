@@ -1,13 +1,11 @@
-import _ from 'lodash';
 import { QueryExpression, defaultQuery } from 'types';
 import {
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
-  QueryEditorExpression,
-  QueryEditorArrayExpression,
   QueryEditorPropertyExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
+  QueryEditorReduceExpressionArray,
 } from 'components/LegacyQueryEditor/editor/expressions';
 import { QueryEditorPropertyType, QueryEditorProperty } from '../schema/types';
 
@@ -46,7 +44,7 @@ const migrateV2ToV3 = (expression: any): QueryExpression => {
             type: QueryEditorExpressionType.Or,
             expressions: [exp],
           };
-        }) as QueryEditorExpression[],
+        }),
     };
   }
 
@@ -61,7 +59,7 @@ const migrateV2ToV3 = (expression: any): QueryExpression => {
   return migrated;
 };
 
-const migrateV2Array = (expressions: any[]): QueryEditorArrayExpression => {
+const migrateV2Array = (expressions: any[]): QueryEditorReduceExpressionArray => {
   if (!Array.isArray(expressions)) {
     return {
       type: QueryEditorExpressionType.And,
@@ -71,11 +69,13 @@ const migrateV2Array = (expressions: any[]): QueryEditorArrayExpression => {
 
   return {
     type: QueryEditorExpressionType.And,
-    expressions: expressions.map(migrateV2Expression).filter((exp) => !!exp) as QueryEditorExpression[],
+    expressions: expressions.map(migrateV2Expression).filter((exp) => !!exp) as QueryEditorReduceExpression[],
   };
 };
 
-const migrateV2Expression = (expression: any): QueryEditorExpression | undefined => {
+const migrateV2Expression = (
+  expression: any
+): QueryEditorOperatorExpression | QueryEditorPropertyExpression | undefined => {
   switch (expression?.type) {
     case 'fieldAndOperator':
       return migrateV2OperatorExpression(expression);

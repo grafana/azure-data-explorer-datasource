@@ -1,4 +1,4 @@
-import { QueryEditorExpression, QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { QueryEditorOperator, QueryEditorPropertyType } from 'schema/types';
 import { defaultQuery } from 'types';
 import { AggregateFunctions } from '../AggregateItem';
@@ -337,9 +337,10 @@ describe('defaultTimeSeriesColumns', () => {
                   {
                     type: QueryEditorExpressionType.Property,
                     property: { name: 'foo', type: QueryEditorPropertyType.DateTime },
+                    operator: { name: '==', value: 'bar' },
                   },
                 ],
-              } as QueryEditorExpression,
+              },
             ],
           },
         },
@@ -363,7 +364,8 @@ describe('defaultTimeSeriesColumns', () => {
               {
                 type: QueryEditorExpressionType.Operator,
                 property: { name: 'foo', type: QueryEditorPropertyType.TimeSpan },
-              } as QueryEditorExpression,
+                reduce: { name: AggregateFunctions.Avg, type: QueryEditorPropertyType.Function },
+              },
             ],
           },
         },
@@ -387,7 +389,7 @@ describe('defaultTimeSeriesColumns', () => {
               {
                 type: QueryEditorExpressionType.Operator,
                 property: { name: 'foo', type: QueryEditorPropertyType.TimeSpan },
-              } as QueryEditorExpression,
+              },
             ],
           },
         },

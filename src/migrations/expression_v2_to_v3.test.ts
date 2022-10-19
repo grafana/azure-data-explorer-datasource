@@ -1,10 +1,10 @@
 import { QueryExpression } from 'types';
 import {
   QueryEditorExpressionType,
-  QueryEditorOperatorExpression,
-  QueryEditorArrayExpression,
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
+  QueryEditorReduceExpressionArray,
+  QueryEditorGroupByExpressionArray,
 } from 'components/LegacyQueryEditor/editor/expressions';
 import { QueryEditorPropertyType } from '../schema/types';
 import { migrateExpression } from './expression';
@@ -42,13 +42,13 @@ describe('migrate expression from v2 to v3', () => {
                     name: '==',
                     value: 'United States',
                   },
-                } as QueryEditorOperatorExpression,
+                },
               ],
-            } as QueryEditorArrayExpression,
+            },
           ],
         },
-        reduce: emptyArrayExpression(),
-        groupBy: emptyArrayExpression(),
+        reduce: emptyReduceArrayExpression(),
+        groupBy: emptyGroupByExpression(),
       };
 
       expect(migrated).toStrictEqual(expected);
@@ -84,9 +84,9 @@ describe('migrate expression from v2 to v3', () => {
                     name: 'in',
                     value: ['Texas', '$state'],
                   },
-                } as QueryEditorOperatorExpression,
+                },
               ],
-            } as QueryEditorArrayExpression,
+            },
           ],
         },
         reduce: {
@@ -154,7 +154,14 @@ describe('migrate expression from v2 to v3', () => {
   });
 });
 
-const emptyArrayExpression = (): QueryEditorArrayExpression => {
+const emptyReduceArrayExpression = (): QueryEditorReduceExpressionArray => {
+  return {
+    type: QueryEditorExpressionType.And,
+    expressions: [],
+  };
+};
+
+const emptyGroupByExpression = (): QueryEditorGroupByExpressionArray => {
   return {
     type: QueryEditorExpressionType.And,
     expressions: [],
