@@ -18,12 +18,12 @@
   "license": "Apache",
   "devDependencies": {
     "@emotion/core": "^11.0.0",
-    "@grafana/data": "9.2.0",
-    "@grafana/e2e": "9.2.0",
-    "@grafana/e2e-selectors": "9.2.0",
-    "@grafana/runtime": "9.2.0",
-    "@grafana/toolkit": "8.5.2",
-    "@grafana/ui": "9.2.0",
+    "@grafana/data": "9.2.1",
+    "@grafana/e2e": "9.2.1",
+    "@grafana/e2e-selectors": "9.2.1",
+    "@grafana/runtime": "9.2.1",
+    "@grafana/toolkit": "9.2.1",
+    "@grafana/ui": "9.2.1",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^13.1.9",
     "@types/chance": "^1.1.2",
@@ -38,8 +38,7 @@
     "emotion": "^11.0.0",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "monaco-editor": "0.17.0",
-    "prismjs": "1.29.0",
-    "ts-jest": "^26.4.3"
+    "prismjs": "1.29.0"
   },
   "dependencies": {
     "@grafana/experimental": "0.0.2-canary.35",
