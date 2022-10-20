@@ -26,7 +26,7 @@ getAppEvents().subscribe<DashboardLoadedEvent<KustoQuery>>(
     }
 
     trackADXMonitorDashboardLoaded({
-      adx_plugin_version: pluginJson.info.version,
+      adx_plugin_version: plugin.meta.info.version,
       grafana_version: grafanaVersion,
       dashboard_id: dashboardId,
       org_id: orgId,
