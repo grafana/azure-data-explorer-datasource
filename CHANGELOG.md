@@ -1,5 +1,10 @@
 # Change Log
 
+## [4.1.9]
+
+- Security: Upgrade Go in build process to 1.19.2
+- Fix: Schema mapping displaying macro functions
+
 ## [4.1.8]
 
 - Report interaction on dashboard load for feature tracking
