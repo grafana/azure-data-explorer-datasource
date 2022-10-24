@@ -5,6 +5,11 @@
  */
 
 module.exports = {
+  moduleNameMapper: {
+    "\\.(css|scss|sass)$": "identity-obj-proxy",
+  },
+  modulePaths: ['<rootDir>/src'],
+  setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
   testEnvironment: 'jest-environment-jsdom',
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
@@ -26,10 +31,5 @@ module.exports = {
         },
       },
     ],
-  },
-  setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
-  modulePaths: ['<rootDir>/src'],
-  moduleNameMapper: {
-    "\\.(css|less|scss|sass)$": "identity-obj-proxy"
   },
 };
