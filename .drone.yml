@@ -37,7 +37,7 @@ steps:
     image: grafana/grafana-plugin-ci:1.5.1-alpine
     name: spell-check
   - commands:
-      - if [ -f \"./node_modules/.bin/grafana-toolkit\" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build; else yarn build; yarn test:ci; fi
+      - if [ -f "./node_modules/.bin/grafana-toolkit" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build; else yarn build; yarn test:ci; fi
     depends_on:
       - initialize
     image: grafana/grafana-plugin-ci:1.5.1-alpine
@@ -77,7 +77,7 @@ steps:
     image: grafana/grafana-plugin-ci:1.5.1-alpine
     name: security-scan
   - commands:
-      - if [ -f \"./node_modules/.bin/grafana-toolkit\" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish; else yarn build; mkdir -p ci/jobs/package; mv dist ci/jobs/package/; fi
+      - if [ -f "./node_modules/.bin/grafana-toolkit" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish; else yarn build; mkdir -p ci/jobs/package; mv dist ci/jobs/package/; fi
       - ./bin/grabpl plugin package
     depends_on:
       - build-and-test-frontend
@@ -239,7 +239,7 @@ steps:
     image: grafana/grafana-plugin-ci:1.5.1-alpine
     name: spell-check
   - commands:
-      - if [ -f \"./node_modules/.bin/grafana-toolkit\" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build; else yarn build; yarn test:ci; fi
+      - if [ -f "./node_modules/.bin/grafana-toolkit" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build; else yarn build; yarn test:ci; fi
     depends_on:
       - initialize
     image: grafana/grafana-plugin-ci:1.5.1-alpine
@@ -279,7 +279,7 @@ steps:
     image: grafana/grafana-plugin-ci:1.5.1-alpine
     name: security-scan
   - commands:
-      - if [ -f \"./node_modules/.bin/grafana-toolkit\" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish; else yarn build; mkdir -p ci/jobs/package; mv dist ci/jobs/package/; fi
+      - if [ -f "./node_modules/.bin/grafana-toolkit" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish; else yarn build; mkdir -p ci/jobs/package; mv dist ci/jobs/package/; fi
       - ./bin/grabpl plugin package
     depends_on:
       - build-and-test-frontend
@@ -476,7 +476,7 @@ steps:
     image: grafana/grafana-plugin-ci:1.5.1-alpine
     name: spell-check
   - commands:
-      - if [ -f \"./node_modules/.bin/grafana-toolkit\" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build; else yarn build; yarn test:ci; fi
+      - if [ -f "./node_modules/.bin/grafana-toolkit" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build; else yarn build; yarn test:ci; fi
     depends_on:
       - initialize
     image: grafana/grafana-plugin-ci:1.5.1-alpine
@@ -516,7 +516,7 @@ steps:
     image: grafana/grafana-plugin-ci:1.5.1-alpine
     name: security-scan
   - commands:
-      - if [ -f \"./node_modules/.bin/grafana-toolkit\" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish; else yarn build; mkdir -p ci/jobs/package; mv dist ci/jobs/package/; fi
+      - if [ -f "./node_modules/.bin/grafana-toolkit" ]; then ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish; else yarn build; mkdir -p ci/jobs/package; mv dist ci/jobs/package/; fi
       - ./bin/grabpl plugin package
     depends_on:
       - build-and-test-frontend
@@ -697,6 +697,6 @@ type: docker
 
 ---
 kind: signature
-hmac: 2431aff780fce4b80c214d72095a491bf20fb1d6d5814a3b3d177055aa90d64c
+hmac: c935bb22a0dec2076acc86b267da9a03ad2da0f59ceed9695b3a7faccde5ca95
 
 ...
