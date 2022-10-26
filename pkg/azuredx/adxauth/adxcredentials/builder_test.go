@@ -10,7 +10,7 @@ import (
 )
 
 func TestFromDatasourceData(t *testing.T) {
-	t.Run("ShouldReturnNil_WhenConfigurationEmpty", func(t *testing.T) {
+	t.Run("should return nil when no credentials configured", func(t *testing.T) {
 		var data = map[string]interface{}{}
 		var secureData = map[string]string{}
 
@@ -20,33 +20,7 @@ func TestFromDatasourceData(t *testing.T) {
 		assert.Nil(t, result)
 	})
 
-	t.Run("should return client secret credentials when client secret configured", func(t *testing.T) {
-		var data = map[string]interface{}{
-			"azureCredentials": map[string]interface{}{
-				"authType":   "clientsecret",
-				"azureCloud": "AzureChinaCloud",
-				"tenantId":   "TENANT-ID",
-				"clientId":   "CLIENT-TD",
-			},
-		}
-		var secureData = map[string]string{
-			"azureClientSecret": "FAKE-SECRET",
-		}
-
-		result, err := FromDatasourceData(data, secureData)
-		require.NoError(t, err)
-
-		require.NotNil(t, result)
-		assert.IsType(t, &azcredentials.AzureClientSecretCredentials{}, result)
-		credential := (result).(*azcredentials.AzureClientSecretCredentials)
-
-		assert.Equal(t, credential.AzureCloud, azsettings.AzureChina)
-		assert.Equal(t, credential.TenantId, "TENANT-ID")
-		assert.Equal(t, credential.ClientId, "CLIENT-TD")
-		assert.Equal(t, credential.ClientSecret, "FAKE-SECRET")
-	})
-
-	t.Run("should return OBO credentials when OBO configured", func(t *testing.T) {
+	t.Run("should return on-behalf-of credentials when on-behalf-of auth configured", func(t *testing.T) {
 		var data = map[string]interface{}{
 			"azureCredentials": map[string]interface{}{
 				"authType":   "clientsecret-obo",
@@ -64,8 +38,8 @@ func TestFromDatasourceData(t *testing.T) {
 		require.NoError(t, err)
 
 		require.NotNil(t, result)
-		assert.IsType(t, &AzureClientSecretOboCredentials{}, result)
-		credential := (result).(*AzureClientSecretOboCredentials)
+		assert.IsType(t, &azcredentials.AzureClientSecretOboCredentials{}, result)
+		credential := (result).(*azcredentials.AzureClientSecretOboCredentials)
 
 		require.NotNil(t, credential.ClientSecretCredentials)
 		assert.Equal(t, credential.ClientSecretCredentials.AzureCloud, azsettings.AzureChina)
@@ -74,7 +48,7 @@ func TestFromDatasourceData(t *testing.T) {
 		assert.Equal(t, credential.ClientSecretCredentials.ClientSecret, "FAKE-SECRET")
 	})
 
-	t.Run("should return error when OBO configured but oauthPassThru not enabled", func(t *testing.T) {
+	t.Run("should return error when on-behalf-of auth configured but oauthPassThru not enabled", func(t *testing.T) {
 		var data = map[string]interface{}{
 			"azureCredentials": map[string]interface{}{
 				"authType":   "clientsecret-obo",
@@ -115,7 +89,7 @@ func TestFromDatasourceData(t *testing.T) {
 		assert.Equal(t, credential.ClientSecret, "FAKE-LEGACY-SECRET")
 	})
 
-	t.Run("should return OBO credentials when legacy OBO configuration present", func(t *testing.T) {
+	t.Run("should return on-behalf-of credentials when legacy on-behalf-of configuration present", func(t *testing.T) {
 		var data = map[string]interface{}{
 			"azureCloud":    "azuremonitor",
 			"tenantId":      "LEGACY-TENANT-ID",
@@ -131,8 +105,8 @@ func TestFromDatasourceData(t *testing.T) {
 		require.NoError(t, err)
 
 		require.NotNil(t, result)
-		assert.IsType(t, &AzureClientSecretOboCredentials{}, result)
-		credential := (result).(*AzureClientSecretOboCredentials)
+		assert.IsType(t, &azcredentials.AzureClientSecretOboCredentials{}, result)
+		credential := (result).(*azcredentials.AzureClientSecretOboCredentials)
 
 		require.NotNil(t, credential.ClientSecretCredentials)
 		assert.Equal(t, credential.ClientSecretCredentials.AzureCloud, azsettings.AzurePublic)
@@ -141,7 +115,7 @@ func TestFromDatasourceData(t *testing.T) {
 		assert.Equal(t, credential.ClientSecretCredentials.ClientSecret, "FAKE-LEGACY-SECRET")
 	})
 
-	t.Run("should return error when legacy OBO configuration present but oauthPassThru not enabled", func(t *testing.T) {
+	t.Run("should return error when legacy on-behalf-of auth configuration present but oauthPassThru not enabled", func(t *testing.T) {
 		var data = map[string]interface{}{
 			"azureCloud": "azuremonitor",
 			"tenantId":   "LEGACY-TENANT-ID",
@@ -157,7 +131,7 @@ func TestFromDatasourceData(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("should return client secret credentials when client secret configured even if legacy configuration present", func(t *testing.T) {
+	t.Run("should return client secret credentials when client secret auth configured even if legacy configuration present", func(t *testing.T) {
 		var data = map[string]interface{}{
 			"azureCredentials": map[string]interface{}{
 				"authType":   "clientsecret",
@@ -209,6 +183,49 @@ func TestFromDatasourceData(t *testing.T) {
 		}
 
 		_, err := FromDatasourceData(data, secureData)
+		assert.Error(t, err)
+	})
+}
+
+func TestNormalizeAzureCloud(t *testing.T) {
+	t.Run("should return normalized cloud name", func(t *testing.T) {
+		tests := []struct {
+			description     string
+			legacyCloud     string
+			normalizedCloud string
+		}{
+			{
+				legacyCloud:     azureMonitorPublic,
+				normalizedCloud: azsettings.AzurePublic,
+			},
+			{
+				legacyCloud:     azureMonitorChina,
+				normalizedCloud: azsettings.AzureChina,
+			},
+			{
+				legacyCloud:     azureMonitorUSGovernment,
+				normalizedCloud: azsettings.AzureUSGovernment,
+			},
+			{
+				legacyCloud:     "",
+				normalizedCloud: azsettings.AzurePublic,
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.description, func(t *testing.T) {
+				actualCloud, err := normalizeAzureCloud(tt.legacyCloud)
+				require.NoError(t, err)
+
+				assert.Equal(t, tt.normalizedCloud, actualCloud)
+			})
+		}
+	})
+
+	t.Run("should fail when cloud is unknown", func(t *testing.T) {
+		legacyCloud := "unknown"
+
+		_, err := normalizeAzureCloud(legacyCloud)
 		assert.Error(t, err)
 	})
 }

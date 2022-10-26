@@ -13,22 +13,9 @@ func FromDatasourceData(data map[string]interface{}, secureData map[string]strin
 	var credentials azcredentials.AzureCredentials
 	var err error
 
-	// Authentication types specific to the Azure Data Explorer datasource
-	if credentialsObj, err := maputil.GetMapOptional(data, "azureCredentials"); err != nil {
+	credentials, err = azcredentials.FromDatasourceData(data, secureData)
+	if err != nil {
 		return nil, err
-	} else if credentialsObj != nil {
-		credentials, err = getFromCredentialsObject(data, credentialsObj, secureData)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// Fallback to authentication types supported by SDK
-	if credentials == nil {
-		credentials, err = azcredentials.FromDatasourceData(data, secureData)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	// Fallback to legacy credentials format
@@ -39,48 +26,15 @@ func FromDatasourceData(data map[string]interface{}, secureData map[string]strin
 		}
 	}
 
-	return credentials, err
-}
-
-func getFromCredentialsObject(data map[string]interface{}, credentialsObj map[string]interface{}, secureData map[string]string) (azcredentials.AzureCredentials, error) {
-	authType, err := maputil.GetString(credentialsObj, "authType")
-	if err != nil {
-		return nil, err
-	}
-
-	switch authType {
-	case AzureAuthClientSecretObo:
+	// Current implementation of on-behalf-of authentication requires OAuth token pass-thru enabled
+	switch credentials.(type) {
+	case *azcredentials.AzureClientSecretOboCredentials:
 		if err := ensureOnBehalfOfSupported(data); err != nil {
 			return nil, err
 		}
-
-		cloud, err := maputil.GetString(credentialsObj, "azureCloud")
-		if err != nil {
-			return nil, err
-		}
-		tenantId, err := maputil.GetString(credentialsObj, "tenantId")
-		if err != nil {
-			return nil, err
-		}
-		clientId, err := maputil.GetString(credentialsObj, "clientId")
-		if err != nil {
-			return nil, err
-		}
-		clientSecret := secureData["azureClientSecret"]
-
-		credentials := &AzureClientSecretOboCredentials{
-			ClientSecretCredentials: azcredentials.AzureClientSecretCredentials{
-				AzureCloud:   cloud,
-				TenantId:     tenantId,
-				ClientId:     clientId,
-				ClientSecret: clientSecret,
-			},
-		}
-		return credentials, nil
-
-	default:
-		return nil, nil
 	}
+
+	return credentials, err
 }
 
 func getFromLegacy(data map[string]interface{}, secureData map[string]string) (azcredentials.AzureCredentials, error) {
@@ -122,11 +76,7 @@ func getFromLegacy(data map[string]interface{}, secureData map[string]string) (a
 	var credentials azcredentials.AzureCredentials
 
 	if onBehalfOf {
-		if err := ensureOnBehalfOfSupported(data); err != nil {
-			return nil, err
-		}
-
-		credentials = &AzureClientSecretOboCredentials{
+		credentials = &azcredentials.AzureClientSecretOboCredentials{
 			ClientSecretCredentials: clientSecretCredentials,
 		}
 	} else {
@@ -141,7 +91,7 @@ func ensureOnBehalfOfSupported(data map[string]interface{}) error {
 	if err != nil {
 		return err
 	} else if !oauthPassThru {
-		return errors.New("oauthPassThru should be enabled for On-Behalf-Of authentication")
+		return errors.New("oauthPassThru should be enabled for on-behalf-of authentication")
 	} else {
 		return nil
 	}

@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
@@ -37,7 +36,7 @@ func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *a
 	var aadClient aadClient = nil
 
 	switch c := credentials.(type) {
-	case *adxcredentials.AzureClientSecretOboCredentials:
+	case *azcredentials.AzureClientSecretOboCredentials:
 		// Special support for OBO authentication as it isn't supported by the SDK
 		// Configure the service identity token provider with underlying client secret credentials
 		tokenProvider, err = aztokenprovider.NewAzureAccessTokenProvider(azureSettings, &c.ClientSecretCredentials)

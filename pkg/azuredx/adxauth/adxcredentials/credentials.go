@@ -7,18 +7,6 @@ import (
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 )
 
-const (
-	AzureAuthClientSecretObo = "clientsecret-obo"
-)
-
-type AzureClientSecretOboCredentials struct {
-	ClientSecretCredentials azcredentials.AzureClientSecretCredentials
-}
-
-func (credentials *AzureClientSecretOboCredentials) AzureAuthType() string {
-	return AzureAuthClientSecretObo
-}
-
 func GetDefaultCredentials(settings *azsettings.AzureSettings) azcredentials.AzureCredentials {
 	if settings.ManagedIdentityEnabled {
 		return &azcredentials.AzureManagedIdentityCredentials{}
@@ -35,7 +23,7 @@ func GetAzureCloud(settings *azsettings.AzureSettings, credentials azcredentials
 		return getDefaultAzureCloud(settings), nil
 	case *azcredentials.AzureClientSecretCredentials:
 		return c.AzureCloud, nil
-	case *AzureClientSecretOboCredentials:
+	case *azcredentials.AzureClientSecretOboCredentials:
 		return c.ClientSecretCredentials.AzureCloud, nil
 	default:
 		err := fmt.Errorf("the Azure credentials of type '%s' not supported by Azure Data Explorer datasource", c.AzureAuthType())
