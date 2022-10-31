@@ -18,6 +18,6 @@ jobs:
         with:
           module: './src/module.ts'
           comment-pr: 'yes'
-          skip-comment-if-sucess: 'yes'
+          skip-comment-if-compatible: 'yes'
           fail-if-incompatible: 'no'
           targets: '@grafana/data,@grafana/ui,@grafana/runtime,@grafana/e2e-selectors'
