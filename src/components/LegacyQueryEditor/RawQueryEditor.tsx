@@ -42,7 +42,7 @@ interface Worker {
 // Remove this code once Grafana 8.5 is the minimal version supported
 function gtGrafana8_5() {
   const version = config.buildInfo.version
-  const isValid = valid(config.buildInfo.version)
+  const isValid = valid(version)
   // Assume that a security release will be of the form 'w.x.y.z' - Pre releases of the form 'w.x.y-pre.z' are already valid
   const isSecurityRelease = version.split('.').length > 3
   if (!isValid && isSecurityRelease) {
@@ -50,7 +50,7 @@ function gtGrafana8_5() {
     const coercedValue = coerce(version)
     return coercedValue ? gte(coercedValue, '8.5.0') : null;
   }
-  return valid(config.buildInfo.version) && gte(config.buildInfo.version, '8.5.0');
+  return isValid && gte(version, '8.5.0');
 }
 
 export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
