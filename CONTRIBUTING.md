@@ -26,12 +26,6 @@ Make sure you have the following dependencies installed first:
    yarn dev
    ```
 
-   or
-
-   ```bash
-   yarn watch
-   ```
-
 3. Build plugin in production mode
 
    ```bash
