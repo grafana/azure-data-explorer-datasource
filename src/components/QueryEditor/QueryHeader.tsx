@@ -1,8 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { ConfirmModal, EditorHeader, FlexItem, InlineSelect, RadioButtonGroup } from '@grafana/ui';
+import { Button, ConfirmModal, RadioButtonGroup } from '@grafana/ui';
+import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
 
-import { AdxSchema, EditorMode, KustoQuery } from '../../types';
+import { AdxSchema, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition } from 'schema/types';
@@ -17,6 +18,7 @@ export interface QueryEditorHeaderProps {
   dirty: boolean;
   setDirty: (b: boolean) => void;
   onChange: (value: KustoQuery) => void;
+  onRunQuery: () => void;
 }
 
 const EDITOR_MODES = [
@@ -25,17 +27,17 @@ const EDITOR_MODES = [
 ];
 
 const EDITOR_FORMATS: Array<SelectableValue<string>> = [
-  { label: 'Table', value: 'table' },
-  { label: 'Time series', value: 'time_series' },
+  { label: 'Table', value: FormatOptions.table },
+  { label: 'Time series', value: FormatOptions.timeSeries },
 ];
 
 const adxTimeFormat: SelectableValue<string> = {
   label: 'ADX Time series',
-  value: 'time_series_adx_series',
+  value: FormatOptions.adxTimeSeries,
 };
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
-  const { query, onChange, schema, datasource, dirty, setDirty } = props;
+  const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery } = props;
   const { rawMode } = query;
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query, datasource);
@@ -51,6 +53,12 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   };
 
   useEffect(() => {
+    if (!query.database && database) {
+      onChange({ ...query, database });
+    }
+  }, [query, database, onChange]);
+
+  useEffect(() => {
     if (rawMode) {
       setFormats(EDITOR_FORMATS.concat(adxTimeFormat));
     } else {
@@ -59,6 +67,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   }, [rawMode]);
 
   useEffect(() => {
+    if (!query.resultFormat) {
+      onChange({ ...query, resultFormat: 'table' });
+    }
     if (query.resultFormat === adxTimeFormat.value && !formats.includes(adxTimeFormat)) {
       // Fallback to Time Series since time_series_adx_series is not available
       onChange({ ...query, resultFormat: 'time_series' });
@@ -87,7 +98,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         value={database}
         isLoading={schema.loading}
         onChange={({ value }) => {
-          onChange({ ...query, database: value! });
+          onChange({ ...query, database: value!, expression: defaultQuery.expression });
         }}
       />
       <InlineSelect
@@ -99,6 +110,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         }}
       />
       <FlexItem grow={1} />
+      <Button variant="primary" icon="play" size="sm" onClick={onRunQuery}>
+        Run query
+      </Button>
       <RadioButtonGroup
         size="sm"
         options={EDITOR_MODES}

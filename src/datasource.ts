@@ -9,8 +9,7 @@ import {
 } from '@grafana/data';
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
-import { QueryEditorPropertyExpression } from 'components/LegacyQueryEditor/editor/expressions';
-import { QueryEditorOperator, QueryEditorPropertyType } from './schema/types';
+import { QueryEditorPropertyType } from './schema/types';
 import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
 import { map } from 'lodash';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
@@ -73,7 +72,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return true; // anything else we can check
     }
 
-    const tableExpr = target.expression?.from as QueryEditorPropertyExpression;
+    const tableExpr = target.expression?.from;
     if (!tableExpr) {
       return false;
     }
@@ -86,8 +85,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
-    let query = interpolateKustoQuery(
-      this.templateSrv.replace(target.query, scopedVars, this.interpolateVariable),
+    const query = interpolateKustoQuery(
+      target.query,
+      (val: string) => this.templateSrv.replace(val, scopedVars, this.interpolateVariable),
       scopedVars as ScopedVars
     );
 
@@ -116,7 +116,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
         } as DataQueryRequest<KustoQuery>).toPromise()
       )
       .then((response) => {
-        if (response.data && response.data.length) {
+        if (response?.data && response.data.length) {
           return firstStringFieldToMetricFindValue(response.data[0]);
         }
         return [];
@@ -174,7 +174,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       ],
     } as DataQueryRequest<KustoQuery>).toPromise();
 
-    return functionSchemaParser(response.data as DataFrame[]);
+    return functionSchemaParser(response?.data as DataFrame[]);
   }
 
   async getDynamicSchema(
@@ -208,14 +208,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       ],
     } as DataQueryRequest<KustoQuery>).toPromise();
 
-    return dynamicSchemaParser(response.data as DataFrame[]);
+    return dynamicSchemaParser(response?.data as DataFrame[]);
   }
 
   getVariables() {
     return this.templateSrv.getVariables().map((v) => `$${v.name}`);
   }
 
-  // Used for annotations and templage variables
+  // Used for annotations and template variables
   private buildQuery(query: string, options: any, database: string): KustoQuery {
     if (!options) {
       options = {};
@@ -224,8 +224,11 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       options.scopedVars = {};
     }
 
-    const replacedQuery = this.templateSrv.replace(query, options.scopedVars, this.interpolateVariable);
-    const interpolatedQuery = interpolateKustoQuery(replacedQuery, options.scopedVars);
+    const interpolatedQuery = interpolateKustoQuery(
+      query,
+      (val: string) => this.templateSrv.replace(val, options.scopedVars, this.interpolateVariable),
+      options.scopedVars
+    );
 
     return {
       ...defaultQuery,
@@ -312,18 +315,22 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       }) as DataQueryRequest<KustoQuery>
     ).toPromise();
 
-    if (!Array.isArray(response?.data) || response.data.length === 0) {
+    if (!Array.isArray(response?.data) || response?.data.length === 0) {
       return [];
     }
 
-    if (!Array.isArray(response.data[0].fields) || response.data[0].fields.length === 0) {
+    if (!Array.isArray(response?.data[0].fields) || response?.data[0].fields.length === 0) {
       return [];
     }
 
-    const results = response.data[0].fields[0].values.toArray();
-    const operator: QueryEditorOperator<string> = query.search.operator as QueryEditorOperator<string>; // why is this always T = QueryEditorOperatorValueType
+    const results = response?.data[0].fields[0].values.toArray();
+    const operator = query.search.operator;
 
-    return operator.name === 'contains' ? sortStartsWithValuesFirst(results, operator.value) : results;
+    let searchTerm = '';
+    if (typeof operator.value === 'string') {
+      searchTerm = operator.value;
+    }
+    return operator.name === 'contains' ? sortStartsWithValuesFirst(results, searchTerm) : results;
   }
 }
 
@@ -378,19 +385,19 @@ const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchem
 
 const recordSchemaArray = (name: string, types: AdxSchemaDefinition[], result: AdxColumnSchema[]) => {
   // If a field can have different types (e.g. long and double)
-  // we select the first, assuming they are interchangeable
-  const defaultCslType = types[0];
-  if (types.every((t) => typeof t === 'string' && toPropertyType(t) === QueryEditorPropertyType.Number)) {
-    // If all the types are numbers, the double takes precedence since it has more precission.
-    const cslType = types.find((t) => typeof t === 'string' && (t === 'double' || t === 'real')) || defaultCslType;
-    result.push({ Name: name, CslType: cslType as string, isDynamic: true });
-  } else {
+  // we select double if it exists as it's the one with more precision, otherwise we take the first
+  const defaultCslType = types.find((t) => typeof t === 'string' && (t === 'double' || t === 'real')) || types[0];
+  if (
+    types.length > 1 &&
+    !types.every((t) => typeof t === 'string' && toPropertyType(t) === QueryEditorPropertyType.Number)
+  ) {
+    // If there is more than one type and not all types are numbers
     console.warn(`schema ${name} may contain different types, assuming ${defaultCslType}`);
-    if (typeof defaultCslType === 'object') {
-      recordSchema(name, types[0], result);
-    } else {
-      result.push({ Name: name, CslType: defaultCslType, isDynamic: true });
-    }
+  }
+  if (typeof defaultCslType === 'object') {
+    recordSchema(name, types[0], result);
+  } else {
+    result.push({ Name: name, CslType: defaultCslType, isDynamic: true });
   }
 };
 
@@ -442,7 +449,7 @@ const includeTimeRange = (option: any): any => {
   };
 };
 
-const escapeSpecial = (value: string): string => {
+export const escapeSpecial = (value: string): string => {
   return value.replace(/\'/gim, "\\'");
 };
 

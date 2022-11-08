@@ -18,10 +18,8 @@ export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<
     typeName: '',
     access: '',
     url: '',
-    password: '',
     user: '',
     basicAuth: false,
-    basicAuthPassword: '',
     basicAuthUser: '',
     database: '',
     isDefault: false,
@@ -77,6 +75,7 @@ export const mockDatasource = () =>
         links: [],
       },
     },
+    readOnly: false,
   });
 
 export const mockQuery: KustoQuery = {

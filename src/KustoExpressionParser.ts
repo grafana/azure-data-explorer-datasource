@@ -17,6 +17,7 @@ import {
 } from './components/LegacyQueryEditor/editor/expressions';
 import { cloneDeep } from 'lodash';
 import { SelectableValue } from '@grafana/data';
+import { filterColumns } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 
 interface ParseContext {
   timeColumn?: string;
@@ -43,15 +44,28 @@ export class KustoExpressionParser {
     };
 
     const parts: string[] = [];
+    const expandParts: string[] = [];
+    const name: string = this.addExpanPartsdIfNeeded(query.search.property.name, expandParts);
+    const column = context.castIfDynamic(name, query.search.property.name);
     this.appendProperty(context, query.expression.from, parts);
     this.appendTimeFilter(context, undefined, parts, tableSchema);
+    this.appendMvExpand(expandParts, parts);
 
-    const where = replaceByIndex(query.index, query.expression.where, query.search);
-    const column = query.search.property.name;
-    this.appendWhere(context, where, parts, 'where');
+    if (expandParts.length) {
+      // Replace the column name in the search expression with the "expanded" column name
+      query.search.property.name = name;
+    }
+
+    //query.index is used by the legacy query editor
+    if (query.index) {
+      const where = replaceByIndex(query.index, query.expression.where, query.search);
+      this.appendWhere(context, where, parts, 'where');
+    } else {
+      this.appendWhere(context, query.search, parts, 'where');
+    }
 
     parts.push('take 50000');
-    parts.push(`distinct ${context.castIfDynamic(column)}`);
+    parts.push(`distinct ${column}`);
     parts.push('take 251');
 
     return parts.join('\n| ');
@@ -62,14 +76,16 @@ export class KustoExpressionParser {
       return '';
     }
 
+    const columns = filterColumns(tableSchema, expression.columns);
     const context: ParseContext = {
-      timeColumn: defaultTimeColumn(tableSchema, expression),
+      timeColumn: defaultTimeColumn(columns, expression),
       castIfDynamic: (column: string, schemaName?: string) => escapeAndCastIfDynamic(column, tableSchema, schemaName),
     };
 
     const parts: string[] = [];
     this.appendProperty(context, expression.from, parts);
-    this.appendTimeFilter(context, expression.timeshift, parts, tableSchema);
+    this.appendProject(expression.columns?.columns, parts);
+    this.appendTimeFilter(context, expression.timeshift, parts, columns);
     this.appendWhere(context, expression?.where, parts, 'where');
     this.appendTimeshift(context, expression.timeshift, parts);
     this.appendSummarize(context, expression.reduce, expression.groupBy, parts);
@@ -327,6 +343,12 @@ export class KustoExpressionParser {
     expandParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${p}`));
   }
 
+  private appendProject(columns: string[] | undefined, parts: string[]) {
+    if (columns?.length) {
+      parts.push(`project ${columns.map(escapeColumn).join(', ')}`);
+    }
+  }
+
   private appendProjectAway(expandParts: string[], parts: string[]) {
     if (expandParts.length) {
       // mv-expand creates a new column that we need to delete from the result
@@ -371,7 +393,7 @@ const withPrefix = (value: string, prefix?: string): string => {
 };
 
 const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpression): string | undefined => {
-  if (Array.isArray(expression?.groupBy.expressions)) {
+  if (Array.isArray(expression?.groupBy.expressions) && expression?.groupBy.expressions.length) {
     const groupByTimeColumn = expression?.groupBy.expressions.find((exp) => {
       if (!isGroupBy(exp)) {
         return false;

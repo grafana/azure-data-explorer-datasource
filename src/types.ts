@@ -1,19 +1,23 @@
 import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
 
 import {
-  QueryEditorArrayExpression,
+  QueryEditorColumnsExpression,
   QueryEditorExpressionType,
+  QueryEditorGroupByExpressionArray,
   QueryEditorOperatorExpression,
   QueryEditorPropertyExpression,
+  QueryEditorReduceExpressionArray,
+  QueryEditorWhereArrayExpression,
 } from './components/LegacyQueryEditor/editor/expressions';
 
 const packageJson = require('../package.json');
 
 export interface QueryExpression {
   from?: QueryEditorPropertyExpression;
-  where: QueryEditorArrayExpression;
-  reduce: QueryEditorArrayExpression;
-  groupBy: QueryEditorArrayExpression;
+  columns?: QueryEditorColumnsExpression;
+  where: QueryEditorWhereArrayExpression;
+  reduce: QueryEditorReduceExpressionArray;
+  groupBy: QueryEditorGroupByExpressionArray;
   timeshift?: QueryEditorPropertyExpression;
 }
 
@@ -33,7 +37,7 @@ export interface AutoCompleteQuery {
   database: string;
   search: QueryEditorOperatorExpression;
   expression: QueryExpression;
-  index: string;
+  index?: string;
 }
 
 export enum EditorMode {
@@ -149,6 +153,12 @@ export enum AzureCloudType {
   AzurePublic = 'azuremonitor',
   AzureUSGovernment = 'govazuremonitor',
   AzureChina = 'chinaazuremonitor',
+}
+
+export enum FormatOptions {
+  table = 'table',
+  timeSeries = 'time_series',
+  adxTimeSeries = 'time_series_adx_series',
 }
 
 export type AdxDataSourceSettings = DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>;

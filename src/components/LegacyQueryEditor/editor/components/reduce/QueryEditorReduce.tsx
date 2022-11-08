@@ -58,38 +58,46 @@ export const QueryEditorReduce: React.FC<Props> = (props) => {
           type: QueryEditorPropertyType.Function,
         });
       }
+
+      if (reduce) {
+        onChange({
+          type: QueryEditorExpressionType.Reduce,
+          property,
+          reduce,
+          parameters,
+        });
+      }
     },
-    [setField, value, functions]
+    [setField, value, functions, reduce, parameters, onChange]
   );
 
   const onChangeReduce = useCallback(
     (property: QueryEditorProperty) => {
       setReduce(property);
+      onChange({
+        type: QueryEditorExpressionType.Reduce,
+        property,
+        reduce: property,
+        parameters,
+      });
     },
-    [setReduce]
+    [setReduce, parameters, onChange]
   );
 
   const onChangeParameter = useCallback(
     (expression: QueryEditorFunctionParameterExpression[]) => {
       setParameters(expression);
+      if (reduce && field) {
+        onChange({
+          type: QueryEditorExpressionType.Reduce,
+          property: field,
+          reduce,
+          parameters: expression,
+        });
+      }
     },
-    [setParameters]
+    [setParameters, reduce, field, onChange]
   );
-
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    if (field && reduce) {
-      const payload: QueryEditorReduceExpression = {
-        type: QueryEditorExpressionType.Reduce,
-        property: field,
-        reduce,
-        parameters: parameters,
-      };
-
-      onChange(payload); // adding onChange to dependency array below causes maximum call depth error
-    }
-  }, [field, reduce, parameters]);
-  /* eslint-enable react-hooks/exhaustive-deps */
 
   const reduceParameters: QueryEditorFunctionParameter[] = getParameters(reduce, props.functions);
 

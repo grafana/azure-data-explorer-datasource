@@ -9,9 +9,7 @@ const config = standard.jestConfig();
 config.setupFilesAfterEnv = ['<rootDir>/src/test/setupTests.ts'];
 
 // This process will use the same config that `yarn test` is using
-// Including jsdom-sixteen to get the JSDOM v16 for Jest tests which is need for the react testing tools: https://github.com/testing-library/dom-testing-library/issues/477
 module.exports = {
   ...config,
-  testEnvironment: 'jest-environment-jsdom-sixteen',
   watchPathIgnorePatterns: ['<rootDir>/node_modules/'],
 };

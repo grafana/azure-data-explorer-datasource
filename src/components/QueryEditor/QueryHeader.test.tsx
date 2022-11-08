@@ -5,7 +5,7 @@ import { openMenu } from 'react-select-event';
 
 import { mockDatasource, mockQuery } from '../__fixtures__/Datasource';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
-import { AdxSchema } from 'types';
+import { AdxSchema, defaultQuery } from 'types';
 
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
@@ -34,6 +34,7 @@ const defaultProps = {
   schema: defaultSchema,
   dirty: false,
   setDirty: jest.fn(),
+  onRunQuery: jest.fn(),
 };
 
 describe('QueryEditor', () => {
@@ -55,6 +56,21 @@ describe('QueryEditor', () => {
         },
       },
     };
+
+    it('should select a format by default', async () => {
+      const onChange = jest.fn();
+      render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />);
+      await waitFor(() => screen.getByText('foo'));
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'table' }));
+    });
+
+    it('should select a database by default', async () => {
+      const onChange = jest.fn();
+      render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />);
+      await waitFor(() => screen.getByText('foo'));
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ database: 'foo' }));
+    });
+
     it('should render with the default database selected', async () => {
       const ds = mockDatasource();
       ds.getDefaultOrFirstDatabase = jest.fn().mockResolvedValue('bar');
@@ -69,7 +85,9 @@ describe('QueryEditor', () => {
       const sel = screen.getByLabelText('Database:');
       openMenu(sel);
       screen.getByText('bar').click();
-      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ database: 'bar' }));
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({ database: 'bar', expression: defaultQuery.expression })
+      );
     });
 
     it('should show a warning if switching from raw mode', async () => {
@@ -95,6 +113,14 @@ describe('QueryEditor', () => {
       b.click();
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ rawMode: false }));
       expect(setDirty).toHaveBeenCalledWith(false);
+    });
+
+    it('runs a query', async () => {
+      const onRunQuery = jest.fn();
+      render(<QueryHeader {...defaultProps} schema={schema} onRunQuery={onRunQuery} />);
+      await waitFor(() => screen.getByText('foo'));
+      screen.getByText('Run query').click();
+      expect(onRunQuery).toHaveBeenCalledTimes(1);
     });
   });
 

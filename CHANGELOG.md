@@ -1,5 +1,24 @@
 # Change Log
 
+## [4.1.9]
+
+- Security: Upgrade Go in build process to 1.19.2
+- Fix: Schema mapping displaying macro functions
+
+## [4.1.8]
+
+- Report interaction on dashboard load for feature tracking
+
+## [4.1.7]
+
+- Fix crash when creating Alerts
+- Autocomplete now works with dynamic values
+- Fix template variables for values containing parentheses
+
+## [4.1.6]
+
+- Change default logic for dynamic columns: Cast to double if type exists in schema
+
 ## [4.1.5]
 
 - Fix: Update table in the KQL expression when changing the database.
