@@ -76,7 +76,7 @@ func TestOnBehalfOf(t *testing.T) {
 			c.aadClient = fakeAADClient
 		}
 
-		auth, err := c.QueryDataAuthorization(context.Background(), &req)
+		auth, err := c.GetAccessToken(context.Background())
 
 		switch {
 		case err != nil:

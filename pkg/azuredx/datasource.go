@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxusercontext"
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -92,25 +93,24 @@ func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryD
 	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
 	res := backend.NewQueryDataResponse()
 
-	authorization, err := adx.serviceCredentials.QueryDataAuthorization(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = adx.handleQuery(q, req.PluginContext.User, authorization)
+		res.Responses[q.RefID] = adx.handleQuery(adxusercontext.FromQueryReq(ctx, req), q, req.PluginContext.User)
 	}
 
 	return res, nil
 }
 
+func (adx *AzureDataExplorer) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
+	return adx.CallResourceHandler.CallResource(adxusercontext.FromResourceReq(ctx, req), req, sender)
+}
+
 // CheckHealth handles health checks
 func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	authorization, err := adx.serviceCredentials.ServicePrincipalAuthorization(ctx)
+	accessToken, err := adx.serviceCredentials.GetAccessToken(adxusercontext.FromHealthCheckReq(ctx, req))
 	if err != nil {
 		return nil, err
 	}
-	headers := map[string]string{"Authorization": authorization}
+	headers := map[string]string{"Authorization": "Bearer " + accessToken}
 	err = adx.client.TestRequest(adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
 	if err != nil {
 		return &backend.CheckHealthResult{
@@ -125,7 +125,7 @@ func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.Chec
 	}, nil
 }
 
-func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.User, authorization string) backend.DataResponse {
+func (adx *AzureDataExplorer) handleQuery(ctx context.Context, q backend.DataQuery, user *backend.User) backend.DataResponse {
 	var qm models.QueryModel
 	err := json.Unmarshal(q.JSON, &qm)
 	if err != nil {
@@ -139,7 +139,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	}
 	props := models.NewConnectionProperties(adx.settings, cs)
 
-	resp, err := adx.modelQuery(qm, props, user, authorization)
+	resp, err := adx.modelQuery(ctx, qm, props, user)
 	if err != nil {
 		resp.Frames = append(resp.Frames, &data.Frame{
 			RefID: q.RefID,
@@ -150,8 +150,13 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	return resp
 }
 
-func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User, authorization string) (backend.DataResponse, error) {
-	headers := map[string]string{"Authorization": authorization}
+func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryModel, props *models.Properties, user *backend.User) (backend.DataResponse, error) {
+	accessToken, err := adx.serviceCredentials.GetAccessToken(ctx)
+	if err != nil {
+		return backend.DataResponse{}, err
+	}
+
+	headers := map[string]string{"Authorization": "Bearer " + accessToken}
 	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", q.QuerySource, rand.Uint64())
 	if adx.settings.EnableUserTracking {
 		if user != nil {
