@@ -5,12 +5,10 @@ import (
 	"math/rand"
 	"net/http"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxusercontext"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
@@ -59,24 +57,12 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 		credentials = adxcredentials.GetDefaultCredentials(azureSettings)
 	}
 
-	httpClientOptions, err := instanceSettings.HTTPClientOptions()
+	adxClient, err := client.New(datasourceSettings, azureSettings, credentials)
 	if err != nil {
-		backend.Logger.Error("failed to create HTTP client options", "error", err.Error())
+		backend.Logger.Error("failed to create ADX client", "error", err.Error())
 		return nil, err
 	}
-	httpClientOptions.Timeouts.Timeout = datasourceSettings.QueryTimeout
-	httpClient, err := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{}).New(httpClientOptions)
-	if err != nil {
-		backend.Logger.Error("failed to create HTTP client", "error", err.Error())
-		return nil, err
-	}
-
-	serviceCredentials, err := adxauth.NewServiceCredentials(datasourceSettings, azureSettings, credentials)
-	if err != nil {
-		return nil, err
-	}
-
-	adx.client = client.New(serviceCredentials, httpClient)
+	adx.client = adxClient
 
 	mux := http.NewServeMux()
 	adx.registerRoutes(mux)

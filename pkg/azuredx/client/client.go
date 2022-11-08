@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
+	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
+	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	// 100% compatible drop-in replacement of "encoding/json"
 	json "github.com/json-iterator/go"
 
@@ -22,13 +23,16 @@ var _ AdxClient = new(Client) // validates interface conformance
 
 // Client is an http.Client used for API requests.
 type Client struct {
-	httpClient         *http.Client
-	serviceCredentials adxauth.ServiceCredentials
+	httpClient *http.Client
 }
 
 // NewClient creates a Grafana Plugin SDK Go Http Client
-func New(serviceCredentials adxauth.ServiceCredentials, client *http.Client) *Client {
-	return &Client{serviceCredentials: serviceCredentials, httpClient: client}
+func New(settings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*Client, error) {
+	httpClient, err := newHttpClient(settings, azureSettings, credentials)
+	if err != nil {
+		return nil, err
+	}
+	return &Client{httpClient: httpClient}, nil
 }
 
 // TestRequest handles a data source test request in Grafana's Datasource configuration UI.
@@ -42,19 +46,12 @@ func (c *Client) TestRequest(ctx context.Context, datasourceSettings *models.Dat
 		return err
 	}
 
-	// TODO: This is a workaround because Plugin SDK doesn't expose user context for CheckHealth
-	accessToken, err := c.serviceCredentials.GetAccessToken(ctx)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("POST", datasourceSettings.ClusterURL+"/v1/rest/query", bytes.NewReader(buf))
+	req, err := http.NewRequestWithContext(ctx, "POST", datasourceSettings.ClusterURL+"/v1/rest/query", bytes.NewReader(buf))
 	if err != nil {
 		return err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+accessToken)
 	for key, value := range additionalHeaders {
 		req.Header.Set(key, value)
 	}
@@ -80,19 +77,13 @@ func (c *Client) KustoRequest(ctx context.Context, url string, payload models.Re
 		return nil, fmt.Errorf("no Azure request serial: %w", err)
 	}
 
-	accessToken, err := c.serviceCredentials.GetAccessToken(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(buf))
 	if err != nil {
 		return nil, fmt.Errorf("no Azure request instance: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("x-ms-app", "Grafana-ADX")
 	if payload.QuerySource == "" {
 		payload.QuerySource = "unspecified"

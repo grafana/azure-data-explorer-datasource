@@ -1,4 +1,4 @@
-package adxauth
+package client
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ var (
 	}
 )
 
-func getAzureScopes(settings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials, clusterUrl string) ([]string, error) {
+func getAdxScopes(settings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials, clusterUrl string) ([]string, error) {
 	// Extract cloud from credentials
 	azureCloud, err := azcredentials.GetAzureCloud(settings, credentials)
 	if err != nil {
