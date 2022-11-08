@@ -1,14 +1,12 @@
 package azuredx
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/stretchr/testify/require"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -41,7 +39,6 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		adx.serviceCredentials = &FakeServiceCredentials{}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusInternalServerError, res.Code)
 		httpError := models.HttpError{}
@@ -58,7 +55,6 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		adx.serviceCredentials = &FakeServiceCredentials{}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusOK, res.Code)
 		tableResponse := models.TableResponse{}
@@ -106,15 +102,4 @@ func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, 
 			},
 		},
 	}, nil
-}
-
-type FakeServiceCredentials struct {
-}
-
-func (c *FakeServiceCredentials) ServicePrincipalAuthorization(ctx context.Context) (string, error) {
-	return "Bearer test-token", nil
-}
-
-func (c *FakeServiceCredentials) QueryDataAuthorization(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
-	return c.ServicePrincipalAuthorization(ctx)
 }

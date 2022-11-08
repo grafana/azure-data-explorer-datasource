@@ -1,6 +1,7 @@
 package azuredx
 
 import (
+	"context"
 	"testing"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -45,7 +46,7 @@ func TestDatasource(t *testing.T) {
 			require.Contains(t, additionalHeaders["x-ms-client-request-id"], UserLogin)
 			return table, nil
 		}
-		res := adx.handleQuery(query, &backend.User{Login: UserLogin}, "")
+		res := adx.handleQuery(context.TODO(), query, &backend.User{Login: UserLogin})
 		require.NoError(t, res.Error)
 	})
 }

@@ -5,9 +5,9 @@ import (
 	"math/rand"
 	"net/http"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxusercontext"
-	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
@@ -15,7 +15,6 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 
@@ -27,10 +26,8 @@ import (
 // AzureDataExplorer stores reference to plugin and logger
 type AzureDataExplorer struct {
 	backend.CallResourceHandler
-	client             client.AdxClient
-	settings           *models.DatasourceSettings
-	credentials        azcredentials.AzureCredentials
-	serviceCredentials adxauth.ServiceCredentials
+	client   client.AdxClient
+	settings *models.DatasourceSettings
 }
 
 func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
@@ -61,7 +58,6 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 	} else if credentials == nil {
 		credentials = adxcredentials.GetDefaultCredentials(azureSettings)
 	}
-	adx.credentials = credentials
 
 	httpClientOptions, err := instanceSettings.HTTPClientOptions()
 	if err != nil {
@@ -74,12 +70,13 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 		backend.Logger.Error("failed to create HTTP client", "error", err.Error())
 		return nil, err
 	}
-	adx.client = client.New(httpClient)
 
-	adx.serviceCredentials, err = adxauth.NewServiceCredentials(datasourceSettings, azureSettings, credentials, httpClient)
+	serviceCredentials, err := adxauth.NewServiceCredentials(datasourceSettings, azureSettings, credentials)
 	if err != nil {
 		return nil, err
 	}
+
+	adx.client = client.New(serviceCredentials, httpClient)
 
 	mux := http.NewServeMux()
 	adx.registerRoutes(mux)
@@ -90,7 +87,9 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 
 // QueryData is the primary method called by grafana-server
 func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+	ctx = adxusercontext.FromQueryReq(ctx, req)
 	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
+
 	res := backend.NewQueryDataResponse()
 
 	for _, q := range req.Queries {
@@ -106,12 +105,9 @@ func (adx *AzureDataExplorer) CallResource(ctx context.Context, req *backend.Cal
 
 // CheckHealth handles health checks
 func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	accessToken, err := adx.serviceCredentials.GetAccessToken(adxusercontext.FromHealthCheckReq(ctx, req))
-	if err != nil {
-		return nil, err
-	}
-	headers := map[string]string{"Authorization": "Bearer " + accessToken}
-	err = adx.client.TestRequest(adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
+	ctx = adxusercontext.FromHealthCheckReq(ctx, req)
+	headers := map[string]string{}
+	err := adx.client.TestRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
@@ -151,12 +147,7 @@ func (adx *AzureDataExplorer) handleQuery(ctx context.Context, q backend.DataQue
 }
 
 func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryModel, props *models.Properties, user *backend.User) (backend.DataResponse, error) {
-	accessToken, err := adx.serviceCredentials.GetAccessToken(ctx)
-	if err != nil {
-		return backend.DataResponse{}, err
-	}
-
-	headers := map[string]string{"Authorization": "Bearer " + accessToken}
+	headers := map[string]string{}
 	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", q.QuerySource, rand.Uint64())
 	if adx.settings.EnableUserTracking {
 		if user != nil {
@@ -166,7 +157,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	}
 	headers["x-ms-client-request-id"] = msClientRequestIDHeader
 
-	tableRes, err := adx.client.KustoRequest(adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
+	tableRes, err := adx.client.KustoRequest(ctx, adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
 		CSL:         q.Query,
 		DB:          q.Database,
 		Properties:  props,

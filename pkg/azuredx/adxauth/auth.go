@@ -16,6 +16,7 @@ import (
 
 // ServiceCredentials provides authorization for cloud service usage.
 type ServiceCredentials interface {
+	// TODO: GetServiceAccessToken needed for a workaround in CheckHealth
 	GetServiceAccessToken(ctx context.Context) (string, error)
 	GetAccessToken(ctx context.Context) (string, error)
 }
@@ -29,7 +30,7 @@ type ServiceCredentialsImpl struct {
 }
 
 func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings,
-	credentials azcredentials.AzureCredentials, httpClient *http.Client) (ServiceCredentials, error) {
+	credentials azcredentials.AzureCredentials) (ServiceCredentials, error) {
 	var err error
 
 	var tokenProvider aztokenprovider.AzureTokenProvider
@@ -43,7 +44,7 @@ func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *a
 		if err != nil {
 			return nil, fmt.Errorf("invalid Azure configuration: %w", err)
 		}
-		aadClient, err = newAADClient(&c.ClientSecretCredentials, httpClient)
+		aadClient, err = newAADClient(&c.ClientSecretCredentials, http.DefaultClient)
 		if err != nil {
 			return nil, fmt.Errorf("invalid Azure configuration: %w", err)
 		}
@@ -68,6 +69,7 @@ func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *a
 }
 
 // GetServiceAccessToken returns access token for the service credentials
+// TODO: GetServiceAccessToken needed for a workaround in CheckHealth
 func (c *ServiceCredentialsImpl) GetServiceAccessToken(ctx context.Context) (string, error) {
 	backend.Logger.Debug("using service principal token for data request")
 	return c.tokenProvider.GetAccessToken(ctx, c.scopes)
@@ -88,11 +90,9 @@ func (c *ServiceCredentialsImpl) GetAccessToken(ctx context.Context) (string, er
 
 	// Use AAD client if initialized (for OBO credentials)
 	if c.aadClient != nil {
-		// TODO: Add temporary workaround for cases when OBO isn't possible
 		return c.onBehalfOf(ctx)
 	} else {
 		// Service identity credentials
-		backend.Logger.Debug("using service principal token for data request")
 		return c.tokenProvider.GetAccessToken(ctx, c.scopes)
 	}
 }
