@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 )
@@ -19,7 +18,7 @@ var (
 
 func getAzureScopes(settings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials, clusterUrl string) ([]string, error) {
 	// Extract cloud from credentials
-	azureCloud, err := adxcredentials.GetAzureCloud(settings, credentials)
+	azureCloud, err := azcredentials.GetAzureCloud(settings, credentials)
 	if err != nil {
 		return nil, err
 	}
