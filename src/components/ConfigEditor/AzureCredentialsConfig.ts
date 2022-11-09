@@ -1,10 +1,20 @@
 import { DataSourceSettings } from '@grafana/data';
-import { config } from '@grafana/runtime';
+import { AzureSettings, config } from '@grafana/runtime';
 
 import { AzureCloud, AzureCredentials, ConcealedSecret } from './AzureCredentials';
 
 const concealed: ConcealedSecret = Symbol('Concealed client secret');
 const concealedLegacy: ConcealedSecret = Symbol('Concealed legacy client secret');
+
+// TODO: Remove once it added to the runtime library
+interface AzureSettingsEx extends AzureSettings {
+  userIdentityEnabled: boolean;
+}
+
+export const getUserIdentityEnabled = (): boolean =>
+  // Also check feature flag to make it possible to enable in Grafana versions
+  // before user identity configuration was introduced
+  (config.azure as unknown as AzureSettingsEx).userIdentityEnabled ?? config.featureToggles['adxUserIdentityEnabled'];
 
 export const getOboEnabled = (): boolean => !!config.featureToggles['adxOnBehalfOf'];
 
@@ -33,8 +43,13 @@ export function hasCredentials(options: DataSourceSettings<any, any>): boolean {
 }
 
 export function getDefaultCredentials(): AzureCredentials {
-  if (config.azure.managedIdentityEnabled) {
+  const userIdentityEnabled = getUserIdentityEnabled();
+  if (userIdentityEnabled && config.featureToggles['adxUserIdentityPreferred']) {
+    return { authType: 'currentuser' };
+  } else if (config.azure.managedIdentityEnabled) {
     return { authType: 'msi' };
+  } else if (userIdentityEnabled) {
+    return { authType: 'currentuser' };
   } else {
     return { authType: 'clientsecret', azureCloud: getDefaultAzureCloud() };
   }
@@ -49,6 +64,16 @@ export function getCredentials(options: DataSourceSettings<any, any>): AzureCred
   }
 
   switch (credentials.authType) {
+    case 'currentuser':
+      if (getUserIdentityEnabled()) {
+        return {
+          authType: 'currentuser',
+        };
+      } else {
+        // If authentication type is user identity but user identities were disabled in Grafana config,
+        // then we should fall back to an empty default credentials
+        return getDefaultCredentials();
+      }
     case 'msi':
       if (config.azure.managedIdentityEnabled) {
         return {
@@ -136,6 +161,21 @@ export function updateCredentials(
 
   // Apply updated credentials
   switch (credentials.authType) {
+    case 'currentuser':
+      if (!getUserIdentityEnabled()) {
+        throw new Error('User Identity authentication is not enabled in Grafana config.');
+      }
+      options = {
+        ...options,
+        jsonData: {
+          ...options.jsonData,
+          azureCredentials: {
+            authType: 'currentuser',
+          },
+        },
+      };
+      break;
+
     case 'msi':
       if (!config.azure.managedIdentityEnabled) {
         throw new Error('Managed Identity authentication is not enabled in Grafana config.');
@@ -182,6 +222,7 @@ export function updateCredentials(
 
   // User identity based auth requires oauthPassThru to have access to the user's ID token
   switch (credentials.authType) {
+    case 'currentuser':
     case 'clientsecret-obo':
       options = {
         ...options,
