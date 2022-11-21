@@ -218,7 +218,7 @@ T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timest
 
 ### Time Macros
 
-To make writing queries easier there are two Grafana macros that can be used in the where clause of a query:
+To make writing queries easier there are some Grafana macros that can be used in the where clause of a query:
 
 - `$__timeFilter()` - Expands to `TimeGenerated ≥ datetime(2018-06-05T18:09:58.907Z) and TimeGenerated ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
 - `$__timeFilter(datetimeColumn)` - Expands to `datetimeColumn ≥ datetime(2018-06-05T18:09:58.907Z) and datetimeColumn ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
