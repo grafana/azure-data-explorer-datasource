@@ -142,7 +142,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
             Show Help <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
           </label>
         </div>
-        <div className="gf-form" ng-show="ctrl.lastQuery">
+        <div className="gf-form">
           <label className="gf-form-label query-keyword" onClick={() => setShowLastQuery(!showLastQuery)}>
             Raw Query <Icon name={showLastQuery ? 'angle-down' : 'angle-right'} />
           </label>
