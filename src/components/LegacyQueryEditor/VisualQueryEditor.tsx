@@ -56,7 +56,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
 
   // Set initial data
   useEffect(() => {
-    if (database && resultFormat && table?.property.name && !query.expression.from) {
+    if (database && resultFormat && table?.property.name && !query.expression?.from) {
       onChangeQuery({
         ...query,
         database,
