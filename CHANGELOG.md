@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.1.10]
+
+- Fix: Invalid code editor loaded for Grafana versions that don't follow semantic versioning by @aangelisc in https://github.com/grafana/azure-data-explorer-datasource/pull/506
+- Fix error unmounting ADX query editor by @aangelisc in https://github.com/grafana/azure-data-explorer-datasource/pull/519
+- Security: Upgrade Go in build process to 1.19.3
+
 ## [4.1.9]
 
 - Security: Upgrade Go in build process to 1.19.2
