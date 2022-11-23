@@ -11,13 +11,11 @@
     "lint": "eslint --cache --ignore-path ./.gitignore --ext .js,.jsx,.ts,.tsx .",
     "lint:fix": "yarn lint --fix",
     "server": "docker-compose up --build",
-    "sign": "grafana-toolkit plugin:sign",
     "test": "jest --watch --onlyChanged",
     "test:ci": "jest --maxWorkers 4",
     "test:coverage": "jest --coverage",
     "test:coverage:changes": "jest --coverage --changedSince=origin/main",
     "typecheck": "tsc --noEmit",
-    "watch": "grafana-toolkit plugin:dev --watch",
     "generate-release-notes": "PREV_TAG=$(git tag | tail -n 1) && gh api --method POST /repos/grafana/azure-data-explorer-datasource/releases/generate-notes -f tag_name=v${npm_package_version} -f target_commitish=main -f previous_tag_name=${PREV_TAG} | jq -r .body"
   },
   "author": "Grafana Labs",
