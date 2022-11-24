@@ -11,6 +11,7 @@
     "lint": "eslint --cache --ignore-path ./.gitignore --ext .js,.jsx,.ts,.tsx .",
     "lint:fix": "yarn lint --fix",
     "server": "docker-compose up --build",
+    "sign": "npx @grafana/sign-plugin",
     "test": "jest --watch --onlyChanged",
     "test:ci": "jest --maxWorkers 4",
     "test:coverage": "jest --coverage",
