@@ -1,6 +1,6 @@
 # On-Behalf-Of Authorization
 
-**Note\***: The feature is in beta, which means changes to the API and the user experience might occur.
+**Note**: The feature is in beta, which means changes to the API and the user experience might occur.
 
 ⚠️ Only compatible with Grafana 8.3.4 or above.
 
@@ -42,7 +42,7 @@ datasources:
 
 We do not support on-behalf-of authorization for private clouds (like "chinaazuremonitor" or "govazuremonitor") at this time.
 
-**Note:\***: Do not set up alerts when your data source is configured to use the on-behalf-of authorization. Alert rules will not work once the user who created the rule logs off from Grafana.
+**Note**: Do not set up alerts when your data source is configured to use the on-behalf-of authorization. Alert rules will not work once the user who created the rule logs off from Grafana.
 
 ## Setup
 
