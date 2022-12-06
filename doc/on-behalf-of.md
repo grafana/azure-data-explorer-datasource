@@ -1,10 +1,10 @@
 # On-Behalf-Of Authorization
 
-**Note***: The feature is in beta, which means changes to the API and the user experience might occur.
+**Note\***: The feature is in beta, which means changes to the API and the user experience might occur.
 
 ⚠️ Only compatible with Grafana 8.3.4 or above.
 
-Since 3.7.0, we provide OBO flow for Token Authorization. To be used, this feature flag needs to be enabled explicitely in Grafana's config:
+Since 3.7.0, we provide OBO flow for Token Authorization. To be used, this feature flag needs to be enabled explicitly in Grafana's config:
 
 ```ini
 [feature_toggles]
@@ -42,8 +42,7 @@ datasources:
 
 We do not support on-behalf-of authorization for private clouds (like "chinaazuremonitor" or "govazuremonitor") at this time.
 
-**Note:***: Do not set up alerts when your data source is configured to use the on-behalf-of authorization. Alert rules will not work once the user who created the rule logs off from Grafana. 
-
+**Note:\***: Do not set up alerts when your data source is configured to use the on-behalf-of authorization. Alert rules will not work once the user who created the rule logs off from Grafana.
 
 ## Setup
 
@@ -51,11 +50,10 @@ We do not support on-behalf-of authorization for private clouds (like "chinaazur
 
 2. ID tokens must be enabled with a checkbox found on the [Azure portal](https://portal.azure.com/) under “App Registrations” → the respective application → “Manage” → “Authentication”.
 
-3. In addition to the “Microsoft Graph” `User.Read`, a special “Azure Data Explorer” `user_impersonation` permission must be enabled on the [Azure portal](https://portal.azure.com/)  under “App Registrations” → the respective application → “Manage” → “API permissions”.
+3. In addition to the “Microsoft Graph” `User.Read`, a special “Azure Data Explorer” `user_impersonation` permission must be enabled on the [Azure portal](https://portal.azure.com/) under “App Registrations” → the respective application → “Manage” → “API permissions”.
 
 4. Enable “Admin consent” under “App Registrations” → the respective application → “Security” → “Permissions”.
-Enabling “Admin consent” will grant consent on behalf of all users in the current tenant, ensuring the users will not be required to consent when using the application.
-
+   Enabling “Admin consent” will grant consent on behalf of all users in the current tenant, ensuring the users will not be required to consent when using the application.
 
 ## Monitoring
 

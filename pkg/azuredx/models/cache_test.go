@@ -31,7 +31,7 @@ func TestNewCacheSettings(t *testing.T) {
 			},
 			query: `SampleData
 					 | where state == "Texas"
-					 | summarize avg(Coulumn) by bin(TimeColumn, 1m)`,
+					 | summarize avg(Column) by bin(TimeColumn, 1m)`,
 			interval: time.Second * 10,
 			timeRange: backend.TimeRange{
 				From: time.Date(2019, 7, 30, 20, 2, 33, 0, time.UTC),
@@ -54,7 +54,7 @@ func TestNewCacheSettings(t *testing.T) {
 			},
 			query: `SampleData
 				     | where state == "Texas"
-					 | summarize avg(Coulumn) by bin(TimeColumn, 10m)`,
+					 | summarize avg(Column) by bin(TimeColumn, 10m)`,
 			interval: time.Second * 10,
 			timeRange: backend.TimeRange{
 				From: time.Date(2020, 9, 1, 20, 2, 33, 0, time.UTC),

@@ -97,25 +97,25 @@ var binSizeRE = regexp.MustCompile(`by bin\([\w\$\(\)\.]+, ` +
 func detectResolution(query string, interval time.Duration) time.Duration {
 	match := binSizeRE.FindStringSubmatch(query)
 	if len(match) != 2 {
-		return intevalOrDefault(interval)
+		return intervalOrDefault(interval)
 	}
 
 	if macroRE.MatchString(match[1]) {
-		return intevalOrDefault(interval)
+		return intervalOrDefault(interval)
 	}
 
 	d, err := time.ParseDuration(match[1])
 	if err != nil {
-		return intevalOrDefault(interval)
+		return intervalOrDefault(interval)
 	}
 
 	if d <= interval {
-		return intevalOrDefault(interval)
+		return intervalOrDefault(interval)
 	}
 	return d
 }
 
-func intevalOrDefault(interval time.Duration) time.Duration {
+func intervalOrDefault(interval time.Duration) time.Duration {
 	if interval.Milliseconds() == 0 {
 		return time.Millisecond * 1000 // default to 1000ms
 	}

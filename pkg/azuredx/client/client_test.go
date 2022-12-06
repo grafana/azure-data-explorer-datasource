@@ -16,7 +16,7 @@ func TestClient(t *testing.T) {
 		filename := "./testdata/successful-response.json"
 		testDataRes, err := loadTestFile(filename)
 		if err != nil {
-			t.Errorf("test logic error: file doesnt exist: %s", filename)
+			t.Errorf("test logic error: file doesn't exist: %s", filename)
 		}
 		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			rw.WriteHeader(http.StatusOK)
@@ -43,7 +43,7 @@ func TestClient(t *testing.T) {
 		filename := "./testdata/error-response.json"
 		testDataRes, err := loadTestFile(filename)
 		if err != nil {
-			t.Errorf("test logic error: file doesnt exist: %s", filename)
+			t.Errorf("test logic error: file doesn't exist: %s", filename)
 		}
 		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			rw.WriteHeader(http.StatusBadRequest)
