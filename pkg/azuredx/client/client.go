@@ -16,7 +16,7 @@ type AdxClient interface {
 	KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
 }
 
-var _ AdxClient = new(Client) // validates interfarce conformance
+var _ AdxClient = new(Client) // validates interface conformance
 
 // Client is an http.Client used for API requests.
 type Client struct {

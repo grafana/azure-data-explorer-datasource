@@ -26,7 +26,7 @@ func TestDatasource(t *testing.T) {
 	const UserLogin string = "user-login"
 	const ClusterURL string = "base-url"
 
-	t.Run("When running a query the right args should be passed to KustoReqest", func(t *testing.T) {
+	t.Run("When running a query the right args should be passed to KustoRequest", func(t *testing.T) {
 		adx = AzureDataExplorer{}
 		adx.client = &fakeClient{}
 		adx.settings = &models.DatasourceSettings{EnableUserTracking: true, ClusterURL: ClusterURL}

@@ -17,7 +17,8 @@
     "test:coverage": "jest --coverage",
     "test:coverage:changes": "jest --coverage --changedSince=origin/main",
     "typecheck": "tsc --noEmit",
-    "generate-release-notes": "PREV_TAG=$(git tag | tail -n 1) && gh api --method POST /repos/grafana/azure-data-explorer-datasource/releases/generate-notes -f tag_name=v${npm_package_version} -f target_commitish=main -f previous_tag_name=${PREV_TAG} | jq -r .body"
+    "generate-release-notes": "PREV_TAG=$(git tag | tail -n 1) && gh api --method POST /repos/grafana/azure-data-explorer-datasource/releases/generate-notes -f tag_name=v${npm_package_version} -f target_commitish=main -f previous_tag_name=${PREV_TAG} | jq -r .body",
+    "spellcheck": "cspell -c cspell.config.json \"**/*.{ts,tsx,js,go,md,mdx,yml,yaml,json,scss,css}\""
   },
   "author": "Grafana Labs",
   "license": "Apache",
@@ -66,6 +67,7 @@
     "replace-in-file-webpack-plugin": "^1.0.6",
     "sass": "1.55.0",
     "sass-loader": "13.1.0",
+    "cspell": "6.13.3",
     "style-loader": "3.3.1",
     "swc-loader": "^0.1.15",
     "ts-node": "^10.5.0",

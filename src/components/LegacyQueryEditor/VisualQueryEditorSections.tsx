@@ -147,7 +147,7 @@ export const KustoWhereEditorSection = buildFilterQueryEditorSection((filterSect
         .multipleValues(false)
         .add();
 
-      operator('!startsswith')
+      operator('!startswith')
         .supportTypes([QueryEditorPropertyType.String])
         .withDescription('does not start with')
         .multipleValues(false)

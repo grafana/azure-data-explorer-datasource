@@ -279,12 +279,12 @@ describe('AdxDataSource', () => {
 describe('sortStartsWithValuesFirst', () => {
   describe('when called with random ordered values', () => {
     it('then should order startsWith values on top followed by values that include searchText', () => {
-      const arr = ['South Korea', 'Norway', 'Tailand', 'Taiwan', 'United States', 'Sweden', 'Finland'];
+      const arr = ['South Korea', 'Norway', 'Thailand', 'Taiwan', 'United States', 'Sweden', 'Finland'];
       const searchText = 't';
 
       const result = sortStartsWithValuesFirst(arr, searchText);
 
-      expect(result).toEqual(['Tailand', 'Taiwan', 'South Korea', 'United States', 'Norway', 'Sweden', 'Finland']);
+      expect(result).toEqual(['Thailand', 'Taiwan', 'South Korea', 'United States', 'Norway', 'Sweden', 'Finland']);
     });
   });
 });
