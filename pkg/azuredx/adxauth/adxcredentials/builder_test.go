@@ -214,7 +214,7 @@ func TestNormalizeAzureCloud(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.description, func(t *testing.T) {
-				actualCloud, err := normalizeAzureCloud(tt.legacyCloud)
+				actualCloud, err := resolveLegacyCloudName(tt.legacyCloud)
 				require.NoError(t, err)
 
 				assert.Equal(t, tt.normalizedCloud, actualCloud)
@@ -225,7 +225,7 @@ func TestNormalizeAzureCloud(t *testing.T) {
 	t.Run("should fail when cloud is unknown", func(t *testing.T) {
 		legacyCloud := "unknown"
 
-		_, err := normalizeAzureCloud(legacyCloud)
+		_, err := resolveLegacyCloudName(legacyCloud)
 		assert.Error(t, err)
 	})
 }

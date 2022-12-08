@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials/internal/maputil"
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/util/maputil"
 )
 
 func FromDatasourceData(data map[string]interface{}, secureData map[string]string) (azcredentials.AzureCredentials, error) {
@@ -42,7 +42,7 @@ func getFromLegacy(data map[string]interface{}, secureData map[string]string) (a
 	if err != nil {
 		return nil, err
 	}
-	cloud, err := normalizeAzureCloud(legacyCloud)
+	cloud, err := resolveLegacyCloudName(legacyCloud)
 	if err != nil {
 		return nil, fmt.Errorf("invalid Azure credentials: %w", err)
 	}
@@ -97,14 +97,14 @@ func ensureOnBehalfOfSupported(data map[string]interface{}) error {
 	}
 }
 
-// Azure cloud names used by the Azure Data Explorer datasource
+// Legacy Azure cloud names used by the Azure Data Explorer datasource
 const (
 	azureMonitorPublic       = "azuremonitor"
 	azureMonitorChina        = "chinaazuremonitor"
 	azureMonitorUSGovernment = "govazuremonitor"
 )
 
-func normalizeAzureCloud(cloudName string) (string, error) {
+func resolveLegacyCloudName(cloudName string) (string, error) {
 	switch cloudName {
 	case azureMonitorPublic:
 		return azsettings.AzurePublic, nil
