@@ -72,7 +72,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([
           createOperator('eventType', '==', 'ThunderStorm'),
           createWhereExpressions(
-            [createOperator('state', '==', ''), createOperator('eventType', '==', 'Ligthning')],
+            [createOperator('state', '==', ''), createOperator('eventType', '==', 'Lightning')],
             QueryEditorExpressionType.Or
           ),
         ]),
@@ -88,7 +88,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
         'StormEvents' +
           "\n| where eventType == 'ThunderStorm'" +
-          "\n| where state contains 'TEXAS' or eventType == 'Ligthning'" +
+          "\n| where state contains 'TEXAS' or eventType == 'Lightning'" +
           '\n| take 50000' +
           '\n| distinct state' +
           '\n| take 251'
@@ -101,7 +101,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([
           createOperator('eventType', '==', 'ThunderStorm'),
           createWhereExpressions(
-            [createOperator('column["type"]', '==', ''), createOperator('eventType', '==', 'Ligthning')],
+            [createOperator('column["type"]', '==', ''), createOperator('eventType', '==', 'Lightning')],
             QueryEditorExpressionType.Or
           ),
         ]),
@@ -125,7 +125,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toAutoCompleteQuery(acQuery, tableSchema)).toEqual(
         'StormEvents' +
           "\n| where eventType == 'ThunderStorm'" +
-          "\n| where column[\"type\"] contains 'TEXAS' or eventType == 'Ligthning'" +
+          "\n| where column[\"type\"] contains 'TEXAS' or eventType == 'Lightning'" +
           '\n| take 50000' +
           '\n| distinct tostring(column["type"])' +
           '\n| take 251'
@@ -138,7 +138,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([
           createOperator('eventType', '==', 'ThunderStorm'),
           createWhereExpressions(
-            [createOperator('column["type"]', '==', ''), createOperator('eventType', '==', 'Ligthning')],
+            [createOperator('column["type"]', '==', ''), createOperator('eventType', '==', 'Lightning')],
             QueryEditorExpressionType.Or
           ),
         ]),
@@ -167,7 +167,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           "\n| where eventType == 'ThunderStorm'" +
-          "\n| where column[\"type\"] contains 'TEXAS' or eventType == 'Ligthning'" +
+          "\n| where column[\"type\"] contains 'TEXAS' or eventType == 'Lightning'" +
           '\n| take 50000' +
           '\n| distinct tostring(column["type"])' +
           '\n| take 251'
@@ -1187,7 +1187,7 @@ describe('KustoExpressionParser', () => {
       );
     });
 
-    it('should parse expression with where array containg empty or', () => {
+    it('should parse expression with where array containing empty or', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createWhereArray([createWhereExpressions([], QueryEditorExpressionType.Or)]),
@@ -1207,7 +1207,7 @@ describe('KustoExpressionParser', () => {
       );
     });
 
-    it('should parse expression with where array containg empty operators', () => {
+    it('should parse expression with where array containing empty operators', () => {
       const expression = createQueryExpression({
         from: createProperty('StormEvents'),
         where: createWhereArray([createOperator('', '', '')]),

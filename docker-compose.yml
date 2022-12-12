@@ -1,9 +1,0 @@
-grafana:
-  image: grafana/grafana:latest
-  ports:
-    - "3000:3000"
-  volumes:
-    - ./:/var/lib/grafana/plugins/grafana-azure-data-explorer-datasource
-    - ./provisioning:/etc/grafana/provisioning
-  environment:
-    - TERM=linux

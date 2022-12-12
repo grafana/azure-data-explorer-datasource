@@ -351,7 +351,7 @@ func ToADXTimeSeries(in *data.Frame) (*data.Frame, error) {
 		}
 
 		for _, valueIdx := range valueColIdxs {
-			// Will treat all numberic values as nullable floats here
+			// Will treat all numeric values as nullable floats here
 			vals := []*float64{}
 			rawValues := in.At(valueIdx, rowIdx).(string)
 			err := jsoniter.Unmarshal([]byte(rawValues), &vals)

@@ -10,7 +10,7 @@ type QueryModel struct {
 	MacroData   MacroData
 }
 
-// Interpolate applys macro expansion on the QueryModel's Payload's Query string
+// Interpolate applies macro expansion on the QueryModel's Payload's Query string
 func (qm *QueryModel) Interpolate() (err error) {
 	qm.Query, err = qm.MacroData.Interpolate(qm.Query)
 	return

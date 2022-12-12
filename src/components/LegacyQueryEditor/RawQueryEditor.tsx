@@ -6,7 +6,7 @@ import { QueryEditorResultFormat, selectResultFormat } from './QueryEditorResult
 import { AdxDataSource } from 'datasource';
 import { KustoMonacoEditor } from 'monaco/KustoMonacoEditor';
 import React, { useEffect, useState } from 'react';
-import { gte, valid } from 'semver';
+import { gte, valid, coerce } from 'semver';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 
@@ -41,7 +41,16 @@ interface Worker {
 // that includes fixes required for auto-completion to work.
 // Remove this code once Grafana 8.5 is the minimal version supported
 function gtGrafana8_5() {
-  return valid(config.buildInfo.version) && gte(config.buildInfo.version, '8.5.0');
+  const version = config.buildInfo.version;
+  const isValid = valid(version);
+  // Assume that a security release will be of the form 'w.x.y.z' - Pre releases of the form 'w.x.y-pre.z' are already valid
+  const isSecurityRelease = version.split('.').length > 3;
+  if (!isValid && isSecurityRelease) {
+    // Coerce will drop the z in 'w.x.y.z' leaving just the major-minor-patch version
+    const coercedValue = coerce(version);
+    return coercedValue ? gte(coercedValue, '8.5.0') : null;
+  }
+  return isValid && gte(version, '8.5.0');
 }
 
 export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
@@ -142,7 +151,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
             Show Help <Icon name={showHelp ? 'angle-down' : 'angle-right'} />
           </label>
         </div>
-        <div className="gf-form" ng-show="ctrl.lastQuery">
+        <div className="gf-form">
           <label className="gf-form-label query-keyword" onClick={() => setShowLastQuery(!showLastQuery)}>
             Raw Query <Icon name={showLastQuery ? 'angle-down' : 'angle-right'} />
           </label>

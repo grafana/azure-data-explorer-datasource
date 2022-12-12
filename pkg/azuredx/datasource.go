@@ -211,16 +211,16 @@ func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Prop
 			}
 		}
 	case "time_series_adx_series":
-		orginalDFs, err := tableRes.ToDataFrames(q.Query)
+		originalDFs, err := tableRes.ToDataFrames(q.Query)
 		if err != nil {
 			return resp, fmt.Errorf("error converting response to data frames: %w", err)
 		}
-		for _, f := range orginalDFs {
-			formatedDF, err := models.ToADXTimeSeries(f)
+		for _, f := range originalDFs {
+			formattedDF, err := models.ToADXTimeSeries(f)
 			if err != nil {
 				return resp, err
 			}
-			resp.Frames = append(resp.Frames, formatedDF)
+			resp.Frames = append(resp.Frames, formattedDF)
 		}
 
 	// 	series, timeNotASC, err := tableRes.ToTimeSeries()

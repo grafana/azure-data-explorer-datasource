@@ -174,12 +174,12 @@ const migrateV2OperatorExpression = (expression: any): QueryEditorOperatorExpres
 
 const migrateV2Property = (property: any): QueryEditorProperty => {
   return {
-    type: migrateV2PropertType(property.fieldType),
+    type: migrateV2PropertyType(property.fieldType),
     name: property.value,
   };
 };
 
-const migrateV2PropertType = (type: any): QueryEditorPropertyType => {
+const migrateV2PropertyType = (type: any): QueryEditorPropertyType => {
   switch (type) {
     case 'boolean':
       return QueryEditorPropertyType.Boolean;

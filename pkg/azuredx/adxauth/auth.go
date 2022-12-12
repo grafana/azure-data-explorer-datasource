@@ -119,7 +119,7 @@ func (c *ServiceCredentialsImpl) queryDataOnBehalfOf(ctx context.Context, req *b
 		// Don't leak any context to the end-user.
 		return "", errors.New("on-behalf-of token exchange failed for data request")
 	}
-	backend.Logger.Debug("aquired on-behalf-of token for data request")
+	backend.Logger.Debug("acquired on-behalf-of token for data request")
 
 	return "Bearer " + onBehalfOfToken, nil
 }

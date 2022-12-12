@@ -59,4 +59,46 @@ describe('RawQueryEditor', () => {
       await screen.findByText('Loading...');
     });
   });
+
+  describe('when the Grafana version is <=8.5 and is a security release', () => {
+    beforeEach(() => {
+      config.buildInfo.version = '8.1.0.1';
+    });
+    it('should render legacy editor', () => {
+      render(<RawQueryEditor {...defaultProps} />);
+      expect(screen.getByTestId(selectors.components.queryEditor.codeEditorLegacy.container)).toBeInTheDocument();
+    });
+  });
+
+  describe('when the Grafana version is >=8.5 and is a security release', () => {
+    beforeEach(() => {
+      config.buildInfo.version = '8.5.0.1';
+    });
+    it('should render the new code editor', async () => {
+      render(<RawQueryEditor {...defaultProps} />);
+      expect(screen.getByTestId(selectors.components.queryEditor.codeEditor.container)).toBeInTheDocument();
+      await screen.findByText('Loading...');
+    });
+  });
+
+  describe('when the Grafana version is <=8.5 and is a pre-release', () => {
+    beforeEach(() => {
+      config.buildInfo.version = '8.1.0-pre.1';
+    });
+    it('should render legacy editor', () => {
+      render(<RawQueryEditor {...defaultProps} />);
+      expect(screen.getByTestId(selectors.components.queryEditor.codeEditorLegacy.container)).toBeInTheDocument();
+    });
+  });
+
+  describe('when the Grafana version is >=8.5 and is a pre-release', () => {
+    beforeEach(() => {
+      config.buildInfo.version = '8.6.0-pre.1';
+    });
+    it('should render the new code editor', async () => {
+      render(<RawQueryEditor {...defaultProps} />);
+      expect(screen.getByTestId(selectors.components.queryEditor.codeEditor.container)).toBeInTheDocument();
+      await screen.findByText('Loading...');
+    });
+  });
 });

@@ -299,7 +299,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return [];
     }
 
-    const kustQuery: KustoQuery = {
+    const kustoQuery: KustoQuery = {
       ...defaultQuery,
       refId: `adx-${autoQuery}`,
       database: query.database,
@@ -311,7 +311,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
     const response = await this.query(
       includeTimeRange({
-        targets: [kustQuery],
+        targets: [kustoQuery],
       }) as DataQueryRequest<KustoQuery>
     ).toPromise();
 
@@ -434,7 +434,7 @@ const recordSchema = (columnName: string, schema: AdxSchemaDefinition, result: A
 };
 
 /**
- * this is a suuuper ugly way of doing this.
+ * this is a super ugly way of doing this.
  */
 const includeTimeRange = (option: any): any => {
   const range = (getTemplateSrv() as any)?.timeRange as TimeRange;
