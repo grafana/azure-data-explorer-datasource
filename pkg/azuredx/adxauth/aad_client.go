@@ -1,4 +1,4 @@
-package azureauth
+package adxauth
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/confidential"
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
@@ -20,7 +20,7 @@ type aadClient interface {
 }
 
 func newAADClient(credentials *azcredentials.AzureClientSecretCredentials, httpClient *http.Client) (aadClient, error) {
-	authority, err := resolveAuthorityForCloud(credentials.AzureCloud)
+	authorityHost, err := resolveAuthorityForCloud(credentials.AzureCloud)
 	if err != nil {
 		return nil, fmt.Errorf("invalid Azure credentials: %w", err)
 	}
@@ -34,7 +34,7 @@ func newAADClient(credentials *azcredentials.AzureClientSecretCredentials, httpC
 		return nil, err
 	}
 
-	authorityOpts := confidential.WithAuthority(runtime.JoinPaths(string(authority), credentials.TenantId))
+	authorityOpts := confidential.WithAuthority(runtime.JoinPaths(authorityHost, credentials.TenantId))
 	httpClientOpts := confidential.WithHTTPClient(httpClient)
 
 	client, err := confidential.New(credentials.ClientId, clientCredential, authorityOpts, httpClientOpts)
@@ -45,15 +45,15 @@ func newAADClient(credentials *azcredentials.AzureClientSecretCredentials, httpC
 	return client, nil
 }
 
-func resolveAuthorityForCloud(cloudName string) (azidentity.AuthorityHost, error) {
+func resolveAuthorityForCloud(cloudName string) (string, error) {
 	// Known Azure clouds
 	switch cloudName {
 	case azsettings.AzurePublic:
-		return azidentity.AzurePublicCloud, nil
+		return cloud.AzurePublic.ActiveDirectoryAuthorityHost, nil
 	case azsettings.AzureChina:
-		return azidentity.AzureChina, nil
+		return cloud.AzureChina.ActiveDirectoryAuthorityHost, nil
 	case azsettings.AzureUSGovernment:
-		return azidentity.AzureGovernment, nil
+		return cloud.AzureGovernment.ActiveDirectoryAuthorityHost, nil
 	default:
 		err := fmt.Errorf("the Azure cloud '%s' not supported", cloudName)
 		return "", err

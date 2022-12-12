@@ -1,11 +1,12 @@
 package azuredx
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 	"net/http"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
+	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
@@ -13,7 +14,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/azureauth"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 
@@ -27,19 +28,23 @@ type AzureDataExplorer struct {
 	backend.CallResourceHandler
 	client             client.AdxClient
 	settings           *models.DatasourceSettings
-	serviceCredentials azureauth.ServiceCredentials
+	credentials        azcredentials.AzureCredentials
+	serviceCredentials adxauth.ServiceCredentials
 }
 
 func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	adx := &AzureDataExplorer{}
+
+	var jsonData map[string]interface{}
+	err := json.Unmarshal(instanceSettings.JSONData, &jsonData)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get jsonData from instanceSettings: %w", err)
+	}
+
 	datasourceSettings := &models.DatasourceSettings{}
-	err := datasourceSettings.Load(instanceSettings)
+	err = datasourceSettings.Load(instanceSettings)
 	if err != nil {
 		return nil, err
-	}
-	// TODO(pascaldekloe): We need a way to set oauthPassThru in the plugin instead.
-	if datasourceSettings.OnBehalfOf && !datasourceSettings.OAuthPassThru {
-		return nil, errors.New("Azure datasource provisioned with onBehalfOf: true, and no oauthPassThru: true")
 	}
 	adx.settings = datasourceSettings
 
@@ -48,6 +53,14 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 		backend.Logger.Error("failed to read Azure settings from Grafana", "error", err.Error())
 		return nil, err
 	}
+
+	credentials, err := adxcredentials.FromDatasourceData(jsonData, instanceSettings.DecryptedSecureJSONData)
+	if err != nil {
+		return nil, err
+	} else if credentials == nil {
+		credentials = adxcredentials.GetDefaultCredentials(azureSettings)
+	}
+	adx.credentials = credentials
 
 	httpClientOptions, err := instanceSettings.HTTPClientOptions()
 	if err != nil {
@@ -62,7 +75,7 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 	}
 	adx.client = client.New(httpClient)
 
-	adx.serviceCredentials, err = azureauth.NewServiceCredentials(datasourceSettings, azureSettings, httpClient)
+	adx.serviceCredentials, err = adxauth.NewServiceCredentials(datasourceSettings, azureSettings, credentials, httpClient)
 	if err != nil {
 		return nil, err
 	}

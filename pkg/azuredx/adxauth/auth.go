@@ -1,4 +1,4 @@
-package azureauth
+package adxauth
 
 import (
 	"context"
@@ -21,7 +21,6 @@ type ServiceCredentials interface {
 }
 
 type ServiceCredentialsImpl struct {
-	OnBehalfOf   bool
 	QueryTimeout time.Duration
 
 	tokenProvider aztokenprovider.AzureTokenProvider
@@ -30,36 +29,37 @@ type ServiceCredentialsImpl struct {
 }
 
 func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings,
-	httpClient *http.Client) (ServiceCredentials, error) {
-	azureCloud, err := normalizeAzureCloud(settings.AzureCloud)
-	if err != nil {
-		return nil, fmt.Errorf("invalid Azure credentials: %w", err)
+	credentials azcredentials.AzureCredentials, httpClient *http.Client) (ServiceCredentials, error) {
+	var err error
+
+	var tokenProvider aztokenprovider.AzureTokenProvider
+	var aadClient aadClient = nil
+
+	switch c := credentials.(type) {
+	case *azcredentials.AzureClientSecretOboCredentials:
+		// Special support for OBO authentication as it isn't supported by the SDK
+		// Configure the service identity token provider with underlying client secret credentials
+		tokenProvider, err = aztokenprovider.NewAzureAccessTokenProvider(azureSettings, &c.ClientSecretCredentials)
+		if err != nil {
+			return nil, fmt.Errorf("invalid Azure configuration: %w", err)
+		}
+		aadClient, err = newAADClient(&c.ClientSecretCredentials, httpClient)
+		if err != nil {
+			return nil, fmt.Errorf("invalid Azure configuration: %w", err)
+		}
+	default:
+		tokenProvider, err = aztokenprovider.NewAzureAccessTokenProvider(azureSettings, c)
+		if err != nil {
+			return nil, fmt.Errorf("invalid Azure configuration: %w", err)
+		}
 	}
 
-	credentials := &azcredentials.AzureClientSecretCredentials{
-		AzureCloud:   azureCloud,
-		TenantId:     settings.TenantID,
-		ClientId:     settings.ClientID,
-		ClientSecret: settings.Secret,
-	}
-
-	tokenProvider, err := aztokenprovider.NewAzureAccessTokenProvider(azureSettings, credentials)
-	if err != nil {
-		return nil, fmt.Errorf("invalid Azure configuration: %w", err)
-	}
-
-	aadClient, err := newAADClient(credentials, httpClient)
-	if err != nil {
-		return nil, fmt.Errorf("invalid Azure configuration: %w", err)
-	}
-
-	scopes, err := getAzureScopes(credentials, settings.ClusterURL)
+	scopes, err := getAzureScopes(azureSettings, credentials, settings.ClusterURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid Azure configuration: %w", err)
 	}
 
 	return &ServiceCredentialsImpl{
-		OnBehalfOf:    settings.OnBehalfOf,
 		QueryTimeout:  settings.QueryTimeout,
 		tokenProvider: tokenProvider,
 		aadClient:     aadClient,
@@ -87,11 +87,10 @@ func (c *ServiceCredentialsImpl) QueryDataAuthorization(ctx context.Context, req
 		defer cancel()
 	}
 
-	switch {
-	case c.OnBehalfOf:
+	// Use AAD client if initialized (for OBO credentials)
+	if c.aadClient != nil {
 		return c.queryDataOnBehalfOf(ctx, req)
-
-	default:
+	} else {
 		backend.Logger.Debug("using service principal token for data request")
 		return c.ServicePrincipalAuthorization(ctx)
 	}

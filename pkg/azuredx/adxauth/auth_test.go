@@ -1,4 +1,4 @@
-package azureauth
+package adxauth
 
 import (
 	"context"
@@ -14,9 +14,9 @@ func TestOnBehalfOf(t *testing.T) {
 		RequestUser                *backend.User
 		RequestAuthorizationHeader string
 		RequestIDTokenHeader       string
-		ShouldRequestToken 		   bool
-		ExpectedError      		   string
-		OnBehalfOfDisabled		   bool
+		ShouldRequestToken         bool
+		ExpectedError              string
+		OnBehalfOfDisabled         bool
 	}{
 		// happy flow
 		0: {
@@ -47,9 +47,9 @@ func TestOnBehalfOf(t *testing.T) {
 		},
 
 		4: {
-			RequestUser:                &backend.User{Login: "alice"},
-			RequestIDTokenHeader: 		"ID-TOKEN",
-			OnBehalfOfDisabled: 		true,
+			RequestUser:          &backend.User{Login: "alice"},
+			RequestIDTokenHeader: "ID-TOKEN",
+			OnBehalfOfDisabled:   true,
 		},
 	}
 
@@ -70,10 +70,11 @@ func TestOnBehalfOf(t *testing.T) {
 		fakeTokenProvider := &FakeTokenProvider{}
 
 		c := &ServiceCredentialsImpl{
-			aadClient: fakeAADClient,
-			tokenProvider:  fakeTokenProvider,
+			tokenProvider: fakeTokenProvider,
 		}
-		c.OnBehalfOf = !g.OnBehalfOfDisabled
+		if !g.OnBehalfOfDisabled {
+			c.aadClient = fakeAADClient
+		}
 
 		auth, err := c.QueryDataAuthorization(context.Background(), &req)
 

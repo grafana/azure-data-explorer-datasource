@@ -13,6 +13,9 @@
     "pkg/azuredx/testdata/**"
   ],
   "words": [
+    "adxauth",
+    "adxcredentials",
+    "clientsecret",
     "Codeowners",
     "datasource",
     "datetime",
@@ -21,6 +24,7 @@
     "gtime",
     "httpclient",
     "logm",
+    "maputil",
     "sdkhttpclient",
     "timeseries",
     "inlinesvg",
