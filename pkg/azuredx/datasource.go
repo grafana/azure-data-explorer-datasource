@@ -93,7 +93,7 @@ func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryD
 	res := backend.NewQueryDataResponse()
 
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = adx.handleQuery(adxusercontext.FromQueryReq(ctx, req), q, req.PluginContext.User)
+		res.Responses[q.RefID] = adx.handleQuery(ctx, q, req.PluginContext.User)
 	}
 
 	return res, nil

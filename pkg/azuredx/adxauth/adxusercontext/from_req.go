@@ -46,7 +46,8 @@ func FromHealthCheckReq(ctx context.Context, req *backend.CheckHealthRequest) co
 		return ctx
 	}
 
-	// TODO: Add support for ID and access tokens
+	// TODO: CheckHealthRequest currently doesn't support ID and access tokens, only user information
+	// See issue https://github.com/grafana/grafana-plugin-sdk-go/issues/579
 	currentUser := CurrentUserContext{
 		User:        req.PluginContext.User,
 		IdToken:     "",
@@ -57,7 +58,6 @@ func FromHealthCheckReq(ctx context.Context, req *backend.CheckHealthRequest) co
 }
 
 func getQueryReqHeader(req *backend.QueryDataRequest, headerName string) string {
-	// TODO: Check what subset of Unicode is case-insensitive for request headers, possibly narrow to ASCII
 	headerNameCI := strings.ToLower(headerName)
 
 	for name, value := range req.Headers {
@@ -70,7 +70,6 @@ func getQueryReqHeader(req *backend.QueryDataRequest, headerName string) string 
 }
 
 func getResourceReqHeader(req *backend.CallResourceRequest, headerName string) string {
-	// TODO: Check what subset of Unicode is case-insensitive for request headers, possibly narrow to ASCII
 	headerNameCI := strings.ToLower(headerName)
 
 	for name, values := range req.Headers {
