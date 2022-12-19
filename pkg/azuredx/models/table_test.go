@@ -94,6 +94,12 @@ func TestResponseToFrames(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("query with exceptions", func(t *testing.T) {
+		_, err := tableFromJSONFile("query_with_exceptions.json")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Query execution lacks memory resources")
+	})
 }
 
 func TestTableResponse_ToADXTimeSeries(t *testing.T) {

@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -14,7 +15,8 @@ import (
 
 // TableResponse represents the response struct from Azure's Data Explorer REST API.
 type TableResponse struct {
-	Tables []Table
+	Tables     []Table
+	Exceptions []string
 }
 
 // Table is a member of TableResponse
@@ -25,7 +27,7 @@ type Table struct {
 }
 
 // Row Represents a row within a TableResponse
-type Row []interface{}
+type Row interface{}
 
 // Column is a descriptor within a TableResponse
 type Column struct {
@@ -53,7 +55,11 @@ func (tr *TableResponse) ToDataFrames(executedQueryString string) (data.Frames, 
 		return nil, err
 	}
 	for rowIdx, row := range table.Rows {
-		for fieldIdx, field := range row {
+		rows, ok := row.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("unable to parse rows: %v", row)
+		}
+		for fieldIdx, field := range rows {
 			err = converterFrame.Set(fieldIdx, rowIdx, field)
 			if err != nil {
 				return nil, err
@@ -382,6 +388,14 @@ func TableFromJSON(rc io.Reader) (*TableResponse, error) {
 	}
 	if tr.Tables == nil || len(tr.Tables) == 0 {
 		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
+	}
+
+	if tr.Exceptions != nil && len(tr.Exceptions) > 0 {
+		errMsg := ""
+		for _, e := range tr.Exceptions {
+			errMsg += e + ". "
+		}
+		return nil, errors.New(errMsg)
 	}
 
 	return tr, nil

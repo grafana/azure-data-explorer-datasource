@@ -1,0 +1,24 @@
+{
+  "Tables": [
+    {
+      "TableName": "Table_0",
+      "Columns": [
+        {
+          "ColumnName": "avg_string_size_numArr",
+          "DataType": "Double",
+          "ColumnType": "real"
+        }
+      ],
+      "Rows": [
+        {
+          "Exceptions": [
+            "Query execution lacks memory resources to complete (80DA0007): Partial query failure: Low memory condition (E_LOW_MEMORY_CONDITION)"
+          ]
+        }
+      ]
+    }
+  ],
+  "Exceptions": [
+    "Query execution lacks memory resources to complete (80DA0007): Partial query failure: Low memory condition (E_LOW_MEMORY_CONDITION)"
+  ]
+}
