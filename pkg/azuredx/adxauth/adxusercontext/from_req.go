@@ -7,7 +7,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
-func FromQueryReq(ctx context.Context, req *backend.QueryDataRequest) context.Context {
+func WithUserFromQueryReq(ctx context.Context, req *backend.QueryDataRequest) context.Context {
 	if req == nil {
 		return ctx
 	}
@@ -24,7 +24,7 @@ func FromQueryReq(ctx context.Context, req *backend.QueryDataRequest) context.Co
 	return WithCurrentUser(ctx, currentUser)
 }
 
-func FromResourceReq(ctx context.Context, req *backend.CallResourceRequest) context.Context {
+func WithUserFromResourceReq(ctx context.Context, req *backend.CallResourceRequest) context.Context {
 	if req == nil {
 		return ctx
 	}
@@ -41,7 +41,7 @@ func FromResourceReq(ctx context.Context, req *backend.CallResourceRequest) cont
 	return WithCurrentUser(ctx, currentUser)
 }
 
-func FromHealthCheckReq(ctx context.Context, req *backend.CheckHealthRequest) context.Context {
+func WithUserFromHealthCheckReq(ctx context.Context, req *backend.CheckHealthRequest) context.Context {
 	if req == nil {
 		return ctx
 	}
