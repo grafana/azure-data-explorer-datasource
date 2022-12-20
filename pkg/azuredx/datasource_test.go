@@ -46,17 +46,17 @@ func TestDatasource(t *testing.T) {
 			require.Contains(t, additionalHeaders["x-ms-client-request-id"], UserLogin)
 			return table, nil
 		}
-		res := adx.handleQuery(context.TODO(), query, &backend.User{Login: UserLogin})
+		res := adx.handleQuery(context.Background(), query, &backend.User{Login: UserLogin})
 		require.NoError(t, res.Error)
 	})
 }
 
 type fakeClient struct{}
 
-func (c *fakeClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
+func (c *fakeClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
-func (c *fakeClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+func (c *fakeClient) KustoRequest(_ context.Context, url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
 	return kustoRequestMock(url, payload, additionalHeaders)
 }

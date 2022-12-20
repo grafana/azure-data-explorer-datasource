@@ -1,6 +1,7 @@
 package azuredx
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -68,21 +69,21 @@ func TestResourceHandler(t *testing.T) {
 
 type failingClient struct{}
 
-func (c *failingClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
+func (c *failingClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
-func (c *failingClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+func (c *failingClient) KustoRequest(_ context.Context, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
 	return nil, fmt.Errorf("HTTP error: %v - %v", http.StatusBadRequest, "")
 }
 
 type workingClient struct{}
 
-func (c *workingClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
+func (c *workingClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
-func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+func (c *workingClient) KustoRequest(_ context.Context, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
 	return &models.TableResponse{
 		Tables: []models.Table{
 			{

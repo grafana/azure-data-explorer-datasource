@@ -5,66 +5,53 @@ import (
 	"testing"
 
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/confidential"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestOnBehalfOf(t *testing.T) {
 	golden := []struct {
-		RequestUser                *backend.User
-		RequestAuthorizationHeader string
-		RequestIDTokenHeader       string
-		ShouldRequestToken         bool
-		ExpectedError              string
-		OnBehalfOfDisabled         bool
+		CurrentUser        *adxusercontext.CurrentUserContext
+		OnBehalfOfDisabled bool
+		ShouldRequestToken bool
+		ExpectedError      string
 	}{
 		// happy flow
 		0: {
-			RequestUser:          &backend.User{Login: "alice"},
-			RequestIDTokenHeader: "ID-TOKEN",
-			ShouldRequestToken:   true,
-			ExpectedError:        "",
+			CurrentUser: &adxusercontext.CurrentUserContext{
+				User:    &backend.User{Login: "alice"},
+				IdToken: "ID-TOKEN",
+			},
+			ShouldRequestToken: true,
+			ExpectedError:      "",
 		},
 
 		1: {
-			RequestUser:          nil,
-			RequestIDTokenHeader: "ID-TOKEN",
-			ShouldRequestToken:   false,
-			ExpectedError:        "non-user requests not permitted with on-behalf-of configuration",
+			CurrentUser:        nil,
+			ShouldRequestToken: false,
+			ExpectedError:      "user context not configured",
 		},
 
 		2: {
-			RequestUser:        &backend.User{Login: "alice"},
+			CurrentUser: &adxusercontext.CurrentUserContext{
+				User: &backend.User{Login: "alice"},
+			},
 			ShouldRequestToken: false,
-			ExpectedError:      "system accounts are denied with on-behalf-of configuration",
+			ExpectedError:      "user context doesn't have ID token",
 		},
 
 		3: {
-			RequestUser:                &backend.User{Login: "alice"},
-			RequestAuthorizationHeader: "arbitrary",
-			ShouldRequestToken:         false,
-			ExpectedError:              "ID token absent for data request",
-		},
-
-		4: {
-			RequestUser:          &backend.User{Login: "alice"},
-			RequestIDTokenHeader: "ID-TOKEN",
-			OnBehalfOfDisabled:   true,
+			CurrentUser: &adxusercontext.CurrentUserContext{
+				User:    &backend.User{Login: "alice"},
+				IdToken: "ID-TOKEN",
+			},
+			OnBehalfOfDisabled: true,
+			ShouldRequestToken: false,
 		},
 	}
 
 	for index, g := range golden {
-		// compose request
-		var req backend.QueryDataRequest
-		req.PluginContext.User = g.RequestUser
-		req.Headers = make(map[string]string)
-		if g.RequestAuthorizationHeader != "" {
-			req.Headers["Authorization"] = g.RequestAuthorizationHeader
-		}
-		if g.RequestIDTokenHeader != "" {
-			req.Headers["X-ID-Token"] = g.RequestIDTokenHeader
-		}
-
 		// setup & test
 		fakeAADClient := &FakeAADClient{}
 		fakeTokenProvider := &FakeTokenProvider{}
@@ -76,7 +63,12 @@ func TestOnBehalfOf(t *testing.T) {
 			c.aadClient = fakeAADClient
 		}
 
-		auth, err := c.GetAccessToken(context.Background())
+		ctx := context.Background()
+		if g.CurrentUser != nil {
+			ctx = adxusercontext.WithCurrentUser(ctx, *g.CurrentUser)
+		}
+
+		auth, err := c.GetAccessToken(ctx)
 
 		switch {
 		case err != nil:
