@@ -87,6 +87,7 @@ func (c *workingClient) TestRequest(datasourceSettings *models.DatasourceSetting
 }
 
 func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+
 	return &models.TableResponse{
 		Tables: []models.Table{
 			{
@@ -96,12 +97,8 @@ func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, 
 					{ColumnName: "col2"},
 				},
 				Rows: []models.Row{
-					{
-						"val1",
-					},
-					{
-						"val2",
-					},
+					"val1",
+					"val2",
 				},
 			},
 		},
