@@ -93,12 +93,8 @@ func (c *workingClient) KustoRequest(_ context.Context, _ string, _ models.Reque
 					{ColumnName: "col2"},
 				},
 				Rows: []models.Row{
-					{
-						"val1",
-					},
-					{
-						"val2",
-					},
+					"val1",
+					"val2",
 				},
 			},
 		},
