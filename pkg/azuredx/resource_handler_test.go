@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/stretchr/testify/require"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -41,7 +40,6 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		adx.serviceCredentials = &FakeServiceCredentials{}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusInternalServerError, res.Code)
 		httpError := models.HttpError{}
@@ -58,7 +56,6 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		adx.serviceCredentials = &FakeServiceCredentials{}
 		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
 		require.Equal(t, http.StatusOK, res.Code)
 		tableResponse := models.TableResponse{}
@@ -72,22 +69,21 @@ func TestResourceHandler(t *testing.T) {
 
 type failingClient struct{}
 
-func (c *failingClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
+func (c *failingClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
-func (c *failingClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+func (c *failingClient) KustoRequest(_ context.Context, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
 	return nil, fmt.Errorf("HTTP error: %v - %v", http.StatusBadRequest, "")
 }
 
 type workingClient struct{}
 
-func (c *workingClient) TestRequest(datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
+func (c *workingClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
-func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
-
+func (c *workingClient) KustoRequest(_ context.Context, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
 	return &models.TableResponse{
 		Tables: []models.Table{
 			{
@@ -103,15 +99,4 @@ func (c *workingClient) KustoRequest(url string, payload models.RequestPayload, 
 			},
 		},
 	}, nil
-}
-
-type FakeServiceCredentials struct {
-}
-
-func (c *FakeServiceCredentials) ServicePrincipalAuthorization(ctx context.Context) (string, error) {
-	return "Bearer test-token", nil
-}
-
-func (c *FakeServiceCredentials) QueryDataAuthorization(ctx context.Context, req *backend.QueryDataRequest) (string, error) {
-	return c.ServicePrincipalAuthorization(ctx)
 }

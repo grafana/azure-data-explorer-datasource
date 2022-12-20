@@ -5,8 +5,9 @@ import (
 	"math/rand"
 	"net/http"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
-	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxusercontext"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
@@ -14,7 +15,6 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 
@@ -26,10 +26,8 @@ import (
 // AzureDataExplorer stores reference to plugin and logger
 type AzureDataExplorer struct {
 	backend.CallResourceHandler
-	client             client.AdxClient
-	settings           *models.DatasourceSettings
-	credentials        azcredentials.AzureCredentials
-	serviceCredentials adxauth.ServiceCredentials
+	client   client.AdxClient
+	settings *models.DatasourceSettings
 }
 
 func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
@@ -60,7 +58,6 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 	} else if credentials == nil {
 		credentials = adxcredentials.GetDefaultCredentials(azureSettings)
 	}
-	adx.credentials = credentials
 
 	httpClientOptions, err := instanceSettings.HTTPClientOptions()
 	if err != nil {
@@ -73,12 +70,13 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 		backend.Logger.Error("failed to create HTTP client", "error", err.Error())
 		return nil, err
 	}
-	adx.client = client.New(httpClient)
 
-	adx.serviceCredentials, err = adxauth.NewServiceCredentials(datasourceSettings, azureSettings, credentials, httpClient)
+	serviceCredentials, err := adxauth.NewServiceCredentials(datasourceSettings, azureSettings, credentials)
 	if err != nil {
 		return nil, err
 	}
+
+	adx.client = client.New(serviceCredentials, httpClient)
 
 	mux := http.NewServeMux()
 	adx.registerRoutes(mux)
@@ -89,29 +87,27 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 
 // QueryData is the primary method called by grafana-server
 func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+	ctx = adxusercontext.WithUserFromQueryReq(ctx, req)
 	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
+
 	res := backend.NewQueryDataResponse()
 
-	authorization, err := adx.serviceCredentials.QueryDataAuthorization(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
 	for _, q := range req.Queries {
-		res.Responses[q.RefID] = adx.handleQuery(q, req.PluginContext.User, authorization)
+		res.Responses[q.RefID] = adx.handleQuery(ctx, q, req.PluginContext.User)
 	}
 
 	return res, nil
 }
 
+func (adx *AzureDataExplorer) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
+	return adx.CallResourceHandler.CallResource(adxusercontext.WithUserFromResourceReq(ctx, req), req, sender)
+}
+
 // CheckHealth handles health checks
 func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	authorization, err := adx.serviceCredentials.ServicePrincipalAuthorization(ctx)
-	if err != nil {
-		return nil, err
-	}
-	headers := map[string]string{"Authorization": authorization}
-	err = adx.client.TestRequest(adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
+	ctx = adxusercontext.WithUserFromHealthCheckReq(ctx, req)
+	headers := map[string]string{}
+	err := adx.client.TestRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
@@ -125,7 +121,7 @@ func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.Chec
 	}, nil
 }
 
-func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.User, authorization string) backend.DataResponse {
+func (adx *AzureDataExplorer) handleQuery(ctx context.Context, q backend.DataQuery, user *backend.User) backend.DataResponse {
 	var qm models.QueryModel
 	err := json.Unmarshal(q.JSON, &qm)
 	if err != nil {
@@ -139,7 +135,7 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	}
 	props := models.NewConnectionProperties(adx.settings, cs)
 
-	resp, err := adx.modelQuery(qm, props, user, authorization)
+	resp, err := adx.modelQuery(ctx, qm, props, user)
 	if err != nil {
 		resp.Frames = append(resp.Frames, &data.Frame{
 			RefID: q.RefID,
@@ -150,8 +146,8 @@ func (adx *AzureDataExplorer) handleQuery(q backend.DataQuery, user *backend.Use
 	return resp
 }
 
-func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Properties, user *backend.User, authorization string) (backend.DataResponse, error) {
-	headers := map[string]string{"Authorization": authorization}
+func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryModel, props *models.Properties, user *backend.User) (backend.DataResponse, error) {
+	headers := map[string]string{}
 	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", q.QuerySource, rand.Uint64())
 	if adx.settings.EnableUserTracking {
 		if user != nil {
@@ -161,7 +157,7 @@ func (adx *AzureDataExplorer) modelQuery(q models.QueryModel, props *models.Prop
 	}
 	headers["x-ms-client-request-id"] = msClientRequestIDHeader
 
-	tableRes, err := adx.client.KustoRequest(adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
+	tableRes, err := adx.client.KustoRequest(ctx, adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
 		CSL:         q.Query,
 		DB:          q.Database,
 		Properties:  props,

@@ -25,13 +25,8 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 		QuerySource: "schema",
 	}
 
-	authorization, err := adx.serviceCredentials.ServicePrincipalAuthorization(req.Context())
-	if err != nil {
-		respondWithError(rw, http.StatusInternalServerError, "Azure query denied", err)
-		return
-	}
-	headers := map[string]string{"Authorization": authorization}
-	response, err := adx.client.KustoRequest(adx.settings.ClusterURL+ManagementApiPath, payload, headers)
+	headers := map[string]string{}
+	response, err := adx.client.KustoRequest(req.Context(), adx.settings.ClusterURL+ManagementApiPath, payload, headers)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
@@ -54,13 +49,8 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 		CSL: ".show databases",
 	}
 
-	authorization, err := adx.serviceCredentials.ServicePrincipalAuthorization(req.Context())
-	if err != nil {
-		respondWithError(rw, http.StatusInternalServerError, "Azure query denied", err)
-		return
-	}
-	headers := map[string]string{"Authorization": authorization}
-	response, err := adx.client.KustoRequest(adx.settings.ClusterURL+ManagementApiPath, payload, headers)
+	headers := map[string]string{}
+	response, err := adx.client.KustoRequest(req.Context(), adx.settings.ClusterURL+ManagementApiPath, payload, headers)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return

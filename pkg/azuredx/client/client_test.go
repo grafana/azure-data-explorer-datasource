@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -33,8 +34,8 @@ func TestClient(t *testing.T) {
 			QuerySource: "schema",
 		}
 
-		client := New(server.Client())
-		table, err := client.KustoRequest(server.URL, payload, nil)
+		client := New(&fakeCredentialsProvider{}, server.Client())
+		table, err := client.KustoRequest(context.Background(), server.URL, payload, nil)
 		require.NoError(t, err)
 		require.NotNil(t, table)
 	})
@@ -60,8 +61,8 @@ func TestClient(t *testing.T) {
 			QuerySource: "schema",
 		}
 
-		client := New(server.Client())
-		table, err := client.KustoRequest(server.URL, payload, nil)
+		client := New(&fakeCredentialsProvider{}, server.Client())
+		table, err := client.KustoRequest(context.Background(), server.URL, payload, nil)
 		require.Nil(t, table)
 		require.NotNil(t, err)
 		require.Contains(t, err.Error(), "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'")
@@ -87,8 +88,8 @@ func TestClient(t *testing.T) {
 			"x-ms-client-request-id": "KGC.schema;deadbeef",
 		}
 
-		client := New(server.Client())
-		table, err := client.KustoRequest(server.URL, payload, headers)
+		client := New(&fakeCredentialsProvider{}, server.Client())
+		table, err := client.KustoRequest(context.Background(), server.URL, payload, headers)
 		require.Nil(t, table)
 		require.NotNil(t, err)
 	})
@@ -100,4 +101,14 @@ func loadTestFile(path string) ([]byte, error) {
 		return nil, err
 	}
 	return jsonBody, nil
+}
+
+type fakeCredentialsProvider struct{}
+
+func (c *fakeCredentialsProvider) GetServiceAccessToken(_ context.Context) (string, error) {
+	return "FAKE_TOKEN", nil
+}
+
+func (c *fakeCredentialsProvider) GetAccessToken(_ context.Context) (string, error) {
+	return "FAKE_TOKEN", nil
 }
