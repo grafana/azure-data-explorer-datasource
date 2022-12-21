@@ -100,6 +100,14 @@ func TestResponseToFrames(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "Query execution lacks memory resources")
 	})
+
+	t.Run("query with no rows", func(t *testing.T) {
+		respTable, err := tableFromJSONFile("no_rows.json")
+		assert.NoError(t, err)
+		frames, err := respTable.ToDataFrames("")
+		assert.NoError(t, err)
+		assert.Empty(t, frames)
+	})
 }
 
 func TestTableResponse_ToADXTimeSeries(t *testing.T) {

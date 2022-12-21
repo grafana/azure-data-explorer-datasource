@@ -120,4 +120,15 @@ describe('VisualQueryEditor', () => {
     // But the other column is not
     expect(screen.queryByText('barfoo')).not.toBeInTheDocument();
   });
+
+  it('should call onChange only if the query expression changes', async () => {
+    const datasource = mockDatasource();
+    const onChange = jest.fn();
+    datasource.getSchema = jest.fn().mockResolvedValue(schema);
+    render(
+      <VisualQueryEditor {...defaultProps} datasource={datasource} database="foo" schema={schema} onChange={onChange} />
+    );
+    await waitFor(() => screen.getByText('Table'));
+    expect(onChange).toHaveBeenCalledTimes(1);
+  });
 });

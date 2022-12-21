@@ -50,6 +50,9 @@ func (tr *TableResponse) ToDataFrames(executedQueryString string) (data.Frames, 
 	if err != nil {
 		return nil, err
 	}
+	if len(table.Rows) == 0 {
+		return data.Frames{}, nil
+	}
 	converterFrame, err := converterFrameForTable(table, executedQueryString)
 	if err != nil {
 		return nil, err

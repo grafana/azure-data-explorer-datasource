@@ -49,10 +49,10 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
 
   useEffect(() => {
     if (tableSchema.value?.length) {
-      onChange({
-        ...query,
-        query: parseExpression(query.expression, tableSchema.value),
-      });
+      const q = parseExpression(query.expression, tableSchema.value);
+      if (q !== query.query) {
+        onChange({ ...query, query: q });
+      }
     }
     // We are only interested on re-parsing if the expression changes
     // eslint-disable-next-line react-hooks/exhaustive-deps

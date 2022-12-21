@@ -107,8 +107,8 @@ e2e.scenario({
 
         e2e.flows.addDashboard({
           timeRange: {
-            from: '2022-01-05 19:00:00',
-            to: '2022-01-10 19:00:00',
+            from: '2017-09-22 12:00:00',
+            to: '2017-09-23 12:00:00',
           },
           variables: [],
         });
