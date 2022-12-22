@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FunctionComponent, useEffect, useMemo, useReducer, useState} from 'react';
+import React, { ChangeEvent, FunctionComponent, useEffect, useMemo, useReducer, useState } from 'react';
 
 import { SelectableValue } from '@grafana/data';
 import { InlineFormLabel, Button, Select, Input } from '@grafana/ui';

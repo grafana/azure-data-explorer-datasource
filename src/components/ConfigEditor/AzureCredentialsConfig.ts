@@ -113,12 +113,24 @@ export function updateCredentials(
   options: DataSourceSettings<any, any>,
   credentials: AzureCredentials
 ): DataSourceSettings<any, any> {
+  // Cleanup legacy credentials
+  options = {
+    ...options,
+    jsonData: {
+      ...options.jsonData,
+      cloudName: undefined,
+      tenantId: undefined,
+      clientId: undefined,
+      onBehalfOf: undefined,
+    },
+  };
+
+  // Apply updated credentials
   switch (credentials.authType) {
     case 'msi':
       if (!config.azure.managedIdentityEnabled) {
         throw new Error('Managed Identity authentication is not enabled in Grafana config.');
       }
-
       options = {
         ...options,
         jsonData: {
@@ -126,11 +138,9 @@ export function updateCredentials(
           azureCredentials: {
             authType: 'msi',
           },
-          oauthPassThru: undefined,
         },
       };
-
-      return options;
+      break;
 
     case 'clientsecret':
     case 'clientsecret-obo':
@@ -144,7 +154,6 @@ export function updateCredentials(
             tenantId: credentials.tenantId,
             clientId: credentials.clientId,
           },
-          oauthPassThru: credentials.authType === 'clientsecret-obo' ? true : undefined,
         },
         secureJsonData: {
           ...options.secureJsonData,
@@ -158,27 +167,31 @@ export function updateCredentials(
           azureClientSecret: typeof credentials.clientSecret === 'symbol',
         },
       };
-
-      return options;
+      break;
   }
-}
 
-export function setDefaultCredentials(options: DataSourceSettings<any, any>): Partial<DataSourceSettings<any, any>> {
-  return {
-    jsonData: {
-      ...options.jsonData,
-      azureCredentials: getDefaultCredentials(),
-    },
-  };
-}
+  // User identity based auth requires oauthPassThru to have access to the user's ID token
+  switch (credentials.authType) {
+    case 'clientsecret-obo':
+      options = {
+        ...options,
+        jsonData: {
+          ...options.jsonData,
+          oauthPassThru: true,
+        },
+      };
+      break;
 
-export function resetCredentials(options: DataSourceSettings<any, any>): Partial<DataSourceSettings<any, any>> {
-  return {
-    jsonData: {
-      ...options.jsonData,
-      azureAuth: undefined,
-      azureCredentials: undefined,
-      azureEndpointResourceId: undefined,
-    },
-  };
+    default:
+      options = {
+        ...options,
+        jsonData: {
+          ...options.jsonData,
+          oauthPassThru: undefined,
+        },
+      };
+      break;
+  }
+
+  return options;
 }
