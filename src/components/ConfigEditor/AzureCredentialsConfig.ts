@@ -5,8 +5,7 @@ import { AzureCloud, AzureCredentials, ConcealedSecret } from './AzureCredential
 
 const concealed: ConcealedSecret = Symbol('Concealed client secret');
 
-export const getOboEnabled = (): boolean =>
-    !!config.featureToggles['adxOnBehalfOf'];
+export const getOboEnabled = (): boolean => !!config.featureToggles['adxOnBehalfOf'];
 
 function getDefaultAzureCloud(): string {
   return config.azure.cloud || AzureCloud.Public;
@@ -22,10 +21,6 @@ function getSecret(options: DataSourceSettings<any, any>): undefined | string | 
   }
 }
 
-export function hasCredentials(options: DataSourceSettings<any, any>): boolean {
-  return !!options.jsonData.azureCredentials;
-}
-
 export function getDefaultCredentials(): AzureCredentials {
   if (config.azure.managedIdentityEnabled) {
     return { authType: 'msi' };
@@ -37,10 +32,9 @@ export function getDefaultCredentials(): AzureCredentials {
 export function getCredentials(options: DataSourceSettings<any, any>): AzureCredentials {
   const credentials = options.jsonData.azureCredentials as AzureCredentials | undefined;
 
-  // If no credentials saved, then return empty credentials
-  // of type based on whether the managed identity enabled
+  // If no credentials saved then try to restore legacy credentials, otherwise return default credentials
   if (!credentials) {
-    return getDefaultCredentials();
+    return getLegacyCredentials(options) ?? getDefaultCredentials();
   }
 
   switch (credentials.authType) {
@@ -68,6 +62,50 @@ export function getCredentials(options: DataSourceSettings<any, any>): AzureCred
         clientId: credentials.clientId,
         clientSecret: getSecret(options),
       };
+  }
+}
+
+function getLegacyCredentials(options: DataSourceSettings<any, any>): AzureCredentials | undefined {
+  const jsonData = options.jsonData;
+
+  if (typeof jsonData.tenantId === 'string' || typeof jsonData.clientId === 'string') {
+    try {
+      const azureCloud = resolveLegacyCloudName(jsonData.cloudName);
+
+      return {
+        authType: jsonData.onBehalfOf ? 'clientsecret-obo' : 'clientsecret',
+        azureCloud: azureCloud,
+        tenantId: typeof jsonData.tenantId === 'string' ? jsonData.tenantId : '',
+        clientId: typeof jsonData.clientId === 'string' ? jsonData.clientId : '',
+        // When converting existing credentials from the legacy format,
+        // client secret is going to be lost and will need to be reentered
+        clientSecret: undefined,
+      };
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error('Unable to restore legacy credentials: %s', e.message);
+      }
+      return undefined;
+    }
+  }
+
+  return undefined;
+}
+
+function resolveLegacyCloudName(cloudName: string): AzureCloud {
+  if (!cloudName) {
+    return AzureCloud.Public;
+  }
+
+  switch (cloudName) {
+    case 'azuremonitor':
+      return AzureCloud.Public;
+    case 'chinaazuremonitor':
+      return AzureCloud.China;
+    case 'govazuremonitor':
+      return AzureCloud.USGovernment;
+    default:
+      throw new Error(`Azure cloud '${cloudName}' not supported by Azure Data Explorer datasource.`);
   }
 }
 
