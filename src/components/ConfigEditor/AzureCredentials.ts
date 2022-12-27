@@ -19,7 +19,6 @@ export type ConcealedSecret = symbol;
 
 interface AzureCredentialsBase {
   authType: AzureAuthType;
-  defaultSubscriptionId?: string;
 }
 
 export interface AzureManagedIdentityCredentials extends AzureCredentialsBase {
