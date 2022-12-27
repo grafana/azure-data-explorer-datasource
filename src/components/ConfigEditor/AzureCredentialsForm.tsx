@@ -92,7 +92,10 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
   };
 
   const onAzureCloudChange = (selected: SelectableValue<string>) => {
-    if (onCredentialsChange && (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')) {
+    if (
+      onCredentialsChange &&
+      (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')
+    ) {
       setSubscriptions([]);
       const updated: AzureCredentials = {
         ...credentials,
@@ -104,7 +107,10 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
   };
 
   const onTenantIdChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (onCredentialsChange && (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')) {
+    if (
+      onCredentialsChange &&
+      (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')
+    ) {
       setSubscriptions([]);
       const updated: AzureCredentials = {
         ...credentials,
@@ -116,7 +122,10 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
   };
 
   const onClientIdChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (onCredentialsChange && (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')) {
+    if (
+      onCredentialsChange &&
+      (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')
+    ) {
       setSubscriptions([]);
       const updated: AzureCredentials = {
         ...credentials,
@@ -128,7 +137,10 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
   };
 
   const onClientSecretChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (onCredentialsChange && (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')) {
+    if (
+      onCredentialsChange &&
+      (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')
+    ) {
       setSubscriptions([]);
       const updated: AzureCredentials = {
         ...credentials,
@@ -140,7 +152,10 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
   };
 
   const onClientSecretReset = () => {
-    if (onCredentialsChange && (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')) {
+    if (
+      onCredentialsChange &&
+      (credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo')
+    ) {
       setSubscriptions([]);
       const updated: AzureCredentials = {
         ...credentials,
@@ -163,7 +178,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
 
   return (
     <div className="gf-form-group">
-      {(authTypeOptions.length > 1) && (
+      {authTypeOptions.length > 1 && (
         <div className="gf-form-inline">
           <div className="gf-form">
             <InlineFormLabel className="width-12" tooltip="Choose the type of authentication to Azure services">
