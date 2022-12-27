@@ -4,7 +4,6 @@ export enum AzureCloud {
   Public = 'AzureCloud',
   China = 'AzureChinaCloud',
   USGovernment = 'AzureUSGovernment',
-  None = '',
 }
 
 export const KnownAzureClouds = [
