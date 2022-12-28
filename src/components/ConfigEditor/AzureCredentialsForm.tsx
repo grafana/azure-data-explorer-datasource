@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FunctionComponent, useMemo } from 'react';
 
 import { SelectableValue } from '@grafana/data';
-import { InlineFormLabel, Button, Select, Input } from '@grafana/ui';
+import { Button, Select, Input, InlineField } from '@grafana/ui';
 
 import { AzureAuthType, AzureCredentials } from './AzureCredentials';
 
@@ -119,91 +119,85 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
   return (
     <div className="gf-form-group">
       {authTypeOptions.length > 1 && (
-        <div className="gf-form-inline">
-          <div className="gf-form">
-            <InlineFormLabel className="width-12" tooltip="Choose the type of authentication to Azure services">
-              Authentication
-            </InlineFormLabel>
-            <Select
-              className="width-15"
-              value={authTypeOptions.find((opt) => opt.value === credentials.authType)}
-              options={authTypeOptions}
-              onChange={onAuthTypeChange}
-            />
-          </div>
-        </div>
+        <InlineField
+          label="Authentication"
+          labelWidth={18}
+          tooltip="Choose the type of authentication to Azure services"
+          htmlFor="azure-auth-type"
+        >
+          <Select
+            inputId="azure-auth-type"
+            className="width-15"
+            value={authTypeOptions.find((opt) => opt.value === credentials.authType)}
+            options={authTypeOptions}
+            onChange={onAuthTypeChange}
+          />
+        </InlineField>
       )}
       {(credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo') && (
         <>
           {azureCloudOptions && (
-            <div className="gf-form-inline">
-              <div className="gf-form">
-                <InlineFormLabel className="width-12" tooltip="Choose an Azure Cloud">
-                  Azure Cloud
-                </InlineFormLabel>
-                <Select
-                  className="width-15"
-                  value={azureCloudOptions.find((opt) => opt.value === credentials.azureCloud)}
-                  options={azureCloudOptions}
-                  onChange={onAzureCloudChange}
-                />
-              </div>
-            </div>
+            <InlineField label="Azure Cloud" labelWidth={18} tooltip="Choose an Azure Cloud" htmlFor="azure-cloud-type">
+              <Select
+                inputId="azure-cloud-type"
+                className="width-15"
+                aria-label="Azure Cloud"
+                value={azureCloudOptions.find((opt) => opt.value === credentials.azureCloud)}
+                options={azureCloudOptions}
+                onChange={onAzureCloudChange}
+              />
+            </InlineField>
           )}
-          <div className="gf-form-inline">
-            <div className="gf-form">
-              <InlineFormLabel className="width-12">Directory (tenant) ID</InlineFormLabel>
-              <div className="width-15">
-                <Input
-                  className="width-30"
-                  placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-                  value={credentials.tenantId || ''}
-                  onChange={onTenantIdChange}
-                />
-              </div>
+          <InlineField label="Directory (tenant) ID" labelWidth={18} htmlFor="aad-tenant-id">
+            <div className="width-15">
+              <Input
+                id="aad-tenant-id"
+                className="width-30"
+                aria-label="Tenant ID"
+                placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+                value={credentials.tenantId || ''}
+                onChange={onTenantIdChange}
+              />
             </div>
-          </div>
-          <div className="gf-form-inline">
-            <div className="gf-form">
-              <InlineFormLabel className="width-12">Application (client) ID</InlineFormLabel>
-              <div className="width-15">
-                <Input
-                  className="width-30"
-                  placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-                  value={credentials.clientId || ''}
-                  onChange={onClientIdChange}
-                />
-              </div>
+          </InlineField>
+          <InlineField label="Application (client) ID" labelWidth={18} htmlFor="aad-client-id">
+            <div className="width-15">
+              <Input
+                id="aad-client-id"
+                className="width-30"
+                aria-label="Client ID"
+                placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+                value={credentials.clientId || ''}
+                onChange={onClientIdChange}
+              />
             </div>
-          </div>
+          </InlineField>
+
           {typeof credentials.clientSecret === 'symbol' ? (
-            <div className="gf-form-inline">
-              <div className="gf-form">
-                <InlineFormLabel className="width-12">Client Secret</InlineFormLabel>
-                <Input className="width-25" placeholder="configured" disabled={true} />
+            <InlineField label="Client Secret" labelWidth={18} htmlFor="aad-client-secret-configured">
+              <div className="width-30" style={{ display: 'flex', gap: '4px' }}>
+                <Input
+                  id="aad-client-secret-configured"
+                  aria-label="Client Secret"
+                  placeholder="configured"
+                  disabled={true}
+                />
+                <Button variant="secondary" type="button" onClick={onClientSecretReset}>
+                  Reset
+                </Button>
               </div>
-              <div className="gf-form">
-                <div className="max-width-30 gf-form-inline">
-                  <Button variant="secondary" type="button" onClick={onClientSecretReset}>
-                    reset
-                  </Button>
-                </div>
-              </div>
-            </div>
+            </InlineField>
           ) : (
-            <div className="gf-form-inline">
-              <div className="gf-form">
-                <InlineFormLabel className="width-12">Client Secret</InlineFormLabel>
-                <div className="width-15">
-                  <Input
-                    className="width-30"
-                    placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-                    value={credentials.clientSecret || ''}
-                    onChange={onClientSecretChange}
-                  />
-                </div>
-              </div>
-            </div>
+            <InlineField label="Client Secret" labelWidth={18} htmlFor="aad-client-secret">
+              <Input
+                id="aad-client-secret"
+                className="width-30"
+                aria-label="Client Secret"
+                placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+                value={credentials.clientSecret || ''}
+                onChange={onClientSecretChange}
+              />
+            </InlineField>
           )}
         </>
       )}
