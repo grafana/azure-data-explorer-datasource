@@ -4,6 +4,7 @@ import { config } from '@grafana/runtime';
 import { AzureCloud, AzureCredentials, ConcealedSecret } from './AzureCredentials';
 
 const concealed: ConcealedSecret = Symbol('Concealed client secret');
+const concealedLegacy: ConcealedSecret = Symbol('Concealed legacy client secret');
 
 export const getOboEnabled = (): boolean => !!config.featureToggles['adxOnBehalfOf'];
 
@@ -15,6 +16,9 @@ function getSecret(options: DataSourceSettings<any, any>): undefined | string | 
   if (options.secureJsonFields.azureClientSecret) {
     // The secret is concealed on server
     return concealed;
+  } else if (options.secureJsonFields.clientSecret) {
+    // A legacy secret field was preserved during migration
+    return concealedLegacy;
   } else {
     const secret = options.secureJsonData?.azureClientSecret;
     return typeof secret === 'string' && secret.length > 0 ? secret : undefined;
@@ -70,16 +74,14 @@ function getLegacyCredentials(options: DataSourceSettings<any, any>): AzureCrede
 
   if (typeof jsonData.tenantId === 'string' || typeof jsonData.clientId === 'string') {
     try {
-      const azureCloud = resolveLegacyCloudName(jsonData.cloudName);
+      const azureCloud = resolveLegacyCloudName(jsonData.azureCloud);
 
       return {
         authType: jsonData.onBehalfOf ? 'clientsecret-obo' : 'clientsecret',
         azureCloud: azureCloud,
         tenantId: typeof jsonData.tenantId === 'string' ? jsonData.tenantId : '',
         clientId: typeof jsonData.clientId === 'string' ? jsonData.clientId : '',
-        // When converting existing credentials from the legacy format,
-        // client secret is going to be lost and will need to be reentered
-        clientSecret: undefined,
+        clientSecret: options.secureJsonFields.clientSecret ? concealedLegacy : undefined,
       };
     } catch (e) {
       if (e instanceof Error) {
@@ -118,7 +120,7 @@ export function updateCredentials(
     ...options,
     jsonData: {
       ...options.jsonData,
-      cloudName: undefined,
+      azureCloud: undefined,
       tenantId: undefined,
       clientId: undefined,
       onBehalfOf: undefined,
@@ -164,7 +166,8 @@ export function updateCredentials(
         },
         secureJsonFields: {
           ...options.secureJsonFields,
-          azureClientSecret: typeof credentials.clientSecret === 'symbol',
+          azureClientSecret: credentials.clientSecret === concealed,
+          clientSecret: credentials.clientSecret === concealedLegacy,
         },
       };
       break;
