@@ -42,7 +42,6 @@ describe('analyzeQueries', () => {
         },
       },
       expectedCounters: {
-        on_behalf_of_queries: 1,
         queries_with_custom_timeout: 1,
         dynamic_caching_queries: 1,
         weak_data_consistency_queries: 1,

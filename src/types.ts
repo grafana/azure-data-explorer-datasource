@@ -87,8 +87,8 @@ export enum SchemaMappingType {
   table = 'table',
   materializedView = 'materializedView',
 }
+
 export interface AdxDataSourceOptions extends DataSourceJsonData {
-  azureCloud?: AzureCloudType;
   defaultDatabase: string;
   minimalCache: number;
   defaultEditorMode: EditorMode;
@@ -100,15 +100,9 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   schemaMappings?: Array<Partial<SchemaMapping>>;
   enableUserTracking: boolean;
   clusterUrl: string;
-  tenantId: string;
-  clientId: string;
-  onBehalfOf: boolean;
-  oauthPassThru: boolean; // required for onBehalfOf
 }
 
-export interface AdxDataSourceSecureOptions {
-  clientSecret: string | false;
-}
+export interface AdxDataSourceSecureOptions {}
 
 export interface AdxSchema {
   Databases: Record<string, AdxDatabaseSchema>;
@@ -147,13 +141,6 @@ export interface AdxFunctionSchema {
 export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
 
 export type AdxSchemaDefinition = string | AdxSchemaDefinition[] | { [k: string]: AdxSchemaDefinition };
-
-// must be in synch with clouds.go
-export enum AzureCloudType {
-  AzurePublic = 'azuremonitor',
-  AzureUSGovernment = 'govazuremonitor',
-  AzureChina = 'chinaazuremonitor',
-}
 
 export enum FormatOptions {
   table = 'table',

@@ -41,11 +41,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
     <div data-testid="azure-data-explorer-config-editor">
       <ConfigHelp />
 
-      <ConnectionConfig
-        options={options}
-        onOptionsChange={onOptionsChange}
-        updateJsonData={updateJsonData}
-      />
+      <ConnectionConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
 
       <h3 className="page-heading">Authentication</h3>
       <AzureCredentialsForm

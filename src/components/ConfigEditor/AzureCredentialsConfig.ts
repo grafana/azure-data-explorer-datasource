@@ -25,6 +25,13 @@ function getSecret(options: DataSourceSettings<any, any>): undefined | string | 
   }
 }
 
+export function hasCredentials(options: DataSourceSettings<any, any>): boolean {
+  return (
+    typeof options.jsonData.azureCredentials === 'object' ||
+    (typeof options.jsonData.tenantId === 'string' && typeof options.jsonData.clientId === 'string')
+  );
+}
+
 export function getDefaultCredentials(): AzureCredentials {
   if (config.azure.managedIdentityEnabled) {
     return { authType: 'msi' };

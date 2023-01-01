@@ -30,8 +30,6 @@ export type ADXCounters = {
   query_builder_queries: number;
   /** number of queries using the Kusto editor  */
   raw_queries: number;
-  /** number of queries using On-Behalf-Of authentication */
-  on_behalf_of_queries: number;
   /** number of queries using a timeout different than the default */
   queries_with_custom_timeout: number;
   /** number of queries using ADX dynamic caching */
@@ -58,7 +56,6 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
     adx_time_series_queries: 0,
     query_builder_queries: 0,
     raw_queries: 0,
-    on_behalf_of_queries: 0,
     queries_with_custom_timeout: 0,
     dynamic_caching_queries: 0,
     weak_data_consistency_queries: 0,
@@ -89,9 +86,6 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
       datasources[JSON.stringify(query.datasource)] = dsSettings;
     }
     if (dsSettings) {
-      if (dsSettings.jsonData?.onBehalfOf) {
-        counters.on_behalf_of_queries++;
-      }
       if (dsSettings.jsonData?.queryTimeout) {
         counters.queries_with_custom_timeout++;
       }

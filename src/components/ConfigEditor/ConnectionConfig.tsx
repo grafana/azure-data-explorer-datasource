@@ -11,15 +11,11 @@ interface ConnectionConfigProps
 
 const LABEL_WIDTH = 18;
 
-const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
-  options,
-  updateJsonData,
-}) => {
+const ConnectionConfig: React.FC<ConnectionConfigProps> = ({ options, updateJsonData }) => {
   const { jsonData } = options;
 
   return (
     <FieldSet label="Connection Details">
-
       <InlineField
         label="Cluster URL"
         labelWidth={LABEL_WIDTH}
@@ -34,7 +30,6 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('clusterUrl', ev.target.value)}
         />
       </InlineField>
-
     </FieldSet>
   );
 };
