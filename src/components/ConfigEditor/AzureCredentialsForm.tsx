@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FunctionComponent, useMemo } from 'react';
 
 import { SelectableValue } from '@grafana/data';
-import { Button, Select, Input, InlineField } from '@grafana/ui';
+import { Alert, Button, Select, Input, InlineField } from '@grafana/ui';
 
 import { AzureAuthType, AzureCredentials } from './AzureCredentials';
 
@@ -133,6 +133,16 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
             onChange={onAuthTypeChange}
           />
         </InlineField>
+      )}
+      {credentials.authType === 'clientsecret-obo' && (
+        <>
+          {/* eslint-disable prettier/prettier */}
+          <Alert title="On-Behalf-Of feature is in beta" severity="warning">
+            For known limitations and issues, bug report, or feedback,
+            please visit <a href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md" target="_blank">https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md</a>.
+          </Alert>
+          {/* eslint-enable prettier/prettier */}
+        </>
       )}
       {(credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo') && (
         <>
