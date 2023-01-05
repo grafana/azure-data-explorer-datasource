@@ -139,7 +139,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
           {/* eslint-disable prettier/prettier */}
           <Alert title="On-Behalf-Of feature is in beta" severity="warning">
             For known limitations and issues, bug report, or feedback,
-            please visit <a href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md" target="_blank">https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md</a>.
+            please visit <a href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md" target="_blank" rel="noreferrer">https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md</a>.
           </Alert>
           {/* eslint-enable prettier/prettier */}
         </>
