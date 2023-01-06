@@ -98,7 +98,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
     updateJsonData('schemaMappings', newMappings);
   };
 
-  const canGetSchema = () => hasCredentials(options);
+  const canGetSchema = () => options.jsonData.clusterUrl && hasCredentials(options);
 
   const updateSchema = async () => {
     try {
