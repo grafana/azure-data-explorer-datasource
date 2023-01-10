@@ -2,7 +2,7 @@
 
 ## [4.2.0]
 
-This release enables a new query builder:
+This release revamps the plugin query builder:
 
 - New feature: It's now possible to filter columns to query, improving the performance of queries.
 - The query preview includes syntax highlighting for Kusto.
