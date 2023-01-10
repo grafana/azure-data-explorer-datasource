@@ -1,5 +1,13 @@
 # Change Log
 
+## [4.2.0]
+
+This release enables a new query builder:
+
+- New feature: It's now possible to filter columns to query, improving the performance of queries.
+- The query preview includes syntax highlighting for Kusto.
+- The rest of components has been refactored to match the latest Grafana UI.
+
 ## [4.1.10]
 
 - Fix: Invalid code editor loaded for Grafana versions that don't follow semantic versioning by @aangelisc in https://github.com/grafana/azure-data-explorer-datasource/pull/506
