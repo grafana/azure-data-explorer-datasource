@@ -94,6 +94,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       ></ConfirmModal>
       <InlineSelect
         label="Database"
+        aria-label="Database"
         options={databases}
         value={database}
         isLoading={schema.loading}
@@ -110,7 +111,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         }}
       />
       <FlexItem grow={1} />
-      <Button variant="primary" icon="play" size="sm" onClick={onRunQuery}>
+      <Button variant="primary" icon="play" size="sm" onClick={onRunQuery} aria-label="Run query">
         Run query
       </Button>
       <RadioButtonGroup

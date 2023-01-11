@@ -73,7 +73,7 @@ e2e.scenario({
           queriesForm: () => {
             e2eSelectors.queryEditor.database.input().click({ force: true });
             cy.contains('PerfTest').click({ force: true });
-            e2eSelectors.queryEditor.editKQL.button().click({ force: true });
+            cy.contains('KQL').click({ force: true });
             // Wait for the schema to load
             cy.get('.Table', { timeout: 10000 });
             e2eSelectors.queryEditor.codeEditor
