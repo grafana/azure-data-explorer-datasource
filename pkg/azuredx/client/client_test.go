@@ -105,10 +105,6 @@ func loadTestFile(path string) ([]byte, error) {
 
 type fakeCredentialsProvider struct{}
 
-func (c *fakeCredentialsProvider) GetServiceAccessToken(_ context.Context) (string, error) {
-	return "FAKE_TOKEN", nil
-}
-
 func (c *fakeCredentialsProvider) GetAccessToken(_ context.Context) (string, error) {
 	return "FAKE_TOKEN", nil
 }

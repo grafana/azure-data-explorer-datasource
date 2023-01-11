@@ -16,8 +16,6 @@ import (
 
 // ServiceCredentials provides authorization for cloud service usage.
 type ServiceCredentials interface {
-	// TODO: GetServiceAccessToken needed for a workaround in CheckHealth
-	GetServiceAccessToken(ctx context.Context) (string, error)
 	GetAccessToken(ctx context.Context) (string, error)
 }
 
@@ -66,13 +64,6 @@ func NewServiceCredentials(settings *models.DatasourceSettings, azureSettings *a
 		aadClient:     aadClient,
 		scopes:        scopes,
 	}, nil
-}
-
-// GetServiceAccessToken returns access token for the service credentials
-// TODO: GetServiceAccessToken needed for a workaround in CheckHealth
-func (c *ServiceCredentialsImpl) GetServiceAccessToken(ctx context.Context) (string, error) {
-	backend.Logger.Debug("using service principal token for data request")
-	return c.tokenProvider.GetAccessToken(ctx, c.scopes)
 }
 
 // GetAccessToken returns access token for configured credentials
