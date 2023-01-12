@@ -36,7 +36,7 @@ export const components = {
       input: 'Table',
     },
     runQuery: {
-      button: 'Run query',
+      button: 'data-testid run-query',
     },
   },
 };
