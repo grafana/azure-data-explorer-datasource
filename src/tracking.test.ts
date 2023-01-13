@@ -33,7 +33,6 @@ describe('analyzeQueries', () => {
       queries: [{ rawMode: false }],
       dsSettings: {
         jsonData: {
-          onBehalfOf: false,
           queryTimeout: 10,
           dynamicCaching: true,
           dataConsistency: 'weakconsistency',
