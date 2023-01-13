@@ -43,7 +43,7 @@ func (c *Client) TestRequest(ctx context.Context, datasourceSettings *models.Dat
 	}
 
 	// TODO: This is a workaround because Plugin SDK doesn't expose user context for CheckHealth
-	accessToken, err := c.serviceCredentials.GetServiceAccessToken(ctx)
+	accessToken, err := c.serviceCredentials.GetAccessToken(ctx)
 	if err != nil {
 		return err
 	}
