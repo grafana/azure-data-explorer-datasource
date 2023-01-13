@@ -1,6 +1,7 @@
 import { DataSourceInstanceSettings } from '@grafana/data';
 import { DataSourceSrv, reportInteraction } from '@grafana/runtime';
 import { AdxDataSourceOptions, EditorMode, FormatOptions, KustoQuery } from 'types';
+import { AzureAuthType, AzureCredentials } from './components/ConfigEditor/AzureCredentials';
 
 /**
  * Loaded the first time a dashboard containing ADX queries is loaded (not on every render)
@@ -30,6 +31,8 @@ export type ADXCounters = {
   query_builder_queries: number;
   /** number of queries using the Kusto editor  */
   raw_queries: number;
+  /** number of queries using On-Behalf-Of authentication */
+  on_behalf_of_queries: number;
   /** number of queries using a timeout different than the default */
   queries_with_custom_timeout: number;
   /** number of queries using ADX dynamic caching */
@@ -56,6 +59,7 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
     adx_time_series_queries: 0,
     query_builder_queries: 0,
     raw_queries: 0,
+    on_behalf_of_queries: 0,
     queries_with_custom_timeout: 0,
     dynamic_caching_queries: 0,
     weak_data_consistency_queries: 0,
@@ -86,6 +90,9 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
       datasources[JSON.stringify(query.datasource)] = dsSettings;
     }
     if (dsSettings) {
+      if (getCredentialsAuthType(dsSettings) === 'clientsecret-obo') {
+        counters.on_behalf_of_queries++;
+      }
       if (dsSettings.jsonData?.queryTimeout) {
         counters.queries_with_custom_timeout++;
       }
@@ -106,3 +113,17 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
 
   return counters;
 };
+
+function getCredentialsAuthType(options: DataSourceInstanceSettings<any>): AzureAuthType | undefined {
+  if (!options?.jsonData) {
+    return undefined;
+  }
+
+  const credentials = options.jsonData.azureCredentials as AzureCredentials | undefined;
+
+  if (!credentials) {
+    return options.jsonData.onBehalfOf ? 'clientsecret-obo' : 'clientsecret';
+  }
+
+  return credentials.authType;
+}
