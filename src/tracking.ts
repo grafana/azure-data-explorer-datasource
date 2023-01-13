@@ -1,6 +1,7 @@
 import { DataSourceInstanceSettings } from '@grafana/data';
 import { DataSourceSrv, reportInteraction } from '@grafana/runtime';
 import { AdxDataSourceOptions, EditorMode, FormatOptions, KustoQuery } from 'types';
+import { AzureAuthType, AzureCredentials } from './components/ConfigEditor/AzureCredentials';
 
 /**
  * Loaded the first time a dashboard containing ADX queries is loaded (not on every render)
@@ -89,7 +90,7 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
       datasources[JSON.stringify(query.datasource)] = dsSettings;
     }
     if (dsSettings) {
-      if (dsSettings.jsonData?.onBehalfOf) {
+      if (getCredentialsAuthType(dsSettings) === 'clientsecret-obo') {
         counters.on_behalf_of_queries++;
       }
       if (dsSettings.jsonData?.queryTimeout) {
@@ -112,3 +113,17 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
 
   return counters;
 };
+
+function getCredentialsAuthType(options: DataSourceInstanceSettings<any>): AzureAuthType | undefined {
+  if (!options?.jsonData) {
+    return undefined;
+  }
+
+  const credentials = options.jsonData.azureCredentials as AzureCredentials | undefined;
+
+  if (!credentials) {
+    return options.jsonData.onBehalfOf ? 'clientsecret-obo' : 'clientsecret';
+  }
+
+  return credentials.authType;
+}

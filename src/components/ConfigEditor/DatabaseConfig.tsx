@@ -17,6 +17,7 @@ import { AdxDataSource } from 'datasource';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useEffectOnce } from 'react-use';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
+import { hasCredentials } from './AzureCredentialsConfig';
 import { refreshSchema, Schema } from './refreshSchema';
 
 interface DatabaseConfigProps
@@ -48,7 +49,7 @@ type FetchErrorResponse = FetchResponse<{
 
 const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProps) => {
   const { options, updateJsonData } = props;
-  const { jsonData, secureJsonData, secureJsonFields } = options;
+  const { jsonData } = options;
   const mappings = useMemo(() => jsonData.schemaMappings ?? [], [jsonData.schemaMappings]);
   const [schema, setSchema] = useState<Schema>({ databases: [], schemaMappingOptions: [] });
   const [schemaError, setSchemaError] = useState<FetchErrorResponse['data']>();
@@ -97,10 +98,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
     updateJsonData('schemaMappings', newMappings);
   };
 
-  const canGetSchema = () => {
-    const requiredJsonData = [jsonData.clusterUrl, jsonData.tenantId, jsonData.clientId];
-    return requiredJsonData.every((d) => d!!) && !!(secureJsonData?.clientSecret || secureJsonFields.clientSecret);
-  };
+  const canGetSchema = () => options.jsonData.clusterUrl && hasCredentials(options);
 
   const updateSchema = async () => {
     try {

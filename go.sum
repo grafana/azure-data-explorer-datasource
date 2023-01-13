@@ -200,8 +200,9 @@ github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e h1:JKmoR8x90Iww1
 github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
-github.com/grafana/grafana-azure-sdk-go v1.5.0 h1:rPZGXjJVzdr6VsBprAYf9kjzran71PmkQhedVhvLmRo=
-github.com/grafana/grafana-azure-sdk-go v1.5.0/go.mod h1:OJJuBJ3MOoaq2mqD6xlPsArpL2R5j80TrDqPYr35Zak=
+github.com/grafana/grafana-azure-sdk-go v1.5.2 h1:rjN5WIJ1GS/K5SKT1WPRKynsdvHFqU/SvAigCp0zSp4=
+github.com/grafana/grafana-azure-sdk-go v1.5.2/go.mod h1:OJJuBJ3MOoaq2mqD6xlPsArpL2R5j80TrDqPYr35Zak=
+github.com/grafana/grafana-plugin-sdk-go v0.129.0/go.mod h1:4edtosZepfQF9jkQwRywJsNSJzXTHmzbmcVcAl8MEQc=
 github.com/grafana/grafana-plugin-sdk-go v0.129.0/go.mod h1:4edtosZepfQF9jkQwRywJsNSJzXTHmzbmcVcAl8MEQc=
 github.com/grafana/grafana-plugin-sdk-go v0.147.0 h1:VavvJOa/Ubs+wzalzWIl+FQmdaD4vEK8KVYU0a8rf+E=
 github.com/grafana/grafana-plugin-sdk-go v0.147.0/go.mod h1:NMgO3t2gR5wyLx8bWZ9CTmpDk5Txp4wYFccFLHdYn3Q=

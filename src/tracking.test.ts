@@ -33,7 +33,6 @@ describe('analyzeQueries', () => {
       queries: [{ rawMode: false }],
       dsSettings: {
         jsonData: {
-          onBehalfOf: true,
           queryTimeout: 10,
           dynamicCaching: true,
           dataConsistency: 'weakconsistency',
@@ -42,12 +41,56 @@ describe('analyzeQueries', () => {
         },
       },
       expectedCounters: {
-        on_behalf_of_queries: 1,
         queries_with_custom_timeout: 1,
         dynamic_caching_queries: 1,
         weak_data_consistency_queries: 1,
         queries_with_default_raw_editor: 1,
         queries_with_managed_schema: 1,
+      },
+    },
+    {
+      description: 'should count OBO when on-behalf-of credentials configured',
+      queries: [{ rawMode: false }],
+      dsSettings: {
+        jsonData: {
+          azureCredentials: {
+            authType: 'clientsecret-obo',
+            azureCloud: 'AzureCloud',
+            clientId: '123',
+            tenantId: '123',
+          },
+          onBehalfOf: false,
+        },
+      },
+      expectedCounters: {
+        on_behalf_of_queries: 1,
+      },
+    },
+    {
+      description: 'should count OBO when legacy on-behalf-of credentials configured',
+      queries: [{ rawMode: false }],
+      dsSettings: {
+        jsonData: {
+          onBehalfOf: true,
+        },
+      },
+      expectedCounters: {
+        on_behalf_of_queries: 1,
+      },
+    },
+    {
+      description: 'should not count OBO when credentials are not OBO even if legacy on-behalf-of flag set',
+      queries: [{ rawMode: false }],
+      dsSettings: {
+        jsonData: {
+          azureCredentials: {
+            authType: 'msi',
+          },
+          onBehalfOf: true,
+        },
+      },
+      expectedCounters: {
+        on_behalf_of_queries: 0,
       },
     },
   ].forEach((t) => {
