@@ -4,6 +4,7 @@ import { SelectableValue } from '@grafana/data';
 import { Alert, Button, Select, Input, InlineField } from '@grafana/ui';
 
 import { AzureAuthType, AzureCredentials } from './AzureCredentials';
+import { selectors } from 'test/selectors';
 
 export interface Props {
   managedIdentityEnabled: boolean;
@@ -136,18 +137,29 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
       )}
       {credentials.authType === 'clientsecret-obo' && (
         <>
-          {/* eslint-disable prettier/prettier */}
           <Alert title="On-Behalf-Of feature is in beta" severity="warning">
-            For known limitations and issues, bug report, or feedback,
-            please visit <a href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md" target="_blank" rel="noreferrer">the documentation</a>.
+            For known limitations and issues, bug report, or feedback, please visit{' '}
+            <a
+              href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md"
+              target="_blank"
+              rel="noreferrer"
+            >
+              the documentation
+            </a>
+            .
           </Alert>
-          {/* eslint-enable prettier/prettier */}
         </>
       )}
       {(credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo') && (
         <>
           {azureCloudOptions && (
-            <InlineField label="Azure Cloud" labelWidth={18} tooltip="Choose an Azure Cloud" htmlFor="azure-cloud-type">
+            <InlineField
+              label="Azure Cloud"
+              labelWidth={18}
+              tooltip="Choose an Azure Cloud"
+              htmlFor="azure-cloud-type"
+              data-testid={selectors.components.configEditor.azureCloud.input}
+            >
               <Select
                 inputId="azure-cloud-type"
                 className="width-15"
@@ -167,6 +179,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
                 placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
                 value={credentials.tenantId || ''}
                 onChange={onTenantIdChange}
+                data-testid={selectors.components.configEditor.tenantID.input}
               />
             </div>
           </InlineField>
@@ -179,6 +192,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
                 placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
                 value={credentials.clientId || ''}
                 onChange={onClientIdChange}
+                data-testid={selectors.components.configEditor.clientID.input}
               />
             </div>
           </InlineField>
@@ -206,6 +220,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
                 placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
                 value={credentials.clientSecret || ''}
                 onChange={onClientSecretChange}
+                data-testid={selectors.components.configEditor.clientSecret.input}
               />
             </InlineField>
           )}
