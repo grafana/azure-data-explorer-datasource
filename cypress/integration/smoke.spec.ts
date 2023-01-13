@@ -26,7 +26,7 @@ function addCommonProvisioningADXDatasource(ADXProvisions: ADXProvision[]) {
   e2e.flows.addDataSource({
     type: 'Azure Data Explorer Datasource',
     form: () => {
-      e2eSelectors.configEditor.azureCloud.input().find('#azure-cloud-type').type('Azure');
+      e2eSelectors.configEditor.azureCloud.input().find('input').type('Azure');
       e2eSelectors.configEditor.clusterURL.input().click({ force: true }).type(datasource.jsonData.clusterUrl);
       e2eSelectors.configEditor.tenantID.input().type(datasource.jsonData.tenantId);
       e2eSelectors.configEditor.clientID.input().type(datasource.jsonData.clientId);
