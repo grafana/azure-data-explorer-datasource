@@ -20,7 +20,7 @@ export const components = {
   },
   queryEditor: {
     editKQL: {
-      button: 'Edit KQL',
+      button: 'KQL',
     },
     codeEditorLegacy: {
       container: 'data-testid legacy-editor',
@@ -33,10 +33,10 @@ export const components = {
       input: 'Database',
     },
     tableFrom: {
-      input: 'From table',
+      input: 'Table',
     },
     runQuery: {
-      button: 'Run Query',
+      button: 'data-testid run-query',
     },
   },
 };

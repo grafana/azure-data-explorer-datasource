@@ -1,5 +1,19 @@
 # Change Log
 
+## [4.2.0]
+
+This release revamps the plugin query builder:
+
+- New feature: It's now possible to filter columns within a query, improving the performance of queries.
+- The query preview includes syntax highlighting for Kusto.
+- All other components have been refactored to match the latest Grafana UI.
+
+Apart from that, this release also includes:
+
+- Refactor: Authentication and configuration has been refactored to match other Azure plugins.
+- Fix: Health check for data sources configured with On-Behalf-Of authentication.
+- Fix: Alert queries that returns no data.
+
 ## [4.1.10]
 
 - Fix: Invalid code editor loaded for Grafana versions that don't follow semantic versioning by @aangelisc in https://github.com/grafana/azure-data-explorer-datasource/pull/506

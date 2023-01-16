@@ -10,6 +10,7 @@ import { QueryEditorPropertyDefinition } from 'schema/types';
 import { useAsync } from 'react-use';
 import { databaseToDefinition } from 'schema/mapper';
 import { SelectableValue } from '@grafana/data';
+import { selectors } from 'test/selectors';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
@@ -94,6 +95,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       ></ConfirmModal>
       <InlineSelect
         label="Database"
+        aria-label="Database"
         options={databases}
         value={database}
         isLoading={schema.loading}
@@ -110,7 +112,13 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         }}
       />
       <FlexItem grow={1} />
-      <Button variant="primary" icon="play" size="sm" onClick={onRunQuery}>
+      <Button
+        variant="primary"
+        icon="play"
+        size="sm"
+        onClick={onRunQuery}
+        data-testid={selectors.components.queryEditor.runQuery.button}
+      >
         Run query
       </Button>
       <RadioButtonGroup

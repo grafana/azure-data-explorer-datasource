@@ -9,5 +9,5 @@ import { AdxDataSourceOptions, KustoQuery } from 'types';
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = (props) => {
-  return config.featureToggles.adxNewEditor ? <NewQueryEditor {...props} /> : <LegacyQueryEditor {...props} />;
+  return config.featureToggles.adxLegacyEditor ? <LegacyQueryEditor {...props} /> : <NewQueryEditor {...props} />;
 };
