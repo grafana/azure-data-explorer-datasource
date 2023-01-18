@@ -73,6 +73,7 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
     <InputGroup>
       <Select
         aria-label="column"
+        autoFocus={filter.focus}
         width="auto"
         value={filter.property?.name ? valueToDefinition(filter.property?.name) : null}
         options={columns ? columnsToDefinition(columns) : []}
@@ -121,7 +122,7 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
         />
       </div>
       <AccessoryButton aria-label="remove" icon="times" variant="secondary" onClick={onDelete} />
-      {Number(filter.index) < filtersLength - 1 ? <Label className={styles.orLabel}>OR</Label> : null}
+      <>{Number(filter.index) < filtersLength - 1 ? <Label className={styles.orLabel}>OR</Label> : null}</>
     </InputGroup>
   );
 };

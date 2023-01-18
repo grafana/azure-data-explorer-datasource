@@ -22,10 +22,13 @@ interface KQLFilterProps {
   columns?: AdxColumnSchema[];
   templateVariableOptions: SelectableValue<string>;
   onChange: (query: KustoQuery) => void;
+  focusNewGroup?: boolean;
+  setFocus?: (focus: boolean) => void;
 }
 
 export interface FilterExpression extends QueryEditorOperatorExpression {
   index: number;
+  focus?: boolean;
 }
 
 function extractExpressions(whereExpressions: QueryEditorOperatorExpression | QueryEditorWhereExpression) {
@@ -55,10 +58,13 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
   datasource,
   columns,
   templateVariableOptions,
+  focusNewGroup,
+  setFocus,
 }) => {
   // Each expression is a group of several OR statements
   const expressions = extractExpressions(query.expression.where.expressions[index]);
   const [filters, setFilters] = useState<FilterExpression[]>(expressions);
+  const ref = React.createRef<HTMLButtonElement>();
 
   useEffect(() => {
     if (!filters.length && expressions?.length) {
@@ -66,16 +72,26 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
     }
   }, [filters.length, expressions]);
 
+  useEffect(() => {
+    if (focusNewGroup && setFocus) {
+      ref.current?.focus();
+      setFocus(false);
+    }
+  }, [focusNewGroup, ref, setFocus]);
+
   const onChange = (newItems: Array<Partial<QueryEditorOperatorExpression>>) => {
     // As new (empty object) items come in, with need to make sure they have the correct type
-    const cleaned = newItems.map(
-      (v, i): FilterExpression => ({
+    const cleaned = newItems.map((v, i): FilterExpression => {
+      const isNewItem = Object.keys(v).length === 0;
+
+      return {
         type: QueryEditorExpressionType.Operator,
         property: v.property ?? { type: QueryEditorPropertyType.String, name: '' },
         operator: v.operator ?? { name: '==', value: '' },
         index: i,
-      })
-    );
+        focus: isNewItem,
+      };
+    });
     setFilters(cleaned);
 
     // Only save valid and complete filters into the query state
@@ -100,12 +116,12 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
     const newExpression = { ...query.expression, where };
     onQueryChange({ ...query, expression: newExpression, query: datasource.parseExpression(newExpression, columns) });
   };
-
   return (
     <EditorList
       items={filters}
       onChange={onChange}
       renderItem={makeRenderFilter(datasource, query, columns, templateVariableOptions, filters.length)}
+      ref={ref}
     />
   );
 };

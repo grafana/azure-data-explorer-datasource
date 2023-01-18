@@ -3,7 +3,7 @@ import { Button, Label, useStyles2 } from '@grafana/ui';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { AdxDataSource } from 'datasource';
-import React from 'react';
+import React, { useState } from 'react';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import KQLFilter from './KQLFilter';
 import { css } from '@emotion/css';
@@ -23,6 +23,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   columns,
   templateVariableOptions,
 }) => {
+  const [focus, setFocus] = useState(false);
   const styles = useStyles2(getStyles);
 
   return (
@@ -37,6 +38,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     <div key={`filter${i}`}>
                       <KQLFilter
                         index={i}
+                        focusNewGroup={focus}
+                        setFocus={setFocus}
                         query={query}
                         onChange={onChange}
                         datasource={datasource}
@@ -67,6 +70,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                       },
                     },
                   });
+                  setFocus(true);
                 }}
               >
                 Add group
