@@ -31,6 +31,7 @@ export interface QueryEditorReduceExpression extends QueryEditorExpression {
   property: QueryEditorProperty;
   reduce: QueryEditorProperty;
   parameters?: QueryEditorFunctionParameterExpression[];
+  focus?: boolean;
 }
 
 export interface QueryEditorReduceExpressionArray extends QueryEditorExpression {
@@ -40,6 +41,7 @@ export interface QueryEditorReduceExpressionArray extends QueryEditorExpression 
 export interface QueryEditorGroupByExpression extends QueryEditorExpression {
   property: QueryEditorProperty;
   interval?: QueryEditorProperty;
+  focus?: boolean;
 }
 
 export interface QueryEditorGroupByExpressionArray extends QueryEditorExpression {

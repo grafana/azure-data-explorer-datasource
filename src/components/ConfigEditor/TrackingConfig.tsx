@@ -8,7 +8,7 @@ interface TrackingConfigProps
   updateJsonData: <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => void;
 }
 
-const LABEL_WIDTH = 27;
+const LABEL_WIDTH = 28;
 
 const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData }) => {
   const { jsonData } = options;

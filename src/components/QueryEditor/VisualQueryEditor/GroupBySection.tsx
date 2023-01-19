@@ -47,13 +47,16 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
   }, [currentTable, query.expression.from?.property.name]);
 
   const onChange = (newItems: Array<Partial<QueryEditorGroupByExpression>>) => {
-    const cleaned = newItems.map(
-      (v): QueryEditorGroupByExpression => ({
+    const cleaned = newItems.map((v): QueryEditorGroupByExpression => {
+      const isNewItem = Object.keys(v).length === 0;
+
+      return {
         type: QueryEditorExpressionType.GroupBy,
         property: v.property ?? { type: QueryEditorPropertyType.String, name: '' },
         interval: v.interval,
-      })
-    );
+        focus: isNewItem,
+      };
+    });
     setGroupBys(cleaned);
 
     // Only save valid and complete filters into the query state

@@ -47,14 +47,17 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
   }, [currentTable, query.expression.from?.property.name]);
 
   const onChange = (newItems: Array<Partial<QueryEditorReduceExpression>>) => {
-    const cleaned = newItems.map(
-      (v): QueryEditorReduceExpression => ({
+    const cleaned = newItems.map((v): QueryEditorReduceExpression => {
+      const isNewItem = Object.keys(v).length === 0;
+
+      return {
         type: QueryEditorExpressionType.Reduce,
         property: v.property ?? { type: QueryEditorPropertyType.String, name: '' },
         reduce: v.reduce ?? { name: '', type: QueryEditorPropertyType.String },
         parameters: v.parameters,
-      })
-    );
+        focus: isNewItem,
+      };
+    });
     setAggregates(cleaned);
 
     // Only save valid and complete filters into the query state

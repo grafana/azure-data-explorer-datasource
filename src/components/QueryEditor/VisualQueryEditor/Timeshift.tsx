@@ -46,42 +46,47 @@ const Timeshift: React.FC<TimeshiftProps> = (props) => {
               type="button"
               hidden={displaySelect}
             />
-            <div hidden={!displaySelect}>
-              <Select
-                width={'auto'}
-                aria-label="timeshift"
-                allowCustomValue
-                options={[
-                  {
-                    label: 'No timeshift',
-                    value: '',
-                  },
-                  {
-                    label: 'Hour before',
-                    value: '1h',
-                  },
-                  {
-                    label: 'Day before',
-                    value: '1d',
-                  },
-                  {
-                    label: 'Week before',
-                    value: '7d',
-                  },
-                ]}
-                value={query.expression.timeshift?.property?.name || ''}
-                onChange={(e) => onChangeValue(e.value)}
-              />
-              <AccessoryButton
-                aria-label="remove"
-                icon="times"
-                variant="secondary"
-                onClick={() => {
-                  onChangeValue();
-                  setDisplaySelect(false);
-                }}
-              />
-            </div>
+            <>
+              {displaySelect && (
+                <>
+                  <Select
+                    width={'auto'}
+                    aria-label="timeshift"
+                    autoFocus={displaySelect}
+                    allowCustomValue
+                    options={[
+                      {
+                        label: 'No timeshift',
+                        value: '',
+                      },
+                      {
+                        label: 'Hour before',
+                        value: '1h',
+                      },
+                      {
+                        label: 'Day before',
+                        value: '1d',
+                      },
+                      {
+                        label: 'Week before',
+                        value: '7d',
+                      },
+                    ]}
+                    value={query.expression.timeshift?.property?.name || ''}
+                    onChange={(e) => onChangeValue(e.value)}
+                  />
+                  <AccessoryButton
+                    aria-label="remove"
+                    icon="times"
+                    variant="secondary"
+                    onClick={() => {
+                      onChangeValue();
+                      setDisplaySelect(false);
+                    }}
+                  />
+                </>
+              )}
+            </>
           </InputGroup>
         </EditorField>
       </EditorFieldGroup>

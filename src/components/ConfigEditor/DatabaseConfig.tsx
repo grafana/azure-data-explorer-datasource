@@ -35,7 +35,7 @@ function formatMappingValue(mapping): string {
   }
 }
 
-const LABEL_WIDTH = 18;
+const LABEL_WIDTH = 19;
 
 function isFetchError(e: unknown): e is FetchError {
   return typeof e === 'object' && e !== null && 'status' in e && 'data' in e;

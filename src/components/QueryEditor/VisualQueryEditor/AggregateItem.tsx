@@ -46,6 +46,7 @@ const AggregateItem: React.FC<AggregateItemProps> = (props) => {
     <InputGroup>
       <Select
         aria-label="function"
+        autoFocus={aggregate.focus}
         width="auto"
         value={aggregate.reduce?.name ? valueToDefinition(aggregate.reduce?.name) : null}
         options={Object.values(AggregateFunctions).map((f) => ({ label: f, value: f }))}
@@ -63,66 +64,70 @@ const AggregateItem: React.FC<AggregateItemProps> = (props) => {
           })
         }
       />
-      {aggregate.reduce?.name === AggregateFunctions.Percentile && (
-        <Select
-          aria-label="percentile"
-          options={range(0, 100, 5).map((n) => ({ label: n.toString(), value: n.toString() }))}
-          value={aggregate.parameters?.length ? aggregate.parameters[0].value : undefined}
-          width="auto"
-          allowCustomValue
-          onChange={(e) => {
-            e.value &&
-              onChange({
-                property: {
-                  name: aggregate.property?.name || '',
-                  type: aggregate.property?.type || QueryEditorPropertyType.String,
-                },
-                reduce: {
-                  name: aggregate.reduce?.name || '',
-                  type: aggregate.property?.type || QueryEditorPropertyType.Function,
-                },
-                parameters: [
-                  {
-                    type: QueryEditorExpressionType.FunctionParameter,
-                    fieldType: QueryEditorPropertyType.Number,
-                    value: e.value,
-                    name: 'percentileParam',
-                  },
-                ],
-                type: QueryEditorExpressionType.Reduce,
-              });
-          }}
-        />
-      )}
-      {aggregate.reduce?.name !== AggregateFunctions.Count && (
-        <>
-          <Label style={{ margin: '9px 9px 0 9px' }}>of</Label>
+      <>
+        {aggregate.reduce?.name === AggregateFunctions.Percentile && (
           <Select
-            aria-label="column"
-            width={'auto'}
-            value={aggregate.property?.name ? valueToDefinition(aggregate.property?.name) : null}
-            options={columnOptions}
+            aria-label="percentile"
+            options={range(0, 100, 5).map((n) => ({ label: n.toString(), value: n.toString() }))}
+            value={aggregate.parameters?.length ? aggregate.parameters[0].value : undefined}
+            width="auto"
             allowCustomValue
-            onChange={(e) =>
+            onChange={(e) => {
               e.value &&
-              onChange({
-                property: {
-                  name: e.value,
-                  type: toPropertyType(
-                    columns?.find((c) => c.Name === e.value)?.CslType || QueryEditorPropertyType.String
-                  ),
-                },
-                reduce: {
-                  name: aggregate.reduce?.name || '',
-                  type: aggregate.property?.type || QueryEditorPropertyType.Function,
-                },
-                parameters: aggregate.parameters,
-                type: QueryEditorExpressionType.Reduce,
-              })
-            }
+                onChange({
+                  property: {
+                    name: aggregate.property?.name || '',
+                    type: aggregate.property?.type || QueryEditorPropertyType.String,
+                  },
+                  reduce: {
+                    name: aggregate.reduce?.name || '',
+                    type: aggregate.property?.type || QueryEditorPropertyType.Function,
+                  },
+                  parameters: [
+                    {
+                      type: QueryEditorExpressionType.FunctionParameter,
+                      fieldType: QueryEditorPropertyType.Number,
+                      value: e.value,
+                      name: 'percentileParam',
+                    },
+                  ],
+                  type: QueryEditorExpressionType.Reduce,
+                });
+            }}
           />
-        </>
-      )}
+        )}
+      </>
+      <>
+        {aggregate.reduce?.name !== AggregateFunctions.Count && (
+          <>
+            <Label style={{ margin: '9px 9px 0 9px' }}>of</Label>
+            <Select
+              aria-label="column"
+              width={'auto'}
+              value={aggregate.property?.name ? valueToDefinition(aggregate.property?.name) : null}
+              options={columnOptions}
+              allowCustomValue
+              onChange={(e) =>
+                e.value &&
+                onChange({
+                  property: {
+                    name: e.value,
+                    type: toPropertyType(
+                      columns?.find((c) => c.Name === e.value)?.CslType || QueryEditorPropertyType.String
+                    ),
+                  },
+                  reduce: {
+                    name: aggregate.reduce?.name || '',
+                    type: aggregate.property?.type || QueryEditorPropertyType.Function,
+                  },
+                  parameters: aggregate.parameters,
+                  type: QueryEditorExpressionType.Reduce,
+                })
+              }
+            />
+          </>
+        )}
+      </>
       <AccessoryButton aria-label="remove" icon="times" variant="secondary" onClick={onDelete} />
     </InputGroup>
   );

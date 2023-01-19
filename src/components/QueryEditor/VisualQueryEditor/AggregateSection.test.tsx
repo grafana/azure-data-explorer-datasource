@@ -47,6 +47,7 @@ describe('AggregateSection', () => {
                 property: { name: 'foo', type: QueryEditorPropertyType.String },
                 reduce: { name: AggregateFunctions.Avg, type: QueryEditorPropertyType.String },
                 type: QueryEditorExpressionType.Reduce,
+                focus: false,
               },
             ],
             type: QueryEditorExpressionType.And,
