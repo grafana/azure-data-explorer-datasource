@@ -33,6 +33,7 @@ describe('GroupBySection', () => {
               {
                 property: { name: 'foo', type: QueryEditorPropertyType.String },
                 type: QueryEditorExpressionType.GroupBy,
+                focus: false,
               },
             ],
             type: QueryEditorExpressionType.And,
