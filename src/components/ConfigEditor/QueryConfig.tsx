@@ -18,7 +18,7 @@ const editorModeOptions: Array<{ value: EditorMode; label: string }> = [
   { value: EditorMode.Raw, label: 'Raw' },
 ];
 
-const LABEL_WIDTH = 20;
+const LABEL_WIDTH = 21;
 
 const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) => {
   const { jsonData } = options;
