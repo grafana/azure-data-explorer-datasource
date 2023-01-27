@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxusercontext"
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/aztokenprovider"
+	"github.com/grafana/grafana-azure-sdk-go/azusercontext"
 )
 
 type onBehalfOfTokenProvider struct {
@@ -53,7 +53,7 @@ func (provider *onBehalfOfTokenProvider) GetAccessToken(ctx context.Context, sco
 		return "", err
 	}
 
-	currentUser, ok := adxusercontext.GetCurrentUser(ctx)
+	currentUser, ok := azusercontext.GetCurrentUser(ctx)
 	if !ok {
 		err := fmt.Errorf("user context not configured")
 		return "", err
