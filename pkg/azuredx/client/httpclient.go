@@ -9,23 +9,28 @@ import (
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azhttpclient"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 )
 
-func newHttpClient(settings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
+func newHttpClient(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
 	authOpts := azhttpclient.NewAuthOptions(azureSettings)
 
 	// TODO: Check feature flag
 	authOpts.AddTokenProvider(azcredentials.AzureAuthClientSecretObo, adxauth.NewOnBehalfOfAccessTokenProvider)
 
-	scopes, err := getAdxScopes(azureSettings, credentials, settings.ClusterURL)
+	scopes, err := getAdxScopes(azureSettings, credentials, dsSettings.ClusterURL)
 	if err != nil {
 		return nil, err
 	}
 	authOpts.Scopes(scopes)
 
-	clientOpts := httpclient.Options{}
-	clientOpts.Timeouts.Timeout = settings.QueryTimeout
+	clientOpts, err := instanceSettings.HTTPClientOptions()
+	if err != nil {
+		return nil, fmt.Errorf("error creating http client: %w", err)
+	}
+	clientOpts.Timeouts.Timeout = dsSettings.QueryTimeout
+
 	azhttpclient.AddAzureAuthentication(&clientOpts, authOpts, credentials)
 
 	httpClient, err := httpclient.NewProvider().New(clientOpts)
