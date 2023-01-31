@@ -34,7 +34,7 @@ func TestClient(t *testing.T) {
 			QuerySource: "schema",
 		}
 
-		client := New(&fakeCredentialsProvider{}, server.Client())
+		client := &Client{httpClient: server.Client()}
 		table, err := client.KustoRequest(context.Background(), server.URL, payload, nil)
 		require.NoError(t, err)
 		require.NotNil(t, table)
@@ -61,7 +61,7 @@ func TestClient(t *testing.T) {
 			QuerySource: "schema",
 		}
 
-		client := New(&fakeCredentialsProvider{}, server.Client())
+		client := &Client{httpClient: server.Client()}
 		table, err := client.KustoRequest(context.Background(), server.URL, payload, nil)
 		require.Nil(t, table)
 		require.NotNil(t, err)
@@ -88,7 +88,7 @@ func TestClient(t *testing.T) {
 			"x-ms-client-request-id": "KGC.schema;deadbeef",
 		}
 
-		client := New(&fakeCredentialsProvider{}, server.Client())
+		client := &Client{httpClient: server.Client()}
 		table, err := client.KustoRequest(context.Background(), server.URL, payload, headers)
 		require.Nil(t, table)
 		require.NotNil(t, err)
@@ -101,10 +101,4 @@ func loadTestFile(path string) ([]byte, error) {
 		return nil, err
 	}
 	return jsonBody, nil
-}
-
-type fakeCredentialsProvider struct{}
-
-func (c *fakeCredentialsProvider) GetAccessToken(_ context.Context) (string, error) {
-	return "FAKE_TOKEN", nil
 }
