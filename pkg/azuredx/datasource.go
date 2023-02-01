@@ -5,12 +5,10 @@ import (
 	"math/rand"
 	"net/http"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxusercontext"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/azusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
@@ -59,24 +57,12 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 		credentials = adxcredentials.GetDefaultCredentials(azureSettings)
 	}
 
-	httpClientOptions, err := instanceSettings.HTTPClientOptions()
+	adxClient, err := client.New(&instanceSettings, datasourceSettings, azureSettings, credentials)
 	if err != nil {
-		backend.Logger.Error("failed to create HTTP client options", "error", err.Error())
+		backend.Logger.Error("failed to create ADX client", "error", err.Error())
 		return nil, err
 	}
-	httpClientOptions.Timeouts.Timeout = datasourceSettings.QueryTimeout
-	httpClient, err := sdkhttpclient.NewProvider(sdkhttpclient.ProviderOptions{}).New(httpClientOptions)
-	if err != nil {
-		backend.Logger.Error("failed to create HTTP client", "error", err.Error())
-		return nil, err
-	}
-
-	serviceCredentials, err := adxauth.NewServiceCredentials(datasourceSettings, azureSettings, credentials)
-	if err != nil {
-		return nil, err
-	}
-
-	adx.client = client.New(serviceCredentials, httpClient)
+	adx.client = adxClient
 
 	mux := http.NewServeMux()
 	adx.registerRoutes(mux)
@@ -87,7 +73,7 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 
 // QueryData is the primary method called by grafana-server
 func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
-	ctx = adxusercontext.WithUserFromQueryReq(ctx, req)
+	ctx = azusercontext.WithUserFromQueryReq(ctx, req)
 	backend.Logger.Debug("Query", "datasource", req.PluginContext.DataSourceInstanceSettings.Name)
 
 	res := backend.NewQueryDataResponse()
@@ -100,12 +86,12 @@ func (adx *AzureDataExplorer) QueryData(ctx context.Context, req *backend.QueryD
 }
 
 func (adx *AzureDataExplorer) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
-	return adx.CallResourceHandler.CallResource(adxusercontext.WithUserFromResourceReq(ctx, req), req, sender)
+	return adx.CallResourceHandler.CallResource(azusercontext.WithUserFromResourceReq(ctx, req), req, sender)
 }
 
 // CheckHealth handles health checks
 func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	ctx = adxusercontext.WithUserFromHealthCheckReq(ctx, req)
+	ctx = azusercontext.WithUserFromHealthCheckReq(ctx, req)
 	headers := map[string]string{}
 	err := adx.client.TestRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
 	if err != nil {

@@ -15,7 +15,8 @@
   "words": [
     "adxauth",
     "adxcredentials",
-    "adxusercontext",
+    "azhttpclient",
+    "azusercontext",
     "clientsecret",
     "Codeowners",
     "datasource",
