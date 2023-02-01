@@ -16,7 +16,7 @@ import (
 func newHttpClient(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
 	authOpts := azhttpclient.NewAuthOptions(azureSettings)
 
-	// TODO: Check feature flag
+	// TODO: #555 configure on-behalf-of authentication if enabled in AzureSettings
 	authOpts.AddTokenProvider(azcredentials.AzureAuthClientSecretObo, adxauth.NewOnBehalfOfAccessTokenProvider)
 
 	scopes, err := getAdxScopes(azureSettings, credentials, dsSettings.ClusterURL)
