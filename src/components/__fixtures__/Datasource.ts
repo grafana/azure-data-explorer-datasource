@@ -2,7 +2,7 @@ import { DataSourcePluginOptionsEditorProps, PluginType } from '@grafana/data';
 
 import { AdxDataSource } from '../../datasource';
 import { QueryEditorExpressionType } from '../LegacyQueryEditor/editor/expressions';
-import { AdxDataSourceOptions, AdxDataSourceSecureOptions, EditorMode, KustoQuery } from '../../types';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxQueryType, EditorMode, KustoQuery } from '../../types';
 
 export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<
   AdxDataSourceOptions,
@@ -86,4 +86,5 @@ export const mockQuery: KustoQuery = {
   },
   querySource: 'raw',
   pluginVersion: '1',
+  queryType: AdxQueryType.KustoQuery,
 };

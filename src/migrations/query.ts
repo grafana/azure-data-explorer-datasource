@@ -1,13 +1,33 @@
-import { KustoQuery, defaultQuery } from 'types';
+import { AdxQueryType, KustoQuery, defaultQuery, EditorMode } from 'types';
 import { looksLikeV2, migrateExpression } from './expression';
 
-export const migrateQuery = (query: KustoQuery): KustoQuery => {
+export const migrateQuery = (query: KustoQuery | string): KustoQuery => {
+  if (typeof query === 'string') {
+    const databasesQuery = query.match(/^databases\(\)/i);
+    const baseQuery = {
+      ...defaultQuery,
+      query,
+      refId: `adx-${query}`,
+      querySource: EditorMode.Raw,
+      database: '',
+      resultFormat: 'table',
+      rawMode: true,
+      pluginVersion: defaultQuery.pluginVersion,
+      expression: defaultQuery.expression,
+      queryType: AdxQueryType.KustoQuery,
+    };
+    if (databasesQuery) {
+      return { ...baseQuery, queryType: AdxQueryType.Databases };
+    }
+    return baseQuery;
+  }
   return {
     ...defaultQuery,
     ...query,
     rawMode: isRawMode(query),
     pluginVersion: defaultQuery.pluginVersion,
     expression: migrateExpression(defaultQuery.pluginVersion, query.expression),
+    queryType: AdxQueryType.KustoQuery,
   };
 };
 
@@ -25,6 +45,10 @@ export const needsToBeMigrated = (query: KustoQuery): boolean => {
   }
 
   if (looksLikeV2(query.expression)) {
+    return true;
+  }
+
+  if (!query.queryType) {
     return true;
   }
 

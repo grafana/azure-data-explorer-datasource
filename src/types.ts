@@ -31,6 +31,7 @@ export interface KustoQuery extends DataQuery {
   rawMode?: boolean;
   querySource: QuerySource;
   pluginVersion: string;
+  queryType: AdxQueryType;
 }
 
 export interface AutoCompleteQuery {
@@ -45,7 +46,12 @@ export enum EditorMode {
   Raw = 'raw',
 }
 
-export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource' | 'pluginVersion'> = {
+export enum AdxQueryType {
+  Databases = 'Databases',
+  KustoQuery = 'KQL',
+}
+
+export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource' | 'pluginVersion' | 'queryType'> = {
   query: '',
   querySource: EditorMode.Raw,
   expression: {
@@ -63,6 +69,7 @@ export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySourc
     },
   },
   pluginVersion: packageJson.version,
+  queryType: AdxQueryType.KustoQuery,
 };
 
 export interface SchemaMapping {
