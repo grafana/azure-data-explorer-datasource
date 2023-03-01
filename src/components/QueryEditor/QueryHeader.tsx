@@ -75,7 +75,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       // Fallback to Time Series since time_series_adx_series is not available when not in rawMode
       onChange({ ...query, resultFormat: 'time_series' });
     }
-  }, [query, formats, onChange]);
+  }, [query, formats, onChange, rawMode]);
 
   return (
     <EditorHeader>
