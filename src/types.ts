@@ -49,6 +49,7 @@ export enum EditorMode {
 export enum AdxQueryType {
   Databases = 'Databases',
   KustoQuery = 'KQL',
+  Tables = 'Tables',
 }
 
 export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource' | 'pluginVersion' | 'queryType'> = {

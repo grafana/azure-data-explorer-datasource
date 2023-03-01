@@ -2,13 +2,11 @@ import {
   DataFrame,
   DataQueryRequest,
   DataSourceInstanceSettings,
-  MetricFindValue,
   ScopedVar,
   ScopedVars,
   TimeRange,
 } from '@grafana/data';
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
-import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyType } from './schema/types';
 import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
 import { map } from 'lodash';
@@ -193,6 +191,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     );
 
     return dynamicSchemaParser(response?.data as DataFrame[]);
+  }
+
+  getVariablesRaw() {
+    return this.templateSrv.getVariables();
   }
 
   getVariables() {

@@ -4,6 +4,7 @@ import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import VariableEditor from 'components/VariableEditor/VariableEditor';
 import { AdxDataSource, includeTimeRange } from 'datasource';
 import { Observable, from, lastValueFrom } from 'rxjs';
+import { AdxSchemaResolver } from 'schema/AdxSchemaResolver';
 import { AdxQueryType, KustoQuery } from 'types';
 
 export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQuery> {
@@ -33,12 +34,19 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
         }
       }
 
+      const schemaResolver = new AdxSchemaResolver(this.datasource);
+
       try {
         switch (queryObj.queryType) {
           case AdxQueryType.Databases:
             const databases = await this.datasource.getDatabases();
             return {
               data: databases.length ? [toDataFrame(databases)] : [],
+            };
+          case AdxQueryType.Tables:
+            const tables = await schemaResolver.getTablesForDatabase(this.templateSrv.replace(queryObj.database));
+            return {
+              data: tables.length ? [toDataFrame(tables)] : [],
             };
           default:
             const query = this.datasource.buildQuery(queryObj.query, {}, queryObj.database);
