@@ -71,8 +71,8 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
     if (!query.resultFormat) {
       onChange({ ...query, resultFormat: 'table' });
     }
-    if (query.resultFormat === adxTimeFormat.value && !formats.includes(adxTimeFormat)) {
-      // Fallback to Time Series since time_series_adx_series is not available
+    if (query.resultFormat === adxTimeFormat.value && !rawMode) {
+      // Fallback to Time Series since time_series_adx_series is not available when not in rawMode
       onChange({ ...query, resultFormat: 'time_series' });
     }
   }, [query, formats, onChange]);
