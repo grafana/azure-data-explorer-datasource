@@ -24,8 +24,8 @@ const VariableEditor = (props: VariableProps) => {
   const { query, onChange, datasource } = props;
   const VARIABLE_TYPE_OPTIONS = [
     { label: 'Databases', value: AdxQueryType.Databases },
-    { label: 'Kusto Query', value: AdxQueryType.KustoQuery },
     { label: 'Tables', value: AdxQueryType.Tables },
+    { label: 'Kusto Query', value: AdxQueryType.KustoQuery },
   ];
   const [variableOptionGroup, setVariableOptionGroup] = useState<{ label: string; options: VariableOptions[] }>({
     label: 'Template Variables',
