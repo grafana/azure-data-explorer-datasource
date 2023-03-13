@@ -46,6 +46,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
         dirty={dirty}
         setDirty={setDirty}
         onRunQuery={onRunQuery}
+        templateVariableOptions={templateVariables}
       />
       {query.rawMode ? (
         <RawQueryEditor

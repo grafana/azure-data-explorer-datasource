@@ -35,6 +35,7 @@ const defaultProps = {
   dirty: false,
   setDirty: jest.fn(),
   onRunQuery: jest.fn(),
+  templateVariableOptions: [],
 };
 
 describe('QueryEditor', () => {

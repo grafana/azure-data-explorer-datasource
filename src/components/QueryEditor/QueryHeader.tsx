@@ -6,7 +6,7 @@ import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
 import { AdxSchema, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxDataSource } from 'datasource';
-import { QueryEditorPropertyDefinition } from 'schema/types';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { useAsync } from 'react-use';
 import { databaseToDefinition } from 'schema/mapper';
 import { SelectableValue } from '@grafana/data';
@@ -20,6 +20,7 @@ export interface QueryEditorHeaderProps {
   setDirty: (b: boolean) => void;
   onChange: (value: KustoQuery) => void;
   onRunQuery: () => void;
+  templateVariableOptions: SelectableValue<string>;
 }
 
 const EDITOR_MODES = [
@@ -38,7 +39,7 @@ const adxTimeFormat: SelectableValue<string> = {
 };
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
-  const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery } = props;
+  const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions } = props;
   const { rawMode } = query;
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query, datasource);
@@ -77,6 +78,11 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
     }
   }, [query, formats, onChange]);
 
+  const onDatabaseChange = ({ value }: SelectableValue) => {
+    onChange({ ...query, database: value!, expression: defaultQuery.expression });
+    onRunQuery();
+  };
+
   return (
     <EditorHeader>
       <ConfirmModal
@@ -96,12 +102,14 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       <InlineSelect
         label="Database"
         aria-label="Database"
-        options={databases}
+        options={databases.concat({
+          ...templateVariableOptions,
+          value: templateVariableOptions.value || '',
+          type: QueryEditorPropertyType.String,
+        })}
         value={database}
         isLoading={schema.loading}
-        onChange={({ value }) => {
-          onChange({ ...query, database: value!, expression: defaultQuery.expression });
-        }}
+        onChange={onDatabaseChange}
       />
       <InlineSelect
         label="Format as"
