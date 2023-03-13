@@ -2,6 +2,7 @@ import { SelectableValue } from '@grafana/data';
 import { InlineField, Select } from '@grafana/ui';
 import { QueryEditor } from 'components/QueryEditor';
 import { AdxDataSource } from 'datasource';
+import { selectors } from 'test/selectors';
 import { get } from 'lodash';
 import { needsToBeMigrated, migrateQuery } from 'migrations/query';
 import React, { useEffect, useState } from 'react';
@@ -9,7 +10,7 @@ import { useEffectOnce } from 'react-use';
 import { AdxSchemaResolver } from 'schema/AdxSchemaResolver';
 import { AdxQueryType, KustoQuery } from 'types';
 
-type VariableProps = {
+export type VariableProps = {
   query: KustoQuery;
   onChange: (query: KustoQuery) => void;
   datasource: AdxDataSource;
@@ -124,7 +125,11 @@ const VariableEditor = (props: VariableProps) => {
 
   return (
     <>
-      <InlineField label="Select query type" labelWidth={20}>
+      <InlineField
+        label="Select query type"
+        labelWidth={20}
+        data-testid={selectors.components.variableEditor.queryType.input}
+      >
         <Select
           aria-label="select query type"
           onChange={onQueryTypeChange}
@@ -137,7 +142,11 @@ const VariableEditor = (props: VariableProps) => {
         <QueryEditor query={query} onChange={onChange} datasource={datasource} onRunQuery={() => {}} />
       )}
       {requireDatabase && (
-        <InlineField label="Select database" labelWidth={20}>
+        <InlineField
+          label="Select database"
+          labelWidth={20}
+          data-testid={selectors.components.variableEditor.databases.input}
+        >
           <Select
             aria-label="select database"
             onChange={onDatabaseChange}
@@ -148,7 +157,11 @@ const VariableEditor = (props: VariableProps) => {
         </InlineField>
       )}
       {requireTable && (
-        <InlineField label="Select table" labelWidth={20}>
+        <InlineField
+          label="Select table"
+          labelWidth={20}
+          data-testid={selectors.components.variableEditor.tables.input}
+        >
           <Select
             aria-label="select table"
             onChange={onTableChange}

@@ -35,8 +35,22 @@ export const components = {
     tableFrom: {
       input: 'Table',
     },
+    columns: {
+      input: 'Columns',
+    },
     runQuery: {
       button: 'data-testid run-query',
+    },
+  },
+  variableEditor: {
+    queryType: {
+      input: 'data-testid query-type',
+    },
+    databases: {
+      input: 'data-testid databases',
+    },
+    tables: {
+      input: 'data-testid tables',
     },
   },
 };
