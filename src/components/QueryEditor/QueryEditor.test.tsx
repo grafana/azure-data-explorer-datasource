@@ -2,7 +2,7 @@ import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
 import { QueryEditor } from './QueryEditor';
 import { render, screen, waitFor } from '@testing-library/react';
-import { defaultQuery, EditorMode } from 'types';
+import { AdxQueryType, defaultQuery, EditorMode } from 'types';
 
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
@@ -26,7 +26,7 @@ describe('QueryEditor', () => {
   describe('on first load', () => {
     it('should migrate a query ', async () => {
       const onChange = jest.fn();
-      const query = { ...mockQuery, pluginVersion: '' };
+      const query = { ...mockQuery, pluginVersion: '', queryType: '' as AdxQueryType };
       render(<QueryEditor {...defaultProps} onChange={onChange} query={query} />);
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ pluginVersion: defaultQuery.pluginVersion }));
       // wait to load
