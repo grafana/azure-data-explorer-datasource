@@ -36,6 +36,14 @@ export const needsToBeMigrated = (query: KustoQuery): boolean => {
     return false;
   }
 
+  if (query.queryType) {
+    return false;
+  }
+
+  if (!query.queryType) {
+    return true;
+  }
+
   if (!query.pluginVersion) {
     return true;
   }
@@ -45,10 +53,6 @@ export const needsToBeMigrated = (query: KustoQuery): boolean => {
   }
 
   if (looksLikeV2(query.expression)) {
-    return true;
-  }
-
-  if (!query.queryType) {
     return true;
   }
 
