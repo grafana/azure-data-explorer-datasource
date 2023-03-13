@@ -36,7 +36,7 @@ export const needsToBeMigrated = (query: KustoQuery): boolean => {
     return false;
   }
 
-  if (query.queryType) {
+  if (query.queryType && query.queryType !== AdxQueryType.KustoQuery) {
     return false;
   }
 
