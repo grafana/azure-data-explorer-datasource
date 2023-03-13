@@ -9,6 +9,10 @@ import TEST_DASHBOARD from '../dashboards/example.json';
 const e2eSelectors = e2e.getSelectors(selectors.components);
 const dataSourceName = `Azure Data Explorer E2E Tests - ${uuidv4()}`;
 
+for (const panel of TEST_DASHBOARD.panels) {
+  panel.datasource = dataSourceName;
+}
+
 type ADXConfig = {
   secureJsonData: {
     clientSecret: string;
@@ -80,13 +84,13 @@ e2e.scenario({
 
 e2e.scenario({
   describeName: 'Add ADX datasource Import Dashoard',
-  itName: 'fills out datasource connection configuration and imports JSON dashboard',
+  itName: 'imports JSON dashboard',
   scenario: () => e2e.flows.importDashboard(TEST_DASHBOARD, undefined, true),
 });
 
 e2e.scenario({
   describeName: 'Creates Panel run KQL query',
-  itName: 'fills out datasource connection configuration, adds panel and runs query',
+  itName: 'adds panel and runs query',
   scenario: () => {
     e2e.flows.addDashboard({
       timeRange: {
@@ -104,8 +108,7 @@ e2e.scenario({
         e2eSelectors.queryEditor.database.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
         cy.contains('KQL').click({ force: true });
-        // Wait for the schema to load
-        cy.get('.Table', { timeout: 10000 });
+        e2e().wait(10000);
         e2eSelectors.queryEditor.codeEditor
           .container()
           .click({ force: true })
@@ -127,7 +130,7 @@ e2e.scenario({
 
 e2e.scenario({
   describeName: 'Creates Panel run query via builder',
-  itName: 'fills out datasource connection configuration, adds panel and runs query via builder',
+  itName: 'adds panel and runs query via builder',
   scenario: () => {
     e2e.flows.addDashboard({
       timeRange: {
@@ -157,7 +160,7 @@ e2e.scenario({
 
 e2e.scenario({
   describeName: 'Create dashboard with template variables',
-  itName: 'creates a dashboard that includes a template variable',
+  itName: 'creates a dashboard that includes template variables',
   scenario: () => {
     e2e.flows.addDashboard({
       timeRange: {
@@ -180,20 +183,27 @@ e2e.scenario({
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest').click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('column').click();
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('_val1_').click();
-    e2eSelectors.queryEditor.runQuery.button().click({ force: true });
 
     e2e.flows.addPanel({
       matchScreenshot: false,
       visitDashboardAtStart: false,
       dataSourceName, // avoid issue selecting the data source before the editor is fully loaded
       queriesForm: () => {
-        e2eSelectors.queryEditor.database.input().type('$database');
-        e2eSelectors.queryEditor.tableFrom.input().type('$table');
-        e2eSelectors.queryEditor.columns.input().type('$column');
+        e2eSelectors.queryEditor.database.input().type('$database{enter}');
+        e2eSelectors.queryEditor.tableFrom.input().type('$table{enter}');
+        e2eSelectors.queryEditor.columns.input().type('$column{enter}');
 
         e2eSelectors.queryEditor.runQuery.button().click({ force: true });
         cy.contains('_val1_').should('exist');
       },
     });
+  },
+});
+
+e2e.scenario({
+  describeName: 'Remove datasource',
+  itName: 'remove azure data explorer datasource',
+  scenario: () => {
+    e2e.flows.deleteDataSource({ name: dataSourceName, id: '', quick: true });
   },
 });
