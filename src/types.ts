@@ -32,6 +32,7 @@ export interface KustoQuery extends DataQuery {
   querySource: QuerySource;
   pluginVersion: string;
   queryType: AdxQueryType;
+  table?: string;
 }
 
 export interface AutoCompleteQuery {
@@ -50,6 +51,7 @@ export enum AdxQueryType {
   Databases = 'Databases',
   KustoQuery = 'KQL',
   Tables = 'Tables',
+  Columns = 'Columns',
 }
 
 export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource' | 'pluginVersion' | 'queryType'> = {

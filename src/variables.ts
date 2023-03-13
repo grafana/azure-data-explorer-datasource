@@ -1,6 +1,7 @@
 import { CustomVariableSupport, DataQueryRequest, DataQueryResponse, toDataFrame } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
 import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
+import { toColumnNames } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 import VariableEditor from 'components/VariableEditor/VariableEditor';
 import { AdxDataSource, includeTimeRange } from 'datasource';
 import { Observable, from, lastValueFrom } from 'rxjs';
@@ -47,6 +48,15 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
             const tables = await schemaResolver.getTablesForDatabase(this.templateSrv.replace(queryObj.database));
             return {
               data: tables.length ? [toDataFrame(tables)] : [],
+            };
+          case AdxQueryType.Columns:
+            const columns = await schemaResolver.getColumnsForTable(
+              this.templateSrv.replace(queryObj.database),
+              this.templateSrv.replace(queryObj.table)
+            );
+            const columnNames = toColumnNames(columns).map((column) => ({ Name: column }));
+            return {
+              data: columns.length ? [toDataFrame(columnNames)] : [],
             };
           default:
             const query = this.datasource.buildQuery(queryObj.query, {}, queryObj.database);
