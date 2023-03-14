@@ -121,7 +121,7 @@ e2e.scenario({
           .container()
           .click({ force: true })
           .type('$__timeFilter(_Timestamp_) | order by _Timestamp_ asc');
-        e2eSelectors.queryEditor.runQuery.button().click({ force: true });
+        e2eSelectors.queryEditor.runQuery.button().click({ force: true }).wait(10000);
         cy.contains('_val1_');
       },
     });
@@ -151,7 +151,7 @@ e2e.scenario({
         e2eSelectors.queryEditor.tableFrom.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
 
-        e2eSelectors.queryEditor.runQuery.button().click({ force: true });
+        e2eSelectors.queryEditor.runQuery.button().click({ force: true }).wait(10000);
         cy.contains('_val1_').should('exist');
       },
     });
