@@ -1,4 +1,4 @@
-import { defaultQuery, EditorMode } from 'types';
+import { AdxQueryType, defaultQuery, EditorMode } from 'types';
 import { migrateAnnotation } from './annotation';
 
 const OLD_ANNOTATION = {
@@ -28,6 +28,7 @@ const NEW_ANNOTATION = {
     rawMode: true,
     refId: 'Anno',
     resultFormat: 'table',
+    queryType: AdxQueryType.KustoQuery,
   },
 };
 

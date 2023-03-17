@@ -2,13 +2,11 @@ import {
   DataFrame,
   DataQueryRequest,
   DataSourceInstanceSettings,
-  MetricFindValue,
   ScopedVar,
   ScopedVars,
   TimeRange,
 } from '@grafana/data';
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
-import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { QueryEditorPropertyType } from './schema/types';
 import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
 import { map } from 'lodash';
@@ -30,6 +28,9 @@ import {
   KustoQuery,
   QueryExpression,
 } from './types';
+import { VariableSupport } from 'variables';
+
+import { lastValueFrom } from 'rxjs';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -56,6 +57,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.parseExpression = this.parseExpression.bind(this);
     this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
     this.getSchemaMapper = this.getSchemaMapper.bind(this);
+
+    this.variables = new VariableSupport(this);
   }
 
   /**
@@ -102,31 +105,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     prepareAnnotation: migrateAnnotation,
   };
 
-  async metricFindQuery(query: string, optionalOptions: any): Promise<MetricFindValue[]> {
-    const databasesQuery = query.match(/^databases\(\)/i);
-    if (databasesQuery) {
-      return this.getDatabases();
-    }
-
-    return this.getDefaultOrFirstDatabase()
-      .then((database) => this.buildQuery(query, optionalOptions, database))
-      .then((query) =>
-        this.query({
-          targets: [query],
-        } as DataQueryRequest<KustoQuery>).toPromise()
-      )
-      .then((response) => {
-        if (response?.data && response.data.length) {
-          return firstStringFieldToMetricFindValue(response.data[0]);
-        }
-        return [];
-      })
-      .catch((err) => {
-        console.log('There was an error', err);
-        throw err;
-      });
-  }
-
   async getDatabases(): Promise<DatabaseItem[]> {
     return this.getResource<KustoDatabaseList>('databases').then((response) => {
       return new ResponseParser().parseDatabases(response);
@@ -165,14 +143,16 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     queryParts.push('getschema');
 
     const query = this.buildQuery(queryParts.join('\n | '), {}, database);
-    const response = await this.query({
-      targets: [
-        {
-          ...query,
-          querySource: 'schema',
-        },
-      ],
-    } as DataQueryRequest<KustoQuery>).toPromise();
+    const response = await lastValueFrom(
+      this.query({
+        targets: [
+          {
+            ...query,
+            querySource: 'schema',
+          },
+        ],
+      } as DataQueryRequest<KustoQuery>)
+    );
 
     return functionSchemaParser(response?.data as DataFrame[]);
   }
@@ -199,16 +179,22 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     queryParts.push(summarize);
 
     const query = this.buildQuery(queryParts.join('\n | '), {}, database);
-    const response = await this.query({
-      targets: [
-        {
-          ...query,
-          querySource: 'schema',
-        },
-      ],
-    } as DataQueryRequest<KustoQuery>).toPromise();
+    const response = await lastValueFrom(
+      this.query({
+        targets: [
+          {
+            ...query,
+            querySource: 'schema',
+          },
+        ],
+      } as DataQueryRequest<KustoQuery>)
+    );
 
     return dynamicSchemaParser(response?.data as DataFrame[]);
+  }
+
+  getVariablesRaw() {
+    return this.templateSrv.getVariables();
   }
 
   getVariables() {
@@ -216,7 +202,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   // Used for annotations and template variables
-  private buildQuery(query: string, options: any, database: string): KustoQuery {
+  buildQuery(query: string, options: any, database: string): KustoQuery {
     if (!options) {
       options = {};
     }
@@ -309,11 +295,13 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       querySource: 'autocomplete',
     };
 
-    const response = await this.query(
-      includeTimeRange({
-        targets: [kustoQuery],
-      }) as DataQueryRequest<KustoQuery>
-    ).toPromise();
+    const response = await lastValueFrom(
+      this.query(
+        includeTimeRange({
+          targets: [kustoQuery],
+        }) as DataQueryRequest<KustoQuery>
+      )
+    );
 
     if (!Array.isArray(response?.data) || response?.data.length === 0) {
       return [];
@@ -436,7 +424,7 @@ const recordSchema = (columnName: string, schema: AdxSchemaDefinition, result: A
 /**
  * this is a super ugly way of doing this.
  */
-const includeTimeRange = (option: any): any => {
+export const includeTimeRange = (option: any): any => {
   const range = (getTemplateSrv() as any)?.timeRange as TimeRange;
 
   if (!range) {

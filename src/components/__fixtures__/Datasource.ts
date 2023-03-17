@@ -2,7 +2,7 @@ import { DataSourcePluginOptionsEditorProps, PluginType } from '@grafana/data';
 
 import { AdxDataSource } from '../../datasource';
 import { QueryEditorExpressionType } from '../LegacyQueryEditor/editor/expressions';
-import { AdxDataSourceOptions, AdxDataSourceSecureOptions, EditorMode, KustoQuery } from '../../types';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxQueryType, EditorMode, KustoQuery } from '../../types';
 
 export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<
   AdxDataSourceOptions,
@@ -42,8 +42,8 @@ export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<
   onOptionsChange: jest.fn(),
 };
 
-export const mockDatasource = () =>
-  new AdxDataSource({
+export const mockDatasource = (overrides?: Partial<{ [Property in keyof AdxDataSource]: AdxDataSource[Property] }>) => {
+  const ds = new AdxDataSource({
     id: 1,
     uid: 'adx-id',
     type: 'adx-datasource',
@@ -73,6 +73,13 @@ export const mockDatasource = () =>
     },
     readOnly: false,
   });
+  if (overrides) {
+    for (const key of Object.keys(overrides)) {
+      ds[key] = overrides[key];
+    }
+  }
+  return ds;
+};
 
 export const mockQuery: KustoQuery = {
   refId: 'A',
@@ -86,4 +93,5 @@ export const mockQuery: KustoQuery = {
   },
   querySource: 'raw',
   pluginVersion: '1',
+  queryType: AdxQueryType.KustoQuery,
 };

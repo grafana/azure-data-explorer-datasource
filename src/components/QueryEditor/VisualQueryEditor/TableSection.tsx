@@ -115,7 +115,13 @@ const TableSection: React.FC<TableSectionProps> = ({
             aria-label="Columns"
             isMulti
             value={query.expression.columns?.columns ? query.expression.columns.columns : []}
-            options={toColumnNames(tableSchema.value || []).map((c) => ({ label: c, value: c }))}
+            options={toColumnNames(tableSchema.value || [])
+              .map((c) => ({ label: c, value: c }))
+              .concat({
+                value: templateVariableOptions.value || '',
+                label: templateVariableOptions.label || '',
+                ...templateVariableOptions,
+              })}
             placeholder="All"
             onChange={(e) => {
               onChange({

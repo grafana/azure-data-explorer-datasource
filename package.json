@@ -27,8 +27,8 @@
   "license": "Apache",
   "devDependencies": {
     "@babel/core": "^7.16.7",
-    "@grafana/e2e": "9.1.2",
-    "@grafana/e2e-selectors": "9.1.2",
+    "@grafana/e2e": "9.4.3",
+    "@grafana/e2e-selectors": "9.4.3",
     "@grafana/eslint-config": "^2.5.0",
     "@grafana/tsconfig": "^1.2.0-rc1",
     "@swc/core": "^1.2.144",
@@ -45,6 +45,7 @@
     "@types/lodash": "latest",
     "@types/node": "^17.0.19",
     "@types/prismjs": "1.26.0",
+    "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "chance": "^1.1.7",
@@ -90,7 +91,8 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-use": "^15.3.3",
-    "tslib": "^2.3.1"
+    "tslib": "^2.3.1",
+    "uuid": "^9.0.0"
   },
   "resolutions": {
     "**/@testing-library/dom": "7.31.2"

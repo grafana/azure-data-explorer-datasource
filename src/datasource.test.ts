@@ -1,5 +1,6 @@
 import { AdxDataSource, sortStartsWithValuesFirst } from './datasource';
 import { toDataFrame } from '@grafana/data';
+import { of } from 'rxjs';
 import _ from 'lodash';
 import { EditorMode } from 'types';
 import { mockDatasource } from 'components/__fixtures__/Datasource';
@@ -37,25 +38,6 @@ describe('AdxDataSource', () => {
       return ctx.ds.getDatabases().then((results) => {
         expect(results[0].text).toBe('Grafana');
         expect(results[0].value).toBe('Grafana');
-      });
-    });
-  });
-
-  describe('When performing metricFindQuery', () => {
-    describe('and is the databases() macro', () => {
-      let queryResults;
-
-      beforeEach(async () => {
-        ctx.ds = new AdxDataSource(ctx.instanceSettings);
-        ctx.ds.getResource = jest.fn().mockResolvedValue(setupTableResponse());
-
-        queryResults = await ctx.ds.metricFindQuery('databases()');
-      });
-
-      it('should return a list of databases', () => {
-        expect(queryResults.length).toBe(2);
-        expect(queryResults[0].text).toBe('Grafana');
-        expect(queryResults[0].value).toBe('Grafana');
       });
     });
   });
@@ -132,8 +114,8 @@ describe('AdxDataSource', () => {
   describe('when getting a dynamic schema', () => {
     it('should return valid accessors', async () => {
       const datasource = mockDatasource();
-      datasource.query = jest.fn().mockReturnValue({
-        toPromise: jest.fn().mockResolvedValue({
+      datasource.query = jest.fn().mockReturnValue(
+        of({
           data: [
             toDataFrame({
               fields: [
@@ -150,8 +132,8 @@ describe('AdxDataSource', () => {
               ],
             }),
           ],
-        }),
-      });
+        })
+      );
 
       expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
         Teams: [
@@ -166,8 +148,8 @@ describe('AdxDataSource', () => {
 
     it('should build a correct query if the column includes a space', async () => {
       const datasource = mockDatasource();
-      datasource.query = jest.fn().mockReturnValue({
-        toPromise: jest.fn().mockResolvedValue({
+      datasource.query = jest.fn().mockReturnValue(
+        of({
           data: [
             toDataFrame({
               fields: [
@@ -184,8 +166,8 @@ describe('AdxDataSource', () => {
               ],
             }),
           ],
-        }),
-      });
+        })
+      );
 
       expect(await datasource.getDynamicSchema('foo', 'bar', ['col name'])).toEqual({
         Teams: [
@@ -245,8 +227,8 @@ describe('AdxDataSource', () => {
         });
         it(`should return ${t.expected.CslType} type for ${t.expected.Name}`, async () => {
           const datasource = mockDatasource();
-          datasource.query = jest.fn().mockReturnValue({
-            toPromise: jest.fn().mockResolvedValue({
+          datasource.query = jest.fn().mockReturnValue(
+            of({
               data: [
                 toDataFrame({
                   fields: [
@@ -261,8 +243,8 @@ describe('AdxDataSource', () => {
                   ],
                 }),
               ],
-            }),
-          });
+            })
+          );
 
           expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
             Teams: [t.expected],

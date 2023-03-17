@@ -1,5 +1,5 @@
 import { DataSourceRef } from '@grafana/data';
-import { KustoQuery, defaultQuery } from 'types';
+import { AdxQueryType, KustoQuery, defaultQuery } from 'types';
 
 type inputAnnotation = {
   datasource: DataSourceRef | null | undefined;
@@ -26,6 +26,7 @@ export const migrateAnnotation = (annotation: inputAnnotation) => {
     refId: annotation.target?.refId ?? 'Anno',
     resultFormat: annotation.resultFormat ?? 'table',
     pluginVersion: defaultQuery.pluginVersion,
+    queryType: AdxQueryType.KustoQuery,
   };
 
   return {
