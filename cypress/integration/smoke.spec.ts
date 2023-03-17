@@ -103,12 +103,12 @@ e2e.scenario({
     e2e.flows.addPanel({
       matchScreenshot: false,
       visitDashboardAtStart: false,
-      dataSourceName, // avoid issue selecting the data source before the editor is fully loaded
+      dataSourceName: '', // avoid issue selecting the data source before the editor is fully loaded
       queriesForm: () => {
+        e2e.components.DataSourcePicker.inputV2().click().type(`${dataSourceName}{enter}`);
         e2eSelectors.queryEditor.database.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
         cy.contains('KQL').click({ force: true });
-        e2e().wait(10000);
         e2eSelectors.queryEditor.codeEditor
           .container()
           .click({ force: true })
@@ -121,7 +121,7 @@ e2e.scenario({
           .container()
           .click({ force: true })
           .type('$__timeFilter(_Timestamp_) | order by _Timestamp_ asc');
-        e2eSelectors.queryEditor.runQuery.button().click({ force: true }).wait(10000);
+        e2eSelectors.queryEditor.runQuery.button().click({ force: true }).wait(6000);
         cy.contains('_val1_');
       },
     });
@@ -143,15 +143,16 @@ e2e.scenario({
     e2e.flows.addPanel({
       matchScreenshot: false,
       visitDashboardAtStart: false,
-      dataSourceName,
+      dataSourceName: '',
       queriesForm: () => {
+        e2e.components.DataSourcePicker.inputV2().click().type(`${dataSourceName}{enter}`);
         e2eSelectors.queryEditor.database.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
 
         e2eSelectors.queryEditor.tableFrom.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
 
-        e2eSelectors.queryEditor.runQuery.button().click({ force: true }).wait(10000);
+        e2eSelectors.queryEditor.runQuery.button().click({ force: true }).wait(6000);
         cy.contains('_val1_').should('exist');
       },
     });
