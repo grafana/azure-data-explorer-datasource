@@ -105,10 +105,10 @@ e2e.scenario({
       visitDashboardAtStart: false,
       dataSourceName: '', // avoid issue selecting the data source before the editor is fully loaded
       queriesForm: () => {
-        e2e.components.DataSourcePicker.inputV2().click().type(`${dataSourceName}{enter}`);
+        e2e.components.DataSourcePicker.inputV2().click().type(`${dataSourceName}{enter}`).wait(6000);
         e2eSelectors.queryEditor.database.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
-        cy.contains('KQL').click({ force: true });
+        cy.contains('KQL').click({ force: true }).wait(6000);
         e2eSelectors.queryEditor.codeEditor
           .container()
           .click({ force: true })
@@ -145,7 +145,7 @@ e2e.scenario({
       visitDashboardAtStart: false,
       dataSourceName: '',
       queriesForm: () => {
-        e2e.components.DataSourcePicker.inputV2().click().type(`${dataSourceName}{enter}`);
+        e2e.components.DataSourcePicker.inputV2().click().type(`${dataSourceName}{enter}`).wait(6000);
         e2eSelectors.queryEditor.database.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
 
