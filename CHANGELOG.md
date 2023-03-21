@@ -1,4 +1,20 @@
-# Change Log
+# CHANGELOG
+
+## [4.3.0]
+
+This release revamps the editor for Azure Data Explorer template variables:
+
+- New feature: Predefined queries have been added for databases, tables, and columns to simplify template variable usage.
+- New feature: Both the query builder and KQL editor can be used to query for template variables.
+- New feature: Macros and template variables are now supported within Azure Data Explorer template variable queries.
+
+This release also includes:
+
+- Fix: The ADX time series format is now preserved when using the KQL editor.
+- Fix: Config editor label widths are now consistent.
+- Fix: Field focussing now behaves as expected.
+- Refactor: OBO token provider makes use of configurable middleware.
+- Refactor: Deprecated `metricFindQuery` function from Grafana and other `rxjs` functions have been removed.
 
 ## [4.2.0]
 
