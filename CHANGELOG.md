@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.4.0]
+
+Update backend dependencies
+
 ## [4.3.0]
 
 This release revamps the editor for Azure Data Explorer template variables:
