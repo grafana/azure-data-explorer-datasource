@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.4.1]
+
+Build with latest Go version 1.20.4
+
 ## [4.4.0]
 
 Update backend dependencies
