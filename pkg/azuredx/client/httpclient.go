@@ -16,6 +16,8 @@ import (
 func newHttpClient(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
 	authOpts := azhttpclient.NewAuthOptions(azureSettings)
 
+	authOpts.AllowUserIdentity()
+
 	// TODO: #555 configure on-behalf-of authentication if enabled in AzureSettings
 	authOpts.AddTokenProvider(azcredentials.AzureAuthClientSecretObo, adxauth.NewOnBehalfOfAccessTokenProvider)
 
