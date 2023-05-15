@@ -16,6 +16,9 @@ import (
 func newHttpClient(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
 	authOpts := azhttpclient.NewAuthOptions(azureSettings)
 
+        // Enables support for the experimental user-based authentication feature if the user_identity_enabled flag is set to true in the Grafana configuration
+	authOpts.AllowUserIdentity()
+
 	// TODO: #555 configure on-behalf-of authentication if enabled in AzureSettings
 	authOpts.AddTokenProvider(azcredentials.AzureAuthClientSecretObo, adxauth.NewOnBehalfOfAccessTokenProvider)
 
