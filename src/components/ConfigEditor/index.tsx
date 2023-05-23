@@ -1,14 +1,20 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import ConfigHelp from './ConfigHelp';
-import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
 import ConnectionConfig from './ConnectionConfig';
 import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
 import TrackingConfig from './TrackingConfig';
 import { AzureCredentials, KnownAzureClouds } from './AzureCredentials';
-import { getCredentials, getOboEnabled, updateCredentials } from './AzureCredentialsConfig';
+import {
+  getCredentials,
+  getOboEnabled,
+  updateCredentials,
+  hasCredentials,
+  getDefaultCredentials,
+} from './AzureCredentialsConfig';
 import AzureCredentialsForm from './AzureCredentialsForm';
 
 export interface ConfigEditorProps
@@ -19,6 +25,14 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
   const { jsonData } = options;
 
   const credentials = useMemo(() => getCredentials(options), [options]);
+
+  const updateOptions = useCallback(
+    (optionsFunc: (options: AdxDataSourceSettings) => AdxDataSourceSettings): void => {
+      const updated = optionsFunc(options);
+      onOptionsChange(updated);
+    },
+    [onOptionsChange, options]
+  );
 
   const updateJsonData = useCallback(
     <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => {
@@ -34,8 +48,14 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
   );
 
   const onCredentialsChange = (credentials: AzureCredentials): void => {
-    onOptionsChange(updateCredentials(options, credentials));
+    updateOptions((options) => updateCredentials(options, credentials));
   };
+
+  useEffect(() => {
+    if (!hasCredentials(options)) {
+      updateOptions((options) => updateCredentials(options, getDefaultCredentials()));
+    }
+  }, [options, updateOptions]);
 
   return (
     <div data-testid="azure-data-explorer-config-editor">
