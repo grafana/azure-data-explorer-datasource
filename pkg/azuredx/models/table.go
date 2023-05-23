@@ -214,7 +214,7 @@ var boolConverter = data.FieldConverter{
 			b = i != "0"
 			return &b, nil
 		}
-		return nil, fmt.Errorf("unexpected type, expected bool or json.Number but got got type %T with a value of %v", v, v)
+                return nil, fmt.Errorf("unexpected type, expected bool or json.Number but got type %T with a value of %v", v, v)
 	},
 }
 
