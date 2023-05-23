@@ -1,6 +1,6 @@
 # Current User Authorization
 
-**Note**: The feature is experimental, which means it may not work as expected and breaking changes may be introduced
+**Note**: The feature is experimental, which means it may not work as expected, it may cause Grafana to behave in an unexpected way, and breaking changes may be introduced
 in the future.
 
 ⚠️ Only compatible with Grafana 10.0 or above.
