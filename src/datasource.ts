@@ -57,6 +57,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.parseExpression = this.parseExpression.bind(this);
     this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
     this.getSchemaMapper = this.getSchemaMapper.bind(this);
+    this.generateQueryForOpenAI = this.generateQueryForOpenAI.bind(this);
 
     this.variables = new VariableSupport(this);
   }
@@ -108,6 +109,12 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   async getDatabases(): Promise<DatabaseItem[]> {
     return this.getResource<KustoDatabaseList>('databases').then((response) => {
       return new ResponseParser().parseDatabases(response);
+    });
+  }
+
+  async generateQueryForOpenAI(body): Promise<any> {
+    return super.postResource('generateQuery', body).then((resp) => {
+      return new ResponseParser().parseOpenAIResponse(resp);
     });
   }
 

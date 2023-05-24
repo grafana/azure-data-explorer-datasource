@@ -32,6 +32,9 @@ func TestResourceHandler(t *testing.T) {
 
 		mux.ServeHTTP(res, httptest.NewRequest("PUT", "/schema", nil))
 		require.Equal(t, http.StatusMethodNotAllowed, res.Code)
+
+		mux.ServeHTTP(res, httptest.NewRequest("PUT", "/generateQuery", nil))
+		require.Equal(t, http.StatusMethodNotAllowed, res.Code)
 	})
 
 	t.Run("When kust request fails route should return an error", func(t *testing.T) {

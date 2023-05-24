@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strings"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
@@ -43,6 +44,7 @@ func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instanc
 		return nil, err
 	}
 	adx.settings = datasourceSettings
+	adx.settings.OpenAIAPIKey = strings.TrimSpace(instanceSettings.DecryptedSecureJSONData["OpenAIAPIKey"])
 
 	azureSettings, err := azsettings.ReadFromEnv()
 	if err != nil {

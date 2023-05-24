@@ -21,7 +21,7 @@ export interface QueryExpression {
   timeshift?: QueryEditorPropertyExpression;
 }
 
-type QuerySource = 'raw' | 'schema' | 'autocomplete' | 'visual';
+type QuerySource = 'raw' | 'schema' | 'autocomplete' | 'visual' | 'openai';
 export interface KustoQuery extends DataQuery {
   query: string;
   database: string;
@@ -33,6 +33,7 @@ export interface KustoQuery extends DataQuery {
   pluginVersion: string;
   queryType: AdxQueryType;
   table?: string;
+  OpenAI?: boolean;
 }
 
 export interface AutoCompleteQuery {
@@ -45,6 +46,7 @@ export interface AutoCompleteQuery {
 export enum EditorMode {
   Visual = 'visual',
   Raw = 'raw',
+  OpenAI = 'openai',
 }
 
 export enum AdxQueryType {
@@ -112,7 +114,9 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   clusterUrl: string;
 }
 
-export interface AdxDataSourceSecureOptions {}
+export interface AdxDataSourceSecureOptions {
+  OpenAIAPIKey?: string;
+}
 
 export interface AdxSchema {
   Databases: Record<string, AdxDatabaseSchema>;

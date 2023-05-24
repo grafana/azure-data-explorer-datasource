@@ -10,6 +10,7 @@ import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/t
 import { useAsync } from 'react-use';
 import { databaseToDefinition } from 'schema/mapper';
 import { SelectableValue } from '@grafana/data';
+import { reportInteraction } from '@grafana/runtime';
 import { selectors } from 'test/selectors';
 
 export interface QueryEditorHeaderProps {
@@ -26,6 +27,7 @@ export interface QueryEditorHeaderProps {
 const EDITOR_MODES = [
   { label: 'Builder', value: EditorMode.Visual },
   { label: 'KQL', value: EditorMode.Raw },
+  { label: 'OpenAI', value: EditorMode.OpenAI },
 ];
 
 const EDITOR_FORMATS: Array<SelectableValue<string>> = [
@@ -40,17 +42,18 @@ const adxTimeFormat: SelectableValue<string> = {
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions } = props;
-  const { rawMode } = query;
+  const { rawMode, OpenAI } = query;
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query, datasource);
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
 
   const changeEditorMode = (value: EditorMode) => {
+    reportInteraction('grafana_ds_adx_editor_mode');
     if (value === EditorMode.Visual && dirty) {
       setShowWarning(true);
     } else {
-      onChange({ ...query, rawMode: value === EditorMode.Raw });
+      onChange({ ...query, rawMode: value === EditorMode.Raw, OpenAI: value === EditorMode.OpenAI });
     }
   };
 
@@ -81,6 +84,18 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const onDatabaseChange = ({ value }: SelectableValue) => {
     onChange({ ...query, database: value!, expression: defaultQuery.expression });
     onRunQuery();
+  };
+
+  const EditorSelector = () => {
+    if (rawMode) {
+      return EditorMode.Raw;
+    }
+
+    if (OpenAI) {
+      return EditorMode.OpenAI;
+    }
+
+    return EditorMode.Visual;
   };
 
   return (
@@ -129,12 +144,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       >
         Run query
       </Button>
-      <RadioButtonGroup
-        size="sm"
-        options={EDITOR_MODES}
-        value={query.rawMode ? EditorMode.Raw : EditorMode.Visual}
-        onChange={changeEditorMode}
-      />
+      <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
     </EditorHeader>
   );
 };
