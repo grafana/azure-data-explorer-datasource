@@ -43,7 +43,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [variables] = useState(getTemplateSrv().getVariables());
   const [stateSchema, setStateSchema] = useState(cloneDeep(schema));
   const styles = useStyles2(getStyles);
-  const baselinePrompt = `You are an AI assistant that is fluent in KQL for querying Azure Data Explorer and you only respond with the correct KQL code snippets and no explainations. Generate a query that fulfills the following text.\nText:"""`;
+  const baselinePrompt = `You are an AI assistant that is fluent in KQL for querying Azure Data Explorer and you only respond with the correct KQL code snippets and no explanations. Generate a query that fulfills the following text.\nText:"""`;
 
   const onRawQueryChange = (kql: string) => {
     if (kql !== props.query.query) {
@@ -118,7 +118,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
         <Alert
           onRemove={() => setError(false)}
           severity="error"
-          title="An error occured generating your query, tweak your prompt and try again."
+          title="An error occurred generating your query, tweak your prompt and try again."
         />
       )}
       <div className={styles.outerMargin}>
