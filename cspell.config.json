@@ -18,6 +18,7 @@
     "azhttpclient",
     "azusercontext",
     "clientsecret",
+    "currentuser",
     "Codeowners",
     "datasource",
     "datetime",

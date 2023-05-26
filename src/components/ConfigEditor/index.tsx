@@ -10,10 +10,11 @@ import TrackingConfig from './TrackingConfig';
 import { AzureCredentials, KnownAzureClouds } from './AzureCredentials';
 import {
   getCredentials,
-  getOboEnabled,
-  updateCredentials,
-  hasCredentials,
   getDefaultCredentials,
+  getOboEnabled,
+  getUserIdentityEnabled,
+  hasCredentials,
+  updateCredentials,
 } from './AzureCredentialsConfig';
 import AzureCredentialsForm from './AzureCredentialsForm';
 
@@ -65,6 +66,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
 
       <h3 className="page-heading">Authentication</h3>
       <AzureCredentialsForm
+        userIdentityEnabled={getUserIdentityEnabled()}
         managedIdentityEnabled={config.azure.managedIdentityEnabled}
         oboEnabled={getOboEnabled()}
         credentials={credentials}

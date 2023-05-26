@@ -7,6 +7,7 @@ import { AzureAuthType, AzureCredentials } from './AzureCredentials';
 import { selectors } from 'test/selectors';
 
 export interface Props {
+  userIdentityEnabled: boolean;
   managedIdentityEnabled: boolean;
   oboEnabled: boolean;
   credentials: AzureCredentials;
@@ -32,6 +33,13 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
       });
     }
 
+    if (props.userIdentityEnabled) {
+      opts.unshift({
+        value: 'currentuser',
+        label: 'Current User',
+      });
+    }
+
     if (props.oboEnabled) {
       opts.push({
         value: 'clientsecret-obo',
@@ -40,7 +48,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
     }
 
     return opts;
-  }, [props.managedIdentityEnabled, props.oboEnabled]);
+  }, [props.userIdentityEnabled, props.managedIdentityEnabled, props.oboEnabled]);
 
   const onAuthTypeChange = (selected: SelectableValue<AzureAuthType>) => {
     if (onCredentialsChange) {
@@ -134,6 +142,22 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
             onChange={onAuthTypeChange}
           />
         </InlineField>
+      )}
+      {credentials.authType === 'currentuser' && (
+        <>
+          <Alert title="Current user authentication is experimental" severity="warning">
+            Certain Grafana features (e.g. alerting) may not work as expected. For other known limitations and issues,
+            bug reports, or feedback, please visit{' '}
+            <a
+              href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md"
+              target="_blank"
+              rel="noreferrer"
+            >
+              the documentation
+            </a>
+            .
+          </Alert>
+        </>
       )}
       {credentials.authType === 'clientsecret-obo' && (
         <>
