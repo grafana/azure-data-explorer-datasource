@@ -15,6 +15,7 @@ jest.mock('@grafana/runtime', () => {
       getVariables: () => [],
       replace: (s: string) => s,
     }),
+    reportInteraction: (string, props) => ({}),
     config: {
       ...original.config,
       buildInfo: {

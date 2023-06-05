@@ -9,6 +9,7 @@ import { AdxDataSourceOptions, EditorMode, KustoQuery } from 'types';
 import { AdxDataSource } from '../../datasource';
 import { QueryHeader } from './QueryHeader';
 import { RawQueryEditor } from './RawQueryEditor';
+import { OpenAIEditor } from './OpenAIEditor';
 import { VisualQueryEditor } from './VisualQueryEditor';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
@@ -34,7 +35,6 @@ export const QueryEditor: React.FC<Props> = (props) => {
       onRunQuery();
     }
   });
-
   return (
     <>
       {schema.error && <Alert title="Could not load datasource schema">{parseSchemaError(schema.error)}</Alert>}
@@ -48,6 +48,16 @@ export const QueryEditor: React.FC<Props> = (props) => {
         onRunQuery={onRunQuery}
         templateVariableOptions={templateVariables}
       />
+      {query.OpenAI ? (
+        <OpenAIEditor
+          {...props}
+          schema={schema.value}
+          database={query.database}
+          datasource={datasource}
+          templateVariableOptions={templateVariables}
+          setDirty={() => !dirty && setDirty(true)}
+        />
+      ) : null}
       {query.rawMode ? (
         <RawQueryEditor
           {...props}
@@ -56,14 +66,15 @@ export const QueryEditor: React.FC<Props> = (props) => {
           templateVariableOptions={templateVariables}
           setDirty={() => !dirty && setDirty(true)}
         />
-      ) : (
+      ) : null}
+      {!query.rawMode && !query.OpenAI ? (
         <VisualQueryEditor
           {...props}
           schema={schema.value}
           database={query.database}
           templateVariableOptions={templateVariables}
         />
-      )}
+      ) : null}
     </>
   );
 };

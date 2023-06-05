@@ -28,6 +28,7 @@ type DatasourceSettings struct {
 	// ServerTimeoutValue is the QueryTimeout formatted as a MS Timespan
 	// which is used as a connection property option.
 	ServerTimeoutValue string `json:"-"`
+	OpenAIAPIKey       string
 }
 
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's

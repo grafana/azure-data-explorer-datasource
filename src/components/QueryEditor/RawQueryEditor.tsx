@@ -1,5 +1,5 @@
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
-import { getTemplateSrv } from '@grafana/runtime';
+import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
 import { CodeEditor, Monaco, MonacoEditor } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 import React, { useEffect, useState } from 'react';
@@ -29,6 +29,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [stateSchema, setStateSchema] = useState(cloneDeep(schema));
 
   const onRawQueryChange = (kql: string) => {
+    reportInteraction('grafana_ds_adx_raw_editor_query_blurred');
     if (kql !== props.query.query) {
       props.setDirty();
       props.onChange({

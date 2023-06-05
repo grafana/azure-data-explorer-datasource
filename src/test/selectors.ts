@@ -28,6 +28,7 @@ export const components = {
     },
     codeEditor: {
       container: 'data-testid code-editor',
+      openAI: 'data-testid open-ai-editor',
     },
     database: {
       input: 'Database',

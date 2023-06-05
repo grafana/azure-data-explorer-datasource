@@ -88,4 +88,9 @@ export class ResponseParser {
     const schemaJson = results.Tables[0].Rows[0][0];
     return JSON.parse(schemaJson) as AdxSchema;
   }
+
+  parseOpenAIResponse(results: any) {
+    const content = results.choices[0].Message.Content;
+    return content;
+  }
 }
