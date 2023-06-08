@@ -31,8 +31,16 @@ export type ADXCounters = {
   query_builder_queries: number;
   /** number of queries using the Kusto editor  */
   raw_queries: number;
+  /** number of queries using the OpenAI editor */
+  open_ai_queries: number;
+  /** number of queries using current user authentication */
+  current_user_queries: number;
   /** number of queries using On-Behalf-Of authentication */
   on_behalf_of_queries: number;
+  /** number of queries using MSI authentication */
+  msi_queries: number;
+  /** number of queries using app registration authentication */
+  app_registration_queries: number;
   /** number of queries using a timeout different than the default */
   queries_with_custom_timeout: number;
   /** number of queries using ADX dynamic caching */
@@ -59,7 +67,11 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
     adx_time_series_queries: 0,
     query_builder_queries: 0,
     raw_queries: 0,
+    open_ai_queries: 0,
+    current_user_queries: 0,
     on_behalf_of_queries: 0,
+    msi_queries: 0,
+    app_registration_queries: 0,
     queries_with_custom_timeout: 0,
     dynamic_caching_queries: 0,
     weak_data_consistency_queries: 0,
@@ -82,6 +94,9 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
         break;
     }
     query.rawMode ? counters.raw_queries++ : counters.query_builder_queries++;
+    if (query.OpenAI) {
+      counters.open_ai_queries++;
+    }
 
     // Data source features
     let dsSettings = datasources[JSON.stringify(query.datasource)];
@@ -90,8 +105,18 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
       datasources[JSON.stringify(query.datasource)] = dsSettings;
     }
     if (dsSettings) {
-      if (getCredentialsAuthType(dsSettings) === 'clientsecret-obo') {
+      const authType = getCredentialsAuthType(dsSettings);
+      if (authType === 'clientsecret-obo') {
         counters.on_behalf_of_queries++;
+      }
+      if (authType === 'currentuser') {
+        counters.current_user_queries++;
+      }
+      if (authType === 'msi') {
+        counters.msi_queries++;
+      }
+      if (authType === 'clientsecret') {
+        counters.app_registration_queries++;
       }
       if (dsSettings.jsonData?.queryTimeout) {
         counters.queries_with_custom_timeout++;
