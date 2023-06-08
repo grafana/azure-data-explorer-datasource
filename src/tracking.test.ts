@@ -1,8 +1,16 @@
-import { analyzeQueries } from 'tracking';
-import { EditorMode, FormatOptions, KustoQuery } from 'types';
+import { DataSourceInstanceSettings } from '@grafana/data';
+import { ADXCounters, analyzeQueries } from 'tracking';
+import { AdxDataSourceOptions, DeepPartial, EditorMode, FormatOptions, KustoQuery } from 'types';
+
+interface TrackingTest {
+  description: string;
+  queries: Array<Partial<KustoQuery>>;
+  expectedCounters: Partial<ADXCounters>;
+  dsSettings?: DeepPartial<DataSourceInstanceSettings<AdxDataSourceOptions>>;
+}
 
 describe('analyzeQueries', () => {
-  [
+  const tests: TrackingTest[] = [
     {
       description: 'should count 1 table query',
       queries: [{ resultFormat: FormatOptions.table }],
@@ -24,6 +32,11 @@ describe('analyzeQueries', () => {
       expectedCounters: { raw_queries: 1, query_builder_queries: 0 },
     },
     {
+      description: 'should count 1 OpenAI query',
+      queries: [{ OpenAI: true }],
+      expectedCounters: { open_ai_queries: 1 },
+    },
+    {
       description: 'should count 1 query builder query',
       queries: [{ rawMode: false }],
       expectedCounters: { raw_queries: 0, query_builder_queries: 1 },
@@ -33,7 +46,7 @@ describe('analyzeQueries', () => {
       queries: [{ rawMode: false }],
       dsSettings: {
         jsonData: {
-          queryTimeout: 10,
+          queryTimeout: '10',
           dynamicCaching: true,
           dataConsistency: 'weakconsistency',
           defaultEditorMode: EditorMode.Raw,
@@ -93,7 +106,44 @@ describe('analyzeQueries', () => {
         on_behalf_of_queries: 0,
       },
     },
-  ].forEach((t) => {
+    {
+      description: 'should count current user queries',
+      queries: [{ query: '' }],
+      dsSettings: {
+        jsonData: {
+          azureCredentials: {
+            authType: 'currentuser',
+          },
+        },
+      },
+      expectedCounters: { current_user_queries: 1 },
+    },
+    {
+      description: 'should count MSI queries',
+      queries: [{ query: '' }],
+      dsSettings: {
+        jsonData: {
+          azureCredentials: {
+            authType: 'msi',
+          },
+        },
+      },
+      expectedCounters: { msi_queries: 1 },
+    },
+    {
+      description: 'should count app registration queries',
+      queries: [{ query: '' }],
+      dsSettings: {
+        jsonData: {
+          azureCredentials: {
+            authType: 'clientsecret',
+          },
+        },
+      },
+      expectedCounters: { app_registration_queries: 1 },
+    },
+  ];
+  tests.forEach((t) => {
     it(t.description, () => {
       expect(
         analyzeQueries(
