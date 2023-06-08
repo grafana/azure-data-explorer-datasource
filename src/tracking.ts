@@ -1,6 +1,6 @@
 import { DataSourceInstanceSettings } from '@grafana/data';
 import { DataSourceSrv, reportInteraction } from '@grafana/runtime';
-import { AdxDataSourceOptions, AdxQueryType, EditorMode, FormatOptions, KustoQuery } from 'types';
+import { AdxDataSourceOptions, EditorMode, FormatOptions, KustoQuery } from 'types';
 import { AzureAuthType, AzureCredentials } from './components/ConfigEditor/AzureCredentials';
 
 /**
