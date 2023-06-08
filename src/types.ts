@@ -9,6 +9,7 @@ import {
   QueryEditorReduceExpressionArray,
   QueryEditorWhereArrayExpression,
 } from './components/LegacyQueryEditor/editor/expressions';
+import { AzureCredentials } from 'components/ConfigEditor/AzureCredentials';
 
 const packageJson = require('../package.json');
 
@@ -112,6 +113,8 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   schemaMappings?: Array<Partial<SchemaMapping>>;
   enableUserTracking: boolean;
   clusterUrl: string;
+  azureCredentials?: AzureCredentials;
+  onBehalfOf?: boolean;
 }
 
 export interface AdxDataSourceSecureOptions {
