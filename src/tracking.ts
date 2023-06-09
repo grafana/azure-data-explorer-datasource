@@ -41,6 +41,8 @@ export type ADXCounters = {
   msi_queries: number;
   /** number of queries using app registration authentication */
   app_registration_queries: number;
+  /** number of queries using anonymous authentication */
+  anonymous_queries: number;
   /** number of queries using a timeout different than the default */
   queries_with_custom_timeout: number;
   /** number of queries using ADX dynamic caching */
@@ -72,6 +74,7 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
     on_behalf_of_queries: 0,
     msi_queries: 0,
     app_registration_queries: 0,
+    anonymous_queries: 0,
     queries_with_custom_timeout: 0,
     dynamic_caching_queries: 0,
     weak_data_consistency_queries: 0,
@@ -117,6 +120,9 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
       }
       if (authType === 'clientsecret') {
         counters.app_registration_queries++;
+      }
+      if (authType === 'anonymous') {
+        counters.anonymous_queries++;
       }
       if (dsSettings.jsonData?.queryTimeout) {
         counters.queries_with_custom_timeout++;

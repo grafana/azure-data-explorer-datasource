@@ -12,7 +12,7 @@ export const KnownAzureClouds = [
   { value: AzureCloud.USGovernment, label: 'Azure US Government' },
 ] as SelectableValue[];
 
-export type AzureAuthType = 'currentuser' | 'msi' | 'clientsecret' | 'clientsecret-obo';
+export type AzureAuthType = 'currentuser' | 'msi' | 'clientsecret' | 'clientsecret-obo' | 'anonymous';
 
 export type ConcealedSecret = symbol;
 
@@ -44,16 +44,22 @@ interface AzureClientSecretOboCredentials extends AzureCredentialsBase {
   clientSecret?: string | ConcealedSecret;
 }
 
+interface AzureAnonymousCredentials extends AzureCredentialsBase {
+  authType: 'anonymous';
+}
+
 export type AzureCredentials =
   | AadCurrentUserCredentials
   | AzureManagedIdentityCredentials
   | AzureClientSecretCredentials
-  | AzureClientSecretOboCredentials;
+  | AzureClientSecretOboCredentials
+  | AzureAnonymousCredentials;
 
 export function isCredentialsComplete(credentials: AzureCredentials): boolean {
   switch (credentials.authType) {
     case 'currentuser':
     case 'msi':
+    case 'anonymous':
       return true;
     case 'clientsecret':
     case 'clientsecret-obo':

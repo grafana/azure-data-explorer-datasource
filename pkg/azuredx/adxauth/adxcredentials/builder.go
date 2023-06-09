@@ -13,6 +13,17 @@ func FromDatasourceData(data map[string]interface{}, secureData map[string]strin
 	var credentials azcredentials.AzureCredentials
 	var err error
 
+	// Check for anonymous authentication
+	if credentialsObj, err := maputil.GetMapOptional(data, "azureCredentials"); err != nil {
+		return nil, err
+	} else if credentialsObj != nil {
+		if authType, err := maputil.GetStringOptional(credentialsObj, "authType"); err != nil {
+			return nil, err
+		} else if authType == "anonymous" {
+			return &AzureAnonymousCredentials{}, nil
+		}
+	}
+
 	credentials, err = azcredentials.FromDatasourceData(data, secureData)
 	if err != nil {
 		return nil, err

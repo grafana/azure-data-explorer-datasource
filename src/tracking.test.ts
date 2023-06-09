@@ -142,6 +142,18 @@ describe('analyzeQueries', () => {
       },
       expectedCounters: { app_registration_queries: 1 },
     },
+    {
+      description: 'should count anonymous queries',
+      queries: [{ query: '' }],
+      dsSettings: {
+        jsonData: {
+          azureCredentials: {
+            authType: 'anonymous',
+          },
+        },
+      },
+      expectedCounters: { anonymous_queries: 1 },
+    },
   ];
   tests.forEach((t) => {
     it(t.description, () => {

@@ -24,6 +24,10 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
         value: 'clientsecret',
         label: 'App Registration',
       },
+      {
+        value: 'anonymous',
+        label: 'Anonymous',
+      },
     ];
 
     if (props.managedIdentityEnabled) {

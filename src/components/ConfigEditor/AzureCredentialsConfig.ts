@@ -98,6 +98,10 @@ export function getCredentials(options: DataSourceSettings<any, any>): AzureCred
         clientId: credentials.clientId,
         clientSecret: getSecret(options),
       };
+    case 'anonymous':
+      return {
+        authType: 'anonymous',
+      };
   }
 }
 
@@ -215,6 +219,17 @@ export function updateCredentials(
           ...options.secureJsonFields,
           azureClientSecret: credentials.clientSecret === concealed,
           clientSecret: credentials.clientSecret === concealedLegacy,
+        },
+      };
+      break;
+    case 'anonymous':
+      options = {
+        ...options,
+        jsonData: {
+          ...options.jsonData,
+          azureCredentials: {
+            authType: 'anonymous',
+          },
         },
       };
       break;

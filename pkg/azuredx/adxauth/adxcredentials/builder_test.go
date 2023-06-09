@@ -185,6 +185,21 @@ func TestFromDatasourceData(t *testing.T) {
 		_, err := FromDatasourceData(data, secureData)
 		assert.Error(t, err)
 	})
+
+	t.Run("should return anonymous credentials when anonymous auth configured", func(t *testing.T) {
+		var data = map[string]interface{}{
+			"azureCredentials": map[string]interface{}{
+				"authType": "anonymous",
+			},
+		}
+		var secureData = map[string]string{}
+
+		result, err := FromDatasourceData(data, secureData)
+		require.NoError(t, err)
+
+		require.NotNil(t, result)
+		assert.IsType(t, &AzureAnonymousCredentials{}, result)
+	})
 }
 
 func TestNormalizeAzureCloud(t *testing.T) {
