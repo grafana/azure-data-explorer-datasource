@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.5.0]
+
+Add OpenAI integration which allows users to generate KQL queries via natural language.
+
 ## [4.4.1]
 
 Build with latest Go version 1.20.4
