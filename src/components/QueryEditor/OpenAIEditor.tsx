@@ -34,7 +34,7 @@ interface Worker {
 }
 
 export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
-  const { schema, datasource } = props;
+  const { schema, datasource, onRunQuery } = props;
   const [worker, setWorker] = useState<Worker>();
   const [prompt, setPrompt] = useState('');
   const [isWaiting, setWaiting] = useState(false);
@@ -122,10 +122,16 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
         />
       )}
       <div className={styles.outerMargin}>
-        <HorizontalGroup justify="space-between">
+        <HorizontalGroup justify="flex-start" align="flex-start">
           <h5>Ask OpenAI to generate a KQL query</h5>
-          <Button onClick={generateQuery} variant={'secondary'} size={'sm'}>
-            {isWaiting && <Spinner inline={true} />} Generate query
+          <Button
+            className={styles.buttonLeftMargin}
+            onClick={generateQuery}
+            icon="message"
+            variant="primary"
+            size="sm"
+          >
+            {isWaiting && <Spinner className={styles.spinnerSpace} inline={true} />} Generate query
           </Button>
         </HorizontalGroup>
         <TextArea
@@ -135,9 +141,21 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
           className={styles.innerMargin}
         ></TextArea>
       </div>
-      <div className={styles.innerMargin}>
-        <h5>Generated query</h5>
-        <div data-testid={selectors.components.queryEditor.codeEditor.container}>
+      <div className={styles.dividerSpace}>
+        <HorizontalGroup justify="flex-start" align="flex-start">
+          <h5>Generated query</h5>
+          <Button
+            className={styles.buttonLeftMargin}
+            variant="primary"
+            icon="play"
+            size="sm"
+            onClick={onRunQuery}
+            data-testid={selectors.components.queryEditor.runQuery.button}
+          >
+            Run query
+          </Button>
+        </HorizontalGroup>
+        <div className={styles.editorSpace} data-testid={selectors.components.queryEditor.codeEditor.container}>
           <CodeEditor
             language="kusto"
             value={generatedQuery}
@@ -160,6 +178,18 @@ const getStyles = (theme: GrafanaTheme2) => {
     }),
     innerMargin: css({
       marginTop: theme.spacing(2),
+    }),
+    editorSpace: css({
+      paddingTop: theme.spacing(1),
+    }),
+    spinnerSpace: css({
+      paddingRight: theme.spacing(1),
+    }),
+    buttonLeftMargin: css({
+      marginLeft: theme.spacing(1),
+    }),
+    dividerSpace: css({
+      marginTop: theme.spacing(4),
     }),
   };
 };

@@ -135,15 +135,18 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         }}
       />
       <FlexItem grow={1} />
-      <Button
-        variant="primary"
-        icon="play"
-        size="sm"
-        onClick={onRunQuery}
-        data-testid={selectors.components.queryEditor.runQuery.button}
-      >
-        Run query
-      </Button>
+      {!query.OpenAI && (
+        <Button
+          variant="primary"
+          icon="play"
+          size="sm"
+          onClick={onRunQuery}
+          data-testid={selectors.components.queryEditor.runQuery.button}
+        >
+          Run query
+        </Button>
+      )}
+
       <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
     </EditorHeader>
   );
