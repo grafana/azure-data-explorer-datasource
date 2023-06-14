@@ -96,6 +96,7 @@ const TableSection: React.FC<TableSectionProps> = ({
         </EditorField>
         <EditorField
           label="Columns"
+          tooltipInteractive={true}
           tooltip={
             <>
               Select a subset of columns for faster results. Time series requires both time and number values, other
