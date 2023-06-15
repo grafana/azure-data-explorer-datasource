@@ -76,6 +76,14 @@ func TestResponseToFrames(t *testing.T) {
 					"dynamic", "guid", "int", "long", "real", "timespan", "decimal"}}},
 			),
 		},
+		{
+			name:     "number should be converted to bool",
+			testFile: "convert_number_to_bool.json",
+			errorIs:  assert.NoError,
+			frame: data.NewFrame("", data.NewField("XBool", nil, []*bool{pointer.Bool(true), pointer.Bool(false)})).SetMeta(
+				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool"}}},
+			),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
