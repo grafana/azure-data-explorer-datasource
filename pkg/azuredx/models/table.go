@@ -222,7 +222,7 @@ var boolConverter = data.FieldConverter{
 			b = i != "0"
 			return &b, nil
 		}
-                return nil, fmt.Errorf("unexpected type, expected bool or json.Number but got type %T with a value of %v", v, v)
+		return nil, fmt.Errorf("unexpected type, expected bool or json.Number but got type %T with a value of %v", v, v)
 	},
 }
 
@@ -307,7 +307,13 @@ var tagsConverter = data.FieldConverter{
 			return nil, nil
 		}
 
-		m := v.(map[string]any)
+		m, ok := v.(map[string]any)
+		if !ok {
+			err := json.Unmarshal([]byte(v.(string)), &m)
+			if err != nil {
+				return nil, fmt.Errorf("failed to unmarshal trace tags: %s", err)
+			}
+		}
 
 		parsedTags := make([]*KeyValue, 0, len(m)-1)
 		for k, v := range m {
