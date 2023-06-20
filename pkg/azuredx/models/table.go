@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"sort"
 	"strconv"
 	"time"
 
@@ -45,7 +46,7 @@ func (ar *TableResponse) getTableByName(name string) (Table, error) {
 	return Table{}, fmt.Errorf("no data as %v table is missing from the the response", name)
 }
 
-func (tr *TableResponse) ToDataFrames(executedQueryString string) (data.Frames, error) {
+func (tr *TableResponse) ToDataFrames(executedQueryString string, format string) (data.Frames, error) {
 	table, err := tr.getTableByName("Table_0")
 	if err != nil {
 		return nil, err
@@ -53,7 +54,7 @@ func (tr *TableResponse) ToDataFrames(executedQueryString string) (data.Frames, 
 	if len(table.Rows) == 0 {
 		return data.Frames{}, nil
 	}
-	converterFrame, err := converterFrameForTable(table, executedQueryString)
+	converterFrame, err := converterFrameForTable(table, executedQueryString, format)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +73,7 @@ func (tr *TableResponse) ToDataFrames(executedQueryString string) (data.Frames, 
 	return data.Frames{converterFrame.Frame}, nil
 }
 
-func converterFrameForTable(t Table, executedQueryString string) (*data.FrameInputConverter, error) {
+func converterFrameForTable(t Table, executedQueryString string, format string) (*data.FrameInputConverter, error) {
 	converters := []data.FieldConverter{}
 	colNames := make([]string, len(t.Columns))
 	colTypes := make([]string, len(t.Columns))
@@ -81,6 +82,9 @@ func converterFrameForTable(t Table, executedQueryString string) (*data.FrameInp
 		colNames[i] = col.ColumnName
 		colTypes[i] = col.ColumnType
 		converter, ok := converterMap[col.ColumnType]
+		if format == "trace" && (col.ColumnName == "serviceTags" || col.ColumnName == "tags") {
+			converter = tagsConverter
+		}
 		if !ok {
 			return nil, fmt.Errorf("unsupported analytics column type %v", col.ColumnType)
 		}
@@ -284,6 +288,54 @@ var decimalConverter = data.FieldConverter{
 			return nil, err
 		}
 		return &out, nil
+	},
+}
+
+type KeyValue struct {
+	Value interface{} `json:"value"`
+	Key   string      `json:"key"`
+}
+
+var tagsConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableJSON,
+	Converter: func(v interface{}) (interface{}, error) {
+		if v == nil {
+			return nil, nil
+		}
+
+		m := v.(map[string]any)
+
+		parsedTags := make([]*KeyValue, 0, len(m)-1)
+		for k, v := range m {
+			if v == nil {
+				continue
+			}
+
+			switch v.(type) {
+			case float64:
+				if v == 0 {
+					continue
+				}
+			case string:
+				if v == "" {
+					continue
+				}
+			}
+
+			parsedTags = append(parsedTags, &KeyValue{Key: k, Value: v})
+		}
+		sort.Slice(parsedTags, func(i, j int) bool {
+			return parsedTags[i].Key < parsedTags[j].Key
+		})
+
+		marshalledTags, err := json.Marshal(parsedTags)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal parsed trace tags: %s", err)
+		}
+
+		jsonTags := json.RawMessage(marshalledTags)
+
+		return &jsonTags, nil
 	},
 }
 
