@@ -106,6 +106,10 @@ func converterFrameForTable(t Table, executedQueryString string, format string) 
 		Custom:              AzureFrameMD{ColumnTypes: colTypes},
 	}
 
+	if format == "trace" {
+		fic.Frame.Meta.PreferredVisualization = "trace"
+	}
+
 	return fic, nil
 }
 
