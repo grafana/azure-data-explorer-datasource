@@ -34,9 +34,11 @@ interface Worker {
 }
 
 export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
+  const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
   const { schema, datasource, onRunQuery } = props;
   const [worker, setWorker] = useState<Worker>();
   const [prompt, setPrompt] = useState('');
+  const [errorMessage, setErrorMessage] = useState(TOKEN_NOT_FOUND);
   const [isWaiting, setWaiting] = useState(false);
   const [hasError, setError] = useState(false);
   const [generatedQuery, setGeneratedQuery] = useState('//OpenAI generated query');
@@ -64,6 +66,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
   const generateQuery = () => {
     setWaiting(true);
     setError(false);
+    setErrorMessage(TOKEN_NOT_FOUND);
     reportInteraction('grafana_ds_adx_openai_query_generated');
     datasource
       .generateQueryForOpenAI(`${baselinePrompt}${prompt}"""`)
@@ -74,6 +77,9 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
       })
       .catch((e) => {
         setWaiting(false);
+        if (e.data?.Message) {
+          setErrorMessage(e.data?.Message);
+        }
         setError(true);
       });
   };
@@ -116,9 +122,12 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
     <div>
       {hasError && (
         <Alert
-          onRemove={() => setError(false)}
+          onRemove={() => {
+            setError(false);
+            setErrorMessage(TOKEN_NOT_FOUND);
+          }}
           severity="error"
-          title="An error occurred generating your query, tweak your prompt and try again."
+          title={errorMessage}
         />
       )}
       <div className={styles.outerMargin}>
