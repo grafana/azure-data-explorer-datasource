@@ -48,6 +48,10 @@ func (adx *AzureDataExplorer) generateQuery(rw http.ResponseWriter, req *http.Re
 		respondWithError(rw, http.StatusMethodNotAllowed, "Invalid HTTP method", nil)
 		return
 	}
+	if adx.settings.OpenAIAPIKey == "" {
+		respondWithError(rw, http.StatusInternalServerError, "OpenAI API token not found, please add a valid token to the datasource configuration", nil)
+		return
+	}
 
 	body, _ := io.ReadAll(req.Body)
 
