@@ -92,7 +92,7 @@ func TestResponseToFrames(t *testing.T) {
 				t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
 			}
 
-			frames, err := respTable.ToDataFrames("")
+			frames, err := respTable.ToDataFrames("", "")
 			tt.errorIs(t, err)
 			if err != nil {
 				return
@@ -112,7 +112,7 @@ func TestResponseToFrames(t *testing.T) {
 	t.Run("query with no rows", func(t *testing.T) {
 		respTable, err := tableFromJSONFile("no_rows.json")
 		assert.NoError(t, err)
-		frames, err := respTable.ToDataFrames("")
+		frames, err := respTable.ToDataFrames("", "")
 		assert.NoError(t, err)
 		assert.Empty(t, frames)
 	})
@@ -160,7 +160,7 @@ func TestTableResponse_ToADXTimeSeries(t *testing.T) {
 				}
 			}
 
-			initialFrames, err := respTable.ToDataFrames("T | select NotActualQuery")
+			initialFrames, err := respTable.ToDataFrames("T | select NotActualQuery", "")
 			require.NoError(t, err)
 
 			require.Equal(t, 1, len(initialFrames))
