@@ -34,7 +34,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
       });
       onRunQuery();
     }
-  }, [datasource, onChange, query, onRunQuery]);
+  }, [datasource, onChange, onRunQuery, query]);
 
   return (
     <>
