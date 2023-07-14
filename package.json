@@ -96,6 +96,6 @@
     "uuid": "^9.0.0"
   },
   "resolutions": {
-    "**/@testing-library/dom": "7.31.2"
+    "**/@testing-library/dom": "8.0.0"
   }
 }
