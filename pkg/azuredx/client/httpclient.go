@@ -14,15 +14,33 @@ import (
 )
 
 func newHttpClient(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
+	// Extract cloud from credentials
+	azureCloud, err := azcredentials.GetAzureCloud(azureSettings, credentials)
+	if err != nil {
+		return nil, err
+	}
+
 	authOpts := azhttpclient.NewAuthOptions(azureSettings)
 
-        // Enables support for the experimental user-based authentication feature if the user_identity_enabled flag is set to true in the Grafana configuration
+	// Enables support for the experimental user-based authentication feature if the user_identity_enabled flag is set to true in the Grafana configuration
 	authOpts.AllowUserIdentity()
 
 	// TODO: #555 configure on-behalf-of authentication if enabled in AzureSettings
 	authOpts.AddTokenProvider(azcredentials.AzureAuthClientSecretObo, adxauth.NewOnBehalfOfAccessTokenProvider)
 
-	scopes, err := getAdxScopes(azureSettings, credentials, dsSettings.ClusterURL)
+	// Enforce only known Azure Data Explorer endpoints if enabled
+	if dsSettings.EnforceTrustedEndpoints {
+		endpoints, err := getAdxEndpoints(azureCloud)
+		if err != nil {
+			return nil, err
+		}
+		err = authOpts.AllowedEndpoints(endpoints)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL)
 	if err != nil {
 		return nil, err
 	}

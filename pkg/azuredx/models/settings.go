@@ -3,6 +3,8 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -29,6 +31,8 @@ type DatasourceSettings struct {
 	// which is used as a connection property option.
 	ServerTimeoutValue string `json:"-"`
 	OpenAIAPIKey       string
+
+	EnforceTrustedEndpoints bool `json:"-"`
 }
 
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's
@@ -55,6 +59,11 @@ func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) err
 		return err
 	}
 
+	d.EnforceTrustedEndpoints, err = envBoolOrDefault("GF_PLUGIN_ADX_ENFORCE_TRUSTED_ENDPOINTS", false)
+	if err != nil {
+		return fmt.Errorf("invalid datasource endpoint configuration: %w", err)
+	}
+
 	return nil
 }
 
@@ -76,4 +85,14 @@ func formatTimeout(d time.Duration) (string, error) {
 
 	tSeconds := d - tMinutes
 	return fmt.Sprintf("00:%02.0f:%02.0f)", tMinutes.Minutes(), tSeconds.Seconds()), nil
+}
+
+func envBoolOrDefault(key string, defaultValue bool) (bool, error) {
+	if strValue := os.Getenv(key); strValue == "" {
+		return defaultValue, nil
+	} else if value, err := strconv.ParseBool(strValue); err != nil {
+		return false, fmt.Errorf("environment variable '%s' is invalid bool value '%s'", key, strValue)
+	} else {
+		return value, nil
+	}
 }
