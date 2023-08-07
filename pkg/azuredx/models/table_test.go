@@ -107,7 +107,7 @@ func TestResponseToFrames(t *testing.T) {
 				data.NewField("duration", nil, []*float64{pointer.Float64(26.7374)}),
 				data.NewField("traceID", nil, []*string{pointer.String("fc5b1c02-57fa-8611c2df33e2")}),
 				data.NewField("spanID", nil, []*string{pointer.String("92930421e2a400394")}),
-				data.NewField("parentSpanID", nil, []*string{pointer.String("fc5b1casf1we31e8823bc657fa8611c2df33e2")}),
+				data.NewField("parentSpanID", nil, []*string{pointer.String("test-id")}),
 				data.NewField("operationName", nil, []*string{pointer.String("service")}),
 				data.NewField("serviceTags", nil, []*json.RawMessage{&serviceTags}),
 				data.NewField("tags", nil, []*json.RawMessage{&tags}),

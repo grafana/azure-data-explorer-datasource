@@ -381,18 +381,18 @@ var logsConverter = data.FieldConverter{
 
 		parsedLogs := make([]TraceLog, 0, len(m)-1)
 		for i := range m {
-			curr, ok := m[i].(map[string]any)
+			current, ok := m[i].(map[string]any)
 			if !ok {
 				err := json.Unmarshal([]byte(v.(string)), &m)
 				if err != nil {
 					return nil, fmt.Errorf("failed to unmarshal trace log: %s", err)
 				}
 			}
-			timestamp, err := curr["timestamp"].(json.Number).Int64()
+			timestamp, err := current["timestamp"].(json.Number).Int64()
 			if err != nil {
 				return nil, fmt.Errorf("failed to unmarshal trace log: %s", err)
 			}
-			fields, ok := curr["fields"].(map[string]any)
+			fields, ok := current["fields"].(map[string]any)
 			if !ok {
 				return nil, fmt.Errorf("failed to unmarshal trace log: %s", err)
 			}

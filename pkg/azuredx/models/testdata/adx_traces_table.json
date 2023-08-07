@@ -72,7 +72,7 @@
           26.7374,
           "fc5b1c02-57fa-8611c2df33e2",
           "92930421e2a400394",
-          "fc5b1casf1we31e8823bc657fa8611c2df33e2",
+          "test-id",
           "service",
           {
             "cloud_RoleInstance": "test-cloud-id",
