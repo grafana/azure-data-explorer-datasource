@@ -82,8 +82,12 @@ func converterFrameForTable(t Table, executedQueryString string, format string) 
 		colNames[i] = col.ColumnName
 		colTypes[i] = col.ColumnType
 		converter, ok := converterMap[col.ColumnType]
-		if format == "trace" && (col.ColumnName == "serviceTags" || col.ColumnName == "tags") {
-			converter = tagsConverter
+		if format == "trace" {
+			if col.ColumnName == "serviceTags" || col.ColumnName == "tags" {
+				converter = tagsConverter
+			} else if col.ColumnName == "logs" {
+				converter = logsConverter
+			}
 		}
 		if !ok {
 			return nil, fmt.Errorf("unsupported analytics column type %v", col.ColumnType)
@@ -300,6 +304,33 @@ type KeyValue struct {
 	Key   string      `json:"key"`
 }
 
+func parseKeyValue(m map[string]any) []KeyValue {
+	parsedTags := make([]KeyValue, 0, len(m)-1)
+	for k, v := range m {
+		if v == nil {
+			continue
+		}
+
+		switch v.(type) {
+		case float64:
+			if v == 0 {
+				continue
+			}
+		case string:
+			if v == "" {
+				continue
+			}
+		}
+
+		parsedTags = append(parsedTags, KeyValue{Key: k, Value: v})
+	}
+	sort.Slice(parsedTags, func(i, j int) bool {
+		return parsedTags[i].Key < parsedTags[j].Key
+	})
+
+	return parsedTags
+}
+
 var tagsConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableJSON,
 	Converter: func(v interface{}) (interface{}, error) {
@@ -315,28 +346,7 @@ var tagsConverter = data.FieldConverter{
 			}
 		}
 
-		parsedTags := make([]*KeyValue, 0, len(m)-1)
-		for k, v := range m {
-			if v == nil {
-				continue
-			}
-
-			switch v.(type) {
-			case float64:
-				if v == 0 {
-					continue
-				}
-			case string:
-				if v == "" {
-					continue
-				}
-			}
-
-			parsedTags = append(parsedTags, &KeyValue{Key: k, Value: v})
-		}
-		sort.Slice(parsedTags, func(i, j int) bool {
-			return parsedTags[i].Key < parsedTags[j].Key
-		})
+		parsedTags := parseKeyValue(m)
 
 		marshalledTags, err := json.Marshal(parsedTags)
 		if err != nil {
@@ -344,6 +354,62 @@ var tagsConverter = data.FieldConverter{
 		}
 
 		jsonTags := json.RawMessage(marshalledTags)
+
+		return &jsonTags, nil
+	},
+}
+
+type TraceLog struct {
+	Timestamp int64      `json:"timestamp"`
+	Fields    []KeyValue `json:"fields"`
+}
+
+var logsConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableJSON,
+	Converter: func(v interface{}) (interface{}, error) {
+		if v == nil {
+			return nil, nil
+		}
+
+		m, ok := v.([]any)
+		if !ok {
+			err := json.Unmarshal([]byte(v.(string)), &m)
+			if err != nil {
+				return nil, fmt.Errorf("failed to unmarshal trace logs: %s", err)
+			}
+		}
+
+		parsedLogs := make([]TraceLog, 0, len(m)-1)
+		for i := range m {
+			curr, ok := m[i].(map[string]any)
+			if !ok {
+				err := json.Unmarshal([]byte(v.(string)), &m)
+				if err != nil {
+					return nil, fmt.Errorf("failed to unmarshal trace log: %s", err)
+				}
+			}
+			timestamp, err := curr["timestamp"].(json.Number).Int64()
+			if err != nil {
+				return nil, fmt.Errorf("failed to unmarshal trace log: %s", err)
+			}
+			fields, ok := curr["fields"].(map[string]any)
+			if !ok {
+				return nil, fmt.Errorf("failed to unmarshal trace log: %s", err)
+			}
+			traceLog := TraceLog{
+				Timestamp: timestamp,
+				Fields:    parseKeyValue(fields),
+			}
+
+			parsedLogs = append(parsedLogs, traceLog)
+		}
+
+		marshalledLogs, err := json.Marshal(parsedLogs)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal parsed trace logs: %s", err)
+		}
+
+		jsonTags := json.RawMessage(marshalledLogs)
 
 		return &jsonTags, nil
 	},
