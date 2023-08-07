@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"os"
 	"path"
 	"testing"
@@ -23,11 +24,18 @@ func tableFromJSONFile(name string) (tr *TableResponse, err error) {
 }
 
 func TestResponseToFrames(t *testing.T) {
+	var serviceTags json.RawMessage
+	var tags json.RawMessage
+	var logs json.RawMessage
+	_ = serviceTags.UnmarshalJSON([]byte("[{\"key\": \"cloud_RoleInstance\", \"value\": \"test-cloud-id\"},{\"key\": \"cloud_RoleName\", \"value\": \"test-app\"}]"))
+	_ = tags.UnmarshalJSON([]byte("[{\"key\":\"appId\",\"value\":\"test-app\"}]"))
+	_ = logs.UnmarshalJSON([]byte("[{\"timestamp\": 1687260450000,\"fields\": [{\"key\":\"key\", \"value\": \"test\"},{\"key\":\"value\", \"value\": \"value\"}]}]"))
 	tests := []struct {
 		name     string
 		testFile string
 		errorIs  assert.ErrorAssertionFunc
 		frame    *data.Frame
+		format   string
 	}{
 		{
 			name:     "single bool should have extracted value",
@@ -36,6 +44,7 @@ func TestResponseToFrames(t *testing.T) {
 			frame: data.NewFrame("", data.NewField("print_0", nil, []*bool{pointer.Bool(true)})).SetMeta(
 				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool"}}},
 			),
+			format: "table",
 		},
 		{
 			name:     "supported types should load with values",
@@ -56,6 +65,7 @@ func TestResponseToFrames(t *testing.T) {
 				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool", "string", "datetime",
 					"dynamic", "guid", "int", "long", "real", "timespan", "decimal"}}},
 			),
+			format: "table",
 		},
 		{
 			name:     "supported types should load with null values",
@@ -75,6 +85,7 @@ func TestResponseToFrames(t *testing.T) {
 				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool", "datetime",
 					"dynamic", "guid", "int", "long", "real", "timespan", "decimal"}}},
 			),
+			format: "table",
 		},
 		{
 			name:     "number should be converted to bool",
@@ -83,6 +94,28 @@ func TestResponseToFrames(t *testing.T) {
 			frame: data.NewFrame("", data.NewField("XBool", nil, []*bool{pointer.Bool(true), pointer.Bool(false)})).SetMeta(
 				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"bool"}}},
 			),
+			format: "table",
+		},
+		{
+			name:     "traces should be converted to dataframe appropriately",
+			testFile: "adx_traces_table.json",
+			errorIs:  assert.NoError,
+			frame: data.NewFrame("",
+				data.NewField("startTime", nil, []*float64{pointer.Float64(1687260000000)}),
+				data.NewField("itemType", nil, []*string{pointer.String("request")}),
+				data.NewField("serviceName", nil, []*string{pointer.String("test-app")}),
+				data.NewField("duration", nil, []*float64{pointer.Float64(26.7374)}),
+				data.NewField("traceID", nil, []*string{pointer.String("fc5b1c02-57fa-8611c2df33e2")}),
+				data.NewField("spanID", nil, []*string{pointer.String("92930421e2a400394")}),
+				data.NewField("parentSpanID", nil, []*string{pointer.String("fc5b1casf1we31e8823bc657fa8611c2df33e2")}),
+				data.NewField("operationName", nil, []*string{pointer.String("service")}),
+				data.NewField("serviceTags", nil, []*json.RawMessage{&serviceTags}),
+				data.NewField("tags", nil, []*json.RawMessage{&tags}),
+				data.NewField("itemId", nil, []*string{pointer.String("11ee-a66c-0022481b10a7")}),
+				data.NewField("logs", nil, []*json.RawMessage{&logs})).SetMeta(
+				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"real", "string", "string", "real", "guid", "string", "string", "string", "dynamic", "dynamic", "guid", "dynamic"}}, PreferredVisualization: "trace"},
+			),
+			format: "trace",
 		},
 	}
 	for _, tt := range tests {
@@ -92,7 +125,7 @@ func TestResponseToFrames(t *testing.T) {
 				t.Errorf("unable to run test '%v', could not load file '%v': %v", tt.name, tt.testFile, err)
 			}
 
-			frames, err := respTable.ToDataFrames("", "")
+			frames, err := respTable.ToDataFrames("", tt.format)
 			tt.errorIs(t, err)
 			if err != nil {
 				return
