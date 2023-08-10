@@ -221,9 +221,9 @@ T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timest
 The trace format option can be used to display appropriately formatted data using the built in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
 
 - `logs` - an array of JSON objects with a `timestamp` field that has a numeric value, and a `fields` field that is key-value object.
-- `serviceTags` and tags - a typical key-value JSON object without nested objects.
+- `serviceTags` and `tags` - a typical key-value JSON object without nested objects.
 
-The values for keys are expected to be primitive types rather than complex types.
+The values for keys are expected to be primitive types rather than complex types. The correct value to pass when empty is either `null`, an empty JSON object for `serviceTags` and `tags`, or an empty array for `logs`.
 
 ### Time Macros
 
