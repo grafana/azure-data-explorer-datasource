@@ -1,0 +1,85 @@
+{
+  "Tables": [
+    {
+      "TableName": "Table_0",
+      "Columns": [
+        {
+          "ColumnName": "startTime",
+          "DataType": "Double",
+          "ColumnType": "real"
+        },
+        {
+          "ColumnName": "itemType",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "serviceName",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "duration",
+          "DataType": "Double",
+          "ColumnType": "real"
+        },
+        {
+          "ColumnName": "traceID",
+          "DataType": "Guid",
+          "ColumnType": "guid"
+        },
+        {
+          "ColumnName": "spanID",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "parentSpanID",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "operationName",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "serviceTags",
+          "DataType": "Object",
+          "ColumnType": "dynamic"
+        },
+        {
+          "ColumnName": "tags",
+          "DataType": "Object",
+          "ColumnType": "dynamic"
+        },
+        {
+          "ColumnName": "itemId",
+          "DataType": "Guid",
+          "ColumnType": "guid"
+        },
+        {
+          "ColumnName": "logs",
+          "DataType": "Object",
+          "ColumnType": "dynamic"
+        }
+      ],
+      "Rows": [
+        [
+          1687260000000,
+          "request",
+          "test-app",
+          26.7374,
+          "fc5b1c02-57fa-8611c2df33e2",
+          "92930421e2a400394",
+          "test-id",
+          "service",
+          {},
+          {},
+          "11ee-a66c-0022481b10a7",
+          []
+        ]
+      ]
+    }
+  ]
+}

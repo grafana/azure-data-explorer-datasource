@@ -30,6 +30,8 @@ func TestResponseToFrames(t *testing.T) {
 	_ = serviceTags.UnmarshalJSON([]byte("[{\"key\": \"cloud_RoleInstance\", \"value\": \"test-cloud-id\"},{\"key\": \"cloud_RoleName\", \"value\": \"test-app\"}]"))
 	_ = tags.UnmarshalJSON([]byte("[{\"key\":\"appId\",\"value\":\"test-app\"}]"))
 	_ = logs.UnmarshalJSON([]byte("[{\"timestamp\": 1687260450000,\"fields\": [{\"key\":\"key\", \"value\": \"test\"},{\"key\":\"value\", \"value\": \"value\"}]}]"))
+	var emptyArray json.RawMessage
+	_ = emptyArray.UnmarshalJSON([]byte("[]"))
 	tests := []struct {
 		name     string
 		testFile string
@@ -113,6 +115,27 @@ func TestResponseToFrames(t *testing.T) {
 				data.NewField("tags", nil, []*json.RawMessage{&tags}),
 				data.NewField("itemId", nil, []*string{pointer.String("11ee-a66c-0022481b10a7")}),
 				data.NewField("logs", nil, []*json.RawMessage{&logs})).SetMeta(
+				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"real", "string", "string", "real", "guid", "string", "string", "string", "dynamic", "dynamic", "guid", "dynamic"}}, PreferredVisualization: "trace"},
+			),
+			format: "trace",
+		},
+		{
+			name:     "traces with empty dynamics should be converted to dataframe appropriately",
+			testFile: "adx_traces_table_empty_dynamics.json",
+			errorIs:  assert.NoError,
+			frame: data.NewFrame("",
+				data.NewField("startTime", nil, []*float64{pointer.Float64(1687260000000)}),
+				data.NewField("itemType", nil, []*string{pointer.String("request")}),
+				data.NewField("serviceName", nil, []*string{pointer.String("test-app")}),
+				data.NewField("duration", nil, []*float64{pointer.Float64(26.7374)}),
+				data.NewField("traceID", nil, []*string{pointer.String("fc5b1c02-57fa-8611c2df33e2")}),
+				data.NewField("spanID", nil, []*string{pointer.String("92930421e2a400394")}),
+				data.NewField("parentSpanID", nil, []*string{pointer.String("test-id")}),
+				data.NewField("operationName", nil, []*string{pointer.String("service")}),
+				data.NewField("serviceTags", nil, []*json.RawMessage{&emptyArray}),
+				data.NewField("tags", nil, []*json.RawMessage{&emptyArray}),
+				data.NewField("itemId", nil, []*string{pointer.String("11ee-a66c-0022481b10a7")}),
+				data.NewField("logs", nil, []*json.RawMessage{&emptyArray})).SetMeta(
 				&data.FrameMeta{Custom: AzureFrameMD{ColumnTypes: []string{"real", "string", "string", "real", "guid", "string", "string", "string", "dynamic", "dynamic", "guid", "dynamic"}}, PreferredVisualization: "trace"},
 			),
 			format: "trace",

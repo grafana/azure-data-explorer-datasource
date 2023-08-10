@@ -305,7 +305,7 @@ type KeyValue struct {
 }
 
 func parseKeyValue(m map[string]any) []KeyValue {
-	parsedTags := make([]KeyValue, 0, len(m)-1)
+	parsedTags := []KeyValue{}
 	for k, v := range m {
 		if v == nil {
 			continue
@@ -379,7 +379,7 @@ var logsConverter = data.FieldConverter{
 			}
 		}
 
-		parsedLogs := make([]TraceLog, 0, len(m)-1)
+		parsedLogs := []TraceLog{}
 		for i := range m {
 			current, ok := m[i].(map[string]any)
 			if !ok {
