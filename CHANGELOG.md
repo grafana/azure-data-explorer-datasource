@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.6.1]
+
+- Fix: Allow dynamic values to be empty for traces.
+
 ## [4.6.0]
 
 - New feature: Add support for trace data and the Trace visualization.
