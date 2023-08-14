@@ -28,7 +28,7 @@ func newHttpClient(instanceSettings *backend.DataSourceInstanceSettings, dsSetti
 	// TODO: #555 configure on-behalf-of authentication if enabled in AzureSettings
 	authOpts.AddTokenProvider(azcredentials.AzureAuthClientSecretObo, adxauth.NewOnBehalfOfAccessTokenProvider)
 
-	// Enforce only known Azure Data Explorer endpoints if enabled
+	// Enforce only trusted Azure Data Explorer endpoints if enabled
 	if dsSettings.EnforceTrustedEndpoints {
 		endpoints, err := getAdxEndpoints(azureCloud)
 		if err != nil {
