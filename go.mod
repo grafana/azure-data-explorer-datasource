@@ -3,20 +3,20 @@ module github.com/grafana/azure-data-explorer-datasource
 go 1.20
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.2.0
-	github.com/AzureAD/microsoft-authentication-library-for-go v0.7.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.1
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.0.0
 	github.com/google/go-cmp v0.5.9
-	github.com/grafana/grafana-azure-sdk-go v1.7.0
+	github.com/grafana/grafana-azure-sdk-go v1.8.0
 	github.com/grafana/grafana-plugin-sdk-go v0.147.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.1
 	github.com/xorcare/pointer v1.1.0
-	golang.org/x/net v0.7.0
+	golang.org/x/net v0.8.0
 )
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.0.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -31,7 +31,7 @@ require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/flatbuffers v2.0.0+incompatible // indirect
@@ -58,7 +58,7 @@ require (
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pierrec/lz4/v4 v4.1.8 // indirect
-	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
+	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
@@ -70,9 +70,9 @@ require (
 	github.com/unknwon/com v1.0.1 // indirect
 	github.com/unknwon/log v0.0.0-20150304194804-e617c87089d3 // indirect
 	github.com/urfave/cli v1.22.1 // indirect
-	golang.org/x/crypto v0.0.0-20220511200225-c6db032c6c88 // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
+	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
 	google.golang.org/grpc v1.53.0 // indirect
