@@ -1,9 +1,22 @@
 # CHANGELOG
 
+## [4.6.1]
+
+- Fix: Allow dynamic values to be empty for traces.
+
+## [4.6.0]
+
+- New feature: Add support for trace data and the Trace visualization.
+- Dependency updates.
+- Fix: Fixed a bug that prevented switching back to the ADX datasource.
+- Fix: When using the generate query feature the token is now validated before attempting to query.
+- Fix: Booleans can be represented as numbers or bool as ADX allows.
+
 ## [4.5.0]
 
 - Add OpenAI integration which allows users to generate KQL queries via natural language.
 - Experimental - Add support for [current user authorization](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md).
+  
 ## [4.4.1]
 
 Build with latest Go version 1.20.4
@@ -44,8 +57,8 @@ Apart from that, this release also includes:
 
 ## [4.1.10]
 
-- Fix: Invalid code editor loaded for Grafana versions that don't follow semantic versioning by @aangelisc in https://github.com/grafana/azure-data-explorer-datasource/pull/506
-- Fix error unmounting ADX query editor by @aangelisc in https://github.com/grafana/azure-data-explorer-datasource/pull/519
+- Fix: Invalid code editor loaded for Grafana versions that don't follow semantic versioning by @aangelisc in <https://github.com/grafana/azure-data-explorer-datasource/pull/506>
+- Fix error unmounting ADX query editor by @aangelisc in <https://github.com/grafana/azure-data-explorer-datasource/pull/519>
 - Security: Upgrade Go in build process to 1.19.3
 
 ## [4.1.9]

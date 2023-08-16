@@ -216,6 +216,15 @@ T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timest
   | extend series_decompose_forecast(AvgHatInventory, 30) | project-away *residual, *baseline, *seasonal
 ```
 
+### Trace Visualization Support
+
+The trace format option can be used to display appropriately formatted data using the built in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
+
+- `logs` - an array of JSON objects with a `timestamp` field that has a numeric value, and a `fields` field that is key-value object.
+- `serviceTags` and `tags` - a typical key-value JSON object without nested objects.
+
+The values for keys are expected to be primitive types rather than complex types. The correct value to pass when empty is either `null`, an empty JSON object for `serviceTags` and `tags`, or an empty array for `logs`.
+
 ### Time Macros
 
 To make writing queries easier there are some Grafana macros that can be used in the where clause of a query:
@@ -295,11 +304,9 @@ MyLogs
 
 ## Query Builder - Data Types
 
-<!-- TODO: Update the paragraph below once #353 is fixed -->
+The query builder provides an easy to use interface to query Azure Data Explorer. As of v4.1.0, columns of type `dynamic` are also appropriately supported within the query builder. Dynamically typed columns can now be queried using the `Where`, `Aggregate`, and `Group By` operations. When choosing one of these operations, the options will be populated based on the values within the dynamic column. This encompasses arrays, JSON objects, and nested objects within arrays. A limitation is only the first 50,000 rows are queried for data, so only properties contained within the first 50,000 rows will be listed as options in the builder selectors. Also, due to the fact that these queries make use of `mv-expand`, they may become resource intensive.
 
-The query builder provides an easy to use interface to query Azure Data Explorer. However, there are limitations on the supported data types that a column can possess. Currently, if a column is typed as `dynamic` it is fully not included as an option for the following operations: `Where`, `Aggregate`, `Group by`. The reason for this is that columns of type `dynamic` can potentially contain values that have any of the primitive data types, but also arrays (where the array can then have values of any type) and JSON objects. The query builder does not currently support querying values that are either arrays or JSON objects.
-
-Note that only the 50.000 first rows of a table are evaluated in order to obtain possible values to show as options in the query builder. Additional values can be manually written in the different selectors if they don't appear by default.
+Note that only the 50,000 first rows of a table are evaluated in order to obtain possible values to show as options in the query builder. Additional values can be manually written in the different selectors if they don't appear by default.
 
 See the below documentation for further details on how to handle dynamic columns appropriately via the KQL editor.
 

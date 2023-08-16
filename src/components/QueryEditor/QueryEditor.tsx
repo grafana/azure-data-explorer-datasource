@@ -2,8 +2,8 @@ import { QueryEditorProps } from '@grafana/data';
 import { Alert } from '@grafana/ui';
 import { get } from 'lodash';
 import { migrateQuery, needsToBeMigrated } from 'migrations/query';
-import React, { useMemo, useState } from 'react';
-import { useAsync, useEffectOnce } from 'react-use';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useAsync } from 'react-use';
 import { AdxDataSourceOptions, EditorMode, KustoQuery } from 'types';
 
 import { AdxDataSource } from '../../datasource';
@@ -20,7 +20,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
   const templateVariables = useTemplateVariables(datasource);
   const [dirty, setDirty] = useState(false);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     let processedQuery = query;
     if (needsToBeMigrated(query)) {
       processedQuery = migrateQuery(query);
@@ -34,7 +34,8 @@ export const QueryEditor: React.FC<Props> = (props) => {
       });
       onRunQuery();
     }
-  });
+  }, [datasource, onChange, onRunQuery, query]);
+
   return (
     <>
       {schema.error && <Alert title="Could not load datasource schema">{parseSchemaError(schema.error)}</Alert>}
@@ -67,7 +68,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
           setDirty={() => !dirty && setDirty(true)}
         />
       ) : null}
-      {!query.rawMode && !query.OpenAI ? (
+      {!query.rawMode && !query.OpenAI && query.expression ? (
         <VisualQueryEditor
           {...props}
           schema={schema.value}

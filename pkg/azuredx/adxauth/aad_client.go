@@ -16,7 +16,7 @@ import (
 
 // Abstraction over confidential.Client from MSAL for Go
 type aadClient interface {
-	AcquireTokenOnBehalfOf(ctx context.Context, userAssertion string, scopes []string) (confidential.AuthResult, error)
+	AcquireTokenOnBehalfOf(ctx context.Context, userAssertion string, scopes []string, options ...confidential.AcquireOnBehalfOfOption) (confidential.AuthResult, error)
 }
 
 func newAADClient(credentials *azcredentials.AzureClientSecretCredentials, httpClient *http.Client) (aadClient, error) {
@@ -29,15 +29,15 @@ func newAADClient(credentials *azcredentials.AzureClientSecretCredentials, httpC
 		return nil, errors.New("invalid tenantId")
 	}
 
+	authority := runtime.JoinPaths(authorityHost, credentials.TenantId)
+
 	clientCredential, err := confidential.NewCredFromSecret(credentials.ClientSecret)
 	if err != nil {
 		return nil, err
 	}
 
-	authorityOpts := confidential.WithAuthority(runtime.JoinPaths(authorityHost, credentials.TenantId))
 	httpClientOpts := confidential.WithHTTPClient(httpClient)
-
-	client, err := confidential.New(credentials.ClientId, clientCredential, authorityOpts, httpClientOpts)
+	client, err := confidential.New(authority, credentials.ClientId, clientCredential, httpClientOpts)
 	if err != nil {
 		return nil, err
 	}

@@ -159,13 +159,19 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	var resp backend.DataResponse
 	switch q.Format {
 	case "table":
-		resp.Frames, err = tableRes.ToDataFrames(q.Query)
+		resp.Frames, err = tableRes.ToDataFrames(q.Query, q.Format)
+		if err != nil {
+			backend.Logger.Debug("error converting response to data frames", "error", err.Error())
+			return resp, fmt.Errorf("error converting response to data frames: %w", err)
+		}
+	case "trace":
+		resp.Frames, err = tableRes.ToDataFrames(q.Query, q.Format)
 		if err != nil {
 			backend.Logger.Debug("error converting response to data frames", "error", err.Error())
 			return resp, fmt.Errorf("error converting response to data frames: %w", err)
 		}
 	case "time_series":
-		frames, err := tableRes.ToDataFrames(q.Query)
+		frames, err := tableRes.ToDataFrames(q.Query, q.Format)
 		if err != nil {
 			return resp, err
 		}
@@ -195,7 +201,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 			}
 		}
 	case "time_series_adx_series":
-		originalDFs, err := tableRes.ToDataFrames(q.Query)
+		originalDFs, err := tableRes.ToDataFrames(q.Query, q.Format)
 		if err != nil {
 			return resp, fmt.Errorf("error converting response to data frames: %w", err)
 		}
