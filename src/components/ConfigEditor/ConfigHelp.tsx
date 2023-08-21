@@ -1,10 +1,11 @@
+import { ConfigSection } from '@grafana/experimental';
 import React from 'react';
 
 interface ConfigHelpProps {}
 
 const ConfigHelp: React.FC<ConfigHelpProps> = () => {
   return (
-    <div className="gf-form-group">
+    <ConfigSection title="Configuration Help" isCollapsible isInitiallyOpen={false}>
       <div className="grafana-info-box">
         <h5>Configuring Azure and your Azure Data Explorer Database</h5>
         <h5>1. Create an AAD application</h5>
@@ -47,7 +48,7 @@ const ConfigHelp: React.FC<ConfigHelpProps> = () => {
           </a>
         </p>
       </div>
-    </div>
+    </ConfigSection>
   );
 };
 

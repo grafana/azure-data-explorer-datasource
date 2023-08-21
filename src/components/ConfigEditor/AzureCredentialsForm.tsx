@@ -1,10 +1,11 @@
 import React, { ChangeEvent, FunctionComponent, useMemo } from 'react';
 
 import { SelectableValue } from '@grafana/data';
-import { Alert, Button, Select, Input, InlineField } from '@grafana/ui';
+import { Alert, Button, Select, Input, Field } from '@grafana/ui';
 
 import { AzureAuthType, AzureCredentials } from './AzureCredentials';
 import { selectors } from 'test/selectors';
+import { ConfigSection } from '@grafana/experimental';
 
 export interface Props {
   userIdentityEnabled: boolean;
@@ -126,12 +127,11 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
   };
 
   return (
-    <div className="gf-form-group">
+    <ConfigSection title="Authentication">
       {authTypeOptions.length > 1 && (
-        <InlineField
-          label="Authentication"
-          labelWidth={18}
-          tooltip="Choose the type of authentication to Azure services"
+        <Field
+          label="Authentication Method"
+          description="Choose the type of authentication to Azure services"
           htmlFor="azure-auth-type"
         >
           <Select
@@ -141,7 +141,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
             options={authTypeOptions}
             onChange={onAuthTypeChange}
           />
-        </InlineField>
+        </Field>
       )}
       {credentials.authType === 'currentuser' && (
         <>
@@ -177,10 +177,8 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
       {(credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo') && (
         <>
           {azureCloudOptions && (
-            <InlineField
+            <Field
               label="Azure Cloud"
-              labelWidth={18}
-              tooltip="Choose an Azure Cloud"
               htmlFor="azure-cloud-type"
               data-testid={selectors.components.configEditor.azureCloud.input}
             >
@@ -192,37 +190,45 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
                 options={azureCloudOptions}
                 onChange={onAzureCloudChange}
               />
-            </InlineField>
+            </Field>
           )}
-          <InlineField label="Directory (tenant) ID" labelWidth={18} htmlFor="aad-tenant-id">
-            <div className="width-15">
-              <Input
-                id="aad-tenant-id"
-                className="width-30"
-                aria-label="Tenant ID"
-                placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-                value={credentials.tenantId || ''}
-                onChange={onTenantIdChange}
-                data-testid={selectors.components.configEditor.tenantID.input}
-              />
-            </div>
-          </InlineField>
-          <InlineField label="Application (client) ID" labelWidth={18} htmlFor="aad-client-id">
-            <div className="width-15">
-              <Input
-                id="aad-client-id"
-                className="width-30"
-                aria-label="Client ID"
-                placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-                value={credentials.clientId || ''}
-                onChange={onClientIdChange}
-                data-testid={selectors.components.configEditor.clientID.input}
-              />
-            </div>
-          </InlineField>
+          <Field
+            label="Directory (tenant) ID"
+            htmlFor="aad-tenant-id"
+            required
+            invalid={!credentials.tenantId}
+            error={'Tenant ID is required'}
+          >
+            <Input
+              id="aad-tenant-id"
+              className="width-30"
+              aria-label="Tenant ID"
+              placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+              value={credentials.tenantId || ''}
+              onChange={onTenantIdChange}
+              data-testid={selectors.components.configEditor.tenantID.input}
+            />
+          </Field>
+          <Field
+            label="Application (client) ID"
+            htmlFor="aad-client-id"
+            required
+            invalid={!credentials.clientId}
+            error={'Client ID is required'}
+          >
+            <Input
+              id="aad-client-id"
+              className="width-30"
+              aria-label="Client ID"
+              placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+              value={credentials.clientId || ''}
+              onChange={onClientIdChange}
+              data-testid={selectors.components.configEditor.clientID.input}
+            />
+          </Field>
 
           {typeof credentials.clientSecret === 'symbol' ? (
-            <InlineField label="Client Secret" labelWidth={18} htmlFor="aad-client-secret-configured">
+            <Field label="Client Secret" htmlFor="aad-client-secret-configured" required>
               <div className="width-30" style={{ display: 'flex', gap: '4px' }}>
                 <Input
                   id="aad-client-secret-configured"
@@ -234,9 +240,15 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
                   Reset
                 </Button>
               </div>
-            </InlineField>
+            </Field>
           ) : (
-            <InlineField label="Client Secret" labelWidth={18} htmlFor="aad-client-secret">
+            <Field
+              label="Client Secret"
+              htmlFor="aad-client-secret"
+              required
+              invalid={!credentials.clientSecret}
+              error={'Client secret is required'}
+            >
               <Input
                 id="aad-client-secret"
                 className="width-30"
@@ -246,11 +258,11 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
                 onChange={onClientSecretChange}
                 data-testid={selectors.components.configEditor.clientSecret.input}
               />
-            </InlineField>
+            </Field>
           )}
         </>
       )}
-    </div>
+    </ConfigSection>
   );
 };
 

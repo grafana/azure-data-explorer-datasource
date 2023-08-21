@@ -1,7 +1,8 @@
 import React, { ChangeEvent } from 'react';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { Button, FieldSet, Input, InlineField, InlineFieldRow } from '@grafana/ui';
+import { Button, Input, Field, InlineFieldRow } from '@grafana/ui';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import { ConfigSubSection } from '@grafana/experimental';
 
 interface Props extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
   updateJsonData: <T extends keyof AdxDataSourceOptions>(fieldName: T, value: AdxDataSourceOptions[T]) => void;
@@ -35,25 +36,29 @@ export function OpenAIConfig(props: Props) {
   };
 
   return (
-    <FieldSet label="OpenAI API Key" className="gf-form-group">
+    <ConfigSubSection title="OpenAI Configuration" isCollapsible>
       <InlineFieldRow>
-        <InlineField label="OpenAI API Key" labelWidth={18} htmlFor="openai-api-key">
-          <Input
-            id="openai-api-key"
-            aria-label="OpenAI API Key"
-            placeholder={secureJsonFields?.OpenAIAPIKey ? 'configured' : ''}
-            value={secureJsonData?.OpenAIAPIKey ?? ''}
-            onChange={onAPIKeyChange}
-            data-testid={'openai-api-key'}
-          />
-        </InlineField>
-        <InlineField>
-          <Button variant="secondary" type="button" onClick={onResetAPIKey}>
-            Reset
-          </Button>
-        </InlineField>
+        <Field
+          label="OpenAI API Key"
+          htmlFor="openai-api-key"
+          description="Supplying an OpenAI API key will allow users to make use of the generate queries feature."
+        >
+          <div className="width-30" style={{ display: 'flex', gap: '4px' }}>
+            <Input
+              id="openai-api-key"
+              aria-label="OpenAI API Key"
+              placeholder={secureJsonFields?.OpenAIAPIKey ? 'configured' : ''}
+              value={secureJsonData?.OpenAIAPIKey ?? ''}
+              onChange={onAPIKeyChange}
+              data-testid={'openai-api-key'}
+            />
+            <Button variant="secondary" type="button" onClick={onResetAPIKey}>
+              Reset
+            </Button>
+          </div>
+        </Field>
       </InlineFieldRow>
-    </FieldSet>
+    </ConfigSubSection>
   );
 }
 
