@@ -36,7 +36,7 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
     <ConfigSubSection
       title="Query Optimizations"
       isCollapsible
-      description="Various settings for controlling query behaviour."
+      description="Various settings for controlling query behavior."
     >
       <Field label="Query timeout" description="This value controls the client query timeout.">
         <Input
