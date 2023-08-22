@@ -1,4 +1,4 @@
-import { SelectableValue } from '@grafana/data';
+import { KeyValue, SelectableValue } from '@grafana/data';
 
 export enum AzureCloud {
   Public = 'AzureCloud',
@@ -50,13 +50,18 @@ export type AzureCredentials =
   | AzureClientSecretCredentials
   | AzureClientSecretOboCredentials;
 
-export function isCredentialsComplete(credentials: AzureCredentials): boolean {
+export function isCredentialsComplete(credentials: AzureCredentials, secureFields: KeyValue<boolean>): boolean {
   switch (credentials.authType) {
     case 'currentuser':
     case 'msi':
       return true;
     case 'clientsecret':
     case 'clientsecret-obo':
-      return !!(credentials.azureCloud && credentials.tenantId && credentials.clientId && credentials.clientSecret);
+      return !!(
+        credentials.azureCloud &&
+        credentials.tenantId &&
+        credentials.clientId &&
+        (secureFields['clientSecret'] || secureFields['azureClientSecret'])
+      );
   }
 }

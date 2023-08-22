@@ -1,11 +1,24 @@
+import { DataSourceSettings } from '@grafana/data';
 import { ConfigSection } from '@grafana/experimental';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import { isCredentialsComplete } from './AzureCredentials';
 
-interface ConfigHelpProps {}
+interface ConfigHelpProps {
+  options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>;
+}
 
-const ConfigHelp: React.FC<ConfigHelpProps> = () => {
+const ConfigHelp: React.FC<ConfigHelpProps> = ({ options }) => {
+  const isHelpOpen = useMemo(
+    () =>
+      options.jsonData.azureCredentials
+        ? !isCredentialsComplete(options.jsonData.azureCredentials, options.secureJsonFields)
+        : true,
+    [options]
+  );
+
   return (
-    <ConfigSection title="Configuration Help" isCollapsible isInitiallyOpen={false}>
+    <ConfigSection title="Configuration Help" isCollapsible isInitiallyOpen={isHelpOpen}>
       <div className="grafana-info-box">
         <h5>Configuring Azure and your Azure Data Explorer Database</h5>
         <h5>1. Create an AAD application</h5>
