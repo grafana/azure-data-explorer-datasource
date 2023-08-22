@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.6.2]
+
+- Fix: Infinite re-render in QueryEditor component.
+  
 ## [4.6.1]
 
 - Fix: Allow dynamic values to be empty for traces.
