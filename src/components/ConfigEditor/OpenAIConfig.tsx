@@ -26,7 +26,7 @@ export function OpenAIConfig(props: Props) {
       ...options,
       secureJsonFields: {
         ...options.secureJsonFields,
-        apiKey: false,
+        OpenAIAPIKey: false,
       },
       secureJsonData: {
         ...options.secureJsonData,
