@@ -37,7 +37,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         options.jsonData.cacheMaxAge ||
         options.jsonData.useSchemaMapping ||
         options.jsonData.enableUserTracking ||
-        options.secureJsonFields['apiKey']
+        options.secureJsonFields['OpenAIAPIKey']
       ),
     [options]
   );
