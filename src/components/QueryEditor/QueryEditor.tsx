@@ -2,8 +2,8 @@ import { QueryEditorProps } from '@grafana/data';
 import { Alert } from '@grafana/ui';
 import { get } from 'lodash';
 import { migrateQuery, needsToBeMigrated } from 'migrations/query';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useAsync } from 'react-use';
+import React, { useMemo, useState } from 'react';
+import { useAsync, useEffectOnce } from 'react-use';
 import { AdxDataSourceOptions, EditorMode, KustoQuery } from 'types';
 
 import { AdxDataSource } from '../../datasource';
@@ -20,21 +20,20 @@ export const QueryEditor: React.FC<Props> = (props) => {
   const templateVariables = useTemplateVariables(datasource);
   const [dirty, setDirty] = useState(false);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     let processedQuery = query;
     if (needsToBeMigrated(query)) {
       processedQuery = migrateQuery(query);
       onChange(processedQuery);
       onRunQuery();
-    }
-    if (processedQuery.rawMode === undefined) {
+    } else if (processedQuery.rawMode === undefined) {
       onChange({
         ...processedQuery,
         rawMode: datasource.getDefaultEditorMode() === EditorMode.Raw,
       });
       onRunQuery();
     }
-  }, [datasource, onChange, onRunQuery, query]);
+  });
 
   return (
     <>
