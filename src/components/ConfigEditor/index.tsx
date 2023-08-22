@@ -80,7 +80,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         docsLink="https://grafana.com/grafana/plugins/grafana-azure-data-explorer-datasource/"
         hasRequiredFields
       />
-      <ConfigHelp />
+      {/* TODO add dividers */
+      /* <Divider/>*/}
+      <ConfigHelp options={options} />
       {/* TODO add dividers */
       /* <Divider/>*/}
 
