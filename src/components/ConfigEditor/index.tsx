@@ -19,6 +19,7 @@ import {
 } from './AzureCredentialsConfig';
 import AzureCredentialsForm from './AzureCredentialsForm';
 import { DataSourceDescription, ConfigSection } from '@grafana/experimental';
+import { Divider } from '@grafana/ui';
 
 export interface ConfigEditorProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {}
@@ -80,16 +81,11 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         docsLink="https://grafana.com/grafana/plugins/grafana-azure-data-explorer-datasource/"
         hasRequiredFields
       />
-      {/* TODO add dividers */
-      /* <Divider/>*/}
+      <Divider />
       <ConfigHelp options={options} />
-      {/* TODO add dividers */
-      /* <Divider/>*/}
-
+      <Divider />
       <ConnectionConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
-
-      {/* TODO add dividers */
-      /* <Divider/>*/}
+      <Divider />
       <AzureCredentialsForm
         userIdentityEnabled={getUserIdentityEnabled()}
         managedIdentityEnabled={config.azure.managedIdentityEnabled}
@@ -98,9 +94,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         azureCloudOptions={KnownAzureClouds}
         onCredentialsChange={onCredentialsChange}
       />
-      {/* TODO add dividers */
-      /* <Divider/>*/}
-
+      <Divider />
       <ConfigSection
         title="Additional settings"
         description="Additional settings are optional settings that can be configured for more control over your data source. This includes query optimizations, schema settings, tracking configuration, and OpenAI configuration."
@@ -108,11 +102,8 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         isInitiallyOpen={hasAdditionalSettings}
       >
         <QueryConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
-
         <DatabaseConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
-
         <TrackingConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
-
         <OpenAIConfig options={options} updateJsonData={updateJsonData} onOptionsChange={onOptionsChange} />
       </ConfigSection>
     </>
