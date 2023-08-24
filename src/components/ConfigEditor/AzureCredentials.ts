@@ -1,4 +1,6 @@
-import { KeyValue, SelectableValue } from '@grafana/data';
+import { DataSourceSettings, SelectableValue } from '@grafana/data';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import { getCredentials } from './AzureCredentialsConfig';
 
 export enum AzureCloud {
   Public = 'AzureCloud',
@@ -50,18 +52,16 @@ export type AzureCredentials =
   | AzureClientSecretCredentials
   | AzureClientSecretOboCredentials;
 
-export function isCredentialsComplete(credentials: AzureCredentials, secureFields: KeyValue<boolean>): boolean {
+export function isCredentialsComplete(
+  options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>
+): boolean {
+  const credentials = options.jsonData.azureCredentials ? options.jsonData.azureCredentials : getCredentials(options);
   switch (credentials.authType) {
     case 'currentuser':
     case 'msi':
       return true;
     case 'clientsecret':
     case 'clientsecret-obo':
-      return !!(
-        credentials.azureCloud &&
-        credentials.tenantId &&
-        credentials.clientId &&
-        (secureFields['clientSecret'] || secureFields['azureClientSecret'])
-      );
+      return !!(credentials.azureCloud && credentials.tenantId && credentials.clientId && credentials.clientSecret);
   }
 }

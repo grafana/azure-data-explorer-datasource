@@ -9,13 +9,7 @@ interface ConfigHelpProps {
 }
 
 const ConfigHelp: React.FC<ConfigHelpProps> = ({ options }) => {
-  const isHelpOpen = useMemo(
-    () =>
-      options.jsonData.azureCredentials
-        ? !isCredentialsComplete(options.jsonData.azureCredentials, options.secureJsonFields)
-        : true,
-    [options]
-  );
+  const isHelpOpen = useMemo(() => !isCredentialsComplete(options), [options]);
 
   return (
     <ConfigSection title="Configuration Help" isCollapsible isInitiallyOpen={isHelpOpen}>
