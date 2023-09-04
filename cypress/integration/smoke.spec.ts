@@ -179,13 +179,14 @@ e2e.scenario({
       database: '$database',
       table: '$table',
     });
+    e2e.pages.Dashboard.Settings.Actions.close().click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('database').click();
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest').click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('table').click();
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest').click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('column').click();
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('_val1_').click();
-    e2e.pages.Dashboard.Settings.Actions.close().click();
+
     e2e.flows.addPanel({
       matchScreenshot: false,
       visitDashboardAtStart: false,
