@@ -67,7 +67,8 @@ e2e.scenario({
         e2e.flows.addDataSource({
           type: 'Azure Data Explorer Datasource',
           form: () => {
-            e2eSelectors.configEditor.authType.input().click().find('input').type('App Registration{enter}');
+            // This line is needed if feature flags for additional auth are enabled
+            // e2eSelectors.configEditor.authType.input().click().find('input').type('App Registration{enter}');
             e2eSelectors.configEditor.azureCloud.input().find('input').type('Azure');
             e2eSelectors.configEditor.clusterURL.input().click({ force: true }).type(datasource.jsonData.clusterUrl);
             e2eSelectors.configEditor.tenantID.input().type(datasource.jsonData.tenantId);
