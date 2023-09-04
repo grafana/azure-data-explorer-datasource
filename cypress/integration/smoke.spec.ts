@@ -34,9 +34,9 @@ const addAdxVariable = (
   isFirst: boolean,
   options?: { database?: string; table?: string }
 ) => {
-  e2e.components.PageToolbar.item('Dashboard settings').click();
-  e2e.components.Tab.title('Variables').click();
   if (isFirst) {
+    e2e.components.PageToolbar.item('Dashboard settings').click();
+    e2e.components.Tab.title('Variables').click();
     e2e.pages.Dashboard.Settings.Variables.List.addVariableCTAV2().click();
   } else {
     e2e.pages.Dashboard.Settings.Variables.List.newButton().click();
@@ -53,7 +53,7 @@ const addAdxVariable = (
       e2eSelectors.variableEditor.tables.input().find('input').type(`${options?.table}{enter}`);
       break;
   }
-  e2e.pages.Dashboard.Settings.Variables.Edit.General.submitButton().click();
+  e2e.pages.Dashboard.Settings.Variables.Edit.General.applyButton().click();
 };
 
 e2e.scenario({
@@ -184,7 +184,7 @@ e2e.scenario({
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest').click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('column').click();
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('_val1_').click();
-
+    e2e.pages.Dashboard.Settings.Actions.close().click();
     e2e.flows.addPanel({
       matchScreenshot: false,
       visitDashboardAtStart: false,
