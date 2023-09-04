@@ -133,6 +133,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
           label="Authentication Method"
           description="Choose the type of authentication to Azure services"
           htmlFor="azure-auth-type"
+          data-testid={selectors.components.configEditor.authType.input}
         >
           <Select
             inputId="azure-auth-type"

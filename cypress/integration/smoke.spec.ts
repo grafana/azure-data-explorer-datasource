@@ -54,7 +54,6 @@ const addAdxVariable = (
       break;
   }
   e2e.pages.Dashboard.Settings.Variables.Edit.General.submitButton().click();
-  e2e.components.PageToolbar.item('Go Back').click();
 };
 
 e2e.scenario({
@@ -68,6 +67,7 @@ e2e.scenario({
         e2e.flows.addDataSource({
           type: 'Azure Data Explorer Datasource',
           form: () => {
+            e2eSelectors.configEditor.authType.input().click().find('input').type('App Registration{enter}');
             e2eSelectors.configEditor.azureCloud.input().find('input').type('Azure');
             e2eSelectors.configEditor.clusterURL.input().click({ force: true }).type(datasource.jsonData.clusterUrl);
             e2eSelectors.configEditor.tenantID.input().type(datasource.jsonData.tenantId);
@@ -105,7 +105,7 @@ e2e.scenario({
       visitDashboardAtStart: false,
       dataSourceName: '', // avoid issue selecting the data source before the editor is fully loaded
       queriesForm: () => {
-        e2e.components.DataSourcePicker.inputV2().click().type(`${dataSourceName}{enter}`).wait(6000);
+        e2e.components.DataSourcePicker.input().click().type(`${dataSourceName}{enter}`).wait(6000);
         e2eSelectors.queryEditor.database.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
         cy.contains('KQL').click({ force: true }).wait(6000);
@@ -113,14 +113,14 @@ e2e.scenario({
           .container()
           .click({ force: true })
           .type('{selectall}{del}')
-          .type('PerfTest | where ');
+          .type('PerfTest | where $__');
         // It should trigger auto-completion suggestions
         cy.contains('$__timeFilter');
         // complete the query
         e2eSelectors.queryEditor.codeEditor
           .container()
           .click({ force: true })
-          .type('$__timeFilter(_Timestamp_) | order by _Timestamp_ asc');
+          .type('timeFilter(_Timestamp_) | order by _Timestamp_ asc');
         e2eSelectors.queryEditor.runQuery.button().click({ force: true }).wait(6000);
         cy.contains('_val1_');
       },
