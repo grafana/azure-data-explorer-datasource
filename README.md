@@ -69,7 +69,7 @@ If the server where Grafana is installed has no access to the Grafana.com server
 
 ### Enforcing trusted Azure Data Explorer endpoints
 
-For additional security it's possible to enforce a list of allowed trusted ADX endpoints to prevent possibility of redirecting request to a third-party endpoint.
+For additional security, it's possible to enforce a list of trusted ADX endpoints that the cluster URL will be verified against. This prevents a request from being redirected to a third-party endpoint.
 
 It can be done by setting environment variable:
 ```
