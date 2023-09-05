@@ -59,7 +59,7 @@ func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) err
 		return err
 	}
 
-	d.EnforceTrustedEndpoints, err = envBoolOrDefault("GF_PLUGIN_ADX_ENFORCE_TRUSTED_ENDPOINTS", false)
+	d.EnforceTrustedEndpoints, err = envBoolOrDefault("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", false)
 	if err != nil {
 		return fmt.Errorf("invalid datasource endpoint configuration: %w", err)
 	}

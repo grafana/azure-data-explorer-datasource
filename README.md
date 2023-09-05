@@ -71,9 +71,11 @@ If the server where Grafana is installed has no access to the Grafana.com server
 
 For additional security, it's possible to enforce a list of trusted ADX endpoints that the cluster URL will be verified against. This prevents a request from being redirected to a third-party endpoint.
 
-It can be done by setting environment variable:
-```
-GF_PLUGIN_ADX_ENFORCE_TRUSTED_ENDPOINTS=true
+This can be enabled by setting `enforce_trusted_endpoints` in your Grafana configuration under the `[plugin.grafana-azure-data-explorer-datasource]` section:
+
+```ini
+[plugin.grafana-azure-data-explorer-datasource]
+enforce_trusted_endpoints = true
 ```
 
 ## Configuring the datasource in Grafana
