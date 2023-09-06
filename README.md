@@ -6,8 +6,12 @@
 
 ## Installation
 
-This plugin requires Grafana 10.1.0 or newer as of version 4.6.2, Grafana 8.0.0 or newer as of version 4.0.0, or Grafana 7.1.0 or newer as of version 3.0.0.
-Plugin versions prior to 3.0.0 require Grafana 6.3.6.
+This plugin has the following minimum requirements:
+
+- v4.6.3+: Grafana 9.5.0
+- v4.0.0+: Grafana 8.0.0
+- v3.0.0+: Grafana 7.1.0
+- < v3.0.0 require Grafana 6.3.6.
 
 ## Grafana Cloud
 

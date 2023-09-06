@@ -19,7 +19,7 @@ import {
 } from './AzureCredentialsConfig';
 import AzureCredentialsForm from './AzureCredentialsForm';
 import { DataSourceDescription, ConfigSection } from '@grafana/experimental';
-import { Divider } from '@grafana/ui';
+import { Divider } from './Divider';
 
 export interface ConfigEditorProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {}
