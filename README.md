@@ -13,7 +13,7 @@ This plugin has the following minimum requirements:
 - v3.0.0+: Grafana 7.1.0
 - < v3.0.0 require Grafana 6.3.6.
 
-## Grafana Cloud
+### Grafana Cloud
 
 If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can sign up for one [here](https://grafana.com/cloud/grafana).
 
@@ -70,6 +70,17 @@ If the server where Grafana is installed has no access to the Grafana.com server
 3. Extract the zip file into the data/plugins subdirectory for Grafana.
 4. Restart the Grafana server
 5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
+
+### Enforcing trusted Azure Data Explorer endpoints
+
+For additional security, it's possible to enforce a list of trusted ADX endpoints that the cluster URL will be verified against. This prevents a request from being redirected to a third-party endpoint.
+
+This can be enabled by setting `enforce_trusted_endpoints` in your Grafana configuration under the `[plugin.grafana-azure-data-explorer-datasource]` section:
+
+```ini
+[plugin.grafana-azure-data-explorer-datasource]
+enforce_trusted_endpoints = true
+```
 
 ## Configuring the datasource in Grafana
 

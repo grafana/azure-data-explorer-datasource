@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 )
 
@@ -16,12 +15,7 @@ var (
 	}
 )
 
-func getAdxScopes(settings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials, clusterUrl string) ([]string, error) {
-	// Extract cloud from credentials
-	azureCloud, err := azcredentials.GetAzureCloud(settings, credentials)
-	if err != nil {
-		return nil, err
-	}
+func getAdxScopes(azureCloud string, clusterUrl string) ([]string, error) {
 	// Get scopes for the given cloud
 	if scopeTmpl, ok := azureDataExplorerScopes[azureCloud]; !ok {
 		err := fmt.Errorf("the Azure cloud '%s' not supported by Azure Data Explorer datasource", azureCloud)
