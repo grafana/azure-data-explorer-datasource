@@ -8,7 +8,6 @@
 
 This plugin has the following minimum requirements:
 
-- v4.6.3+: Grafana 9.5.0
 - v4.0.0+: Grafana 8.0.0
 - v3.0.0+: Grafana 7.1.0
 - < v3.0.0 require Grafana 6.3.6.
