@@ -1,11 +1,4 @@
-import {
-  DataFrame,
-  DataQueryRequest,
-  DataSourceInstanceSettings,
-  ScopedVar,
-  ScopedVars,
-  TimeRange,
-} from '@grafana/data';
+import { DataFrame, DataQueryRequest, DataSourceInstanceSettings, ScopedVars, TimeRange } from '@grafana/data';
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { QueryEditorPropertyType } from './schema/types';
 import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
@@ -88,7 +81,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return true;
   }
 
-  applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVar): Record<string, any> {
+  applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVars): Record<string, any> {
     const query = interpolateKustoQuery(
       target.query,
       (val: string) => this.templateSrv.replace(val, scopedVars, this.interpolateVariable),
