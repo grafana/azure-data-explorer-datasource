@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.6.3]
+
+- New feature: Add support for enforcing only known Azure Data Explorer endpoints in cluster URL.
+  
 ## [4.6.2]
 
 - Fix: Infinite re-render in QueryEditor component.
