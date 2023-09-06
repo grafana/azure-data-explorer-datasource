@@ -56,7 +56,7 @@ set up the Jest DOM for the testing library and to apply some polyfills. ([link 
 
 #### ESM errors with Jest
 
-A common issue found with the current jest config involves importing an npm package which only offers an ESM build. These packages cause jest to error with `SyntaxError: Cannot use import statement outside a module`. To work around this we provide a list of known packages to pass to the `[transformIgnorePatterns](https://jestjs.io/docs/configuration#transformignorepatterns-arraystring)` jest configuration property. If need be this can be extended in the following way:
+A common issue with the current jest config involves importing an npm package that only offers an ESM build. These packages cause jest to error with `SyntaxError: Cannot use import statement outside a module`. To work around this, we provide a list of known packages to pass to the `[transformIgnorePatterns](https://jestjs.io/docs/configuration#transformignorepatterns-arraystring)` jest configuration property. If need be, this can be extended in the following way:
 
 ```javascript
 process.env.TZ = 'UTC';
