@@ -41,7 +41,7 @@ export function OpenAIConfig(props: Props) {
         <Field
           label="OpenAI API Key"
           htmlFor="openai-api-key"
-          description="Supplying an OpenAI API key will allow users to make use of the generate queries feature."
+          description={'Supplying an OpenAI API key will allow users to make use of the "Generate queries" feature.'}
         >
           <div className="width-30" style={{ display: 'flex', gap: '4px' }}>
             <Input
@@ -50,7 +50,7 @@ export function OpenAIConfig(props: Props) {
               placeholder={secureJsonFields?.OpenAIAPIKey ? 'configured' : ''}
               value={secureJsonData?.OpenAIAPIKey ?? ''}
               onChange={onAPIKeyChange}
-              data-testid={'openai-api-key'}
+              data-testid="openai-api-key"
             />
             <Button variant="secondary" type="button" onClick={onResetAPIKey}>
               Reset
