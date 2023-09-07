@@ -9,7 +9,7 @@ import { AdxDataSourceOptions, KustoQuery } from 'types';
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = (props) => {
-  // Using any here as the adxLegacyEditor property doesn't exist as a feature toogle anymore. This code will be removed.
+  // Using any here as the adxLegacyEditor property doesn't exist as a feature toggle anymore. This code will be removed.
   if ((config.featureToggles as any).adxLegacyEditor) {
     return <LegacyQueryEditor {...props} />;
   }
