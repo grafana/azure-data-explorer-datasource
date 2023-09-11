@@ -2,6 +2,7 @@
   "type": "datasource",
   "name": "Azure Data Explorer Datasource",
   "id": "grafana-azure-data-explorer-datasource",
+  "category": "logging",
   "info": {
     "description": "Grafana data source for Azure Data Explorer",
     "author": {
