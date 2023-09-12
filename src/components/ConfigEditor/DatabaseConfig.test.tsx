@@ -32,7 +32,7 @@ describe('DatabaseConfig', () => {
 
   it('should disable the refresh schema button if there is some missing info', async () => {
     render(<DatabaseConfig {...defaultProps} />);
-    await waitFor(() => expect(screen.getByRole('button')).toBeDisabled());
+    await waitFor(() => expect(screen.getByRole('button', { name: /reload schema/i })).toBeDisabled());
   });
 
   it('should save the data source and refresh the schema', async () => {
@@ -53,7 +53,7 @@ describe('DatabaseConfig', () => {
       },
     };
     render(<DatabaseConfig {...props} />);
-    const refreshButton = await waitFor(() => screen.getByRole('button'));
+    const refreshButton = await waitFor(() => screen.getByRole('button', { name: /reload schema/i }));
     expect(refreshButton).toBeEnabled();
     refreshButton.click();
     expect(jestPut).toHaveBeenCalled();

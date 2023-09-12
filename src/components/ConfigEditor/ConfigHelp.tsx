@@ -1,10 +1,18 @@
-import React from 'react';
+import { DataSourceSettings } from '@grafana/data';
+import { ConfigSection } from '@grafana/experimental';
+import React, { useMemo } from 'react';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import { isCredentialsComplete } from './AzureCredentials';
 
-interface ConfigHelpProps {}
+interface ConfigHelpProps {
+  options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>;
+}
 
-const ConfigHelp: React.FC<ConfigHelpProps> = () => {
+const ConfigHelp: React.FC<ConfigHelpProps> = ({ options }) => {
+  const isHelpOpen = useMemo(() => !isCredentialsComplete(options), [options]);
+
   return (
-    <div className="gf-form-group">
+    <ConfigSection title="Configuration Help" isCollapsible isInitiallyOpen={isHelpOpen}>
       <div className="grafana-info-box">
         <h5>Configuring Azure and your Azure Data Explorer Database</h5>
         <h5>1. Create an AAD application</h5>
@@ -47,7 +55,7 @@ const ConfigHelp: React.FC<ConfigHelpProps> = () => {
           </a>
         </p>
       </div>
-    </div>
+    </ConfigSection>
   );
 };
 
