@@ -16,6 +16,7 @@
     "test:ci": "jest --passWithNoTests --maxWorkers 4",
     "test:coverage": "jest --coverage",
     "test:coverage:changes": "jest --coverage --changedSince=origin/main",
+    "test:e2e": "k6 run ./e2e/e2e.test.js",
     "typecheck": "tsc --noEmit",
     "generate-release-notes": "PREV_TAG=$(git tag | tail -n 1) && gh api --method POST /repos/grafana/azure-data-explorer-datasource/releases/generate-notes -f tag_name=v${npm_package_version} -f target_commitish=main -f previous_tag_name=${PREV_TAG} | jq -r .body",
     "spellcheck": "cspell -c cspell.config.json \"**/*.{ts,tsx,js,go,md,mdx,yml,yaml,json,scss,css}\""
