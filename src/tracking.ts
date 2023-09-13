@@ -58,6 +58,7 @@ export interface ADXDashboardLoadedProps extends ADXCounters {
   grafana_version?: string;
   dashboard_id: string;
   org_id?: number;
+  [key: string]: any;
 }
 
 export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceSrv): ADXCounters => {

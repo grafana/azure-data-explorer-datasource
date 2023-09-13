@@ -34,9 +34,9 @@ const addAdxVariable = (
   isFirst: boolean,
   options?: { database?: string; table?: string }
 ) => {
-  e2e.components.PageToolbar.item('Dashboard settings').click();
-  e2e.components.Tab.title('Variables').click();
   if (isFirst) {
+    e2e.components.PageToolbar.item('Dashboard settings').click();
+    e2e.components.Tab.title('Variables').click();
     e2e.pages.Dashboard.Settings.Variables.List.addVariableCTAV2().click();
   } else {
     e2e.pages.Dashboard.Settings.Variables.List.newButton().click();
@@ -53,8 +53,7 @@ const addAdxVariable = (
       e2eSelectors.variableEditor.tables.input().find('input').type(`${options?.table}{enter}`);
       break;
   }
-  e2e.pages.Dashboard.Settings.Variables.Edit.General.submitButton().click();
-  e2e.components.PageToolbar.item('Go Back').click();
+  e2e.pages.Dashboard.Settings.Variables.Edit.General.applyButton().click();
 };
 
 e2e.scenario({
@@ -68,6 +67,8 @@ e2e.scenario({
         e2e.flows.addDataSource({
           type: 'Azure Data Explorer Datasource',
           form: () => {
+            // This line is needed if feature flags for additional auth are enabled
+            // e2eSelectors.configEditor.authType.input().click().find('input').type('App Registration{enter}');
             e2eSelectors.configEditor.azureCloud.input().find('input').type('Azure');
             e2eSelectors.configEditor.clusterURL.input().click({ force: true }).type(datasource.jsonData.clusterUrl);
             e2eSelectors.configEditor.tenantID.input().type(datasource.jsonData.tenantId);
@@ -105,7 +106,7 @@ e2e.scenario({
       visitDashboardAtStart: false,
       dataSourceName: '', // avoid issue selecting the data source before the editor is fully loaded
       queriesForm: () => {
-        e2e.components.DataSourcePicker.inputV2().click().type(`${dataSourceName}{enter}`).wait(6000);
+        e2e.components.DataSourcePicker.input().click().type(`${dataSourceName}{enter}`).wait(6000);
         e2eSelectors.queryEditor.database.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
         cy.contains('KQL').click({ force: true }).wait(6000);
@@ -113,14 +114,14 @@ e2e.scenario({
           .container()
           .click({ force: true })
           .type('{selectall}{del}')
-          .type('PerfTest | where ');
+          .type('PerfTest | where $__');
         // It should trigger auto-completion suggestions
         cy.contains('$__timeFilter');
         // complete the query
         e2eSelectors.queryEditor.codeEditor
           .container()
           .click({ force: true })
-          .type('$__timeFilter(_Timestamp_) | order by _Timestamp_ asc');
+          .type('timeFilter(_Timestamp_) | order by _Timestamp_ asc');
         e2eSelectors.queryEditor.runQuery.button().click({ force: true }).wait(6000);
         cy.contains('_val1_');
       },
@@ -178,6 +179,7 @@ e2e.scenario({
       database: '$database',
       table: '$table',
     });
+    e2e.pages.Dashboard.Settings.Actions.close().click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('database').click();
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest').click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('table').click();

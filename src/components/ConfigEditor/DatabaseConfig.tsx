@@ -3,15 +3,14 @@ import { FetchError, FetchResponse, getBackendSrv, getDataSourceSrv } from '@gra
 import {
   Alert,
   Button,
-  FieldSet,
   HorizontalGroup,
   Icon,
-  InlineField,
+  Field,
   InlineLabel,
-  InlineSwitch,
   Input,
   Select,
   VerticalGroup,
+  Switch,
 } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
@@ -19,6 +18,7 @@ import { useEffectOnce } from 'react-use';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
 import { hasCredentials } from './AzureCredentialsConfig';
 import { refreshSchema, Schema } from './refreshSchema';
+import { ConfigSubSection } from '@grafana/experimental';
 
 interface DatabaseConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
@@ -34,8 +34,6 @@ function formatMappingValue(mapping): string {
       return mapping.value;
   }
 }
-
-const LABEL_WIDTH = 19;
 
 function isFetchError(e: unknown): e is FetchError {
   return typeof e === 'object' && e !== null && 'status' in e && 'data' in e;
@@ -145,27 +143,38 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
   }, [schema?.databases, jsonData.defaultDatabase, updateJsonData]);
 
   return (
-    <FieldSet label="Database schema settings">
-      <InlineField label="Default database" labelWidth={LABEL_WIDTH}>
-        <Select
-          width={45}
-          options={schema.databases}
-          value={schema.databases.find((v) => v.value === jsonData.defaultDatabase)}
-          onChange={(change: SelectableValue<string>) => updateJsonData('defaultDatabase', change.value || '')}
-          aria-label="choose default database"
-        />
-      </InlineField>
+    <ConfigSubSection
+      title="Database schema settings"
+      isCollapsible
+      description="Configuration for the database schema including the default database."
+    >
+      <Field label="Default database">
+        <div className="width-30" style={{ display: 'flex', gap: '4px' }}>
+          <Select
+            options={schema.databases}
+            value={schema.databases.find((v) => v.value === jsonData.defaultDatabase)}
+            onChange={(change: SelectableValue<string>) => updateJsonData('defaultDatabase', change.value || '')}
+            aria-label="choose default database"
+          />
+          <Button variant="primary" onClick={saveAndUpdateSchema} disabled={!canGetSchema()} type="button" icon="sync">
+            Reload schema
+          </Button>
+        </div>
+      </Field>
 
-      <InlineField label="Use managed schema" labelWidth={LABEL_WIDTH}>
-        <InlineSwitch
+      <Field
+        label="Use managed schema"
+        description="If enabled, allows tables, functions, and materialized views to be mapped to user friendly names."
+      >
+        <Switch
           id="adx-use-schema-mapping"
           value={jsonData.useSchemaMapping}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('useSchemaMapping', ev.target.checked)}
         />
-      </InlineField>
+      </Field>
 
       {jsonData.useSchemaMapping && (
-        <InlineField label="Schema mappings" labelWidth={LABEL_WIDTH}>
+        <Field label="Schema mappings">
           <VerticalGroup spacing="xs">
             {mappings.map((mapping, index) => (
               <HorizontalGroup spacing="xs" key={index}>
@@ -202,21 +211,15 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
               Add mapping
             </Button>
           </VerticalGroup>
-        </InlineField>
+        </Field>
       )}
-
-      <br />
 
       {schemaError && (
         <Alert severity="error" title="Error updating Azure Data Explorer schema">
           {schemaError.message}
         </Alert>
       )}
-
-      <Button variant="primary" onClick={saveAndUpdateSchema} disabled={!canGetSchema()} type="button" icon="sync">
-        Reload schema
-      </Button>
-    </FieldSet>
+    </ConfigSubSection>
   );
 };
 

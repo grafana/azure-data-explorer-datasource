@@ -1,5 +1,6 @@
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
-import { FieldSet, InlineField, InlineSwitch, Input, Select } from '@grafana/ui';
+import { ConfigSubSection } from '@grafana/experimental';
+import { Field, Input, Select, Switch } from '@grafana/ui';
 import React, { useEffect } from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, EditorMode } from 'types';
 
@@ -18,8 +19,6 @@ const editorModeOptions: Array<{ value: EditorMode; label: string }> = [
   { value: EditorMode.Raw, label: 'Raw' },
 ];
 
-const LABEL_WIDTH = 21;
-
 const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) => {
   const { jsonData } = options;
 
@@ -34,12 +33,12 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
   }, [jsonData.dataConsistency, jsonData.defaultEditorMode, updateJsonData]);
 
   return (
-    <FieldSet label="Query Optimizations">
-      <InlineField
-        label="Query timeout"
-        labelWidth={LABEL_WIDTH}
-        tooltip="This value controls the client query timeout."
-      >
+    <ConfigSubSection
+      title="Query Optimizations"
+      isCollapsible
+      description="Various settings for controlling query behavior."
+    >
+      <Field label="Query timeout" description="This value controls the client query timeout.">
         <Input
           value={jsonData.queryTimeout}
           id="adx-query-timeout"
@@ -47,25 +46,23 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
           width={18}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('queryTimeout', ev.target.value)}
         />
-      </InlineField>
+      </Field>
 
-      <InlineField
+      <Field
         label="Use dynamic caching"
-        labelWidth={LABEL_WIDTH}
-        tooltip="By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored.<br /><br />For time series queries we will use the bin size to widen the time range but also as cache max age."
+        description="By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored. For time series queries we will use the bin size to widen the time range but also as cache max age."
       >
-        <InlineSwitch
+        <Switch
           value={jsonData.dynamicCaching}
           id="adx-caching"
           transparent={false}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('dynamicCaching', ev.target.checked)}
         />
-      </InlineField>
+      </Field>
 
-      <InlineField
+      <Field
         label="Cache max age"
-        labelWidth={LABEL_WIDTH}
-        tooltip="By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live."
+        description="By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live."
       >
         <Input
           value={jsonData.cacheMaxAge}
@@ -74,9 +71,24 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
           width={18}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('cacheMaxAge', ev.target.value)}
         />
-      </InlineField>
+      </Field>
 
-      <InlineField label="Data consistency" labelWidth={LABEL_WIDTH} tooltip="Defaults to Strong">
+      <Field
+        label="Data consistency"
+        description={
+          <span>
+            Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more
+            information see the{' '}
+            <a
+              href="https://learn.microsoft.com/en-us/azure/data-explorer/kusto/concepts/queryconsistency"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Azure Data Explorer documentation.
+            </a>
+          </span>
+        }
+      >
         <Select
           options={dataConsistencyOptions}
           value={dataConsistencyOptions.find((v) => v.value === jsonData.dataConsistency)}
@@ -86,9 +98,12 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
           isClearable={false}
           width={18}
         />
-      </InlineField>
+      </Field>
 
-      <InlineField label="Default editor mode" labelWidth={LABEL_WIDTH} tooltip="Defaults to Visual">
+      <Field
+        label="Default editor mode"
+        description="This setting dictates which mode the editor will open in. Defaults to Visual."
+      >
         <Select
           options={editorModeOptions}
           value={editorModeOptions.find((v) => v.value === jsonData.defaultEditorMode)}
@@ -97,8 +112,8 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
           }
           width={18}
         />
-      </InlineField>
-    </FieldSet>
+      </Field>
+    </ConfigSubSection>
   );
 };
 
