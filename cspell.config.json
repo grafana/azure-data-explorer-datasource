@@ -164,6 +164,7 @@
     "openai",
     "AIAPI",
     "AIURL",
+    "workloadidentity",
     ""
   ]
 }
