@@ -52,7 +52,7 @@
     "copy-webpack-plugin": "^11.0.0",
     "cspell": "6.13.3",
     "css-loader": "^6.7.3",
-    "cypress": "9.3.1",
+    "cypress": "13.3.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-jsdoc": "^39.3.24",
