@@ -9,12 +9,16 @@ const concealedLegacy: ConcealedSecret = Symbol('Concealed legacy client secret'
 // TODO: Remove once it added to the runtime library
 interface AzureSettingsEx extends AzureSettings {
   userIdentityEnabled: boolean;
+  workloadIdentityEnabled: boolean;
 }
 
 export const getUserIdentityEnabled = (): boolean =>
   // Also check feature flag to make it possible to enable in Grafana versions
   // before user identity configuration was introduced
   (config.azure as unknown as AzureSettingsEx).userIdentityEnabled ?? config.featureToggles['adxUserIdentityEnabled'];
+
+export const getWorkloadIdentityEnabled = (): boolean =>
+  (config.azure as unknown as AzureSettingsEx).workloadIdentityEnabled;
 
 export const getOboEnabled = (): boolean => !!config.featureToggles['adxOnBehalfOf'];
 
@@ -48,6 +52,8 @@ export function getDefaultCredentials(): AzureCredentials {
     return { authType: 'currentuser' };
   } else if (config.azure.managedIdentityEnabled) {
     return { authType: 'msi' };
+  } else if (getWorkloadIdentityEnabled()) {
+    return { authType: 'workloadidentity' };
   } else if (userIdentityEnabled) {
     return { authType: 'currentuser' };
   } else {
@@ -81,6 +87,16 @@ export function getCredentials(options: DataSourceSettings<any, any>): AzureCred
         };
       } else {
         // If authentication type is managed identity but managed identities were disabled in Grafana config,
+        // then we should fall back to an empty default credentials
+        return getDefaultCredentials();
+      }
+    case 'workloadidentity':
+      if (getWorkloadIdentityEnabled()) {
+        return {
+          authType: 'workloadidentity',
+        };
+      } else {
+        // If authentication type is workload identity but workload identity is disabled in Grafana config,
         // then we should fall back to an empty default credentials
         return getDefaultCredentials();
       }
@@ -186,6 +202,20 @@ export function updateCredentials(
           ...options.jsonData,
           azureCredentials: {
             authType: 'msi',
+          },
+        },
+      };
+      break;
+    case 'workloadidentity':
+      if (!getWorkloadIdentityEnabled()) {
+        throw new Error('Workload Identity authentication is not enabled in Grafana config.');
+      }
+      options = {
+        ...options,
+        jsonData: {
+          ...options.jsonData,
+          azureCredentials: {
+            authType: 'workloadidentity',
           },
         },
       };
