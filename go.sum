@@ -202,8 +202,6 @@ github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e h1:JKmoR8x90Iww1
 github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
-github.com/grafana/grafana-azure-sdk-go v1.8.0 h1:trDjahZSXSe0tmJGk2jX9EMGz8TNu0e5dqK+qBEFD7Q=
-github.com/grafana/grafana-azure-sdk-go v1.8.0/go.mod h1:1vBa0KOl+/Kcm7V888OyMXDSFncmek14q7XhEkrcSaA=
 github.com/grafana/grafana-azure-sdk-go v1.9.0 h1:4JRwlqgUtPRAQSoiV4DFZDQ3lbNsauHqj9kC6SMR9Ak=
 github.com/grafana/grafana-azure-sdk-go v1.9.0/go.mod h1:1vBa0KOl+/Kcm7V888OyMXDSFncmek14q7XhEkrcSaA=
 github.com/grafana/grafana-plugin-sdk-go v0.172.0 h1:Iy58w8PipSeMmiES30okNHOBcusBwTylH017ZFPaU2c=
@@ -346,8 +344,8 @@ github.com/unknwon/log v0.0.0-20150304194804-e617c87089d3/go.mod h1:1xEUf2abjfP9
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/urfave/cli v1.22.12 h1:igJgVw1JdKH+trcLWLeLwZjU9fEfPesQ+9/e4MQ44S8=
 github.com/urfave/cli v1.22.12/go.mod h1:sSBEIC79qR6OvcmsD4U3KABeOTxDqQtdDnaFuUN30b8=
-github.com/xorcare/pointer v1.1.0 h1:sFwXOhRF8QZ0tyVZrtxWGIoVZNEmRzBCaFWdONPQIUM=
-github.com/xorcare/pointer v1.1.0/go.mod h1:6KLhkOh6YbuvZkT4YbxIbR/wzLBjyMxOiNzZhJTor2Y=
+github.com/xorcare/pointer v1.2.2 h1:zjD77b5DTehClND4MK+9dDE0DcpFIZisAJ/+yVJvKYA=
+github.com/xorcare/pointer v1.2.2/go.mod h1:azsKh7oVwYB7C1o8P284fG8MvtErX/F5/dqXiaj71ak=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
