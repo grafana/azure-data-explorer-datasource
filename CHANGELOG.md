@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.7.0]
+
+- New feature: Add support for [Workload Identity authentication](https://azure.github.io/azure-workload-identity/docs/).
+  
 ## [4.6.3]
 
 - New feature: Add support for enforcing only known Azure Data Explorer endpoints in cluster URL.

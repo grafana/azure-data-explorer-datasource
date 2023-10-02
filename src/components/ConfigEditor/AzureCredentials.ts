@@ -14,7 +14,7 @@ export const KnownAzureClouds = [
   { value: AzureCloud.USGovernment, label: 'Azure US Government' },
 ] as SelectableValue[];
 
-export type AzureAuthType = 'currentuser' | 'msi' | 'clientsecret' | 'clientsecret-obo';
+export type AzureAuthType = 'currentuser' | 'msi' | 'clientsecret' | 'clientsecret-obo' | 'workloadidentity';
 
 export type ConcealedSecret = symbol;
 
@@ -28,6 +28,10 @@ interface AadCurrentUserCredentials extends AzureCredentialsBase {
 
 export interface AzureManagedIdentityCredentials extends AzureCredentialsBase {
   authType: 'msi';
+}
+
+export interface AzureWorkloadIdentityCredentials extends AzureCredentialsBase {
+  authType: 'workloadidentity';
 }
 
 export interface AzureClientSecretCredentials extends AzureCredentialsBase {
@@ -50,7 +54,8 @@ export type AzureCredentials =
   | AadCurrentUserCredentials
   | AzureManagedIdentityCredentials
   | AzureClientSecretCredentials
-  | AzureClientSecretOboCredentials;
+  | AzureClientSecretOboCredentials
+  | AzureWorkloadIdentityCredentials;
 
 export function isCredentialsComplete(
   options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>
@@ -59,6 +64,7 @@ export function isCredentialsComplete(
   switch (credentials.authType) {
     case 'currentuser':
     case 'msi':
+    case 'workloadidentity':
       return true;
     case 'clientsecret':
     case 'clientsecret-obo':
