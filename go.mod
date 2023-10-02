@@ -10,7 +10,7 @@ require (
 	github.com/grafana/grafana-plugin-sdk-go v0.172.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.2
-	github.com/xorcare/pointer v1.1.0
+	github.com/xorcare/pointer v1.2.2
 	golang.org/x/net v0.12.0
 )
 
