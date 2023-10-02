@@ -2,14 +2,16 @@ name: E2E tests - k6
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
+
       - name: Install yarn dependencies
         run: yarn install
         env:
@@ -22,6 +24,7 @@ jobs:
         run: yarn build
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
+
       - name: Setup k6
         run: |
           sudo gpg -k
@@ -29,7 +32,15 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
           sudo apt-get update
           sudo apt-get install k6
+
       - name: Start Grafana
-        run: docker run --rm -d -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-azure-data-explorer-datasource --volume "$PWD:/var/lib/grafana/plugins" grafana/grafana
-      - name: Run e2e tests
-        run: k6 run ./e2e/k6/k6.test.js
+        run: docker run --rm -d -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-azure-data-explorer-datasource --volume "$PWD/dist:/var/lib/grafana/plugins/azure-data-explorer-datasource" grafana/grafana; sleep 30
+
+      - name: Run E2E tests
+        run: k6 run ./e2e/k6/k6.spec.js
+        env:
+          E2E_ADX_CLIENT_ID: ${{ secrets.E2E_ADX_CLIENT_ID }}
+          E2E_ADX_CLIENT_SECRET: ${{ secrets.E2E_ADX_CLIENT_SECRET }}
+          E2E_ADX_CLUSTER_URL: ${{ secrets.E2E_ADX_CLUSTER_URL }}
+          E2E_ADX_TENANT_ID: ${{ secrets.E2E_ADX_TENANT_ID }}
+

@@ -2,14 +2,16 @@ name: E2E tests - Cypress
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js
+
+      - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
+
       - name: Install yarn dependencies
         run: yarn install
         env:
@@ -22,5 +24,14 @@ jobs:
         run: yarn build
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
+
       - name: Start Grafana
         run: docker run --rm -d -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-azure-data-explorer-datasource --volume "$PWD:/var/lib/grafana/plugins" grafana/grafana
+
+      - name: Run E2E tests
+        run: yarn run e2e
+        env:
+          E2E_ADX_CLIENT_ID: ${{ secrets.E2E_ADX_CLIENT_ID }}
+          E2E_ADX_CLIENT_SECRET: ${{ secrets.E2E_ADX_CLIENT_SECRET }}
+          E2E_ADX_CLUSTER_URL: ${{ secrets.E2E_ADX_CLUSTER_URL }}
+          E2E_ADX_TENANT_ID: ${{ secrets.E2E_ADX_TENANT_ID }}

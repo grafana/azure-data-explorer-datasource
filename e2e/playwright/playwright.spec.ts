@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { selectors } from '@grafana/e2e-selectors';
 import { v4 as uuidv4 } from 'uuid';
 
 const DASHBOARD_TITLE = `e2e-test-dashboard-${uuidv4()}`;
 const DATASOURCE_NAME = `adx-e2e-test-${uuidv4()}`;
 
-const getDashboardUid = (url) => {
+const getDashboardUid = (url: string) => {
   const matches = new URL(url).pathname.match(/\/d\/([^/]+)/);
 
   if (matches && Array.isArray(matches) && matches.length > 0) {
@@ -15,7 +15,7 @@ const getDashboardUid = (url) => {
   }
 };
 
-test('Login', async ({ page }) => {
+async function login(page: Page) {
   await page.goto(`http://localhost:3000${selectors.pages.Login.url}`, {
     waitUntil: 'networkidle',
   });
@@ -31,17 +31,17 @@ test('Login', async ({ page }) => {
   };
 
   // login
-  fields.username.fill('admin');
-  fields.password.fill('admin');
+  await fields.username.fill('admin');
+  await fields.password.fill('admin');
   await buttons.submit.click();
 
   // checks page for skip change password screen
-  expect(buttons.skip).toBeAttached();
+  await expect(buttons.skip.isVisible()).toBeTruthy();
 
   await buttons.skip.click();
-});
+}
 
-test('Add datasource', async ({ page }) => {
+async function addDatasource(page: Page) {
   await page.goto(`http://localhost:3000${selectors.pages.AddDataSource.url}`, {
     waitUntil: 'networkidle',
   });
@@ -53,29 +53,26 @@ test('Add datasource', async ({ page }) => {
 
   // name datasource
   const dsName = page.locator(`input[aria-label="${selectors.pages.DataSource.name}"]`);
-  dsName.fill('');
-  dsName.fill(`${DATASOURCE_NAME}`);
-
-  // form inputs
-  const inputs = {
-    'Client ID': '',
-    'Client Secret': '',
-    'Cluster URL': '',
-    'Tenant ID': '',
-  };
+  await dsName.fill('');
+  await dsName.fill(`${DATASOURCE_NAME}`);
 
   // fill in form inputs
-  Object.entries(inputs).forEach(([key, value]) => page.locator(`input[aria-label="${key}"]`).fill(value));
+  await page.locator(`input[id="adx-cluster-url"]`).fill(process.env.E2E_ADX_CLUSTER_URL!);
+  await page.locator(`input[id="aad-tenant-id"]`).fill(process.env.E2E_ADX_TENANT_ID!);
+  await page.locator(`input[id="aad-client-id"]`).fill(process.env.E2E_ADX_CLIENT_ID!);
+  await page.locator(`input[id="aad-client-secret"]`).fill(process.env.E2E_ADX_CLIENT_SECRET!);
 
   // save and test
   const saveBtn = page.locator(`button[data-testid="data-testid ${selectors.pages.DataSource.saveAndTest}"]`);
   await saveBtn.click();
 
   // checks the page for the data source is working message
-  expect(page.locator('[aria-label="Create a dashboard"]')).toContainText('building a dashboard');
-});
+  await expect(page.locator(`[aria-label="Data source settings page Alert"]`)).toContainText(
+    'Success'
+  );
+}
 
-test('Add dashboard', async ({ page }) => {
+async function addDashboard(page: Page) {
   await page.goto(`http://localhost:3000${selectors.pages.AddDashboard.url}`, { waitUntil: 'networkidle' });
 
   // checks for the create dashboard button
@@ -88,18 +85,18 @@ test('Add dashboard', async ({ page }) => {
 
   // name dashboard
   const dashboardTitleInput = page.locator(`input[aria-label="${selectors.pages.SaveDashboardAsModal.newName}"]`);
-  dashboardTitleInput.fill('');
-  dashboardTitleInput.fill(DASHBOARD_TITLE);
+  await dashboardTitleInput.fill('');
+  await dashboardTitleInput.fill(DASHBOARD_TITLE);
 
   // save dashboard
   const saveDashboardModalButton = page.locator(`button[aria-label="${selectors.pages.SaveDashboardAsModal.save}"]`);
   await saveDashboardModalButton.click();
 
   // checks that the dashboard is created successfully
-  expect(page.locator('div[data-testid="data-testid Alert success"]')).toBeAttached();
-});
+  await expect(page.locator(`div[data-testid="${selectors.pages.DataSource.alert}"]`).isVisible()).toBeTruthy();
+}
 
-test('Configure panel', async ({ page }) => {
+async function configurePanel(page: Page) {
   const dashboardURL = page.url();
   await page.goto(`${dashboardURL}`, { waitUntil: 'networkidle' });
 
@@ -108,33 +105,42 @@ test('Configure panel', async ({ page }) => {
   await addPanelButton.click();
 
   // select data source for panel
-  page.locator('input[placeholder="Search data source"]').fill(`${DATASOURCE_NAME}`);
-  page.keyboard.down('Tab');
-  page.keyboard.down('Enter');
+  const dsPanel = page.locator('input[placeholder="Select data source"]')
+  await dsPanel.fill(`${DATASOURCE_NAME}`);
+  await page.keyboard.down('Tab');
+  await page.keyboard.down('Enter');
 
   // select database
   const database = page.locator(`[aria-label="Database"]`);
   await database.click();
-  database.fill('PerfTest');
-  page.keyboard.down('Enter');
+  await database.fill('PerfTest');
+  await page.keyboard.down('Enter');
 
   // select table
   const table = page.locator(`[aria-label="Table"]`);
   await table.click();
-  table.fill('PerfTest');
-  page.keyboard.down('Enter');
+  await table.fill('PerfTest');
+  await page.keyboard.down('Enter');
 
   // run query
   const runQueryBtn = page.locator(`[data-testid="data-testid run-query"]`);
   await runQueryBtn.click();
+
   // are there results?
   const columns = page.locator(`[aria-label="Columns"]`);
   await columns.click();
 
-  expect(page.locator('[aria-label="Select options menu"]').innerHTML()).toContain('_val1_');
-});
+  const html = await page.locator('[aria-label="Select options menu"]').innerHTML();
+  await expect(html).toContain('_val1_');
 
-test('Remove dashboard', async ({ page }) => {
+  // save panel
+  const savePanelBtn = page.locator(`button[title="Apply changes and save dashboard"]`);
+  await savePanelBtn.click();
+  const saveDashButton = page.locator('button[aria-label="Save dashboard button"]');
+  await saveDashButton.click();
+}
+
+export async function removeDashboard(page: Page) {
   const dashboardUID = getDashboardUid(page.url());
   await page.goto(`http://localhost:3000/d/${dashboardUID}`, { waitUntil: 'networkidle' });
 
@@ -157,5 +163,15 @@ test('Remove dashboard', async ({ page }) => {
   await deleteDashboardModalButton.click();
 
   // checks for success alert message
-  expect(page.locator('div[data-testid="data-testid Alert success"]')).toBeAttached();
+  await expect(
+    page.locator(`div[data-testid="${selectors.components.Alert.alertV2('success')}"]`).isVisible()
+  ).toBeTruthy();
+}
+
+test('Azure Data Explorer dashboard', async ({ page }) => {
+  await login(page);
+  await addDatasource(page);
+  await addDashboard(page);
+  await configurePanel(page);
+  await removeDashboard(page);
 });

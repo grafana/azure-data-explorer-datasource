@@ -6,32 +6,43 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version-file: .nvmrc
-    - name: Install yarn dependencies
-      run: yarn install
-      env:
-        NODE_OPTIONS: '--max_old_space_size=4096'
+      - uses: actions/checkout@v3
 
-    - name: Build
-      run: go build -v ./...
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
 
-    - name: Build Frontend
-      run: yarn build
-      env:
-        NODE_OPTIONS: '--max_old_space_size=4096'
-    - name: Install Playwright Browsers
-      run: yarn playwright install --with-deps
-    - name: Start Grafana
-      run: docker run --rm -d -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-azure-data-explorer-datasource --volume "$PWD:/var/lib/grafana/plugins" grafana/grafana
-    - name: Run Playwright tests
-      run: yarn playwright test
+      - name: Install yarn dependencies
+        run: yarn install
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
 
-    # - uses: actions/upload-artifact@v3
-    #   if: always()
-    #   with:
-    #     name: playwright-report
-    #     path: playwright-report/
-    #     retention-days: 30
+      - name: Build
+        run: go build -v ./...
+
+      - name: Build Frontend
+        run: yarn build
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
+
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps
+
+      - name: Start Grafana
+        run: docker run --rm -d -p 3000:3000 --name=grafana --env GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-azure-data-explorer-datasource --volume "$PWD/dist:/var/lib/grafana/plugins/grafana-azure-data-explorer-datasource" grafana/grafana; sleep 30
+
+      - name: Run Playwright tests
+        run: yarn playwright test
+        env:
+          E2E_ADX_CLIENT_ID: ${{ secrets.E2E_ADX_CLIENT_ID }}
+          E2E_ADX_CLIENT_SECRET: ${{ secrets.E2E_ADX_CLIENT_SECRET }}
+          E2E_ADX_CLUSTER_URL: ${{ secrets.E2E_ADX_CLUSTER_URL }}
+          E2E_ADX_TENANT_ID: ${{ secrets.E2E_ADX_TENANT_ID }}
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

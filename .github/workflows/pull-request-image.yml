@@ -105,6 +105,7 @@ jobs:
         with:
           issue-number: ${{ github.event.number }}
           body-includes: Use the following command to run this PR with Docker
+
       - name: Update comment on PR
         if: steps.fc.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v3
@@ -118,6 +119,7 @@ jobs:
               ```
               docker run --rm -p 3000:3000 grafana/plugin-builds:${{ github.event.pull_request.head.sha }}pre
               ```
+
       - name: Add comment to PR
         if: steps.fc.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v3

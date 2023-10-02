@@ -80,16 +80,11 @@ export async function addDatasource(page) {
     dsName.fill('');
     dsName.type(`${DATASOURCE_NAME}`);
 
-    // form inputs
-    const inputs = {
-      'Client ID': '',
-      'Client Secret': '',
-      'Cluster URL': '',
-      'Tenant ID': '',
-    };
-
     // fill in form inputs
-    Object.entries(inputs).forEach(([key, value]) => page.locator(`input[aria-label="${key}"]`).type(value));
+    await page.locator(`input[id="adx-cluster-url"]`).fill(__ENV.E2E_ADX_CLUSTER_URL);
+    await page.locator(`input[id="aad-tenant-id"]`).fill(__ENV.E2E_ADX_TENANT_ID);
+    await page.locator(`input[id="aad-client-id"]`).fill(__ENV.E2E_ADX_CLIENT_ID);
+    await page.locator(`input[id="aad-client-secret"]`).fill(__ENV.E2E_ADX_CLIENT_SECRET);
 
     // save and test
     const saveBtn = page.locator(`button[data-testid="data-testid ${selectors.pages.DataSource.saveAndTest}"]`);
@@ -98,7 +93,7 @@ export async function addDatasource(page) {
     // checks the page for the data source is working message
     check(page, {
       'add datasource successful':
-        (await page.locator('[aria-label="Create a dashboard"]').textContent()) === 'building a dashboard',
+        (await page.locator('div[data-testid="data-testid Alert success"]').textContent()) === 'Success',
     });
   } catch (e) {
     fail(`add datasource failed: ${e}`);
