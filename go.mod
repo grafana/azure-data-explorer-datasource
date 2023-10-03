@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.7.2
-	github.com/AzureAD/microsoft-authentication-library-for-go v1.0.0
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.0
 	github.com/google/go-cmp v0.5.9
 	github.com/grafana/grafana-azure-sdk-go v1.9.0
 	github.com/grafana/grafana-plugin-sdk-go v0.172.0
@@ -33,7 +33,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/flatbuffers v2.0.0+incompatible // indirect
