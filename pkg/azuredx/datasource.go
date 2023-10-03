@@ -29,7 +29,7 @@ type AzureDataExplorer struct {
 	settings *models.DatasourceSettings
 }
 
-func NewDatasource(instanceSettings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func NewDatasource(ctx context.Context, instanceSettings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	adx := &AzureDataExplorer{}
 
 	var jsonData map[string]interface{}
