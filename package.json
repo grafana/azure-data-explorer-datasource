@@ -36,7 +36,7 @@
     "@swc/jest": "^0.2.26",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^12.1.4",
-    "@testing-library/user-event": "^13.1.9",
+    "@testing-library/user-event": "^14.5.1",
     "@types/chance": "^1.1.2",
     "@types/debounce-promise": "^3.1.2",
     "@types/glob": "^8.0.0",
@@ -45,12 +45,12 @@
     "@types/lodash": "^4.14.194",
     "@types/node": "^18.15.11",
     "@types/prismjs": "1.26.0",
-    "@types/uuid": "^9.0.1",
+    "@types/uuid": "^9.0.4",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "chance": "^1.1.7",
     "copy-webpack-plugin": "^11.0.0",
-    "cspell": "6.13.3",
+    "cspell": "7.3.7",
     "css-loader": "^6.7.3",
     "cypress": "13.3.0",
     "eslint": "^7.32.0",
@@ -78,6 +78,7 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "4.8.4",
+    "uuid": "^9.0.1",
     "webpack": "^5.86.0",
     "webpack-cli": "^5.1.4",
     "webpack-livereload-plugin": "^3.0.2"
@@ -92,8 +93,7 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-use": "^15.3.3",
-    "tslib": "2.5.3",
-    "uuid": "^9.0.0"
+    "tslib": "2.5.3"
   },
   "resolutions": {
     "**/@testing-library/dom": "7.31.2"
