@@ -9,7 +9,7 @@ require (
 	github.com/grafana/grafana-azure-sdk-go v1.9.0
 	github.com/grafana/grafana-plugin-sdk-go v0.172.0
 	github.com/json-iterator/go v1.1.12
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.4
 	github.com/xorcare/pointer v1.2.2
 	golang.org/x/net v0.15.0
 )
