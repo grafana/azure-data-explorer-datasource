@@ -4056,10 +4056,10 @@
   dependencies:
     "@types/d3-color" "*"
 
-"@types/debounce-promise@^3.1.2":
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/@types/debounce-promise/-/debounce-promise-3.1.5.tgz#b911a4cc87ddab5b52c0eb7da09855f1d1bd16ca"
-  integrity sha512-fOoAIu7qusGngVHLjZEo3pgEaaAqL9XkYHe8WCjwtBGygn+mk7WkW1xke4ZiKEr7pj3lz3jykUVOsLymZvljUw==
+"@types/debounce-promise@^3.1.7":
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/@types/debounce-promise/-/debounce-promise-3.1.7.tgz#44457d4a567c7ae9ae143390c735ca97230b1c99"
+  integrity sha512-XzqG8zCd9n33gmusdQo0d4p9iRKg/mZbG52wfHxnuZZyeO68ryOT5xyv9Fk3vLAvQBUsHmSL14Cqpsx4jjzz1Q==
 
 "@types/eslint-scope@^3.7.3":
   version "3.7.4"
