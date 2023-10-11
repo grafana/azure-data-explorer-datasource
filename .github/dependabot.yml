@@ -16,13 +16,10 @@ updates:
     # Ignore most dependencies that are maintained via the create-plugin tool
     # See https://github.com/grafana/plugin-tools/blob/main/packages/create-plugin/templates/common/package.json
     ignore:
-      - dependency-name: "@emotion/css"
-      - dependency-name: react
-      - dependency-name: react-dom
-      - dependency-name: react-router-dom
-      - dependency-name: rxjs
-      - dependency-name: tslib
       - dependency-name: "@babel/core"
+      - dependency-name: "@emotion/css"
+      - dependency-name: "@grafana/eslint-config"
+      - dependency-name: "@grafana/tsconfig"
       - dependency-name: "@swc/core"
       - dependency-name: "@swc/helpers"
       - dependency-name: "@swc/jest"
@@ -32,6 +29,11 @@ updates:
       - dependency-name: "@types/lodash"
       - dependency-name: "@types/node"
       - dependency-name: "@types/react-router-dom"
+      - dependency-name: react
+      - dependency-name: react-dom
+      - dependency-name: react-router-dom
+      - dependency-name: rxjs
+      - dependency-name: tslib
       - dependency-name: copy-webpack-plugin
       - dependency-name: css-loader
       - dependency-name: eslint-webpack-plugin
