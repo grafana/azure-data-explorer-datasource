@@ -1,6 +1,6 @@
 import { SelectableValue } from '@grafana/data';
-import { InlineField, Select } from '@grafana/ui';
-import { QueryEditor } from 'components/QueryEditor';
+import { Field, Select } from '@grafana/ui';
+import { QueryEditor } from 'components/QueryEditor/QueryEditor';
 import { AdxDataSource } from 'datasource';
 import { selectors } from 'test/selectors';
 import { get } from 'lodash';
@@ -125,11 +125,7 @@ const VariableEditor = (props: VariableProps) => {
 
   return (
     <>
-      <InlineField
-        label="Select query type"
-        labelWidth={20}
-        data-testid={selectors.components.variableEditor.queryType.input}
-      >
+      <Field label="Query Type" data-testid={selectors.components.variableEditor.queryType.input}>
         <Select
           aria-label="select query type"
           onChange={onQueryTypeChange}
@@ -137,16 +133,12 @@ const VariableEditor = (props: VariableProps) => {
           width={25}
           value={queryType}
         />
-      </InlineField>
+      </Field>
       {query.queryType === AdxQueryType.KustoQuery && (
         <QueryEditor query={query} onChange={onChange} datasource={datasource} onRunQuery={() => {}} />
       )}
       {requireDatabase && (
-        <InlineField
-          label="Select database"
-          labelWidth={20}
-          data-testid={selectors.components.variableEditor.databases.input}
-        >
+        <Field label="Database" data-testid={selectors.components.variableEditor.databases.input}>
           <Select
             aria-label="select database"
             onChange={onDatabaseChange}
@@ -154,14 +146,10 @@ const VariableEditor = (props: VariableProps) => {
             width={25}
             value={query.database || null}
           />
-        </InlineField>
+        </Field>
       )}
       {requireTable && (
-        <InlineField
-          label="Select table"
-          labelWidth={20}
-          data-testid={selectors.components.variableEditor.tables.input}
-        >
+        <Field label="Table" data-testid={selectors.components.variableEditor.tables.input}>
           <Select
             aria-label="select table"
             onChange={onTableChange}
@@ -169,7 +157,7 @@ const VariableEditor = (props: VariableProps) => {
             width={25}
             value={query.table || null}
           />
-        </InlineField>
+        </Field>
       )}
     </>
   );

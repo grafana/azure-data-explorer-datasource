@@ -40,7 +40,7 @@ const defaultProps = (overrides?: Partial<VariableProps>): VariableProps => {
 describe('VariableEditor', () => {
   it('should render the VariableEditor', async () => {
     render(<VariableEditor {...defaultProps()} />);
-    await waitFor(() => screen.getByText('Select query type'));
+    await waitFor(() => screen.getByText('Query Type'));
   });
 
   it('will migrate a legacy database variable query', async () => {
