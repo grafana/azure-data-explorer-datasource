@@ -6,15 +6,16 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: grafana/grafana-plugin-ci-e2e:1.9.3
-      options: --user root
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash
     steps:
       - uses: actions/checkout@v3
 
       - name: Initialise nvm
-        run: . /root/.init-nvm.sh
+        run: |
+          cp /root/.init-nvm.sh ~/.init-nvm.sh
+          . ~/.init-nvm.sh
 
       - name: Install yarn dependencies
         run: yarn install
