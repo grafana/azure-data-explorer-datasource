@@ -5,7 +5,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: grafana/grafana-plugin-ci-e2e
+      image: grafana/grafana-plugin-ci-e2e:1.9.3
     defaults:
       run:
         shell: bash
