@@ -12,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Initialise nvm
+        run: . ~/.init-nvm.sh
+
       - name: Install yarn dependencies
         run: yarn install
         env:
