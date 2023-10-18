@@ -6,12 +6,17 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: grafana/grafana-plugin-ci-e2e:1.9.3
-      options: --user 1001
+      options: --user root
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set ownership
+        run: |
+          # Fix git issue with owner of directory
+          chown -R $(id -u):$(id -g) $PWD
 
       - name: Initialise nvm
         run: |
