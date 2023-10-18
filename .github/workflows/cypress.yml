@@ -4,13 +4,13 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: grafana/grafana-plugin-ci-e2e
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v3
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: .nvmrc
 
       - name: Install yarn dependencies
         run: yarn install
