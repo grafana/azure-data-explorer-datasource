@@ -1,5 +1,9 @@
 name: E2E tests - Playwright
-on: [push, pull_request]
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - main
 
 jobs:
   test:
@@ -12,16 +16,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
+      
+      - name: Install Mage
+        uses: magefile/mage-action@v3
+        with:
+          install-only: true
 
       - name: Install yarn dependencies
         run: yarn install
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
 
-      - name: Build
-        run: go build -v ./...
+      - name: Build binaries
+        run: mage -v
 
-      - name: Build Frontend
+      - name: Build frontend
         run: yarn build
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
@@ -46,3 +55,4 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+

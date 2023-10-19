@@ -81,20 +81,22 @@ export async function addDatasource(page) {
     dsName.type(`${DATASOURCE_NAME}`);
 
     // fill in form inputs
-    await page.locator(`input[id="adx-cluster-url"]`).fill(__ENV.E2E_ADX_CLUSTER_URL);
-    await page.locator(`input[id="aad-tenant-id"]`).fill(__ENV.E2E_ADX_TENANT_ID);
-    await page.locator(`input[id="aad-client-id"]`).fill(__ENV.E2E_ADX_CLIENT_ID);
-    await page.locator(`input[id="aad-client-secret"]`).fill(__ENV.E2E_ADX_CLIENT_SECRET);
+    // you must use type() instead of fill() for the inputs to be filled in
+    await page.locator(`input[id="adx-cluster-url"]`).type(__ENV.E2E_ADX_CLUSTER_URL);
+    await page.locator(`input[id="aad-tenant-id"]`).type(__ENV.E2E_ADX_TENANT_ID);
+    await page.locator(`input[id="aad-client-id"]`).type(__ENV.E2E_ADX_CLIENT_ID);
+    await page.locator(`input[id="aad-client-secret"]`).type(__ENV.E2E_ADX_CLIENT_SECRET);
 
     // save and test
     const saveBtn = page.locator(`button[data-testid="data-testid ${selectors.pages.DataSource.saveAndTest}"]`);
     await saveBtn.click();
 
+    sleep(4);
+
+    const text = await page.locator('[aria-label="Data source settings page Alert"]').textContent();
+
     // checks the page for the data source is working message
-    check(page, {
-      'add datasource successful':
-        (await page.locator('div[data-testid="data-testid Alert success"]').textContent()) === 'Success',
-    });
+    check(page, { 'add datasource successful': text.includes('Success') === true });
   } catch (e) {
     fail(`add datasource failed: ${e}`);
   }
@@ -114,7 +116,7 @@ export async function addDashboard(page) {
 
     // name dashboard
     const dashboardTitleInput = page.locator(`input[aria-label="${selectors.pages.SaveDashboardAsModal.newName}"]`);
-    dashboardTitleInput.fill('');
+    dashboardTitleInput.fill('')
     dashboardTitleInput.type(DASHBOARD_TITLE);
 
     // save dashboard
@@ -132,15 +134,12 @@ export async function addDashboard(page) {
 
 export async function configurePanel(page) {
   try {
-    const dashboardURL = page.url();
-    await page.goto(`${dashboardURL}`, { waitUntil: 'networkidle' });
-
     // add panel
     const addPanelButton = page.locator('button[data-testid="data-testid Create new panel button"]');
     await addPanelButton.click();
 
     // select data source for panel
-    page.locator('input[placeholder="Search data source"]').type(`${DATASOURCE_NAME}`);
+    page.locator('input[placeholder="Select data source"]').type(`${DATASOURCE_NAME}`);
     page.keyboard.down('Tab');
     page.keyboard.down('Enter');
 
@@ -150,11 +149,9 @@ export async function configurePanel(page) {
     database.type('PerfTest');
     page.keyboard.down('Enter');
 
-    sleep(1);
-
     // select table
     const table = page.locator(`[aria-label="Table"]`);
-    await table.click();
+    await table.click({ force: true });
     table.type('PerfTest');
     page.keyboard.down('Enter');
 

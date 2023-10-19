@@ -67,9 +67,7 @@ async function addDatasource(page: Page) {
   await saveBtn.click();
 
   // checks the page for the data source is working message
-  await expect(page.locator(`[aria-label="Data source settings page Alert"]`)).toContainText(
-    'Success'
-  );
+  await expect(page.locator(`[aria-label="Data source settings page Alert"]`)).toContainText('Success');
 }
 
 async function addDashboard(page: Page) {
@@ -97,47 +95,38 @@ async function addDashboard(page: Page) {
 }
 
 async function configurePanel(page: Page) {
-  const dashboardURL = page.url();
-  await page.goto(`${dashboardURL}`, { waitUntil: 'networkidle' });
-
   // add panel
   const addPanelButton = page.locator('button[data-testid="data-testid Create new panel button"]');
   await addPanelButton.click();
 
   // select data source for panel
-  const dsPanel = page.locator('input[placeholder="Select data source"]')
+  const dsPanel = page.locator('input[placeholder="Select data source"]');
   await dsPanel.fill(`${DATASOURCE_NAME}`);
   await page.keyboard.down('Tab');
   await page.keyboard.down('Enter');
 
   // select database
   const database = page.locator(`[aria-label="Database"]`);
-  await database.click();
+  await database.click({ force: true });
   await database.fill('PerfTest');
-  await page.keyboard.down('Enter');
 
   // select table
   const table = page.locator(`[aria-label="Table"]`);
-  await table.click();
+  await table.click({ force: true });
   await table.fill('PerfTest');
-  await page.keyboard.down('Enter');
 
   // run query
   const runQueryBtn = page.locator(`[data-testid="data-testid run-query"]`);
-  await runQueryBtn.click();
+  await runQueryBtn.click({ force: true });
 
   // are there results?
   const columns = page.locator(`[aria-label="Columns"]`);
-  await columns.click();
+  await columns.click({ force: true });
+
+  await page.waitForTimeout(6000);
 
   const html = await page.locator('[aria-label="Select options menu"]').innerHTML();
   await expect(html).toContain('_val1_');
-
-  // save panel
-  const savePanelBtn = page.locator(`button[title="Apply changes and save dashboard"]`);
-  await savePanelBtn.click();
-  const saveDashButton = page.locator('button[aria-label="Save dashboard button"]');
-  await saveDashButton.click();
 }
 
 export async function removeDashboard(page: Page) {

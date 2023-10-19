@@ -1,17 +1,18 @@
 {
   "ignorePaths": [
     ".github/**",
-    "node_modules/**",
-    "dist/**",
     "cypress/**",
-    "provisioning/**",
-    "src/dashboards/**",
-    "yarn.lock",
+    "dist/**",
+    "e2e/**",
     "go.sum",
     "mage_output_file.go",
-    "src/libs/**",
+    "node_modules/**",
+    "pkg/azuredx/models/testdata/**",
     "pkg/azuredx/testdata/**",
-    "pkg/azuredx/models/testdata/**"
+    "provisioning/**",
+    "src/dashboards/**",
+    "src/libs/**",
+    "yarn.lock"
   ],
   "words": [
     "adxauth",
