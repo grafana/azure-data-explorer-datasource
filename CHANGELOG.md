@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [4.7.1]
+
+- Upgrade dependencies
+- Update variable editor
+
 ## [4.7.0]
 
 - New feature: Add support for [Workload Identity authentication](https://azure.github.io/azure-workload-identity/docs/).
