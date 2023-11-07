@@ -23,6 +23,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({ options, updateJson
         invalid={!options.jsonData.clusterUrl}
       >
         <Input
+          aria-label="Cluster URL"
           data-testid={selectors.components.configEditor.clusterURL.input}
           value={jsonData.clusterUrl}
           id="adx-cluster-url"
