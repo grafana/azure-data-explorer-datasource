@@ -1,4 +1,5 @@
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
+import { llms } from '@grafana/experimental';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
 import {
   Alert,
@@ -17,6 +18,7 @@ import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 import { cloneDeep } from 'lodash';
 import { css } from '@emotion/css';
+import { useAsync } from 'react-use';
 
 import { getFunctions, getSignatureHelp } from './Suggestions';
 
@@ -40,12 +42,18 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [prompt, setPrompt] = useState('');
   const [errorMessage, setErrorMessage] = useState(TOKEN_NOT_FOUND);
   const [isWaiting, setWaiting] = useState(false);
+  const [enabled, setEnabled] = useState(false);
   const [hasError, setError] = useState(false);
   const [generatedQuery, setGeneratedQuery] = useState('//OpenAI generated query');
   const [variables] = useState(getTemplateSrv().getVariables());
   const [stateSchema, setStateSchema] = useState(cloneDeep(schema));
   const styles = useStyles2(getStyles);
   const baselinePrompt = `You are an AI assistant that is fluent in KQL for querying Azure Data Explorer and you only respond with the correct KQL code snippets and no explanations. Generate a query that fulfills the following text.\nText:"""`;
+
+  useAsync(async () => {
+    const enabled = await llms.openai.enabled();
+    setEnabled(enabled);
+  });
 
   const onRawQueryChange = (kql: string) => {
     if (kql !== props.query.query) {
@@ -64,24 +72,52 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
   }, [schema, stateSchema]);
 
   const generateQuery = () => {
+    reportInteraction('grafana_ds_adx_openai_query_generated');
     setWaiting(true);
     setError(false);
     setErrorMessage(TOKEN_NOT_FOUND);
-    reportInteraction('grafana_ds_adx_openai_query_generated');
-    datasource
-      .generateQueryForOpenAI(`${baselinePrompt}${prompt}"""`)
-      .then((resp) => {
-        setWaiting(false);
-        setGeneratedQuery(resp);
-        onRawQueryChange(resp);
+    if (enabled) {
+      newGenerateQuery(); //eventually this will replace this function
+    } else {
+      datasource
+        .generateQueryForOpenAI(`${baselinePrompt}${prompt}"""`)
+        .then((resp) => {
+          setWaiting(false);
+          setGeneratedQuery(resp);
+        })
+        .catch((e) => {
+          setWaiting(false);
+          if (e.data?.Message) {
+            setErrorMessage(e.data?.Message);
+          }
+          setError(true);
+        });
+    }
+  };
+
+  const newGenerateQuery = () => {
+    reportInteraction('grafana_ds_adx_openai_query_generated_with_llm_plugin');
+    const stream = llms.openai
+      .streamChatCompletions({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: baselinePrompt },
+          { role: 'user', content: `${prompt}"""` },
+        ],
       })
-      .catch((e) => {
+      .pipe(llms.openai.accumulateContent());
+    stream.subscribe({
+      next: (m) => {
+        setGeneratedQuery(m);
+      },
+      complete: () => {
         setWaiting(false);
-        if (e.data?.Message) {
-          setErrorMessage(e.data?.Message);
-        }
+      },
+      error: (e) => {
         setError(true);
-      });
+        setErrorMessage(e);
+      },
+    });
   };
 
   const onPromptChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -130,6 +166,26 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
           title={errorMessage}
         />
       )}
+      {!enabled && (
+        <Alert
+          onRemove={() => {
+            setError(false);
+            setErrorMessage(TOKEN_NOT_FOUND);
+          }}
+          severity="info"
+          title={'You need to enable the LLM plugin to use this feature.'}
+        >
+          Install the LLM plugin from the{' '}
+          <a className={styles.link} href="https://grafana.com/grafana/plugins/grafana-llm-app/">
+            catalog
+          </a>
+          . You can then{' '}
+          <a className={styles.link} href="/plugins/grafana-llm-app">
+            enable
+          </a>{' '}
+          it.
+        </Alert>
+      )}
       <div className={styles.outerMargin}>
         <HorizontalGroup justify="flex-start" align="flex-start">
           <h5>Ask OpenAI to generate a KQL query</h5>
@@ -158,7 +214,10 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
             variant="primary"
             icon="play"
             size="sm"
-            onClick={onRunQuery}
+            onClick={() => {
+              onRawQueryChange(generatedQuery);
+              onRunQuery();
+            }}
             data-testid={selectors.components.queryEditor.runQuery.button}
           >
             Run query
@@ -168,7 +227,10 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
           <CodeEditor
             language="kusto"
             value={generatedQuery}
-            onBlur={onRawQueryChange}
+            onBlur={(q) => {
+              onRawQueryChange(q);
+              onRunQuery();
+            }}
             showMiniMap={false}
             showLineNumbers={true}
             height="240px"
@@ -184,6 +246,10 @@ const getStyles = (theme: GrafanaTheme2) => {
   return {
     outerMargin: css({
       marginTop: theme.spacing(1),
+    }),
+    link: css({
+      color: theme.colors.text.link,
+      textDecoration: 'underline',
     }),
     innerMargin: css({
       marginTop: theme.spacing(2),

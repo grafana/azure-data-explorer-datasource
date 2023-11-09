@@ -3,7 +3,6 @@ import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import ConfigHelp from './ConfigHelp';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
-import OpenAIConfig from './OpenAIConfig';
 import ConnectionConfig from './ConnectionConfig';
 import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
@@ -106,7 +105,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         <QueryConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
         <DatabaseConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
         <TrackingConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
-        <OpenAIConfig options={options} updateJsonData={updateJsonData} onOptionsChange={onOptionsChange} />
       </ConfigSection>
     </>
   );
