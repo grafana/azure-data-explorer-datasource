@@ -9,6 +9,7 @@ import (
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+
 	// 100% compatible drop-in replacement of "encoding/json"
 	json "github.com/json-iterator/go"
 
@@ -28,8 +29,8 @@ type Client struct {
 }
 
 // NewClient creates a Grafana Plugin SDK Go Http Client
-func New(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*Client, error) {
-	httpClient, err := newHttpClient(instanceSettings, dsSettings, azureSettings, credentials)
+func New(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*Client, error) {
+	httpClient, err := newHttpClient(ctx, instanceSettings, dsSettings, azureSettings, credentials)
 	if err != nil {
 		return nil, err
 	}
