@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -13,7 +14,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 )
 
-func newHttpClient(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
+func newHttpClient(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
 	// Extract cloud from credentials
 	azureCloud, err := azcredentials.GetAzureCloud(azureSettings, credentials)
 	if err != nil {
@@ -46,7 +47,7 @@ func newHttpClient(instanceSettings *backend.DataSourceInstanceSettings, dsSetti
 	}
 	authOpts.Scopes(scopes)
 
-	clientOpts, err := instanceSettings.HTTPClientOptions()
+	clientOpts, err := instanceSettings.HTTPClientOptions(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error creating http client: %w", err)
 	}

@@ -59,7 +59,7 @@ func NewDatasource(ctx context.Context, instanceSettings backend.DataSourceInsta
 		credentials = adxcredentials.GetDefaultCredentials(azureSettings)
 	}
 
-	adxClient, err := client.New(&instanceSettings, datasourceSettings, azureSettings, credentials)
+	adxClient, err := client.New(ctx, &instanceSettings, datasourceSettings, azureSettings, credentials)
 	if err != nil {
 		backend.Logger.Error("failed to create ADX client", "error", err.Error())
 		return nil, err
