@@ -3,7 +3,7 @@ module github.com/grafana/azure-data-explorer-datasource
 go 1.20
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.8.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.0
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.0
 	github.com/google/go-cmp v0.6.0
 	github.com/grafana/grafana-azure-sdk-go v1.10.0
@@ -11,13 +11,13 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.4
 	github.com/xorcare/pointer v1.2.2
-	golang.org/x/net v0.15.0
+	golang.org/x/net v0.17.0
 )
 
 require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.4.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.5.0 // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/apache/arrow/go/v13 v13.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
