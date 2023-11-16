@@ -3985,10 +3985,10 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/chance@^1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@types/chance/-/chance-1.1.4.tgz#bdb4f5b36ed7622640b597720e8affbfaa7bbfd7"
-  integrity sha512-et3alUWI9jEPnGai+QRCyDdRMYS+atq32IaldWURyxPRZBYg+cSwppxK2UHnDv9X/0pdoxR3Ufbz5hRmjD/uNg==
+"@types/chance@^1.1.6":
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/@types/chance/-/chance-1.1.6.tgz#2fe3de58742629602c3fbab468093b27207f04ad"
+  integrity sha512-V+pm3stv1Mvz8fSKJJod6CglNGVqEQ6OyuqitoDkWywEODM/eJd1eSuIp9xt6DrX8BWZ2eDSIzbw1tPCUTvGbQ==
 
 "@types/d3-color@*":
   version "3.1.0"
