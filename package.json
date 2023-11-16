@@ -52,7 +52,7 @@
     "@typescript-eslint/parser": "^4.33.0",
     "chance": "^1.1.11",
     "copy-webpack-plugin": "^11.0.0",
-    "cspell": "7.3.8",
+    "cspell": "8.0.0",
     "css-loader": "^6.7.3",
     "cypress": "13.3.0",
     "eslint": "^7.32.0",
