@@ -4008,10 +4008,10 @@
   dependencies:
     "@types/d3-color" "*"
 
-"@types/debounce-promise@^3.1.7":
-  version "3.1.7"
-  resolved "https://registry.yarnpkg.com/@types/debounce-promise/-/debounce-promise-3.1.7.tgz#44457d4a567c7ae9ae143390c735ca97230b1c99"
-  integrity sha512-XzqG8zCd9n33gmusdQo0d4p9iRKg/mZbG52wfHxnuZZyeO68ryOT5xyv9Fk3vLAvQBUsHmSL14Cqpsx4jjzz1Q==
+"@types/debounce-promise@^3.1.9":
+  version "3.1.9"
+  resolved "https://registry.yarnpkg.com/@types/debounce-promise/-/debounce-promise-3.1.9.tgz#b59346fe5c24636ebe0fb88f2f7e41b888b1cd7c"
+  integrity sha512-awNxydYSU+E2vL7EiOAMtiSOfL5gUM5X4YSE2A92qpxDJQ/rXz6oMPYBFDcDywlUmvIDI6zsqgq17cGm5CITQw==
 
 "@types/eslint-scope@^3.7.3":
   version "3.7.4"
