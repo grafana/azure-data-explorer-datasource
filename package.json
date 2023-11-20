@@ -43,7 +43,7 @@
     "@types/glob": "^8.0.0",
     "@types/grafana": "github:CorpGlory/types-grafana.git",
     "@types/jest": "^29.5.0",
-    "@types/k6": "^0.47.1",
+    "@types/k6": "^0.47.3",
     "@types/lodash": "^4.14.194",
     "@types/node": "^18.15.11",
     "@types/prismjs": "1.26.3",
