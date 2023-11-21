@@ -1,6 +1,7 @@
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
 import { CodeEditor, Monaco, MonacoEditor } from '@grafana/ui';
+import { KustoWorker, getKustoWorker } from '@kusto/monaco-kusto';
 import { AdxDataSource } from 'datasource';
 import React, { useEffect, useState } from 'react';
 import { selectors } from 'test/selectors';
@@ -50,15 +51,34 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
       signatureHelpTriggerCharacters: ['(', ')'],
       provideSignatureHelp: getSignatureHelp,
     });
-    monaco.languages['kusto']
-      .getKustoWorker()
-      .then((kusto) => {
-        const model = editor.getModel();
-        return model && kusto(model.uri);
-      })
-      .then((worker) => {
-        setWorker(worker);
-      });
+
+    const model = editor.getModel();
+
+    try {
+      // try to load via global monaco
+      monaco.languages['kusto']
+        .getKustoWorker()
+        .then((kusto) => {
+          return model && kusto(model.uri);
+        })
+        .then((worker) => {
+          setWorker(worker);
+        });
+    } catch (err) {
+      console.error(err);
+      try {
+        // fallback to use getKustoWorker which is available in Grafana >= 10.3.x
+        getKustoWorker()
+          .then((kusto) => {
+            return model && kusto(model.uri);
+          })
+          .then((worker) => {
+            setWorker(worker as unknown as KustoWorker);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
 
   useEffect(() => {

@@ -3,8 +3,8 @@
   "version": "4.7.1",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
-    "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
-    "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
+    "build": "webpack -c ./webpack.config.ts --env production",
+    "dev": "webpack -w -c ./webpack.config.ts --env development",
     "e2e": "yarn exec cypress install && yarn exec grafana-e2e run",
     "e2e:open": "grafana-e2e open",
     "e2e:update": "yarn exec cypress install && yarn exec grafana-e2e run --update-screenshots",
@@ -91,6 +91,7 @@
     "@grafana/experimental": "^1.7.0",
     "@grafana/runtime": "9.5.10",
     "@grafana/ui": "10.1.0",
+    "@kusto/monaco-kusto": "7.7.0",
     "debounce-promise": "^3.1.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
