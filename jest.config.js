@@ -2,7 +2,13 @@
 // generally used by snapshots, but can affect specific tests
 process.env.TZ = 'UTC';
 
+// Jest configuration provided by Grafana scaffolding
+const createPluginConfig = require('./.config/jest.config');
+
 module.exports = {
-  // Jest configuration provided by Grafana scaffolding
-  ...require('./.config/jest.config'),
+  ...createPluginConfig,
+  moduleNameMapper: {
+    ...createPluginConfig.moduleNameMapper,
+    '@kusto/monaco-kusto': '<rootDir>/src/test/mocks/monaco-kusto.ts',
+  },
 };
