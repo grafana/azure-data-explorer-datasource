@@ -12,6 +12,7 @@ import {
   TextArea,
   HorizontalGroup,
 } from '@grafana/ui';
+import { getKustoWorker } from '@kusto/monaco-kusto';
 import { AdxDataSource } from 'datasource';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { selectors } from 'test/selectors';
@@ -129,15 +130,34 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
       signatureHelpTriggerCharacters: ['(', ')'],
       provideSignatureHelp: getSignatureHelp,
     });
-    monaco.languages['kusto']
-      .getKustoWorker()
-      .then((kusto) => {
-        const model = editor.getModel();
-        return model && kusto(model.uri);
-      })
-      .then((worker) => {
-        setWorker(worker);
-      });
+
+    const model = editor.getModel();
+
+    try {
+      // try to load via global monaco
+      monaco.languages['kusto']
+        .getKustoWorker()
+        .then((kusto) => {
+          return model && kusto(model.uri);
+        })
+        .then((worker) => {
+          setWorker(worker);
+        });
+    } catch (err) {
+      console.error(err);
+      try {
+        // fallback to use getKustoWorker which is available in Grafana >= 10.3.x
+        getKustoWorker()
+          .then((kusto) => {
+            return model && kusto(model.uri);
+          })
+          .then((worker) => {
+            worker !== null && setWorker(worker);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
 
   useEffect(() => {

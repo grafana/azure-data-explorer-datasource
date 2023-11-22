@@ -1,7 +1,7 @@
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
 import { CodeEditor, Monaco, MonacoEditor } from '@grafana/ui';
-import { KustoWorker, getKustoWorker } from '@kusto/monaco-kusto';
+import { getKustoWorker } from '@kusto/monaco-kusto';
 import { AdxDataSource } from 'datasource';
 import React, { useEffect, useState } from 'react';
 import { selectors } from 'test/selectors';
@@ -73,7 +73,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
             return model && kusto(model.uri);
           })
           .then((worker) => {
-            setWorker(worker as unknown as KustoWorker);
+            worker !== null && setWorker(worker);
           });
       } catch (error) {
         console.error(error);
