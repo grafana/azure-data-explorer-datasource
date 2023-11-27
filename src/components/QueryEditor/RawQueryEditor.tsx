@@ -51,8 +51,10 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
       provideSignatureHelp: getSignatureHelp,
     });
 
+    const model = editor.getModel();
+
+    // Handle cases where kusto is already loaded or will be loaded via AMD
     if (monaco.languages['kusto'] && monaco.languages['kusto'].getKustoWorker) {
-      const model = editor.getModel();
       monaco.languages['kusto']
         .getKustoWorker()
         .then((kusto) => {
@@ -62,7 +64,23 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
           setWorker(worker);
         });
     } else {
-      console.warn('monaco-kusto language failed to load.');
+      // Handle cases where kusto should be loaded via ESM web worker (Grafana 10.3.x)
+      if ('System' in window) {
+        window.System.import('@kusto/monaco-kusto').then((kustoModule) => {
+          if (kustoModule && kustoModule.getKustoWorker) {
+            kustoModule
+              .getKustoWorker()
+              .then((workerAccessor) => {
+                return model && workerAccessor(model.uri);
+              })
+              .then((worker) => {
+                setWorker(worker);
+              });
+          } else {
+            console.log('kusto monaco language failed to load.');
+          }
+        });
+      }
     }
   };
 
