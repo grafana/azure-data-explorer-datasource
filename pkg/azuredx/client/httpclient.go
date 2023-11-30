@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -13,7 +14,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 )
 
-func newHttpClientAzureCloud(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
+func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
 	// Extract cloud from credentials
 	azureCloud, err := azcredentials.GetAzureCloud(azureSettings, credentials)
 	if err != nil {
@@ -31,7 +32,7 @@ func newHttpClientAzureCloud(instanceSettings *backend.DataSourceInstanceSetting
 	}
 	authOpts.Scopes(scopes)
 
-	httpClient, err := getHttpClient(instanceSettings, dsSettings, authOpts, credentials)
+	httpClient, err := getHttpClient(ctx, instanceSettings, dsSettings, authOpts, credentials)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +40,7 @@ func newHttpClientAzureCloud(instanceSettings *backend.DataSourceInstanceSetting
 	return httpClient, nil
 }
 
-func newHttpClientManagement(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
+func newHttpClientManagement(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
 	// Extract cloud from credentials
 	azureCloud, err := azcredentials.GetAzureCloud(azureSettings, credentials)
 	if err != nil {
@@ -53,7 +54,7 @@ func newHttpClientManagement(instanceSettings *backend.DataSourceInstanceSetting
 
 	authOpts.Scopes([]string{"https://management.azure.com/.default"})
 
-	httpClient, err := getHttpClient(instanceSettings, dsSettings, authOpts, credentials)
+	httpClient, err := getHttpClient(ctx, instanceSettings, dsSettings, authOpts, credentials)
 	if err != nil {
 		return nil, err
 	}
@@ -84,8 +85,8 @@ func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.Dat
 	return authOpts, nil
 }
 
-func getHttpClient(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, authOpts *azhttpclient.AuthOptions, credentials azcredentials.AzureCredentials) (*http.Client, error) {
-	clientOpts, err := instanceSettings.HTTPClientOptions()
+func getHttpClient(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, authOpts *azhttpclient.AuthOptions, credentials azcredentials.AzureCredentials) (*http.Client, error) {
+	clientOpts, err := instanceSettings.HTTPClientOptions(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error creating http client: %w", err)
 	}

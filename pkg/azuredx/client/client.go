@@ -32,12 +32,12 @@ type Client struct {
 }
 
 // NewClient creates a Grafana Plugin SDK Go Http Client
-func New(instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*Client, error) {
-	httpClientAzureCloud, err := newHttpClientAzureCloud(instanceSettings, dsSettings, azureSettings, credentials)
+func New(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*Client, error) {
+	httpClientAzureCloud, err := newHttpClientAzureCloud(ctx, instanceSettings, dsSettings, azureSettings, credentials)
 	if err != nil {
 		return nil, err
 	}
-	httpClientManagement, err := newHttpClientManagement(instanceSettings, dsSettings, azureSettings, credentials)
+	httpClientManagement, err := newHttpClientManagement(ctx, instanceSettings, dsSettings, azureSettings, credentials)
 	if err != nil {
 		return nil, err
 	}
