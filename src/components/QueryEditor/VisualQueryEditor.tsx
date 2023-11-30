@@ -29,6 +29,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
   const { schema, database, datasource, query, onChange } = props;
   const { id: datasourceId, parseExpression, getSchemaMapper } = datasource;
   const databaseName = templateSrv.replace(database);
+  const clusterName = templateSrv.replace(query.clusterUri);
   const tables = useTableOptions(schema, databaseName, datasource);
   const table = useSelectedTable(tables, query, datasource);
   const tableName = getTemplateSrv().replace(table?.value ?? '');
@@ -39,8 +40,8 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
     }
 
     const name = tableMapping?.value ?? tableName;
-    return await getTableSchema(datasource, databaseName, name);
-  }, [datasourceId, databaseName, tableName, tableMapping?.value]);
+    return await getTableSchema(datasource, databaseName, name, clusterName);
+  }, [datasourceId, databaseName, tableName, tableMapping?.value, clusterName]);
   const [tableColumns, setTableColumns] = useState<AdxColumnSchema[]>([]);
 
   useEffect(() => {
@@ -130,7 +131,7 @@ const useSelectedTable = (
   }, [options, table, variables]);
 };
 
-async function getTableSchema(datasource: AdxDataSource, databaseName: string, tableName: string) {
+async function getTableSchema(datasource: AdxDataSource, databaseName: string, tableName: string, clusterUri: string) {
   const schemaResolver = new AdxSchemaResolver(datasource);
-  return await schemaResolver.getColumnsForTable(databaseName, tableName);
+  return await schemaResolver.getColumnsForTable(databaseName, tableName, clusterUri);
 }

@@ -34,8 +34,8 @@ func TestClient(t *testing.T) {
 			QuerySource: "schema",
 		}
 
-		client := &Client{httpClient: server.Client()}
-		table, err := client.KustoRequest(context.Background(), server.URL, payload, nil)
+		client := &Client{httpClientAzureCloud: server.Client()}
+		table, err := client.KustoRequest(context.Background(), "", server.URL, payload, nil)
 		require.NoError(t, err)
 		require.NotNil(t, table)
 	})
@@ -61,8 +61,8 @@ func TestClient(t *testing.T) {
 			QuerySource: "schema",
 		}
 
-		client := &Client{httpClient: server.Client()}
-		table, err := client.KustoRequest(context.Background(), server.URL, payload, nil)
+		client := &Client{httpClientAzureCloud: server.Client()}
+		table, err := client.KustoRequest(context.Background(), "", server.URL, payload, nil)
 		require.Nil(t, table)
 		require.NotNil(t, err)
 		require.Contains(t, err.Error(), "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'")
@@ -88,8 +88,8 @@ func TestClient(t *testing.T) {
 			"x-ms-client-request-id": "KGC.schema;deadbeef",
 		}
 
-		client := &Client{httpClient: server.Client()}
-		table, err := client.KustoRequest(context.Background(), server.URL, payload, headers)
+		client := &Client{httpClientAzureCloud: server.Client()}
+		table, err := client.KustoRequest(context.Background(), "", server.URL, payload, headers)
 		require.Nil(t, table)
 		require.NotNil(t, err)
 	})

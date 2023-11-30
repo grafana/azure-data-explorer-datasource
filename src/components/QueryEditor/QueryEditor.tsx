@@ -16,7 +16,7 @@ type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = (props) => {
   const { onChange, onRunQuery, query, datasource } = props;
-  const schema = useAsync(() => datasource.getSchema(false), [datasource.id]);
+  const schema = useAsync(() => datasource.getSchema(query.clusterUri, false), [datasource.id, query.clusterUri]);
   const templateVariables = useTemplateVariables(datasource);
   const [dirty, setDirty] = useState(false);
 

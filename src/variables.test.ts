@@ -180,7 +180,7 @@ describe('variables', () => {
       const variableSupport = new VariableSupport(datasource);
       const req = mockRequest({
         targets: [
-          { ...defaultQuery, database: '', resultFormat: 'table', refId: '', queryType: AdxQueryType.Databases },
+          { ...defaultQuery, database: '', resultFormat: 'table', refId: '', queryType: AdxQueryType.Databases, clusterUri: '', },
         ],
       });
       const res = await lastValueFrom(variableSupport.query(req));
@@ -193,7 +193,7 @@ describe('variables', () => {
       const variableSupport = new VariableSupport(datasource);
       const req = mockRequest({
         targets: [
-          { ...defaultQuery, database: 'test_db', resultFormat: 'table', refId: '', queryType: AdxQueryType.Tables },
+          { ...defaultQuery, database: 'test_db', resultFormat: 'table', refId: '', queryType: AdxQueryType.Tables, clusterUri: '', },
         ],
       });
       const res = await lastValueFrom(variableSupport.query(req));
@@ -211,6 +211,7 @@ describe('variables', () => {
             resultFormat: 'table',
             refId: '',
             queryType: AdxQueryType.Columns,
+            clusterUri: '',
           },
         ],
       });

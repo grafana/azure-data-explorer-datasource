@@ -16,6 +16,10 @@ type RequestPayload struct {
 	Properties  *Properties `json:"properties,omitempty"`
 }
 
+type ARGRequestPayload struct {
+	Query string `json:"query"`
+}
+
 // AzureFrameMD is a type to populate a Frame's Custom metadata property.
 type AzureFrameMD struct {
 	ColumnTypes []string

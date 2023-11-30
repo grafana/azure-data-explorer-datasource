@@ -76,8 +76,12 @@ func (c *failingClient) TestRequest(_ context.Context, _ *models.DatasourceSetti
 	panic("not implemented")
 }
 
-func (c *failingClient) KustoRequest(_ context.Context, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
+func (c *failingClient) KustoRequest(_ context.Context, _ string, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
 	return nil, fmt.Errorf("HTTP error: %v - %v", http.StatusBadRequest, "")
+}
+
+func (c *failingClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
+	panic("not implemented")
 }
 
 type workingClient struct{}
@@ -86,7 +90,7 @@ func (c *workingClient) TestRequest(_ context.Context, _ *models.DatasourceSetti
 	panic("not implemented")
 }
 
-func (c *workingClient) KustoRequest(_ context.Context, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
+func (c *workingClient) KustoRequest(_ context.Context, _ string, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
 	return &models.TableResponse{
 		Tables: []models.Table{
 			{
@@ -102,4 +106,8 @@ func (c *workingClient) KustoRequest(_ context.Context, _ string, _ models.Reque
 			},
 		},
 	}, nil
+}
+
+func (c *workingClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
+	panic("not implemented")
 }

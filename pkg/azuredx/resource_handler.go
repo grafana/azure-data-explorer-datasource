@@ -13,6 +13,7 @@ func (adx *AzureDataExplorer) registerRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/databases", adx.getDatabases)
 	mux.HandleFunc("/schema", adx.getSchema)
 	mux.HandleFunc("/generateQuery", adx.generateQuery)
+	mux.HandleFunc("/clusters", adx.getClusters)
 }
 
 const ManagementApiPath = "/v1/rest/mgmt"
@@ -101,9 +102,21 @@ func (adx *AzureDataExplorer) generateQuery(rw http.ResponseWriter, req *http.Re
 }
 
 func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Request) {
-	if req.Method != "GET" {
+	if req.Method != "POST" {
 		respondWithError(rw, http.StatusMethodNotAllowed, "Invalid method", nil)
 		return
+	}
+
+	body, _ := io.ReadAll(req.Body)
+
+	var cluster struct {
+		ClusterUri string `json:"clusterUri,omitempty"`
+	}
+
+	json.Unmarshal(body, &cluster)
+
+	if cluster.ClusterUri == "" {
+		cluster.ClusterUri = adx.settings.ClusterURL
 	}
 
 	payload := models.RequestPayload{
@@ -112,7 +125,7 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 	}
 
 	headers := map[string]string{}
-	response, err := adx.client.KustoRequest(req.Context(), adx.settings.ClusterURL+ManagementApiPath, payload, headers)
+	response, err := adx.client.KustoRequest(req.Context(), cluster.ClusterUri, ManagementApiPath, payload, headers)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
@@ -126,9 +139,21 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 }
 
 func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Request) {
-	if req.Method != "GET" {
+	if req.Method != "POST" {
 		respondWithError(rw, http.StatusMethodNotAllowed, "Invalid method", nil)
 		return
+	}
+
+	body, _ := io.ReadAll(req.Body)
+
+	var cluster struct {
+		ClusterUri string `json:"clusterUri,omitempty"`
+	}
+
+	json.Unmarshal(body, &cluster)
+
+	if cluster.ClusterUri == "" {
+		cluster.ClusterUri = adx.settings.ClusterURL
 	}
 
 	payload := models.RequestPayload{
@@ -136,7 +161,7 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 	}
 
 	headers := map[string]string{}
-	response, err := adx.client.KustoRequest(req.Context(), adx.settings.ClusterURL+ManagementApiPath, payload, headers)
+	response, err := adx.client.KustoRequest(req.Context(), cluster.ClusterUri, ManagementApiPath, payload, headers)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
@@ -147,6 +172,43 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 	}
+}
+
+func (adx *AzureDataExplorer) getClusters(rw http.ResponseWriter, req *http.Request) {
+	if req.Method != "GET" {
+		respondWithError(rw, http.StatusMethodNotAllowed, "Invalid method", nil)
+		return
+	}
+
+	payload := models.ARGRequestPayload{Query: "resources | where type == \"microsoft.kusto/clusters\""}
+
+	headers := map[string]string{}
+
+	clusters, err := adx.client.ARGClusterRequest(req.Context(), payload, headers)
+	if err != nil {
+		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
+		return
+	}
+
+	clusters = addClusterFromSettings(clusters, adx)
+
+	rw.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(rw).Encode(clusters)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
+// addClusterFromSettings Check to see if cluster URL from settings was found in results. If found, move it to the front of the list
+// if not found, add it to the front of the list
+func addClusterFromSettings(clusters []models.ClusterOption, adx *AzureDataExplorer) []models.ClusterOption {
+	for i, v := range clusters {
+		if v.Uri == adx.settings.ClusterURL {
+			removeFound := append(clusters[:i], clusters[i+1:]...)
+			return append([]models.ClusterOption{v}, removeFound...)
+		}
+	}
+	return append([]models.ClusterOption{{Name: adx.settings.ClusterURL, Uri: adx.settings.ClusterURL}}, clusters...)
 }
 
 func respondWithError(rw http.ResponseWriter, code int, message string, err error) {

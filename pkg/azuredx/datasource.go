@@ -145,7 +145,11 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	}
 	headers["x-ms-client-request-id"] = msClientRequestIDHeader
 
-	tableRes, err := adx.client.KustoRequest(ctx, adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
+	clusterURL := q.ClusterUri
+	if clusterURL == "" {
+		clusterURL = adx.settings.ClusterURL
+	}
+	tableRes, err := adx.client.KustoRequest(ctx, clusterURL, "/v1/rest/query", models.RequestPayload{
 		CSL:         q.Query,
 		DB:          q.Database,
 		Properties:  props,
@@ -212,14 +216,6 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 			}
 			resp.Frames = append(resp.Frames, formattedDF)
 		}
-
-	// 	series, timeNotASC, err := tableRes.ToTimeSeries()
-	// 	if err != nil {
-	// 		qr.Error = err.Error()
-	// 		break
-	// 	}
-	// 	md.TimeNotASC = timeNotASC
-	// 	qr.Series = series
 
 	default:
 		resp.Error = fmt.Errorf("unsupported query type: '%v'", q.Format)

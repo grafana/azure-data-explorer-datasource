@@ -38,7 +38,7 @@ describe('Test schema resolution', () => {
   });
 
   it('Will correctly retrieve table columns', async () => {
-    const columns = await schemaResolver.getColumnsForTable('testdb', 'testtable');
+    const columns = await schemaResolver.getColumnsForTable('testdb', 'testtable', 'cluster');
     expect(columns).toHaveLength(1);
     expect(columns).toEqual(schema.Databases['testdb'].Tables['testtable'].OrderedColumns);
   });
@@ -71,7 +71,7 @@ describe('Test schema resolution', () => {
       },
     };
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
-    const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictable');
+    const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictable', 'cluster');
     expect(columns).toHaveLength(testColumns.length);
     expect(columns).toEqual(
       expect.arrayContaining([{ CslType: 'string', Name: 'Modes["`indexer`"]', Type: 'dynamic' }])
@@ -106,7 +106,7 @@ describe('Test schema resolution', () => {
       },
     };
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
-    const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictable');
+    const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictable', 'cluster');
     expect(columns).toHaveLength(testColumns.length);
     expect(columns).toEqual(
       expect.arrayContaining([{ CslType: 'string', Name: 'Modes["`indexer`"]', Type: 'dynamic' }])
@@ -141,7 +141,7 @@ describe('Test schema resolution', () => {
       },
     };
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
-    const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictableobj');
+    const columns = await schemaResolver.getColumnsForTable('testdb', 'testdynamictableobj', 'cluster');
     expect(columns).toHaveLength(testColumns.length);
     expect(columns).toEqual(expect.arrayContaining([{ CslType: 'long', Name: 'Teams["Score"]' }]));
   });

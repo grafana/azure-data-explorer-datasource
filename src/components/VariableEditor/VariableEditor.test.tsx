@@ -22,6 +22,7 @@ const createDefaultQuery = (overrides?: Partial<KustoQuery>): KustoQuery => ({
   database: '',
   resultFormat: 'table',
   refId: '',
+  clusterUri: '',
   ...overrides,
 });
 

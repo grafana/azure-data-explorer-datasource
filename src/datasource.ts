@@ -16,6 +16,7 @@ import {
   AdxSchema,
   AdxSchemaDefinition,
   AutoCompleteQuery,
+  ClusterOption,
   defaultQuery,
   EditorMode,
   KustoQuery,
@@ -29,6 +30,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private backendSrv: BackendSrv;
   private templateSrv: TemplateSrv;
   private defaultOrFirstDatabase: string;
+  private defaultOrFirstClusterUrl: string;
   private url?: string;
   private expressionParser: KustoExpressionParser;
   private defaultEditorMode: EditorMode;
@@ -43,6 +45,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.backendSrv = getBackendSrv();
     this.templateSrv = getTemplateSrv();
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
+    this.defaultOrFirstClusterUrl = instanceSettings.jsonData.clusterUrl;
     this.url = instanceSettings.url;
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
     this.schemaMapper = new AdxSchemaMapper(useSchemaMapping, schemaMapping);
@@ -99,8 +102,11 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     prepareAnnotation: migrateAnnotation,
   };
 
-  async getDatabases(): Promise<DatabaseItem[]> {
-    return this.getResource<KustoDatabaseList>('databases').then((response) => {
+  async getDatabases(clusterUri = ''): Promise<DatabaseItem[]> {
+    if (!clusterUri) {
+      clusterUri = await this.getDefaultOrFirstCluster()
+    }
+    return this.postResource<KustoDatabaseList>('databases', {clusterUri: clusterUri}).then((response) => {
       return new ResponseParser().parseDatabases(response);
     });
   }
@@ -111,8 +117,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  async getResource<T = unknown>(path: string): Promise<any> {
-    return super.getResource(path);
+
+  getClusters(): Promise<ClusterOption[]> {
+    return this.getResource('/clusters');
   }
 
   async getDefaultOrFirstDatabase(): Promise<string> {
@@ -126,15 +133,26 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  async getSchema(refreshCache = false): Promise<AdxSchema> {
+  async getDefaultOrFirstCluster(): Promise<string> {
+    if (this.defaultOrFirstClusterUrl) {
+      return Promise.resolve(this.defaultOrFirstClusterUrl);
+    }
+
+    return this.getClusters().then((clusters) => {
+      this.defaultOrFirstClusterUrl = clusters[0].uri;
+      return this.defaultOrFirstClusterUrl;
+    });
+  }
+
+  async getSchema(clusterUri: string, refreshCache = false): Promise<AdxSchema> {
     return cache<AdxSchema>(
-      `${this.id}.schema.overview`,
-      () => this.getResource('schema').then(new ResponseParser().parseSchemaResult),
+      `${this.id}.${clusterUri}.schema.overview`,
+      () => this.postResource(`schema`, {clusterUri: clusterUri}).then(new ResponseParser().parseSchemaResult),
       refreshCache
     );
   }
 
-  async getFunctionSchema(database: string, targetFunction: string): Promise<AdxColumnSchema[]> {
+  async getFunctionSchema(database: string, targetFunction: string, clusterUri: string): Promise<AdxColumnSchema[]> {
     const queryParts: string[] = [];
     const take = 'take 50000';
 
@@ -142,7 +160,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     queryParts.push(take);
     queryParts.push('getschema');
 
-    const query = this.buildQuery(queryParts.join('\n | '), {}, database);
+    const query = this.buildQuery(queryParts.join('\n | '), {}, database, clusterUri);
     const response = await lastValueFrom(
       this.query({
         targets: [
@@ -160,7 +178,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   async getDynamicSchema(
     database: string,
     source: string,
-    columns: string[]
+    columns: string[],
+    clusterUri: string
   ): Promise<Record<string, AdxColumnSchema[]>> {
     if (!database || !source || !Array.isArray(columns) || columns.length === 0) {
       return {};
@@ -178,7 +197,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     queryParts.push(project);
     queryParts.push(summarize);
 
-    const query = this.buildQuery(queryParts.join('\n | '), {}, database);
+    const query = this.buildQuery(queryParts.join('\n | '), {}, database, clusterUri);
     const response = await lastValueFrom(
       this.query({
         targets: [
@@ -202,7 +221,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   // Used for annotations and template variables
-  buildQuery(query: string, options: any, database: string): KustoQuery {
+  buildQuery(query: string, options: any, database: string, clusterUri: string): KustoQuery {
     if (!options) {
       options = {};
     }
@@ -223,6 +242,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       rawMode: true,
       query: interpolatedQuery,
       database,
+      clusterUri,
     };
   }
 
@@ -293,6 +313,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       query: autoQuery,
       resultFormat: 'table',
       querySource: 'autocomplete',
+      clusterUri: query.clusterUri,
     };
 
     const response = await lastValueFrom(

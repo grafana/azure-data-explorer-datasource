@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	kustoRequestMock func(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
-	table            = &models.TableResponse{
+	kustoRequestMock      func(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
+	ARGClusterRequestMock func(payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error)
+	table                 = &models.TableResponse{
 		Tables: []models.Table{
 			{
 				TableName: "Table_0",
@@ -57,6 +58,10 @@ func (c *fakeClient) TestRequest(_ context.Context, _ *models.DatasourceSettings
 	panic("not implemented")
 }
 
-func (c *fakeClient) KustoRequest(_ context.Context, url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+func (c *fakeClient) KustoRequest(_ context.Context, cluster string, url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
 	return kustoRequestMock(url, payload, additionalHeaders)
+}
+
+func (c *fakeClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
+	return ARGClusterRequestMock(payload, additionalHeaders)
 }

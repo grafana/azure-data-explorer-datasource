@@ -135,7 +135,7 @@ describe('AdxDataSource', () => {
         })
       );
 
-      expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
+      expect(await datasource.getDynamicSchema('foo', 'bar', ['col'], 'cluster')).toEqual({
         Teams: [
           {
             CslType: 'long',
@@ -169,7 +169,7 @@ describe('AdxDataSource', () => {
         })
       );
 
-      expect(await datasource.getDynamicSchema('foo', 'bar', ['col name'])).toEqual({
+      expect(await datasource.getDynamicSchema('foo', 'bar', ['col name'], 'cluster')).toEqual({
         Teams: [
           {
             CslType: 'long',
@@ -246,7 +246,7 @@ describe('AdxDataSource', () => {
             })
           );
 
-          expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
+          expect(await datasource.getDynamicSchema('foo', 'bar', ['col'], 'cluster')).toEqual({
             Teams: [t.expected],
           });
           if (t.warn) {

@@ -27,7 +27,8 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
       if (typeof queryObj === 'string') {
         const databasesQuery = (queryObj as string).match(/^databases\(\)/i);
         const defaultDatabase = await this.datasource.getDefaultOrFirstDatabase();
-        const baseQuery = this.datasource.buildQuery(queryObj, {}, defaultDatabase);
+        const defaultCluster = await this.datasource.getDefaultOrFirstCluster();
+        const baseQuery = this.datasource.buildQuery(queryObj, {}, defaultDatabase, defaultCluster);
         if (databasesQuery) {
           queryObj = { ...baseQuery, queryType: AdxQueryType.Databases };
         } else {
@@ -52,14 +53,15 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
           case AdxQueryType.Columns:
             const columns = await schemaResolver.getColumnsForTable(
               this.templateSrv.replace(queryObj.database),
-              this.templateSrv.replace(queryObj.table)
+              this.templateSrv.replace(queryObj.table),
+              this.templateSrv.replace(queryObj.clusterUri)
             );
             const columnNames = toColumnNames(columns).map((column) => ({ Name: column }));
             return {
               data: columns.length ? [toDataFrame(columnNames)] : [],
             };
           default:
-            const query = this.datasource.buildQuery(queryObj.query, {}, queryObj.database);
+            const query = this.datasource.buildQuery(queryObj.query, {}, queryObj.database, queryObj.clusterUri);
             const queryRes = await lastValueFrom(
               this.datasource.query(includeTimeRange({ targets: [query] } as DataQueryRequest<KustoQuery>))
             );

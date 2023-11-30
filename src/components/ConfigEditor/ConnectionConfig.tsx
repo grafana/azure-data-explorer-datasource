@@ -16,11 +16,8 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({ options, updateJson
   return (
     <ConfigSection title="Connection Details">
       <Field
-        label="Cluster URL"
-        description="The cluster url for your Azure Data Explorer database."
-        required
-        error={'Cluster URL is required'}
-        invalid={!options.jsonData.clusterUrl}
+        label="Default cluster url"
+        description="The default cluster url for your Azure Data Explorer database."
       >
         <Input
           aria-label="Cluster URL"

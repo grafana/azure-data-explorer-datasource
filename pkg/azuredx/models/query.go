@@ -7,6 +7,7 @@ type QueryModel struct {
 	Query       string `json:"query"`
 	Database    string `json:"database"`
 	QuerySource string `json:"querySource"` // used to identify if query came from getSchema, raw mode, etc
+	ClusterUri  string `json:"clusterUri,omitempty"`
 	MacroData   MacroData
 }
 

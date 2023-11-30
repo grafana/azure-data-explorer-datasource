@@ -86,6 +86,7 @@ export const mockQuery: KustoQuery = {
   query: '',
   database: '',
   resultFormat: '',
+  clusterUri: '',
   expression: {
     where: { expressions: [], type: QueryEditorExpressionType.And },
     reduce: { expressions: [], type: QueryEditorExpressionType.And },

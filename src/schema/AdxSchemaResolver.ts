@@ -19,7 +19,7 @@ export class AdxSchemaResolver {
   }
 
   async getDatabases(): Promise<AdxDatabaseSchema[]> {
-    const schema = await this.datasource.getSchema();
+    const schema = await this.datasource.getSchema('');
     return Object.keys(schema.Databases).map((key) => schema.Databases[key]);
   }
 
@@ -53,7 +53,7 @@ export class AdxSchemaResolver {
     return Object.keys(database.Functions).map((key) => database.Functions[key]);
   }
 
-  async getColumnsForTable(databaseName: string, tableName: string): Promise<AdxColumnSchema[]> {
+  async getColumnsForTable(databaseName: string, tableName: string, clusterUri: string): Promise<AdxColumnSchema[]> {
     const cacheKey = this.createCacheKey(`db.${databaseName}.${tableName}`);
     const mapper = this.datasource.getSchemaMapper();
 
@@ -66,7 +66,7 @@ export class AdxSchemaResolver {
       }
 
       if (mapping?.type === SchemaMappingType.function) {
-        schema.OrderedColumns = await this.datasource.getFunctionSchema(databaseName, mapping.value);
+        schema.OrderedColumns = await this.datasource.getFunctionSchema(databaseName, mapping.value, clusterUri);
       }
 
       const dynamicColumns = schema.OrderedColumns.filter((column) => column.CslType === 'dynamic').map(
@@ -76,7 +76,8 @@ export class AdxSchemaResolver {
       const schemaByColumn = await this.datasource.getDynamicSchema(
         databaseName,
         mapping?.name ?? tableName,
-        dynamicColumns
+        dynamicColumns,
+        clusterUri
       );
 
       return schema.OrderedColumns.reduce((columns: AdxColumnSchema[], column) => {
