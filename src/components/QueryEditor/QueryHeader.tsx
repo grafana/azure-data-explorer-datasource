@@ -12,6 +12,7 @@ import { databaseToDefinition } from 'schema/mapper';
 import { SelectableValue } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
 import { selectors } from 'test/selectors';
+import { parseClustersResponse } from 'response_parser';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
@@ -90,7 +91,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       setClusters(clusters);
     });
   }, [datasource]);
-
+  
   const onClusterChange = ({ value }: SelectableValue) => {
     onChange({ ...query, clusterUri: value!, database: '', expression: defaultQuery.expression });
   };
@@ -224,16 +225,4 @@ const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[]
 
     return databases;
   }, [schema]);
-};
-
-export const parseClustersResponse = (res: any): SelectableValue[] => {
-  if (!res && !res.length) {
-    return [];
-  }
-
-  if (res.data && res.data.length) {
-    return res.data.map((val: ClusterOption) => ({ label: val.name, value: val.uri }));
-  }
-
-  return res.map((val: ClusterOption) => ({ label: val.name, value: val.uri}));
 };
