@@ -5,6 +5,9 @@ on:
     types: [opened, reopened, synchronize]
     branches:
       - main
+  push:
+    branches:
+      - main
 
 permissions:
   pull-requests: write
@@ -64,6 +67,14 @@ jobs:
       - name: Generate Dockerfile
         shell: bash
         run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            SHA="${{ github.event.pull_request.head.sha }}"
+            NUMBER="${{ github.event.number }}"
+          else
+            SHA=${GITHUB_SHA}
+            NUMBER="main"
+          fi
+
           echo "FROM grafana/grafana-oss:latest
 
           # Make it as simple as possible to access the grafana instance for development purposes
@@ -76,9 +87,11 @@ jobs:
           ENV GF_DEFAULT_APP_MODE "development"
 
           # TODO: Cleanup script should remove images from closed PRs using these labels
-          LABEL gh-sha="${{ github.event.pull_request.head.sha }}"
+          LABEL gh-sha=${SHA}
+
           LABEL gh-repo="${{ github.event.repository.name }}"
-          LABEL gh-pr-number="${{ github.event.number }}"
+
+          LABEL gh-pr-number=${NUMBER}
 
           # Copy plugin build artifacts into the image
           COPY . /var/lib/grafana/plugins/${{ github.event.repository.name }}/" > Dockerfile
@@ -89,17 +102,29 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image for PRs
         uses: docker/build-push-action@v5
+        if: ${{ github.event_name == 'pull_request' }}
         with:
           context: .
           file: ./Dockerfile
           push: true
           tags: grafana/plugin-builds:${{ github.event.pull_request.head.sha }}pre
+
+      - name: Build and push Docker image for main branch
+        uses: docker/build-push-action@v5
+        if: ${{ github.event_name == 'push' }}
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: grafana/plugin-builds:azure-data-explorer-datasource-latest
+
   add_pr_comment:
     name: Add PR comment
     runs-on: ubuntu-latest
     needs: push_to_registry
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Find previous comment (if any)
         uses: peter-evans/find-comment@v2
