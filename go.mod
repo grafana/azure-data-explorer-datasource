@@ -9,7 +9,7 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.0
 	github.com/google/go-cmp v0.6.0
 	github.com/grafana/grafana-azure-sdk-go v1.10.0
-	github.com/grafana/grafana-plugin-sdk-go v0.195.0
+	github.com/grafana/grafana-plugin-sdk-go v0.196.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.4
 	github.com/xorcare/pointer v1.2.2
