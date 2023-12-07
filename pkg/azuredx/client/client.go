@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -27,7 +28,7 @@ var _ AdxClient = new(Client) // validates interface conformance
 
 // Client is an http.Client used for API requests.
 type Client struct {
-	httpClientAzureCloud *http.Client
+	httpClientKusto      *http.Client
 	httpClientManagement *http.Client
 }
 
@@ -41,11 +42,27 @@ func New(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettin
 	if err != nil {
 		return nil, err
 	}
-	return &Client{httpClientAzureCloud: httpClientAzureCloud, httpClientManagement: httpClientManagement}, nil
+	return &Client{httpClientKusto: httpClientAzureCloud, httpClientManagement: httpClientManagement}, nil
 }
 
 // TestRequest handles a data source test request in Grafana's Datasource configuration UI.
 func (c *Client) TestRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
+	if err := c.testManagementClientAndGetCluster(ctx, datasourceSettings, additionalHeaders); err != nil {
+		return err
+	}
+
+	if datasourceSettings.ClusterURL == "" {
+		return nil
+	}
+
+	if err := c.testKustoClientWithDefaultCluster(ctx, datasourceSettings, datasourceSettings.ClusterURL, properties, additionalHeaders); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) testKustoClientWithDefaultCluster(ctx context.Context, datasourceSettings *models.DatasourceSettings, clusterURL string, properties *models.Properties, additionalHeaders map[string]string) error {
 	buf, err := json.Marshal(models.RequestPayload{
 		CSL:        ".show databases schema",
 		DB:         datasourceSettings.DefaultDatabase,
@@ -65,15 +82,52 @@ func (c *Client) TestRequest(ctx context.Context, datasourceSettings *models.Dat
 		req.Header.Set(key, value)
 	}
 
-	resp, err := c.httpClientAzureCloud.Do(req)
+	resp, err := c.httpClientKusto.Do(req)
 	if err != nil {
 		return err
 	}
+
 	defer resp.Body.Close()
 
+	if resp.StatusCode == 403 {
+		return fmt.Errorf("The client does not have permission to get schemas on %q. The query editor will have limited options.", clusterURL)
+	}
 	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("azure HTTP %q", resp.Status)
 	}
+
+	return nil
+}
+
+func (c *Client) testManagementClientAndGetCluster(ctx context.Context, datasourceSettings *models.DatasourceSettings, additionalHeaders map[string]string) error {
+	buf, err := json.Marshal(models.ARGRequestPayload{Query: "resources | where type == \"microsoft.kusto/clusters\""})
+	if err != nil {
+		return fmt.Errorf("no Azure request serial: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01", bytes.NewReader(buf))
+	if err != nil {
+		return fmt.Errorf("no Azure request instance: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	for key, value := range additionalHeaders {
+		req.Header.Set(key, value)
+	}
+
+	resp, err := c.httpClientManagement.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 403 {
+		return errors.New("The client does not have permission to use Azure Resource Graph. The cluster select in the query editor and the default cluster URL in this data source config will not be populated.")
+	}
+	if resp.StatusCode/100 != 2 {
+		return fmt.Errorf("azure HTTP %q", resp.Status)
+	}
+
 	return nil
 }
 
@@ -101,7 +155,7 @@ func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, p
 		req.Header.Set(key, value)
 	}
 
-	resp, err := c.httpClientAzureCloud.Do(req)
+	resp, err := c.httpClientKusto.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -150,9 +204,6 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 	}
 
 	defer resp.Body.Close()
-	if err != nil {
-		return nil, err
-	}
 
 	switch {
 	case resp.StatusCode == http.StatusUnauthorized:

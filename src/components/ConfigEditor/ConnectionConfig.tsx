@@ -1,25 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
-import { Button, Field, Select } from '@grafana/ui';
+import { Field, Select } from '@grafana/ui';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
 import { selectors } from 'test/selectors';
 import { ConfigSection } from '@grafana/experimental';
 import { parseClustersResponse } from 'response_parser';
 import { getBackendSrv } from '@grafana/runtime';
 import { lastValueFrom } from 'rxjs';
-
-
-const getClusters = async (pluginUid: string) => {
-  try {
-    //await saveOptions();
-    const res = await lastValueFrom(
-      getBackendSrv().fetch({ url: `/api/datasources/uid/${pluginUid}/resources/clusters`, method: 'GET' })
-    );
-    return parseClustersResponse(res);
-  } catch (err) {
-    return Promise.resolve([]);
-  }
-};
 
 interface ConnectionConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
@@ -37,21 +24,8 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = (props: ConnectionConf
     });
   }, [onOptionsChange, options]);
 
-  const updateClusters = useCallback((received: Array<SelectableValue<string>>, clusterUrl: string) => {
-    setClusters(received);
-    if (clusterUrl && received.length > 0) {
-      // Selecting the default cluster if clusters are received and there is no default
-      onClusterChange(received[0]);
-      return;
-    }
-    const found = received.find((opt) => opt.value === clusterUrl);
-    if (!found) {
-      onClusterChange(undefined);
-    }
-  }, [onClusterChange]);
-
-  useEffect(()=> {
-    const basdf = async () => {
+  useEffect(() => {
+    const gettingClusters = async () => {
       if (!options.jsonData || !getClusters) {
         setClusters([]);
         return;
@@ -59,24 +33,22 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = (props: ConnectionConf
       let canceled = false;
       getClusters(options.uid).then((result) => {
         if (!canceled) {
-          updateClusters(result, options.jsonData.clusterUrl);
+          setClusters(result);
         }
       });
       return () => {
         canceled = true;
       };
     };
-    basdf();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    gettingClusters().catch(console.error);
+  }, [options.jsonData, options.uid])
 
   return (
     <ConfigSection title="Connection Details">
       <Field
-        label="Default cluster url"
-        description="The default cluster url for your Azure Data Explorer database."
+        label="Default cluster URL"
+        description="The default cluster url for this data source. Enter a cluster URL or Save & Test to get a list of available clusters."
       >
-        <div className="width-30" style={{ display: 'flex', gap: '4px' }}>
         <Select
         aria-label="Cluster URL"
         data-testid={selectors.components.configEditor.clusterURL.input}
@@ -86,16 +58,20 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = (props: ConnectionConf
         onChange={onClusterChange}
         allowCustomValue={true}
       />
-      <Button
-        variant="secondary"
-        type="button"
-      >
-        Load Clusters
-      </Button>
-      </div>
       </Field>
     </ConfigSection>
   );
+};
+
+const getClusters = async (pluginUid: string) => {
+  try {
+    const res = await lastValueFrom(
+      getBackendSrv().fetch({ url: `/api/datasources/uid/${pluginUid}/resources/clusters`, method: 'GET' })
+    );
+    return parseClustersResponse(res);
+  } catch (err) {
+    return Promise.resolve([]);
+  }
 };
 
 export default ConnectionConfig;

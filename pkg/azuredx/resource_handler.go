@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
@@ -190,7 +191,7 @@ func (adx *AzureDataExplorer) getClusters(rw http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	clusters = addClusterFromSettings(clusters, adx)
+	clusters = addClusterFromSettings(clusters, adx.settings.ClusterURL)
 
 	rw.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(rw).Encode(clusters)
@@ -201,14 +202,15 @@ func (adx *AzureDataExplorer) getClusters(rw http.ResponseWriter, req *http.Requ
 
 // addClusterFromSettings Check to see if cluster URL from settings was found in results. If found, move it to the front of the list
 // if not found, add it to the front of the list
-func addClusterFromSettings(clusters []models.ClusterOption, adx *AzureDataExplorer) []models.ClusterOption {
+func addClusterFromSettings(clusters []models.ClusterOption, clusterURL string) []models.ClusterOption {
 	for i, v := range clusters {
-		if v.Uri == adx.settings.ClusterURL {
+		if v.Uri == clusterURL {
 			removeFound := append(clusters[:i], clusters[i+1:]...)
 			return append([]models.ClusterOption{v}, removeFound...)
 		}
 	}
-	return append([]models.ClusterOption{{Name: adx.settings.ClusterURL, Uri: adx.settings.ClusterURL}}, clusters...)
+	clusterName := strings.Split(strings.Split(clusterURL, "//")[1], ".")[0]
+	return append([]models.ClusterOption{{Name: clusterName, Uri: clusterURL}}, clusters...)
 }
 
 func respondWithError(rw http.ResponseWriter, code int, message string, err error) {

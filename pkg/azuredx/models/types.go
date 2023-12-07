@@ -38,6 +38,11 @@ type Properties struct {
 	Options *options `json:"options,omitempty"`
 }
 
+type ClusterOption struct {
+	Name string `json:"name,omitempty"`
+	Uri  string `json:"uri,omitempty"`
+}
+
 // NewConnectionProperties creates ADX connection properties based on datasource settings.
 func NewConnectionProperties(s *DatasourceSettings, cs *CacheSettings) *Properties {
 	cacheMaxAge := s.CacheMaxAge
