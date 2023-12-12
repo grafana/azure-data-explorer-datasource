@@ -96,14 +96,9 @@ export class ResponseParser {
   }
 }
 
-export const parseClustersResponse = (res: any): SelectableValue[] => {
-  if (!res && !res.length) {
+export const parseClustersResponse = (res: ClusterOption[], giveNames = true): SelectableValue[] => {
+  if (!res || res.length === 0) {
     return [];
   }
-
-  if (res.data && res.data.length) {
-    return res.data.map((val: ClusterOption) => ({ label: val.name, value: val.uri }));
-  }
-
-  return res.map((val: ClusterOption) => ({ label: val.name, value: val.uri}));
+  return res.map((val: ClusterOption) => ({ label: giveNames ? val.name : val.uri, value: val.uri}));
 };

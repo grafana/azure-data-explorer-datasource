@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
 import { Field, Select } from '@grafana/ui';
-import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions, ClusterOption } from 'types';
 import { selectors } from 'test/selectors';
 import { ConfigSection } from '@grafana/experimental';
 import { parseClustersResponse } from 'response_parser';
-import { getBackendSrv } from '@grafana/runtime';
+import { BackendSrvRequest, getBackendSrv } from '@grafana/runtime';
 import { lastValueFrom } from 'rxjs';
+import { AzureClientSecretCredentials } from './AzureCredentials';
 
 interface ConnectionConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
@@ -31,7 +32,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = (props: ConnectionConf
         return;
       }
       let canceled = false;
-      getClusters(options.uid).then((result) => {
+      getClusters(props.options.jsonData.azureCredentials as AzureClientSecretCredentials).then((result) => {
         if (!canceled) {
           setClusters(result);
         }
@@ -41,7 +42,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = (props: ConnectionConf
       };
     };
     gettingClusters().catch(console.error);
-  }, [options.jsonData, options.uid])
+  }, [options.jsonData, options.uid, props.options.jsonData.azureCredentials])
 
   return (
     <ConfigSection title="Connection Details">
@@ -63,15 +64,54 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = (props: ConnectionConf
   );
 };
 
-const getClusters = async (pluginUid: string) => {
+const getToken = async (creds: AzureClientSecretCredentials) => {
+  const request = {
+    url: `https://login.microsoftonline.com/${creds.tenantId}/oauth2/v2.0/authorize`,
+    responseType: "json",
+    method: 'POST',
+    data: {
+    "grant_type": "client_credentials",
+    "client_id": creds.clientId,
+    "client_secret": creds.clientSecret,
+    "resource": "https://management.azure.com/"
+    },
+  } as BackendSrvRequest;
   try {
     const res = await lastValueFrom(
-      getBackendSrv().fetch({ url: `/api/datasources/uid/${pluginUid}/resources/clusters`, method: 'GET' })
+      getBackendSrv().fetch<any>(request)
     );
-    return parseClustersResponse(res);
+    const clusters = res.data;
+    return clusters;
   } catch (err) {
     return Promise.resolve([]);
   }
+}
+
+const getClusters = async (creds: AzureClientSecretCredentials) => {
+  const f = await getToken(creds);
+  console.log(f);
+  // const request = {
+  //   url: `https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01`,
+  //   method: 'POST',
+  //   headers: {
+  //     "dsaf": "dsf"
+  //   },
+  //   data: {
+  //     "subscriptions": [
+  //         //`${}`
+  //     ],
+  //     "query": `resources | where type == "microsoft.kusto/clusters"`
+  //   }
+  // } as BackendSrvRequest;
+  // try {
+  //   const res = await lastValueFrom(
+  //     getBackendSrv().fetch<ClusterOption[]>(request)
+  //   );
+  //   const clusters = res.data;
+  //   return parseClustersResponse(clusters, false);
+  // } catch (err) {
+  //   return Promise.resolve([]);
+  // }
 };
 
 export default ConnectionConfig;

@@ -26,7 +26,7 @@ func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL) // HELP! This is used to get China or US ADX. not sure how to test this stuff
+	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,11 @@ func newHttpClientManagement(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	authOpts.Scopes([]string{"https://management.azure.com/.default"})
+	scopes, err := getARGScopes(azureCloud)
+	if err != nil {
+		return nil, err
+	}
+	authOpts.Scopes(scopes)
 
 	httpClient, err := getHttpClient(ctx, instanceSettings, dsSettings, authOpts, credentials)
 	if err != nil {
