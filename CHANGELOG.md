@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [4.8.0]
+
+- New feature: OpenAI: incorporate the LLM plugin
+- Bump github.com/grafana/grafana-plugin-sdk-go from 0.180.0 to 0.195.0
+
 ## [4.7.1]
 
 - Upgrade dependencies

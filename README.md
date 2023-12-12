@@ -49,6 +49,12 @@ docker run -d --name=grafana -p 8081:8081 -e "GF_SERVER_HTTP_PORT=8081" -e "GF_I
 
 It is recommended that you use a volume to save the Grafana data in. Otherwise if you remove the docker container, you will lose all your Grafana data (dashboards, users etc.). You can create a volume with the [Docker Volume Driver for Azure File Storage](https://github.com/Azure/azurefile-dockervolumedriver).
 
+#### Docker latest
+
+Alternatively, you can use the tag `azure-data-explorer-datasource-latest` to pull down a Docker image for whatever is current in `main`.
+
+`docker run --rm -p 3000:3000 grafana/plugin-builds:azure-data-explorer-datasource-latest`
+
 ### Installing the Plugin on an Existing Grafana with the CLI
 
 Grafana comes with a command line tool that can be used to install plugins.
@@ -168,7 +174,8 @@ If the command succeeds you should get a result like this:
 
 6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
 
-### Configuring On-Behalf-Of authentication (Beta) 
+### Configuring On-Behalf-Of authentication (Beta)
+
 ⚠️ _This feature is in Beta and subject to breaking changes_
 
 For information about setting up and using the OBO flow: [on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
