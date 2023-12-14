@@ -119,7 +119,6 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 	}
 
 	body, err := io.ReadAll(req.Body)
-
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 	}
@@ -128,7 +127,10 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 		ClusterUri string `json:"clusterUri,omitempty"`
 	}
 
-	json.Unmarshal(body, &cluster)
+	err = json.Unmarshal(body, &cluster)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 
 	if cluster.ClusterUri == "" && adx.settings != nil {
 		cluster.ClusterUri = adx.settings.ClusterURL
@@ -169,7 +171,10 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 		ClusterUri string `json:"clusterUri,omitempty"`
 	}
 
-	json.Unmarshal(body, &cluster)
+	err = json.Unmarshal(body, &cluster)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 
 	if cluster.ClusterUri == "" && adx.settings != nil {
 		cluster.ClusterUri = adx.settings.ClusterURL
