@@ -57,6 +57,7 @@ describe('VariableEditor', () => {
       pluginVersion: defaultQuery.pluginVersion,
       expression: defaultQuery.expression,
       queryType: AdxQueryType.Databases,
+      clusterUri: '',
     };
     await act(async () => {
       render(<VariableEditor {...props} query={'databases()' as any} />);

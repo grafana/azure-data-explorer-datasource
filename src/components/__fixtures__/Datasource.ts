@@ -73,6 +73,7 @@ export const mockDatasource = (overrides?: Partial<{ [Property in keyof AdxDataS
     },
     readOnly: false,
   });
+  ds.getResource = jest.fn().mockResolvedValue([])
   if (overrides) {
     for (const key of Object.keys(overrides)) {
       ds[key] = overrides[key];

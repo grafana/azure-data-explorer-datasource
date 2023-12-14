@@ -139,7 +139,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     }
 
     return this.getClusters().then((clusters) => {
-      this.defaultOrFirstClusterUrl = clusters[0].uri;
+      this.defaultOrFirstClusterUrl = clusters[0]?.uri;
       return this.defaultOrFirstClusterUrl;
     });
   }
