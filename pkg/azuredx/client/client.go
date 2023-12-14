@@ -231,7 +231,10 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 		return nil, err
 	}
 
-	json.NewDecoder(bytes.NewReader(body)).Decode(&clusterData)
+	err = json.NewDecoder(bytes.NewReader(body)).Decode(&clusterData)
+	if err != nil {
+		return nil, err
+	}
 
 	clusterOptions := []models.ClusterOption{}
 	for _, v := range clusterData.Data {
