@@ -27,7 +27,8 @@ func TestResourceHandler(t *testing.T) {
 
 	t.Run("When incorrect method is used a 405 should be returned", func(t *testing.T) {
 		setup()
-		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", nil))
+
+		mux.ServeHTTP(res, httptest.NewRequest("PUT", "/databases", nil))
 		require.Equal(t, http.StatusMethodNotAllowed, res.Code)
 
 		mux.ServeHTTP(res, httptest.NewRequest("PUT", "/schema", nil))
@@ -43,7 +44,7 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
+		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", nil))
 		require.Equal(t, http.StatusInternalServerError, res.Code)
 		httpError := models.HttpError{}
 		err := json.NewDecoder(res.Body).Decode(&httpError)
@@ -59,7 +60,7 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
+		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", nil))
 		require.Equal(t, http.StatusOK, res.Code)
 		tableResponse := models.TableResponse{}
 		err := json.NewDecoder(res.Body).Decode(&tableResponse)

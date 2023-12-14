@@ -55,7 +55,11 @@ func (adx *AzureDataExplorer) generateQuery(rw http.ResponseWriter, req *http.Re
 		return
 	}
 
-	body, _ := io.ReadAll(req.Body)
+	body, err := io.ReadAll(req.Body)
+
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 
 	reqBody := openaiBody{
 		Model: OpenAIModel,
@@ -89,7 +93,13 @@ func (adx *AzureDataExplorer) generateQuery(rw http.ResponseWriter, req *http.Re
 	defer resp.Body.Close()
 
 	var content openaiResponse
-	body, _ = io.ReadAll(resp.Body)
+
+	body, err = io.ReadAll(resp.Body)
+
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
+
 	err = json.Unmarshal(body, &content)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Error parsing generated query", err)
@@ -108,7 +118,11 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	body, _ := io.ReadAll(req.Body)
+	body, err := io.ReadAll(req.Body)
+
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 
 	var cluster struct {
 		ClusterUri string `json:"clusterUri,omitempty"`
@@ -116,7 +130,7 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 
 	json.Unmarshal(body, &cluster)
 
-	if cluster.ClusterUri == "" {
+	if cluster.ClusterUri == "" && adx.settings != nil {
 		cluster.ClusterUri = adx.settings.ClusterURL
 	}
 
@@ -145,7 +159,11 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 		return
 	}
 
-	body, _ := io.ReadAll(req.Body)
+	body, err := io.ReadAll(req.Body)
+
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 
 	var cluster struct {
 		ClusterUri string `json:"clusterUri,omitempty"`
@@ -153,7 +171,7 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 
 	json.Unmarshal(body, &cluster)
 
-	if cluster.ClusterUri == "" {
+	if cluster.ClusterUri == "" && adx.settings != nil {
 		cluster.ClusterUri = adx.settings.ClusterURL
 	}
 
