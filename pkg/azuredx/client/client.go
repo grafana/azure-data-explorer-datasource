@@ -122,7 +122,7 @@ func (c *Client) testManagementClientAndGetCluster(ctx context.Context, datasour
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 403 {
-		return errors.New("The client does not have permission to use Azure Resource Graph. The cluster select in the query editor and the default cluster URL in this data source config will not be populated.")
+		return errors.New("The client does not have permission to use Azure Resource Graph. The cluster select in the query editor config will not be populated.")
 	}
 	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("azure HTTP %q", resp.Status)
