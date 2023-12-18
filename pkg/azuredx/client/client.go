@@ -222,7 +222,8 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 		Data []struct {
 			Name       string `json:"name,omitempty"`
 			Properties struct {
-				Uri string `json:"uri,omitempty"`
+				Uri   string `json:"uri,omitempty"`
+				State string `json:"state,omitempty"`
 			} `json:"properties,omitempty"`
 		} `json:"data,omitempty"`
 	}
@@ -238,6 +239,9 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 
 	clusterOptions := []models.ClusterOption{}
 	for _, v := range clusterData.Data {
+		if v.Properties.State != "Running" {
+			continue
+		}
 		clusterOptions = append(clusterOptions, models.ClusterOption{
 			Name: v.Name,
 			Uri:  v.Properties.Uri,

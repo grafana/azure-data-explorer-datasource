@@ -125,7 +125,6 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 
 	var cluster struct {
 		ClusterUri string `json:"clusterUri,omitempty"`
-		State      string `json:"state,omitempty"`
 	}
 
 	err = json.Unmarshal(body, &cluster)
@@ -170,7 +169,6 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 
 	var cluster struct {
 		ClusterUri string `json:"clusterUri,omitempty"`
-		State      string `json:"state,omitempty"`
 	}
 
 	err = json.Unmarshal(body, &cluster)
