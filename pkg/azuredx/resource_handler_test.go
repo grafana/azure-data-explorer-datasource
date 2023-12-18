@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -44,7 +45,7 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", nil))
+		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", strings.NewReader("{}")))
 		require.Equal(t, http.StatusInternalServerError, res.Code)
 		httpError := models.HttpError{}
 		err := json.NewDecoder(res.Body).Decode(&httpError)
@@ -60,7 +61,7 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", nil))
+		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", strings.NewReader("{}")))
 		require.Equal(t, http.StatusOK, res.Code)
 		tableResponse := models.TableResponse{}
 		err := json.NewDecoder(res.Body).Decode(&tableResponse)
