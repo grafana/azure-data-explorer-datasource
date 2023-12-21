@@ -41,7 +41,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
 
     const name = tableMapping?.value ?? tableName;
     return await getTableSchema(datasource, databaseName, name, clusterName);
-  }, [datasourceId, databaseName, tableName, tableMapping?.value, clusterName]);
+  }, [datasourceId, databaseName, tableName, tableMapping?.value]);
   const [tableColumns, setTableColumns] = useState<AdxColumnSchema[]>([]);
 
   useEffect(() => {
@@ -55,9 +55,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
         onChange({ ...query, query: q });
       }
     }
-    // We are only interested on re-parsing if the expression changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query.expression, tableSchema.value]);
+  }, [query.expression, tableSchema.value, clusterName, parseExpression, query, onChange]);
 
   if (!schema) {
     return null;

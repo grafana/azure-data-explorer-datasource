@@ -14,25 +14,25 @@ describe('Test schema resolution', () => {
   });
 
   it('Will correctly retrieve databases', async () => {
-    const databases = await schemaResolver.getDatabases();
+    const databases = await schemaResolver.getDatabases('testClusterUri');
     expect(databases).toHaveLength(1);
     expect(databases[0]).toEqual(schema.Databases['testdb']);
   });
 
   it('Will correctly retrieve database tables', async () => {
-    const tables = await schemaResolver.getTablesForDatabase('testdb');
+    const tables = await schemaResolver.getTablesForDatabase('testdb', 'testClusterUri');
     expect(tables).toHaveLength(1);
     expect(tables[0]).toEqual(schema.Databases['testdb'].Tables['testtable']);
   });
 
   it('Will correctly retrieve materialized views', async () => {
-    const views = await schemaResolver.getViewsForDatabase('testdb');
+    const views = await schemaResolver.getViewsForDatabase('testdb', 'testClusterUri');
     expect(views).toHaveLength(1);
     expect(views[0]).toEqual(schema.Databases['testdb'].MaterializedViews['testMaterializedView']);
   });
 
   it('Will correctly retrieve functions', async () => {
-    const functions = await schemaResolver.getFunctionsForDatabase('testdb');
+    const functions = await schemaResolver.getFunctionsForDatabase('testdb', 'testClusterUri');
     expect(functions).toHaveLength(1);
     expect(functions[0]).toEqual(schema.Databases['testdb'].Functions['testfunction']);
   });

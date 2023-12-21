@@ -18,13 +18,13 @@ export class AdxSchemaResolver {
     return `${schemaKey}.${this.datasource.id}.${addition}`;
   }
 
-  async getDatabases(): Promise<AdxDatabaseSchema[]> {
-    const schema = await this.datasource.getSchema('');
+  async getDatabases(clusterUri: string): Promise<AdxDatabaseSchema[]> {
+    const schema = await this.datasource.getSchema(clusterUri);
     return Object.keys(schema.Databases).map((key) => schema.Databases[key]);
   }
 
-  async getTablesForDatabase(databaseName: string): Promise<AdxTableSchema[]> {
-    const databases = await this.getDatabases();
+  async getTablesForDatabase(databaseName: string, clusterUri: string): Promise<AdxTableSchema[]> {
+    const databases = await this.getDatabases(clusterUri);
     const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
@@ -33,8 +33,8 @@ export class AdxSchemaResolver {
     return Object.keys(database.Tables).map((key) => database.Tables[key]);
   }
 
-  async getViewsForDatabase(databaseName: string): Promise<AdxTableSchema[]> {
-    const databases = await this.getDatabases();
+  async getViewsForDatabase(databaseName: string, clusterUri: string): Promise<AdxTableSchema[]> {
+    const databases = await this.getDatabases(clusterUri);
     const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
@@ -43,8 +43,8 @@ export class AdxSchemaResolver {
     return Object.keys(database.MaterializedViews).map((key) => database.MaterializedViews[key]);
   }
 
-  async getFunctionsForDatabase(databaseName: string): Promise<AdxFunctionSchema[]> {
-    const databases = await this.getDatabases();
+  async getFunctionsForDatabase(databaseName: string, clusterUri: string): Promise<AdxFunctionSchema[]> {
+    const databases = await this.getDatabases(clusterUri);
     const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
@@ -59,7 +59,7 @@ export class AdxSchemaResolver {
 
     return cache(cacheKey, async () => {
       const mapping = mapper.getMappingByValue(tableName);
-      const schema = await this.findSchema(databaseName, tableName, mapping);
+      const schema = await this.findSchema(databaseName, tableName, clusterUri, mapping);
 
       if (!schema) {
         return [];
@@ -98,12 +98,13 @@ export class AdxSchemaResolver {
   private async findSchema(
     databaseName: string,
     tableName: string,
+    clusterUri: string,
     mapping?: SchemaMapping
   ): Promise<AdxTableSchema | undefined> {
     const [tables, funcs, views] = await Promise.all([
-      this.getTablesForDatabase(databaseName),
-      this.getFunctionsForDatabase(databaseName),
-      this.getViewsForDatabase(databaseName),
+      this.getTablesForDatabase(databaseName, clusterUri),
+      this.getFunctionsForDatabase(databaseName, clusterUri),
+      this.getViewsForDatabase(databaseName, clusterUri),
     ]);
 
     const name = mapping?.name ?? tableName;

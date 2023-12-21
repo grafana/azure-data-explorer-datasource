@@ -46,7 +46,7 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
               data: databases.length ? [toDataFrame(databases)] : [],
             };
           case AdxQueryType.Tables:
-            const tables = await schemaResolver.getTablesForDatabase(this.templateSrv.replace(queryObj.database));
+            const tables = await schemaResolver.getTablesForDatabase(this.templateSrv.replace(queryObj.database), this.templateSrv.replace(queryObj.clusterUri));
             return {
               data: tables.length ? [toDataFrame(tables)] : [],
             };

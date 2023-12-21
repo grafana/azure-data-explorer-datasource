@@ -45,7 +45,7 @@ const adxTimeFormat: SelectableValue<string> = {
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions } = props;
   const { rawMode, OpenAI } = query;
-  const [cluster, setCluster] = useState(query.clusterUri);
+  const [clusterUri, setClusterUri] = useState(query.clusterUri);
   const [clusters, setClusters] = useState<Array<SelectableValue<string>>>([]);
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query, datasource);
@@ -91,15 +91,15 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       setClusters(clusters);
       if (!query.clusterUri) {
         datasource.getDefaultOrFirstCluster().then((cluster: string) => {
-          setCluster(cluster);
+          setClusterUri(cluster);
         })
       }
     });
   }, [datasource, query.clusterUri]);
   
   const onClusterChange = ({ value }: SelectableValue) => {
-    setCluster(value);
-    onChange({ ...query, clusterUri: value, database: '', expression: defaultQuery.expression });
+    setClusterUri(value);
+    onChange({ ...query, clusterUri: value, expression: defaultQuery.expression });
   };
 
   const onDatabaseChange = ({ value }: SelectableValue) => {
@@ -139,7 +139,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         label="Cluster"
         aria-label="Cluster"
         options={clusters}
-        value={cluster}
+        value={clusterUri}
         onChange={onClusterChange}
         allowCustomValue={true}
       />

@@ -88,7 +88,7 @@ const VariableEditor = (props: VariableProps) => {
       const schemaResolver = new AdxSchemaResolver(datasource);
       if (query.database) {
         schemaResolver
-          .getTablesForDatabase(query.database)
+          .getTablesForDatabase(query.database, query.clusterUri)
           .then((tables) => setTables(tables.map((table) => ({ label: table.Name, value: table.Name }))));
       }
     }
