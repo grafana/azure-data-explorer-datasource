@@ -54,7 +54,7 @@ export class AdxSchemaResolver {
   }
 
   async getColumnsForTable(databaseName: string, tableName: string, clusterUri: string): Promise<AdxColumnSchema[]> {
-    const cacheKey = this.createCacheKey(`db.${databaseName}.${tableName}`);
+    const cacheKey = this.createCacheKey(`${clusterUri}.${databaseName}.${tableName}`);
     const mapper = this.datasource.getSchemaMapper();
 
     return cache(cacheKey, async () => {

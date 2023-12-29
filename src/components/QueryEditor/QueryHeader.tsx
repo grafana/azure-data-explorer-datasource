@@ -62,7 +62,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   };
 
   useEffect(() => {
-    if (!query.database && database) {
+    if (database && query.database !== database) {
       onChange({ ...query, database });
     }
   }, [query, database, onChange]);
