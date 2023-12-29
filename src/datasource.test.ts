@@ -26,6 +26,27 @@ describe('AdxDataSource', () => {
     };
   });
 
+  describe('when performing getClusters', () => {
+    const response = [
+      {
+        name: 'ClusterName',
+        value: 'ClusterValue'
+      }
+    ]
+
+    beforeEach(() => {
+      ctx.ds = new AdxDataSource(ctx.instanceSettings);
+      ctx.ds.getResource = jest.fn().mockResolvedValue(response);
+    });
+
+    it('should return a list of clusters', () => {
+      return ctx.ds.getClusters().then((results) => {
+        expect(results[0].name).toBe('ClusterName');
+        expect(results[0].value).toBe('ClusterValue');
+      });
+    });
+  });
+
   describe('when performing getDatabases', () => {
     const response = setupTableResponse();
 
@@ -36,7 +57,7 @@ describe('AdxDataSource', () => {
     });
 
     it('should return a list of databases', () => {
-      return ctx.ds.getDatabases('').then((results) => {
+      return ctx.ds.getDatabases('clusterUri').then((results) => {
         expect(results[0].text).toBe('Grafana');
         expect(results[0].value).toBe('Grafana');
       });

@@ -25,6 +25,7 @@ interface VariableOptions<T = string> {
 const VariableEditor = (props: VariableProps) => {
   const { query, onChange, datasource } = props;
   const VARIABLE_TYPE_OPTIONS = [
+    { label: 'Clusters', value: AdxQueryType.Clusters },
     { label: 'Databases', value: AdxQueryType.Databases },
     { label: 'Tables', value: AdxQueryType.Tables },
     { label: 'Columns', value: AdxQueryType.Columns },
@@ -36,8 +37,10 @@ const VariableEditor = (props: VariableProps) => {
   });
   const queryType = typeof query === 'string' ? '' : query.queryType;
 
+  const [clusters, setClusters] = useState<SelectableValue[]>([]);
   const [databases, setDatabases] = useState<SelectableValue[]>([]);
   const [tables, setTables] = useState<SelectableValue[]>([]);
+  const [requireCluster, setRequireCluster] = useState<boolean>(false);
   const [requireDatabase, setRequireDatabase] = useState<boolean>(false);
   const [requireTable, setRequireTable] = useState<boolean>(false);
 
@@ -63,6 +66,7 @@ const VariableEditor = (props: VariableProps) => {
   }, [datasource, queryType]);
 
   useEffect(() => {
+    setRequireCluster(false);
     setRequireDatabase(false);
     setRequireTable(false);
     switch (queryType) {
@@ -71,26 +75,37 @@ const VariableEditor = (props: VariableProps) => {
         setRequireTable(true);
       case AdxQueryType.Tables:
         setRequireDatabase(true);
-        break;
       case AdxQueryType.Databases:
+        setRequireCluster(true);
+        break;
+      case AdxQueryType.Clusters:
       case AdxQueryType.KustoQuery:
     }
   }, [queryType]);
 
   useEffectOnce(() => {
-    datasource
-      .getDatabases()
-      .then((databases) => setDatabases(databases.map((db) => ({ label: db.text, value: db.value }))));
+    datasource.getClusters().then((clusters) => setClusters(clusters.map(cluster => ({label: cluster.name, value: cluster.uri}))));
   });
 
   useEffect(() => {
-    if (queryType === AdxQueryType.Columns) {
-      const schemaResolver = new AdxSchemaResolver(datasource);
-      if (query.database) {
-        schemaResolver
-          .getTablesForDatabase(query.database, query.clusterUri)
-          .then((tables) => setTables(tables.map((table) => ({ label: table.Name, value: table.Name }))));
-      }
+    if (queryType === '' || queryType === AdxQueryType.Clusters) {
+      return;
+    }
+    datasource
+      .getDatabases(query.clusterUri)
+      .then((databases) => setDatabases(databases.map(db => ({ label: db.text, value: db.value }))));
+    setTables([]);
+  }, [datasource, query.clusterUri, queryType])
+
+  useEffect(() => {
+    if (queryType !== AdxQueryType.Columns) {
+      return;
+    }
+    const schemaResolver = new AdxSchemaResolver(datasource);
+    if (query.database) {
+      schemaResolver
+        .getTablesForDatabase(query.database, query.clusterUri)
+        .then((tables) => setTables(tables.map((table) => ({ label: table.Name, value: table.Name }))));
     }
   }, [query, queryType, datasource]);
 
@@ -99,8 +114,18 @@ const VariableEditor = (props: VariableProps) => {
       onChange({
         ...query,
         queryType: selectableValue.value,
+        clusterUri: '',
         database: '',
         table: undefined,
+      });
+    }
+  };
+
+  const onClusterChange = (selectableValue: SelectableValue) => {
+    if (selectableValue.value) {
+      onChange({
+        ...query,
+        clusterUri: selectableValue.value,
       });
     }
   };
@@ -136,6 +161,17 @@ const VariableEditor = (props: VariableProps) => {
       </Field>
       {query.queryType === AdxQueryType.KustoQuery && (
         <QueryEditor query={query} onChange={onChange} datasource={datasource} onRunQuery={() => {}} />
+      )}
+      {requireCluster && (
+        <Field label="Cluster" data-testid={selectors.components.variableEditor.clusters.input}>
+          <Select
+            aria-label="select cluster"
+            onChange={onClusterChange}
+            options={clusters.concat(variableOptionGroup)}
+            width={25}
+            value={query.clusterUri || null}
+          />
+        </Field>
       )}
       {requireDatabase && (
         <Field label="Database" data-testid={selectors.components.variableEditor.databases.input}>

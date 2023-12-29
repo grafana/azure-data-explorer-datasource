@@ -53,6 +53,7 @@ export enum EditorMode {
 }
 
 export enum AdxQueryType {
+  Clusters = 'Clusters',
   Databases = 'Databases',
   KustoQuery = 'KQL',
   Tables = 'Tables',

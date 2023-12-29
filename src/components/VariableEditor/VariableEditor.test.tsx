@@ -28,6 +28,7 @@ const createDefaultQuery = (overrides?: Partial<KustoQuery>): KustoQuery => ({
 
 const defaultProps = (overrides?: Partial<VariableProps>): VariableProps => {
   const datasource = mockDatasource();
+  datasource.getClusters = jest.fn().mockResolvedValue([{ name: 'cluster_name', value: 'cluster_value' }]);
   datasource.getDatabases = jest.fn().mockResolvedValue([{ text: 'test_db', value: 'test_db' }]);
   datasource.getSchema = jest.fn().mockResolvedValue([]);
   return {
@@ -70,6 +71,23 @@ describe('VariableEditor', () => {
     render(<VariableEditor {...defaultProps()} />);
 
     await waitFor(() => screen.getByText('Run query'));
+  });
+
+  it('will run cluster query', async () => {
+    const props = defaultProps();
+    const { rerender } = render(<VariableEditor {...props} />);
+    await waitFor(() => screen.getByLabelText('select query type'));
+
+    const querySelector = await screen.getByLabelText('select query type');
+    await openMenu(querySelector);
+    await act(async () => {
+      screen.getByText('Clusters').click();
+      const newQuery = { ...props.query, queryType: AdxQueryType.Clusters };
+      rerender(<VariableEditor {...props} query={newQuery} />);
+    });
+
+    expect(props.onChange).toHaveBeenCalledWith(expect.objectContaining({ queryType: AdxQueryType.Clusters }));
+    expect(props.datasource.getClusters).toBeCalled();
   });
 
   it('will run database query', async () => {

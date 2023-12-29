@@ -94,6 +94,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return {
       ...target,
       query,
+      clusterUri: this.templateSrv.replace(target.clusterUri, scopedVars),
       database: this.templateSrv.replace(target.database, scopedVars),
     };
   }
@@ -102,11 +103,16 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     prepareAnnotation: migrateAnnotation,
   };
 
-  async getDatabases(clusterUri = ''): Promise<DatabaseItem[]> {
-    if (!clusterUri) {
+  async getDatabases(clusterUri?: string): Promise<DatabaseItem[]> {
+    if (clusterUri === '') {
+      return [];
+    }
+    if (clusterUri === undefined) {
       clusterUri = await this.getDefaultOrFirstCluster()
     }
-    return this.postResource<KustoDatabaseList>('databases', {clusterUri: clusterUri}).then((response) => {
+    const replacedClusterUri = this.templateSrv.replace(clusterUri, this.templateSrv.getVariables() as any);
+    
+    return this.postResource<KustoDatabaseList>('databases', {clusterUri: replacedClusterUri}).then((response) => {
       return new ResponseParser().parseDatabases(response);
     });
   }
@@ -145,9 +151,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   async getSchema(clusterUri: string, refreshCache = false): Promise<AdxSchema> {
+    const replacedClusterUri = this.templateSrv.replace(clusterUri, this.templateSrv.getVariables() as any);
     return cache<AdxSchema>(
-      `${this.id}.${clusterUri}.schema.overview`,
-      () => this.postResource(`schema`, {clusterUri: clusterUri}).then(new ResponseParser().parseSchemaResult),
+      `${this.id}.${replacedClusterUri}.schema.overview`,
+      () => this.postResource(`schema`, {clusterUri: replacedClusterUri}).then(new ResponseParser().parseSchemaResult),
       refreshCache
     );
   }

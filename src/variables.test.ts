@@ -93,7 +93,7 @@ const datasource = mockDatasource({
   getDefaultOrFirstDatabase: jest.fn().mockResolvedValue('test_db'),
   getDatabases: jest.fn().mockResolvedValue([{ text: 'test_db', value: 'test_db' }]),
   getSchema: jest.fn().mockResolvedValue(mockSchema),
-  getClusters: jest.fn().mockResolvedValue([]),
+  getClusters: jest.fn().mockResolvedValue([{ name: 'cluster_name', value: 'cluster_value' }]),
   query: jest.fn().mockReturnValue(
     of({
       data: [

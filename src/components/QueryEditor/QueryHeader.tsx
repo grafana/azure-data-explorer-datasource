@@ -138,7 +138,11 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       <InlineSelect
         label="Cluster"
         aria-label="Cluster"
-        options={clusters}
+        options={clusters.concat({
+          ...templateVariableOptions,
+          value: templateVariableOptions.value || '',
+          type: QueryEditorPropertyType.String,
+        })}
         value={clusterUri}
         onChange={onClusterChange}
         allowCustomValue={true}
