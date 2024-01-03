@@ -108,7 +108,7 @@ func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.Chec
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusUnknown,
-			Message: err.Error(),
+			Message: "Unable to use Azure Resource Graph queries to get clusters: " + err.Error(),
 		}, nil
 	}
 
