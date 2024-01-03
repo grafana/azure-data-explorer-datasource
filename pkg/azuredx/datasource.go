@@ -95,10 +95,19 @@ func (adx *AzureDataExplorer) CallResource(ctx context.Context, req *backend.Cal
 func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	ctx = azusercontext.WithUserFromHealthCheckReq(ctx, req)
 	headers := map[string]string{}
-	err := adx.client.TestRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
+
+	err := adx.client.TestKustoRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
+			Message: err.Error(),
+		}, nil
+	}
+
+	err = adx.client.TestARGSRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
+	if err != nil {
+		return &backend.CheckHealthResult{
+			Status:  backend.HealthStatusUnknown,
 			Message: err.Error(),
 		}, nil
 	}

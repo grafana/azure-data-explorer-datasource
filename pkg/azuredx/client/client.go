@@ -19,7 +19,8 @@ import (
 )
 
 type AdxClient interface {
-	TestRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
+	TestKustoRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
+	TestARGSRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
 	KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
 	ARGClusterRequest(ctx context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error)
 }
@@ -45,12 +46,15 @@ func New(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettin
 	return &Client{httpClientKusto: httpClientAzureCloud, httpClientManagement: httpClientManagement}, nil
 }
 
-// TestRequest handles a data source test request in Grafana's Datasource configuration UI.
-func (c *Client) TestRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
-	if err := c.testManagementClientAndGetCluster(ctx, datasourceSettings, additionalHeaders); err != nil {
+func (c *Client) TestARGSRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
+	if err := c.testManagementClient(ctx, datasourceSettings, additionalHeaders); err != nil {
 		return err
 	}
+	return nil
+}
 
+// TestKustoRequest handles a data source test request in Grafana's Datasource configuration UI.
+func (c *Client) TestKustoRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
 	if datasourceSettings.ClusterURL == "" {
 		return nil
 	}
@@ -99,7 +103,7 @@ func (c *Client) testKustoClientWithDefaultCluster(ctx context.Context, datasour
 	return nil
 }
 
-func (c *Client) testManagementClientAndGetCluster(ctx context.Context, datasourceSettings *models.DatasourceSettings, additionalHeaders map[string]string) error {
+func (c *Client) testManagementClient(ctx context.Context, datasourceSettings *models.DatasourceSettings, additionalHeaders map[string]string) error {
 	buf, err := json.Marshal(models.ARGRequestPayload{Query: "resources | where type == \"microsoft.kusto/clusters\""})
 	if err != nil {
 		return fmt.Errorf("no Azure request serial: %w", err)
