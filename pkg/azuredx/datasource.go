@@ -104,11 +104,11 @@ func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.Chec
 		}, nil
 	}
 
-	err = adx.client.TestARGSRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
+	err = adx.client.TestARGsRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
 	if err != nil {
 		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusUnknown,
-			Message: "Unable to use Azure Resource Graph queries to get clusters: " + err.Error(),
+			Status:  backend.HealthStatusOk,
+			Message: "Success connecting to Azure Data Explore, but unable to connect to Azure Resource Graph to get clusters: " + err.Error(),
 		}, nil
 	}
 

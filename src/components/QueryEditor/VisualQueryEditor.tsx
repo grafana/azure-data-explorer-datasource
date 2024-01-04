@@ -68,7 +68,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
           {tableSchema.error?.message}
         </Alert>
       )}
-      {!tableSchema.loading && tableSchema.value?.length === 0 && (
+      {!tableSchema.loading && tableSchema.value?.length === 0 && clusterName && (
         <Alert severity="warning" title="Table schema loaded successfully but without any columns" />
       )}
       <TableSection {...props} tableSchema={tableSchema} tables={tables} table={table} />

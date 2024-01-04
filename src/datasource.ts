@@ -151,6 +151,11 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   async getSchema(clusterUri: string, refreshCache = false): Promise<AdxSchema> {
+    if (!clusterUri) {
+      return new Promise((resolve) => {
+        resolve({} as AdxSchema);
+    });
+    }
     const replacedClusterUri = this.templateSrv.replace(clusterUri, this.templateSrv.getVariables() as any);
     return cache<AdxSchema>(
       `${this.id}.${replacedClusterUri}.schema.overview`,

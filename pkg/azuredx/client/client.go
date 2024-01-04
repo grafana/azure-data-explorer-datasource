@@ -20,7 +20,7 @@ import (
 
 type AdxClient interface {
 	TestKustoRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
-	TestARGSRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
+	TestARGsRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
 	KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
 	ARGClusterRequest(ctx context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error)
 }
@@ -46,7 +46,7 @@ func New(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettin
 	return &Client{httpClientKusto: httpClientAzureCloud, httpClientManagement: httpClientManagement}, nil
 }
 
-func (c *Client) TestARGSRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
+func (c *Client) TestARGsRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
 	if err := c.testManagementClient(ctx, datasourceSettings, additionalHeaders); err != nil {
 		return err
 	}
@@ -55,18 +55,31 @@ func (c *Client) TestARGSRequest(ctx context.Context, datasourceSettings *models
 
 // TestKustoRequest handles a data source test request in Grafana's Datasource configuration UI.
 func (c *Client) TestKustoRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
-	if datasourceSettings.ClusterURL == "" {
-		return nil
+	clusterURL := datasourceSettings.ClusterURL
+	if clusterURL == "" {
+
+		payload := models.ARGRequestPayload{Query: "resources | where type == \"microsoft.kusto/clusters\""}
+
+		headers := map[string]string{}
+
+		clusters, err := c.ARGClusterRequest(ctx, payload, headers)
+		if err != nil {
+			return fmt.Errorf("Unable to connect to connect to Azure Resource Graph. Add access to ARG in Azure or add a default cluster URL. %w", err)
+		}
+		if len(clusters) == 0 {
+			return errors.New("Azure Resource Graph resource query returned 0 clusters.")
+		}
+		clusterURL = clusters[0].Uri
 	}
 
-	if err := c.testKustoClientWithDefaultCluster(ctx, datasourceSettings, datasourceSettings.ClusterURL, properties, additionalHeaders); err != nil {
+	if err := c.testKustoClient(ctx, datasourceSettings, clusterURL, properties, additionalHeaders); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (c *Client) testKustoClientWithDefaultCluster(ctx context.Context, datasourceSettings *models.DatasourceSettings, clusterURL string, properties *models.Properties, additionalHeaders map[string]string) error {
+func (c *Client) testKustoClient(ctx context.Context, datasourceSettings *models.DatasourceSettings, clusterURL string, properties *models.Properties, additionalHeaders map[string]string) error {
 	buf, err := json.Marshal(models.RequestPayload{
 		CSL:        ".show databases schema",
 		DB:         datasourceSettings.DefaultDatabase,
@@ -76,7 +89,7 @@ func (c *Client) testKustoClientWithDefaultCluster(ctx context.Context, datasour
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", datasourceSettings.ClusterURL+"/v1/rest/query", bytes.NewReader(buf))
+	req, err := http.NewRequestWithContext(ctx, "POST", clusterURL+"/v1/rest/query", bytes.NewReader(buf))
 	if err != nil {
 		return err
 	}

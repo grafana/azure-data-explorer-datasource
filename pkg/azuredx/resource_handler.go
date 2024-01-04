@@ -214,7 +214,9 @@ func (adx *AzureDataExplorer) getClusters(rw http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	clusters = addClusterFromSettings(clusters, adx.settings.ClusterURL)
+	if adx.settings.ClusterURL != "" {
+		clusters = addClusterFromSettings(clusters, adx.settings.ClusterURL)
+	}
 
 	rw.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(rw).Encode(clusters)
