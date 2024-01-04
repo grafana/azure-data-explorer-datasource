@@ -104,9 +104,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   };
 
   async getDatabases(clusterUri?: string): Promise<DatabaseItem[]> {
-    if (clusterUri === '') {
-      return [];
-    }
     if (clusterUri === undefined) {
       clusterUri = await this.getDefaultOrFirstCluster()
     }
