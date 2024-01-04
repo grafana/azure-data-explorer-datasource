@@ -36,7 +36,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private defaultEditorMode: EditorMode;
   private schemaMapper: AdxSchemaMapper;
 
-  constructor(instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
+  constructor(private instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
 
     const useSchemaMapping = instanceSettings.jsonData.useSchemaMapping ?? false;
@@ -151,10 +151,10 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   async getSchema(clusterUri: string, refreshCache = false): Promise<AdxSchema> {
-    if (!clusterUri) {
+    if (!clusterUri && !this.instanceSettings.jsonData.clusterUrl) {
       return new Promise((resolve) => {
         resolve({} as AdxSchema);
-    });
+      });
     }
     const replacedClusterUri = this.templateSrv.replace(clusterUri, this.templateSrv.getVariables() as any);
     return cache<AdxSchema>(

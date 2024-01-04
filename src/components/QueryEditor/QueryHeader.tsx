@@ -48,7 +48,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const [clusterUri, setClusterUri] = useState(query.clusterUri);
   const [clusters, setClusters] = useState<Array<SelectableValue<string>>>([]);
   const databases = useDatabaseOptions(schema.value);
-  const database = useSelectedDatabase(databases, props.query, datasource);
+  const database = useSelectedDatabase(databases, query, datasource);
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
 
@@ -89,13 +89,13 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
     datasource.getClusters().then((result: ClusterOption[]) => {
       const clusters = parseClustersResponse(result);
       setClusters(clusters);
-      if (!query.clusterUri) {
+      if (!clusterUri) {
         datasource.getDefaultOrFirstCluster().then((cluster: string) => {
           setClusterUri(cluster);
         })
       }
     });
-  }, [datasource, query.clusterUri]);
+  }, [datasource, clusterUri]);
   
   const onClusterChange = ({ value }: SelectableValue) => {
     setClusterUri(value);
