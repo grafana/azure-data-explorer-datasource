@@ -74,7 +74,11 @@ func TestResourceHandler(t *testing.T) {
 
 type failingClient struct{}
 
-func (c *failingClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+func (c *failingClient) TestKustoRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+	panic("not implemented")
+}
+
+func (c *failingClient) TestARGsRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
@@ -88,7 +92,11 @@ func (c *failingClient) ARGClusterRequest(_ context.Context, payload models.ARGR
 
 type workingClient struct{}
 
-func (c *workingClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+func (c *workingClient) TestKustoRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+	panic("not implemented")
+}
+
+func (c *workingClient) TestARGsRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 

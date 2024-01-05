@@ -55,7 +55,11 @@ func TestDatasource(t *testing.T) {
 
 type fakeClient struct{}
 
-func (c *fakeClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+func (c *fakeClient) TestKustoRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+	panic("not implemented")
+}
+
+func (c *fakeClient) TestARGsRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
