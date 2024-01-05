@@ -148,7 +148,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   async getSchema(clusterUri: string, refreshCache = false): Promise<AdxSchema> {
-    if (!clusterUri && !this.instanceSettings.jsonData.clusterUrl) {
+    if (!clusterUri && !this.instanceSettings?.jsonData?.clusterUrl) {
       return new Promise((resolve) => {
         resolve({} as AdxSchema);
       });

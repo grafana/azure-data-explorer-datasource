@@ -159,7 +159,7 @@ describe('variables', () => {
 
       expect(datasource.getDefaultOrFirstDatabase).toBeCalled();
       expect(datasource.getDatabases).toBeCalled();
-      expect(buildQuerySpy).toBeCalledWith('databases()', { scopedVars: {} }, 'test_db', undefined);
+      expect(buildQuerySpy).toBeCalledWith('databases()', { scopedVars: {} }, 'test_db', 'clusterUrl');
       expect(res.data).toEqual([toDataFrame([{ text: 'test_db', value: 'test_db' }])]);
     });
 
@@ -170,7 +170,7 @@ describe('variables', () => {
       const res = await lastValueFrom(variableSupport.query(req));
 
       expect(datasource.getDefaultOrFirstDatabase).toBeCalled();
-      expect(buildQuerySpy).toBeCalledWith('test', { scopedVars: {} }, 'test_db', undefined);
+      expect(buildQuerySpy).toBeCalledWith('test', { scopedVars: {} }, 'test_db', 'clusterUrl');
       expect(datasource.query).toBeCalled();
       expect(res.data).toEqual([{ text: 'test_string' }]);
     });
