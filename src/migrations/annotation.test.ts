@@ -29,6 +29,7 @@ const NEW_ANNOTATION = {
     refId: 'Anno',
     resultFormat: 'table',
     queryType: AdxQueryType.KustoQuery,
+    clusterUri: '',
   },
 };
 

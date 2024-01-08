@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { Button, ConfirmModal, RadioButtonGroup } from '@grafana/ui';
+import { Button, ConfirmModal, RadioButtonGroup/*, InlineField, Input*/ } from '@grafana/ui';
 import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
 
-import { AdxSchema, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
+import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
@@ -12,6 +12,7 @@ import { databaseToDefinition } from 'schema/mapper';
 import { SelectableValue } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
 import { selectors } from 'test/selectors';
+import { parseClustersResponse } from 'response_parser';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
@@ -44,8 +45,10 @@ const adxTimeFormat: SelectableValue<string> = {
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions } = props;
   const { rawMode, OpenAI } = query;
+  const [clusterUri, setClusterUri] = useState(query.clusterUri);
+  const [clusters, setClusters] = useState<Array<SelectableValue<string>>>([]);
   const databases = useDatabaseOptions(schema.value);
-  const database = useSelectedDatabase(databases, props.query, datasource);
+  const database = useSelectedDatabase(databases, query, datasource);
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
 
@@ -59,7 +62,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   };
 
   useEffect(() => {
-    if (!query.database && database) {
+    if (database && query.database !== database) {
       onChange({ ...query, database });
     }
   }, [query, database, onChange]);
@@ -81,6 +84,23 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       onChange({ ...query, resultFormat: 'time_series' });
     }
   }, [query, formats, onChange, rawMode]);
+
+  useEffect(() => {
+    datasource.getClusters().then((result: ClusterOption[]) => {
+      const clusters = parseClustersResponse(result);
+      setClusters(clusters);
+      if (!clusterUri) {
+        datasource.getDefaultOrFirstCluster().then((cluster: string) => {
+          setClusterUri(cluster);
+        })
+      }
+    });
+  }, [datasource, clusterUri]);
+  
+  const onClusterChange = ({ value }: SelectableValue) => {
+    setClusterUri(value);
+    onChange({ ...query, clusterUri: value, expression: defaultQuery.expression });
+  };
 
   const onDatabaseChange = ({ value }: SelectableValue) => {
     onChange({ ...query, database: value!, expression: defaultQuery.expression });
@@ -115,6 +135,18 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           setShowWarning(false);
         }}
       ></ConfirmModal>
+      <InlineSelect
+        label="Cluster"
+        aria-label="Cluster"
+        options={clusters.concat({
+          ...templateVariableOptions,
+          value: templateVariableOptions.value || '',
+          type: QueryEditorPropertyType.String,
+        })}
+        value={clusterUri}
+        onChange={onClusterChange}
+        allowCustomValue={true}
+      />
       <InlineSelect
         label="Database"
         aria-label="Database"

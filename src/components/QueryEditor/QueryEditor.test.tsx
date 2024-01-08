@@ -26,8 +26,10 @@ describe('QueryEditor', () => {
   describe('on first load', () => {
     it('should migrate a query ', async () => {
       const onChange = jest.fn();
+      const ds = mockDatasource();
+      ds.getClusters = jest.fn().mockResolvedValue([]);
       const query = { ...mockQuery, pluginVersion: '', queryType: '' as AdxQueryType };
-      render(<QueryEditor {...defaultProps} onChange={onChange} query={query} />);
+      render(<QueryEditor {...defaultProps} onChange={onChange} query={query} datasource={ds} />);
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ pluginVersion: defaultQuery.pluginVersion }));
       // wait to load
       await waitFor(() => screen.getByText('Could not load datasource schema'));
@@ -38,6 +40,7 @@ describe('QueryEditor', () => {
       const query = { ...mockQuery, rawMode: undefined };
       const ds = mockDatasource();
       ds.getDefaultEditorMode = jest.fn().mockReturnValue(EditorMode.Raw);
+      ds.getClusters = jest.fn().mockResolvedValue([]);
       render(<QueryEditor {...defaultProps} onChange={onChange} query={query} datasource={ds} />);
       expect(ds.getDefaultEditorMode).toHaveBeenCalled();
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ rawMode: true }));
@@ -58,6 +61,7 @@ describe('QueryEditor', () => {
           Message: 'Boom!',
         },
       });
+      ds.getClusters = jest.fn().mockResolvedValue([]);
       render(<QueryEditor {...defaultProps} datasource={ds} />);
       await waitFor(() => screen.getByText('Could not load datasource schema'));
       await waitFor(() => screen.getByText('Boom!'));
@@ -65,6 +69,7 @@ describe('QueryEditor', () => {
 
     it('should render the error', async () => {
       const ds = mockDatasource();
+      ds.getClusters = jest.fn().mockResolvedValue([]);
       ds.getSchema = jest.fn().mockRejectedValue('Boom!');
       render(<QueryEditor {...defaultProps} datasource={ds} />);
       await waitFor(() => screen.getByText('Could not load datasource schema'));

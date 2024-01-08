@@ -21,7 +21,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
   const executedQueryError = useExecutedQueryError(props.data);
   const dirty = useDirty(props.query.query, executedQuery);
   const rawMode = isRawMode(props);
-  const schema = useAsync(() => ds.getSchema(false), [datasource.id]);
+  const schema = useAsync(() => ds.getSchema(query.clusterUri, false), [datasource.id, query.clusterUri]);
   const templateVariables = useTemplateVariables(ds);
   const databases = useDatabaseOptions(schema.value);
   const database = useSelectedDatabase(databases, props.query, ds);

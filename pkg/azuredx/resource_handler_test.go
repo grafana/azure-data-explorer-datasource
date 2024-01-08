@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -27,7 +28,8 @@ func TestResourceHandler(t *testing.T) {
 
 	t.Run("When incorrect method is used a 405 should be returned", func(t *testing.T) {
 		setup()
-		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", nil))
+
+		mux.ServeHTTP(res, httptest.NewRequest("PUT", "/databases", nil))
 		require.Equal(t, http.StatusMethodNotAllowed, res.Code)
 
 		mux.ServeHTTP(res, httptest.NewRequest("PUT", "/schema", nil))
@@ -43,7 +45,7 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
+		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", strings.NewReader("{}")))
 		require.Equal(t, http.StatusInternalServerError, res.Code)
 		httpError := models.HttpError{}
 		err := json.NewDecoder(res.Body).Decode(&httpError)
@@ -59,7 +61,7 @@ func TestResourceHandler(t *testing.T) {
 		adx.settings = &models.DatasourceSettings{
 			ClusterURL: "some-baseurl",
 		}
-		mux.ServeHTTP(res, httptest.NewRequest("GET", "/databases", nil))
+		mux.ServeHTTP(res, httptest.NewRequest("POST", "/databases", strings.NewReader("{}")))
 		require.Equal(t, http.StatusOK, res.Code)
 		tableResponse := models.TableResponse{}
 		err := json.NewDecoder(res.Body).Decode(&tableResponse)
@@ -72,21 +74,33 @@ func TestResourceHandler(t *testing.T) {
 
 type failingClient struct{}
 
-func (c *failingClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+func (c *failingClient) TestKustoRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
-func (c *failingClient) KustoRequest(_ context.Context, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
+func (c *failingClient) TestARGsRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+	panic("not implemented")
+}
+
+func (c *failingClient) KustoRequest(_ context.Context, _ string, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
 	return nil, fmt.Errorf("HTTP error: %v - %v", http.StatusBadRequest, "")
+}
+
+func (c *failingClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
+	panic("not implemented")
 }
 
 type workingClient struct{}
 
-func (c *workingClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+func (c *workingClient) TestKustoRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
-func (c *workingClient) KustoRequest(_ context.Context, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
+func (c *workingClient) TestARGsRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+	panic("not implemented")
+}
+
+func (c *workingClient) KustoRequest(_ context.Context, _ string, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
 	return &models.TableResponse{
 		Tables: []models.Table{
 			{
@@ -102,4 +116,8 @@ func (c *workingClient) KustoRequest(_ context.Context, _ string, _ models.Reque
 			},
 		},
 	}, nil
+}
+
+func (c *workingClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
+	panic("not implemented")
 }

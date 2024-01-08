@@ -51,6 +51,10 @@ export type ADXCounters = {
   queries_with_default_raw_editor: number;
   /** number of queries using a custom schema mapping */
   queries_with_managed_schema: number;
+  /** number of queries not using a default cluster */
+  queries_no_default_cluster: number;
+  /** number of queries that have not selected a cluster. meaning they aren't using cluster select */
+  queries_no_selected_cluster: number;
 };
 
 export interface ADXDashboardLoadedProps extends ADXCounters {
@@ -78,6 +82,8 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
     weak_data_consistency_queries: 0,
     queries_with_default_raw_editor: 0,
     queries_with_managed_schema: 0,
+    queries_no_default_cluster: 0,
+    queries_no_selected_cluster: 0,
   };
 
   const datasources: { [key: string]: DataSourceInstanceSettings<Partial<AdxDataSourceOptions>> | undefined } = {};
@@ -133,6 +139,12 @@ export const analyzeQueries = (queries: KustoQuery[], datasourceSrv: DataSourceS
       }
       if (dsSettings.jsonData?.useSchemaMapping) {
         counters.queries_with_managed_schema++;
+      }
+      if (!dsSettings.jsonData?.clusterUrl) {
+        counters.queries_no_default_cluster++;
+      }
+      if (!query.clusterUri) {
+        counters.queries_no_selected_cluster++;
       }
     }
   });

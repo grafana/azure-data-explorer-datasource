@@ -32,7 +32,7 @@ const addAdxVariable = (
   name: string,
   type: AdxQueryType,
   isFirst: boolean,
-  options?: { database?: string; table?: string }
+  options?: { cluster?: string, database?: string; table?: string }
 ) => {
   if (isFirst) {
     e2e.components.PageToolbar.item('Dashboard settings').click();
@@ -45,10 +45,15 @@ const addAdxVariable = (
   e2e.components.DataSourcePicker.inputV2().type(`${dataSourceName}{enter}`);
   e2eSelectors.variableEditor.queryType.input().find('input').type(`${type}{enter}`);
   switch (type) {
+    case AdxQueryType.Databases:
+      e2eSelectors.variableEditor.clusters.input().find('input').type(`${options?.cluster}{enter}`);
+      break;
     case AdxQueryType.Tables:
+      e2eSelectors.variableEditor.clusters.input().find('input').type(`${options?.cluster}{enter}`);
       e2eSelectors.variableEditor.databases.input().find('input').type(`${options?.database}{enter}`);
       break;
     case AdxQueryType.Columns:
+      e2eSelectors.variableEditor.clusters.input().find('input').type(`${options?.cluster}{enter}`);
       e2eSelectors.variableEditor.databases.input().find('input').type(`${options?.database}{enter}`);
       e2eSelectors.variableEditor.tables.input().find('input').type(`${options?.table}{enter}`);
       break;
@@ -171,15 +176,22 @@ e2e.scenario({
         zone: 'Coordinated Universal Time',
       },
     });
-    addAdxVariable('database', AdxQueryType.Databases, true);
+    addAdxVariable('cluster', AdxQueryType.Clusters, true);
+    addAdxVariable('database', AdxQueryType.Databases, false, {
+      cluster: '$cluster',
+    });
     addAdxVariable('table', AdxQueryType.Tables, false, {
+      cluster: '$cluster',
       database: '$database',
     });
     addAdxVariable('column', AdxQueryType.Columns, false, {
+      cluster: '$cluster',
       database: '$database',
       table: '$table',
     });
     e2e.pages.Dashboard.Settings.Actions.close().click();
+    e2e.pages.Dashboard.SubMenu.submenuItemLabels('cluster').click();
+    e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('grafanaadxdev').click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('database').click();
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest').click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('table').click();

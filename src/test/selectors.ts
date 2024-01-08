@@ -50,6 +50,9 @@ export const components = {
     queryType: {
       input: 'data-testid query-type',
     },
+    clusters: {
+      input: 'data-testid clusters',
+    },
     databases: {
       input: 'data-testid databases',
     },

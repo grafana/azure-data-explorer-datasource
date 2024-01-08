@@ -16,6 +16,10 @@ type RequestPayload struct {
 	Properties  *Properties `json:"properties,omitempty"`
 }
 
+type ARGRequestPayload struct {
+	Query string `json:"query"`
+}
+
 // AzureFrameMD is a type to populate a Frame's Custom metadata property.
 type AzureFrameMD struct {
 	ColumnTypes []string
@@ -32,6 +36,11 @@ type ErrorResponse struct {
 // Properties is a property bag of connection string options.
 type Properties struct {
 	Options *options `json:"options,omitempty"`
+}
+
+type ClusterOption struct {
+	Name string `json:"name,omitempty"`
+	Uri  string `json:"uri,omitempty"`
 }
 
 // NewConnectionProperties creates ADX connection properties based on datasource settings.

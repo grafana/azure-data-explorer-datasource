@@ -33,7 +33,7 @@ export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<
       dynamicCaching: false,
       useSchemaMapping: false,
       enableUserTracking: false,
-      clusterUrl: '',
+      clusterUrl: 'clusterUrl',
     },
     secureJsonFields: {},
     readOnly: false,
@@ -73,6 +73,7 @@ export const mockDatasource = (overrides?: Partial<{ [Property in keyof AdxDataS
     },
     readOnly: false,
   });
+  ds.getResource = jest.fn().mockResolvedValue([])
   if (overrides) {
     for (const key of Object.keys(overrides)) {
       ds[key] = overrides[key];
@@ -86,6 +87,7 @@ export const mockQuery: KustoQuery = {
   query: '',
   database: '',
   resultFormat: '',
+  clusterUri: '',
   expression: {
     where: { expressions: [], type: QueryEditorExpressionType.And },
     reduce: { expressions: [], type: QueryEditorExpressionType.And },

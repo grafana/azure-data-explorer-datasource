@@ -26,16 +26,38 @@ describe('AdxDataSource', () => {
     };
   });
 
-  describe('when performing getDatabases', () => {
-    const response = setupTableResponse();
+  describe('when performing getClusters', () => {
+    const response = [
+      {
+        name: 'ClusterName',
+        value: 'ClusterValue'
+      }
+    ]
 
     beforeEach(() => {
       ctx.ds = new AdxDataSource(ctx.instanceSettings);
       ctx.ds.getResource = jest.fn().mockResolvedValue(response);
     });
 
+    it('should return a list of clusters', () => {
+      return ctx.ds.getClusters().then((results) => {
+        expect(results[0].name).toBe('ClusterName');
+        expect(results[0].value).toBe('ClusterValue');
+      });
+    });
+  });
+
+  describe('when performing getDatabases', () => {
+    const response = setupTableResponse();
+
+    beforeEach(() => {
+      ctx.ds = new AdxDataSource(ctx.instanceSettings);
+      ctx.ds.getResource = jest.fn().mockResolvedValue(response);
+      ctx.ds.postResource = jest.fn().mockResolvedValue(response);
+    });
+
     it('should return a list of databases', () => {
-      return ctx.ds.getDatabases().then((results) => {
+      return ctx.ds.getDatabases('clusterUri').then((results) => {
         expect(results[0].text).toBe('Grafana');
         expect(results[0].value).toBe('Grafana');
       });
@@ -73,10 +95,11 @@ describe('AdxDataSource', () => {
     beforeEach(() => {
       ctx.ds = new AdxDataSource(ctx.instanceSettings);
       ctx.ds.getResource = jest.fn().mockResolvedValue(response);
+      ctx.ds.postResource = jest.fn().mockResolvedValue(response);
     });
 
     it('should return a parsed schema', () => {
-      return ctx.ds.getSchema().then((result) => {
+      return ctx.ds.getSchema('clusterUri').then((result) => {
         expect(Object.keys(result.Databases.Grafana.Tables).length).toBe(1);
         expect(result.Databases.Grafana.Tables.MyLogs.Name).toBe('MyLogs');
       });
@@ -135,7 +158,7 @@ describe('AdxDataSource', () => {
         })
       );
 
-      expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
+      expect(await datasource.getDynamicSchema('foo', 'bar', ['col'], 'cluster')).toEqual({
         Teams: [
           {
             CslType: 'long',
@@ -169,7 +192,7 @@ describe('AdxDataSource', () => {
         })
       );
 
-      expect(await datasource.getDynamicSchema('foo', 'bar', ['col name'])).toEqual({
+      expect(await datasource.getDynamicSchema('foo', 'bar', ['col name'], 'cluster')).toEqual({
         Teams: [
           {
             CslType: 'long',
@@ -246,7 +269,7 @@ describe('AdxDataSource', () => {
             })
           );
 
-          expect(await datasource.getDynamicSchema('foo', 'bar', ['col'])).toEqual({
+          expect(await datasource.getDynamicSchema('foo', 'bar', ['col'], 'cluster')).toEqual({
             Teams: [t.expected],
           });
           if (t.warn) {

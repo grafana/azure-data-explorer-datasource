@@ -19,7 +19,7 @@ jest.mock('@grafana/runtime', () => {
 
 const defaultProps = {
   database: '',
-  query: mockQuery,
+  query: {...mockQuery, clusterUri: 'clusterUri'},
   onChange: jest.fn(),
   onRunQuery: jest.fn(),
   datasource: mockDatasource(),

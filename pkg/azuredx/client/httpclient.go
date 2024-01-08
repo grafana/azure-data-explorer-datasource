@@ -14,13 +14,59 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 )
 
-func newHttpClient(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
+func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
 	// Extract cloud from credentials
 	azureCloud, err := azcredentials.GetAzureCloud(azureSettings, credentials)
 	if err != nil {
 		return nil, err
 	}
 
+	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud)
+	if err != nil {
+		return nil, err
+	}
+
+	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL)
+	if err != nil {
+		return nil, err
+	}
+	authOpts.Scopes(scopes)
+
+	httpClient, err := getHttpClient(ctx, instanceSettings, dsSettings, authOpts, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	return httpClient, nil
+}
+
+func newHttpClientManagement(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*http.Client, error) {
+	// Extract cloud from credentials
+	azureCloud, err := azcredentials.GetAzureCloud(azureSettings, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud)
+	if err != nil {
+		return nil, err
+	}
+
+	scopes, err := getARGScopes(azureCloud)
+	if err != nil {
+		return nil, err
+	}
+	authOpts.Scopes(scopes)
+
+	httpClient, err := getHttpClient(ctx, instanceSettings, dsSettings, authOpts, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	return httpClient, nil
+}
+
+func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.DatasourceSettings, azureCloud string) (*azhttpclient.AuthOptions, error) {
 	authOpts := azhttpclient.NewAuthOptions(azureSettings)
 
 	// Enables support for the experimental user-based authentication feature if the user_identity_enabled flag is set to true in the Grafana configuration
@@ -40,13 +86,10 @@ func newHttpClient(ctx context.Context, instanceSettings *backend.DataSourceInst
 			return nil, err
 		}
 	}
+	return authOpts, nil
+}
 
-	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL)
-	if err != nil {
-		return nil, err
-	}
-	authOpts.Scopes(scopes)
-
+func getHttpClient(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, authOpts *azhttpclient.AuthOptions, credentials azcredentials.AzureCredentials) (*http.Client, error) {
 	clientOpts, err := instanceSettings.HTTPClientOptions(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error creating http client: %w", err)

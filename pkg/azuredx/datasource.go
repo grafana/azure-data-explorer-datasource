@@ -95,11 +95,20 @@ func (adx *AzureDataExplorer) CallResource(ctx context.Context, req *backend.Cal
 func (adx *AzureDataExplorer) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	ctx = azusercontext.WithUserFromHealthCheckReq(ctx, req)
 	headers := map[string]string{}
-	err := adx.client.TestRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
+
+	err := adx.client.TestKustoRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
 	if err != nil {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
 			Message: err.Error(),
+		}, nil
+	}
+
+	err = adx.client.TestARGsRequest(ctx, adx.settings, models.NewConnectionProperties(adx.settings, nil), headers)
+	if err != nil {
+		return &backend.CheckHealthResult{
+			Status:  backend.HealthStatusOk,
+			Message: "Success connecting to Azure Data Explore, but unable to connect to Azure Resource Graph to get clusters: " + err.Error(),
 		}, nil
 	}
 
@@ -145,7 +154,11 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	}
 	headers["x-ms-client-request-id"] = msClientRequestIDHeader
 
-	tableRes, err := adx.client.KustoRequest(ctx, adx.settings.ClusterURL+"/v1/rest/query", models.RequestPayload{
+	clusterURL := q.ClusterUri
+	if clusterURL == "" {
+		clusterURL = adx.settings.ClusterURL
+	}
+	tableRes, err := adx.client.KustoRequest(ctx, clusterURL, "/v1/rest/query", models.RequestPayload{
 		CSL:         q.Query,
 		DB:          q.Database,
 		Properties:  props,
@@ -212,14 +225,6 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 			}
 			resp.Frames = append(resp.Frames, formattedDF)
 		}
-
-	// 	series, timeNotASC, err := tableRes.ToTimeSeries()
-	// 	if err != nil {
-	// 		qr.Error = err.Error()
-	// 		break
-	// 	}
-	// 	md.TimeNotASC = timeNotASC
-	// 	qr.Series = series
 
 	default:
 		resp.Error = fmt.Errorf("unsupported query type: '%v'", q.Format)
