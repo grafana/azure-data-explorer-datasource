@@ -43,7 +43,7 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
           case AdxQueryType.Clusters:
             const clusters = await this.datasource.getClusters();
             return {
-              data: clusters.length ? [toDataFrame(clusters.map(cluster => cluster.uri))] : [],
+              data: clusters.length ? [toDataFrame(clusters.map(cluster => {return {text: cluster.name, value: cluster.uri}}))] : [],
             };
           case AdxQueryType.Databases:
             const databases = await this.datasource.getDatabases(this.templateSrv.replace(queryObj.clusterUri));

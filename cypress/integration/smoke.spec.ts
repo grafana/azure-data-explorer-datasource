@@ -176,7 +176,7 @@ e2e.scenario({
         zone: 'Coordinated Universal Time',
       },
     });
-    addAdxVariable('database', AdxQueryType.Clusters, true);
+    addAdxVariable('cluster', AdxQueryType.Clusters, true);
     addAdxVariable('database', AdxQueryType.Databases, false, {
       cluster: '$cluster',
     });
@@ -191,7 +191,7 @@ e2e.scenario({
     });
     e2e.pages.Dashboard.Settings.Actions.close().click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('cluster').click();
-    e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('https://grafanaadxdev.northeurope.kusto.windows.net').click();
+    e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('grafanaadxdev').click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('database').click();
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest').click();
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('table').click();
