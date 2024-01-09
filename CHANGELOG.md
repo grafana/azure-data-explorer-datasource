@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [4.9.0]
+
+- dfd
+- fd
+
 ## [4.8.0]
 
 - New feature: OpenAI: incorporate the LLM plugin
