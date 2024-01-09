@@ -1,7 +1,5 @@
 # Azure Data Explorer data source for Grafana
 
-[![Build Status](https://drone.grafana.net/api/badges/grafana/azure-data-explorer-datasource/status.svg)](https://drone.grafana.net/grafana/azure-data-explorer-datasource)
-
 [Azure Data Explorer](https://docs.microsoft.com/en-us/azure/data-explorer/) is a log analytics cloud platform optimized for ad-hoc big data queries.
 
 ## Installation
@@ -84,21 +82,17 @@ If the command succeeds you should get a result like this:
 ### Configuring Grafana
 
 
-1. Accessed from the Grafana main menu, newly installed datasources can be added immediately within the Data Sources section. Next, click the "Add datasource" button in the upper right.
+[Add a data source](https://grafana.com/docs/grafana/latest/datasources/add-a-data-source/) by filling in the following fields:
 
-2. Select Azure Data Explorer Datasource from the datasource list.
 
-3. In the name field, a default name is filled in automatically but it can be changed to anything.
 
-4. You need 3 pieces of information from the Azure portal (see link above for detailed instructions):
-
-   - **Directory (tenant) ID** (Azure Active Directory -> Properties -> Directory ID)
-   - **Application (client) ID** (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
-   - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
-
-5. Paste these three items into the fields in the Azure Data Explorer API Details section.
-
-6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
+| Field  | Description                                 |
+| ------ | ------------------------------------------- |
+| Directory (tenant) ID | (Azure Active Directory -> Properties -> Directory ID) |
+| Application (client) ID | (Azure Active Directory -> App Registrations -> Choose your app -> Application ID) |
+| Client Secret | ( Azure Active Directory -> App Registrations -> Choose your app -> Keys) |
+| Default Cluster | (Options) If no cluster is selected when making a query, the default cluster will be used. |
+| Default database? | not sure if this is still in use - FIX THIS| 
 
 ### Configuring On-Behalf-Of authentication (Beta)
 
@@ -108,7 +102,7 @@ For information about setting up and using the OBO flow: [on-behalf-of documenta
 
 ## Writing Queries
 
-Queries are written in the new [Kusto Query Language](https://docs.microsoft.com/en-us/azure/kusto/query/).
+Queries are written in the new Kusto Query Language, for more infromation refer to [Kusto Query Language (KQL) overview](https://docs.microsoft.com/en-us/azure/kusto/query/).
 
 Queries can be formatted as _Table_, _Time Series_, or _ADX Time Series_ data.
 
