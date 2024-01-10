@@ -15,7 +15,7 @@ locally, please check out the [Plugin installation docs](https://grafana.com/doc
 
 ### Enforcing trusted Azure Data Explorer endpoints
 
-For additional security, it's possible to enforce a list of trusted ADX endpoints that the cluster URL will be verified against. This prevents a request from being redirected to a third-party endpoint.
+For additional security, enforcing a list of trusted ADX endpoints against which the cluster URL will be verified is possible. This prevents a request from being redirected to a third-party endpoint.
 
 This can be enabled by setting `enforce_trusted_endpoints` in your Grafana configuration under the `[plugin.grafana-azure-data-explorer-datasource]` section:
 
@@ -26,9 +26,9 @@ enforce_trusted_endpoints = true
 
 ## Configure the Azure Data Explorer data source
 
-To configure ADX for using the ADX data source are create an Azure Active Directory (AAD) Application and AAD Service Principle, log into the Azure Data Explorer WebExplorer and connect the AAD Application to an Azure Data Explorer database user, and use the AAD Application to configure the datasource connection in Grafana.
+To configure ADX for using this data source, create an Azure Active Directory (AAD) Application and AAD Service Principle, log into the Azure Data Explorer WebExplorer and connect the AAD Application to an Azure Data Explorer database user, and use the AAD Application to configure the data source connection in Grafana.
 
-Optionally to use use the dropdown cluster select when creating queries, add reader access for Azure Resource Graph queries and add reader access to each desired cluster.
+***Optionally** To use the dropdown cluster select when creating queries, add reader access for Azure Resource Graph queries, and add reader access to each desired cluster.
 
 ### Creating an Azure Active Directory Service Principle
 
@@ -73,7 +73,7 @@ A real example with a client/app id and tenant id:
 .add database Grafana viewers ('aadapp=377a87d4-2cd3-44c0-b35a-8887a12fxxx;e7f3f661-a933-4b3f-8176-51c4f982exxx')
 ```
 
-If the command succeeds you should get a result like this:
+If the command succeeds, you should get a result like this:
 
 ![Azure Data Web Explorer Add result](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/config_3_web_ui.png)
 
@@ -95,13 +95,13 @@ Additional settings are optional settings that can be configured for more contro
 | Field  | Description                                 |
 | ------ | ------------------------------------------- |
 | Query timeout| This value controls the client query timeout.| 
-| Use dynamic caching | By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored. For time series queries we will use the bin size to widen the time range but also as cache max age. |
-| Cache max age | By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live. |
-| Data consistency | Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more information refer to [Query consistency](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/concepts/queryconsistency) | 
+| Use dynamic caching | By enabling this feature Grafana will dynamically apply cache settings on a per-query basis, and the default cache max age will be ignored. The bin size for time series queries will be used to widen the time range and as cache max age. |
+| Cache max age | By default, the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live. |
+| Data consistency | Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more information, refer to [Query consistency](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/concepts/queryconsistency) | 
 | Default editor mode | This setting dictates which mode the editor will open in. Defaults to Visual. |
-| Default database | If no database is selected, the default database will be used. A default cluster is required to select a default database. To load default database options, first you must save the data source with valid Azure connection. |
-| Use managed schema | If enabled, allows tables, functions, and materialized views to be mapped to user friendly names. |
-| Send username header to host | With this feature enabled, Grafana will pass the logged in user's username in the `x-ms-user-id` header and in the `x-ms-client-request-id` header when sending requests to ADX. Can be useful when tracking needs to be done in ADX. |
+| Default database | The default database will be used if no database is selected. A default cluster is required to select a default database. To load default database options, you must save the data source with a valid Azure connection. |
+| Use managed schema | If enabled, tables, functions, and materialized views are mapped to user-friendly names. |
+| Send username header to host | With this feature enabled, Grafana will pass the logged in user's username in the `x-ms-user-id` header and in the `x-ms-client-request-id` header when sending requests to ADX. It can be useful when tracking needs to be done in ADX. |
 
 ### Configuring On-Behalf-Of authentication (Beta)
 
@@ -111,17 +111,17 @@ For information about setting up and using the OBO flow: [on-behalf-of documenta
 
 ## Query the data source
 
-Before querying the data source select the query header options cluster, database and format. You can create queries using the query builder, KQL, or OpenAI.
+Before querying the data source, select the query header options cluster, database, and format. You can create queries using the query builder, KQL, or OpenAI.
 
 ### Query header
 
 #### Cluster
 
-Select a cluster to query. If a default cluster was set in the data source settings then it will auto populate the cluster select. If there are not clusters to select from, refer to [Configure the Azure Data Explorer data source](#configure-the-azure-data-explorer-data-source)
+Select a cluster to query. If a default cluster was set in the data source settings, then it will auto-populate the cluster select. If there are no clusters to choose from, refer to [Configure the Azure Data Explorer data source](#configure-the-azure-data-explorer-data-source)
 
 #### Database
 
-Select a database to query. If a default database was set in the data source settings then it will auto populate the database select. 
+Select a database to query. If a default database was set in the data source settings, it will auto-populate the database selection. 
 
 #### Format as
 
@@ -129,7 +129,7 @@ Queries can be formatted as _Table_, _Time Series_, _Trace_, or _ADX time series
 
 ##### Table
 
-_Table_ queries are mainly used in the Table panel and row a list of columns and rows. This example query returns rows with the 6 specified columns:
+_Table_ queries are mainly used in the Table panel as a list of columns and rows. This example query returns rows with the six specified columns:
 
 ```kusto
 AzureActivity
@@ -149,7 +149,7 @@ AzureActivity
 | order by TimeGenerated asc
 ```
 
-The number valued columns are considered metrics and the optional string columns are treated as tags. A time series is returned for each value column + unique set of string column values. Each series has name of valueColumnName {stringColumnName=columnValue, ... }.
+The number of valued columns is considered metrics, and the optional string columns are treated as tags. A time series is returned for each value column + a unique set of string column values. Each series has name of valueColumnName {stringColumnName=columnValue, ... }.
 
 For example, the following query will produce series like ` AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY} `:
 
@@ -162,7 +162,7 @@ StormEvents
 
 ##### Trace
 
-The trace format option can be used to display appropriately formatted data using the built in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
+The trace format option can be used to display appropriately formatted data using the built-in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
 
 - `logs` - an array of JSON objects with a `timestamp` field that has a numeric value, and a `fields` field that is key-value object.
 - `serviceTags` and `tags` - a typical key-value JSON object without nested objects.
@@ -192,16 +192,16 @@ T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timest
 | Field | Description |
 | -- | -- |
 | Table | Select a table. |
-| Columns | Select a subset of columns for faster results. Time series requires both time and number values, other columns are rendered as dimensions. For more information about dimensions refer to [Time series dimensions](https://grafana.com/docs/grafana/latest/fundamentals/timeseries-dimensions/). |
+| Columns | Select a subset of columns for faster results. Time series requires both time and number values; other columns are rendered as dimensions. For more information about dimensions, refer to [Time series dimensions](https://grafana.com/docs/grafana/latest/fundamentals/timeseries-dimensions/). |
 | Filters | (Optional) Add filters for the selected columns. Values for filters will be restricted to the column's data type. |
 | Aggregate | (Optional) Add aggregations for the selected columns. Select an aggregation type from the dropdown and select a column to aggregate on.  |
 | Group by | (Optional) Add group bys for the selected columns. For time group bys select a time range bucket. |
 | Timeshift | (Optional) **DO NOT MERGE!** why does this exist? |
 
 
-Columns of type `dynamic` are supported within the query builder. This encompasses arrays, JSON objects, and nested objects within arrays. A limitation is only the first 50,000 rows are queried for data, so only properties contained within the first 50,000 rows will be listed as options in the builder selectors. Additional values can be manually written in the different selectors if they don't appear by default. Also, due to the fact that these queries make use of `mv-expand`, they may become resource intensive.
+Columns of the `dynamic` type are supported within the query builder. This encompasses arrays, JSON objects, and nested objects within arrays. A limitation is only the first 50,000 rows are queried for data, so only properties contained within the first 50,000 rows will be listed as options in the builder selectors. Additional values can be manually written in the different selectors if they don't appear by default. Also, due to the fact that these queries make use of `mv-expand`, they may become resource intensive.
 
-Refer to the below documentation for further details on how to handle dynamic columns appropriately via the KQL editor.
+Refer to the documentation below for further details on handling dynamic columns appropriately via the KQL editor.
 
 [Kusto Data Types](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/) - Documentation on data types supported by Kusto.
 
@@ -209,19 +209,19 @@ Refer to the below documentation for further details on how to handle dynamic co
 
 ### Query with Kusto Query Language (KQL)
 
-Queries are written in the new Kusto Query Language, for more information refer to [Kusto Query Language (KQL) overview](https://docs.microsoft.com/en-us/azure/kusto/query/).
+Queries are written in the new Kusto Query Language; for more information, refer to [Kusto Query Language (KQL) overview](https://docs.microsoft.com/en-us/azure/kusto/query/).
 
 ### OpenAI query generator
 
 _You need to enable the LLM plugin to use this feature._
 
-The LLM plugin can be found and installed at [LLM app](https://grafana.com/grafana/plugins/grafana-llm-app/). After installing the plugin enable it.
+The LLM plugin can be installed at [LLM app](https://grafana.com/grafana/plugins/grafana-llm-app/). After installing the plugin, enable it.
 
-To use the query generator, type in a statement or question about the data you would like to see and click **Generate query**. Review and edit the generated KQL query in the **Generated query** field. Once satisfied with the query, run the query by clicking **Run query**.
+To use the query generator, type in a statement or question about the data you want to see and click **Generate query**. Review and edit the generated KQL query in the **Generated query** field. Once satisfied with the query, run the query by clicking **Run query**.
 
 ### Time Macros
 
-To make writing queries easier there are some Grafana macros that can be used in the where clause of a query:
+To make writing queries easier, there are some Grafana macros that can be used in the where clause of a query:
 
 - `$__timeFilter()` - Expands to `TimeGenerated ≥ datetime(2018-06-05T18:09:58.907Z) and TimeGenerated ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
 - `$__timeFilter(datetimeColumn)` - Expands to `datetimeColumn ≥ datetime(2018-06-05T18:09:58.907Z) and datetimeColumn ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
@@ -238,9 +238,9 @@ To make writing queries easier there are some Grafana macros that can be used in
 
 ## Templating with Variables
 
-Instead of hard-coding things like server, application and sensor name in your metric queries you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns make it easy to change the data being displayed in your dashboard.
+Instead of hard-coding things like server, application, and sensor name in your metric queries, you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns make it easy to change the data being displayed in your dashboard.
 
-Create the variable in the dashboard settings. Usually you will need to write a query in the Kusto Query Language to get a list of values for the dropdown. It is however also possible to have a list of hard-coded values.
+Create the variable in the dashboard settings. Usually, you will need to write a query in the Kusto Query Language to get a list of values for the dropdown. However, having a list of hard-coded values is also possible.
 
 1. Fill in a name for your variable. The `Name` field is the name of the variable. There is also a `Label` field for the friendly name.
 2. In the Query Options section, choose the `Azure Data Explorer` datasource in the `Data source` dropdown.
