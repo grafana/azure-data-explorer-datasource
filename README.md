@@ -24,13 +24,11 @@ This can be enabled by setting `enforce_trusted_endpoints` in your Grafana confi
 enforce_trusted_endpoints = true
 ```
 
-## Configuring the datasource in Grafana
+## Configure the Azure Data Explorer data source
 
-The steps for configuring the integration between the Azure Data Explorer service and Grafana are:
+To configure ADX for using the ADX data source are create an Azure Active Directory (AAD) Application and AAD Service Principle, log into the Azure Data Explorer WebExplorer and connect the AAD Application to an Azure Data Explorer database user, and use the AAD Application to configure the datasource connection in Grafana.
 
-1. Create an Azure Active Directory (AAD) Application and AAD Service Principle.
-2. Log into the Azure Data Explorer WebExplorer and connect the AAD Application to an Azure Data Explorer database user.
-3. Use the AAD Application to configure the datasource connection in Grafana.
+Optionally to use use the dropdown cluster select when creating queries, add reader access for Azure Resource Graph queries and add reader access to each desired cluster.
 
 ### Creating an Azure Active Directory Service Principle
 
@@ -79,12 +77,9 @@ If the command succeeds you should get a result like this:
 
 ![Azure Data Web Explorer Add result](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/config_3_web_ui.png)
 
-### Configuring Grafana
-
+## Configuring Grafana
 
 [Add a data source](https://grafana.com/docs/grafana/latest/datasources/add-a-data-source/) by filling in the following fields:
-
-
 
 | Field  | Description                                 |
 | ------ | ------------------------------------------- |
@@ -92,21 +87,47 @@ If the command succeeds you should get a result like this:
 | Application (client) ID | (Azure Active Directory -> App Registrations -> Choose your app -> Application ID) |
 | Client Secret | ( Azure Active Directory -> App Registrations -> Choose your app -> Keys) |
 | Default Cluster | (Options) If no cluster is selected when making a query, the default cluster will be used. |
-| Default database? | not sure if this is still in use - FIX THIS| 
+
+### Additional settings
+
+Additional settings are optional settings that can be configured for more control over your data source. Additional settings can be accessed by expanding the additional settings section at the bottom of the data source configuration page.
+
+| Field  | Description                                 |
+| ------ | ------------------------------------------- |
+| Query timeout| This value controls the client query timeout.| 
+| Use dynamic caching | By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored. For time series queries we will use the bin size to widen the time range but also as cache max age. |
+| Cache max age | By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live. |
+| Data consistency | Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more information refer to [Query consistency](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/concepts/queryconsistency) | 
+| Default editor mode | This setting dictates which mode the editor will open in. Defaults to Visual. |
+| Default database | If no database is selected, the default database will be used. A default cluster is required to select a default database. To load default database options, first you must save the data source with valid Azure connection. |
+| Use managed schema | If enabled, allows tables, functions, and materialized views to be mapped to user friendly names. |
+| Send username header to host | With this feature enabled, Grafana will pass the logged in user's username in the `x-ms-user-id` header and in the `x-ms-client-request-id` header when sending requests to ADX. Can be useful when tracking needs to be done in ADX. |
 
 ### Configuring On-Behalf-Of authentication (Beta)
 
-⚠️ _This feature is in Beta and subject to breaking changes_
+_This feature is in Beta and subject to breaking changes_
 
 For information about setting up and using the OBO flow: [on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
 
-## Writing Queries
+## Query the data source
 
-Queries are written in the new Kusto Query Language, for more infromation refer to [Kusto Query Language (KQL) overview](https://docs.microsoft.com/en-us/azure/kusto/query/).
+Before querying the data source select the query header options cluster, database and format. You can create queries using the query builder, KQL, or OpenAI.
 
-Queries can be formatted as _Table_, _Time Series_, or _ADX Time Series_ data.
+### Query header
 
-### Table Queries
+#### Cluster
+
+Select a cluster to query. If a default cluster was set in the data source settings then it will auto populate the cluster select. If there are not clusters to select from, refer to [Configure the Azure Data Explorer data source](#configure-the-azure-data-explorer-data-source)
+
+#### Database
+
+Select a database to query. If a default database was set in the data source settings then it will auto populate the database select. 
+
+#### Format as
+
+Queries can be formatted as _Table_, _Time Series_, _Trace_, or _ADX time series_ data using the **Format as** dropdown select. 
+
+##### Table
 
 _Table_ queries are mainly used in the Table panel and row a list of columns and rows. This example query returns rows with the 6 specified columns:
 
@@ -117,7 +138,7 @@ AzureActivity
 | order by TimeGenerated desc
 ```
 
-### Time Series Queries
+##### Time series
 
 _Time Series_ queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
 
@@ -139,7 +160,16 @@ StormEvents
 | order by StartTime asc
 ```
 
-### ADX Time Series Queries
+##### Trace
+
+The trace format option can be used to display appropriately formatted data using the built in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
+
+- `logs` - an array of JSON objects with a `timestamp` field that has a numeric value, and a `fields` field that is key-value object.
+- `serviceTags` and `tags` - a typical key-value JSON object without nested objects.
+
+The values for keys are expected to be primitive types rather than complex types. The correct value to pass when empty is either `null`, an empty JSON object for `serviceTags` and `tags`, or an empty array for `logs`.
+
+##### ADX time series
 
 _ADX Time Series_ are for queries that use the [Kusto `make-series` operator](https://docs.microsoft.com/en-us/azure/kusto/query/make-seriesoperator). The query must have exactly one datetime column named `Timestamp` and at least one value column. There may also optionally be string columns that will be labels.
 
@@ -157,14 +187,37 @@ T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timest
   | extend series_decompose_forecast(AvgHatInventory, 30) | project-away *residual, *baseline, *seasonal
 ```
 
-### Trace Visualization Support
+### Query Builder
 
-The trace format option can be used to display appropriately formatted data using the built in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
+| Field | Description |
+| -- | -- |
+| Table | Select a table. |
+| Columns | Select a subset of columns for faster results. Time series requires both time and number values, other columns are rendered as dimensions. For more information about dimensions refer to [Time series dimensions](https://grafana.com/docs/grafana/latest/fundamentals/timeseries-dimensions/). |
+| Filters | (Optional) Add filters for the selected columns. Values for filters will be restricted to the column's data type. |
+| Aggregate | (Optional) Add aggregations for the selected columns. Select an aggregation type from the dropdown and select a column to aggregate on.  |
+| Group by | (Optional) Add group bys for the selected columns. For time group bys select a time range bucket. |
+| Timeshift | (Optional) **DO NOT MERGE!** why does this exist? |
 
-- `logs` - an array of JSON objects with a `timestamp` field that has a numeric value, and a `fields` field that is key-value object.
-- `serviceTags` and `tags` - a typical key-value JSON object without nested objects.
 
-The values for keys are expected to be primitive types rather than complex types. The correct value to pass when empty is either `null`, an empty JSON object for `serviceTags` and `tags`, or an empty array for `logs`.
+Columns of type `dynamic` are supported within the query builder. This encompasses arrays, JSON objects, and nested objects within arrays. A limitation is only the first 50,000 rows are queried for data, so only properties contained within the first 50,000 rows will be listed as options in the builder selectors. Additional values can be manually written in the different selectors if they don't appear by default. Also, due to the fact that these queries make use of `mv-expand`, they may become resource intensive.
+
+Refer to the below documentation for further details on how to handle dynamic columns appropriately via the KQL editor.
+
+[Kusto Data Types](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/) - Documentation on data types supported by Kusto.
+
+[Dynamic Data Type](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic) - Detailed documentation on the dynamic data type.
+
+### Query with Kusto Query Language (KQL)
+
+Queries are written in the new Kusto Query Language, for more information refer to [Kusto Query Language (KQL) overview](https://docs.microsoft.com/en-us/azure/kusto/query/).
+
+### OpenAI query generator
+
+_You need to enable the LLM plugin to use this feature._
+
+The LLM plugin can be found and installed at [LLM app](https://grafana.com/grafana/plugins/grafana-llm-app/). After installing the plugin enable it.
+
+To use the query generator, type in a statement or question about the data you would like to see and click **Generate query**. Review and edit the generated KQL query in the **Generated query** field. Once satisfied with the query, run the query by clicking **Run query**.
 
 ### Time Macros
 
@@ -243,18 +296,9 @@ MyLogs
 | project Timestamp, Text=Message , Tags="tag1,tag2"
 ```
 
-## Query Builder - Data Types
+## Learn more
 
-The query builder provides an easy to use interface to query Azure Data Explorer. As of v4.1.0, columns of type `dynamic` are also appropriately supported within the query builder. Dynamically typed columns can now be queried using the `Where`, `Aggregate`, and `Group By` operations. When choosing one of these operations, the options will be populated based on the values within the dynamic column. This encompasses arrays, JSON objects, and nested objects within arrays. A limitation is only the first 50,000 rows are queried for data, so only properties contained within the first 50,000 rows will be listed as options in the builder selectors. Also, due to the fact that these queries make use of `mv-expand`, they may become resource intensive.
-
-Note that only the 50,000 first rows of a table are evaluated in order to obtain possible values to show as options in the query builder. Additional values can be manually written in the different selectors if they don't appear by default.
-
-See the below documentation for further details on how to handle dynamic columns appropriately via the KQL editor.
-
-[Kusto Data Types](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/) - Documentation on data types supported by Kusto.
-
-[Dynamic Data Type](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic) - Detailed documentation on the dynamic data type.
-
-## CHANGELOG
-
-See the [Changelog](https://github.com/grafana/azure-data-explorer-datasource/blob/main/CHANGELOG.md).
+- Add [Annotations](https://grafana.com/docs/grafana/latest/dashboards/annotations/).
+- Configure and use [Templates and variables](https://grafana.com/docs/grafana/latest/variables/).
+- Add [Transformations](https://grafana.com/docs/grafana/latest/panels/transformations/).
+- Set up alerting; refer to [Alerts overview](https://grafana.com/docs/grafana/latest/alerting/).
