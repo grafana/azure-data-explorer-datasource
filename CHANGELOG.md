@@ -2,8 +2,7 @@
 
 ## [4.9.0]
 
-- dfd
-- fd
+- New feature: Add support for query cluster selection.
 
 ## [4.8.0]
 
