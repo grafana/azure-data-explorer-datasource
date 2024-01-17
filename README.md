@@ -112,7 +112,7 @@ Additional settings are optional settings that can be configured for more contro
 This feature is in Beta and subject to breaking changes
 {{%/* /admonition */%}}
 
-For information about setting up and using the OBO flow: [on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
+For information about setting up and using the OBO flow, refer to [on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
 
 ## Query the data source
 
