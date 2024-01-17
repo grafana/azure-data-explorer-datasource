@@ -132,65 +132,57 @@ Select a database to query. If a default database was set in the data source set
 
 Queries can be formatted as _Table_, _Time Series_, _Trace_, or _ADX time series_ data using the **Format as** dropdown select. 
 
-##### Table
+- **Table** queries are mainly used in the Table panel as a list of columns and rows. This example query returns rows with the six specified columns:
 
-_Table_ queries are mainly used in the Table panel as a list of columns and rows. This example query returns rows with the six specified columns:
+  ```kusto
+  AzureActivity
+  | where $__timeFilter()
+  | project TimeGenerated, ResourceGroup, Category, OperationName, ActivityStatus, Caller
+  | order by TimeGenerated desc
+  ```
 
-```kusto
-AzureActivity
-| where $__timeFilter()
-| project TimeGenerated, ResourceGroup, Category, OperationName, ActivityStatus, Caller
-| order by TimeGenerated desc
-```
+- **Time series** queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
 
-##### Time series
+  ```kusto
+  AzureActivity
+  | where $__timeFilter(TimeGenerated)
+  | summarize count() by Category, bin(TimeGenerated, 1h)
+  | order by TimeGenerated asc
+  ```
 
-_Time Series_ queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
+  The number of valued columns is considered metrics, and the optional string columns are treated as tags. A time series is returned for each value column + a unique set of string column values. Each series has name of valueColumnName {stringColumnName=columnValue, ... }.
 
-```kusto
-AzureActivity
-| where $__timeFilter(TimeGenerated)
-| summarize count() by Category, bin(TimeGenerated, 1h)
-| order by TimeGenerated asc
-```
+  For example, the following query will produce series like ` AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY} `:
 
-The number of valued columns is considered metrics, and the optional string columns are treated as tags. A time series is returned for each value column + a unique set of string column values. Each series has name of valueColumnName {stringColumnName=columnValue, ... }.
+  ```kusto
+  StormEvents
+  | where $__timeFilter(StartTime)
+  | summarize EventCount=count(), AvgDirectDeaths=avg(DeathsDirect) by EventType, State, bin(StartTime, $__timeInterval)
+  | order by StartTime asc
+  ```
 
-For example, the following query will produce series like ` AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY} `:
+- **Trace** format option can be used to display appropriately formatted data using the built-in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
 
-```kusto
-StormEvents
-| where $__timeFilter(StartTime)
-| summarize EventCount=count(), AvgDirectDeaths=avg(DeathsDirect) by EventType, State, bin(StartTime, $__timeInterval)
-| order by StartTime asc
-```
+  - `logs` - an array of JSON objects with a `timestamp` field that has a numeric value, and a `fields` field that is key-value object.
+  - `serviceTags` and `tags` - a typical key-value JSON object without nested objects.
 
-##### Trace
+  The values for keys are expected to be primitive types rather than complex types. The correct value to pass when empty is either `null`, an empty JSON object for `serviceTags` and `tags`, or an empty array for `logs`.
 
-The trace format option can be used to display appropriately formatted data using the built-in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
+- **ADX time series** are for queries that use the [Kusto `make-series` operator](https://docs.microsoft.com/en-us/azure/kusto/query/make-seriesoperator). The query must have exactly one datetime column named `Timestamp` and at least one value column. There may also optionally be string columns that will be labels.
 
-- `logs` - an array of JSON objects with a `timestamp` field that has a numeric value, and a `fields` field that is key-value object.
-- `serviceTags` and `tags` - a typical key-value JSON object without nested objects.
+  Example:
 
-The values for keys are expected to be primitive types rather than complex types. The correct value to pass when empty is either `null`, an empty JSON object for `serviceTags` and `tags`, or an empty array for `logs`.
+  ```kusto
+  let T = range Timestamp from $__timeFrom to ($__timeTo + -30m) step 1m
+    | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
+    | extend   Place  = dynamic(["EU",     "EU",     "US",   "EU"])
+    | mvexpand Person, Place
+    | extend   HatInventory = rand(5)
+    | project  Timestamp, tostring(Person), tostring(Place), HatInventory;
 
-##### ADX time series
-
-_ADX Time Series_ are for queries that use the [Kusto `make-series` operator](https://docs.microsoft.com/en-us/azure/kusto/query/make-seriesoperator). The query must have exactly one datetime column named `Timestamp` and at least one value column. There may also optionally be string columns that will be labels.
-
-Example:
-
-```kusto
-let T = range Timestamp from $__timeFrom to ($__timeTo + -30m) step 1m
-  | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
-  | extend   Place  = dynamic(["EU",     "EU",     "US",   "EU"])
-  | mvexpand Person, Place
-  | extend   HatInventory = rand(5)
-  | project  Timestamp, tostring(Person), tostring(Place), HatInventory;
-
-T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timestamp from $__timeFrom to $__timeTo step 1m by Person, Place
-  | extend series_decompose_forecast(AvgHatInventory, 30) | project-away *residual, *baseline, *seasonal
-```
+  T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timestamp from $__timeFrom to $__timeTo step 1m by Person, Place
+    | extend series_decompose_forecast(AvgHatInventory, 30) | project-away *residual, *baseline, *seasonal
+  ```
 
 ### Query Builder
 
