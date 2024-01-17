@@ -218,7 +218,10 @@ Queries are written in the new Kusto Query Language; for more information, refer
 
 ### OpenAI query generator
 
-_You need to enable the LLM plugin to use this feature._
+{{%/* admonition type="note" */%}}
+You must enable the LLM plugin to use this feature.
+{{%/* /admonition */%}}
+
 
 The LLM plugin can be installed at [LLM app](https://grafana.com/grafana/plugins/grafana-llm-app/). After installing the plugin, enable it.
 
