@@ -107,11 +107,19 @@ func converterFrameForTable(t Table, executedQueryString string, format string) 
 
 	fic.Frame.Meta = &data.FrameMeta{
 		ExecutedQueryString: executedQueryString,
-		Custom:              AzureFrameMD{ColumnTypes: colTypes},
+		Custom:              map[string]any{"ColumnTypes": colTypes, "searchWords": []string{}},
 	}
 
 	if format == "trace" {
-		fic.Frame.Meta.PreferredVisualization = "trace"
+		fic.Frame.SetMeta(&data.FrameMeta{
+			PreferredVisualization: data.VisTypeTrace,
+		})
+	}
+
+	if format == "logs" {
+		fic.Frame.SetMeta(&data.FrameMeta{
+			PreferredVisualization: data.VisTypeLogs,
+		})
 	}
 
 	return fic, nil
