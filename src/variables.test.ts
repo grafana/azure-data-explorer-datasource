@@ -93,6 +93,7 @@ const datasource = mockDatasource({
   getDefaultOrFirstDatabase: jest.fn().mockResolvedValue('test_db'),
   getDatabases: jest.fn().mockResolvedValue([{ text: 'test_db', value: 'test_db' }]),
   getSchema: jest.fn().mockResolvedValue(mockSchema),
+  getClusters: jest.fn().mockResolvedValue([{ name: 'cluster_name', value: 'cluster_value' }]),
   query: jest.fn().mockReturnValue(
     of({
       data: [
@@ -158,7 +159,7 @@ describe('variables', () => {
 
       expect(datasource.getDefaultOrFirstDatabase).toBeCalled();
       expect(datasource.getDatabases).toBeCalled();
-      expect(buildQuerySpy).toBeCalledWith('databases()', { scopedVars: {} }, 'test_db');
+      expect(buildQuerySpy).toBeCalledWith('databases()', { scopedVars: {} }, 'test_db', 'clusterUrl');
       expect(res.data).toEqual([toDataFrame([{ text: 'test_db', value: 'test_db' }])]);
     });
 
@@ -169,7 +170,7 @@ describe('variables', () => {
       const res = await lastValueFrom(variableSupport.query(req));
 
       expect(datasource.getDefaultOrFirstDatabase).toBeCalled();
-      expect(buildQuerySpy).toBeCalledWith('test', { scopedVars: {} }, 'test_db');
+      expect(buildQuerySpy).toBeCalledWith('test', { scopedVars: {} }, 'test_db', 'clusterUrl');
       expect(datasource.query).toBeCalled();
       expect(res.data).toEqual([{ text: 'test_string' }]);
     });
@@ -180,7 +181,7 @@ describe('variables', () => {
       const variableSupport = new VariableSupport(datasource);
       const req = mockRequest({
         targets: [
-          { ...defaultQuery, database: '', resultFormat: 'table', refId: '', queryType: AdxQueryType.Databases },
+          { ...defaultQuery, database: '', resultFormat: 'table', refId: '', queryType: AdxQueryType.Databases, clusterUri: '', },
         ],
       });
       const res = await lastValueFrom(variableSupport.query(req));
@@ -193,7 +194,7 @@ describe('variables', () => {
       const variableSupport = new VariableSupport(datasource);
       const req = mockRequest({
         targets: [
-          { ...defaultQuery, database: 'test_db', resultFormat: 'table', refId: '', queryType: AdxQueryType.Tables },
+          { ...defaultQuery, database: 'test_db', resultFormat: 'table', refId: '', queryType: AdxQueryType.Tables, clusterUri: '', },
         ],
       });
       const res = await lastValueFrom(variableSupport.query(req));
@@ -211,6 +212,7 @@ describe('variables', () => {
             resultFormat: 'table',
             refId: '',
             queryType: AdxQueryType.Columns,
+            clusterUri: '',
           },
         ],
       });

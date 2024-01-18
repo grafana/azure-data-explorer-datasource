@@ -29,6 +29,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
   const { schema, database, datasource, query, onChange } = props;
   const { id: datasourceId, parseExpression, getSchemaMapper } = datasource;
   const databaseName = templateSrv.replace(database);
+  const clusterName = templateSrv.replace(query.clusterUri);
   const tables = useTableOptions(schema, databaseName, datasource);
   const table = useSelectedTable(tables, query, datasource);
   const tableName = getTemplateSrv().replace(table?.value ?? '');
@@ -39,7 +40,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
     }
 
     const name = tableMapping?.value ?? tableName;
-    return await getTableSchema(datasource, databaseName, name);
+    return await getTableSchema(datasource, databaseName, name, clusterName);
   }, [datasourceId, databaseName, tableName, tableMapping?.value]);
   const [tableColumns, setTableColumns] = useState<AdxColumnSchema[]>([]);
 
@@ -54,9 +55,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
         onChange({ ...query, query: q });
       }
     }
-    // We are only interested on re-parsing if the expression changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query.expression, tableSchema.value]);
+  }, [query.expression, tableSchema.value, clusterName, parseExpression, query, onChange]);
 
   if (!schema) {
     return null;
@@ -69,7 +68,7 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
           {tableSchema.error?.message}
         </Alert>
       )}
-      {!tableSchema.loading && tableSchema.value?.length === 0 && (
+      {!tableSchema.loading && tableSchema.value?.length === 0 && clusterName && (
         <Alert severity="warning" title="Table schema loaded successfully but without any columns" />
       )}
       <TableSection {...props} tableSchema={tableSchema} tables={tables} table={table} />
@@ -130,7 +129,7 @@ const useSelectedTable = (
   }, [options, table, variables]);
 };
 
-async function getTableSchema(datasource: AdxDataSource, databaseName: string, tableName: string) {
+async function getTableSchema(datasource: AdxDataSource, databaseName: string, tableName: string, clusterUri: string) {
   const schemaResolver = new AdxSchemaResolver(datasource);
-  return await schemaResolver.getColumnsForTable(databaseName, tableName);
+  return await schemaResolver.getColumnsForTable(databaseName, tableName, clusterUri);
 }

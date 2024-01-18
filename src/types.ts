@@ -25,6 +25,7 @@ export interface QueryExpression {
 type QuerySource = 'raw' | 'schema' | 'autocomplete' | 'visual' | 'openai';
 export interface KustoQuery extends DataQuery {
   query: string;
+  clusterUri: string;
   database: string;
   alias?: string;
   resultFormat: string;
@@ -39,6 +40,7 @@ export interface KustoQuery extends DataQuery {
 
 export interface AutoCompleteQuery {
   database: string;
+  clusterUri: string;
   search: QueryEditorOperatorExpression;
   expression: QueryExpression;
   index?: string;
@@ -51,10 +53,16 @@ export enum EditorMode {
 }
 
 export enum AdxQueryType {
+  Clusters = 'Clusters',
   Databases = 'Databases',
   KustoQuery = 'KQL',
   Tables = 'Tables',
   Columns = 'Columns',
+}
+
+export interface ClusterOption {
+  name: string;
+  uri: string;
 }
 
 export const defaultQuery: Pick<KustoQuery, 'query' | 'expression' | 'querySource' | 'pluginVersion' | 'queryType'> = {

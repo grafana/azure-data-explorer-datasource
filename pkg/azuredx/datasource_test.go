@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	kustoRequestMock func(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
-	table            = &models.TableResponse{
+	kustoRequestMock      func(url string, cluster string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
+	ARGClusterRequestMock func(payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error)
+	table                 = &models.TableResponse{
 		Tables: []models.Table{
 			{
 				TableName: "Table_0",
@@ -39,8 +40,9 @@ func TestDatasource(t *testing.T) {
 			TimeRange:     backend.TimeRange{},
 			JSON:          []byte(`{"resultFormat": "table","querySource": "schema"}`),
 		}
-		kustoRequestMock = func(url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
-			require.Equal(t, ClusterURL+"/v1/rest/query", url)
+		kustoRequestMock = func(url string, cluster string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+			require.Equal(t, "/v1/rest/query", url)
+			require.Equal(t, ClusterURL, cluster)
 			require.Contains(t, additionalHeaders, "x-ms-user-id")
 			require.Equal(t, UserLogin, additionalHeaders["x-ms-user-id"])
 			require.Contains(t, additionalHeaders["x-ms-client-request-id"], UserLogin)
@@ -53,10 +55,18 @@ func TestDatasource(t *testing.T) {
 
 type fakeClient struct{}
 
-func (c *fakeClient) TestRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+func (c *fakeClient) TestKustoRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
 	panic("not implemented")
 }
 
-func (c *fakeClient) KustoRequest(_ context.Context, url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
-	return kustoRequestMock(url, payload, additionalHeaders)
+func (c *fakeClient) TestARGsRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {
+	panic("not implemented")
+}
+
+func (c *fakeClient) KustoRequest(_ context.Context, cluster string, url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+	return kustoRequestMock(url, cluster, payload, additionalHeaders)
+}
+
+func (c *fakeClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
+	return ARGClusterRequestMock(payload, additionalHeaders)
 }

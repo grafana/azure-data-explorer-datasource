@@ -1,4 +1,5 @@
-import { AdxSchema } from 'types';
+import { SelectableValue } from '@grafana/data';
+import { AdxSchema, ClusterOption } from 'types';
 
 export interface DataTarget {
   target: string;
@@ -94,3 +95,10 @@ export class ResponseParser {
     return content;
   }
 }
+
+export const parseClustersResponse = (res: ClusterOption[], giveNames = true): SelectableValue[] => {
+  if (!res || res.length === 0) {
+    return [];
+  }
+  return res.map((val: ClusterOption) => ({ label: giveNames ? val.name : val.uri, value: val.uri}));
+};

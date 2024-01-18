@@ -18,13 +18,13 @@ export class AdxSchemaResolver {
     return `${schemaKey}.${this.datasource.id}.${addition}`;
   }
 
-  async getDatabases(): Promise<AdxDatabaseSchema[]> {
-    const schema = await this.datasource.getSchema();
+  async getDatabases(clusterUri: string): Promise<AdxDatabaseSchema[]> {
+    const schema = await this.datasource.getSchema(clusterUri);
     return Object.keys(schema.Databases).map((key) => schema.Databases[key]);
   }
 
-  async getTablesForDatabase(databaseName: string): Promise<AdxTableSchema[]> {
-    const databases = await this.getDatabases();
+  async getTablesForDatabase(databaseName: string, clusterUri: string): Promise<AdxTableSchema[]> {
+    const databases = await this.getDatabases(clusterUri);
     const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
@@ -33,8 +33,8 @@ export class AdxSchemaResolver {
     return Object.keys(database.Tables).map((key) => database.Tables[key]);
   }
 
-  async getViewsForDatabase(databaseName: string): Promise<AdxTableSchema[]> {
-    const databases = await this.getDatabases();
+  async getViewsForDatabase(databaseName: string, clusterUri: string): Promise<AdxTableSchema[]> {
+    const databases = await this.getDatabases(clusterUri);
     const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
@@ -43,8 +43,8 @@ export class AdxSchemaResolver {
     return Object.keys(database.MaterializedViews).map((key) => database.MaterializedViews[key]);
   }
 
-  async getFunctionsForDatabase(databaseName: string): Promise<AdxFunctionSchema[]> {
-    const databases = await this.getDatabases();
+  async getFunctionsForDatabase(databaseName: string, clusterUri: string): Promise<AdxFunctionSchema[]> {
+    const databases = await this.getDatabases(clusterUri);
     const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
@@ -53,20 +53,20 @@ export class AdxSchemaResolver {
     return Object.keys(database.Functions).map((key) => database.Functions[key]);
   }
 
-  async getColumnsForTable(databaseName: string, tableName: string): Promise<AdxColumnSchema[]> {
-    const cacheKey = this.createCacheKey(`db.${databaseName}.${tableName}`);
+  async getColumnsForTable(databaseName: string, tableName: string, clusterUri: string): Promise<AdxColumnSchema[]> {
+    const cacheKey = this.createCacheKey(`${clusterUri}.${databaseName}.${tableName}`);
     const mapper = this.datasource.getSchemaMapper();
 
     return cache(cacheKey, async () => {
       const mapping = mapper.getMappingByValue(tableName);
-      const schema = await this.findSchema(databaseName, tableName, mapping);
+      const schema = await this.findSchema(databaseName, tableName, clusterUri, mapping);
 
       if (!schema) {
         return [];
       }
 
       if (mapping?.type === SchemaMappingType.function) {
-        schema.OrderedColumns = await this.datasource.getFunctionSchema(databaseName, mapping.value);
+        schema.OrderedColumns = await this.datasource.getFunctionSchema(databaseName, mapping.value, clusterUri);
       }
 
       const dynamicColumns = schema.OrderedColumns.filter((column) => column.CslType === 'dynamic').map(
@@ -76,7 +76,8 @@ export class AdxSchemaResolver {
       const schemaByColumn = await this.datasource.getDynamicSchema(
         databaseName,
         mapping?.name ?? tableName,
-        dynamicColumns
+        dynamicColumns,
+        clusterUri
       );
 
       return schema.OrderedColumns.reduce((columns: AdxColumnSchema[], column) => {
@@ -97,12 +98,13 @@ export class AdxSchemaResolver {
   private async findSchema(
     databaseName: string,
     tableName: string,
+    clusterUri: string,
     mapping?: SchemaMapping
   ): Promise<AdxTableSchema | undefined> {
     const [tables, funcs, views] = await Promise.all([
-      this.getTablesForDatabase(databaseName),
-      this.getFunctionsForDatabase(databaseName),
-      this.getViewsForDatabase(databaseName),
+      this.getTablesForDatabase(databaseName, clusterUri),
+      this.getFunctionsForDatabase(databaseName, clusterUri),
+      this.getViewsForDatabase(databaseName, clusterUri),
     ]);
 
     const name = mapping?.name ?? tableName;

@@ -27,6 +27,7 @@ export const migrateAnnotation = (annotation: inputAnnotation) => {
     resultFormat: annotation.resultFormat ?? 'table',
     pluginVersion: defaultQuery.pluginVersion,
     queryType: AdxQueryType.KustoQuery,
+    clusterUri: '',
   };
 
   return {

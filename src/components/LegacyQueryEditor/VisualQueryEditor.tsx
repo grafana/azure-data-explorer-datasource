@@ -47,6 +47,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
 
   const resultFormat = selectResultFormat(query.resultFormat);
   const databaseName = getTemplateSrv().replace(database);
+  const clusterName = getTemplateSrv().replace(query.clusterUri);
   const tables = useTableOptions(schema, databaseName, datasource);
   const table = useSelectedTable(tables, query, datasource);
   const tableName = getTemplateSrv().replace(table?.property.name ?? '');
@@ -81,7 +82,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
     }
 
     const name = tableMapping?.value ?? tableName;
-    const schema = await getTableSchema(datasource, databaseName, name);
+    const schema = await getTableSchema(datasource, databaseName, name, clusterName);
     const expression = query.expression ?? defaultQuery.expression;
 
     onChangeQuery({
@@ -96,7 +97,7 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
     });
 
     return schema;
-  }, [datasourceId, databaseName, tableName, tableMapping?.value]);
+  }, [datasourceId, databaseName, tableName, tableMapping?.value, clusterName]);
 
   const onAutoComplete = useCallback(
     async (index: string, search: QueryEditorOperatorExpression) => {
@@ -106,13 +107,14 @@ export const VisualQueryEditor: React.FC<Props> = (props) => {
           database: databaseName,
           expression: query.expression,
           index,
+          clusterUri: clusterName
         },
         tableSchema.value
       );
 
       return values.map((value) => ({ value, label: value }));
     },
-    [autoCompleteQuery, databaseName, tableSchema.value, query.expression]
+    [autoCompleteQuery, databaseName, tableSchema.value, query.expression, clusterName]
   );
 
   const columns = useColumnOptions(tableSchema.value);
@@ -409,9 +411,9 @@ const useTableOptions = (
   }, [database, schema, mapper]);
 };
 
-async function getTableSchema(datasource: AdxDataSource, databaseName: string, tableName: string) {
+async function getTableSchema(datasource: AdxDataSource, databaseName: string, tableName: string, cluster: string) {
   const schemaResolver = new AdxSchemaResolver(datasource);
-  return await schemaResolver.getColumnsForTable(databaseName, tableName);
+  return await schemaResolver.getColumnsForTable(databaseName, tableName, cluster);
 }
 
 const useTimeshiftOptions = (): QueryEditorPropertyDefinition[] => {

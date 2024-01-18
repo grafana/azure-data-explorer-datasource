@@ -84,8 +84,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
       <Divider />
       <ConfigHelp options={options} />
       <Divider />
-      <ConnectionConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
-      <Divider />
       <AzureCredentialsForm
         userIdentityEnabled={getUserIdentityEnabled()}
         managedIdentityEnabled={config.azure.managedIdentityEnabled}
@@ -95,6 +93,8 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         azureCloudOptions={KnownAzureClouds}
         onCredentialsChange={onCredentialsChange}
       />
+      <Divider />
+      <ConnectionConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
       <Divider />
       <ConfigSection
         title="Additional settings"

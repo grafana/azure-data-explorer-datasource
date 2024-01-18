@@ -10,6 +10,7 @@ export const migrateQuery = (query: KustoQuery | string): KustoQuery => {
       refId: `adx-${query}`,
       querySource: EditorMode.Raw,
       database: '',
+      clusterUri: '',
       resultFormat: 'table',
       rawMode: true,
       pluginVersion: defaultQuery.pluginVersion,
