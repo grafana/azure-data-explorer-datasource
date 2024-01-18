@@ -28,7 +28,7 @@ enforce_trusted_endpoints = true
 
 To configure ADX for using this data source:
 1. Create an Azure Active Directory (AAD) Application and AAD Service Principal.
-1. In the Azure Data Explorer WebExplorer and connect the AAD Application to an Azure Data Explorer database user.
+1. In the Azure Data Explorer WebExplorer, connect the AAD Application to an Azure Data Explorer database user.
 1. Use the AAD Application to configure the data source connection in Grafana.
 
 1. (Optional) To use the dropdown cluster select when creating queries, add reader access for Azure Resource Graph queries, and add reader access to each desired cluster.
