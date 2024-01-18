@@ -31,11 +31,11 @@ To configure ADX for using this data source:
 1. In the Azure Data Explorer WebExplorer, connect the AAD Application to an Azure Data Explorer database user.
 1. Use the AAD Application to configure the data source connection in Grafana.
 
-1. (Optional) To use the dropdown cluster select when creating queries, add reader access for Azure Resource Graph queries, and add reader access to each desired cluster.
+1. (Optional) To use the dropdown cluster select when creating queries, add reader access to any subscriptions supported for Azure Resource Graph queries, and add reader access to each desired cluster.
 
 ### Creating an Azure Active Directory Service Principle
 
-For detailed instructions on how to set up a Microsoft Entra application and service principal that can access resources, please follow this guide from Microsoft [Create a Microsoft Entra application and service principal that can access resources](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal)
+For detailed instructions on how to set up a Microsoft Entra application and service principal that can access resources, please follow this guide from Microsoft: [Create a Microsoft Entra application and service principal that can access resources](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal)
 
 An alternative way to create an AAD application is with the Azure CLI. For more information on the Azure CLI command, refer to [az ad sp create-for-rbac](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create-for-rbac):
 
@@ -206,7 +206,7 @@ Refer to the documentation below for further details on handling dynamic columns
 
 ### Query with Kusto Query Language (KQL)
 
-Queries are written in the new Kusto Query Language; for more information, refer to [Kusto Query Language (KQL) overview](https://docs.microsoft.com/en-us/azure/kusto/query/).
+Queries are written in Kusto Query Language; for more information, refer to [Kusto Query Language (KQL) overview](https://docs.microsoft.com/en-us/azure/kusto/query/).
 
 ### OpenAI query generator
 
@@ -221,7 +221,7 @@ To use the query generator, type in a statement or question about the data you w
 
 ### Time Macros
 
-To make writing queries easier, there are some Grafana macros that can be used in the where clause of a query:
+To make writing queries easier, there are some Grafana macros that can be used in the `where` clause of a query:
 
 - `$__timeFilter()` - Expands to `TimeGenerated ≥ datetime(2018-06-05T18:09:58.907Z) and TimeGenerated ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
 - `$__timeFilter(datetimeColumn)` - Expands to `datetimeColumn ≥ datetime(2018-06-05T18:09:58.907Z) and datetimeColumn ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
@@ -240,7 +240,7 @@ To make writing queries easier, there are some Grafana macros that can be used i
 
 Instead of hard-coding things like server, application, and sensor name in your metric queries, you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns make it easy to change the data being displayed in your dashboard.
 
-Create the variable in the dashboard settings. Usually, you will need to write a query in the Kusto Query Language to get a list of values for the dropdown. However, having a list of hard-coded values is also possible.
+Create the variable in the dashboard settings. Usually, you will need to write a query in KQL to get a list of values for the dropdown. However, having a list of hard-coded values is also possible.
 
 1. Fill in a name for your variable. The `Name` field is the name of the variable. There is also a `Label` field for the friendly name.
 2. In the Query Options section, choose the `Azure Data Explorer` datasource in the `Data source` dropdown.
