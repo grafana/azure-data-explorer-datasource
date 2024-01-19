@@ -27,6 +27,7 @@ enforce_trusted_endpoints = true
 ## Configure the Azure Data Explorer data source
 
 To configure ADX for using this data source:
+
 1. Create an Azure Active Directory (AAD) Application and AAD Service Principal.
 1. In the Azure Data Explorer WebExplorer, connect the AAD Application to an Azure Data Explorer database user.
 1. Use the AAD Application to configure the data source connection in Grafana.
@@ -84,27 +85,27 @@ If the command succeeds, you should get a result like this:
 
 [Add a data source](https://grafana.com/docs/grafana/latest/datasources/add-a-data-source/) by filling in the following fields:
 
-| Field  | Description                                 |
-| ------ | ------------------------------------------- |
-| Directory (tenant) ID | (Azure Active Directory -> Properties -> Directory ID) |
-| Application (client) ID | (Azure Active Directory -> App Registrations -> Choose your app -> Application ID) |
-| Client Secret | ( Azure Active Directory -> App Registrations -> Choose your app -> Keys) |
-| Default Cluster | (Options) If no cluster is selected when making a query, the default cluster will be used. |
+| Field                   | Description                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------ |
+| Directory (tenant) ID   | (Azure Active Directory -> Properties -> Directory ID)                                     |
+| Application (client) ID | (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)         |
+| Client Secret           | ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)                  |
+| Default Cluster         | (Options) If no cluster is selected when making a query, the default cluster will be used. |
 
 ### Additional settings
 
 Additional settings are optional settings that can be configured for more control over your data source. Additional settings can be accessed by expanding the additional settings section at the bottom of the data source configuration page.
 
-| Field  | Description                                 |
-| ------ | ------------------------------------------- |
-| Query timeout| This value controls the client query timeout.| 
-| Use dynamic caching | By enabling this feature Grafana will dynamically apply cache settings on a per-query basis, and the default cache max age will be ignored. The bin size for time series queries will be used to widen the time range and as cache max age. |
-| Cache max age | By default, the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live. |
-| Data consistency | Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more information, refer to [Query consistency](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/concepts/queryconsistency) | 
-| Default editor mode | This setting dictates which mode the editor will open in. Defaults to Visual. |
-| Default database | The default database will be used if no database is selected. A default cluster is required to select a default database. To load default database options, you must save the data source with a valid Azure connection. |
-| Use managed schema | If enabled, tables, functions, and materialized views are mapped to user-friendly names. |
-| Send username header to host | With this feature enabled, Grafana will pass the logged in user's username in the `x-ms-user-id` header and in the `x-ms-client-request-id` header when sending requests to ADX. It can be useful when tracking needs to be done in ADX. |
+| Field                        | Description                                                                                                                                                                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Query timeout                | This value controls the client query timeout.                                                                                                                                                                                               |
+| Use dynamic caching          | By enabling this feature Grafana will dynamically apply cache settings on a per-query basis, and the default cache max age will be ignored. The bin size for time series queries will be used to widen the time range and as cache max age. |
+| Cache max age                | By default, the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.                                                                                                             |
+| Data consistency             | Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more information, refer to [Query consistency](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/concepts/queryconsistency)          |
+| Default editor mode          | This setting dictates which mode the editor will open in. Defaults to Visual.                                                                                                                                                               |
+| Default database             | The default database will be used if no database is selected. A default cluster is required to select a default database. To load default database options, you must save the data source with a valid Azure connection.                    |
+| Use managed schema           | If enabled, tables, functions, and materialized views are mapped to user-friendly names.                                                                                                                                                    |
+| Send username header to host | With this feature enabled, Grafana will pass the logged in user's username in the `x-ms-user-id` header and in the `x-ms-client-request-id` header when sending requests to ADX. It can be useful when tracking needs to be done in ADX.    |
 
 ### Configuring On-Behalf-Of authentication (Beta)
 
@@ -126,11 +127,11 @@ Select a cluster to query. If a default cluster was set in the data source setti
 
 #### Database
 
-Select a database to query. If a default database was set in the data source settings, it will auto-populate the database selection. 
+Select a database to query. If a default database was set in the data source settings, it will auto-populate the database selection.
 
 #### Format as
 
-Queries can be formatted as _Table_, _Time Series_, _Trace_, or _ADX time series_ data using the **Format as** dropdown select. 
+Queries can be formatted as _Table_, _Time Series_, _Trace_, or _ADX time series_ data using the **Format as** dropdown select.
 
 - **Table** queries are mainly used in the Table panel as a list of columns and rows. This example query returns rows with the six specified columns:
 
@@ -186,15 +187,14 @@ Queries can be formatted as _Table_, _Time Series_, _Trace_, or _ADX time series
 
 ### Query Builder
 
-| Field | Description |
-| -- | -- |
-| Table | Select a table. |
-| Columns | Select a subset of columns for faster results. Time series requires both time and number values; other columns are rendered as dimensions. For more information about dimensions, refer to [Time series dimensions](https://grafana.com/docs/grafana/latest/fundamentals/timeseries-dimensions/). |
-| Filters | (Optional) Add filters for the selected columns. Values for filters will be restricted to the column's data type. |
-| Aggregate | (Optional) Add aggregations for the selected columns. Select an aggregation type from the dropdown and select a column to aggregate on.  |
-| Group by | (Optional) Add group bys for the selected columns. For time group bys select a time range bucket. |
-| Timeshift | (Optional) **DO NOT MERGE!** why does this exist? |
-
+| Field                                                                                                                                                                             | Description                                                                                                                                                                                                                                                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Table                                                                                                                                                                             | Select a table.                                                                                                                                                                                                                                                                                   |
+| Columns                                                                                                                                                                           | Select a subset of columns for faster results. Time series requires both time and number values; other columns are rendered as dimensions. For more information about dimensions, refer to [Time series dimensions](https://grafana.com/docs/grafana/latest/fundamentals/timeseries-dimensions/). |
+| Filters                                                                                                                                                                           | (Optional) Add filters for the selected columns. Values for filters will be restricted to the column's data type.                                                                                                                                                                                 |
+| Aggregate                                                                                                                                                                         | (Optional) Add aggregations for the selected columns. Select an aggregation type from the dropdown and select a column to aggregate on.                                                                                                                                                           |
+| Group by                                                                                                                                                                          | (Optional) Add group bys for the selected columns. For time group bys select a time range bucket.                                                                                                                                                                                                 |
+| Timeshift (deprecated use grafana time shift in [Query Options](https://grafana.com/docs/grafana-cloud/visualizations/panels-visualizations/query-transform-data/#query-options)) | (Optional) Shift the time ranges generated from Grafana macros by a predetermined duration.                                                                                                                                                                                                       |
 
 Columns of the `dynamic` type are supported within the query builder. This encompasses arrays, JSON objects, and nested objects within arrays. A limitation is only the first 50,000 rows are queried for data, so only properties contained within the first 50,000 rows will be listed as options in the builder selectors. Additional values can be manually written in the different selectors if they don't appear by default. Also, due to the fact that these queries make use of `mv-expand`, they may become resource intensive.
 
@@ -213,7 +213,6 @@ Queries are written in Kusto Query Language; for more information, refer to [Kus
 {{%/* admonition type="note" */%}}
 You must enable the LLM plugin to use this feature.
 {{%/* /admonition */%}}
-
 
 The LLM plugin can be installed at [LLM app](https://grafana.com/grafana/plugins/grafana-llm-app/). After installing the plugin, enable it.
 
