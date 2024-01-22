@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { Button, ConfirmModal, RadioButtonGroup/*, InlineField, Input*/ } from '@grafana/ui';
-import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
+import { Alert, Button, CollapsableSection, ConfirmModal, RadioButtonGroup, useStyles2 } from '@grafana/ui';
+import { EditorHeader, FlexItem, InlineSelect, llms } from '@grafana/experimental';
 
 import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
@@ -9,10 +9,11 @@ import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { useAsync } from 'react-use';
 import { databaseToDefinition } from 'schema/mapper';
-import { SelectableValue } from '@grafana/data';
+import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
 import { selectors } from 'test/selectors';
 import { parseClustersResponse } from 'response_parser';
+import { css } from '@emotion/css';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
@@ -51,6 +52,16 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const database = useSelectedDatabase(databases, query, datasource);
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
+  const [enabled, setEnabled] = useState(false);
+  const [error, setError] = useState(false);
+  const [generatedExplanation, setGeneratedExplanation] = useState('');
+  const baselinePrompt = `You are a KQL expert and a Grafana expert that can explain any KQL query that contains Grafana macros clearly to someone who isn't familiar with KQL or Grafana. Explain the following KQL.\nText:"""`;
+  const styles = useStyles2(getStyles);
+
+  useAsync(async () => {
+    const enabled = await llms.openai.enabled();
+    setEnabled(enabled);
+  });
 
   const changeEditorMode = (value: EditorMode) => {
     reportInteraction('grafana_ds_adx_editor_mode');
@@ -105,6 +116,37 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const onDatabaseChange = ({ value }: SelectableValue) => {
     onChange({ ...query, database: value!, expression: defaultQuery.expression });
     onRunQuery();
+  };
+
+  const showExplanation = () => {
+    if (query.query !== "") {
+      reportInteraction('grafana_ds_adx_openai_query_explanation_generated_with_llm_plugin');
+      const stream = llms.openai
+        .streamChatCompletions({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'system', content: baselinePrompt },
+            { role: 'user', content: `${query.query}"""` },
+          ],
+        })
+        .pipe(llms.openai.accumulateContent());
+      stream.subscribe({
+        next: (m) => {
+          setGeneratedExplanation(m);
+        },
+        complete: () => {
+          console.log('hello')
+          // setWaiting(false);
+        },
+        error: (e) => {
+          console.log('goodbye')
+          // setError(true);
+          // setErrorMessage(e);
+        },
+      });
+    } else {
+      setError(true);
+    }
   };
 
   const EditorSelector = () => {
@@ -179,8 +221,42 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           Run query
         </Button>
       )}
-
-      <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
+      <div>
+        <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
+        {query.rawMode && (
+          <Button
+          variant="secondary"
+          size="sm"
+          onClick={showExplanation}
+          style={{margin: '0 0 0 15px'}}
+          disabled={!enabled}
+          >
+            Explain KQL
+          </Button>
+        )}
+        <CollapsableSection isOpen={true} label="KQL Explanation" className={styles.collapse}>
+          {generatedExplanation}
+        </CollapsableSection>
+        {/* {generatedExplanation && (
+          // <div>
+          //   <Button
+          //   variant="destructive"
+          //   size="sm"
+          //   style={{margin: '0 0 0 15px'}}
+          //   onClick={() => setGeneratedExplanation("")}
+          //   >
+          //     Clear explanation
+          //   </Button>
+          // </div>
+        // )} */}
+      </div>
+      <div>
+        {error && (
+          <Alert severity="error" title="Invalid query" onRemove={() => setError(false)} >
+            Query is empty or invalid. Please edit your query and try again.
+          </Alert>
+        )}
+      </div>
     </EditorHeader>
   );
 };
@@ -235,4 +311,18 @@ const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[]
 
     return databases;
   }, [schema]);
+};
+
+const getStyles = (theme: GrafanaTheme2) => {
+  return {
+    collapse: css({
+      backgroundColor: 'unset',
+      border: 'unset',
+      marginBottom: 0,
+
+      ['> button']: {
+        padding: theme.spacing(0, 1),
+      },
+    }),
+  }
 };
