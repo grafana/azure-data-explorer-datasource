@@ -9,7 +9,7 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.1
 	github.com/google/go-cmp v0.6.0
 	github.com/grafana/grafana-azure-sdk-go v1.10.0
-	github.com/grafana/grafana-plugin-sdk-go v0.198.0
+	github.com/grafana/grafana-plugin-sdk-go v0.200.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.4
 	github.com/xorcare/pointer v1.2.2
@@ -59,7 +59,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -72,7 +71,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.18.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
-	github.com/prometheus/common v0.45.0 // indirect
+	github.com/prometheus/common v0.46.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/unknwon/bra v0.0.0-20200517080246-1e3013ecaff8 // indirect
