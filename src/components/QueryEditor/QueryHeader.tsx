@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { Alert, Button, CollapsableSection, ConfirmModal, RadioButtonGroup, useStyles2 } from '@grafana/ui';
+import { Button, ConfirmModal, RadioButtonGroup, useStyles2 } from '@grafana/ui';
 import { EditorHeader, FlexItem, InlineSelect, llms } from '@grafana/experimental';
 
 import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
@@ -53,10 +53,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
   const [enabled, setEnabled] = useState(false);
-  const [error, setError] = useState(false);
+  // const [error, setError] = useState(false);
   const [generatedExplanation, setGeneratedExplanation] = useState('');
   const baselinePrompt = `You are a KQL expert and a Grafana expert that can explain any KQL query that contains Grafana macros clearly to someone who isn't familiar with KQL or Grafana. Explain the following KQL.\nText:"""`;
-  const styles = useStyles2(getStyles);
 
   useAsync(async () => {
     const enabled = await llms.openai.enabled();
@@ -135,17 +134,17 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           setGeneratedExplanation(m);
         },
         complete: () => {
-          console.log('hello')
+          console.log('hello');
           // setWaiting(false);
         },
         error: (e) => {
-          console.log('goodbye')
+          console.log('goodbye:', e)
           // setError(true);
           // setErrorMessage(e);
         },
       });
     } else {
-      setError(true);
+      // setError(true);
     }
   };
 
@@ -210,53 +209,29 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         }}
       />
       <FlexItem grow={1} />
+      {query.rawMode && (
+        <Button
+        variant="secondary"
+        size="sm"
+        onClick={showExplanation}
+        style={{margin: '0 0 0 15px'}}
+        disabled={!enabled}
+        >
+          Explain KQL
+        </Button>
+      )}
       {!query.OpenAI && (
         <Button
-          variant="primary"
-          icon="play"
-          size="sm"
-          onClick={onRunQuery}
-          data-testid={selectors.components.queryEditor.runQuery.button}
+        variant="primary"
+        icon="play"
+        size="sm"
+        onClick={onRunQuery}
+        data-testid={selectors.components.queryEditor.runQuery.button}
         >
           Run query
         </Button>
       )}
-      <div>
-        <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
-        {query.rawMode && (
-          <Button
-          variant="secondary"
-          size="sm"
-          onClick={showExplanation}
-          style={{margin: '0 0 0 15px'}}
-          disabled={!enabled}
-          >
-            Explain KQL
-          </Button>
-        )}
-        <CollapsableSection isOpen={true} label="KQL Explanation" className={styles.collapse}>
-          {generatedExplanation}
-        </CollapsableSection>
-        {/* {generatedExplanation && (
-          // <div>
-          //   <Button
-          //   variant="destructive"
-          //   size="sm"
-          //   style={{margin: '0 0 0 15px'}}
-          //   onClick={() => setGeneratedExplanation("")}
-          //   >
-          //     Clear explanation
-          //   </Button>
-          // </div>
-        // )} */}
-      </div>
-      <div>
-        {error && (
-          <Alert severity="error" title="Invalid query" onRemove={() => setError(false)} >
-            Query is empty or invalid. Please edit your query and try again.
-          </Alert>
-        )}
-      </div>
+      <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
     </EditorHeader>
   );
 };
