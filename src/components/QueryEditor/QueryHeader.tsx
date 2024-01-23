@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { Button, ConfirmModal, RadioButtonGroup, useStyles2 } from '@grafana/ui';
+import { Button, ConfirmModal, LoadingPlaceholder, RadioButtonGroup } from '@grafana/ui';
 import { EditorHeader, FlexItem, InlineSelect, llms } from '@grafana/experimental';
 
 import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
@@ -9,11 +9,11 @@ import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { useAsync } from 'react-use';
 import { databaseToDefinition } from 'schema/mapper';
-import { GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { SelectableValue } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
 import { selectors } from 'test/selectors';
 import { parseClustersResponse } from 'response_parser';
-import { css } from '@emotion/css';
+// import { css } from '@emotion/css';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
@@ -53,7 +53,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
   const [enabled, setEnabled] = useState(false);
-  // const [error, setError] = useState(false);
+  const [waiting, setWaiting] = useState(false);
   const [generatedExplanation, setGeneratedExplanation] = useState('');
   const baselinePrompt = `You are a KQL expert and a Grafana expert that can explain any KQL query that contains Grafana macros clearly to someone who isn't familiar with KQL or Grafana. Explain the following KQL.\nText:"""`;
 
@@ -118,34 +118,31 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   };
 
   const showExplanation = () => {
-    if (query.query !== "") {
-      reportInteraction('grafana_ds_adx_openai_query_explanation_generated_with_llm_plugin');
-      const stream = llms.openai
-        .streamChatCompletions({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            { role: 'system', content: baselinePrompt },
-            { role: 'user', content: `${query.query}"""` },
-          ],
-        })
-        .pipe(llms.openai.accumulateContent());
-      stream.subscribe({
-        next: (m) => {
-          setGeneratedExplanation(m);
-        },
-        complete: () => {
-          console.log('hello');
-          // setWaiting(false);
-        },
-        error: (e) => {
-          console.log('goodbye:', e)
-          // setError(true);
-          // setErrorMessage(e);
-        },
-      });
-    } else {
-      // setError(true);
-    }
+    setWaiting(true);
+    reportInteraction('grafana_ds_adx_openai_kql_query_explanation_generated_with_llm_plugin');
+    const stream = llms.openai
+      .streamChatCompletions({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: baselinePrompt },
+          { role: 'user', content: `${query.query}"""` },
+        ],
+      })
+      .pipe(llms.openai.accumulateContent());
+    stream.subscribe({
+      next: (m) => {
+        setWaiting(false);
+        setGeneratedExplanation(m);
+      },
+      complete: () => {
+        console.log('hello');
+      },
+      error: (e) => {
+        console.log('goodbye:', e)
+        // setError(true);
+        // setErrorMessage(e);
+      },
+    });
   };
 
   const EditorSelector = () => {
@@ -231,6 +228,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           Run query
         </Button>
       )}
+      {!waiting ? generatedExplanation : <LoadingPlaceholder text="" /> }
       <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
     </EditorHeader>
   );
@@ -288,16 +286,16 @@ const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[]
   }, [schema]);
 };
 
-const getStyles = (theme: GrafanaTheme2) => {
-  return {
-    collapse: css({
-      backgroundColor: 'unset',
-      border: 'unset',
-      marginBottom: 0,
+// const getStyles = (theme: GrafanaTheme2) => {
+//   return {
+//     collapse: css({
+//       backgroundColor: 'unset',
+//       border: 'unset',
+//       marginBottom: 0,
 
-      ['> button']: {
-        padding: theme.spacing(0, 1),
-      },
-    }),
-  }
-};
+//       ['> button']: {
+//         padding: theme.spacing(0, 1),
+//       },
+//     }),
+//   }
+// };
