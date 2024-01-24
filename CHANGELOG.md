@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.9.0]
+
+- New feature: Add support for query cluster selection.
+
 ## [4.8.0]
 
 - New feature: OpenAI: incorporate the LLM plugin
