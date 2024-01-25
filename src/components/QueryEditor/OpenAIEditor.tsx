@@ -129,15 +129,38 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
       signatureHelpTriggerCharacters: ['(', ')'],
       provideSignatureHelp: getSignatureHelp,
     });
-    monaco.languages['kusto']
-      .getKustoWorker()
-      .then((kusto) => {
-        const model = editor.getModel();
-        return model && kusto(model.uri);
-      })
-      .then((worker) => {
-        setWorker(worker);
-      });
+
+    const model = editor.getModel();
+
+    // Handle cases where kusto is already loaded or will be loaded via AMD
+    if (monaco.languages['kusto'] && monaco.languages['kusto'].getKustoWorker) {
+      monaco.languages['kusto']
+        .getKustoWorker()
+        .then((kusto) => {
+          return model && kusto(model.uri);
+        })
+        .then((worker) => {
+          setWorker(worker);
+        });
+    } else {
+      // Handle cases where kusto should be loaded via ESM web worker (Grafana 10.3.x)
+      if ('System' in window) {
+        window.System.import('@kusto/monaco-kusto').then((kustoModule) => {
+          if (kustoModule && kustoModule.getKustoWorker) {
+            kustoModule
+              .getKustoWorker()
+              .then((workerAccessor) => {
+                return model && workerAccessor(model.uri);
+              })
+              .then((worker) => {
+                setWorker(worker);
+              });
+          } else {
+            console.log('kusto monaco language failed to load.');
+          }
+        });
+      }
+    }
   };
 
   useEffect(() => {

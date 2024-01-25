@@ -2,7 +2,7 @@
 // generally used by snapshots, but can affect specific tests
 process.env.TZ = 'UTC';
 
+// Jest configuration provided by Grafana scaffolding
 module.exports = {
-  // Jest configuration provided by Grafana scaffolding
   ...require('./.config/jest.config'),
 };
