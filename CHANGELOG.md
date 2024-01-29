@@ -3,6 +3,7 @@
 ## [4.9.0]
 
 - New feature: Add support for query cluster selection.
+- Feature: Add compatibility for loading Monaco Editor via ESM.
 
 ## [4.8.0]
 
