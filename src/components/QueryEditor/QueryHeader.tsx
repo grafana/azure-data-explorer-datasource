@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { Button, Card, ConfirmModal, CustomScrollbar, LoadingPlaceholder, RadioButtonGroup } from '@grafana/ui';
+import { Alert, Button, Card, ConfirmModal, CustomScrollbar, LoadingPlaceholder, RadioButtonGroup, useStyles2 } from '@grafana/ui';
 import { EditorHeader, FlexItem, InlineSelect, llms } from '@grafana/experimental';
 
 import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
@@ -9,10 +9,11 @@ import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { useAsync } from 'react-use';
 import { databaseToDefinition } from 'schema/mapper';
-import { renderMarkdown, SelectableValue } from '@grafana/data';
+import { GrafanaTheme2, renderMarkdown, SelectableValue } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
 import { parseClustersResponse } from 'response_parser';
-// import { css } from '@emotion/css';
+import { css } from '@emotion/css';
+import { selectors } from 'test/selectors';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
@@ -43,6 +44,7 @@ const adxTimeFormat: SelectableValue<string> = {
 };
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
+  const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
   const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions } = props;
   const { rawMode, OpenAI } = query;
   const [clusterUri, setClusterUri] = useState(query.clusterUri);
@@ -53,8 +55,12 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const [showWarning, setShowWarning] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [waiting, setWaiting] = useState(false);
+  const [hasError, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(TOKEN_NOT_FOUND);
   const [generatedExplanation, setGeneratedExplanation] = useState('');
   const baselinePrompt = `You are a KQL expert and a Grafana expert that can explain any KQL query that contains Grafana macros clearly to someone who isn't familiar with KQL or Grafana. Explain the following KQL and return your answer in markdown format highlighting grafana macros, database names and variable names with back ticks.\nText:"""`;
+
+  const styles = useStyles2(getStyles);
 
   useAsync(async () => {
     const enabled = await llms.openai.enabled();
@@ -130,16 +136,14 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       .pipe(llms.openai.accumulateContent());
     stream.subscribe({
       next: (m) => {
-        setWaiting(false);
         setGeneratedExplanation(m);
       },
       complete: () => {
-        console.log('hello');
+        setWaiting(false);
       },
       error: (e) => {
-        console.log('goodbye:', e)
-        // setError(true);
-        // setErrorMessage(e);
+        setError(true);
+        setErrorMessage(e);
       },
     });
   };
@@ -215,7 +219,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           Explain KQL
         </Button>
       )}
-      {/* {!query.OpenAI && (
+      {!query.OpenAI && (
         <Button
         variant="primary"
         icon="play"
@@ -225,10 +229,20 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         >
           Run query
         </Button>
-      )} */}
+      )}
       <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
-      {(query.rawMode && generatedExplanation) && (
-        <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '20px'}}>
+      {hasError && (
+        <Alert
+          onRemove={() => {
+            setError(false);
+            setErrorMessage(TOKEN_NOT_FOUND);
+          }}
+          severity="error"
+          title={errorMessage}
+        />
+      )}
+      {(query.rawMode && generatedExplanation && !hasError) && (
+        <Card className={styles.card}>
           <Card.Heading>
             <div>KQL Explanation</div>
             <Button
@@ -303,16 +317,12 @@ const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[]
   }, [schema]);
 };
 
-// const getStyles = (theme: GrafanaTheme2) => {
-//   return {
-//     collapse: css({
-//       backgroundColor: 'unset',
-//       border: 'unset',
-//       marginBottom: 0,
-
-//       ['> button']: {
-//         padding: theme.spacing(0, 1),
-//       },
-//     }),
-//   }
-// };
+const getStyles = (theme: GrafanaTheme2) => {
+  return {
+    card: css({
+      display: 'flex', 
+      flexDirection: 'column', 
+      marginBottom: '20px'
+    }),
+  }
+};
