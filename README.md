@@ -1,7 +1,5 @@
 # Azure Data Explorer data source for Grafana
 
-[![Build Status](https://drone.grafana.net/api/badges/grafana/azure-data-explorer-datasource/status.svg)](https://drone.grafana.net/grafana/azure-data-explorer-datasource)
-
 [Azure Data Explorer](https://docs.microsoft.com/en-us/azure/data-explorer/) is a log analytics cloud platform optimized for ad-hoc big data queries.
 
 ## Installation
@@ -12,73 +10,12 @@ This plugin has the following minimum requirements:
 - v3.0.0+: Grafana 7.1.0
 - < v3.0.0 require Grafana 6.3.6.
 
-### Grafana Cloud
-
-If you do not have a [Grafana Cloud](https://grafana.com/cloud) account, you can sign up for one [here](https://grafana.com/cloud/grafana).
-
-1. Click on the `Install plugin` button on the [Azure Data Explorer page on Grafana.com](https://grafana.com/plugins/grafana-azure-data-explorer-datasource/?tab=installation). This will automatically add the plugin to your Grafana instance. It might take up to 30 seconds to install.
-
-2. Login to your Hosted Grafana instance (go to your instances page in your profile): `https://grafana.com/orgs/<yourUserName>/instances/` and the Azure Data Explorer datasource will be installed.
-
-### Installation Instructions on the Grafana Docs Site
-
-- [Installing on Debian/Ubuntu](http://docs.grafana.org/installation/debian/)
-- [Installing on RPM-based Linux (CentOS, Fedora, OpenSuse, RedHat)](http://docs.grafana.org/installation/rpm/)
-- [Installing on Windows](http://docs.grafana.org/installation/windows/)
-- [Installing on Mac](http://docs.grafana.org/installation/mac/)
-
-### Docker
-
-1. Fetch the latest version of grafana from Docker Hub:
-   `docker pull grafana/grafana:latest`
-2. Run Grafana and install the Azure Data Explorer plugin with this command:
-
-   ```bash
-   docker run -d --name=grafana -p 3000:3000 -e "GF_INSTALL_PLUGINS=grafana-azure-data-explorer-datasource" grafana/grafana:latest
-   ```
-
-3. Open the browser at: <http://localhost:3000> or <http://your-domain-name:3000>
-4. Login in with username: `admin` and password: `admin`
-5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
-
-This ia an alternative command if you want to run Grafana on a different port than the default 3000 port:
-
-```bash
-docker run -d --name=grafana -p 8081:8081 -e "GF_SERVER_HTTP_PORT=8081" -e "GF_INSTALL_PLUGINS=grafana-azure-data-explorer-datasource" grafana/grafana:master
-```
-
-It is recommended that you use a volume to save the Grafana data in. Otherwise if you remove the docker container, you will lose all your Grafana data (dashboards, users etc.). You can create a volume with the [Docker Volume Driver for Azure File Storage](https://github.com/Azure/azurefile-dockervolumedriver).
-
-#### Docker latest
-
-Alternatively, you can use the tag `azure-data-explorer-datasource-latest` to pull down a Docker image for whatever is current in `main`.
-
-`docker run --rm -p 3000:3000 grafana/plugin-builds:azure-data-explorer-datasource-latest`
-
-### Installing the Plugin on an Existing Grafana with the CLI
-
-Grafana comes with a command line tool that can be used to install plugins.
-
-1. Upgrade Grafana to the latest version. Get that [here](https://grafana.com/grafana/download/).
-2. Run this command: `grafana-cli plugins install grafana-azure-data-explorer-datasource`
-3. Restart the Grafana server.
-4. Open the browser at: <http://localhost:3000> or <http://your-domain-name:3000>
-5. Login in with a user that has admin rights. This is needed to create datasources.
-6. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
-
-### Installing the Plugin Manually on an Existing Grafana
-
-If the server where Grafana is installed has no access to the Grafana.com server, then the plugin can be downloaded and manually copied to the server.
-
-1. Upgrade Grafana to the latest version. Get that [here](https://grafana.com/grafana/download/).
-2. Get the zip file from Grafana.com: <https://grafana.com/plugins/grafana-azure-data-explorer-datasource/installation> and click on the link in step 1 (with this text: "Alternatively, you can manually download the .zip file")
-3. Extract the zip file into the data/plugins subdirectory for Grafana.
-4. Restart the Grafana server
-5. To make sure the plugin was installed, check the list of installed datasources. Click the Plugins item in the main menu. Both core datasources and installed datasources will appear.
+For detailed instructions on how to install the plugin on Grafana Cloud or
+locally, please check out the [Plugin installation docs](https://grafana.com/docs/grafana/latest/plugins/installation/).
 
 ### Enforcing trusted Azure Data Explorer endpoints
 
-For additional security, it's possible to enforce a list of trusted ADX endpoints that the cluster URL will be verified against. This prevents a request from being redirected to a third-party endpoint.
+For additional security, enforcing a list of trusted ADX endpoints against which the cluster URL will be verified is possible. This prevents a request from being redirected to a third-party endpoint.
 
 This can be enabled by setting `enforce_trusted_endpoints` in your Grafana configuration under the `[plugin.grafana-azure-data-explorer-datasource]` section:
 
@@ -87,19 +24,20 @@ This can be enabled by setting `enforce_trusted_endpoints` in your Grafana confi
 enforce_trusted_endpoints = true
 ```
 
-## Configuring the datasource in Grafana
+## Configure the Azure Data Explorer data source
 
-The steps for configuring the integration between the Azure Data Explorer service and Grafana are:
+To configure ADX for using this data source:
 
-1. Create an Azure Active Directory (AAD) Application and AAD Service Principle.
-2. Log into the Azure Data Explorer WebExplorer and connect the AAD Application to an Azure Data Explorer database user.
-3. Use the AAD Application to configure the datasource connection in Grafana.
+1. Create an Azure Active Directory (AAD) Application and AAD Service Principal.
+1. In the Azure Data Explorer WebExplorer, connect the AAD Application to an Azure Data Explorer database user.
+1. Use the AAD Application to configure the data source connection in Grafana.
+1. (Optional) To use the dropdown cluster select when creating queries, add reader access to the subscription(s) that contain the clusters.
 
 ### Creating an Azure Active Directory Service Principle
 
-Follow the instructions in the [guide to setting up an Azure Active Directory Application.](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal)
+For detailed instructions on how to set up a Microsoft Entra application and service principal that can access resources, please follow this guide from Microsoft: [Create a Microsoft Entra application and service principal that can access resources](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal)
 
-An alternative way to create an AAD application is with the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create-for-rbac):
+An alternative way to create an AAD application is with the Azure CLI. For more information on the Azure CLI command, refer to [az ad sp create-for-rbac](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest#az-ad-sp-create-for-rbac):
 
 ```bash
 az ad sp create-for-rbac -n "http://url.to.your.grafana:3000"
@@ -126,17 +64,6 @@ az role assignment delete --assignee <your appId> --role Contributor
 
 ### Connecting AAD with an Azure Data Explorer User
 
-Navigate to the Azure Web UI for Azure Data Explorer: <https://dataexplorer.azure.com/clusters/nameofyourcluster/databases/yourdatabasename>
-
-You can find the link to the Web UI in the Azure Portal by navigating to:
-
-1. All services-> [Azure Data Explorer Clusters](https://portal.azure.com/?feature.customportal=false&Microsoft_Azure_Kusto=true#blade/HubsExtension/Resources/resourceType/Microsoft.Kusto%2FClusters) option
-2. Choose your cluster
-3. Databases -> click on your database
-4. Choose the Query option -> then click on the "Open in web UI" link
-
-To create a cluster and database, follow the instructions [here](https://docs.microsoft.com/en-us/azure/data-explorer/create-cluster-database-portal).
-
 The AAD application that you created above needs to be given viewer access to your Azure Data Explorer database (in this example the database is called Grafana). This is done using the dot command `add`. The argument for `.add` contains both the client and tenant id separated by a semicolon:
 
 ```sql
@@ -149,106 +76,150 @@ A real example with a client/app id and tenant id:
 .add database Grafana viewers ('aadapp=377a87d4-2cd3-44c0-b35a-8887a12fxxx;e7f3f661-a933-4b3f-8176-51c4f982exxx')
 ```
 
-If the command succeeds you should get a result like this:
+If the command succeeds, you should get a result like this:
 
 ![Azure Data Web Explorer Add result](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/config_3_web_ui.png)
 
-### Configuring Grafana
+## Configuring Grafana
 
-1. Accessed from the Grafana main menu, newly installed datasources can be added immediately within the Data Sources section. Next, click the "Add datasource" button in the upper right.
+[Add a data source](https://grafana.com/docs/grafana/latest/datasources/add-a-data-source/) by filling in the following fields:
 
-2. Select Azure Data Explorer Datasource from the datasource list:
+| Field                   | Description                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------ |
+| Directory (tenant) ID   | (Azure Active Directory -> Properties -> Directory ID)                                     |
+| Application (client) ID | (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)         |
+| Client Secret           | ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)                  |
+| Default Cluster         | (Options) If no cluster is selected when making a query, the default cluster will be used. |
 
-   ![Data Source Type](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/config_1_select_type.png)
+### Additional settings
 
-3. In the name field, a default name is filled in automatically but it can be changed to anything.
+Additional settings are optional settings that can be configured for more control over your data source. Additional settings can be accessed by expanding the additional settings section at the bottom of the data source configuration page.
 
-4. You need 3 pieces of information from the Azure portal (see link above for detailed instructions):
-
-   - **Tenant Id** (Azure Active Directory -> Properties -> Directory ID)
-   - **Client Id** (Azure Active Directory -> App Registrations -> Choose your app -> Application ID)
-   - **Client Secret** ( Azure Active Directory -> App Registrations -> Choose your app -> Keys)
-
-5. Paste these three items into the fields in the Azure Data Explorer API Details section:
-   ![Azure Data Explorer API Details](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/config_2_azure_data_explorer_api_details.png)
-
-6. Click the `Save & Test` button. After a few seconds once Grafana has successfully connected then choose the default database and save again.
+| Field                        | Description                                                                                                                                                                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Query timeout                | This value controls the client query timeout.                                                                                                                                                                                               |
+| Use dynamic caching          | By enabling this feature Grafana will dynamically apply cache settings on a per-query basis, and the default cache max age will be ignored. The bin size for time series queries will be used to widen the time range and as cache max age. |
+| Cache max age                | By default, the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.                                                                                                             |
+| Data consistency             | Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more information, refer to [Query consistency](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/concepts/queryconsistency)          |
+| Default editor mode          | This setting dictates which mode the editor will open in. Defaults to Visual.                                                                                                                                                               |
+| Default database             | The default database will be used if no database is selected. A default cluster is required to select a default database. To load default database options, you must save the data source with a valid Azure connection.                    |
+| Use managed schema           | If enabled, tables, functions, and materialized views are mapped to user-friendly names.                                                                                                                                                    |
+| Send username header to host | With this feature enabled, Grafana will pass the logged in user's username in the `x-ms-user-id` header and in the `x-ms-client-request-id` header when sending requests to ADX. It can be useful when tracking needs to be done in ADX.    |
 
 ### Configuring On-Behalf-Of authentication (Beta)
 
-⚠️ _This feature is in Beta and subject to breaking changes_
+{{%/* admonition type="caution" */%}}
+This feature is in Beta and subject to breaking changes
+{{%/* /admonition */%}}
 
-For information about setting up and using the OBO flow: [on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
+For information about setting up and using the OBO flow, refer to [on-behalf-of documentation](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md)
 
-## Writing Queries
+## Query the data source
 
-Queries are written in the new [Kusto Query Language](https://docs.microsoft.com/en-us/azure/kusto/query/).
+Before querying the data source, select the query header options cluster, database, and format. You can create queries using the query builder, KQL, or OpenAI.
 
-Queries can be formatted as _Table_, _Time Series_, or _ADX Time Series_ data.
+### Query header
 
-### Table Queries
+#### Cluster
 
-_Table_ queries are mainly used in the Table panel and row a list of columns and rows. This example query returns rows with the 6 specified columns:
+Select a cluster to query. If a default cluster was set in the data source settings, then it will auto-populate the cluster select. If there are no clusters to choose from, refer to [Configure the Azure Data Explorer data source](#configure-the-azure-data-explorer-data-source)
 
-```kusto
-AzureActivity
-| where $__timeFilter()
-| project TimeGenerated, ResourceGroup, Category, OperationName, ActivityStatus, Caller
-| order by TimeGenerated desc
-```
+#### Database
 
-### Time Series Queries
+Select a database to query. If a default database was set in the data source settings, it will auto-populate the database selection.
 
-_Time Series_ queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
+#### Format as
 
-```kusto
-AzureActivity
-| where $__timeFilter(TimeGenerated)
-| summarize count() by Category, bin(TimeGenerated, 1h)
-| order by TimeGenerated asc
-```
+Queries can be formatted as _Table_, _Time Series_, _Trace_, or _ADX time series_ data using the **Format as** dropdown select.
 
-The number valued columns are considered metrics and the optional string columns are treated as tags. A time series is returned for each value column + unique set of string column values. Each series has name of valueColumnName {stringColumnName=columnValue, ... }.
+- **Table** queries are mainly used in the Table panel as a list of columns and rows. This example query returns rows with the six specified columns:
 
-For example, the following query will produce series like ` AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY} `:
+  ```kusto
+  AzureActivity
+  | where $__timeFilter()
+  | project TimeGenerated, ResourceGroup, Category, OperationName, ActivityStatus, Caller
+  | order by TimeGenerated desc
+  ```
 
-```kusto
-StormEvents
-| where $__timeFilter(StartTime)
-| summarize EventCount=count(), AvgDirectDeaths=avg(DeathsDirect) by EventType, State, bin(StartTime, $__timeInterval)
-| order by StartTime asc
-```
+- **Time series** queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
 
-### ADX Time Series Queries
+  ```kusto
+  AzureActivity
+  | where $__timeFilter(TimeGenerated)
+  | summarize count() by Category, bin(TimeGenerated, 1h)
+  | order by TimeGenerated asc
+  ```
 
-_ADX Time Series_ are for queries that use the [Kusto `make-series` operator](https://docs.microsoft.com/en-us/azure/kusto/query/make-seriesoperator). The query must have exactly one datetime column named `Timestamp` and at least one value column. There may also optionally be string columns that will be labels.
+  The number of valued columns is considered metrics, and the optional string columns are treated as tags. A time series is returned for each value column + a unique set of string column values. Each series has name of valueColumnName {stringColumnName=columnValue, ... }.
 
-Example:
+  For example, the following query will produce series like ` AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY} `:
 
-```kusto
-let T = range Timestamp from $__timeFrom to ($__timeTo + -30m) step 1m
-  | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
-  | extend   Place  = dynamic(["EU",     "EU",     "US",   "EU"])
-  | mvexpand Person, Place
-  | extend   HatInventory = rand(5)
-  | project  Timestamp, tostring(Person), tostring(Place), HatInventory;
+  ```kusto
+  StormEvents
+  | where $__timeFilter(StartTime)
+  | summarize EventCount=count(), AvgDirectDeaths=avg(DeathsDirect) by EventType, State, bin(StartTime, $__timeInterval)
+  | order by StartTime asc
+  ```
 
-T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timestamp from $__timeFrom to $__timeTo step 1m by Person, Place
-  | extend series_decompose_forecast(AvgHatInventory, 30) | project-away *residual, *baseline, *seasonal
-```
+- **Trace** format option can be used to display appropriately formatted data using the built-in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
 
-### Trace Visualization Support
+  - `logs` - an array of JSON objects with a `timestamp` field that has a numeric value, and a `fields` field that is key-value object.
+  - `serviceTags` and `tags` - a typical key-value JSON object without nested objects.
 
-The trace format option can be used to display appropriately formatted data using the built in trace visualization. To use this visualization, data must be presented following the schema that is defined [here](https://grafana.com/docs/grafana/latest/explore/trace-integration/#data-frame-structure). The schema contains the `logs`, `serviceTags`, and `tags` fields which are expected to be JSON objects. These fields will be converted to the expected data structure provided the schema in ADX matches the below:
+  The values for keys are expected to be primitive types rather than complex types. The correct value to pass when empty is either `null`, an empty JSON object for `serviceTags` and `tags`, or an empty array for `logs`.
 
-- `logs` - an array of JSON objects with a `timestamp` field that has a numeric value, and a `fields` field that is key-value object.
-- `serviceTags` and `tags` - a typical key-value JSON object without nested objects.
+- **ADX time series** are for queries that use the [Kusto `make-series` operator](https://docs.microsoft.com/en-us/azure/kusto/query/make-seriesoperator). The query must have exactly one datetime column named `Timestamp` and at least one value column. There may also optionally be string columns that will be labels.
 
-The values for keys are expected to be primitive types rather than complex types. The correct value to pass when empty is either `null`, an empty JSON object for `serviceTags` and `tags`, or an empty array for `logs`.
+  Example:
+
+  ```kusto
+  let T = range Timestamp from $__timeFrom to ($__timeTo + -30m) step 1m
+    | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"])
+    | extend   Place  = dynamic(["EU",     "EU",     "US",   "EU"])
+    | mvexpand Person, Place
+    | extend   HatInventory = rand(5)
+    | project  Timestamp, tostring(Person), tostring(Place), HatInventory;
+
+  T | make-series AvgHatInventory=avg(HatInventory) default=double(null) on Timestamp from $__timeFrom to $__timeTo step 1m by Person, Place
+    | extend series_decompose_forecast(AvgHatInventory, 30) | project-away *residual, *baseline, *seasonal
+  ```
+
+### Query Builder
+
+| Field                                                                                                                                                                             | Description                                                                                                                                                                                                                                                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Table                                                                                                                                                                             | Select a table.                                                                                                                                                                                                                                                                                   |
+| Columns                                                                                                                                                                           | Select a subset of columns for faster results. Time series requires both time and number values; other columns are rendered as dimensions. For more information about dimensions, refer to [Time series dimensions](https://grafana.com/docs/grafana/latest/fundamentals/timeseries-dimensions/). |
+| Filters                                                                                                                                                                           | (Optional) Add filters for the selected columns. Values for filters will be restricted to the column's data type.                                                                                                                                                                                 |
+| Aggregate                                                                                                                                                                         | (Optional) Add aggregations for the selected columns. Select an aggregation type from the dropdown and select a column to aggregate on.                                                                                                                                                           |
+| Group by                                                                                                                                                                          | (Optional) Add group bys for the selected columns. For time group bys select a time range bucket.                                                                                                                                                                                                 |
+| Timeshift (deprecated use grafana time shift in [Query Options](https://grafana.com/docs/grafana-cloud/visualizations/panels-visualizations/query-transform-data/#query-options)) | (Optional) Shift the time ranges generated from Grafana macros by a predetermined duration.                                                                                                                                                                                                       |
+
+Columns of the `dynamic` type are supported within the query builder. This encompasses arrays, JSON objects, and nested objects within arrays. A limitation is only the first 50,000 rows are queried for data, so only properties contained within the first 50,000 rows will be listed as options in the builder selectors. Additional values can be manually written in the different selectors if they don't appear by default. Also, due to the fact that these queries make use of `mv-expand`, they may become resource intensive.
+
+Refer to the documentation below for further details on handling dynamic columns appropriately via the KQL editor.
+
+[Kusto Data Types](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/) - Documentation on data types supported by Kusto.
+
+[Dynamic Data Type](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic) - Detailed documentation on the dynamic data type.
+
+### Query with Kusto Query Language (KQL)
+
+Queries are written in Kusto Query Language; for more information, refer to [Kusto Query Language (KQL) overview](https://docs.microsoft.com/en-us/azure/kusto/query/).
+
+### OpenAI query generator
+
+{{%/* admonition type="note" */%}}
+You must enable the LLM plugin to use this feature.
+{{%/* /admonition */%}}
+
+The LLM plugin can be installed at [LLM app](https://grafana.com/grafana/plugins/grafana-llm-app/). After installing the plugin, enable it.
+
+To use the query generator, type in a statement or question about the data you want to see and click **Generate query**. Review and edit the generated KQL query in the **Generated query** field. Once satisfied with the query, run the query by clicking **Run query**.
 
 ### Time Macros
 
-To make writing queries easier there are some Grafana macros that can be used in the where clause of a query:
+To make writing queries easier, there are some Grafana macros that can be used in the `where` clause of a query:
 
 - `$__timeFilter()` - Expands to `TimeGenerated ≥ datetime(2018-06-05T18:09:58.907Z) and TimeGenerated ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
 - `$__timeFilter(datetimeColumn)` - Expands to `datetimeColumn ≥ datetime(2018-06-05T18:09:58.907Z) and datetimeColumn ≤ datetime(2018-06-05T20:09:58.907Z)` where the from and to datetimes are taken from the Grafana time picker.
@@ -265,9 +236,9 @@ To make writing queries easier there are some Grafana macros that can be used in
 
 ## Templating with Variables
 
-Instead of hard-coding things like server, application and sensor name in your metric queries you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns make it easy to change the data being displayed in your dashboard.
+Instead of hard-coding things like server, application, and sensor name in your metric queries, you can use variables in their place. Variables are shown as dropdown select boxes at the top of the dashboard. These dropdowns make it easy to change the data being displayed in your dashboard.
 
-Create the variable in the dashboard settings. Usually you will need to write a query in the Kusto Query Language to get a list of values for the dropdown. It is however also possible to have a list of hard-coded values.
+Create the variable in the dashboard settings. Usually, you will need to write a query in KQL to get a list of values for the dropdown. However, having a list of hard-coded values is also possible.
 
 1. Fill in a name for your variable. The `Name` field is the name of the variable. There is also a `Label` field for the friendly name.
 2. In the Query Options section, choose the `Azure Data Explorer` datasource in the `Data source` dropdown.
@@ -323,18 +294,9 @@ MyLogs
 | project Timestamp, Text=Message , Tags="tag1,tag2"
 ```
 
-## Query Builder - Data Types
+## Learn more
 
-The query builder provides an easy to use interface to query Azure Data Explorer. As of v4.1.0, columns of type `dynamic` are also appropriately supported within the query builder. Dynamically typed columns can now be queried using the `Where`, `Aggregate`, and `Group By` operations. When choosing one of these operations, the options will be populated based on the values within the dynamic column. This encompasses arrays, JSON objects, and nested objects within arrays. A limitation is only the first 50,000 rows are queried for data, so only properties contained within the first 50,000 rows will be listed as options in the builder selectors. Also, due to the fact that these queries make use of `mv-expand`, they may become resource intensive.
-
-Note that only the 50,000 first rows of a table are evaluated in order to obtain possible values to show as options in the query builder. Additional values can be manually written in the different selectors if they don't appear by default.
-
-See the below documentation for further details on how to handle dynamic columns appropriately via the KQL editor.
-
-[Kusto Data Types](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/) - Documentation on data types supported by Kusto.
-
-[Dynamic Data Type](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/dynamic) - Detailed documentation on the dynamic data type.
-
-## CHANGELOG
-
-See the [Changelog](https://github.com/grafana/azure-data-explorer-datasource/blob/main/CHANGELOG.md).
+- Add [Annotations](https://grafana.com/docs/grafana/latest/dashboards/annotations/).
+- Configure and use [Templates and variables](https://grafana.com/docs/grafana/latest/variables/).
+- Add [Transformations](https://grafana.com/docs/grafana/latest/panels/transformations/).
+- Set up alerting; refer to [Alerts overview](https://grafana.com/docs/grafana/latest/alerting/).
