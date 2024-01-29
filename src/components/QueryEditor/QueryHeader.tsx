@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { Button, ConfirmModal, LoadingPlaceholder, RadioButtonGroup } from '@grafana/ui';
+import { Button, Card, ConfirmModal, CustomScrollbar, LoadingPlaceholder, RadioButtonGroup } from '@grafana/ui';
 import { EditorHeader, FlexItem, InlineSelect, llms } from '@grafana/experimental';
 
 import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
@@ -9,9 +9,8 @@ import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { useAsync } from 'react-use';
 import { databaseToDefinition } from 'schema/mapper';
-import { SelectableValue } from '@grafana/data';
+import { renderMarkdown, SelectableValue } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
-import { selectors } from 'test/selectors';
 import { parseClustersResponse } from 'response_parser';
 // import { css } from '@emotion/css';
 
@@ -55,7 +54,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const [enabled, setEnabled] = useState(false);
   const [waiting, setWaiting] = useState(false);
   const [generatedExplanation, setGeneratedExplanation] = useState('');
-  const baselinePrompt = `You are a KQL expert and a Grafana expert that can explain any KQL query that contains Grafana macros clearly to someone who isn't familiar with KQL or Grafana. Explain the following KQL.\nText:"""`;
+  const baselinePrompt = `You are a KQL expert and a Grafana expert that can explain any KQL query that contains Grafana macros clearly to someone who isn't familiar with KQL or Grafana. Explain the following KQL and return your answer in markdown format highlighting grafana macros, database names and variable names with back ticks.\nText:"""`;
 
   useAsync(async () => {
     const enabled = await llms.openai.enabled();
@@ -211,13 +210,12 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         variant="secondary"
         size="sm"
         onClick={showExplanation}
-        style={{margin: '0 0 0 15px'}}
         disabled={!enabled}
         >
           Explain KQL
         </Button>
       )}
-      {!query.OpenAI && (
+      {/* {!query.OpenAI && (
         <Button
         variant="primary"
         icon="play"
@@ -227,9 +225,28 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         >
           Run query
         </Button>
-      )}
-      {!waiting ? generatedExplanation : <LoadingPlaceholder text="" /> }
+      )} */}
       <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
+      {(query.rawMode && generatedExplanation) && (
+        <Card style={{display: 'flex', flexDirection: 'column', marginBottom: '20px'}}>
+          <Card.Heading>
+            <div>KQL Explanation</div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setGeneratedExplanation("")}
+              data-testid="close-kql-explanation"
+              >
+                x
+            </Button>
+          </Card.Heading>
+          <CustomScrollbar hideTracksWhenNotNeeded={true} showScrollIndicators={true} autoHeightMax="175px">
+            <Card.Description>
+              {waiting ? <LoadingPlaceholder text="Loading..." /> : <div dangerouslySetInnerHTML={{ __html: renderMarkdown(generatedExplanation) }}></div>}
+            </Card.Description>
+          </CustomScrollbar>
+        </Card>
+      )}
     </EditorHeader>
   );
 };
