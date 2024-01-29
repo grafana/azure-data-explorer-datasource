@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"regexp"
 	"sort"
 	"strconv"
 	"time"
@@ -119,10 +120,34 @@ func converterFrameForTable(t Table, executedQueryString string, format string) 
 	if format == "logs" {
 		fic.Frame.SetMeta(&data.FrameMeta{
 			PreferredVisualization: data.VisTypeLogs,
+			Custom: map[string]any{
+				"searchWords": getSearchWords(executedQueryString),
+			},
 		})
 	}
 
 	return fic, nil
+}
+
+// Finds search words in 'where' clauses that are formatted like "| where Level == 'Info' or Level == 'Debug'"
+// Only returns string values. In this example ["Info", "Debug"] will be returned.
+func getSearchWords(query string) []string {
+	const maxFinds = 100
+	whereRegExp := regexp.MustCompile("\\| where [a-zA-Z]+ == '.*'\n")
+	whereLines := whereRegExp.FindAllString(query, maxFinds)
+	stringRegExp := regexp.MustCompile("'(.*?)'")
+	words := []string{}
+	for _, v := range whereLines {
+		phrases := stringRegExp.FindAllString(v, maxFinds)
+		if phrases == nil {
+			continue
+		}
+		// remove quotes around strings
+		for _, v2 := range phrases {
+			words = append(words, v2[1:len(v2)-1])
+		}
+	}
+	return words
 }
 
 var converterMap = map[string]data.FieldConverter{
