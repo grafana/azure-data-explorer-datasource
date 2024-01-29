@@ -1,5 +1,5 @@
+import { AzureCredentials, AzureClientSecretCredentials } from '@grafana/azure-sdk';
 import { DataSourceSettings, KeyValue } from '@grafana/data';
-import { AzureCredentials, AzureClientSecretCredentials } from './AzureCredentials';
 import { hasCredentials, getCredentials, updateCredentials } from './AzureCredentialsConfig';
 
 function dsOptions(

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
+import { AzureCredentials } from '@grafana/azure-sdk';
+import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import ConfigHelp from './ConfigHelp';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
@@ -7,7 +8,7 @@ import ConnectionConfig from './ConnectionConfig';
 import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
 import TrackingConfig from './TrackingConfig';
-import { AzureCredentials, KnownAzureClouds } from './AzureCredentials';
+import { AzureCloud } from './AzureCredentials';
 import {
   getCredentials,
   getDefaultCredentials,
@@ -20,6 +21,12 @@ import {
 import AzureCredentialsForm from './AzureCredentialsForm';
 import { DataSourceDescription, ConfigSection } from '@grafana/experimental';
 import { Divider } from './Divider';
+
+export const KnownAzureClouds = [
+    { value: AzureCloud.Public, label: 'Azure' },
+    { value: AzureCloud.China, label: 'Azure China' },
+    { value: AzureCloud.USGovernment, label: 'Azure US Government' },
+] as SelectableValue[];
 
 export interface ConfigEditorProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {}
