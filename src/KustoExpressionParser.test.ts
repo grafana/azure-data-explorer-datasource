@@ -14,6 +14,7 @@ import {
   QueryEditorWhereExpression,
 } from './components/LegacyQueryEditor/editor/expressions';
 import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
+import { createOperator, valueToPropertyType } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 
 describe('KustoExpressionParser', () => {
   const templateSrv: TemplateSrv = {
@@ -1466,35 +1467,6 @@ const createQueryExpression = (query: Partial<QueryExpression>): QueryExpression
     ...defaultQuery.expression,
     ...query,
   };
-};
-
-const createOperator = (property: string, operator: string, value: any): QueryEditorOperatorExpression => {
-  return {
-    type: QueryEditorExpressionType.Operator,
-    property: {
-      name: property,
-      type: valueToPropertyType(value),
-    },
-    operator: {
-      name: operator,
-      value: value,
-    },
-  };
-};
-
-const valueToPropertyType = (value: any): QueryEditorPropertyType => {
-  if (Array.isArray(value) && value.length > 0) {
-    return valueToPropertyType(value[0]);
-  }
-
-  switch (typeof value) {
-    case 'number':
-      return QueryEditorPropertyType.Number;
-    case 'boolean':
-      return QueryEditorPropertyType.Boolean;
-    default:
-      return QueryEditorPropertyType.String;
-  }
 };
 
 const createWhereExpressions = (
