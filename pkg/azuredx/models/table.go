@@ -108,19 +108,18 @@ func converterFrameForTable(t Table, executedQueryString string, format string) 
 
 	fic.Frame.Meta = &data.FrameMeta{
 		ExecutedQueryString: executedQueryString,
-		Custom:              map[string]any{"ColumnTypes": colTypes, "searchWords": []string{}},
+		Custom:              AzureFrameMD{ColumnTypes: colTypes},
 	}
 
 	if format == "trace" {
-		fic.Frame.SetMeta(&data.FrameMeta{
-			PreferredVisualization: data.VisTypeTrace,
-		})
+		fic.Frame.Meta.PreferredVisualization = data.VisTypeTrace
 	}
 
 	if format == "logs" {
 		fic.Frame.SetMeta(&data.FrameMeta{
 			PreferredVisualization: data.VisTypeLogs,
 			Custom: map[string]any{
+				"ColumnTypes": colTypes,
 				"searchWords": getSearchWords(executedQueryString),
 			},
 		})
@@ -133,7 +132,7 @@ func converterFrameForTable(t Table, executedQueryString string, format string) 
 // Only returns string values. In this example ["Info", "Debug"] will be returned.
 func getSearchWords(query string) []string {
 	const maxFinds = 100
-	whereRegExp := regexp.MustCompile("\\| where [a-zA-Z]+ == '.*'\n")
+	whereRegExp := regexp.MustCompile(`\| where [a-zA-Z]+ == '.*'`)
 	whereLines := whereRegExp.FindAllString(query, maxFinds)
 	stringRegExp := regexp.MustCompile("'(.*?)'")
 	words := []string{}
