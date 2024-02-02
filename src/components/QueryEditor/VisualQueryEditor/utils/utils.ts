@@ -277,3 +277,32 @@ export function defaultTimeSeriesColumns(expression: QueryExpression, tableColum
 
   return res;
 }
+
+export const createOperator = (property: string, operator: string, value: any): QueryEditorOperatorExpression => {
+  return {
+    type: QueryEditorExpressionType.Operator,
+    property: {
+      name: property,
+      type: valueToPropertyType(value),
+    },
+    operator: {
+      name: operator,
+      value: value,
+    },
+  };
+};
+
+export const valueToPropertyType = (value: any): QueryEditorPropertyType => {
+  if (Array.isArray(value) && value.length > 0) {
+    return valueToPropertyType(value[0]);
+  }
+
+  switch (typeof value) {
+    case 'number':
+      return QueryEditorPropertyType.Number;
+    case 'boolean':
+      return QueryEditorPropertyType.Boolean;
+    default:
+      return QueryEditorPropertyType.String;
+  }
+};

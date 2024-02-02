@@ -35,5 +35,6 @@
   "annotations": true,
   "backend": true,
   "executable": "gpx_adx",
-  "alerting": true
+  "alerting": true,
+  "logs": true
 }
