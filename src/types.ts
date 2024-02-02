@@ -173,6 +173,7 @@ export enum FormatOptions {
   timeSeries = 'time_series',
   adxTimeSeries = 'time_series_adx_series',
   trace = 'trace',
+  logs = 'logs',
 }
 
 export type AdxDataSourceSettings = DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>;

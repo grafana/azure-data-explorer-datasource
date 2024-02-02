@@ -36,6 +36,7 @@ const EDITOR_FORMATS: Array<SelectableValue<string>> = [
   { label: 'Table', value: FormatOptions.table },
   { label: 'Time series', value: FormatOptions.timeSeries },
   { label: 'Trace', value: FormatOptions.trace },
+  { label: 'Logs', value: FormatOptions.logs },
 ];
 
 const adxTimeFormat: SelectableValue<string> = {
