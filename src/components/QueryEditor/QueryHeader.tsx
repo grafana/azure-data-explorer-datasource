@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { Button, ConfirmModal, RadioButtonGroup/*, InlineField, Input*/ } from '@grafana/ui';
-import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
+import { Alert, Button, Card, ConfirmModal, CustomScrollbar, LoadingPlaceholder, RadioButtonGroup, useStyles2 } from '@grafana/ui';
+import { EditorHeader, FlexItem, InlineSelect, llms } from '@grafana/experimental';
 
 import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
@@ -9,10 +9,11 @@ import { AdxDataSource } from 'datasource';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { useAsync } from 'react-use';
 import { databaseToDefinition } from 'schema/mapper';
-import { SelectableValue } from '@grafana/data';
+import { GrafanaTheme2, renderMarkdown, SelectableValue } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
-import { selectors } from 'test/selectors';
 import { parseClustersResponse } from 'response_parser';
+import { css } from '@emotion/css';
+import { selectors } from 'test/selectors';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
@@ -44,6 +45,7 @@ const adxTimeFormat: SelectableValue<string> = {
 };
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
+  const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
   const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions } = props;
   const { rawMode, OpenAI } = query;
   const [clusterUri, setClusterUri] = useState(query.clusterUri);
@@ -52,6 +54,19 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const database = useSelectedDatabase(databases, query, datasource);
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
+  const [enabled, setEnabled] = useState(false);
+  const [waiting, setWaiting] = useState(false);
+  const [hasError, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(TOKEN_NOT_FOUND);
+  const [generatedExplanation, setGeneratedExplanation] = useState('');
+  const baselinePrompt = `You are a KQL expert and a Grafana expert that can explain any KQL query that contains Grafana macros clearly to someone who isn't familiar with KQL or Grafana. Explain the following KQL and return your answer in markdown format highlighting grafana macros, database names and variable names with back ticks.\nText:"""`;
+
+  const styles = useStyles2(getStyles);
+
+  useAsync(async () => {
+    const enabled = await llms.openai.enabled();
+    setEnabled(enabled);
+  });
 
   const changeEditorMode = (value: EditorMode) => {
     reportInteraction('grafana_ds_adx_editor_mode');
@@ -106,6 +121,32 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const onDatabaseChange = ({ value }: SelectableValue) => {
     onChange({ ...query, database: value!, expression: defaultQuery.expression });
     onRunQuery();
+  };
+
+  const showExplanation = () => {
+    setWaiting(true);
+    reportInteraction('grafana_ds_adx_openai_kql_query_explanation_generated_with_llm_plugin');
+    const stream = llms.openai
+      .streamChatCompletions({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: baselinePrompt },
+          { role: 'user', content: `${query.query}"""` },
+        ],
+      })
+      .pipe(llms.openai.accumulateContent());
+    stream.subscribe({
+      next: (m) => {
+        setGeneratedExplanation(m);
+      },
+      complete: () => {
+        setWaiting(false);
+      },
+      error: (e) => {
+        setError(true);
+        setErrorMessage(e);
+      },
+    });
   };
 
   const EditorSelector = () => {
@@ -169,19 +210,58 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         }}
       />
       <FlexItem grow={1} />
+      {query.rawMode && (
+        <Button
+        variant="secondary"
+        size="sm"
+        onClick={showExplanation}
+        disabled={!enabled}
+        >
+          Explain KQL
+        </Button>
+      )}
       {!query.OpenAI && (
         <Button
-          variant="primary"
-          icon="play"
-          size="sm"
-          onClick={onRunQuery}
-          data-testid={selectors.components.queryEditor.runQuery.button}
+        variant="primary"
+        icon="play"
+        size="sm"
+        onClick={onRunQuery}
+        data-testid={selectors.components.queryEditor.runQuery.button}
         >
           Run query
         </Button>
       )}
-
       <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
+      {hasError && (
+        <Alert
+          onRemove={() => {
+            setError(false);
+            setErrorMessage(TOKEN_NOT_FOUND);
+          }}
+          severity="error"
+          title={errorMessage}
+        />
+      )}
+      {(query.rawMode && generatedExplanation && !hasError) && (
+        <Card className={styles.card}>
+          <Card.Heading>
+            <div>KQL Explanation</div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setGeneratedExplanation("")}
+              data-testid="close-kql-explanation"
+              >
+                x
+            </Button>
+          </Card.Heading>
+          <CustomScrollbar hideTracksWhenNotNeeded={true} showScrollIndicators={true} autoHeightMax="175px">
+            <Card.Description>
+              {waiting ? <LoadingPlaceholder text="Loading..." /> : <div dangerouslySetInnerHTML={{ __html: renderMarkdown(generatedExplanation) }}></div>}
+            </Card.Description>
+          </CustomScrollbar>
+        </Card>
+      )}
     </EditorHeader>
   );
 };
@@ -236,4 +316,14 @@ const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[]
 
     return databases;
   }, [schema]);
+};
+
+const getStyles = (theme: GrafanaTheme2) => {
+  return {
+    card: css({
+      display: 'flex', 
+      flexDirection: 'column', 
+      marginBottom: '20px'
+    }),
+  }
 };

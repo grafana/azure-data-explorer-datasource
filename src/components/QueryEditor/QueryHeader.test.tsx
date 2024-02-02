@@ -151,4 +151,19 @@ describe('QueryEditor', () => {
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'time_series' }));
     });
   });
+
+  describe('kql explanation', () => {
+    it('renders the Explain KQL button in raw mode', async () => {
+      const onChange = jest.fn();
+      render(<QueryHeader 
+        {...defaultProps} 
+        query={{
+        ...mockQuery,
+        rawMode: true,
+        }} 
+        onChange={onChange} 
+      />);
+      expect(screen.getByText('Explain KQL')).toBeInTheDocument();
+    });
+  });
 });
