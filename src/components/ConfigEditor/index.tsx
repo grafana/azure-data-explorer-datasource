@@ -122,10 +122,10 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         gte(config.buildInfo.version, '10.0.0') && (
           <>
             <div className="gf-form-group">
-              <h3 className="page-heading">Additional Properties</h3>
+              <h3 className="page-heading">Secure Socks Proxy</h3>
                 <br/>
                   <InlineField
-                    label="Secure Socks Proxy"
+                    label="Enable"
                     tooltip={
                       <>
                         Enable proxying the datasource connection through the secure socks proxy to a
