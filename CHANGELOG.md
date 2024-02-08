@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [4.10.0]
+
+- Feature: Support Private Datasource Connect ([secure socks proxy](https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/)).
+- Feature: Add explain button for KQL queries.
+- Feature: Add support for logs visualization.
+- Feature: Add compatibility for loading Monaco Editor via ESM.
+
 ## [4.9.0]
 
 - New feature: Add support for query cluster selection.
