@@ -60,10 +60,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   useEffect(() => {
     const currentStoredPrompts = localStorage.getItem('storedOpenAIPrompts');
-    let allParsedStoredPrompts = [];
-    if (currentStoredPrompts !== null) {
-      allParsedStoredPrompts = JSON.parse(currentStoredPrompts);
-    };
+    const allParsedStoredPrompts = currentStoredPrompts !== null ? JSON.parse(currentStoredPrompts) : []
     setParsedStoredPrompts(allParsedStoredPrompts); 
   }, [])
 
