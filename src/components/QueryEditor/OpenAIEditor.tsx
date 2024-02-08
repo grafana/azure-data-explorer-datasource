@@ -86,10 +86,9 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
   }, [schema, stateSchema]);
 
   const addPromptToLocalStorage = () => {
-    const allPrompts = parsedStoredPrompts.length > 0 ? [...parsedStoredPrompts, prompt] :  [prompt];
+    const allPrompts = parsedStoredPrompts.length > 0 ? [...parsedStoredPrompts, prompt] : [prompt];
     const stringifiedPrompts = JSON.stringify(allPrompts);
     localStorage.setItem("storedOpenAIPrompts", stringifiedPrompts);
-    setParsedStoredPrompts(allPrompts);
   };
 
   const generateQuery = () => {
