@@ -22,8 +22,7 @@ export const PromptHistory = ({ parsedStoredPrompts, useStoredPrompt, setParsedS
     
     const generatePromptCards = ( ) => {
         if (parsedStoredPrompts.length > 0) {
-            return parsedStoredPrompts.map((prompt) => {
-                return(
+            return parsedStoredPrompts.map((prompt) => (
                     <div key={uuidv4()} style={{ border: `1px solid`, padding: '20px', marginTop: '15px', height: '150px' }}>
                         <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
                             <Button
@@ -48,7 +47,7 @@ export const PromptHistory = ({ parsedStoredPrompts, useStoredPrompt, setParsedS
                         </div>
                     </div>
                 )
-            })
+            )
         } else { 
             return (  
                 <div className={styles.wrapper}>
