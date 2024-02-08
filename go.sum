@@ -242,8 +242,6 @@ github.com/unknwon/log v0.0.0-20150304194804-e617c87089d3/go.mod h1:1xEUf2abjfP9
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/urfave/cli v1.22.14 h1:ebbhrRiGK2i4naQJr+1Xj92HXZCrK7MsyTS/ob3HnAk=
 github.com/urfave/cli v1.22.14/go.mod h1:X0eDS6pD6Exaclxm99NJ3FiCDRED7vIHpx2mDOHLvkA=
-github.com/xorcare/pointer v1.2.2 h1:zjD77b5DTehClND4MK+9dDE0DcpFIZisAJ/+yVJvKYA=
-github.com/xorcare/pointer v1.2.2/go.mod h1:azsKh7oVwYB7C1o8P284fG8MvtErX/F5/dqXiaj71ak=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/zeebo/assert v1.3.0 h1:g7C04CbJuIDKNPFHmsk4hwZDO5O+kntRxzaUoNXj+IQ=

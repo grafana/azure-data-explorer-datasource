@@ -7,12 +7,10 @@ toolchain go1.21.4
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.1
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.1
-	github.com/google/go-cmp v0.6.0
 	github.com/grafana/grafana-azure-sdk-go v1.10.0
 	github.com/grafana/grafana-plugin-sdk-go v0.198.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.4
-	github.com/xorcare/pointer v1.2.2
 	golang.org/x/net v0.20.0
 )
 
@@ -40,6 +38,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/flatbuffers v23.1.21+incompatible // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect

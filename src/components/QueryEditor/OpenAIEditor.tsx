@@ -11,6 +11,11 @@ import {
   useStyles2,
   TextArea,
   HorizontalGroup,
+  Field,
+  Switch,
+  Tooltip,
+  CustomScrollbar,
+  Icon,
 } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 import React, { ChangeEvent, useEffect, useState } from 'react';
@@ -21,6 +26,7 @@ import { css } from '@emotion/css';
 import { useAsync } from 'react-use';
 
 import { getFunctions, getSignatureHelp } from './Suggestions';
+import { PromptHistory } from './PromptHistory';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -47,8 +53,19 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [generatedQuery, setGeneratedQuery] = useState('//OpenAI generated query');
   const [variables] = useState(getTemplateSrv().getVariables());
   const [stateSchema, setStateSchema] = useState(cloneDeep(schema));
+  const [showQueryHistory, setShowQueryHistory] = useState(false);
+  const [parsedStoredPrompts, setParsedStoredPrompts] = useState([]);
   const styles = useStyles2(getStyles);
   const baselinePrompt = `You are an AI assistant that is fluent in KQL for querying Azure Data Explorer and you only respond with the correct KQL code snippets and no explanations. Generate a query that fulfills the following text.\nText:"""`;
+
+  useEffect(() => {
+    const currentStoredPrompts = localStorage.getItem('storedOpenAIPrompts');
+    let allParsedStoredPrompts = [];
+    if (currentStoredPrompts !== null) {
+      allParsedStoredPrompts = JSON.parse(currentStoredPrompts);
+    };
+    setParsedStoredPrompts(allParsedStoredPrompts); 
+  }, [])
 
   useAsync(async () => {
     const enabled = await llms.openai.enabled();
@@ -71,6 +88,18 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
     }
   }, [schema, stateSchema]);
 
+  const addPromptToLocalStorage = () => {
+    let allPrompts;
+    if (parsedStoredPrompts.length > 0) {
+      allPrompts = [...parsedStoredPrompts, prompt];
+    } else {
+      allPrompts = [prompt];
+    };
+    const stringifiedPrompts = JSON.stringify(allPrompts);
+    localStorage.setItem("storedOpenAIPrompts", stringifiedPrompts);
+    setParsedStoredPrompts(allPrompts);
+  };
+
   const generateQuery = () => {
     reportInteraction('grafana_ds_adx_openai_query_generated');
     setWaiting(true);
@@ -83,7 +112,6 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
         .generateQueryForOpenAI(`${baselinePrompt}${prompt}"""`)
         .then((resp) => {
           setWaiting(false);
-          setGeneratedQuery(resp);
         })
         .catch((e) => {
           setWaiting(false);
@@ -111,6 +139,10 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
         setGeneratedQuery(m);
       },
       complete: () => {
+        if (prompt !== "") {
+          addPromptToLocalStorage();
+          setPrompt('');
+        };
         setWaiting(false);
       },
       error: (e) => {
@@ -175,7 +207,14 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   if (!stateSchema) {
     return null;
-  }
+  };
+
+  const useStoredPrompt = (prompt: string) => {
+    setShowQueryHistory(false);
+    setPrompt(prompt);
+    onRawQueryChange(prompt);
+    onRunQuery();
+  };
 
   return (
     <div>
@@ -221,13 +260,37 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
           >
             {isWaiting && <Spinner className={styles.spinnerSpace} inline={true} />} Generate query
           </Button>
+          <Field label="Show OpenAI history" style={{ display: 'flex', flexDirection: 'row', margin: '5px' }}>
+            <div style={{ display: 'flex' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-start', margin: '0 10px 0 5px'}}>
+                <Tooltip
+                  content={'View past generated prompts that are stored on your local browser.'}
+                  placement="bottom-end"
+                >
+                  <Icon name="info-circle" size="sm" className={styles.settingsIcon} />
+                </Tooltip>
+              </div>
+              <Switch value={showQueryHistory} onChange={() => setShowQueryHistory(!showQueryHistory)}></Switch>
+            </div>
+          </Field>
         </HorizontalGroup>
-        <TextArea
-          data-testid={selectors.components.queryEditor.codeEditor.openAI}
-          value={prompt}
-          onChange={onPromptChange}
-          className={styles.innerMargin}
-        ></TextArea>
+        {showQueryHistory ? (
+           <CustomScrollbar showScrollIndicators={true} autoHeightMax="300px">
+            <PromptHistory 
+              parsedStoredPrompts={parsedStoredPrompts} 
+              useStoredPrompt={useStoredPrompt} 
+              setParsedStoredPrompts={setParsedStoredPrompts} 
+              setShowQueryHistory={setShowQueryHistory}
+            />
+           </CustomScrollbar>
+        ) : (
+          <TextArea
+            data-testid={selectors.components.queryEditor.codeEditor.openAI}
+            value={prompt}
+            onChange={onPromptChange}
+            className={styles.textArea}
+          ></TextArea>
+        )}
       </div>
       <div className={styles.dividerSpace}>
         <HorizontalGroup justify="flex-start" align="flex-start">
@@ -274,9 +337,6 @@ const getStyles = (theme: GrafanaTheme2) => {
       color: theme.colors.text.link,
       textDecoration: 'underline',
     }),
-    innerMargin: css({
-      marginTop: theme.spacing(2),
-    }),
     editorSpace: css({
       paddingTop: theme.spacing(1),
     }),
@@ -289,5 +349,12 @@ const getStyles = (theme: GrafanaTheme2) => {
     dividerSpace: css({
       marginTop: theme.spacing(4),
     }),
+    textArea: css({
+      marginTop: theme.spacing(2),
+      height: '100px'
+    }),
+    settingsIcon: css`
+      color: ${theme.colors.text.secondary};
+    `,
   };
 };
