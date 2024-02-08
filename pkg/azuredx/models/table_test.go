@@ -93,7 +93,7 @@ func TestResponseToFrames(t *testing.T) {
 				return
 			}
 
-			experimental.CheckGoldenJSONFrame(t, "./testdata/golden_data", tt.name, frames[0], true)
+			experimental.CheckGoldenJSONFrame(t, "./testdata/golden_data", tt.name, frames[0], false)
 		})
 	}
 
