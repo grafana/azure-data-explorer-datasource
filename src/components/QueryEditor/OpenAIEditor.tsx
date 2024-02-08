@@ -275,7 +275,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
           </Field>
         </HorizontalGroup>
         {showQueryHistory ? (
-           <CustomScrollbar showScrollIndicators={true} autoHeightMax="300px">
+           <CustomScrollbar autoHeightMax="300px">
             <PromptHistory 
               parsedStoredPrompts={parsedStoredPrompts} 
               useStoredPrompt={useStoredPrompt} 
