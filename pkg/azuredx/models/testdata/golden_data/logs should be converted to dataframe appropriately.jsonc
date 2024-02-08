@@ -15,24 +15,21 @@
 //              "string",
 //              "string",
 //              "string",
-//              "dynamic",
-//              "dynamic",
-//              "guid",
-//              "dynamic"
+//              "guid"
 //          ],
 //          "searchWords": []
 //      },
 //      "preferredVisualisationType": "logs"
 //  }
 //  Name: 
-//  Dimensions: 12 Fields by 1 Rows
-//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+--------------------------------------------------------------------+----------------------+------------------------+-----------------------------------------------------------------------+
-//  | Name: startTime  | Name: itemType  | Name: serviceName | Name: duration   | Name: traceID              | Name: spanID      | Name: parentSpanID | Name: operationName | Name: serviceTags                                                  | Name: tags           | Name: itemId           | Name: logs                                                            |
-//  | Labels:          | Labels:         | Labels:           | Labels:          | Labels:                    | Labels:           | Labels:            | Labels:             | Labels:                                                            | Labels:              | Labels:                | Labels:                                                               |
-//  | Type: []*float64 | Type: []*string | Type: []*string   | Type: []*float64 | Type: []*string            | Type: []*string   | Type: []*string    | Type: []*string     | Type: []string                                                     | Type: []string       | Type: []*string        | Type: []string                                                        |
-//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+--------------------------------------------------------------------+----------------------+------------------------+-----------------------------------------------------------------------+
-//  | 1.68726e+12      | request         | test-app          | 26.7374          | fc5b1c02-57fa-8611c2df33e2 | 92930421e2a400394 | test-id            | service             | {"cloud_RoleInstance":"test-cloud-id","cloud_RoleName":"test-app"} | {"appId":"test-app"} | 11ee-a66c-0022481b10a7 | [{"timestamp":1687260450000,"fields":{"key":"test","value":"value"}}] |
-//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+--------------------------------------------------------------------+----------------------+------------------------+-----------------------------------------------------------------------+
+//  Dimensions: 9 Fields by 1 Rows
+//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+------------------------+
+//  | Name: startTime  | Name: itemType  | Name: serviceName | Name: duration   | Name: traceID              | Name: spanID      | Name: parentSpanID | Name: operationName | Name: itemId           |
+//  | Labels:          | Labels:         | Labels:           | Labels:          | Labels:                    | Labels:           | Labels:            | Labels:             | Labels:                |
+//  | Type: []*float64 | Type: []*string | Type: []*string   | Type: []*float64 | Type: []*string            | Type: []*string   | Type: []*string    | Type: []*string     | Type: []*string        |
+//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+------------------------+
+//  | 1.68726e+12      | request         | test-app          | 26.7374          | fc5b1c02-57fa-8611c2df33e2 | 92930421e2a400394 | test-id            | service             | 11ee-a66c-0022481b10a7 |
+//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+------------------------+
 //  
 //  
 //  🌟 This was machine generated.  Do not edit. 🌟
@@ -56,10 +53,7 @@
               "string",
               "string",
               "string",
-              "dynamic",
-              "dynamic",
-              "guid",
-              "dynamic"
+              "guid"
             ],
             "searchWords": []
           },
@@ -131,32 +125,11 @@
             }
           },
           {
-            "name": "serviceTags",
-            "type": "string",
-            "typeInfo": {
-              "frame": "string"
-            }
-          },
-          {
-            "name": "tags",
-            "type": "string",
-            "typeInfo": {
-              "frame": "string"
-            }
-          },
-          {
             "name": "itemId",
             "type": "string",
             "typeInfo": {
               "frame": "string",
               "nullable": true
-            }
-          },
-          {
-            "name": "logs",
-            "type": "string",
-            "typeInfo": {
-              "frame": "string"
             }
           }
         ]
@@ -188,16 +161,7 @@
             "service"
           ],
           [
-            "{\"cloud_RoleInstance\":\"test-cloud-id\",\"cloud_RoleName\":\"test-app\"}"
-          ],
-          [
-            "{\"appId\":\"test-app\"}"
-          ],
-          [
             "11ee-a66c-0022481b10a7"
-          ],
-          [
-            "[{\"timestamp\":1687260450000,\"fields\":{\"key\":\"test\",\"value\":\"value\"}}]"
           ]
         ]
       }

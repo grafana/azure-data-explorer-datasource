@@ -75,7 +75,7 @@ func TestResponseToFrames(t *testing.T) {
 		},
 		{
 			name:     "logs should be converted to dataframe appropriately",
-			testFile: "adx_traces_table.json",
+			testFile: "adx_logs_table.json",
 			errorIs:  assert.NoError,
 			format:   data.VisTypeLogs,
 		},
