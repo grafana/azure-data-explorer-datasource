@@ -7,7 +7,7 @@ toolchain go1.21.4
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.1
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.1
-	github.com/grafana/grafana-azure-sdk-go v1.10.0
+	github.com/grafana/grafana-azure-sdk-go v1.12.0
 	github.com/grafana/grafana-plugin-sdk-go v0.209.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.4
@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.4.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.5.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.5.1 // indirect
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/apache/arrow/go/v13 v13.0.0 // indirect
@@ -35,7 +35,7 @@ require (
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/flatbuffers v23.1.21+incompatible // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
@@ -66,7 +66,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
-	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
+	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.18.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
