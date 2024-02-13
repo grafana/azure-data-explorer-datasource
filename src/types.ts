@@ -1,3 +1,4 @@
+import { AzureCredentials } from '@grafana/azure-sdk';
 import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
 
 import {
@@ -9,7 +10,6 @@ import {
   QueryEditorReduceExpressionArray,
   QueryEditorWhereArrayExpression,
 } from './components/LegacyQueryEditor/editor/expressions';
-import { AzureCredentials } from 'components/ConfigEditor/AzureCredentials';
 
 const packageJson = require('../package.json');
 

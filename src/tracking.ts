@@ -1,7 +1,7 @@
+import { AzureAuthType, AzureCredentials } from '@grafana/azure-sdk';
 import { DataSourceInstanceSettings } from '@grafana/data';
 import { DataSourceSrv, reportInteraction } from '@grafana/runtime';
 import { AdxDataSourceOptions, EditorMode, FormatOptions, KustoQuery } from 'types';
-import { AzureAuthType, AzureCredentials } from './components/ConfigEditor/AzureCredentials';
 
 /**
  * Loaded the first time a dashboard containing ADX queries is loaded (not on every render)

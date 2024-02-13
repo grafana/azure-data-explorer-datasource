@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
+import { AzureCredentials } from '@grafana/azure-sdk';
 import { FeatureToggles, DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { Switch,  InlineField} from '@grafana/ui';
 import { config } from '@grafana/runtime';
@@ -9,7 +10,7 @@ import ConnectionConfig from './ConnectionConfig';
 import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
 import TrackingConfig from './TrackingConfig';
-import { AzureCredentials, KnownAzureClouds } from './AzureCredentials';
+import { KnownAzureClouds } from './AzureCredentials';
 import {
   getCredentials,
   getDefaultCredentials,

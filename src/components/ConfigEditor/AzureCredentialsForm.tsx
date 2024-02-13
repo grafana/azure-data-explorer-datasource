@@ -1,9 +1,9 @@
 import React, { ChangeEvent, FunctionComponent, useMemo } from 'react';
 
+import { AzureAuthType, AzureCredentials } from '@grafana/azure-sdk';
 import { SelectableValue } from '@grafana/data';
 import { Alert, Button, Select, Input, Field } from '@grafana/ui';
 
-import { AzureAuthType, AzureCredentials } from './AzureCredentials';
 import { selectors } from 'test/selectors';
 import { ConfigSection } from '@grafana/experimental';
 
