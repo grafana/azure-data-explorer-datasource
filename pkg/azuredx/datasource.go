@@ -225,7 +225,12 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 			}
 			resp.Frames = append(resp.Frames, formattedDF)
 		}
-
+	case "logs":
+		resp.Frames, err = tableRes.ToDataFrames(q.Query, q.Format)
+		if err != nil {
+			backend.Logger.Debug("error converting response to data frames", "error", err.Error())
+			return resp, fmt.Errorf("error converting response to data frames: %w", err)
+		}
 	default:
 		resp.Error = fmt.Errorf("unsupported query type: '%v'", q.Format)
 	}

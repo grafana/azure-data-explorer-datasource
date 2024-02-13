@@ -1,0 +1,235 @@
+//  🌟 This was machine generated.  Do not edit. 🌟
+//  
+//  Frame[0] {
+//      "typeVersion": [
+//          0,
+//          0
+//      ],
+//      "custom": {
+//          "ColumnTypes": [
+//              "real",
+//              "string",
+//              "string",
+//              "real",
+//              "guid",
+//              "string",
+//              "string",
+//              "string",
+//              "dynamic",
+//              "dynamic",
+//              "guid",
+//              "dynamic"
+//          ]
+//      },
+//      "preferredVisualisationType": "trace"
+//  }
+//  Name: 
+//  Dimensions: 12 Fields by 1 Rows
+//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+----------------------------------------------------------------------------------------------------+--------------------------------------+------------------------+-------------------------------------------------------------------------------------------------------+
+//  | Name: startTime  | Name: itemType  | Name: serviceName | Name: duration   | Name: traceID              | Name: spanID      | Name: parentSpanID | Name: operationName | Name: serviceTags                                                                                  | Name: tags                           | Name: itemId           | Name: logs                                                                                            |
+//  | Labels:          | Labels:         | Labels:           | Labels:          | Labels:                    | Labels:           | Labels:            | Labels:             | Labels:                                                                                            | Labels:                              | Labels:                | Labels:                                                                                               |
+//  | Type: []*float64 | Type: []*string | Type: []*string   | Type: []*float64 | Type: []*string            | Type: []*string   | Type: []*string    | Type: []*string     | Type: []*json.RawMessage                                                                           | Type: []*json.RawMessage             | Type: []*string        | Type: []*json.RawMessage                                                                              |
+//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+----------------------------------------------------------------------------------------------------+--------------------------------------+------------------------+-------------------------------------------------------------------------------------------------------+
+//  | 1.68726e+12      | request         | test-app          | 26.7374          | fc5b1c02-57fa-8611c2df33e2 | 92930421e2a400394 | test-id            | service             | [{"value":"test-cloud-id","key":"cloud_RoleInstance"},{"value":"test-app","key":"cloud_RoleName"}] | [{"value":"test-app","key":"appId"}] | 11ee-a66c-0022481b10a7 | [{"timestamp":1687260450000,"fields":[{"value":"test","key":"key"},{"value":"value","key":"value"}]}] |
+//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+----------------------------------------------------------------------------------------------------+--------------------------------------+------------------------+-------------------------------------------------------------------------------------------------------+
+//  
+//  
+//  🌟 This was machine generated.  Do not edit. 🌟
+{
+  "status": 200,
+  "frames": [
+    {
+      "schema": {
+        "meta": {
+          "typeVersion": [
+            0,
+            0
+          ],
+          "custom": {
+            "ColumnTypes": [
+              "real",
+              "string",
+              "string",
+              "real",
+              "guid",
+              "string",
+              "string",
+              "string",
+              "dynamic",
+              "dynamic",
+              "guid",
+              "dynamic"
+            ]
+          },
+          "preferredVisualisationType": "trace"
+        },
+        "fields": [
+          {
+            "name": "startTime",
+            "type": "number",
+            "typeInfo": {
+              "frame": "float64",
+              "nullable": true
+            }
+          },
+          {
+            "name": "itemType",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "serviceName",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "duration",
+            "type": "number",
+            "typeInfo": {
+              "frame": "float64",
+              "nullable": true
+            }
+          },
+          {
+            "name": "traceID",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "spanID",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "parentSpanID",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "operationName",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "serviceTags",
+            "type": "other",
+            "typeInfo": {
+              "frame": "json.RawMessage",
+              "nullable": true
+            }
+          },
+          {
+            "name": "tags",
+            "type": "other",
+            "typeInfo": {
+              "frame": "json.RawMessage",
+              "nullable": true
+            }
+          },
+          {
+            "name": "itemId",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "logs",
+            "type": "other",
+            "typeInfo": {
+              "frame": "json.RawMessage",
+              "nullable": true
+            }
+          }
+        ]
+      },
+      "data": {
+        "values": [
+          [
+            1687260000000
+          ],
+          [
+            "request"
+          ],
+          [
+            "test-app"
+          ],
+          [
+            26.7374
+          ],
+          [
+            "fc5b1c02-57fa-8611c2df33e2"
+          ],
+          [
+            "92930421e2a400394"
+          ],
+          [
+            "test-id"
+          ],
+          [
+            "service"
+          ],
+          [
+            [
+              {
+                "value": "test-cloud-id",
+                "key": "cloud_RoleInstance"
+              },
+              {
+                "value": "test-app",
+                "key": "cloud_RoleName"
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "value": "test-app",
+                "key": "appId"
+              }
+            ]
+          ],
+          [
+            "11ee-a66c-0022481b10a7"
+          ],
+          [
+            [
+              {
+                "timestamp": 1687260450000,
+                "fields": [
+                  {
+                    "value": "test",
+                    "key": "key"
+                  },
+                  {
+                    "value": "value",
+                    "key": "value"
+                  }
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

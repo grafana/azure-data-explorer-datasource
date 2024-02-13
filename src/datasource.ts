@@ -1,4 +1,4 @@
-import { DataFrame, DataQueryRequest, DataSourceInstanceSettings, ScopedVars, TimeRange } from '@grafana/data';
+import { DataFrame, DataQueryRequest, DataSourceInstanceSettings, QueryFixAction, ScopedVars, TimeRange } from '@grafana/data';
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { QueryEditorPropertyType } from './schema/types';
 import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
@@ -25,6 +25,8 @@ import {
 import { VariableSupport } from 'variables';
 
 import { lastValueFrom } from 'rxjs';
+import { QueryEditorExpressionType, QueryEditorOperatorExpression, QueryEditorWhereExpression } from 'components/LegacyQueryEditor/editor/expressions';
+import { createOperator } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -350,7 +352,44 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     }
     return operator.name === 'contains' ? sortStartsWithValuesFirst(results, searchTerm) : results;
   }
+
+  modifyQuery(query: KustoQuery, action: QueryFixAction): KustoQuery {
+    let queryText = query.query ?? '';
+    switch (action.type) {
+      case 'ADD_FILTER':
+        addLabelToQuery('==');
+        break;
+      case 'ADD_FILTER_OUT':
+        addLabelToQuery('!=');
+        break;
+    }
+    return { ...query, query: queryText };
+
+    function addLabelToQuery(operator: string) {
+      if (action.options?.key && action.options?.value) {
+        if (query.rawMode) {
+          queryText += `\n| where ${action.options.key} ${operator} '${action.options.value}'`;
+        } else {
+          const exp = createWhereExpression(
+            [createOperator(action.options.key, operator, action.options.value)],
+            QueryEditorExpressionType.Or
+          );
+          query.expression.where.expressions.push(exp);
+        }
+      }
+    }
+  }
 }
+
+const createWhereExpression = (
+  expressions: QueryEditorOperatorExpression[],
+  type: QueryEditorExpressionType = QueryEditorExpressionType.And
+): QueryEditorWhereExpression => {
+  return {
+    type: type,
+    expressions: expressions,
+  };
+};
 
 const functionSchemaParser = (frames: DataFrame[]): AdxColumnSchema[] => {
   const result: AdxColumnSchema[] = [];
