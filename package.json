@@ -48,7 +48,7 @@
     "@types/prismjs": "1.26.3",
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^6.12.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "chance": "^1.1.11",
     "copy-webpack-plugin": "^11.0.0",
     "cspell": "8.0.0",
