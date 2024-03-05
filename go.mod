@@ -10,7 +10,7 @@ require (
 	github.com/grafana/grafana-azure-sdk-go v1.12.0
 	github.com/grafana/grafana-plugin-sdk-go v0.211.0
 	github.com/json-iterator/go v1.1.12
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	golang.org/x/net v0.21.0
 )
 
