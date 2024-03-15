@@ -21,7 +21,7 @@ func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud)
+	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud, true)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func newHttpClientManagement(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud)
+	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud, false)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func newHttpClientManagement(ctx context.Context, instanceSettings *backend.Data
 	return httpClient, nil
 }
 
-func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.DatasourceSettings, azureCloud string) (*azhttpclient.AuthOptions, error) {
+func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.DatasourceSettings, azureCloud string, userProvidedEndpoint bool) (*azhttpclient.AuthOptions, error) {
 	authOpts := azhttpclient.NewAuthOptions(azureSettings)
 
 	// Enables support for the experimental user-based authentication feature if the user_identity_enabled flag is set to true in the Grafana configuration
@@ -76,7 +76,7 @@ func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.Dat
 	authOpts.AddTokenProvider(azcredentials.AzureAuthClientSecretObo, adxauth.NewOnBehalfOfAccessTokenProvider)
 
 	// Enforce only trusted Azure Data Explorer endpoints if enabled
-	if dsSettings.EnforceTrustedEndpoints {
+	if userProvidedEndpoint && dsSettings.EnforceTrustedEndpoints {
 		endpoints, err := getAdxEndpoints(azureCloud)
 		if err != nil {
 			return nil, err
