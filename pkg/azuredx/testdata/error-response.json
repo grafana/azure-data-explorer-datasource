@@ -1,9 +1,8 @@
 {
   "error": {
     "code": "General_BadRequest",
-    "message": "Request is invalid and cannot be executed.",
     "@type": "Kusto.Data.Exceptions.KustoBadRequestException",
-    "@message": "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'",
+    "message": "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'",
     "@context": {
       "timestamp": "2021-05-26T13:23:26.2867367Z",
       "serviceAlias": "GRAFANAADXDEV",
