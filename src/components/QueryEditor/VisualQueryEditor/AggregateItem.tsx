@@ -45,6 +45,7 @@ const AggregateItem: React.FC<AggregateItemProps> = (props) => {
   return (
     <InputGroup>
       <Select
+        data-testid="aggregate-item-function"
         aria-label="function"
         autoFocus={aggregate.focus}
         width="auto"

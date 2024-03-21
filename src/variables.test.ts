@@ -1,4 +1,4 @@
-import { ArrayVector, CoreApp, DataQueryRequest, getDefaultTimeRange, toDataFrame } from '@grafana/data';
+import { CoreApp, DataQueryRequest, getDefaultTimeRange, toDataFrame } from '@grafana/data';
 import { lastValueFrom, of } from 'rxjs';
 import { mockDatasource } from 'components/__fixtures__/Datasource';
 import { AdxQueryType, KustoQuery, defaultQuery } from 'types';
@@ -115,7 +115,7 @@ const datasource = mockDatasource({
                 nullable: true,
               },
               config: {},
-              values: new ArrayVector([1000000000]),
+              values: [1000000000],
               entities: {},
             },
             {
@@ -126,7 +126,7 @@ const datasource = mockDatasource({
                 nullable: true,
               },
               config: {},
-              values: new ArrayVector([9.9]),
+              values: [9.9],
               entities: {},
             },
             {
@@ -137,7 +137,7 @@ const datasource = mockDatasource({
                 nullable: true,
               },
               config: {},
-              values: new ArrayVector(['test_string']),
+              values: ['test_string'],
               entities: {},
             },
           ],
@@ -181,7 +181,14 @@ describe('variables', () => {
       const variableSupport = new VariableSupport(datasource);
       const req = mockRequest({
         targets: [
-          { ...defaultQuery, database: '', resultFormat: 'table', refId: '', queryType: AdxQueryType.Databases, clusterUri: '', },
+          {
+            ...defaultQuery,
+            database: '',
+            resultFormat: 'table',
+            refId: '',
+            queryType: AdxQueryType.Databases,
+            clusterUri: '',
+          },
         ],
       });
       const res = await lastValueFrom(variableSupport.query(req));
@@ -194,7 +201,14 @@ describe('variables', () => {
       const variableSupport = new VariableSupport(datasource);
       const req = mockRequest({
         targets: [
-          { ...defaultQuery, database: 'test_db', resultFormat: 'table', refId: '', queryType: AdxQueryType.Tables, clusterUri: '', },
+          {
+            ...defaultQuery,
+            database: 'test_db',
+            resultFormat: 'table',
+            refId: '',
+            queryType: AdxQueryType.Tables,
+            clusterUri: '',
+          },
         ],
       });
       const res = await lastValueFrom(variableSupport.query(req));

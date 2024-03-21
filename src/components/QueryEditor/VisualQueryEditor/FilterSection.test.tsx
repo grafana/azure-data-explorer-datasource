@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
@@ -58,11 +58,11 @@ describe('FilterSection', () => {
     expect(screen.getByText('AND')).toBeInTheDocument();
   });
 
-  it('should add a filter group', () => {
+  it('should add a filter group', async () => {
     const onChange = jest.fn();
     render(<FilterSection {...defaultProps} onChange={onChange} />);
     const b = screen.getByRole('button');
-    b.click();
+    await act(() => b.click());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({

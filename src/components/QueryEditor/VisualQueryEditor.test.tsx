@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { VisualQueryEditor } from './VisualQueryEditor';
 import { mockDatasource, mockQuery } from '../__fixtures__/Datasource';
@@ -19,7 +19,7 @@ jest.mock('@grafana/runtime', () => {
 
 const defaultProps = {
   database: '',
-  query: {...mockQuery, clusterUri: 'clusterUri'},
+  query: { ...mockQuery, clusterUri: 'clusterUri' },
   onChange: jest.fn(),
   onRunQuery: jest.fn(),
   datasource: mockDatasource(),
@@ -88,7 +88,7 @@ describe('VisualQueryEditor', () => {
     await waitFor(() => screen.getByText('bar'));
     const sel = screen.getByLabelText('Columns');
     openMenu(sel);
-    screen.getByText('foobar').click();
+    await act(() => screen.getByText('foobar').click());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({
@@ -110,9 +110,11 @@ describe('VisualQueryEditor', () => {
         query={onChange.mock.calls[onChange.mock.calls.length - 1][0]}
       />
     );
-    // Add a section
     const as = screen.getByTestId('aggregate-section');
-    within(as).getByRole('button').click();
+    await act(() => {
+      // Add a section
+      within(as).getByLabelText('Add').click();
+    });
     const selCol = within(as).getByLabelText('column');
     openMenu(selCol);
     // The column is now displayed in the both selectors

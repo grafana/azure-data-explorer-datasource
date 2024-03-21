@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
@@ -18,14 +18,14 @@ const defaultProps = {
 };
 
 describe('AggregateSection', () => {
-  it('add an aggregation function', () => {
+  it('add an aggregation function', async () => {
     const onChange = jest.fn();
     render(<AggregateSection {...defaultProps} onChange={onChange} />);
-    screen.getByRole('button').click();
+    await act(() => screen.getByLabelText('Add').click());
     // Select a function
     const sel = screen.getByLabelText('function');
     openMenu(sel);
-    screen.getByText(AggregateFunctions.Avg).click();
+    await act(() => screen.getByText(AggregateFunctions.Avg).click());
     // The info is not complete so onChange is called with an empty aggregation
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -35,7 +35,7 @@ describe('AggregateSection', () => {
     // Select a column
     const selCol = screen.getByLabelText('column');
     openMenu(selCol);
-    screen.getByText('foo').click();
+    await act(() => screen.getByText('foo').click());
     // Now it's a complete aggregation function so it should change the expression
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({

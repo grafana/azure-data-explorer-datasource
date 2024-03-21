@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
@@ -25,13 +25,13 @@ const defaultProps = {
 };
 
 describe('TableSection', () => {
-  it('should select a table', () => {
+  it('should select a table', async () => {
     const onChange = jest.fn();
     render(<TableSection {...defaultProps} onChange={onChange} />);
     // Select a table
     const sel = screen.getByLabelText('Table');
     openMenu(sel);
-    screen.getByText('mytable').click();
+    await act(() => screen.getByText('mytable').click());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({
@@ -44,13 +44,13 @@ describe('TableSection', () => {
     );
   });
 
-  it('should select a column', () => {
+  it('should select a column', async () => {
     const onChange = jest.fn();
     render(<TableSection {...defaultProps} onChange={onChange} />);
     // Select a table
     const sel = screen.getByLabelText('Columns');
     openMenu(sel);
-    screen.getByText('foo').click();
+    await act(() => screen.getByText('foo').click());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
@@ -25,13 +25,13 @@ const defaultProps = {
 };
 
 describe('TimeshiftItem', () => {
-  it('should select a time shift', () => {
+  it('should select a time shift', async () => {
     const onChange = jest.fn();
     render(<Timeshift {...defaultProps} onChange={onChange} />);
-    screen.getByLabelText('Add').click();
+    await act(() => screen.getByLabelText('Add').click());
     const sel = screen.getByLabelText('timeshift');
     openMenu(sel);
-    screen.getByText('Hour before').click();
+    await act(() => screen.getByText('Hour before').click());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
@@ -17,14 +17,14 @@ const defaultProps = {
 };
 
 describe('GroupBySection', () => {
-  it('add a grouping', () => {
+  it('add a grouping', async () => {
     const onChange = jest.fn();
     render(<GroupBySection {...defaultProps} onChange={onChange} />);
-    screen.getByRole('button').click();
+    await act(() => screen.getByLabelText('Add').click());
     // Select a function
     const sel = screen.getByLabelText('column');
     openMenu(sel);
-    screen.getByText('foo').click();
+    await act(() => screen.getByText('foo').click());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({

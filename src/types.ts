@@ -1,5 +1,6 @@
 import { AzureCredentials } from '@grafana/azure-sdk';
-import { DataQuery, DataSourceJsonData, DataSourceSettings } from '@grafana/data';
+import { DataSourceJsonData, DataSourceSettings } from '@grafana/data';
+import { DataQuery } from '@grafana/schema';
 
 import {
   QueryEditorColumnsExpression,
