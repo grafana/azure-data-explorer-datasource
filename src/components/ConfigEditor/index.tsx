@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { AzureCredentials } from '@grafana/azure-sdk';
-import { FeatureToggles, DataSourcePluginOptionsEditorProps } from '@grafana/data';
+import { AzureCredentials, getAzureClouds } from '@grafana/azure-sdk';
+import { FeatureToggles, DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
 import { Switch,  InlineField} from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { gte } from 'semver';
@@ -10,7 +10,6 @@ import ConnectionConfig from './ConnectionConfig';
 import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
 import TrackingConfig from './TrackingConfig';
-import { KnownAzureClouds } from './AzureCredentials';
 import {
   getCredentials,
   getDefaultCredentials,
@@ -38,6 +37,12 @@ export interface ConfigEditorProps
 const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
   const { options, onOptionsChange } = props;
   const { jsonData } = options;
+
+  const clouds = useMemo(() => {
+    return getAzureClouds().map<SelectableValue>(c => {
+      return { value: c.name, label: c.displayName }
+    });
+  }, []);
 
   const credentials = useMemo(() => getCredentials(options), [options]);
 
@@ -101,7 +106,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         workloadIdentityEnabled={getWorkloadIdentityEnabled()}
         oboEnabled={getOboEnabled()}
         credentials={credentials}
-        azureCloudOptions={KnownAzureClouds}
+        azureCloudOptions={clouds}
         onCredentialsChange={onCredentialsChange}
       />
       <Divider />
