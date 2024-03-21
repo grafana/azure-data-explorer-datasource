@@ -146,16 +146,14 @@ describe('analyzeQueries', () => {
       description: 'should count queries with no default cluster',
       queries: [{ query: '' }],
       dsSettings: {
-        jsonData: {
-        },
+        jsonData: {},
       },
       expectedCounters: { queries_no_default_cluster: 1 },
     },
     {
       description: 'should count queries that are not selecting a cluster',
       queries: [{ query: '' }],
-      dsSettings: {
-      },
+      dsSettings: {},
       expectedCounters: { queries_no_selected_cluster: 1 },
     },
   ];

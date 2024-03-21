@@ -4,7 +4,7 @@ import { getAppEvents, getDataSourceSrv } from '@grafana/runtime';
 import pluginJson from './plugin.json';
 
 import { AdxDataSource } from './datasource';
-import { QueryEditor } from './components/QueryEditor';
+import { QueryEditor } from './components/QueryEditor/QueryEditor';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, KustoQuery } from './types';
 import EditorHelp from 'components/QueryEditor/EditorHelp';
 import { analyzeQueries, trackADXMonitorDashboardLoaded } from 'tracking';

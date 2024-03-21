@@ -10,7 +10,7 @@ import {
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
   QueryEditorWhereExpression,
-} from 'components/LegacyQueryEditor/editor/expressions';
+} from 'types/expressions';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeOperator } from './utils/utils';
 import FilterItem from './FilterItem';

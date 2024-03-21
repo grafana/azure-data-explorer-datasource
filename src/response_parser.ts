@@ -100,5 +100,5 @@ export const parseClustersResponse = (res: ClusterOption[], giveNames = true): S
   if (!res || res.length === 0) {
     return [];
   }
-  return res.map((val: ClusterOption) => ({ label: giveNames ? val.name : val.uri, value: val.uri}));
+  return res.map((val: ClusterOption) => ({ label: giveNames ? val.name : val.uri, value: val.uri }));
 };

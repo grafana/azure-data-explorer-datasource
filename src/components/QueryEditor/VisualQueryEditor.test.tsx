@@ -3,7 +3,7 @@ import React from 'react';
 import { VisualQueryEditor } from './VisualQueryEditor';
 import { mockDatasource, mockQuery } from '../__fixtures__/Datasource';
 import { QueryEditorPropertyType } from 'schema/types';
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType } from 'types/expressions';
 import { openMenu } from 'react-select-event';
 
 jest.mock('@grafana/runtime', () => {

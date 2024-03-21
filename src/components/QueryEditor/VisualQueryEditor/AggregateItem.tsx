@@ -6,10 +6,7 @@ import { AccessoryButton, InputGroup } from '@grafana/experimental';
 
 import { AdxDataSource } from '../../../datasource';
 import { AdxColumnSchema, KustoQuery } from '../../../types';
-import {
-  QueryEditorExpressionType,
-  QueryEditorReduceExpression,
-} from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType, QueryEditorReduceExpression } from 'types/expressions';
 import { columnsToDefinition, toPropertyType, valueToDefinition } from 'schema/mapper';
 import { QueryEditorPropertyType } from 'schema/types';
 import { range } from 'lodash';

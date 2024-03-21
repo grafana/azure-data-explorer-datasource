@@ -84,7 +84,9 @@ const VariableEditor = (props: VariableProps) => {
   }, [queryType]);
 
   useEffectOnce(() => {
-    datasource.getClusters().then((clusters) => setClusters(clusters.map(cluster => ({label: cluster.name, value: cluster.uri}))));
+    datasource
+      .getClusters()
+      .then((clusters) => setClusters(clusters.map((cluster) => ({ label: cluster.name, value: cluster.uri }))));
   });
 
   useEffect(() => {
@@ -93,9 +95,9 @@ const VariableEditor = (props: VariableProps) => {
     }
     datasource
       .getDatabases(query.clusterUri)
-      .then((databases) => setDatabases(databases.map(db => ({ label: db.text, value: db.value }))));
+      .then((databases) => setDatabases(databases.map((db) => ({ label: db.text, value: db.value }))));
     setTables([]);
-  }, [datasource, query.clusterUri, queryType])
+  }, [datasource, query.clusterUri, queryType]);
 
   useEffect(() => {
     if (queryType !== AdxQueryType.Columns) {

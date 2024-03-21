@@ -80,7 +80,9 @@ export default class KustoCodeEditor {
       minimap: {
         enabled: false,
       },
-      renderIndentGuides: false,
+      guides: {
+        indentation: false,
+      },
       wordWrap: 'on',
     });
     this.codeEditor.layout();

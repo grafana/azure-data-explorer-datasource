@@ -1,10 +1,10 @@
-import { VariableModel } from '@grafana/data';
+import { TypedVariableModel } from '@grafana/data';
 import { monacoTypes } from '@grafana/ui';
 import { AdxFunctionSchema } from 'types';
 
 const defaultTimeField = 'TimeGenerated';
 
-export function getFunctions(variables: VariableModel[]): Record<string, AdxFunctionSchema> {
+export function getFunctions(variables: TypedVariableModel[]): Record<string, AdxFunctionSchema> {
   const functions = {
     $__timeFilter: {
       Name: '$__timeFilter',

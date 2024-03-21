@@ -4,7 +4,7 @@ import { Button, Select } from '@grafana/ui';
 import { AccessoryButton, EditorField, EditorFieldGroup, EditorRow, InputGroup } from '@grafana/experimental';
 
 import { KustoQuery } from '../../../types';
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType } from 'types/expressions';
 import { QueryEditorPropertyType } from 'schema/types';
 
 interface TimeshiftProps {

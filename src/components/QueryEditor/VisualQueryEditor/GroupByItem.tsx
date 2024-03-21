@@ -5,10 +5,7 @@ import { Select } from '@grafana/ui';
 import { AccessoryButton, InputGroup } from '@grafana/experimental';
 
 import { AdxColumnSchema, KustoQuery } from '../../../types';
-import {
-  QueryEditorExpressionType,
-  QueryEditorGroupByExpression,
-} from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType, QueryEditorGroupByExpression } from 'types/expressions';
 import { columnsToDefinition, toPropertyType, valueToDefinition } from 'schema/mapper';
 import { QueryEditorPropertyType } from 'schema/types';
 

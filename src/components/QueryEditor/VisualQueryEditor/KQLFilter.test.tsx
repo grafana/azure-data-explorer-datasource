@@ -1,5 +1,5 @@
 import { act, render, screen } from '@testing-library/react';
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType } from 'types/expressions';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
 import { QueryEditorPropertyType } from 'schema/types';

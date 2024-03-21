@@ -13,10 +13,7 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({ options, updateJson
   const { jsonData } = options;
 
   return (
-    <Field
-      label="Default cluster URL (Optional)"
-      description="The default cluster url for this data source."
-    >
+    <Field label="Default cluster URL (Optional)" description="The default cluster url for this data source.">
       <Input
         aria-label="Cluster URL"
         data-testid={selectors.components.configEditor.clusterURL.input}

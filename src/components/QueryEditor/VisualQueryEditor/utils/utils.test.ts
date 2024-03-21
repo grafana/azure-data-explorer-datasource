@@ -1,4 +1,4 @@
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType } from 'types/expressions';
 import { QueryEditorOperator, QueryEditorPropertyType } from 'schema/types';
 import { defaultQuery } from 'types';
 import { AggregateFunctions } from '../AggregateItem';

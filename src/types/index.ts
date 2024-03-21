@@ -10,9 +10,9 @@ import {
   QueryEditorPropertyExpression,
   QueryEditorReduceExpressionArray,
   QueryEditorWhereArrayExpression,
-} from './components/LegacyQueryEditor/editor/expressions';
+} from './expressions';
 
-const packageJson = require('../package.json');
+const packageJson = require('../../package.json');
 
 export interface QueryExpression {
   from?: QueryEditorPropertyExpression;
