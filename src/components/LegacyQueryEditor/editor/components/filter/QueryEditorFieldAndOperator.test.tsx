@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import {
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
@@ -62,7 +62,7 @@ describe('QueryEditorFieldAndOperator', () => {
     const valueSel = screen.getByLabelText('select value for where filter');
     openMenu(valueSel);
     const valueTemplateVariableGroup = screen.getByText('Template Variables');
-    valueTemplateVariableGroup.click();
+    act(() => valueTemplateVariableGroup.click());
     expect(screen.getByText('$foo')).toBeInTheDocument();
     screen.getByText('$foo').click();
 
