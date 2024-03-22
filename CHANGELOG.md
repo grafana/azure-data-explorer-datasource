@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [5.0.0]
+
+- Breaking change: The legacy query editor has been removed. The `adxLegacyEditor` feature toggle will no longer work.
+- Remove references to deprecated Grafana APIs.
+- Dependency updates.
+- Improve error messages.
+- Fix: Bypass trusted endpoint enforcement for cluster request.
+
 ## [4.10.0]
 
 - Feature: Support Private Datasource Connect ([secure socks proxy](https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/)).
