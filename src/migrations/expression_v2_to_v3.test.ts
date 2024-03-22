@@ -5,7 +5,7 @@ import {
   QueryEditorGroupByExpression,
   QueryEditorReduceExpressionArray,
   QueryEditorGroupByExpressionArray,
-} from 'components/LegacyQueryEditor/editor/expressions';
+} from 'types/expressions';
 import { QueryEditorPropertyType } from '../schema/types';
 import { migrateExpression } from './expression';
 

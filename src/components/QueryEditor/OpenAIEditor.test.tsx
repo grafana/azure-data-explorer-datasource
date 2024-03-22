@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { selectors } from 'test/selectors';
 
@@ -43,7 +43,7 @@ const defaultProps = {
 
 describe('OpenAIEditor', () => {
   it('should render the OpenAI code editor', async () => {
-    render(<OpenAIEditor {...defaultProps} />);
+    await waitFor(() => render(<OpenAIEditor {...defaultProps} />));
     expect(screen.getByTestId(selectors.components.queryEditor.codeEditor.openAI)).toBeInTheDocument();
   });
 });

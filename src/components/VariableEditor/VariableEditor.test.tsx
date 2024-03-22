@@ -41,7 +41,7 @@ const defaultProps = (overrides?: Partial<VariableProps>): VariableProps => {
 
 describe('VariableEditor', () => {
   it('should render the VariableEditor', async () => {
-    render(<VariableEditor {...defaultProps()} />);
+    await waitFor(() => render(<VariableEditor {...defaultProps()} />));
     await waitFor(() => screen.getByText('Query Type'));
   });
 

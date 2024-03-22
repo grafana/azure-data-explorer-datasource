@@ -20,7 +20,10 @@ export class AdxSchemaMapper {
   private nameToMapping: Record<string, SchemaMapping> = {};
   private valueToMapping: Record<string, SchemaMapping> = {};
 
-  constructor(private enabled = false, mappings: Array<Partial<SchemaMapping>> = []) {
+  constructor(
+    private enabled = false,
+    mappings: Array<Partial<SchemaMapping>> = []
+  ) {
     for (const mapping of mappings) {
       // Skip mappings with empty values
       if (!validMapping(mapping)) {

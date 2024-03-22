@@ -1,7 +1,7 @@
 import { DataSourcePluginOptionsEditorProps, PluginType } from '@grafana/data';
 
 import { AdxDataSource } from '../../datasource';
-import { QueryEditorExpressionType } from '../LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType } from '../../types/expressions';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxQueryType, EditorMode, KustoQuery } from '../../types';
 
 export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<
@@ -73,7 +73,7 @@ export const mockDatasource = (overrides?: Partial<{ [Property in keyof AdxDataS
     },
     readOnly: false,
   });
-  ds.getResource = jest.fn().mockResolvedValue([])
+  ds.getResource = jest.fn().mockResolvedValue([]);
   if (overrides) {
     for (const key of Object.keys(overrides)) {
       ds[key] = overrides[key];

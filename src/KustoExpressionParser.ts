@@ -8,13 +8,13 @@ import {
   isOrExpression,
   isAndExpression,
   isArrayExpression,
-} from './components/LegacyQueryEditor/editor/guards';
+} from './guards';
 import {
   QueryEditorExpression,
   QueryEditorOperatorExpression,
   QueryEditorArrayExpression,
   QueryEditorPropertyExpression,
-} from './components/LegacyQueryEditor/editor/expressions';
+} from './types/expressions';
 import { cloneDeep } from 'lodash';
 import { SelectableValue } from '@grafana/data';
 import { filterColumns } from 'components/QueryEditor/VisualQueryEditor/utils/utils';

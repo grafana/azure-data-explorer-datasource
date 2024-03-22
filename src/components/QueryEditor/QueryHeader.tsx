@@ -1,6 +1,15 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
-import { Alert, Button, Card, ConfirmModal, CustomScrollbar, LoadingPlaceholder, RadioButtonGroup, useStyles2 } from '@grafana/ui';
+import {
+  Alert,
+  Button,
+  Card,
+  ConfirmModal,
+  CustomScrollbar,
+  LoadingPlaceholder,
+  RadioButtonGroup,
+  useStyles2,
+} from '@grafana/ui';
 import { EditorHeader, FlexItem, InlineSelect, llms } from '@grafana/experimental';
 
 import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
@@ -108,11 +117,11 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       if (!clusterUri) {
         datasource.getDefaultOrFirstCluster().then((cluster: string) => {
           setClusterUri(cluster);
-        })
+        });
       }
     });
   }, [datasource, clusterUri]);
-  
+
   const onClusterChange = ({ value }: SelectableValue) => {
     setClusterUri(value);
     onChange({ ...query, clusterUri: value, expression: defaultQuery.expression });
@@ -211,22 +220,17 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       />
       <FlexItem grow={1} />
       {query.rawMode && (
-        <Button
-        variant="secondary"
-        size="sm"
-        onClick={showExplanation}
-        disabled={!enabled}
-        >
+        <Button variant="secondary" size="sm" onClick={showExplanation} disabled={!enabled}>
           Explain KQL
         </Button>
       )}
       {!query.OpenAI && (
         <Button
-        variant="primary"
-        icon="play"
-        size="sm"
-        onClick={onRunQuery}
-        data-testid={selectors.components.queryEditor.runQuery.button}
+          variant="primary"
+          icon="play"
+          size="sm"
+          onClick={onRunQuery}
+          data-testid={selectors.components.queryEditor.runQuery.button}
         >
           Run query
         </Button>
@@ -242,22 +246,26 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           title={errorMessage}
         />
       )}
-      {(query.rawMode && generatedExplanation && !hasError) && (
+      {query.rawMode && generatedExplanation && !hasError && (
         <Card className={styles.card}>
           <Card.Heading>
             <div>KQL Explanation</div>
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setGeneratedExplanation("")}
+              onClick={() => setGeneratedExplanation('')}
               data-testid="close-kql-explanation"
-              >
-                x
+            >
+              x
             </Button>
           </Card.Heading>
           <CustomScrollbar hideTracksWhenNotNeeded={true} showScrollIndicators={true} autoHeightMax="175px">
             <Card.Description>
-              {waiting ? <LoadingPlaceholder text="Loading..." /> : <div dangerouslySetInnerHTML={{ __html: renderMarkdown(generatedExplanation) }}></div>}
+              {waiting ? (
+                <LoadingPlaceholder text="Loading..." />
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: renderMarkdown(generatedExplanation) }}></div>
+              )}
             </Card.Description>
           </CustomScrollbar>
         </Card>
@@ -321,9 +329,9 @@ const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[]
 const getStyles = (theme: GrafanaTheme2) => {
   return {
     card: css({
-      display: 'flex', 
-      flexDirection: 'column', 
-      marginBottom: '20px'
+      display: 'flex',
+      flexDirection: 'column',
+      marginBottom: '20px',
     }),
-  }
+  };
 };

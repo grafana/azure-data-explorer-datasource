@@ -1,4 +1,11 @@
-import { DataFrame, DataQueryRequest, DataSourceInstanceSettings, QueryFixAction, ScopedVars, TimeRange } from '@grafana/data';
+import {
+  DataFrame,
+  DataQueryRequest,
+  DataSourceInstanceSettings,
+  QueryFixAction,
+  ScopedVars,
+  TimeRange,
+} from '@grafana/data';
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
 import { QueryEditorPropertyType } from './schema/types';
 import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
@@ -25,7 +32,11 @@ import {
 import { VariableSupport } from 'variables';
 
 import { lastValueFrom } from 'rxjs';
-import { QueryEditorExpressionType, QueryEditorOperatorExpression, QueryEditorWhereExpression } from 'components/LegacyQueryEditor/editor/expressions';
+import {
+  QueryEditorExpressionType,
+  QueryEditorOperatorExpression,
+  QueryEditorWhereExpression,
+} from 'types/expressions';
 import { createOperator } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
@@ -86,7 +97,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return true;
   }
 
-  applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVars): Record<string, any> {
+  applyTemplateVariables(target: KustoQuery, scopedVars: ScopedVars): KustoQuery {
     const query = interpolateKustoQuery(
       target.query,
       (val: string) => this.templateSrv.replace(val, scopedVars, this.interpolateVariable),
@@ -107,11 +118,11 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
   async getDatabases(clusterUri?: string): Promise<DatabaseItem[]> {
     if (clusterUri === undefined) {
-      clusterUri = await this.getDefaultOrFirstCluster()
+      clusterUri = await this.getDefaultOrFirstCluster();
     }
     const replacedClusterUri = this.templateSrv.replace(clusterUri, this.templateSrv.getVariables() as any);
-    
-    return this.postResource<KustoDatabaseList>('databases', {clusterUri: replacedClusterUri}).then((response) => {
+
+    return this.postResource<KustoDatabaseList>('databases', { clusterUri: replacedClusterUri }).then((response) => {
       return new ResponseParser().parseDatabases(response);
     });
   }
@@ -121,7 +132,6 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       return new ResponseParser().parseOpenAIResponse(resp);
     });
   }
-
 
   getClusters(): Promise<ClusterOption[]> {
     return this.getResource('/clusters');
@@ -158,7 +168,8 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     const replacedClusterUri = this.templateSrv.replace(clusterUri, this.templateSrv.getVariables() as any);
     return cache<AdxSchema>(
       `${this.id}.${replacedClusterUri}.schema.overview`,
-      () => this.postResource(`schema`, {clusterUri: replacedClusterUri}).then(new ResponseParser().parseSchemaResult),
+      () =>
+        this.postResource(`schema`, { clusterUri: replacedClusterUri }).then(new ResponseParser().parseSchemaResult),
       refreshCache
     );
   }
@@ -259,19 +270,13 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
 
   // Used to get the schema directly
   doRequest(url: string, data: any, maxRetries = 1) {
-    return this.backendSrv
-      .datasourceRequest({
-        url: this.url + url,
-        method: 'POST',
-        data: data,
-      })
-      .catch((error) => {
-        if (maxRetries > 0) {
-          return this.doRequest(url, data, maxRetries - 1);
-        }
+    return this.backendSrv.post(this.url + url, data).catch((error) => {
+      if (maxRetries > 0) {
+        return this.doRequest(url, data, maxRetries - 1);
+      }
 
-        throw error;
-      });
+      throw error;
+    });
   }
 
   interpolateVariable(value: any, variable) {
@@ -409,8 +414,8 @@ const functionSchemaParser = (frames: DataFrame[]): AdxColumnSchema[] => {
   for (const frame of frames) {
     for (let index = 0; index < frame.length; index++) {
       result.push({
-        Name: frame.fields[nameIndex].values.get(index),
-        CslType: frame.fields[typeIndex].values.get(index),
+        Name: frame.fields[nameIndex].values[index],
+        CslType: frame.fields[typeIndex].values[index],
       });
     }
   }
@@ -423,7 +428,7 @@ const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchem
 
   for (const frame of frames) {
     for (const field of frame.fields) {
-      const json = JSON.parse(field.values.get(0));
+      const json = JSON.parse(field.values[0]);
 
       if (json === null) {
         console.log('error with field', field);

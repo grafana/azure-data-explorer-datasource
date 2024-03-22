@@ -1,7 +1,7 @@
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { Button, Label, useStyles2 } from '@grafana/ui';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType } from 'types/expressions';
 import { AdxDataSource } from 'datasource';
 import React, { useState } from 'react';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
