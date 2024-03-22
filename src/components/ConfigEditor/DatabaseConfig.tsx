@@ -164,18 +164,18 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
 
       {jsonData.useSchemaMapping && (
         <Field label="Schema mappings">
-          <Stack gap={0.25} direction={'column'}>
+          <Stack gap={0.25} direction={'column'} justifyContent={'flex-start'}>
             {mappings.map((mapping, index) => (
-              <Stack gap={0.25} key={index} direction={'row'}>
+              <Stack gap={0.25} key={index} direction={'row'} justifyContent={'flex-start'}>
                 <Select
                   value={schema.schemaMappingOptions.find((v) => v.value === mapping.value)}
                   options={schema.schemaMappingOptions}
                   onChange={(change) => handleMappingTargetChange(index, change)}
-                  width={38}
                   placeholder="Target"
+                  width={50}
                 />
 
-                <InlineLabel>
+                <InlineLabel width={5}>
                   <Icon name="arrow-right" />
                 </InlineLabel>
                 <Input
@@ -184,6 +184,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
                   onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
                     handleMappingNameChange(index, ev.target.value)
                   }
+                  width={50}
                 />
                 <Button
                   variant="secondary"
@@ -192,11 +193,18 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
                   aria-label="Remove"
                   type="button"
                   onClick={() => handleRemoveMapping(index)}
+                  fullWidth={false}
                 ></Button>
               </Stack>
             ))}
 
-            <Button variant="secondary" size="md" onClick={handleAddNewMapping} type="button">
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={handleAddNewMapping}
+              type="button"
+              style={{ width: '130px' }}
+            >
               Add mapping
             </Button>
           </Stack>
