@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { act, render, screen } from '@testing-library/react';
+import { QueryEditorExpressionType } from 'types/expressions';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
 import { QueryEditorPropertyType } from 'schema/types';
@@ -42,17 +42,17 @@ describe('KQLFilter', () => {
     expect(screen.getByText('ActivityName')).toBeInTheDocument();
   });
 
-  it('should add a new item', () => {
+  it('should add a new item', async () => {
     const onChange = jest.fn();
     render(<KQLFilter {...defaultProps} onChange={onChange} />);
-    screen.getByLabelText('Add').click();
+    await act(() => screen.getByLabelText('Add').click());
     expect(onChange).toHaveBeenCalledTimes(1);
   });
 
-  it('should remove the filter group when removing the last element', () => {
+  it('should remove the filter group when removing the last element', async () => {
     const onChange = jest.fn();
     render(<KQLFilter {...defaultProps} onChange={onChange} />);
-    screen.getByLabelText('remove').click();
+    await act(() => screen.getByLabelText('remove').click());
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange.mock.calls[0][0].expression.where.expressions.length).toBe(0);
   });
@@ -98,7 +98,7 @@ describe('KQLFilter', () => {
     };
     const { rerender } = render(<KQLFilter {...defaultProps} onChange={onChange} index={1} query={query} />);
     expect(screen.getByText('Other')).toBeInTheDocument();
-    screen.getByLabelText('remove').click();
+    await act(() => screen.getByLabelText('remove').click());
     rerender(<KQLFilter {...defaultProps} onChange={onChange} index={0} query={query} />);
     expect(screen.getByText('ActivityName')).toBeInTheDocument();
   });

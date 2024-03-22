@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { AzureCredentials } from '@grafana/azure-sdk';
 import { FeatureToggles, DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { Switch,  InlineField} from '@grafana/ui';
+import { Switch, InlineField } from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { gte } from 'semver';
 import ConfigHelp from './ConfigHelp';
@@ -26,7 +26,7 @@ import { Divider } from './Divider';
 import { css } from '@emotion/css';
 
 const styles = {
-    toggle: css`
+  toggle: css`
     margin-top: 7px;
     margin-left: 5px;
   `,
@@ -124,42 +124,40 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
           <>
             <div className="gf-form-group">
               <h3 className="page-heading">Secure Socks Proxy</h3>
-                <br/>
-                  <InlineField
-                    label="Enable"
-                    tooltip={
-                      <>
-                        Enable proxying the datasource connection through the secure socks proxy to a
-                        different network.
-                        See{' '}
-                        <a
-                          href="https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Configure a datasource connection proxy.
-                        </a>
-                      </>
-                    }
-                  >
-                  <div className={styles.toggle}>
-                    <Switch
-                      value={options.jsonData.enableSecureSocksProxy}
-                      onChange={(e) => {
-                        onOptionsChange({
-                          ...options,
-                            jsonData: {
-                              ...options.jsonData,
-                              enableSecureSocksProxy: e.currentTarget.checked
-                            },
-                        });
-                      }}
-                    />
-                  </div>
-                </InlineField>
-              </div>
-            </>
-          )}
+              <br />
+              <InlineField
+                label="Enable"
+                tooltip={
+                  <>
+                    Enable proxying the datasource connection through the secure socks proxy to a different network. See{' '}
+                    <a
+                      href="https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Configure a datasource connection proxy.
+                    </a>
+                  </>
+                }
+              >
+                <div className={styles.toggle}>
+                  <Switch
+                    value={options.jsonData.enableSecureSocksProxy}
+                    onChange={(e) => {
+                      onOptionsChange({
+                        ...options,
+                        jsonData: {
+                          ...options.jsonData,
+                          enableSecureSocksProxy: e.currentTarget.checked,
+                        },
+                      });
+                    }}
+                  />
+                </div>
+              </InlineField>
+            </div>
+          </>
+        )}
     </>
   );
 };

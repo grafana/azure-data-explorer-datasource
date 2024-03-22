@@ -1,4 +1,4 @@
-import { DataSourceRef } from '@grafana/data';
+import { DataSourceRef } from '@grafana/schema';
 import { AdxQueryType, KustoQuery, defaultQuery } from 'types';
 
 type inputAnnotation = {

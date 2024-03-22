@@ -1,17 +1,6 @@
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
 import { FetchError, FetchResponse, getBackendSrv, getDataSourceSrv } from '@grafana/runtime';
-import {
-  Alert,
-  Button,
-  HorizontalGroup,
-  Icon,
-  Field,
-  InlineLabel,
-  Input,
-  Select,
-  VerticalGroup,
-  Switch,
-} from '@grafana/ui';
+import { Alert, Button, Icon, Field, InlineLabel, Input, Select, Switch, Stack } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useEffectOnce } from 'react-use';
@@ -175,9 +164,9 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
 
       {jsonData.useSchemaMapping && (
         <Field label="Schema mappings">
-          <VerticalGroup spacing="xs">
+          <Stack gap={0.25} direction={'column'}>
             {mappings.map((mapping, index) => (
-              <HorizontalGroup spacing="xs" key={index}>
+              <Stack gap={0.25} key={index} direction={'row'}>
                 <Select
                   value={schema.schemaMappingOptions.find((v) => v.value === mapping.value)}
                   options={schema.schemaMappingOptions}
@@ -204,13 +193,13 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
                   type="button"
                   onClick={() => handleRemoveMapping(index)}
                 ></Button>
-              </HorizontalGroup>
+              </Stack>
             ))}
 
             <Button variant="secondary" size="md" onClick={handleAddNewMapping} type="button">
               Add mapping
             </Button>
-          </VerticalGroup>
+          </Stack>
         </Field>
       )}
 

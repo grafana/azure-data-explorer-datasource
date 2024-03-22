@@ -1,4 +1,4 @@
-import { QueryEditorPropertyType, QueryEditorProperty, QueryEditorOperator } from '../../../schema/types';
+import { QueryEditorPropertyType, QueryEditorProperty, QueryEditorOperator } from '../schema/types';
 
 export enum QueryEditorExpressionType {
   Property = 'property',

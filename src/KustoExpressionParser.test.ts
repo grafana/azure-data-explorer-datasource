@@ -12,7 +12,7 @@ import {
   QueryEditorGroupByExpressionArray,
   QueryEditorWhereArrayExpression,
   QueryEditorWhereExpression,
-} from './components/LegacyQueryEditor/editor/expressions';
+} from './types/expressions';
 import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
 import { createOperator, valueToPropertyType } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 
@@ -37,7 +37,7 @@ describe('KustoExpressionParser', () => {
         search: createOperator('eventType', 'isnotempty', ''),
         index: '0',
         database: 'Samples',
-        clusterUri: 'cluster'
+        clusterUri: 'cluster',
       };
 
       expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
@@ -56,7 +56,7 @@ describe('KustoExpressionParser', () => {
         search: createOperator('state', 'contains', 'TEXAS'),
         index: '1',
         database: 'Samples',
-        clusterUri: 'cluster'
+        clusterUri: 'cluster',
       };
 
       expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
@@ -86,7 +86,7 @@ describe('KustoExpressionParser', () => {
         search: createOperator('state', 'contains', 'TEXAS'),
         index: '1-0',
         database: 'Samples',
-        clusterUri: 'cluster'
+        clusterUri: 'cluster',
       };
 
       expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
@@ -116,7 +116,7 @@ describe('KustoExpressionParser', () => {
         search: createOperator('column["type"]', 'contains', 'TEXAS'),
         index: '1-0',
         database: 'Samples',
-        clusterUri: 'cluster'
+        clusterUri: 'cluster',
       };
 
       const tableSchema: AdxColumnSchema[] = [
@@ -154,7 +154,7 @@ describe('KustoExpressionParser', () => {
         search: createOperator('column["type"]', 'contains', 'TEXAS'),
         index: '1-0',
         database: 'Samples',
-        clusterUri: 'cluster'
+        clusterUri: 'cluster',
       };
 
       const tableSchema: AdxColumnSchema[] = [
@@ -194,7 +194,7 @@ describe('KustoExpressionParser', () => {
         search: createOperator('state name', 'contains', 'TEXAS'),
         index: '1',
         database: 'Samples',
-        clusterUri: 'cluster'
+        clusterUri: 'cluster',
       };
 
       expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
@@ -217,7 +217,7 @@ describe('KustoExpressionParser', () => {
         search: createOperator('column["`indexer`"]', 'isnotempty', ''),
         index: '0',
         database: 'StormEvents',
-        clusterUri: 'cluster'
+        clusterUri: 'cluster',
       };
 
       const tableSchema: AdxColumnSchema[] = [

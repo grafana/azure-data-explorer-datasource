@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { mockQuery } from 'components/__fixtures__/Datasource';
 import { AdxColumnSchema } from 'types';
 import React from 'react';
@@ -16,7 +16,7 @@ const defaultProps = {
 };
 
 describe('GroupByItem', () => {
-  it('should select a column', () => {
+  it('should select a column', async () => {
     const onChange = jest.fn();
     const columns: AdxColumnSchema[] = [
       {
@@ -27,7 +27,7 @@ describe('GroupByItem', () => {
     render(<GroupByItem {...defaultProps} columns={columns} onChange={onChange} />);
     const sel = screen.getByLabelText('column');
     openMenu(sel);
-    screen.getByText('foo').click();
+    await act(() => screen.getByText('foo').click());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ property: { name: 'foo', type: QueryEditorPropertyType.String } })
     );
@@ -42,14 +42,20 @@ describe('GroupByItem', () => {
     render(<GroupByItem {...defaultProps} onChange={onChange} templateVariableOptions={templateVariableOptions} />);
     const sel = screen.getByLabelText('column');
     openMenu(sel);
-    (await screen.findByText('Template Variables')).click();
-    (await screen.findByText('$foo')).click();
+    const templateVariables = await screen.findByText('Template Variables');
+    await act(() => {
+      templateVariables.click();
+    });
+    const templateVariable = await screen.findByText('$foo');
+    await act(() => {
+      templateVariable.click();
+    });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ property: { name: '$foo', type: QueryEditorPropertyType.String } })
     );
   });
 
-  it('should add an interval when using a DateTime', () => {
+  it('should add an interval when using a DateTime', async () => {
     const onChange = jest.fn();
     const groupBy = {
       property: { name: 'Time', type: QueryEditorPropertyType.DateTime },
@@ -57,7 +63,7 @@ describe('GroupByItem', () => {
     render(<GroupByItem {...defaultProps} onChange={onChange} groupBy={groupBy} />);
     const sel = screen.getByLabelText('interval');
     openMenu(sel);
-    screen.getByText('1 minute').click();
+    await act(() => screen.getByText('1 minute').click());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ interval: { name: '1m', type: QueryEditorPropertyType.Interval } })
     );

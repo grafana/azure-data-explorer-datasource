@@ -8,8 +8,8 @@ import {
   QueryEditorExpression,
   QueryEditorExpressionType,
   QueryEditorArrayExpression,
-} from './expressions';
-import { QueryEditorPropertyType, QueryEditorOperator } from '../../../schema/types';
+} from './types/expressions';
+import { QueryEditorPropertyType, QueryEditorOperator } from './schema/types';
 
 export const isReduceExpression = (expression?: QueryEditorExpression): expression is QueryEditorReduceExpression => {
   return expression?.type === QueryEditorExpressionType.Reduce;
