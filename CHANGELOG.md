@@ -1,7 +1,9 @@
 # CHANGELOG
 
-## [4.11.0]
+## [5.0.0]
 
+- Breaking change: The legacy query editor has been removed. The `adxLegacyEditor` feature toggle will no longer work.
+- Remove references to deprecated Grafana APIs.
 - Dependency updates.
 - Improve error messages.
 - Fix: Bypass trusted endpoint enforcement for cluster request.
