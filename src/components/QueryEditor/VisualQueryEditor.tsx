@@ -121,10 +121,6 @@ const useSelectedTable = (
       };
     }
 
-    if (options.length > 0) {
-      return options[0];
-    }
-
     return;
   }, [options, table, variables]);
 };
