@@ -8,7 +8,7 @@ import { AccessoryButton, InputGroup } from '@grafana/experimental';
 
 import { AdxDataSource } from '../../../datasource';
 import { AdxColumnSchema, KustoQuery } from '../../../types';
-import { QueryEditorExpressionType } from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpressionType } from 'types/expressions';
 import {
   getOperatorExpressionOptions,
   getOperatorExpressionValue,

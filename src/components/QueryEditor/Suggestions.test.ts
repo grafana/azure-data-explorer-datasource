@@ -1,6 +1,8 @@
 import { monacoTypes } from '@grafana/ui';
 
 import { getFunctions, getSignatureHelp } from './Suggestions';
+import { VariableHide, VariableRefresh, VariableSort } from '@grafana/schema';
+import { LoadingState } from '@grafana/data';
 
 describe('Suggestions', () => {
   let lineContent;
@@ -35,7 +37,36 @@ describe('Suggestions', () => {
     });
 
     it('should return template variables as functions', () => {
-      expect(Object.keys(getFunctions([{ type: 'query', name: 'foo', label: 'foo' }]))).toContain('$foo');
+      expect(
+        Object.keys(
+          getFunctions([
+            {
+              type: 'query',
+              name: 'foo',
+              label: 'foo',
+              datasource: null,
+              definition: '',
+              sort: VariableSort.disabled,
+              query: undefined,
+              regex: '',
+              refresh: VariableRefresh.never,
+              multi: false,
+              includeAll: false,
+              current: {},
+              options: [],
+              id: 'var',
+              rootStateKey: null,
+              global: false,
+              hide: VariableHide.dontHide,
+              skipUrlSync: true,
+              index: 0,
+              state: LoadingState.Done,
+              error: null,
+              description: null,
+            },
+          ])
+        )
+      ).toContain('$foo');
     });
   });
 

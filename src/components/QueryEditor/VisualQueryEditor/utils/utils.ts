@@ -6,7 +6,7 @@ import {
   QueryEditorGroupByExpression,
   QueryEditorOperatorExpression,
   QueryEditorReduceExpression,
-} from 'components/LegacyQueryEditor/editor/expressions';
+} from 'types/expressions';
 import { intersection, isUndefined, uniq } from 'lodash';
 import { toPropertyType } from 'schema/mapper';
 import { QueryEditorOperatorValueType, QueryEditorPropertyType } from 'schema/types';

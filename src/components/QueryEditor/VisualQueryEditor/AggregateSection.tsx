@@ -1,10 +1,6 @@
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorList, EditorRow } from '@grafana/experimental';
-import {
-  QueryEditorExpression,
-  QueryEditorExpressionType,
-  QueryEditorReduceExpression,
-} from 'components/LegacyQueryEditor/editor/expressions';
+import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorReduceExpression } from 'types/expressions';
 import { AdxDataSource } from 'datasource';
 import React, { useState, useEffect } from 'react';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';

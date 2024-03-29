@@ -6,7 +6,7 @@ import {
   QueryEditorReduceExpression,
   QueryEditorGroupByExpression,
   QueryEditorReduceExpressionArray,
-} from 'components/LegacyQueryEditor/editor/expressions';
+} from 'types/expressions';
 import { QueryEditorPropertyType, QueryEditorProperty } from '../schema/types';
 
 export const migrateExpression = (version: string | undefined, expression: any): QueryExpression => {

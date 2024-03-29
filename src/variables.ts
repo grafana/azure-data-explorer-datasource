@@ -43,7 +43,15 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
           case AdxQueryType.Clusters:
             const clusters = await this.datasource.getClusters();
             return {
-              data: clusters.length ? [toDataFrame(clusters.map(cluster => {return {text: cluster.name, value: cluster.uri}}))] : [],
+              data: clusters.length
+                ? [
+                    toDataFrame(
+                      clusters.map((cluster) => {
+                        return { text: cluster.name, value: cluster.uri };
+                      })
+                    ),
+                  ]
+                : [],
             };
           case AdxQueryType.Databases:
             const databases = await this.datasource.getDatabases(this.templateSrv.replace(queryObj.clusterUri));
@@ -51,7 +59,10 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
               data: databases.length ? [toDataFrame(databases)] : [],
             };
           case AdxQueryType.Tables:
-            const tables = await schemaResolver.getTablesForDatabase(this.templateSrv.replace(queryObj.database), this.templateSrv.replace(queryObj.clusterUri));
+            const tables = await schemaResolver.getTablesForDatabase(
+              this.templateSrv.replace(queryObj.database),
+              this.templateSrv.replace(queryObj.clusterUri)
+            );
             return {
               data: tables.length ? [toDataFrame(tables)] : [],
             };
@@ -70,16 +81,21 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
             const queryRes = await lastValueFrom(
               this.datasource.query(includeTimeRange({ targets: [query] } as DataQueryRequest<KustoQuery>))
             );
+            let queryError: undefined | string = undefined;
+            if (queryRes.errors) {
+              const errorForRef = queryRes.errors.find((error) => error.refId === query.refId);
+              queryError = errorForRef ? errorForRef.message : undefined;
+            }
             if (queryRes?.data && queryRes.data.length) {
               return {
                 data: firstStringFieldToMetricFindValue(queryRes.data[0]),
-                error: queryRes.error ? new Error(queryRes.error.message) : undefined,
+                error: queryError ? new Error(queryError) : undefined,
               };
             }
 
             return {
               data: [],
-              error: queryRes?.error ? new Error(queryRes.error.message) : undefined,
+              error: queryError ? new Error(queryError) : undefined,
             };
         }
       } catch (err) {

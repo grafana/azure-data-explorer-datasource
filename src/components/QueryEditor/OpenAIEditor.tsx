@@ -1,17 +1,7 @@
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { llms } from '@grafana/experimental';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
-import {
-  Alert,
-  Button,
-  CodeEditor,
-  Spinner,
-  Monaco,
-  MonacoEditor,
-  useStyles2,
-  TextArea,
-  HorizontalGroup,
-} from '@grafana/ui';
+import { Alert, Button, CodeEditor, Spinner, Monaco, MonacoEditor, useStyles2, TextArea, Stack } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { selectors } from 'test/selectors';
@@ -210,7 +200,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
         </Alert>
       )}
       <div className={styles.outerMargin}>
-        <HorizontalGroup justify="flex-start" align="flex-start">
+        <Stack justifyContent="flex-start" alignItems="flex-start" direction={'row'}>
           <h5>Ask OpenAI to generate a KQL query</h5>
           <Button
             className={styles.buttonLeftMargin}
@@ -221,7 +211,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
           >
             {isWaiting && <Spinner className={styles.spinnerSpace} inline={true} />} Generate query
           </Button>
-        </HorizontalGroup>
+        </Stack>
         <TextArea
           data-testid={selectors.components.queryEditor.codeEditor.openAI}
           value={prompt}
@@ -230,7 +220,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
         ></TextArea>
       </div>
       <div className={styles.dividerSpace}>
-        <HorizontalGroup justify="flex-start" align="flex-start">
+        <Stack justifyContent="flex-start" alignItems="flex-start" direction={'row'}>
           <h5>Generated query</h5>
           <Button
             className={styles.buttonLeftMargin}
@@ -245,7 +235,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
           >
             Run query
           </Button>
-        </HorizontalGroup>
+        </Stack>
         <div className={styles.editorSpace} data-testid={selectors.components.queryEditor.codeEditor.container}>
           <CodeEditor
             language="kusto"

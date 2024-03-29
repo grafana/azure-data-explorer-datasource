@@ -30,9 +30,9 @@ describe('AdxDataSource', () => {
     const response = [
       {
         name: 'ClusterName',
-        value: 'ClusterValue'
-      }
-    ]
+        value: 'ClusterValue',
+      },
+    ];
 
     beforeEach(() => {
       ctx.ds = new AdxDataSource(ctx.instanceSettings);
