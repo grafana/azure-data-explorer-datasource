@@ -32,7 +32,7 @@ const addAdxVariable = (
   name: string,
   type: AdxQueryType,
   isFirst: boolean,
-  options?: { cluster?: string, database?: string; table?: string }
+  options?: { cluster?: string; database?: string; table?: string }
 ) => {
   if (isFirst) {
     e2e.components.PageToolbar.item('Dashboard settings').click();
@@ -155,8 +155,7 @@ e2e.scenario({
         e2eSelectors.queryEditor.database.input().click({ force: true });
         cy.contains('PerfTest').click({ force: true });
 
-        e2eSelectors.queryEditor.tableFrom.input().click({ force: true });
-        cy.contains('PerfTest').click({ force: true });
+        e2eSelectors.queryEditor.tableFrom.input().click({ force: true }).type('PerfTest{enter}');
 
         e2eSelectors.queryEditor.runQuery.button().click({ force: true }).wait(6000);
         cy.contains('_val1_').should('exist');

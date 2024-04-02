@@ -65,7 +65,39 @@ describe('VisualQueryEditor', () => {
     render(
       <VisualQueryEditor {...defaultProps} datasource={datasource} database="foo" schema={schema} onChange={onChange} />
     );
-    await waitFor(() => screen.getByText('bar'));
+
+    const tableSelect = screen.getByLabelText('Table');
+    openMenu(tableSelect);
+    await waitFor(() => {
+      screen.getByText('bar');
+    });
+    expect(document.body).not.toHaveTextContent('Could not load table schema');
+  });
+
+  it('selecting a column should remove the rest from other selectors', async () => {
+    const datasource = mockDatasource();
+    const onChange = jest.fn();
+    datasource.getSchema = jest.fn().mockResolvedValue(schema);
+    const { rerender } = render(
+      <VisualQueryEditor {...defaultProps} datasource={datasource} database="foo" schema={schema} onChange={onChange} />
+    );
+
+    const tableSelect = screen.getByLabelText('Table');
+    openMenu(tableSelect);
+    await act(() => {
+      screen.getByText('bar').click();
+
+      rerender(
+        <VisualQueryEditor
+          {...defaultProps}
+          datasource={datasource}
+          database="foo"
+          schema={schema}
+          query={onChange.mock.calls[onChange.mock.calls.length - 1][0]}
+          onChange={onChange}
+        />
+      );
+    });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({
@@ -76,16 +108,7 @@ describe('VisualQueryEditor', () => {
         }),
       })
     );
-  });
 
-  it('selecting a column should remove the rest from other selectors', async () => {
-    const datasource = mockDatasource();
-    const onChange = jest.fn();
-    datasource.getSchema = jest.fn().mockResolvedValue(schema);
-    const { rerender } = render(
-      <VisualQueryEditor {...defaultProps} datasource={datasource} database="foo" schema={schema} onChange={onChange} />
-    );
-    await waitFor(() => screen.getByText('bar'));
     const sel = screen.getByLabelText('Columns');
     openMenu(sel);
     await act(() => screen.getByText('foobar').click());
@@ -123,7 +146,7 @@ describe('VisualQueryEditor', () => {
     expect(screen.queryByText('barfoo')).not.toBeInTheDocument();
   });
 
-  it('should call onChange only if the query expression changes', async () => {
+  it('should not call onChange when loading the editor', async () => {
     const datasource = mockDatasource();
     const onChange = jest.fn();
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
@@ -131,6 +154,6 @@ describe('VisualQueryEditor', () => {
       <VisualQueryEditor {...defaultProps} datasource={datasource} database="foo" schema={schema} onChange={onChange} />
     );
     await waitFor(() => screen.getByText('Table'));
-    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledTimes(0);
   });
 });
