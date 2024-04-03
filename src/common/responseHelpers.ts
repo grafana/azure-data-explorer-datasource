@@ -5,7 +5,7 @@ export function firstStringFieldToMetricFindValue(frame: DataFrame): MetricFindV
   const field = frame.fields.find((f) => f.type === FieldType.string);
   if (field) {
     for (let i = 0; i < field.values.length; i++) {
-      values.push({ text: field.values[i] });
+      values.push({ text: field.values.get(i) });
     }
   }
   return values;
