@@ -1864,12 +1864,12 @@
   dependencies:
     tslib "^2.4.0"
 
-"@grafana/azure-sdk@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@grafana/azure-sdk/-/azure-sdk-0.0.1.tgz#a81d3d51861bc56860f742121da049ce4d81fa42"
-  integrity sha512-looWP4qdNXujpsXYo1aII8RCWf3G9y5KXbG6KqZG2CxkzpbD84f+3V0paiRB5qcKwMwmLW1Mzr3hioEXCnh34A==
+"@grafana/azure-sdk@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@grafana/azure-sdk/-/azure-sdk-0.0.2.tgz#037619958b50e7a4c5bc1d641fd3a7acbee314f6"
+  integrity sha512-ZcQHqMOEPtZp15qOcoo8KL22OBPpOC8b6OfCmrp0Rxbbw9/3MP9xYc58kr2Ky4JwA0e6yKAzgFw+7KpV5ztIWw==
   dependencies:
-    ts-jest "29.1.1"
+    ts-jest "29.1.2"
 
 "@grafana/data@10.4.1":
   version "10.4.1"
@@ -10981,10 +10981,10 @@ ts-easing@^0.2.0:
   resolved "https://registry.yarnpkg.com/ts-easing/-/ts-easing-0.2.0.tgz#c8a8a35025105566588d87dbda05dd7fbfa5a4ec"
   integrity sha512-Z86EW+fFFh/IFB1fqQ3/+7Zpf9t2ebOAxNI/V6Wo7r5gqiqtxmgTlQ1qbqQcjLKYeSHPTsEmvlJUDg/EuL0uHQ==
 
-ts-jest@29.1.1:
-  version "29.1.1"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.1.1.tgz#f58fe62c63caf7bfcc5cc6472082f79180f0815b"
-  integrity sha512-D6xjnnbP17cC85nliwGiL+tpoKN0StpgE0TeOjXQTU6MVCfsB4v7aW05CgQ/1OywGb0x/oy9hHFnN+sczTiRaA==
+ts-jest@29.1.2:
+  version "29.1.2"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.1.2.tgz#7613d8c81c43c8cb312c6904027257e814c40e09"
+  integrity sha512-br6GJoH/WUX4pu7FbZXuWGKGNDuU7b8Uj77g/Sp7puZV6EXzuByl6JrECvm0MzVzSTkSHWTihsXt+5XYER5b+g==
   dependencies:
     bs-logger "0.x"
     fast-json-stable-stringify "2.x"
