@@ -13,12 +13,13 @@ import (
 // DatasourceSettings holds the datasource configuration information for Azure Data Explorer's API
 // that is needed to execute a request against Azure's Data Explorer API.
 type DatasourceSettings struct {
-	ClusterURL         string `json:"clusterUrl"`
-	DefaultDatabase    string `json:"defaultDatabase"`
-	DataConsistency    string `json:"dataConsistency"`
-	CacheMaxAge        string `json:"cacheMaxAge"`
-	DynamicCaching     bool   `json:"dynamicCaching"`
-	EnableUserTracking bool   `json:"enableUserTracking"`
+	ClusterURL          string `json:"clusterUrl"`
+	TrustedClustersURLs string `json:"trustedClustersURLs"`
+	DefaultDatabase     string `json:"defaultDatabase"`
+	DataConsistency     string `json:"dataConsistency"`
+	CacheMaxAge         string `json:"cacheMaxAge"`
+	DynamicCaching      bool   `json:"dynamicCaching"`
+	EnableUserTracking  bool   `json:"enableUserTracking"`
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
 	// to the server execution timeout.

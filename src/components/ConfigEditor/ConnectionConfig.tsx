@@ -13,17 +13,31 @@ const ConnectionConfig: React.FC<ConnectionConfigProps> = ({ options, updateJson
   const { jsonData } = options;
 
   return (
-    <Field label="Default cluster URL (Optional)" description="The default cluster url for this data source.">
-      <Input
-        aria-label="Cluster URL"
-        data-testid={selectors.components.configEditor.clusterURL.input}
-        value={jsonData.clusterUrl}
-        id="adx-cluster-url"
-        placeholder="https://yourcluster.kusto.windows.net"
-        width={60}
-        onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('clusterUrl', ev.target.value)}
-      />
-    </Field>
+    <>
+      <Field label="Default cluster URL (Optional)" description="The default cluster url for this data source.">
+        <Input
+          aria-label="Cluster URL"
+          data-testid={selectors.components.configEditor.clusterURL.input}
+          value={jsonData.clusterUrl}
+          id="adx-cluster-url"
+          placeholder="https://yourcluster.kusto.windows.net"
+          width={60}
+          onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('clusterUrl', ev.target.value)}
+        />
+      </Field>
+
+      <Field label="Additional Trusted Cluster URLs (Optional)" description="The comma separated list of additional trusted cluster URLs.">
+        <Input
+          aria-label="Additional Trusted Clusters URLs"
+          data-testid={selectors.components.configEditor.trustedClustersURLs.input}
+          value={jsonData.trustedClustersURLs}
+          id="adx-trusted-clusters-urls"
+          placeholder="https://yourcluster.kusto.windows.net"
+          width={60}
+          onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('trustedClustersURLs', ev.target.value)}
+        />
+      </Field>
+    </>
   );
 };
 

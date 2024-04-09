@@ -125,6 +125,7 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   azureCredentials?: AzureCredentials;
   onBehalfOf?: boolean;
   enableSecureSocksProxy?: boolean;
+  trustedClustersURLs: string;
 }
 
 export interface AdxDataSourceSecureOptions {

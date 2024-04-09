@@ -14,6 +14,9 @@ export const components = {
     clusterURL: {
       input: 'data-testid cluster-url',
     },
+    trustedClustersURLs: {
+      input: 'data-testid trusted-clusters-urls',
+    },
     clientID: {
       input: 'data-testid client-id',
     },

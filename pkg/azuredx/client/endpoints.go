@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 )
@@ -53,10 +54,15 @@ var azureDataExplorerEndpoints = map[string][]string{
 	},
 }
 
-func getAdxEndpoints(azureCloud string) ([]string, error) {
+func getAdxEndpoints(azureCloud string, trustedClustersURLs string) ([]string, error) {
 	if endpoints, ok := azureDataExplorerEndpoints[azureCloud]; !ok {
 		return nil, fmt.Errorf("the Azure cloud '%s' not supported by Azure Data Explorer datasource", azureCloud)
 	} else {
+		// Append the trusted URLs for all clouds
+		var trustedUrls = strings.Split(trustedClustersURLs, ",")
+		if len(trustedUrls) > 1 || trustedUrls[0] != "" {
+			endpoints = append(endpoints, trustedUrls...)
+		}
 		return endpoints, nil
 	}
 }
