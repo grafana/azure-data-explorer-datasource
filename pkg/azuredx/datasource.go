@@ -158,9 +158,18 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	if clusterURL == "" {
 		clusterURL = adx.settings.ClusterURL
 	}
+
+	database := q.Database
+	if database == "" {
+		if adx.settings.DefaultDatabase == "" {
+			return backend.DataResponse{}, fmt.Errorf("query submitted without database specified and data source does not have a default database")
+		}
+		database = adx.settings.DefaultDatabase
+	}
+
 	tableRes, err := adx.client.KustoRequest(ctx, clusterURL, "/v1/rest/query", models.RequestPayload{
 		CSL:         q.Query,
-		DB:          q.Database,
+		DB:          database,
 		Properties:  props,
 		QuerySource: q.QuerySource,
 	}, headers)
