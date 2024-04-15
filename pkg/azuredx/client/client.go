@@ -6,10 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 
 	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/azusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
 	// 100% compatible drop-in replacement of "encoding/json"
@@ -21,7 +23,7 @@ import (
 type AdxClient interface {
 	TestKustoRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
 	TestARGsRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
-	KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error)
+	KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, userTrackingEnabled bool) (*models.TableResponse, error)
 	ARGClusterRequest(ctx context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error)
 }
 
@@ -151,7 +153,7 @@ func (c *Client) testManagementClient(ctx context.Context, datasourceSettings *m
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
-func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, additionalHeaders map[string]string) (*models.TableResponse, error) {
+func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, userTrackingEnabled bool) (*models.TableResponse, error) {
 	buf, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("no Azure request serial: %w", err)
@@ -168,9 +170,15 @@ func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, p
 	if payload.QuerySource == "" {
 		payload.QuerySource = "unspecified"
 	}
-	for key, value := range additionalHeaders {
-		req.Header.Set(key, value)
+
+	msClientRequestIDHeader := fmt.Sprintf("KGC.%s;%x", payload.QuerySource, rand.Uint64())
+	user, ok := azusercontext.GetCurrentUser(ctx)
+	if userTrackingEnabled && ok {
+		login := user.User.Login
+		msClientRequestIDHeader += fmt.Sprintf(";%v", login)
+		req.Header.Set("x-ms-user-id", login)
 	}
+	req.Header.Set("x-ms-client-request-id", msClientRequestIDHeader)
 
 	resp, err := c.httpClientKusto.Do(req)
 	if err != nil {
