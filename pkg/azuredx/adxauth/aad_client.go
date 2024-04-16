@@ -10,8 +10,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/confidential"
-	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azcredentials"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 )
 
 // Abstraction over confidential.Client from MSAL for Go

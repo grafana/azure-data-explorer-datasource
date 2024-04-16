@@ -4,41 +4,36 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 )
 
-var (
-	adxScopes = map[string]string{
-		azsettings.AzurePublic:       "https://kusto.kusto.windows.net/.default",
-		azsettings.AzureChina:        "https://kusto.kusto.chinacloudapi.cn/.default",
-		azsettings.AzureUSGovernment: "{clusterUrl}/.default",
-	}
-	argScopes = map[string]string{
-		azsettings.AzurePublic:       "https://management.azure.com/.default",
-		azsettings.AzureChina:        "https://management.chinacloudapi.cn/.default",
-		azsettings.AzureUSGovernment: "https://management.usgovcloudapi.net",
-	}
-)
-
-func getAdxScopes(azureCloud string, clusterUrl string) ([]string, error) {
+func getAdxScopes(azureCloud string, clusterUrl string, azureSettings *azsettings.AzureSettings) ([]string, error) {
 	// Get scopes for the given cloud
-	if scopeTmpl, ok := adxScopes[azureCloud]; !ok {
+	if cloud, err := azureSettings.GetCloud(azureCloud); err != nil {
 		err := fmt.Errorf("the Azure cloud '%s' not supported by Azure Data Explorer datasource", azureCloud)
 		return nil, err
 	} else {
-		// TODO: #356 Generalize generation of scopes for all clouds
+		scopeTmpl := "https://kusto" + cloud.Properties["azureDataExplorerSuffix"] + "/.default"
 		clusterUrl = strings.TrimSuffix(clusterUrl, "/")
+
+		// QUESTION
+		// QUESTION: OLD CODE USED "{clusterUrl}" for AzureUSGovernment, but this no longer does - do we still need that functionality? BREAKING CHANGE???
+		// QUESTION
 		scopes := []string{strings.Replace(scopeTmpl, "{clusterUrl}", clusterUrl, 1)}
 		return scopes, nil
 	}
 }
 
-func getARGScopes(azureCloud string) ([]string, error) {
+func getARGScopes(azureCloud string, azureSettings *azsettings.AzureSettings) ([]string, error) {
 	// Get scopes for the given cloud
-	if scopeTmpl, ok := argScopes[azureCloud]; !ok {
+	if cloud, err := azureSettings.GetCloud(azureCloud); err != nil {
 		err := fmt.Errorf("the Azure cloud '%s' not supported by Azure Data Explorer datasource", azureCloud)
 		return nil, err
 	} else {
+		// QUESTION
+		// QUESTION: OLD CODE DIDN"T USE "/.default" for AzureUSGovernment - WHY NOT?  WAS THIS A BUG?
+		// QUESTION
+		scopeTmpl := cloud.Properties["resourceManager"] + "/.default"
 		return []string{scopeTmpl}, nil
 	}
 }

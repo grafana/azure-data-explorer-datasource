@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
-	"github.com/grafana/grafana-azure-sdk-go/azusercontext"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"

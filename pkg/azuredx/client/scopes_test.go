@@ -3,7 +3,7 @@ package client
 import (
 	"testing"
 
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,9 +42,11 @@ func TestGetAzureScopes_KnownClouds(t *testing.T) {
 		},
 	}
 
+	azuresettings := &azsettings.AzureSettings{}
+
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			scopes, err := getAdxScopes(tt.cloud, tt.clusterUrl)
+			scopes, err := getAdxScopes(tt.cloud, tt.clusterUrl, azuresettings)
 			require.NoError(t, err)
 
 			assert.Len(t, scopes, 1)
@@ -57,7 +59,9 @@ func TestGetAzureScopes_UnknownClouds(t *testing.T) {
 	t.Run("should fail when cloud is unknown", func(t *testing.T) {
 		clusterUrl := "https://abc.northeurope.unknown.net"
 
-		_, err := getAdxScopes("Unknown", clusterUrl)
+		azuresettings := &azsettings.AzureSettings{}
+
+		_, err := getAdxScopes("Unknown", clusterUrl, azuresettings)
 		assert.Error(t, err)
 	})
 }

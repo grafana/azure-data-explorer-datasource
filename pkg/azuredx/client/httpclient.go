@@ -7,9 +7,9 @@ import (
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
-	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
-	"github.com/grafana/grafana-azure-sdk-go/azhttpclient"
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azcredentials"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azhttpclient"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 )
@@ -26,7 +26,7 @@ func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL)
+	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL, azureSettings)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func newHttpClientManagement(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	scopes, err := getARGScopes(azureCloud)
+	scopes, err := getARGScopes(azureCloud, azureSettings)
 	if err != nil {
 		return nil, err
 	}
