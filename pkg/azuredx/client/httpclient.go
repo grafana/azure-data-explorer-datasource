@@ -26,7 +26,7 @@ func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL, azureSettings)
+	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL)
 	if err != nil {
 		return nil, err
 	}

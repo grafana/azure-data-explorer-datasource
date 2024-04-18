@@ -42,11 +42,9 @@ func TestGetAzureScopes_KnownClouds(t *testing.T) {
 		},
 	}
 
-	azuresettings := &azsettings.AzureSettings{}
-
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			scopes, err := getAdxScopes(tt.cloud, tt.clusterUrl, azuresettings)
+			scopes, err := getAdxScopes(tt.cloud, tt.clusterUrl)
 			require.NoError(t, err)
 
 			assert.Len(t, scopes, 1)
@@ -56,12 +54,11 @@ func TestGetAzureScopes_KnownClouds(t *testing.T) {
 }
 
 func TestGetAzureScopes_UnknownClouds(t *testing.T) {
-	t.Run("should fail when cloud is unknown", func(t *testing.T) {
+	t.Run("should use the clusterUrl in the scope when cloud is unknown", func(t *testing.T) {
 		clusterUrl := "https://abc.northeurope.unknown.net"
 
-		azuresettings := &azsettings.AzureSettings{}
-
-		_, err := getAdxScopes("Unknown", clusterUrl, azuresettings)
-		assert.Error(t, err)
+		scope, err := getAdxScopes("Unknown", clusterUrl)
+		assert.NoError(t, err)
+		assert.Equal(t, clusterUrl+"/.default", scope[0])
 	})
 }
