@@ -27,7 +27,7 @@
   "license": "Apache",
   "devDependencies": {
     "@babel/core": "^7.21.4",
-    "@grafana/azure-sdk": "0.0.1",
+    "@grafana/azure-sdk": "0.0.2",
     "@grafana/e2e": "10.4.1",
     "@grafana/e2e-selectors": "10.4.1",
     "@grafana/eslint-config": "^7.0.0",

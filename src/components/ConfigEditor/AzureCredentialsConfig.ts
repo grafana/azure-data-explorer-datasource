@@ -2,10 +2,15 @@ import { AzureCredentials, ConcealedSecret } from '@grafana/azure-sdk';
 import { DataSourceSettings } from '@grafana/data';
 import { AzureSettings, config } from '@grafana/runtime';
 
-import { AzureCloud } from './AzureCredentials';
-
 const concealed: ConcealedSecret = Symbol('Concealed client secret');
 const concealedLegacy: ConcealedSecret = Symbol('Concealed legacy client secret');
+
+// Known clouds explicitly used with legacy credentials
+enum AzureCloud {
+  Public = 'AzureCloud',
+  China = 'AzureChinaCloud',
+  USGovernment = 'AzureUSGovernment',
+}
 
 // TODO: Remove once it added to the runtime library
 interface AzureSettingsEx extends AzureSettings {
