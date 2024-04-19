@@ -141,8 +141,8 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 		QuerySource: "schema",
 	}
 
-	headers := map[string]string{}
-	response, err := adx.client.KustoRequest(req.Context(), cluster.ClusterUri, ManagementApiPath, payload, headers)
+	// Default to not sending the user request headers for schema requests
+	response, err := adx.client.KustoRequest(req.Context(), cluster.ClusterUri, ManagementApiPath, payload, false)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
@@ -184,8 +184,8 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 		CSL: ".show databases",
 	}
 
-	headers := map[string]string{}
-	response, err := adx.client.KustoRequest(req.Context(), cluster.ClusterUri, ManagementApiPath, payload, headers)
+	// Default to not sending the user request headers for schema requests
+	response, err := adx.client.KustoRequest(req.Context(), cluster.ClusterUri, ManagementApiPath, payload, false)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
