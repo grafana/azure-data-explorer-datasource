@@ -29,7 +29,7 @@ func NewOnBehalfOfAccessTokenProvider(settings *azsettings.AzureSettings, creden
 
 	switch c := credentials.(type) {
 	case *azcredentials.AzureClientSecretOboCredentials:
-		aadClient, err := newAADClient(&c.ClientSecretCredentials, http.DefaultClient)
+		aadClient, err := newAADClient(&c.ClientSecretCredentials, http.DefaultClient, settings)
 		if err != nil {
 			return nil, fmt.Errorf("invalid Azure configuration: %w", err)
 		}
