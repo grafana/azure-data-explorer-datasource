@@ -2,6 +2,8 @@ package client
 
 import (
 	"fmt"
+	"net/url"
+	"path"
 	"strings"
 
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
@@ -32,7 +34,24 @@ func getARGScopes(azureCloud string, azureSettings *azsettings.AzureSettings) ([
 		err := fmt.Errorf("the Azure cloud '%s' not supported by Azure Data Explorer datasource", azureCloud)
 		return nil, err
 	} else {
-		scopeTmpl := cloud.Properties["resourceManager"] + "/.default"
-		return []string{scopeTmpl}, nil
+		// Get scopes for the given cloud
+		resourceId, ok := cloud.Properties["resourceManager"]
+		if !ok {
+			err := fmt.Errorf("the Azure cloud '%s' doesn't have configuration for 'resourceManager'", azureCloud)
+			return nil, err
+		}
+		return audienceToScopes(resourceId)
 	}
+}
+
+func audienceToScopes(audience string) ([]string, error) {
+	resourceId, err := url.Parse(audience)
+	if err != nil || resourceId.Scheme == "" || resourceId.Host == "" {
+		err = fmt.Errorf("endpoint resource ID (audience) '%s' invalid", audience)
+		return nil, err
+	}
+
+	resourceId.Path = path.Join(resourceId.Path, ".default")
+	scopes := []string{resourceId.String()}
+	return scopes, nil
 }

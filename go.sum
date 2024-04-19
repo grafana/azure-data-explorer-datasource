@@ -98,8 +98,6 @@ github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e h1:JKmoR8x90Iww1
 github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
-github.com/grafana/grafana-azure-sdk-go v1.13.1 h1:zYw5kNYf4zS4mG+yuB0Izn1Z4rsrPdLLivWF2JHUXPk=
-github.com/grafana/grafana-azure-sdk-go v1.13.1/go.mod h1:SAlwLdEuox4vw8ZaeQwnepYXnhznnQQdstJbcw8LH68=
 github.com/grafana/grafana-azure-sdk-go/v2 v2.0.2 h1:CWT7mOBPUht9n7F/NiBQnEM05pFmCP3Z8CZPGCVC1tM=
 github.com/grafana/grafana-azure-sdk-go/v2 v2.0.2/go.mod h1:s8GLONgVh/svnSsO0Eo+OgXc/RZqozI5/0n+pNm3MEE=
 github.com/grafana/grafana-plugin-sdk-go v0.219.0 h1:TilotSOva1Xc8+OIOhUI51ck3i2RJq5q2kHvgm/IuoQ=
