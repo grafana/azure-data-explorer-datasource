@@ -163,7 +163,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 		DB:          q.Database,
 		Properties:  props,
 		QuerySource: q.QuerySource,
-	}, headers)
+	}, adx.settings.EnableUserTracking)
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
 		return backend.DataResponse{}, err
