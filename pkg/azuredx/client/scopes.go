@@ -20,6 +20,8 @@ func getAdxScopes(azureCloud string, clusterUrl string) ([]string, error) {
 	// Get scopes for the given cloud
 	scopeTmpl, ok := "", false
 	if scopeTmpl, ok = adxScopes[azureCloud]; !ok {
+		// AzurePublic and AzureChina use special scopes, other clouds will expect the clusterUrl in the scope
+		// so fallback to this pattern for all others
 		scopeTmpl = "{clusterUrl}/.default"
 	}
 
