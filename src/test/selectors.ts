@@ -33,6 +33,9 @@ export const components = {
       container: 'data-testid code-editor',
       openAI: 'data-testid open-ai-editor',
     },
+    cluster: {
+      input: 'Cluster',
+    },
     database: {
       input: 'Database',
     },
