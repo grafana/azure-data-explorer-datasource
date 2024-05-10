@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [5.0.1]
+
+- Upgrade dependencies
+
 ## [5.0.0]
 
 - Breaking change: The legacy query editor has been removed. The `adxLegacyEditor` feature toggle will no longer work.
