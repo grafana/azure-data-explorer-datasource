@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
-	"github.com/grafana/grafana-azure-sdk-go/azusercontext"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
@@ -172,7 +172,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 		DB:          database,
 		Properties:  props,
 		QuerySource: q.QuerySource,
-	}, headers)
+	}, adx.settings.EnableUserTracking)
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
 		return backend.DataResponse{}, err
