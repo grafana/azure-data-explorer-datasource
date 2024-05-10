@@ -3367,15 +3367,15 @@
     "@typescript-eslint/visitor-keys" "6.18.1"
     debug "^4.3.4"
 
-"@typescript-eslint/parser@^7.4.0":
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-7.4.0.tgz#540f4321de1e52b886c0fa68628af1459954c1f1"
-  integrity sha512-ZvKHxHLusweEUVwrGRXXUVzFgnWhigo4JurEj0dGF1tbcGh6buL+ejDdjxOQxv6ytcY1uhun1p2sm8iWStlgLQ==
+"@typescript-eslint/parser@^7.8.0":
+  version "7.8.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-7.8.0.tgz#1e1db30c8ab832caffee5f37e677dbcb9357ddc8"
+  integrity sha512-KgKQly1pv0l4ltcftP59uQZCi4HUYswCLbTqVZEJu7uLX8CTLyswqMLqLN+2QFz4jCptqWVV4SB7vdxcH2+0kQ==
   dependencies:
-    "@typescript-eslint/scope-manager" "7.4.0"
-    "@typescript-eslint/types" "7.4.0"
-    "@typescript-eslint/typescript-estree" "7.4.0"
-    "@typescript-eslint/visitor-keys" "7.4.0"
+    "@typescript-eslint/scope-manager" "7.8.0"
+    "@typescript-eslint/types" "7.8.0"
+    "@typescript-eslint/typescript-estree" "7.8.0"
+    "@typescript-eslint/visitor-keys" "7.8.0"
     debug "^4.3.4"
 
 "@typescript-eslint/scope-manager@6.18.1":
@@ -3402,13 +3402,13 @@
     "@typescript-eslint/types" "7.3.1"
     "@typescript-eslint/visitor-keys" "7.3.1"
 
-"@typescript-eslint/scope-manager@7.4.0":
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/scope-manager/-/scope-manager-7.4.0.tgz#acfc69261f10ece7bf7ece1734f1713392c3655f"
-  integrity sha512-68VqENG5HK27ypafqLVs8qO+RkNc7TezCduYrx8YJpXq2QGZ30vmNZGJJJC48+MVn4G2dCV8m5ZTVnzRexTVtw==
+"@typescript-eslint/scope-manager@7.8.0":
+  version "7.8.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/scope-manager/-/scope-manager-7.8.0.tgz#bb19096d11ec6b87fb6640d921df19b813e02047"
+  integrity sha512-viEmZ1LmwsGcnr85gIq+FCYI7nO90DVbE37/ll51hjv9aG+YZMb4WDE2fyWpUR4O/UrhGRpYXK/XajcGTk2B8g==
   dependencies:
-    "@typescript-eslint/types" "7.4.0"
-    "@typescript-eslint/visitor-keys" "7.4.0"
+    "@typescript-eslint/types" "7.8.0"
+    "@typescript-eslint/visitor-keys" "7.8.0"
 
 "@typescript-eslint/type-utils@6.18.1":
   version "6.18.1"
@@ -3445,12 +3445,7 @@
   resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-7.3.1.tgz#ae104de8efa4227a462c0874d856602c5994413c"
   integrity sha512-2tUf3uWggBDl4S4183nivWQ2HqceOZh1U4hhu4p1tPiIJoRRXrab7Y+Y0p+dozYwZVvLPRI6r5wKe9kToF9FIw==
 
-"@typescript-eslint/types@7.4.0":
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-7.4.0.tgz#ee9dafa75c99eaee49de6dcc9348b45d354419b6"
-  integrity sha512-mjQopsbffzJskos5B4HmbsadSJQWaRK0UxqQ7GuNA9Ga4bEKeiO6b2DnB6cM6bpc8lemaPseh0H9B/wyg+J7rw==
-
-"@typescript-eslint/types@^7.2.0":
+"@typescript-eslint/types@7.8.0", "@typescript-eslint/types@^7.2.0":
   version "7.8.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-7.8.0.tgz#1fd2577b3ad883b769546e2d1ef379f929a7091d"
   integrity sha512-wf0peJ+ZGlcH+2ZS23aJbOv+ztjeeP8uQ9GgwMJGVLx/Nj9CJt17GWgWWoSmoRVKAX2X+7fzEnAjxdvK2gqCLw==
@@ -3497,19 +3492,19 @@
     semver "^7.5.4"
     ts-api-utils "^1.0.1"
 
-"@typescript-eslint/typescript-estree@7.4.0":
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-7.4.0.tgz#12dbcb4624d952f72c10a9f4431284fca24624f4"
-  integrity sha512-A99j5AYoME/UBQ1ucEbbMEmGkN7SE0BvZFreSnTd1luq7yulcHdyGamZKizU7canpGDWGJ+Q6ZA9SyQobipePg==
+"@typescript-eslint/typescript-estree@7.8.0":
+  version "7.8.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-7.8.0.tgz#b028a9226860b66e623c1ee55cc2464b95d2987c"
+  integrity sha512-5pfUCOwK5yjPaJQNy44prjCwtr981dO8Qo9J9PwYXZ0MosgAbfEMB008dJ5sNo3+/BN6ytBPuSvXUg9SAqB0dg==
   dependencies:
-    "@typescript-eslint/types" "7.4.0"
-    "@typescript-eslint/visitor-keys" "7.4.0"
+    "@typescript-eslint/types" "7.8.0"
+    "@typescript-eslint/visitor-keys" "7.8.0"
     debug "^4.3.4"
     globby "^11.1.0"
     is-glob "^4.0.3"
-    minimatch "9.0.3"
-    semver "^7.5.4"
-    ts-api-utils "^1.0.1"
+    minimatch "^9.0.4"
+    semver "^7.6.0"
+    ts-api-utils "^1.3.0"
 
 "@typescript-eslint/utils@6.18.1":
   version "6.18.1"
@@ -3574,13 +3569,13 @@
     "@typescript-eslint/types" "7.3.1"
     eslint-visitor-keys "^3.4.1"
 
-"@typescript-eslint/visitor-keys@7.4.0":
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/visitor-keys/-/visitor-keys-7.4.0.tgz#0c8ff2c1f8a6fe8d7d1a57ebbd4a638e86a60a94"
-  integrity sha512-0zkC7YM0iX5Y41homUUeW1CHtZR01K3ybjM1l6QczoMuay0XKtrb93kv95AxUGwdjGr64nNqnOCwmEl616N8CA==
+"@typescript-eslint/visitor-keys@7.8.0":
+  version "7.8.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/visitor-keys/-/visitor-keys-7.8.0.tgz#7285aab991da8bee411a42edbd5db760d22fdd91"
+  integrity sha512-q4/gibTNBQNA0lGyYQCmWRS5D15n8rXh4QjK3KV+MBPlTYHpfBUT3D3PaPR/HeNiI9W6R7FvlkcGhNyAoP+caA==
   dependencies:
-    "@typescript-eslint/types" "7.4.0"
-    eslint-visitor-keys "^3.4.1"
+    "@typescript-eslint/types" "7.8.0"
+    eslint-visitor-keys "^3.4.3"
 
 "@ungap/structured-clone@^1.2.0":
   version "1.2.0"
@@ -8482,6 +8477,13 @@ minimatch@^3.0.4, minimatch@^3.0.5, minimatch@^3.1.1, minimatch@^3.1.2:
   dependencies:
     brace-expansion "^1.1.7"
 
+minimatch@^9.0.4:
+  version "9.0.4"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-9.0.4.tgz#8e49c731d1749cbec05050ee5145147b32496a51"
+  integrity sha512-KqWh+VchfxcMNRAJjj2tnsSJdNbHsVgnkBhTNrW7AjVo6OvLtxw8zfT9oLw1JSohlFzJ8jCoTgaoXvJ+kHt6fw==
+  dependencies:
+    brace-expansion "^2.0.1"
+
 minimist@^1.2.5, minimist@^1.2.6, minimist@^1.2.8:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.8.tgz#c1a464e7693302e082a075cee0c057741ac4772c"
@@ -10999,6 +11001,11 @@ ts-api-utils@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/ts-api-utils/-/ts-api-utils-1.0.3.tgz#f12c1c781d04427313dbac808f453f050e54a331"
   integrity sha512-wNMeqtMz5NtwpT/UZGY5alT+VoKdSsOOP/kqHFcUW1P/VRhH2wJ48+DN2WwUliNbQ976ETwDL0Ifd2VVvgonvg==
+
+ts-api-utils@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/ts-api-utils/-/ts-api-utils-1.3.0.tgz#4b490e27129f1e8e686b45cc4ab63714dc60eea1"
+  integrity sha512-UQMIo7pb8WRomKR1/+MFVLTroIvDVtMX3K6OUir8ynLyzB8Jeriont2bTAtmNPa1ekAgN7YPDyf6V+ygrdU+eQ==
 
 ts-easing@^0.2.0:
   version "0.2.0"
