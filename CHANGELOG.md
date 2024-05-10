@@ -3,6 +3,7 @@
 ## [5.0.1]
 
 - Upgrade dependencies
+- Fix: Set query database to default if unspecified [#863](https://github.com/grafana/azure-data-explorer-datasource/pull/863)
 
 ## [5.0.0]
 
