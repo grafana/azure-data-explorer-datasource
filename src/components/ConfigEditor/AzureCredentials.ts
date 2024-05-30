@@ -1,18 +1,6 @@
-import { DataSourceSettings, SelectableValue } from '@grafana/data';
+import { DataSourceSettings } from '@grafana/data';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
 import { getCredentials } from './AzureCredentialsConfig';
-
-export enum AzureCloud {
-  Public = 'AzureCloud',
-  China = 'AzureChinaCloud',
-  USGovernment = 'AzureUSGovernment',
-}
-
-export const KnownAzureClouds = [
-  { value: AzureCloud.Public, label: 'Azure' },
-  { value: AzureCloud.China, label: 'Azure China' },
-  { value: AzureCloud.USGovernment, label: 'Azure US Government' },
-] as SelectableValue[];
 
 export function isCredentialsComplete(
   options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>

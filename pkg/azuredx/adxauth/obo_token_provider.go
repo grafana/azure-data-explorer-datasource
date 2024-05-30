@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/grafana/grafana-azure-sdk-go/azcredentials"
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
-	"github.com/grafana/grafana-azure-sdk-go/aztokenprovider"
-	"github.com/grafana/grafana-azure-sdk-go/azusercontext"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azcredentials"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/v2/aztokenprovider"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
 )
 
 type onBehalfOfTokenProvider struct {
@@ -29,7 +29,7 @@ func NewOnBehalfOfAccessTokenProvider(settings *azsettings.AzureSettings, creden
 
 	switch c := credentials.(type) {
 	case *azcredentials.AzureClientSecretOboCredentials:
-		aadClient, err := newAADClient(&c.ClientSecretCredentials, http.DefaultClient)
+		aadClient, err := newAADClient(&c.ClientSecretCredentials, http.DefaultClient, settings)
 		if err != nil {
 			return nil, fmt.Errorf("invalid Azure configuration: %w", err)
 		}

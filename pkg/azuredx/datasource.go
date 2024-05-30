@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
-	"github.com/grafana/grafana-azure-sdk-go/azusercontext"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
@@ -158,12 +158,21 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	if clusterURL == "" {
 		clusterURL = adx.settings.ClusterURL
 	}
+
+	database := q.Database
+	if database == "" {
+		if adx.settings.DefaultDatabase == "" {
+			return backend.DataResponse{}, fmt.Errorf("query submitted without database specified and data source does not have a default database")
+		}
+		database = adx.settings.DefaultDatabase
+	}
+
 	tableRes, err := adx.client.KustoRequest(ctx, clusterURL, "/v1/rest/query", models.RequestPayload{
 		CSL:         q.Query,
-		DB:          q.Database,
+		DB:          database,
 		Properties:  props,
 		QuerySource: q.QuerySource,
-	}, headers)
+	}, adx.settings.EnableUserTracking)
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
 		return backend.DataResponse{}, err
