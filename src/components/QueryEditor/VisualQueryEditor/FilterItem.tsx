@@ -53,15 +53,9 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
         },
         columns
       )
-      .then((result: string[]) => {
-        if (Array.isArray(templateVariableOptions.options) && filter.property?.type === 'string') {
-          // When selecting a string, automatically quote template variables to generate a valid syntax
-          templateVariableOptions.options = templateVariableOptions.options.map((op: SelectableValue<string>) => {
-            return { label: op.value, value: `'${op.value}'` };
-          });
-        }
-        return result.map((r): SelectableValue<string> => ({ label: r, value: r })).concat(templateVariableOptions);
-      });
+      .then((result: string[]) =>
+        result.map((r): SelectableValue<string> => ({ label: r, value: r })).concat(templateVariableOptions)
+      );
   };
 
   const [state, loadOptions] = useAsyncFn(loadValues, [query, filter.property]);

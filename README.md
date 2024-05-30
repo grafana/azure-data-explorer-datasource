@@ -264,8 +264,6 @@ Create the variable in the dashboard settings. Usually, you will need to write a
 
 Read more about templating and variables in the [Grafana documentation](http://docs.grafana.org/reference/templating/#variables).
 
-> **Note:** Usage of template variables in the _Builder_ is currently not supported.
-
 ## Databases Variable
 
 There is no way to fetch a list of databases with the Kusto query language. When creating a template variable as described in the `Templating with variables` section, use the following function in the `Query` field to return a list of databases:
