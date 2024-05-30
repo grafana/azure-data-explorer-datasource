@@ -3,7 +3,7 @@ package client
 import (
 	"testing"
 
-	"github.com/grafana/grafana-azure-sdk-go/azsettings"
+	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -54,10 +54,11 @@ func TestGetAzureScopes_KnownClouds(t *testing.T) {
 }
 
 func TestGetAzureScopes_UnknownClouds(t *testing.T) {
-	t.Run("should fail when cloud is unknown", func(t *testing.T) {
+	t.Run("should use the clusterUrl in the scope when cloud is unknown", func(t *testing.T) {
 		clusterUrl := "https://abc.northeurope.unknown.net"
 
-		_, err := getAdxScopes("Unknown", clusterUrl)
-		assert.Error(t, err)
+		scope, err := getAdxScopes("Unknown", clusterUrl)
+		assert.NoError(t, err)
+		assert.Equal(t, clusterUrl+"/.default", scope[0])
 	})
 }

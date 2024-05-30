@@ -82,7 +82,7 @@ func (c *failingClient) TestARGsRequest(_ context.Context, _ *models.DatasourceS
 	panic("not implemented")
 }
 
-func (c *failingClient) KustoRequest(_ context.Context, _ string, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
+func (c *failingClient) KustoRequest(_ context.Context, _ string, _ string, _ models.RequestPayload, _ bool) (*models.TableResponse, error) {
 	return nil, fmt.Errorf("HTTP error: %v - %v", http.StatusBadRequest, "")
 }
 
@@ -100,7 +100,7 @@ func (c *workingClient) TestARGsRequest(_ context.Context, _ *models.DatasourceS
 	panic("not implemented")
 }
 
-func (c *workingClient) KustoRequest(_ context.Context, _ string, _ string, _ models.RequestPayload, _ map[string]string) (*models.TableResponse, error) {
+func (c *workingClient) KustoRequest(_ context.Context, _ string, _ string, _ models.RequestPayload, _ bool) (*models.TableResponse, error) {
 	return &models.TableResponse{
 		Tables: []models.Table{
 			{
