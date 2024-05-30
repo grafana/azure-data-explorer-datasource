@@ -414,8 +414,8 @@ const functionSchemaParser = (frames: DataFrame[]): AdxColumnSchema[] => {
   for (const frame of frames) {
     for (let index = 0; index < frame.length; index++) {
       result.push({
-        Name: frame.fields[nameIndex].values[index],
-        CslType: frame.fields[typeIndex].values[index],
+        Name: frame.fields[nameIndex].values.get(index),
+        CslType: frame.fields[typeIndex].values.get(index),
       });
     }
   }
@@ -428,7 +428,7 @@ const dynamicSchemaParser = (frames: DataFrame[]): Record<string, AdxColumnSchem
 
   for (const frame of frames) {
     for (const field of frame.fields) {
-      const json = JSON.parse(field.values[0]);
+      const json = JSON.parse(field.values.get(0));
 
       if (json === null) {
         console.log('error with field', field);
