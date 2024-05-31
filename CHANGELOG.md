@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [5.0.2]
+
+- Upgrade dependencies
+- Fix: Re-add some legacy endpoints for older Grafana version compatibility.
+- Fix: Ensure multi-select template variables work correctly with the query builder.
+
 ## [5.0.1]
 
 - Upgrade dependencies
