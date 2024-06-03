@@ -52,9 +52,60 @@ const schema = {
   },
 };
 
+const schemaNoColumns = {
+  Databases: {
+    foo: {
+      Name: 'foo',
+      Tables: {
+        bar: {
+          Name: 'bar',
+          OrderedColumns: [],
+        },
+      },
+      ExternalTables: {},
+      Functions: {},
+      MaterializedViews: {},
+    },
+  },
+};
+
 describe('VisualQueryEditor', () => {
   it('should render the VisualQueryEditor', async () => {
     render(<VisualQueryEditor {...defaultProps} schema={{ Databases: {} }} />);
+    await waitFor(() => screen.getByLabelText('Table'));
+  });
+
+  it('should render the VisualQueryEditor and display error if no columns are available', async () => {
+    const datasource = mockDatasource();
+    const onChange = jest.fn();
+    datasource.getSchema = jest.fn().mockResolvedValue(schemaNoColumns);
+    const { rerender } = render(
+      <VisualQueryEditor
+        {...defaultProps}
+        datasource={datasource}
+        query={{ ...defaultProps.query, clusterUri: 'test-clusterURI' }}
+        database="foo"
+        schema={schema}
+        onChange={onChange}
+      />
+    );
+
+    const tableSelect = screen.getByLabelText('Table');
+    openMenu(tableSelect);
+    await act(() => {
+      screen.getByText('bar').click();
+
+      rerender(
+        <VisualQueryEditor
+          {...defaultProps}
+          datasource={datasource}
+          database="foo"
+          schema={schema}
+          query={onChange.mock.calls[onChange.mock.calls.length - 1][0]}
+          onChange={onChange}
+        />
+      );
+    });
     await waitFor(() => screen.getByText('Table schema loaded successfully but without any columns'));
   });
 

@@ -88,7 +88,7 @@ describe('FilterItem', () => {
     await act(() => {
       templateVariable.click();
     });
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: "'$foo'" } }));
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: '$foo' } }));
   });
 
   it('type a numeric value', async () => {
