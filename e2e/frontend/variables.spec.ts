@@ -1,97 +1,178 @@
-import {
-  DashboardEditViewArgs,
-  DashboardPage,
-  E2ESelectors,
-  expect,
-  PluginTestCtx,
-  test,
-  VariableEditPage,
-} from '@grafana/plugin-e2e';
+import { PluginTestCtx, test, expect, VariablePage } from '@grafana/plugin-e2e';
 import { selectors } from '../../src/test/selectors';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxQueryType } from '../../src/types';
 import { Page } from '@playwright/test';
 
 const addAdxVariable = async (
   context: PluginTestCtx,
-  dashboardPage: DashboardPage,
+  variablePage: VariablePage,
   page: Page,
   name: string,
   ds: string,
-  type: AdxQueryType,
-  index: string,
-  options?: { cluster?: string; database?: string; table?: string }
+  isFirst: boolean,
+  options: { queryType: AdxQueryType; cluster?: string; database?: string; table?: string }
 ) => {
-  const variablePage = new VariableEditPage(context, { dashboard: dashboardPage.dashboard!, id: index });
-  await variablePage.goto();
-  const { addVariableCTAV2, addVariableCTAV2Item, newButton } =
-    context.selectors.pages.Dashboard.Settings.Variables.List;
+  const { queryType, cluster, database, table } = options;
+  const variableEditPage = await variablePage.clickAddNew(isFirst);
 
-  if (!dashboardPage.dashboard?.uid) {
-    await variablePage.getByGrafanaSelector(addVariableCTAV2(addVariableCTAV2Item)).click();
-  } else {
-    await variablePage.getByGrafanaSelector(newButton).click();
-  }
-  await variablePage.setVariableType('Query');
-  await variablePage.datasource.set(ds);
-  // await page.getByGrafanaSelector(selectors.pages.Dashboard.Settings.Variables.Edit.General.)
-  //   e2e.pages.Dashboard.Settings.Variables.Edit.General.generalNameInputV2().clear().type(name);
-  switch (type) {
+  await variableEditPage.setVariableType('Query');
+  await variableEditPage.datasource.set(ds);
+  await variableEditPage
+    .getByGrafanaSelector(context.selectors.pages.Dashboard.Settings.Variables.Edit.General.generalNameInputV2)
+    .fill(name);
+
+  await page
+    .getByTestId(selectors.components.variableEditor.queryType.input)
+    .getByRole('combobox')
+    .fill(`${queryType}`);
+  await page.keyboard.press('Enter');
+  switch (queryType) {
     case AdxQueryType.Databases:
-      await page.getByTestId(selectors.components.variableEditor.clusters.input).getByRole('combobox').click();
-      await page.keyboard.insertText(`${options?.cluster}`);
+      await page
+        .getByTestId(selectors.components.variableEditor.clusters.input)
+        .getByRole('combobox')
+        .fill(cluster || '');
       await page.keyboard.press('Enter');
       break;
     case AdxQueryType.Tables:
-      await page.getByTestId(selectors.components.variableEditor.clusters.input).getByRole('combobox').click();
-      await page.keyboard.insertText(`${options?.cluster}`);
+      await page
+        .getByTestId(selectors.components.variableEditor.clusters.input)
+        .getByRole('combobox')
+        .fill(cluster || '');
       await page.keyboard.press('Enter');
-      await page.getByTestId(selectors.components.variableEditor.databases.input).getByRole('combobox').click();
-      await page.keyboard.insertText(`${options?.database}`);
+      await page
+        .getByTestId(selectors.components.variableEditor.databases.input)
+        .getByRole('combobox')
+        .fill(database || '');
       await page.keyboard.press('Enter');
       break;
     case AdxQueryType.Columns:
-      await page.getByTestId(selectors.components.variableEditor.clusters.input).getByRole('combobox').click();
-      await page.keyboard.insertText(`${options?.cluster}`);
+      await page
+        .getByTestId(selectors.components.variableEditor.clusters.input)
+        .getByRole('combobox')
+        .fill(cluster || '');
       await page.keyboard.press('Enter');
-      await page.getByTestId(selectors.components.variableEditor.databases.input).getByRole('combobox').click();
-      await page.keyboard.insertText(`${options?.database}`);
+      await page
+        .getByTestId(selectors.components.variableEditor.databases.input)
+        .getByRole('combobox')
+        .fill(database || '');
       await page.keyboard.press('Enter');
-      await page.getByTestId(selectors.components.variableEditor.tables.input).getByRole('combobox').click();
-      await page.keyboard.insertText(`${options?.table}`);
+      await page
+        .getByTestId(selectors.components.variableEditor.tables.input)
+        .getByRole('combobox')
+        .fill(table || '');
       await page.keyboard.press('Enter');
       break;
   }
   await variablePage
     .getByGrafanaSelector(context.selectors.pages.Dashboard.Settings.Variables.Edit.General.submitButton)
     .click();
+
+  await variablePage
+    .getByGrafanaSelector(context.selectors.pages.Dashboard.Settings.Variables.Edit.General.applyButton)
+    .click();
 };
 
 test.describe('Template variables', () => {
   test('creates a dashboard that includes template variables', async ({
-    dashboardPage,
+    dashboardPage: newDashboardPage,
     page,
     readProvisionedDataSource,
-    selectors,
+    gotoVariablePage,
+    gotoDashboardPage,
   }) => {
     const datasource = await readProvisionedDataSource<AdxDataSourceOptions, AdxDataSourceSecureOptions>({
       fileName: 'adx.yaml',
     });
-    const context = dashboardPage.ctx;
-    await dashboardPage.goto()
-    await dashboardPage.getByGrafanaSelector(selectors.pages.)
+    const context = newDashboardPage.ctx;
+    const dashboardUid = await newDashboardPage.saveDashboard(`Template variables test - ${datasource.name}`);
 
-    // addAdxVariable(context, dashboardPage, page, 'cluster', datasource.name, AdxQueryType.Clusters, '0');
-    addAdxVariable(context, dashboardPage, page, 'database', datasource.name, AdxQueryType.Databases, '1', {
+    if (!dashboardUid) {
+      throw new Error('Dashboard saving failed, UID unavailable');
+    }
+    const dashboardPage = await gotoDashboardPage({ uid: dashboardUid });
+    console.log({ uid: dashboardPage.dashboard?.uid });
+
+    const variablePage = await gotoVariablePage({ uid: dashboardUid });
+
+    await addAdxVariable(context, variablePage, page, 'cluster', datasource.name, true, {
+      queryType: AdxQueryType.Clusters,
+    });
+    await addAdxVariable(context, variablePage, page, 'database', datasource.name, false, {
+      queryType: AdxQueryType.Databases,
       cluster: '$cluster',
     });
-    addAdxVariable(context, dashboardPage, page, 'table', datasource.name, AdxQueryType.Tables, '2', {
+    await addAdxVariable(context, variablePage, page, 'table', datasource.name, false, {
+      queryType: AdxQueryType.Tables,
       cluster: '$cluster',
       database: '$database',
     });
-    addAdxVariable(context, dashboardPage, page, 'column', datasource.name, AdxQueryType.Columns, '3', {
+    await addAdxVariable(context, variablePage, page, 'column', datasource.name, false, {
+      queryType: AdxQueryType.Columns,
       cluster: '$cluster',
       database: '$database',
       table: '$table',
     });
+
+    await dashboardPage.getByGrafanaSelector(context.selectors.pages.Dashboard.Settings.Close).click();
+
+    await dashboardPage
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.TemplateVariables.submenuItemLabels('cluster'))
+      .click();
+    await dashboardPage
+      .getByGrafanaSelector(
+        context.selectors.pages.Dashboard.TemplateVariables.submenuItemValueDropDownOptionTexts('grafanaadxdev')
+      )
+      .click();
+    await dashboardPage
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.TemplateVariables.submenuItemLabels('database'))
+      .click();
+    await dashboardPage
+      .getByGrafanaSelector(
+        context.selectors.pages.Dashboard.TemplateVariables.submenuItemValueDropDownOptionTexts('PerfTest')
+      )
+      .click();
+    await dashboardPage
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.TemplateVariables.submenuItemLabels('table'))
+      .click();
+    await dashboardPage
+      .getByGrafanaSelector(
+        context.selectors.pages.Dashboard.TemplateVariables.submenuItemValueDropDownOptionTexts('PerfTest')
+      )
+      .click();
+    await dashboardPage
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.TemplateVariables.submenuItemLabels('column'))
+      .click();
+    await dashboardPage
+      .getByGrafanaSelector(
+        context.selectors.pages.Dashboard.TemplateVariables.submenuItemValueDropDownOptionTexts('_val1_')
+      )
+      .click();
+
+    const panel = await dashboardPage.addPanel();
+    await dashboardPage.timeRange.set({
+      from: '2017-09-22 12:00:00',
+      to: '2017-09-23 12:00:00',
+    });
+    await panel.datasource.set(datasource.name);
+    await panel.setVisualization('Table');
+
+    await page.getByTestId(selectors.components.queryEditor.cluster.input).click({ force: true });
+    await page.getByLabel('Select options menu').getByText('$cluster').click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.database.input).click({ force: true });
+    await page.getByLabel('Select options menu').getByText('$database').click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.tableFrom.input).getByText('$table');
+    await page.getByTestId(selectors.components.queryEditor.columns.input).getByText('$column');
+    await page
+      .getByTestId(selectors.components.queryEditor.tableFrom.input)
+      .getByLabel('Table', { exact: true })
+      .click({ force: true });
+    await page.getByLabel('Select options menu').getByText('$table').click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.runQuery.button).click();
+    await page.waitForTimeout(6000);
+    expect(panel.panel.fieldNames).toContainText(['_val1_', '_val2_']);
+
+    // Delete dashboard for clean-up
+    await dashboardPage.deleteDashboard();
   });
 });

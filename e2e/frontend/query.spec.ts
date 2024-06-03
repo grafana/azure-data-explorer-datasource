@@ -15,9 +15,9 @@ test.describe('Azure Data Explorer queries', () => {
     await panel.datasource.set(datasource.name);
     await panel.setVisualization('Table');
 
-    await page.getByLabel(selectors.components.queryEditor.cluster.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.cluster.input).click({ force: true });
     await page.getByLabel('Select options menu').getByText('grafanaadxdev').click({ force: true });
-    await page.getByLabel(selectors.components.queryEditor.database.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.database.input).click({ force: true });
     await page.getByLabel('Select options menu').getByText('PerfTest').click({ force: true });
     await page.getByText('KQL').click({ force: true });
     await page.waitForTimeout(10000);
@@ -45,16 +45,14 @@ test.describe('Azure Data Explorer queries', () => {
       to: '2017-09-23 12:00:00',
     });
     await panel.datasource.set(datasource.name);
-    await page.waitForTimeout(6000);
     await panel.setVisualization('Table');
 
-    await page.getByLabel(selectors.components.queryEditor.cluster.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.cluster.input).click({ force: true });
     await page.getByLabel('Select options menu').getByText('grafanaadxdev').click({ force: true });
-    await page.getByLabel(selectors.components.queryEditor.database.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.database.input).click({ force: true });
     await page.getByLabel('Select options menu').getByText('PerfTest').click({ force: true });
-    await page.waitForTimeout(6000);
     await page
-      .getByTestId('data-testid Options group Table')
+      .getByTestId(selectors.components.queryEditor.tableFrom.input)
       .getByLabel('Table', { exact: true })
       .click({ force: true });
     await page.getByLabel('Select options menu').getByText('PerfTest').click({ force: true });

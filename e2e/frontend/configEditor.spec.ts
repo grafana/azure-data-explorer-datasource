@@ -14,10 +14,12 @@ test.describe('Create Azure Data Explorer datasource', () => {
     const datasource = await readProvisionedDataSource<AdxDataSourceOptions, AdxDataSourceSecureOptions>({
       fileName: 'adx.yaml',
     });
-    // This line is needed if feature flags for additional auth are enabled
-    await page.getByTestId(selectors.components.configEditor.authType.input).getByRole('combobox').click();
-    await page.keyboard.insertText('App Registration');
-    await page.keyboard.press('Enter');
+
+    // The next 3 lines are needed if feature flags for additional auth are enabled
+    // await page.getByTestId(selectors.components.configEditor.authType.input).getByRole('combobox').click();
+    // await page.keyboard.insertText('App Registration');
+    // await page.keyboard.press('Enter');
+
     const credentials = datasource.jsonData.azureCredentials;
     if (credentials && credentials.authType === 'clientsecret') {
       await page.getByTestId(selectors.components.configEditor.azureCloud.input).getByRole('combobox').click();
