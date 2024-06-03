@@ -8,6 +8,7 @@ import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/t
 import { Select } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 import { defaultTimeSeriesColumns, toColumnNames } from './utils/utils';
+import { selectors } from 'test/selectors';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -74,6 +75,7 @@ const TableSection: React.FC<TableSectionProps> = ({
         <EditorField label="Table">
           <Select
             aria-label="Table"
+            data-testid={selectors.components.queryEditor.tableFrom.input}
             isLoading={tableSchema.loading}
             value={table}
             options={tableOptions}
@@ -114,6 +116,7 @@ const TableSection: React.FC<TableSectionProps> = ({
         >
           <Select
             aria-label="Columns"
+            data-testid={selectors.components.queryEditor.columns.input}
             isMulti
             value={query.expression.columns?.columns ? query.expression.columns.columns : []}
             options={toColumnNames(tableSchema.value || [])

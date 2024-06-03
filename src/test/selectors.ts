@@ -34,16 +34,16 @@ export const components = {
       openAI: 'data-testid open-ai-editor',
     },
     cluster: {
-      input: 'Cluster',
+      input: 'data-testid cluster-input',
     },
     database: {
-      input: 'Database',
+      input: 'data-testid database-input',
     },
     tableFrom: {
-      input: 'Table',
+      input: 'data-testid table',
     },
     columns: {
-      input: 'Columns',
+      input: 'data-testid columns',
     },
     runQuery: {
       button: 'data-testid run-query',
