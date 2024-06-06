@@ -15,9 +15,9 @@ test.describe('Azure Data Explorer queries', () => {
     await panel.datasource.set(datasource.name);
     await panel.setVisualization('Table');
 
-    await page.getByTestId(selectors.components.queryEditor.cluster.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.cluster.input.selector).click({ force: true });
     await page.getByLabel('Select options menu').getByText('grafanaadxdev').click({ force: true });
-    await page.getByTestId(selectors.components.queryEditor.database.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.database.input.selector).click({ force: true });
     await page.getByLabel('Select options menu').getByText('PerfTest').click({ force: true });
     await page.getByText('KQL').click({ force: true });
     await page.waitForTimeout(10000);
@@ -26,10 +26,8 @@ test.describe('Azure Data Explorer queries', () => {
     await page.keyboard.insertText('PerfTest | where $__');
     await page.waitForTimeout(10000);
     await page.keyboard.press('Control+Space');
-    await page.getByText('$__timeFilter').click({ force: true });
-    await page.keyboard.insertText('_Timestamp_');
-    await page.keyboard.press('ArrowRight');
-    await page.keyboard.insertText('| order by _Timestamp_ asc');
+    await expect(page.getByText('$__timeFilter')).toBeVisible();
+    await page.keyboard.insertText('timeFilter(_Timestamp_) | order by _Timestamp_ asc');
     await page.getByTestId(selectors.components.queryEditor.runQuery.button).click();
     await page.waitForTimeout(6000);
     expect(panel.panel.fieldNames).toContainText(['_val1_', '_val2_']);
@@ -47,9 +45,9 @@ test.describe('Azure Data Explorer queries', () => {
     await panel.datasource.set(datasource.name);
     await panel.setVisualization('Table');
 
-    await page.getByTestId(selectors.components.queryEditor.cluster.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.cluster.input.selector).click({ force: true });
     await page.getByLabel('Select options menu').getByText('grafanaadxdev').click({ force: true });
-    await page.getByTestId(selectors.components.queryEditor.database.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.database.input.selector).click({ force: true });
     await page.getByLabel('Select options menu').getByText('PerfTest').click({ force: true });
     await page
       .getByTestId(selectors.components.queryEditor.tableFrom.input)

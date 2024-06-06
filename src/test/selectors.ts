@@ -34,10 +34,18 @@ export const components = {
       openAI: 'data-testid open-ai-editor',
     },
     cluster: {
-      input: 'data-testid cluster-input',
+      input: {
+        label: 'data-testid cluster',
+        // Only required for tests due to the way the InlineSelect component works
+        selector: 'data-testid cluster-input',
+      },
     },
     database: {
-      input: 'data-testid database-input',
+      input: {
+        label: 'data-testid database',
+        // Only required for tests due to the way the InlineSelect component works
+        selector: 'data-testid database-input',
+      },
     },
     tableFrom: {
       input: 'data-testid table',

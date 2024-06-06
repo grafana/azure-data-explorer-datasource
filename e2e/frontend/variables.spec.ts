@@ -114,39 +114,33 @@ test.describe('Template variables', () => {
       table: '$table',
     });
 
-    await dashboardPage.getByGrafanaSelector(context.selectors.pages.Dashboard.Settings.Close).click();
+    await dashboardPage.getByGrafanaSelector(context.selectors.pages.Dashboard.Settings.Actions.close).click();
 
     await dashboardPage
-      .getByGrafanaSelector(context.selectors.pages.Dashboard.TemplateVariables.submenuItemLabels('cluster'))
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemLabels('cluster'))
       .click();
     await dashboardPage
       .getByGrafanaSelector(
-        context.selectors.pages.Dashboard.TemplateVariables.submenuItemValueDropDownOptionTexts('grafanaadxdev')
+        context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('grafanaadxdev')
       )
       .click();
     await dashboardPage
-      .getByGrafanaSelector(context.selectors.pages.Dashboard.TemplateVariables.submenuItemLabels('database'))
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemLabels('database'))
       .click();
     await dashboardPage
-      .getByGrafanaSelector(
-        context.selectors.pages.Dashboard.TemplateVariables.submenuItemValueDropDownOptionTexts('PerfTest')
-      )
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest'))
       .click();
     await dashboardPage
-      .getByGrafanaSelector(context.selectors.pages.Dashboard.TemplateVariables.submenuItemLabels('table'))
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemLabels('table'))
       .click();
     await dashboardPage
-      .getByGrafanaSelector(
-        context.selectors.pages.Dashboard.TemplateVariables.submenuItemValueDropDownOptionTexts('PerfTest')
-      )
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest'))
       .click();
     await dashboardPage
-      .getByGrafanaSelector(context.selectors.pages.Dashboard.TemplateVariables.submenuItemLabels('column'))
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemLabels('column'))
       .click();
     await dashboardPage
-      .getByGrafanaSelector(
-        context.selectors.pages.Dashboard.TemplateVariables.submenuItemValueDropDownOptionTexts('_val1_')
-      )
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('_val1_'))
       .click();
 
     const panel = await dashboardPage.addPanel();
@@ -157,9 +151,9 @@ test.describe('Template variables', () => {
     await panel.datasource.set(datasource.name);
     await panel.setVisualization('Table');
 
-    await page.getByTestId(selectors.components.queryEditor.cluster.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.cluster.input.selector).click({ force: true });
     await page.getByLabel('Select options menu').getByText('$cluster').click({ force: true });
-    await page.getByTestId(selectors.components.queryEditor.database.input).click({ force: true });
+    await page.getByTestId(selectors.components.queryEditor.database.input.selector).click({ force: true });
     await page.getByLabel('Select options menu').getByText('$database').click({ force: true });
     await page.getByTestId(selectors.components.queryEditor.tableFrom.input).getByText('$table');
     await page.getByTestId(selectors.components.queryEditor.columns.input).getByText('$column');
