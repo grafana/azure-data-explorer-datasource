@@ -134,7 +134,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   }
 
   getClusters(): Promise<ClusterOption[]> {
-    return this.getResource('/clusters');
+    return this.getResource('clusters');
   }
 
   async getDefaultOrFirstDatabase(): Promise<string> {
