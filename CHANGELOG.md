@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [5.0.3]
+
+- Upgrade dependencies
+
 ## [5.0.2]
 
 - Upgrade dependencies
