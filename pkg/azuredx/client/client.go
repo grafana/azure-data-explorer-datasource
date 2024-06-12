@@ -33,10 +33,22 @@ var _ AdxClient = new(Client) // validates interface conformance
 type Client struct {
 	httpClientKusto      *http.Client
 	httpClientManagement *http.Client
+	cloudSettings        *azsettings.AzureCloudSettings
 }
 
 // NewClient creates a Grafana Plugin SDK Go Http Client
 func New(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*Client, error) {
+	// Extract cloud from credentials
+	azureCloud, err := azcredentials.GetAzureCloud(azureSettings, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	cloudSettings, err := azureSettings.GetCloud(azureCloud)
+	if err != nil {
+		return nil, err
+	}
+
 	httpClientAzureCloud, err := newHttpClientAzureCloud(ctx, instanceSettings, dsSettings, azureSettings, credentials)
 	if err != nil {
 		return nil, err
@@ -45,7 +57,7 @@ func New(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettin
 	if err != nil {
 		return nil, err
 	}
-	return &Client{httpClientKusto: httpClientAzureCloud, httpClientManagement: httpClientManagement}, nil
+	return &Client{httpClientKusto: httpClientAzureCloud, httpClientManagement: httpClientManagement, cloudSettings: cloudSettings}, nil
 }
 
 func (c *Client) TestARGsRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
@@ -124,7 +136,12 @@ func (c *Client) testManagementClient(ctx context.Context, datasourceSettings *m
 		return fmt.Errorf("no Azure request serial: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01", bytes.NewReader(buf))
+	resourceManager, ok := c.cloudSettings.Properties["resourceManager"]
+	if !ok {
+		return fmt.Errorf("the Azure cloud '%s' doesn't have the required property for 'resourceManager'", c.cloudSettings.Name)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, resourceManager+"/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01", bytes.NewReader(buf))
 	if err != nil {
 		return fmt.Errorf("no Azure request instance: %w", err)
 	}
@@ -210,7 +227,12 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 		return nil, fmt.Errorf("no Azure request serial: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01", bytes.NewReader(buf))
+	resourceManager, ok := c.cloudSettings.Properties["resourceManager"]
+	if !ok {
+		return nil, fmt.Errorf("the Azure cloud '%s' doesn't have the required property for 'resourceManager'", c.cloudSettings.Name)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, resourceManager+"/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01", bytes.NewReader(buf))
 	if err != nil {
 		return nil, fmt.Errorf("no Azure request instance: %w", err)
 	}
