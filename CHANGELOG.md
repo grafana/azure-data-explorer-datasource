@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [5.0.4]
+
+- Fix: Custom clouds are now loaded from context [#921](https://github.com/grafana/azure-data-explorer-datasource/pull/921)
+
 ## [5.0.3]
 
 - Upgrade dependencies
