@@ -46,7 +46,7 @@ func NewDatasource(ctx context.Context, instanceSettings backend.DataSourceInsta
 	adx.settings = datasourceSettings
 	adx.settings.OpenAIAPIKey = strings.TrimSpace(instanceSettings.DecryptedSecureJSONData["OpenAIAPIKey"])
 
-	azureSettings, err := azsettings.ReadFromEnv()
+	azureSettings, err := azsettings.ReadSettings(ctx)
 	if err != nil {
 		backend.Logger.Error("failed to read Azure settings from Grafana", "error", err.Error())
 		return nil, err
