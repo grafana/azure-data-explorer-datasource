@@ -78,7 +78,7 @@ func (c *Client) TestKustoRequest(ctx context.Context, datasourceSettings *model
 
 		clusters, err := c.ARGClusterRequest(ctx, payload, headers)
 		if err != nil {
-			return fmt.Errorf("Unable to connect to connect to Azure Resource Graph. Add access to ARG in Azure or add a default cluster URL. %w", err)
+			return fmt.Errorf("Unable to connect to Azure Resource Graph. Add access to ARG in Azure or add a default cluster URL. %w", err)
 		}
 		if len(clusters) == 0 {
 			return errors.New("Azure Resource Graph resource query returned 0 clusters.")
