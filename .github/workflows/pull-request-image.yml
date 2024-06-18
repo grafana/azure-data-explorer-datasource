@@ -103,7 +103,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image for PRs
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         if: ${{ github.event_name == 'pull_request' }}
         with:
           context: .
@@ -112,7 +112,7 @@ jobs:
           tags: grafana/plugin-builds:${{ github.event.pull_request.head.sha }}pre
 
       - name: Build and push Docker image for main branch
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         if: ${{ github.event_name == 'push' }}
         with:
           context: .
