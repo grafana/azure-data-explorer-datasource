@@ -125,10 +125,17 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   azureCredentials?: AzureCredentials;
   onBehalfOf?: boolean;
   enableSecureSocksProxy?: boolean;
+  // legacy options
+  clientId?: string;
+  tenantId?: string;
+  azureCloud?: string;
+  oauthPassThru?: boolean;
 }
 
 export interface AdxDataSourceSecureOptions {
   OpenAIAPIKey?: string;
+  // legacy options
+  azureClientSecret?: string;
 }
 
 export interface AdxSchema {
@@ -165,7 +172,7 @@ export interface AdxFunctionSchema {
   DocString?: string;
 }
 
-export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
+export interface AdxFunctionInputParameterSchema extends AdxColumnSchema { }
 
 export type AdxSchemaDefinition = string | AdxSchemaDefinition[] | { [k: string]: AdxSchemaDefinition };
 

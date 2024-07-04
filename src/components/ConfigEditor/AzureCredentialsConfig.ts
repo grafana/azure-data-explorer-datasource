@@ -1,6 +1,7 @@
 import { AzureCredentials, ConcealedSecret } from '@grafana/azure-sdk';
 import { DataSourceSettings } from '@grafana/data';
 import { AzureSettings, config } from '@grafana/runtime';
+import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
 
 const concealed: ConcealedSecret = Symbol('Concealed client secret');
 const concealedLegacy: ConcealedSecret = Symbol('Concealed legacy client secret');
@@ -32,7 +33,7 @@ function getDefaultAzureCloud(): string {
   return config.azure.cloud || AzureCloud.Public;
 }
 
-function getSecret(options: DataSourceSettings<any, any>): undefined | string | ConcealedSecret {
+function getSecret(options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>): undefined | string | ConcealedSecret {
   if (options.secureJsonFields.azureClientSecret) {
     // The secret is concealed on server
     return concealed;
@@ -45,7 +46,7 @@ function getSecret(options: DataSourceSettings<any, any>): undefined | string | 
   }
 }
 
-export function hasCredentials(options: DataSourceSettings<any, any>): boolean {
+export function hasCredentials(options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>): boolean {
   return (
     typeof options.jsonData.azureCredentials === 'object' ||
     (typeof options.jsonData.tenantId === 'string' && typeof options.jsonData.clientId === 'string')
@@ -67,7 +68,7 @@ export function getDefaultCredentials(): AzureCredentials {
   }
 }
 
-export function getCredentials(options: DataSourceSettings<any, any>): AzureCredentials {
+export function getCredentials(options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>): AzureCredentials {
   const credentials = options.jsonData.azureCredentials as AzureCredentials | undefined;
 
   // If no credentials saved then try to restore legacy credentials, otherwise return default credentials
@@ -123,12 +124,12 @@ export function getCredentials(options: DataSourceSettings<any, any>): AzureCred
   }
 }
 
-function getLegacyCredentials(options: DataSourceSettings<any, any>): AzureCredentials | undefined {
+function getLegacyCredentials(options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>): AzureCredentials | undefined {
   const jsonData = options.jsonData;
 
   if (typeof jsonData.tenantId === 'string' || typeof jsonData.clientId === 'string') {
     try {
-      const azureCloud = resolveLegacyCloudName(jsonData.azureCloud);
+      const azureCloud = resolveLegacyCloudName(jsonData.azureCloud || "");
 
       return {
         authType: jsonData.onBehalfOf ? 'clientsecret-obo' : 'clientsecret',
@@ -166,9 +167,9 @@ function resolveLegacyCloudName(cloudName: string): AzureCloud {
 }
 
 export function updateCredentials(
-  options: DataSourceSettings<any, any>,
+  options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>,
   credentials: AzureCredentials
-): DataSourceSettings<any, any> {
+): DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
   // Cleanup legacy credentials
   options = {
     ...options,
