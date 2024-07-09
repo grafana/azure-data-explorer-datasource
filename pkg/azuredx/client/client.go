@@ -263,7 +263,7 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 		if err != nil {
 			return nil, fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err)
 		}
-		return nil, fmt.Errorf("azure HTTP %q: %q. %q: %q", resp.Status, r.Error.Message)
+		return nil, fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message)
 	}
 	var clusterData struct {
 		Data []struct {
