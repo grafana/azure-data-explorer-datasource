@@ -7,7 +7,7 @@ toolchain go1.21.4
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.12.0
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2
-	github.com/grafana/grafana-azure-sdk-go/v2 v2.0.4
+	github.com/grafana/grafana-azure-sdk-go/v2 v2.1.0
 	github.com/grafana/grafana-plugin-sdk-go v0.234.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.9.0
