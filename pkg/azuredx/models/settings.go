@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
@@ -45,6 +46,15 @@ func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) err
 		if err := json.Unmarshal(config.JSONData, d); err != nil {
 			return fmt.Errorf("could not unmarshal DatasourceSettings json: %w", err)
 		}
+	}
+
+	if d.ClusterURL != "" {
+		sanitized, err := helpers.SanitizeClusterUri(d.ClusterURL)
+		if err != nil {
+			return fmt.Errorf("invalid datasource endpoint configuration: %w", err)
+		}
+
+		d.ClusterURL = sanitized
 	}
 
 	if d.QueryTimeoutRaw == "" {
