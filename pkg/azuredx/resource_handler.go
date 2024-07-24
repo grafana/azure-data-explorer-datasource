@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
 
@@ -141,8 +142,14 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 		QuerySource: "schema",
 	}
 
+	sanitized, err := helpers.SanitizeClusterUri(cluster.ClusterUri)
+	if err != nil {
+		respondWithError(rw, http.StatusBadRequest, "Invalid clusterUri", err)
+		return
+	}
+
 	// Default to not sending the user request headers for schema requests
-	response, err := adx.client.KustoRequest(req.Context(), cluster.ClusterUri, ManagementApiPath, payload, false)
+	response, err := adx.client.KustoRequest(req.Context(), sanitized, ManagementApiPath, payload, false)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
@@ -184,8 +191,14 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 		CSL: ".show databases",
 	}
 
+	sanitized, err := helpers.SanitizeClusterUri(cluster.ClusterUri)
+	if err != nil {
+		respondWithError(rw, http.StatusBadRequest, "Invalid clusterUri", err)
+		return
+	}
+
 	// Default to not sending the user request headers for schema requests
-	response, err := adx.client.KustoRequest(req.Context(), cluster.ClusterUri, ManagementApiPath, payload, false)
+	response, err := adx.client.KustoRequest(req.Context(), sanitized, ManagementApiPath, payload, false)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
@@ -215,7 +228,13 @@ func (adx *AzureDataExplorer) getClusters(rw http.ResponseWriter, req *http.Requ
 	}
 
 	if adx.settings.ClusterURL != "" {
-		clusters = addClusterFromSettings(clusters, adx.settings.ClusterURL)
+		sanitized, err := helpers.SanitizeClusterUri(adx.settings.ClusterURL)
+		if err != nil {
+			respondWithError(rw, http.StatusBadRequest, "Invalid clusterUri", err)
+			return
+		}
+
+		clusters = addClusterFromSettings(clusters, sanitized)
 	}
 
 	rw.Header().Set("Content-Type", "application/json")
