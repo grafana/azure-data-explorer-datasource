@@ -28,6 +28,16 @@ func Test_SanitizeClusterUri(t *testing.T) {
 			expectErr:  true,
 		},
 		{
+			name:       "URI with query part in path",
+			clusterUri: "http://example.com/?",
+			expectErr:  true,
+		},
+		{
+			name:       "URI with query part and params in path",
+			clusterUri: "http://example.com/test?grafana=test",
+			expectErr:  true,
+		},
+		{
 			name:       "URI with query part and parameters",
 			clusterUri: "http://example.com?param=value",
 			expectErr:  true,
@@ -35,6 +45,16 @@ func Test_SanitizeClusterUri(t *testing.T) {
 		{
 			name:       "URI with fragment part",
 			clusterUri: "http://example.com#fragment",
+			expectErr:  true,
+		},
+		{
+			name:       "URI with fragment part in path",
+			clusterUri: "http://example.com/#",
+			expectErr:  true,
+		},
+		{
+			name:       "URI with complete fragment part in path",
+			clusterUri: "http://example.com/#fragment",
 			expectErr:  true,
 		},
 		{
