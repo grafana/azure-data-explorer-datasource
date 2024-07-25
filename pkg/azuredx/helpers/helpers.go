@@ -13,6 +13,11 @@ func SanitizeClusterUri(clusterUri string) (string, error) {
 		return "", errors.New("clusterUri contains invalid query characters")
 	}
 
+	// check for trailing question mark before parsing
+	if strings.HasSuffix(clusterUri, "#") {
+		return "", errors.New("clusterUri contains invalid fragment characters")
+	}
+
 	parsedUrl, err := url.Parse(clusterUri)
 	if err != nil {
 		return "", err
