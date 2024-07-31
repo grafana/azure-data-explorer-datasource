@@ -7,9 +7,9 @@ import { useAsync, useEffectOnce } from 'react-use';
 import { AdxDataSourceOptions, EditorMode, KustoQuery } from 'types';
 
 import { AdxDataSource } from '../../datasource';
+import { OpenAIEditor } from './OpenAIEditor';
 import { QueryHeader } from './QueryHeader';
 import { RawQueryEditor } from './RawQueryEditor';
-import { OpenAIEditor } from './OpenAIEditor';
 import { VisualQueryEditor } from './VisualQueryEditor';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
@@ -22,17 +22,14 @@ export const QueryEditor: React.FC<Props> = (props) => {
 
   useEffectOnce(() => {
     let processedQuery = query;
+    if (typeof processedQuery !== 'string' && processedQuery.rawMode === undefined) {
+      processedQuery.rawMode = datasource.getDefaultEditorMode() === EditorMode.Raw;
+    }
     if (needsToBeMigrated(query)) {
       processedQuery = migrateQuery(query);
-      onChange(processedQuery);
-      onRunQuery();
-    } else if (processedQuery.rawMode === undefined) {
-      onChange({
-        ...processedQuery,
-        rawMode: datasource.getDefaultEditorMode() === EditorMode.Raw,
-      });
-      onRunQuery();
     }
+    onChange(processedQuery);
+    onRunQuery();
   });
 
   return (
