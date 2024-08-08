@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -167,7 +168,12 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 		database = adx.settings.DefaultDatabase
 	}
 
-	tableRes, err := adx.client.KustoRequest(ctx, clusterURL, "/v1/rest/query", models.RequestPayload{
+	sanitized, err := helpers.SanitizeClusterUri(clusterURL)
+	if err != nil {
+		return backend.DataResponse{}, fmt.Errorf("invalid clusterUri: %w", err)
+	}
+
+	tableRes, err := adx.client.KustoRequest(ctx, sanitized, "/v1/rest/query", models.RequestPayload{
 		CSL:         q.Query,
 		DB:          database,
 		Properties:  props,

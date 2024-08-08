@@ -29,7 +29,9 @@ type AzureFrameMD struct {
 // error body,
 type ErrorResponse struct {
 	Error struct {
-		Message string `json:"message"`
+		Message     string `json:"message"`
+		Type        string `json:"@type"`
+		Description string `json:"@message"`
 	} `json:"error"`
 }
 

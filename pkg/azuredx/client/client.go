@@ -8,6 +8,7 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"net/url"
 
 	"github.com/grafana/grafana-azure-sdk-go/v2/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
@@ -17,6 +18,7 @@ import (
 	// 100% compatible drop-in replacement of "encoding/json"
 	json "github.com/json-iterator/go"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
 
@@ -86,7 +88,12 @@ func (c *Client) TestKustoRequest(ctx context.Context, datasourceSettings *model
 		clusterURL = clusters[0].Uri
 	}
 
-	if err := c.testKustoClient(ctx, datasourceSettings, clusterURL, properties, additionalHeaders); err != nil {
+	sanitized, err := helpers.SanitizeClusterUri(clusterURL)
+	if err != nil {
+		return fmt.Errorf("invalid clusterUri: %w", err)
+	}
+
+	if err := c.testKustoClient(ctx, datasourceSettings, sanitized, properties, additionalHeaders); err != nil {
 		return err
 	}
 
@@ -103,7 +110,12 @@ func (c *Client) testKustoClient(ctx context.Context, datasourceSettings *models
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", clusterURL+"/v1/rest/query", bytes.NewReader(buf))
+	fullUrl, err := url.JoinPath(clusterURL, "/v1/rest/query")
+	if err != nil {
+		return fmt.Errorf("invalid Azure request URL: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", fullUrl, bytes.NewReader(buf))
 	if err != nil {
 		return err
 	}
@@ -130,7 +142,7 @@ func (c *Client) testKustoClient(ctx context.Context, datasourceSettings *models
 	return nil
 }
 
-func (c *Client) testManagementClient(ctx context.Context, datasourceSettings *models.DatasourceSettings, additionalHeaders map[string]string) error {
+func (c *Client) testManagementClient(ctx context.Context, _ *models.DatasourceSettings, additionalHeaders map[string]string) error {
 	buf, err := json.Marshal(models.ARGRequestPayload{Query: "resources | where type == \"microsoft.kusto/clusters\""})
 	if err != nil {
 		return fmt.Errorf("no Azure request serial: %w", err)
@@ -141,10 +153,23 @@ func (c *Client) testManagementClient(ctx context.Context, datasourceSettings *m
 		return fmt.Errorf("the Azure cloud '%s' doesn't have the required property for 'resourceManager'", c.cloudSettings.Name)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, resourceManager+"/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01", bytes.NewReader(buf))
+	u, err := url.Parse(resourceManager)
+	if err != nil {
+		return fmt.Errorf("invalid Azure request URL: %w", err)
+	}
+
+	// the default path for Azure Resource Graph
+	u = u.JoinPath("/providers/Microsoft.ResourceGraph/resources")
+
+	params := u.Query()
+	params.Add("api-version", "2021-03-01")
+	u.RawQuery = params.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(buf))
 	if err != nil {
 		return fmt.Errorf("no Azure request instance: %w", err)
 	}
+
 	req.Header.Set("Content-Type", "application/json")
 	for key, value := range additionalHeaders {
 		req.Header.Set(key, value)
@@ -170,13 +195,18 @@ func (c *Client) testManagementClient(ctx context.Context, datasourceSettings *m
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
-func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, userTrackingEnabled bool) (*models.TableResponse, error) {
+func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path string, payload models.RequestPayload, userTrackingEnabled bool) (*models.TableResponse, error) {
 	buf, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("no Azure request serial: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cluster+url, bytes.NewReader(buf))
+	fullUrl, err := url.JoinPath(clusterUrl, path)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Azure request URL: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fullUrl, bytes.NewReader(buf))
 	if err != nil {
 		return nil, fmt.Errorf("no Azure request instance: %w", err)
 	}
@@ -215,7 +245,7 @@ func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, p
 		if err != nil {
 			return nil, fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err)
 		}
-		return nil, fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message)
+		return nil, fmt.Errorf("azure HTTP %q: %q.\nReceived %q: %q", resp.Status, r.Error.Message, r.Error.Type, r.Error.Description)
 	}
 
 	return models.TableFromJSON(resp.Body)
@@ -232,7 +262,19 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 		return nil, fmt.Errorf("the Azure cloud '%s' doesn't have the required property for 'resourceManager'", c.cloudSettings.Name)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, resourceManager+"/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01", bytes.NewReader(buf))
+	u, err := url.Parse(resourceManager)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Azure request URL: %w", err)
+	}
+
+	// the default path for Azure Resource Graph
+	u = u.JoinPath("/providers/Microsoft.ResourceGraph/resources")
+
+	params := u.Query()
+	params.Add("api-version", "2021-03-01")
+	u.RawQuery = params.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(buf))
 	if err != nil {
 		return nil, fmt.Errorf("no Azure request instance: %w", err)
 	}
