@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [5.0.5]
+
+- Fix: Respect default editor mode [#972](https://github.com/grafana/azure-data-explorer-datasource/pull/972)
+- Fix: Improve Kusto error responses [#954](https://github.com/grafana/azure-data-explorer-datasource/pull/954)
+- Dependency upgrades
+
 ## [5.0.4]
 
 - Fix: Custom clouds are now loaded from context [#921](https://github.com/grafana/azure-data-explorer-datasource/pull/921)
