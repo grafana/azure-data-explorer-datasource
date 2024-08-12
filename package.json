@@ -51,7 +51,7 @@
     "@typescript-eslint/parser": "^7.18.0",
     "chance": "^1.1.11",
     "copy-webpack-plugin": "^12.0.2",
-    "cspell": "8.13.1",
+    "cspell": "8.13.2",
     "css-loader": "^6.7.3",
     "cypress": "13.13.2",
     "eslint": "^8.57.0",
