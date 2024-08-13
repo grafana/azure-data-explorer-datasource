@@ -46,7 +46,7 @@
     "@types/prismjs": "1.26.4",
     "@types/react-router-dom": "^5.2.0",
     "@types/testing-library__jest-dom": "5.14.8",
-    "@types/uuid": "^9.0.7",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "chance": "^1.1.12",
@@ -80,7 +80,7 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "5.4.3",
-    "uuid": "^9.0.1",
+    "uuid": "^10.0.0",
     "webpack": "^5.86.0",
     "webpack-cli": "^5.1.4",
     "webpack-livereload-plugin": "^3.0.2"
