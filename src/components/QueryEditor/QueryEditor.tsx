@@ -78,7 +78,11 @@ export const QueryEditor: React.FC<Props> = (props) => {
 
 function parseSchemaError(error: Error) {
   // error may be an object with a message
-  return get(error, 'data.Message', String(error));
+  let msg = get(error, 'data.Message', '');
+  if (msg === '') {
+    msg = get(error, 'data.message', '');
+  }
+  return msg || String(error);
 }
 
 const useTemplateVariables = (datasource: AdxDataSource) => {
