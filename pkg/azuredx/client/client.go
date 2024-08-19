@@ -246,7 +246,7 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 		if err != nil {
 			return nil, fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err)
 		}
-		return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q: %q.\nReceived %q: %q", resp.Status, r.Error.Message, r.Error.Type, r.Error.Description), false)
+		return nil, errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(resp.StatusCode), fmt.Errorf("azure HTTP %q: %q.\nReceived %q: %q", resp.Status, r.Error.Message, r.Error.Type, r.Error.Description), false)
 	}
 
 	return models.TableFromJSON(resp.Body)
@@ -306,7 +306,7 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 		if err != nil {
 			return nil, fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err)
 		}
-		return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message), false)
+		return nil, errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(resp.StatusCode), fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message), false)
 	}
 	var clusterData struct {
 		Data []struct {
