@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [5.0.6]
+
+- Add `errorsource` [#996](https://github.com/grafana/azure-data-explorer-datasource/pull/996)
+- Dependency updates
+
 ## [5.0.5]
 
 - Fix: Respect default editor mode [#972](https://github.com/grafana/azure-data-explorer-datasource/pull/972)
