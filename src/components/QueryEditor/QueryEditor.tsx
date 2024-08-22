@@ -64,7 +64,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
           setDirty={() => !dirty && setDirty(true)}
         />
       ) : null}
-      {!query.rawMode && !query.OpenAI && query.expression ? (
+      {!query.rawMode && !query.OpenAI ? (
         <VisualQueryEditor
           {...props}
           schema={schema.value}
