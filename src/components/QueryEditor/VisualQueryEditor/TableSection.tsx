@@ -115,7 +115,7 @@ const TableSection: React.FC<TableSectionProps> = ({
           <Select
             aria-label="Columns"
             isMulti
-            value={query.expression.columns?.columns ? query.expression.columns.columns : []}
+            value={query.expression?.columns?.columns ? query.expression?.columns?.columns : []}
             options={toColumnNames(tableSchema.value || [])
               .map((c) => ({ label: c, value: c }))
               .concat({
