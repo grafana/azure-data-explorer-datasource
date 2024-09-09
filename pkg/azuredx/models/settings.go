@@ -42,7 +42,7 @@ type DatasourceSettings struct {
 // It also sets the QueryTimeout and ServerTimeoutValues by parsing QueryTimeoutRaw.
 func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) error {
 	var err error
-	if config.JSONData != nil && len(config.JSONData) > 1 {
+	if len(config.JSONData) > 1 {
 		if err := json.Unmarshal(config.JSONData, d); err != nil {
 			return fmt.Errorf("could not unmarshal DatasourceSettings json: %w", err)
 		}
