@@ -7,7 +7,7 @@ toolchain go1.21.4
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.14.0
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2
-	github.com/grafana/grafana-azure-sdk-go/v2 v2.1.1
+	github.com/grafana/grafana-azure-sdk-go/v2 v2.1.2
 	github.com/grafana/grafana-plugin-sdk-go v0.246.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.9.0
@@ -102,7 +102,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240822170219-fc7c04adadcd // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240814211410-ddb44dafa142 // indirect
-	google.golang.org/grpc v1.65.0 // indirect
+	google.golang.org/grpc v1.66.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/fsnotify/fsnotify.v1 v1.4.7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
