@@ -23,7 +23,7 @@ func SanitizeClusterUri(clusterUri string) (string, error) {
 
 	parsedUrl, err := url.Parse(clusterUri)
 	if err != nil {
-		return "", fmt.Errorf("invalid clusterUri: %w", err)
+		return "", errorsource.DownstreamError(fmt.Errorf("invalid clusterUri: %w", err), false)
 	}
 
 	// check if the URL contains a query part or fragment
