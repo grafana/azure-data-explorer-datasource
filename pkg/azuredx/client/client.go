@@ -199,12 +199,12 @@ func (c *Client) testManagementClient(ctx context.Context, _ *models.DatasourceS
 func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path string, payload models.RequestPayload, userTrackingEnabled bool) (*models.TableResponse, error) {
 	buf, err := json.Marshal(payload)
 	if err != nil {
-		return nil, fmt.Errorf("no Azure request serial: %w", err)
+		return nil, errorsource.DownstreamError(fmt.Errorf("no Azure request serial: %w", err), false)
 	}
 
 	fullUrl, err := url.JoinPath(clusterUrl, path)
 	if err != nil {
-		return nil, fmt.Errorf("invalid Azure request URL: %w", err)
+		return nil, errorsource.DownstreamError(fmt.Errorf("invalid Azure request URL: %w", err), false)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fullUrl, bytes.NewReader(buf))
@@ -230,7 +230,7 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 
 	resp, err := c.httpClientKusto.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, errorsource.DownstreamError(err, false)
 	}
 
 	defer resp.Body.Close()
@@ -244,7 +244,7 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 		var r models.ErrorResponse
 		err := json.NewDecoder(resp.Body).Decode(&r)
 		if err != nil {
-			return nil, fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err)
+			return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err), false)
 		}
 		return nil, errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(resp.StatusCode), fmt.Errorf("azure HTTP %q: %q.\nReceived %q: %q", resp.Status, r.Error.Message, r.Error.Type, r.Error.Description), false)
 	}
@@ -255,7 +255,7 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
 	buf, err := json.Marshal(payload)
 	if err != nil {
-		return nil, fmt.Errorf("no Azure request serial: %w", err)
+		return nil, errorsource.DownstreamError(fmt.Errorf("no Azure request serial: %w", err), false)
 	}
 
 	resourceManager, ok := c.cloudSettings.Properties["resourceManager"]
@@ -265,7 +265,7 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 
 	u, err := url.Parse(resourceManager)
 	if err != nil {
-		return nil, fmt.Errorf("invalid Azure request URL: %w", err)
+		return nil, errorsource.DownstreamError(fmt.Errorf("invalid Azure request URL: %w", err), false)
 	}
 
 	// the default path for Azure Resource Graph
@@ -290,7 +290,7 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 
 	resp, err := c.httpClientManagement.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, errorsource.DownstreamError(err, false)
 	}
 
 	defer resp.Body.Close()
@@ -304,7 +304,7 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 		var r models.ErrorResponse
 		err := json.NewDecoder(resp.Body).Decode(&r)
 		if err != nil {
-			return nil, fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err)
+			return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err), false)
 		}
 		return nil, errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(resp.StatusCode), fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message), false)
 	}
