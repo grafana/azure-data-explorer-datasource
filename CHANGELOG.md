@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [5.0.7]
+
+- `errorsource` improvements [#1030](https://github.com/grafana/azure-data-explorer-datasource/pull/1030)
+- Fix: Query row not displaying [#1001](https://github.com/grafana/azure-data-explorer-datasource/pull/1001)
+- Dependency updates
+  
 ## [5.0.6]
 
 - Add `errorsource` [#996](https://github.com/grafana/azure-data-explorer-datasource/pull/996)
