@@ -1928,7 +1928,7 @@
     react-dom "^18.3.1"
     ts-jest "29.2.5"
 
-"@grafana/data@10.4.1":
+"@grafana/data@10.4.1", "@grafana/data@^10.4.0 ||^11":
   version "10.4.1"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-10.4.1.tgz#bdd6a9de46cc310f35e38137b5eacb487eb06939"
   integrity sha512-hgcFO0pBDddjIQ6NhyYR6I1+aLI0n8p+B7HioDLE4t5xvMDjZN8H3ItFmM9omjY5Qn+NsT/x2iaZrid1iR3kjQ==
@@ -2045,6 +2045,19 @@
     ua-parser-js "^1.0.32"
     web-vitals "^3.1.1"
 
+"@grafana/llm@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@grafana/llm/-/llm-0.11.0.tgz#4268a8255e3e60f0ce710f569852e98e6b12ba15"
+  integrity sha512-6IObi9ez1AunMwke/VFLmZCc4mBuqSGIOGcQ85JJmJgjaO900v2u9QzcF2yAZh24KGzLV2ILu39MtVvEOYfeCw==
+  dependencies:
+    "@grafana/data" "^10.4.0 ||^11"
+    "@grafana/runtime" "^10.4.0 || ^11"
+    react "^18"
+    react-use "^17.5.0"
+    rxjs "^7.8.1"
+    semver "^7.6.3"
+    uuid "^10.0.0"
+
 "@grafana/plugin-e2e@^1.15.0":
   version "1.15.0"
   resolved "https://registry.yarnpkg.com/@grafana/plugin-e2e/-/plugin-e2e-1.15.0.tgz#5d2082acf5400d5b1752f9abb0c8881b171ccc38"
@@ -2064,7 +2077,7 @@
     debug "^4.3.4"
     typescript "^5.3.3"
 
-"@grafana/runtime@10.4.1":
+"@grafana/runtime@10.4.1", "@grafana/runtime@^10.4.0 || ^11":
   version "10.4.1"
   resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-10.4.1.tgz#5c3b3f9d699d8e20887141b5d7c3a716b9634688"
   integrity sha512-SoQxIQ6MtzP8FI3xB8v9Ethtjk73+K7xCxJgrKxdUbDlcs8MxYRjs4DxhX1B4u1CvULXRed6RQTkbCbi168P3A==
@@ -10180,10 +10193,10 @@ react-use@17.5.0, react-use@^17.4.2:
     ts-easing "^0.2.0"
     tslib "^2.1.0"
 
-react-use@^17.5.1:
-  version "17.6.0"
-  resolved "https://registry.yarnpkg.com/react-use/-/react-use-17.6.0.tgz#2101a3a79dc965a25866b21f5d6de4b128488a14"
-  integrity sha512-OmedEScUMKFfzn1Ir8dBxiLLSOzhKe/dPZwVxcujweSj45aNM7BEGPb9BEVIgVEqEXx6f3/TsXzwIktNgUR02g==
+react-use@^17.5.0, react-use@^17.5.1:
+  version "17.5.1"
+  resolved "https://registry.yarnpkg.com/react-use/-/react-use-17.5.1.tgz#19fc2ae079775d8450339e9fa8dbe25b17f2263c"
+  integrity sha512-LG/uPEVRflLWMwi3j/sZqR00nF6JGqTTDblkXK2nzXsIvij06hXl1V/MZIlwj1OKIQUtlh1l9jK8gLsRyCQxMg==
   dependencies:
     "@types/js-cookie" "^2.2.6"
     "@xobotyi/scrollbar-width" "^1.9.5"
@@ -10212,6 +10225,13 @@ react@18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
+  dependencies:
+    loose-envify "^1.1.0"
+
+react@^18:
+  version "18.3.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.3.1.tgz#49ab892009c53933625bd16b2533fc754cab2891"
+  integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
   dependencies:
     loose-envify "^1.1.0"
 
@@ -10568,7 +10588,7 @@ rw@1, rw@^1.3.3:
   resolved "https://registry.yarnpkg.com/rw/-/rw-1.3.3.tgz#3f862dfa91ab766b14885ef4d01124bfda074fb4"
   integrity sha512-PdhdWy89SiZogBLaw42zdeqtRJ//zFd2PgQavcICDUgJT5oW10QCRKbJ6bg4r0/UY2M6BWd5tkxuGFRvCkgfHQ==
 
-rxjs@7.8.1:
+rxjs@7.8.1, rxjs@^7.8.1:
   version "7.8.1"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.8.1.tgz#6f6f3d99ea8044291efd92e7c7fcf562c4057543"
   integrity sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==
@@ -11970,7 +11990,17 @@ uuid@9.0.1:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
   integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
-uuid@^11.0.2, uuid@^11.0.5:
+uuid@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-10.0.0.tgz#5a95aa454e6e002725c79055fd42aaba30ca6294"
+  integrity sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==
+
+uuid@^11.0.2:
+  version "11.0.2"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.0.2.tgz#a8d68ba7347d051e7ea716cc8dcbbab634d66875"
+  integrity sha512-14FfcOJmqdjbBPdDjFQyk/SdT4NySW4eM0zcG+HqbHP5jzuH56xO3J1DGhgs/cEMCfwYi3HQI1gnTO62iaG+tQ==
+
+uuid@^11.0.5:
   version "11.0.5"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.0.5.tgz#07b46bdfa6310c92c3fb3953a8720f170427fc62"
   integrity sha512-508e6IcKLrhxKdBbcA2b4KQZlLVp2+J5UwQ6F7Drckkc5N9ZJwFa4TgWtsww9UG8fGHbm6gbV19TdM5pQ4GaIA==
