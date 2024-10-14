@@ -1,5 +1,5 @@
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
-import { llms } from '@grafana/experimental';
+import { openai } from '@grafana/llm';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
 import { Alert, Button, CodeEditor, Spinner, Monaco, MonacoEditor, useStyles2, TextArea, Stack } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
@@ -41,7 +41,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
   const baselinePrompt = `You are an AI assistant that is fluent in KQL for querying Azure Data Explorer and you only respond with the correct KQL code snippets and no explanations. Generate a query that fulfills the following text.\nText:"""`;
 
   useAsync(async () => {
-    const enabled = await llms.openai.enabled();
+    const enabled = await openai.enabled();
     setEnabled(enabled);
   });
 
@@ -87,7 +87,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
 
   const newGenerateQuery = () => {
     reportInteraction('grafana_ds_adx_openai_query_generated_with_llm_plugin');
-    const stream = llms.openai
+    const stream = openai
       .streamChatCompletions({
         model: 'gpt-3.5-turbo',
         messages: [
@@ -95,7 +95,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
           { role: 'user', content: `${prompt}"""` },
         ],
       })
-      .pipe(llms.openai.accumulateContent());
+      .pipe(openai.accumulateContent());
     stream.subscribe({
       next: (m) => {
         setGeneratedQuery(m);
