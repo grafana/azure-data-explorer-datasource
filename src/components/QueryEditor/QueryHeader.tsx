@@ -10,7 +10,8 @@ import {
   RadioButtonGroup,
   useStyles2,
 } from '@grafana/ui';
-import { EditorHeader, FlexItem, InlineSelect, llms } from '@grafana/experimental';
+import { EditorHeader, FlexItem, InlineSelect } from '@grafana/experimental';
+import llms from '@grafana/llm';
 
 import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
