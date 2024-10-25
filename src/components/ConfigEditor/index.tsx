@@ -14,8 +14,6 @@ import {
   getCredentials,
   getDefaultCredentials,
   getOboEnabled,
-  getUserIdentityEnabled,
-  getWorkloadIdentityEnabled,
   hasCredentials,
   updateCredentials,
 } from './AzureCredentialsConfig';
@@ -101,9 +99,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
       <ConfigHelp options={options} />
       <Divider />
       <AzureCredentialsForm
-        userIdentityEnabled={getUserIdentityEnabled()}
+        userIdentityEnabled={config.azure.userIdentityEnabled}
         managedIdentityEnabled={config.azure.managedIdentityEnabled}
-        workloadIdentityEnabled={getWorkloadIdentityEnabled()}
+        workloadIdentityEnabled={config.azure.userIdentityEnabled}
         oboEnabled={getOboEnabled()}
         credentials={credentials}
         azureCloudOptions={clouds}
