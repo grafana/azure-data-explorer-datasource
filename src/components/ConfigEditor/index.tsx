@@ -101,7 +101,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
       <AzureCredentialsForm
         userIdentityEnabled={config.azure.userIdentityEnabled}
         managedIdentityEnabled={config.azure.managedIdentityEnabled}
-        workloadIdentityEnabled={config.azure.userIdentityEnabled}
+        workloadIdentityEnabled={config.azure.workloadIdentityEnabled}
         oboEnabled={getOboEnabled()}
         credentials={credentials}
         azureCloudOptions={clouds}
