@@ -6,7 +6,7 @@ toolchain go1.22.5
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.16.0
-	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.3
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.3.0
 	github.com/grafana/grafana-azure-sdk-go/v2 v2.1.2
 	github.com/grafana/grafana-plugin-sdk-go v0.258.0
 	github.com/json-iterator/go v1.1.12
