@@ -1,5 +1,5 @@
-import { AzureCredentials } from '@grafana/azure-sdk';
-import { DataSourceJsonData, DataSourceSettings } from '@grafana/data';
+import { AzureDataSourceJsonData, AzureDataSourceSecureJsonData } from '@grafana/azure-sdk';
+import { DataSourceSettings } from '@grafana/data';
 import { DataQuery } from '@grafana/schema';
 
 import {
@@ -110,7 +110,7 @@ export enum SchemaMappingType {
   materializedView = 'materializedView',
 }
 
-export interface AdxDataSourceOptions extends DataSourceJsonData {
+export interface AdxDataSourceOptions extends AzureDataSourceJsonData {
   defaultDatabase: string;
   minimalCache: number;
   defaultEditorMode: EditorMode;
@@ -122,20 +122,14 @@ export interface AdxDataSourceOptions extends DataSourceJsonData {
   schemaMappings?: Array<Partial<SchemaMapping>>;
   enableUserTracking: boolean;
   clusterUrl: string;
-  azureCredentials?: AzureCredentials;
-  onBehalfOf?: boolean;
   enableSecureSocksProxy?: boolean;
   // legacy options
-  clientId?: string;
-  tenantId?: string;
   azureCloud?: string;
-  oauthPassThru?: boolean;
+  onBehalfOf?: boolean;
 }
 
-export interface AdxDataSourceSecureOptions {
+export interface AdxDataSourceSecureOptions extends AzureDataSourceSecureJsonData {
   OpenAIAPIKey?: string;
-  // legacy options
-  azureClientSecret?: string;
 }
 
 export interface AdxSchema {
