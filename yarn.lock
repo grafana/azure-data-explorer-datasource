@@ -1892,10 +1892,10 @@
   dependencies:
     tslib "^2.4.0"
 
-"@grafana/azure-sdk@0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@grafana/azure-sdk/-/azure-sdk-0.0.4.tgz#df0569b1e9102771166703b338aeecf8199dd6d4"
-  integrity sha512-Rtn5oRGA2YmfUdi8JkcPdVGNp2IAqYdyen34VIUDBxNYaEB10ThNwGZNYrzJqfkIPHUxyWDfEPZFjgPnI3pa5Q==
+"@grafana/azure-sdk@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@grafana/azure-sdk/-/azure-sdk-0.0.5.tgz#050ba483c619253357b8564f9eccf064c396e757"
+  integrity sha512-zSyoHtoxWzrIgqGPACnqSewvc7oqthGdNiTW3M/z65LF+Bi9CtgIl6lG6L0krlvfsz+YQM1N1x0l8sDd29y34g==
   dependencies:
     react-dom "^18.3.1"
     ts-jest "29.2.5"
