@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -563,7 +564,7 @@ func TableFromJSON(rc io.Reader) (*TableResponse, error) {
 		for _, e := range tr.Exceptions {
 			errMsg += e + ". "
 		}
-		return nil, errors.New(errMsg)
+		return nil, errorsource.DownstreamError(errors.New(errMsg), false)
 	}
 
 	return tr, nil
