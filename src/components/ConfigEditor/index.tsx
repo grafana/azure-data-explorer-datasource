@@ -10,6 +10,7 @@ import ConnectionConfig from './ConnectionConfig';
 import DatabaseConfig from './DatabaseConfig';
 import QueryConfig from './QueryConfig';
 import TrackingConfig from './TrackingConfig';
+import ApplicationConfig from './ApplicationConfig';
 import {
   getCredentials,
   getDefaultCredentials,
@@ -52,6 +53,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         options.jsonData.cacheMaxAge ||
         options.jsonData.useSchemaMapping ||
         options.jsonData.enableUserTracking ||
+        options.jsonData.application ||
         options.secureJsonFields['OpenAIAPIKey']
       ),
     [options]
@@ -118,6 +120,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
       >
         <QueryConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
         <DatabaseConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
+        <ApplicationConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
         <TrackingConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
       </ConfigSection>
 
