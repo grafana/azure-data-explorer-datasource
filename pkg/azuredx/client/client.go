@@ -26,7 +26,7 @@ import (
 type AdxClient interface {
 	TestKustoRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
 	TestARGsRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error
-	KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, userTrackingEnabled bool) (*models.TableResponse, error)
+	KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, userTrackingEnabled bool, application string) (*models.TableResponse, error)
 	ARGClusterRequest(ctx context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error)
 }
 
@@ -196,7 +196,7 @@ func (c *Client) testManagementClient(ctx context.Context, _ *models.DatasourceS
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
-func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path string, payload models.RequestPayload, userTrackingEnabled bool) (*models.TableResponse, error) {
+func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path string, payload models.RequestPayload, userTrackingEnabled bool, application string) (*models.TableResponse, error) {
 	buf, err := json.Marshal(payload)
 	if err != nil {
 		return nil, errorsource.DownstreamError(fmt.Errorf("no Azure request serial: %w", err), false)
@@ -214,7 +214,11 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-ms-app", "Grafana-ADX")
+    if application == "" {
+        application = "Grafana-ADX"
+    }
+    req.Header.Set("x-ms-app", application)
+	// req.Header.Set("x-ms-app", "Grafana-ADX")
 	if payload.QuerySource == "" {
 		payload.QuerySource = "unspecified"
 	}
