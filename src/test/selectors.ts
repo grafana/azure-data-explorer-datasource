@@ -33,14 +33,25 @@ export const components = {
       container: 'data-testid code-editor',
       openAI: 'data-testid open-ai-editor',
     },
+    cluster: {
+      input: {
+        label: 'data-testid cluster',
+        // Only required for tests due to the way the InlineSelect component works
+        selector: 'data-testid cluster-input',
+      },
+    },
     database: {
-      input: 'Database',
+      input: {
+        label: 'data-testid database',
+        // Only required for tests due to the way the InlineSelect component works
+        selector: 'data-testid database-input',
+      },
     },
     tableFrom: {
-      input: 'Table',
+      input: 'data-testid table',
     },
     columns: {
-      input: 'Columns',
+      input: 'data-testid columns',
     },
     runQuery: {
       button: 'data-testid run-query',
