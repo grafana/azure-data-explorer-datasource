@@ -7,9 +7,9 @@ import { useAsync, useEffectOnce } from 'react-use';
 import { AdxDataSourceOptions, EditorMode, KustoQuery } from 'types';
 
 import { AdxDataSource } from '../../datasource';
+import { OpenAIEditor } from './OpenAIEditor';
 import { QueryHeader } from './QueryHeader';
 import { RawQueryEditor } from './RawQueryEditor';
-import { OpenAIEditor } from './OpenAIEditor';
 import { VisualQueryEditor } from './VisualQueryEditor';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
@@ -22,17 +22,14 @@ export const QueryEditor: React.FC<Props> = (props) => {
 
   useEffectOnce(() => {
     let processedQuery = query;
+    if (typeof processedQuery !== 'string' && processedQuery.rawMode === undefined) {
+      processedQuery.rawMode = datasource.getDefaultEditorMode() === EditorMode.Raw;
+    }
     if (needsToBeMigrated(query)) {
       processedQuery = migrateQuery(query);
-      onChange(processedQuery);
-      onRunQuery();
-    } else if (processedQuery.rawMode === undefined) {
-      onChange({
-        ...processedQuery,
-        rawMode: datasource.getDefaultEditorMode() === EditorMode.Raw,
-      });
-      onRunQuery();
     }
+    onChange(processedQuery);
+    onRunQuery();
   });
 
   return (
@@ -67,7 +64,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
           setDirty={() => !dirty && setDirty(true)}
         />
       ) : null}
-      {!query.rawMode && !query.OpenAI && query.expression ? (
+      {!query.rawMode && !query.OpenAI ? (
         <VisualQueryEditor
           {...props}
           schema={schema.value}
@@ -81,7 +78,11 @@ export const QueryEditor: React.FC<Props> = (props) => {
 
 function parseSchemaError(error: Error) {
   // error may be an object with a message
-  return get(error, 'data.Message', String(error));
+  let msg = get(error, 'data.Message', '');
+  if (msg === '') {
+    msg = get(error, 'data.message', '');
+  }
+  return msg || String(error);
 }
 
 const useTemplateVariables = (datasource: AdxDataSource) => {

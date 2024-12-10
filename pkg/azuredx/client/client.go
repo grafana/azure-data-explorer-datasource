@@ -8,15 +8,18 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"net/url"
 
 	"github.com/grafana/grafana-azure-sdk-go/v2/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 
 	// 100% compatible drop-in replacement of "encoding/json"
 	json "github.com/json-iterator/go"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 )
 
@@ -33,10 +36,22 @@ var _ AdxClient = new(Client) // validates interface conformance
 type Client struct {
 	httpClientKusto      *http.Client
 	httpClientManagement *http.Client
+	cloudSettings        *azsettings.AzureCloudSettings
 }
 
 // NewClient creates a Grafana Plugin SDK Go Http Client
 func New(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings, dsSettings *models.DatasourceSettings, azureSettings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (*Client, error) {
+	// Extract cloud from credentials
+	azureCloud, err := azcredentials.GetAzureCloud(azureSettings, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	cloudSettings, err := azureSettings.GetCloud(azureCloud)
+	if err != nil {
+		return nil, err
+	}
+
 	httpClientAzureCloud, err := newHttpClientAzureCloud(ctx, instanceSettings, dsSettings, azureSettings, credentials)
 	if err != nil {
 		return nil, err
@@ -45,7 +60,7 @@ func New(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettin
 	if err != nil {
 		return nil, err
 	}
-	return &Client{httpClientKusto: httpClientAzureCloud, httpClientManagement: httpClientManagement}, nil
+	return &Client{httpClientKusto: httpClientAzureCloud, httpClientManagement: httpClientManagement, cloudSettings: cloudSettings}, nil
 }
 
 func (c *Client) TestARGsRequest(ctx context.Context, datasourceSettings *models.DatasourceSettings, properties *models.Properties, additionalHeaders map[string]string) error {
@@ -66,7 +81,7 @@ func (c *Client) TestKustoRequest(ctx context.Context, datasourceSettings *model
 
 		clusters, err := c.ARGClusterRequest(ctx, payload, headers)
 		if err != nil {
-			return fmt.Errorf("Unable to connect to connect to Azure Resource Graph. Add access to ARG in Azure or add a default cluster URL. %w", err)
+			return fmt.Errorf("Unable to connect to Azure Resource Graph. Add access to ARG in Azure or add a default cluster URL. %w", err)
 		}
 		if len(clusters) == 0 {
 			return errors.New("Azure Resource Graph resource query returned 0 clusters.")
@@ -74,7 +89,12 @@ func (c *Client) TestKustoRequest(ctx context.Context, datasourceSettings *model
 		clusterURL = clusters[0].Uri
 	}
 
-	if err := c.testKustoClient(ctx, datasourceSettings, clusterURL, properties, additionalHeaders); err != nil {
+	sanitized, err := helpers.SanitizeClusterUri(clusterURL)
+	if err != nil {
+		return fmt.Errorf("invalid clusterUri: %w", err)
+	}
+
+	if err := c.testKustoClient(ctx, datasourceSettings, sanitized, properties, additionalHeaders); err != nil {
 		return err
 	}
 
@@ -91,7 +111,12 @@ func (c *Client) testKustoClient(ctx context.Context, datasourceSettings *models
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", clusterURL+"/v1/rest/query", bytes.NewReader(buf))
+	fullUrl, err := url.JoinPath(clusterURL, "/v1/rest/query")
+	if err != nil {
+		return fmt.Errorf("invalid Azure request URL: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", fullUrl, bytes.NewReader(buf))
 	if err != nil {
 		return err
 	}
@@ -118,16 +143,34 @@ func (c *Client) testKustoClient(ctx context.Context, datasourceSettings *models
 	return nil
 }
 
-func (c *Client) testManagementClient(ctx context.Context, datasourceSettings *models.DatasourceSettings, additionalHeaders map[string]string) error {
+func (c *Client) testManagementClient(ctx context.Context, _ *models.DatasourceSettings, additionalHeaders map[string]string) error {
 	buf, err := json.Marshal(models.ARGRequestPayload{Query: "resources | where type == \"microsoft.kusto/clusters\""})
 	if err != nil {
 		return fmt.Errorf("no Azure request serial: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01", bytes.NewReader(buf))
+	resourceManager, ok := c.cloudSettings.Properties["resourceManager"]
+	if !ok {
+		return fmt.Errorf("the Azure cloud '%s' doesn't have the required property for 'resourceManager'", c.cloudSettings.Name)
+	}
+
+	u, err := url.Parse(resourceManager)
+	if err != nil {
+		return fmt.Errorf("invalid Azure request URL: %w", err)
+	}
+
+	// the default path for Azure Resource Graph
+	u = u.JoinPath("/providers/Microsoft.ResourceGraph/resources")
+
+	params := u.Query()
+	params.Add("api-version", "2021-03-01")
+	u.RawQuery = params.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(buf))
 	if err != nil {
 		return fmt.Errorf("no Azure request instance: %w", err)
 	}
+
 	req.Header.Set("Content-Type", "application/json")
 	for key, value := range additionalHeaders {
 		req.Header.Set(key, value)
@@ -153,13 +196,18 @@ func (c *Client) testManagementClient(ctx context.Context, datasourceSettings *m
 // KustoRequest executes a Kusto Query language request to Azure's Data Explorer V1 REST API
 // and returns a TableResponse. If there is a query syntax error, the error message inside
 // the API's JSON error response is returned as well (if available).
-func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, payload models.RequestPayload, userTrackingEnabled bool) (*models.TableResponse, error) {
+func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path string, payload models.RequestPayload, userTrackingEnabled bool) (*models.TableResponse, error) {
 	buf, err := json.Marshal(payload)
 	if err != nil {
-		return nil, fmt.Errorf("no Azure request serial: %w", err)
+		return nil, errorsource.DownstreamError(fmt.Errorf("no Azure request serial: %w", err), false)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cluster+url, bytes.NewReader(buf))
+	fullUrl, err := url.JoinPath(clusterUrl, path)
+	if err != nil {
+		return nil, errorsource.DownstreamError(fmt.Errorf("invalid Azure request URL: %w", err), false)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fullUrl, bytes.NewReader(buf))
 	if err != nil {
 		return nil, fmt.Errorf("no Azure request instance: %w", err)
 	}
@@ -182,7 +230,7 @@ func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, p
 
 	resp, err := c.httpClientKusto.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, errorsource.DownstreamError(err, false)
 	}
 
 	defer resp.Body.Close()
@@ -190,15 +238,15 @@ func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, p
 	switch {
 	case resp.StatusCode == http.StatusUnauthorized:
 		// HTTP 401 has no error body
-		return nil, fmt.Errorf("azure HTTP %q", resp.Status)
+		return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q", resp.Status), false)
 
 	case resp.StatusCode/100 != 2:
 		var r models.ErrorResponse
 		err := json.NewDecoder(resp.Body).Decode(&r)
 		if err != nil {
-			return nil, fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err)
+			return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err), false)
 		}
-		return nil, fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message)
+		return nil, errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(resp.StatusCode), fmt.Errorf("azure HTTP %q: %q.\nReceived %q: %q", resp.Status, r.Error.Message, r.Error.Type, r.Error.Description), false)
 	}
 
 	return models.TableFromJSON(resp.Body)
@@ -207,10 +255,27 @@ func (c *Client) KustoRequest(ctx context.Context, cluster string, url string, p
 func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
 	buf, err := json.Marshal(payload)
 	if err != nil {
-		return nil, fmt.Errorf("no Azure request serial: %w", err)
+		return nil, errorsource.DownstreamError(fmt.Errorf("no Azure request serial: %w", err), false)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01", bytes.NewReader(buf))
+	resourceManager, ok := c.cloudSettings.Properties["resourceManager"]
+	if !ok {
+		return nil, fmt.Errorf("the Azure cloud '%s' doesn't have the required property for 'resourceManager'", c.cloudSettings.Name)
+	}
+
+	u, err := url.Parse(resourceManager)
+	if err != nil {
+		return nil, errorsource.DownstreamError(fmt.Errorf("invalid Azure request URL: %w", err), false)
+	}
+
+	// the default path for Azure Resource Graph
+	u = u.JoinPath("/providers/Microsoft.ResourceGraph/resources")
+
+	params := u.Query()
+	params.Add("api-version", "2021-03-01")
+	u.RawQuery = params.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(buf))
 	if err != nil {
 		return nil, fmt.Errorf("no Azure request instance: %w", err)
 	}
@@ -225,7 +290,7 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 
 	resp, err := c.httpClientManagement.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, errorsource.DownstreamError(err, false)
 	}
 
 	defer resp.Body.Close()
@@ -233,15 +298,15 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 	switch {
 	case resp.StatusCode == http.StatusUnauthorized:
 		// HTTP 401 has no error body
-		return nil, fmt.Errorf("azure HTTP %q", resp.Status)
+		return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q", resp.Status), false)
 
 	case resp.StatusCode/100 != 2:
 		var r models.ErrorResponse
 		err := json.NewDecoder(resp.Body).Decode(&r)
 		if err != nil {
-			return nil, fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err)
+			return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err), false)
 		}
-		return nil, fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message)
+		return nil, errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(resp.StatusCode), fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message), false)
 	}
 	var clusterData struct {
 		Data []struct {

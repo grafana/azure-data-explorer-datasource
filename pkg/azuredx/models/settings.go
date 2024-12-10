@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
@@ -41,10 +42,19 @@ type DatasourceSettings struct {
 // It also sets the QueryTimeout and ServerTimeoutValues by parsing QueryTimeoutRaw.
 func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) error {
 	var err error
-	if config.JSONData != nil && len(config.JSONData) > 1 {
+	if len(config.JSONData) > 1 {
 		if err := json.Unmarshal(config.JSONData, d); err != nil {
 			return fmt.Errorf("could not unmarshal DatasourceSettings json: %w", err)
 		}
+	}
+
+	if d.ClusterURL != "" {
+		sanitized, err := helpers.SanitizeClusterUri(d.ClusterURL)
+		if err != nil {
+			return fmt.Errorf("invalid datasource endpoint configuration: %w", err)
+		}
+
+		d.ClusterURL = sanitized
 	}
 
 	if d.QueryTimeoutRaw == "" {

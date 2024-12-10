@@ -554,11 +554,11 @@ func TableFromJSON(rc io.Reader) (*TableResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if tr.Tables == nil || len(tr.Tables) == 0 {
+	if len(tr.Tables) == 0 {
 		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
 	}
 
-	if tr.Exceptions != nil && len(tr.Exceptions) > 0 {
+	if len(tr.Exceptions) > 0 {
 		errMsg := ""
 		for _, e := range tr.Exceptions {
 			errMsg += e + ". "

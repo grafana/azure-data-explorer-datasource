@@ -7,12 +7,14 @@ import (
 	"strings"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth/adxcredentials"
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -46,7 +48,7 @@ func NewDatasource(ctx context.Context, instanceSettings backend.DataSourceInsta
 	adx.settings = datasourceSettings
 	adx.settings.OpenAIAPIKey = strings.TrimSpace(instanceSettings.DecryptedSecureJSONData["OpenAIAPIKey"])
 
-	azureSettings, err := azsettings.ReadFromEnv()
+	azureSettings, err := azsettings.ReadSettings(ctx)
 	if err != nil {
 		backend.Logger.Error("failed to read Azure settings from Grafana", "error", err.Error())
 		return nil, err
@@ -139,6 +141,10 @@ func (adx *AzureDataExplorer) handleQuery(ctx context.Context, q backend.DataQue
 			Meta:  &data.FrameMeta{ExecutedQueryString: qm.Query},
 		})
 		resp.Error = err
+		errWithSource, ok := err.(errorsource.Error)
+		if ok {
+			resp.ErrorSource = errWithSource.ErrorSource()
+		}
 	}
 	return resp
 }
@@ -162,12 +168,18 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	database := q.Database
 	if database == "" {
 		if adx.settings.DefaultDatabase == "" {
-			return backend.DataResponse{}, fmt.Errorf("query submitted without database specified and data source does not have a default database")
+			return backend.DataResponse{}, errorsource.DownstreamError(fmt.Errorf("query submitted without database specified and data source does not have a default database"), false)
 		}
 		database = adx.settings.DefaultDatabase
 	}
 
-	tableRes, err := adx.client.KustoRequest(ctx, clusterURL, "/v1/rest/query", models.RequestPayload{
+	sanitized, err := helpers.SanitizeClusterUri(clusterURL)
+	if err != nil {
+		// errorsource set in SanitizeClusterUri
+		return backend.DataResponse{}, err
+	}
+
+	tableRes, err := adx.client.KustoRequest(ctx, sanitized, "/v1/rest/query", models.RequestPayload{
 		CSL:         q.Query,
 		DB:          database,
 		Properties:  props,
@@ -175,6 +187,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	}, adx.settings.EnableUserTracking)
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
+		// errorsource set in KustoRequest
 		return backend.DataResponse{}, err
 	}
 

@@ -118,7 +118,8 @@ describe('updateCredentials', () => {
 
       const updatedOptions = updateCredentials(options, credentials);
 
-      expect(updatedOptions.secureJsonData['azureClientSecret']).toEqual('fake-secret');
+      expect(updatedOptions.secureJsonData).toBeDefined();
+      expect(updatedOptions.secureJsonData!['azureClientSecret']).toEqual('fake-secret');
       expect(updatedOptions.secureJsonFields['azureClientSecret']).toBeFalsy();
       expect(updatedOptions.secureJsonFields['clientSecret']).toBeFalsy();
     });
@@ -148,7 +149,8 @@ describe('updateCredentials', () => {
 
         const updatedOptions = updateCredentials(options, credentials);
 
-        expect(updatedOptions.secureJsonData['azureClientSecret']).toBeUndefined();
+        expect(updatedOptions.secureJsonData).toBeDefined();
+        expect(updatedOptions.secureJsonData!['azureClientSecret']).toBeUndefined();
         expect(updatedOptions.secureJsonFields['azureClientSecret']).toBeTruthy();
         expect(updatedOptions.secureJsonFields['clientSecret']).toBeFalsy();
       });
@@ -161,7 +163,8 @@ describe('updateCredentials', () => {
 
         const updatedOptions = updateCredentials(options, credentials);
 
-        expect(updatedOptions.secureJsonData['azureClientSecret']).toEqual('new-fake-secret');
+        expect(updatedOptions.secureJsonData).toBeDefined();
+        expect(updatedOptions.secureJsonData!['azureClientSecret']).toEqual('new-fake-secret');
         expect(updatedOptions.secureJsonFields['azureClientSecret']).toBeFalsy();
         expect(updatedOptions.secureJsonFields['clientSecret']).toBeFalsy();
       });
@@ -189,7 +192,8 @@ describe('updateCredentials', () => {
 
         const updatedOptions = updateCredentials(options, credentials!);
 
-        expect(updatedOptions.secureJsonData['azureClientSecret']).toBeUndefined();
+        expect(updatedOptions.secureJsonData).toBeDefined();
+        expect(updatedOptions.secureJsonData!['azureClientSecret']).toBeUndefined();
         expect(updatedOptions.secureJsonFields['azureClientSecret']).toBeFalsy();
         expect(updatedOptions.secureJsonFields['clientSecret']).toBeTruthy();
       });
@@ -202,7 +206,8 @@ describe('updateCredentials', () => {
 
         const updatedOptions = updateCredentials(options, credentials!);
 
-        expect(updatedOptions.secureJsonData['azureClientSecret']).toEqual('new-fake-secret');
+        expect(updatedOptions.secureJsonData).toBeDefined();
+        expect(updatedOptions.secureJsonData!['azureClientSecret']).toEqual('new-fake-secret');
         expect(updatedOptions.secureJsonFields['azureClientSecret']).toBeFalsy();
         expect(updatedOptions.secureJsonFields['clientSecret']).toBeFalsy();
       });
