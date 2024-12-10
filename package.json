@@ -10,7 +10,7 @@
     "e2e:playwright:report": "yarn playwright show-report",
     "lint": "eslint --cache --ignore-path ./.gitignore --ext .js,.jsx,.ts,.tsx .",
     "lint:fix": "yarn run lint --fix",
-    "server": "docker-compose up --build",
+    "server": "docker compose up --build",
     "sign": "npx --yes @grafana/sign-plugin@latest",
     "test": "jest --watch --onlyChanged",
     "test:ci": "jest --passWithNoTests --maxWorkers 4",
@@ -18,7 +18,8 @@
     "test:coverage:changes": "jest --coverage --changedSince=origin/main",
     "typecheck": "tsc --noEmit",
     "generate-release-notes": "PREV_TAG=$(git tag | tail -n 1) && gh api --method POST /repos/grafana/azure-data-explorer-datasource/releases/generate-notes -f tag_name=v${npm_package_version} -f target_commitish=main -f previous_tag_name=${PREV_TAG} | jq -r .body",
-    "spellcheck": "cspell -c cspell.config.json \"**/*.{ts,tsx,js,go,md,mdx,yml,yaml,json,scss,css}\""
+    "spellcheck": "cspell -c cspell.config.json \"**/*.{ts,tsx,js,go,md,mdx,yml,yaml,json,scss,css}\"",
+    "e2e": "playwright test"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -29,10 +30,10 @@
     "@babel/core": "^7.21.4",
     "@grafana/e2e": "10.4.1",
     "@grafana/e2e-selectors": "10.4.1",
-    "@grafana/eslint-config": "^7.0.0",
-    "@grafana/plugin-e2e": "1.3.0-canary.942.7d18aba.0",
+    "@grafana/eslint-config": "^8.0.0",
+    "@grafana/plugin-e2e": "^1.13.0",
     "@grafana/plugin-meta-extractor": "^0.0.1",
-    "@grafana/tsconfig": "^1.3.0-rc1",
+    "@grafana/tsconfig": "^2.0.0",
     "@playwright/test": "^1.44.0",
     "@swc/core": "^1.3.90",
     "@swc/helpers": "^0.5.0",
@@ -80,13 +81,19 @@
     "sass-loader": "14.1.1",
     "style-loader": "3.3.4",
     "swc-loader": "^0.2.3",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "5.4.3",
+    "typescript": "5.5.4",
     "uuid": "^11.0.3",
-    "webpack": "^5.86.0",
+    "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4",
-    "webpack-livereload-plugin": "^3.0.2"
+    "webpack-livereload-plugin": "^3.0.2",
+    "@stylistic/eslint-plugin-ts": "^2.9.0",
+    "imports-loader": "^5.0.0",
+    "semver": "^7.6.3",
+    "terser-webpack-plugin": "^5.3.10",
+    "webpack-subresource-integrity": "^5.1.0",
+    "webpack-virtual-modules": "^0.6.2"
   },
   "dependencies": {
     "@emotion/css": "11.11.2",
