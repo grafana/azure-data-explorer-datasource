@@ -199,9 +199,3 @@ jobs:
       - name: Run Playwright tests
         id: run-tests
         run: yarn run e2e:playwright
-
-      - name: Publish report to GCS
-        if: ${{ (always() && steps.run-tests.outcome == 'success') || (failure() && steps.run-tests.outcome == 'failure') && github.event.organization.login == 'grafana' }}
-        uses: grafana/plugin-actions/publish-report@main
-        with:
-          grafana-version: ${{ matrix.GRAFANA_IMAGE.VERSION }}
