@@ -183,6 +183,7 @@ jobs:
       - name: Copy provisioning file
         shell: bash
         run: |
+          mkdir -p provisioning/datasources
           cp .provisioning-repo/provisioning/datasources/adx.yaml provisioning/datasources/
 
       - name: Start Grafana
