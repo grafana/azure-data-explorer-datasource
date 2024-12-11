@@ -60,10 +60,6 @@ jobs:
           version: latest
           args: buildAll
 
-      - name: Sign plugin
-        run: run sign
-        if: ${{ env.GRAFANA_ACCESS_POLICY_TOKEN != '' }}
-
       - name: Get plugin metadata
         id: metadata
         run: |
@@ -91,7 +87,7 @@ jobs:
           retention-days: 5
 
   resolve-versions:
-    if: github.repository_owner == 'grafana'
+    if: github.repository == 'grafana/azure-data-explorer-datasource'
     name: Resolve Grafana images
     runs-on: ubuntu-latest
     timeout-minutes: 3
@@ -105,7 +101,7 @@ jobs:
           version-resolver-type: version-support-policy
 
   playwright-tests:
-    if: github.repository_owner == 'grafana'
+    if: github.repository == 'grafana/azure-data-explorer-datasource'
     needs: [resolve-versions, build]
     timeout-minutes: 60
     strategy:
