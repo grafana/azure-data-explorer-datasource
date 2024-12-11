@@ -13,7 +13,7 @@ const addAdxVariable = async (
   options: { queryType: AdxQueryType; cluster?: string; database?: string; table?: string }
 ) => {
   const { queryType, cluster, database, table } = options;
-  const variableEditPage = await variablePage.clickAddNew(isFirst);
+  const variableEditPage = await variablePage.clickAddNew();
 
   await variableEditPage.setVariableType('Query');
   await variableEditPage.datasource.set(ds);

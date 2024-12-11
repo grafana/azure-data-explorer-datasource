@@ -20,20 +20,19 @@ test.describe('Create Azure Data Explorer datasource', () => {
     // await page.keyboard.insertText('App Registration');
     // await page.keyboard.press('Enter');
 
-    const credentials = datasource.jsonData.azureCredentials;
-    if (credentials && credentials.authType === 'clientsecret') {
-      await page.getByTestId(selectors.components.configEditor.azureCloud.input).getByRole('combobox').click();
-      await page.keyboard.insertText('Azure');
-      await page.keyboard.press('Enter');
-      await page.getByTestId(selectors.components.configEditor.tenantID.input).click();
-      await page.keyboard.insertText(credentials.tenantId || '');
-      await page.getByTestId(selectors.components.configEditor.clientID.input).click();
-      await page.keyboard.insertText(credentials.clientId || '');
-      await page.getByTestId(selectors.components.configEditor.clientSecret.input).click();
-      await page.keyboard.insertText((credentials.clientSecret as string) || '');
-      await page.getByTestId(selectors.components.configEditor.clusterURL.input).click();
-      await page.keyboard.insertText(datasource.jsonData.clusterUrl);
-    }
+    const credentials = datasource.jsonData;
+    const secure = datasource.secureJsonData;
+    await page.getByTestId(selectors.components.configEditor.azureCloud.input).getByRole('combobox').click();
+    await page.keyboard.insertText('Azure');
+    await page.keyboard.press('Enter');
+    await page.getByTestId(selectors.components.configEditor.tenantID.input).click();
+    await page.keyboard.insertText(credentials.tenantId || '');
+    await page.getByTestId(selectors.components.configEditor.clientID.input).click();
+    await page.keyboard.insertText(credentials.clientId || '');
+    await page.getByTestId(selectors.components.configEditor.clientSecret.input).click();
+    await page.keyboard.insertText((secure.clientSecret as string) || '');
+    await page.getByTestId(selectors.components.configEditor.clusterURL.input).click();
+    await page.keyboard.insertText(datasource.jsonData.clusterUrl);
     await expect(configPage.saveAndTest()).toBeOK();
   });
 });
