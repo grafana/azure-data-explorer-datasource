@@ -43,22 +43,6 @@ jobs:
       - name: Build frontend
         run: yarn run build
 
-      - name: Get secrets for action to create github token
-        id: get-secrets
-        uses: grafana/shared-workflows/actions/get-vault-secrets@main
-        with:
-          common_secrets: |
-            GITHUB_APP_ID=data-sources/partner-datasources-app:app-id
-            GITHUB_APP_PRIVATE_KEY=data-sources/partner-datasources-app:private-key
-
-      - name: Create github token
-        uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ env.GITHUB_APP_ID }}
-          private-key: ${{ env.GITHUB_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-
       - name: Setup Go environment
         uses: actions/setup-go@v5
         with:
@@ -107,6 +91,7 @@ jobs:
           retention-days: 5
 
   resolve-versions:
+    if: github.repository_owner == 'grafana'
     name: Resolve Grafana images
     runs-on: ubuntu-latest
     timeout-minutes: 3
@@ -120,6 +105,7 @@ jobs:
           version-resolver-type: version-support-policy
 
   playwright-tests:
+    if: github.repository_owner == 'grafana'
     needs: [resolve-versions, build]
     timeout-minutes: 60
     strategy:
