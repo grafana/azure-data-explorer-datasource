@@ -1,0 +1,208 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      plugin-id: ${{ steps.metadata.outputs.plugin-id }}
+      plugin-version: ${{ steps.metadata.outputs.plugin-version }}
+      archive: ${{ steps.metadata.outputs.archive }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Check types
+        run: yarn run typecheck
+
+      - name: Lint
+        run: yarn run lint
+
+      - name: Unit tests
+        run: yarn run test:ci
+
+      - name: Build frontend
+        run: yarn run build
+
+      - name: Get secrets for action to create github token
+        id: get-secrets
+        uses: grafana/shared-workflows/actions/get-vault-secrets@main
+        with:
+          common_secrets: |
+            GITHUB_APP_ID=data-sources/partner-datasources-app:app-id
+            GITHUB_APP_PRIVATE_KEY=data-sources/partner-datasources-app:private-key
+
+      - name: Create github token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ env.GITHUB_APP_ID }}
+          private-key: ${{ env.GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Test backend
+        uses: magefile/mage-action@v3
+        with:
+          version: latest
+          args: coverage
+
+      - name: Build backend
+        uses: magefile/mage-action@v3
+        with:
+          version: latest
+          args: buildAll
+
+      - name: Sign plugin
+        run: run sign
+        if: ${{ env.GRAFANA_ACCESS_POLICY_TOKEN != '' }}
+
+      - name: Get plugin metadata
+        id: metadata
+        run: |
+          sudo apt-get install jq
+
+          export GRAFANA_PLUGIN_ID=$(cat dist/plugin.json | jq -r .id)
+          export GRAFANA_PLUGIN_VERSION=$(cat dist/plugin.json | jq -r .info.version)
+          export GRAFANA_PLUGIN_ARTIFACT=${GRAFANA_PLUGIN_ID}-${GRAFANA_PLUGIN_VERSION}.zip
+
+          echo "plugin-id=${GRAFANA_PLUGIN_ID}" >> $GITHUB_OUTPUT
+          echo "plugin-version=${GRAFANA_PLUGIN_VERSION}" >> $GITHUB_OUTPUT
+          echo "archive=${GRAFANA_PLUGIN_ARTIFACT}" >> $GITHUB_OUTPUT
+
+      - name: Package plugin
+        id: package-plugin
+        run: |
+          mv dist ${{ steps.metadata.outputs.plugin-id }}
+          zip ${{ steps.metadata.outputs.archive }} ${{ steps.metadata.outputs.plugin-id }} -r
+
+      - name: Archive Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.metadata.outputs.plugin-id }}-${{ steps.metadata.outputs.plugin-version }}
+          path: ${{ steps.metadata.outputs.archive }}
+          retention-days: 5
+
+  resolve-versions:
+    name: Resolve Grafana images
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      matrix: ${{ steps.resolve-versions.outputs.matrix }}
+    steps:
+      - name: Resolve Grafana E2E versions
+        id: resolve-versions
+        uses: grafana/plugin-actions/e2e-version@main
+        with:
+          version-resolver-type: version-support-policy
+
+  playwright-tests:
+    needs: [resolve-versions, build]
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        GRAFANA_IMAGE: ${{fromJson(needs.resolve-versions.outputs.matrix)}}
+    name: ${{ matrix.GRAFANA_IMAGE.name }}@${{ matrix.GRAFANA_IMAGE.VERSION }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Download build
+        id: download-build
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.plugin-id }}-${{ needs.build.outputs.plugin-version }}
+
+      - name: Unpack build
+        run: |
+          unzip ${{ needs.build.outputs.archive }}
+          mv ${{ needs.build.outputs.plugin-id }} dist
+
+      - name: Get secrets
+        id: get-secrets
+        uses: grafana/shared-workflows/actions/get-vault-secrets@main
+        with:
+          common_secrets: |
+            GITHUB_APP_ID=data-sources/partner-datasources-app:app-id
+            GITHUB_APP_PRIVATE_KEY=data-sources/partner-datasources-app:private-key
+
+      - name: Generate GitHub token
+        id: generate-github-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ env.GITHUB_APP_ID }}
+          private-key: ${{ env.GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Checkout provisioning file
+        uses: actions/checkout@v4
+        with:
+          repository: grafana/plugin-provisioning
+          ref: main
+          path: .provisioning-repo
+          sparse-checkout: provisioning/datasources/adx.yaml
+          sparse-checkout-cone-mode: false
+          token: ${{ steps.generate-github-token.outputs.token }}
+
+      - name: Copy provisioning file
+        shell: bash
+        run: |
+          cp .provisioning-repo/provisioning/datasources/adx.yaml provisioning/datasources/
+
+      - name: Start Grafana
+        shell: bash
+        run: |
+          docker compose pull
+          docker compose up --detach --wait --wait-timeout 60
+        env:
+          GRAFANA_IMAGE: ${{ matrix.GRAFANA_IMAGE.NAME }}
+          GRAFANA_VERSION: ${{ matrix.GRAFANA_IMAGE.VERSION }}
+          GF_ENTERPRISE_LICENSE_TEXT: ${{ secrets.GF_ENTERPRISE_LICENSE_TEXT }}
+
+      - name: Run Playwright tests
+        id: run-tests
+        run: yarn run playwright:test
+        env:
+          IRRELEVANT: 'nonsense'
+
+      - name: Publish report to GCS
+        if: ${{ (always() && steps.run-tests.outcome == 'success') || (failure() && steps.run-tests.outcome == 'failure') && github.event.organization.login == 'grafana' }}
+        uses: grafana/plugin-actions/publish-report@main
+        with:
+          grafana-version: ${{ matrix.GRAFANA_IMAGE.VERSION }}
