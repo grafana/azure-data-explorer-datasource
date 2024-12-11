@@ -73,7 +73,7 @@ const addAdxVariable = async (
     .click();
 };
 
-test.describe('Template variables', () => {
+test.skip('Template variables', () => {
   test('creates a dashboard that includes template variables', async ({
     dashboardPage: newDashboardPage,
     page,

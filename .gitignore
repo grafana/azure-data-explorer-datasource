@@ -15,3 +15,4 @@ provisioning
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+.eslintcache

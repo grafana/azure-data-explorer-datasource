@@ -7,9 +7,11 @@
     "go.sum",
     "mage_output_file.go",
     "node_modules/**",
+    "package.json",
     "pkg/azuredx/models/testdata/**",
     "pkg/azuredx/testdata/**",
     "provisioning/**",
+    "playwright-report",
     "src/dashboards/**",
     "src/libs/**",
     "yarn.lock"
