@@ -87,7 +87,6 @@ jobs:
           retention-days: 5
 
   resolve-versions:
-    if: github.repository == 'grafana/azure-data-explorer-datasource'
     name: Resolve Grafana images
     runs-on: ubuntu-latest
     timeout-minutes: 3
@@ -140,39 +139,17 @@ jobs:
         id: get-secrets
         uses: grafana/shared-workflows/actions/get-vault-secrets@main
         with:
-          common_secrets: |
-            GITHUB_APP_ID=data-sources/partner-datasources-app:app-id
-            GITHUB_APP_PRIVATE_KEY=data-sources/partner-datasources-app:private-key
-
-      - name: Generate GitHub token
-        id: generate-github-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ env.GITHUB_APP_ID }}
-          private-key: ${{ env.GITHUB_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-
-      - name: Checkout provisioning file
-        uses: actions/checkout@v4
-        with:
-          repository: grafana/plugin-provisioning
-          ref: main
-          path: .provisioning-repo
-          sparse-checkout: provisioning/datasources/adx.yaml
-          sparse-checkout-cone-mode: false
-          token: ${{ steps.generate-github-token.outputs.token }}
-
-      - name: Copy provisioning file
-        shell: bash
-        run: |
-          mkdir -p provisioning/datasources
-          cp .provisioning-repo/provisioning/datasources/adx.yaml provisioning/datasources/
+          repo_secrets: |
+            TENANT_ID=azure-data-explorer-datasource/e2e:tenantId
+            CLIENT_ID=azure-data-explorer-datasource/e2e:clientId
+            CLIENT_SECRET=azure-data-explorer-datasource/e2e:clientSecret
+            CLUSTER_URL=azure-data-explorer-datasource/e2e:clusterUrl
 
       - name: Start Grafana
         shell: bash
         run: |
           docker compose pull
-          docker compose up --detach --wait --wait-timeout 60
+          TENANT_ID=${{ env.TENANT_ID}} CLIENT_ID=${{ env.CLIENT_ID}} CLIENT_SECRET=${{ env.CLIENT_SECRET}} CLUSTER_URL=${{ env.CLUSTER_URL}} docker compose up --detach --wait --wait-timeout 60
         env:
           GRAFANA_IMAGE: ${{ matrix.GRAFANA_IMAGE.NAME }}
           GRAFANA_VERSION: ${{ matrix.GRAFANA_IMAGE.VERSION }}
