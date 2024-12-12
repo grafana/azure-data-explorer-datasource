@@ -9,6 +9,7 @@ deleteDatasources:
 datasources:
   - editable: true
     enabled: true
+    uid: ADX1234
     jsonData:
       clientId: $CLIENT_ID
       tenantId: $TENANT_ID
@@ -23,6 +24,7 @@ datasources:
 
   - editable: true
     enabled: true
+    uid: ADX12345
     jsonData:
       onBehalfOf: true
       oauthPassThru: true

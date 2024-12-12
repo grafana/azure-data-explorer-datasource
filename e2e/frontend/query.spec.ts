@@ -6,6 +6,7 @@ test.describe('Azure Data Explorer queries', () => {
   test('Create a KQL query', async ({ dashboardPage, page, readProvisionedDataSource }) => {
     const datasource = await readProvisionedDataSource<AdxDataSourceOptions, AdxDataSourceSecureOptions>({
       fileName: 'adx.yaml',
+      name: 'Azure Data Explorer',
     });
     const panel = await dashboardPage.addPanel();
     await dashboardPage.timeRange.set({
