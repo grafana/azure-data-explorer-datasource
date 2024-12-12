@@ -29,7 +29,15 @@ test.describe('Azure Data Explorer queries', () => {
       await panel.getQueryEditorRow('A').getByText('Cluster').click({ force: true });
     }
     await page.getByLabel('Select options menu').getByText('grafanaadxdev').click({ force: true });
-    await page.getByTestId(selectors.components.queryEditor.database.input.selector).click({ force: true });
+    if (versionValue) {
+      await panel
+        .getQueryEditorRow('A')
+        .getByTestId(selectors.components.queryEditor.database.input.selector)
+        .click({ force: true });
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await panel.getQueryEditorRow('A').getByText('Database').click({ force: true });
+    }
     await page.getByLabel('Select options menu').getByText('PerfTest').click({ force: true });
     await page.getByText('KQL').click({ force: true });
     await page.waitForTimeout(10000);
@@ -69,7 +77,15 @@ test.describe('Azure Data Explorer queries', () => {
       await panel.getQueryEditorRow('A').getByText('Cluster').click({ force: true });
     }
     await page.getByLabel('Select options menu').getByText('grafanaadxdev').click({ force: true });
-    await page.getByTestId(selectors.components.queryEditor.database.input.selector).click({ force: true });
+    if (versionValue) {
+      await panel
+        .getQueryEditorRow('A')
+        .getByTestId(selectors.components.queryEditor.database.input.selector)
+        .click({ force: true });
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await panel.getQueryEditorRow('A').getByText('Database').click({ force: true });
+    }
     await page.getByLabel('Select options menu').getByText('PerfTest').click({ force: true });
     await page
       .getByTestId(selectors.components.queryEditor.tableFrom.input)
