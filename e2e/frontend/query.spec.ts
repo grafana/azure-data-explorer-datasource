@@ -20,12 +20,13 @@ test.describe('Azure Data Explorer queries', () => {
     const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
 
     if (versionValue) {
-      await expect(
-        panel.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.cluster.input.selector)
-      ).toBeVisible();
+      await panel
+        .getQueryEditorRow('A')
+        .getByTestId(selectors.components.queryEditor.cluster.input.selector)
+        .click({ force: true });
     } else {
       // data-testid was not passed to the select component prior to 11.1.0
-      await expect(panel.getQueryEditorRow('A').getByText('Cluster')).toBeVisible();
+      await panel.getQueryEditorRow('A').getByText('Cluster').click({ force: true });
     }
     await page.getByLabel('Select options menu').getByText('grafanaadxdev').click({ force: true });
     await page.getByTestId(selectors.components.queryEditor.database.input.selector).click({ force: true });
@@ -44,7 +45,7 @@ test.describe('Azure Data Explorer queries', () => {
     expect(panel.panel.fieldNames).toContainText(['_val1_', '_val2_']);
   });
 
-  test('Create a builder query', async ({ dashboardPage, page, readProvisionedDataSource }) => {
+  test('Create a builder query', async ({ dashboardPage, page, readProvisionedDataSource, grafanaVersion }) => {
     const datasource = await readProvisionedDataSource<AdxDataSourceOptions, AdxDataSourceSecureOptions>({
       fileName: 'adx.yaml',
     });
@@ -56,7 +57,17 @@ test.describe('Azure Data Explorer queries', () => {
     await panel.datasource.set(datasource.name);
     await panel.setVisualization('Table');
 
-    await page.getByTestId(selectors.components.queryEditor.cluster.input.selector).click({ force: true });
+    const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
+
+    if (versionValue) {
+      await panel
+        .getQueryEditorRow('A')
+        .getByTestId(selectors.components.queryEditor.cluster.input.selector)
+        .click({ force: true });
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await panel.getQueryEditorRow('A').getByText('Cluster').click({ force: true });
+    }
     await page.getByLabel('Select options menu').getByText('grafanaadxdev').click({ force: true });
     await page.getByTestId(selectors.components.queryEditor.database.input.selector).click({ force: true });
     await page.getByLabel('Select options menu').getByText('PerfTest').click({ force: true });
