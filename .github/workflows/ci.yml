@@ -153,8 +153,56 @@ jobs:
         env:
           GRAFANA_IMAGE: ${{ matrix.GRAFANA_IMAGE.NAME }}
           GRAFANA_VERSION: ${{ matrix.GRAFANA_IMAGE.VERSION }}
-          GF_ENTERPRISE_LICENSE_TEXT: ${{ secrets.GF_ENTERPRISE_LICENSE_TEXT }}
 
       - name: Run Playwright tests
         id: run-tests
         run: yarn run e2e:playwright
+
+  playwright-tests-fork:
+    if: github.repository != 'grafana/azure-data-explorer-datasource'
+    needs: [resolve-versions, build]
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        GRAFANA_IMAGE: ${{fromJson(needs.resolve-versions.outputs.matrix)}}
+    name: ${{ matrix.GRAFANA_IMAGE.name }}@${{ matrix.GRAFANA_IMAGE.VERSION }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Download build
+        id: download-build
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.plugin-id }}-${{ needs.build.outputs.plugin-version }}
+
+      - name: Unpack build
+        run: |
+          unzip ${{ needs.build.outputs.archive }}
+          mv ${{ needs.build.outputs.plugin-id }} dist
+
+      - name: Start Grafana
+        shell: bash
+        run: |
+          docker compose pull
+          docker compose up --detach --wait --wait-timeout 60
+        env:
+          GRAFANA_IMAGE: ${{ matrix.GRAFANA_IMAGE.NAME }}
+          GRAFANA_VERSION: ${{ matrix.GRAFANA_IMAGE.VERSION }}
+
+      - name: Run Playwright tests
+        id: run-tests
+        run: yarn run e2e:playwright e2e/smoke/
