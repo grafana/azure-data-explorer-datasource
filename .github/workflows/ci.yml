@@ -140,10 +140,10 @@ jobs:
         uses: grafana/shared-workflows/actions/get-vault-secrets@main
         with:
           repo_secrets: |
-            TENANT_ID=azure-data-explorer-datasource/e2e:tenantId
-            CLIENT_ID=azure-data-explorer-datasource/e2e:clientId
-            CLIENT_SECRET=azure-data-explorer-datasource/e2e:clientSecret
-            CLUSTER_URL=azure-data-explorer-datasource/e2e:clusterUrl
+            TENANT_ID=e2e:tenantId
+            CLIENT_ID=e2e:clientId
+            CLIENT_SECRET=e2e:clientSecret
+            CLUSTER_URL=e2e:clusterUrl
 
       - name: Start Grafana
         shell: bash
