@@ -13,6 +13,7 @@ test.describe('Create Azure Data Explorer datasource', () => {
     });
     const datasource = await readProvisionedDataSource<AdxDataSourceOptions, AdxDataSourceSecureOptions>({
       fileName: 'adx.yaml',
+      name: 'Azure Data Explorer',
     });
 
     // The next 3 lines are needed if feature flags for additional auth are enabled
