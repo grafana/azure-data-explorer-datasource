@@ -1,9 +1,10 @@
 import { expect, test } from '@grafana/plugin-e2e';
 import { selectors } from '../../src/test/selectors';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from '../../src/types';
+import { isVersionGtOrEq } from '../../src/version';
 
 test.describe('Azure Data Explorer queries', () => {
-  test('Create a KQL query', async ({ dashboardPage, page, readProvisionedDataSource }) => {
+  test('Create a KQL query', async ({ dashboardPage, page, readProvisionedDataSource, grafanaVersion }) => {
     const datasource = await readProvisionedDataSource<AdxDataSourceOptions, AdxDataSourceSecureOptions>({
       fileName: 'adx.yaml',
       name: 'Azure Data Explorer',
@@ -16,7 +17,16 @@ test.describe('Azure Data Explorer queries', () => {
     await panel.datasource.set(datasource.name);
     await panel.setVisualization('Table');
 
-    await page.getByTestId(selectors.components.queryEditor.cluster.input.selector).click({ force: true });
+    const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
+
+    if (versionValue) {
+      await expect(
+        panel.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.cluster.input.selector)
+      ).toBeVisible();
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await expect(panel.getQueryEditorRow('A').getByText('Cluster')).toBeVisible();
+    }
     await page.getByLabel('Select options menu').getByText('grafanaadxdev').click({ force: true });
     await page.getByTestId(selectors.components.queryEditor.database.input.selector).click({ force: true });
     await page.getByLabel('Select options menu').getByText('PerfTest').click({ force: true });
