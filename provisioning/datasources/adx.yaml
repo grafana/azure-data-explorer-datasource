@@ -10,14 +10,14 @@ datasources:
   - editable: true
     enabled: true
     jsonData:
-      clientId: ${CLIENT_ID}
-      tenantId: ${TENANT_ID}
+      clientId: $CLIENT_ID
+      tenantId: $TENANT_ID
       tlsAuth: false
       tlsAuthWithCACert: false
-      clusterUrl: ${CLUSTER_URL}
+      clusterUrl: $CLUSTER_URL
     name: Azure Data Explorer
     secureJsonData:
-      clientSecret: ${CLIENT_SECRET}
+      clientSecret: $CLIENT_SECRET
     type: grafana-azure-data-explorer-datasource
     version: 1
 
@@ -26,13 +26,13 @@ datasources:
     jsonData:
       onBehalfOf: true
       oauthPassThru: true
-      clientId: ${CLIENT_ID}
-      tenantId: ${TENANT_ID}
+      clientId: $CLIENT_ID
+      tenantId: $TENANT_ID
       tlsAuth: false
       tlsAuthWithCACert: false
-      clusterUrl: ${CLUSTER_URL}
+      clusterUrl: $CLUSTER_URL
     name: Azure Data Explorer (OBO)
     secureJsonData:
-      clientSecret: ${CLIENT_SECRET}
+      clientSecret: $CLIENT_SECRET
     type: grafana-azure-data-explorer-datasource
     version: 1
