@@ -243,7 +243,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 		for _, f := range originalDFs {
 			formattedDF, err := models.ToADXTimeSeries(f)
 			if err != nil {
-				return resp, err
+				return resp, errorsource.DownstreamError(err, false)
 			}
 			resp.Frames = append(resp.Frames, formattedDF)
 		}
