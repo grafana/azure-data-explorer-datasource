@@ -1,0 +1,40 @@
+apiVersion: 1
+
+deleteDatasources:
+  - name: Azure Data Explorer
+    orgId: 1
+  - name: Azure Data Explorer (OBO)
+    orgId: 1
+
+datasources:
+  - editable: true
+    enabled: true
+    uid: ADX1234
+    jsonData:
+      clientId: $CLIENT_ID
+      tenantId: $TENANT_ID
+      tlsAuth: false
+      tlsAuthWithCACert: false
+      clusterUrl: $CLUSTER_URL
+    name: Azure Data Explorer
+    secureJsonData:
+      clientSecret: $CLIENT_SECRET
+    type: grafana-azure-data-explorer-datasource
+    version: 1
+
+  - editable: true
+    enabled: true
+    uid: ADX12345
+    jsonData:
+      onBehalfOf: true
+      oauthPassThru: true
+      clientId: $CLIENT_ID
+      tenantId: $TENANT_ID
+      tlsAuth: false
+      tlsAuthWithCACert: false
+      clusterUrl: $CLUSTER_URL
+    name: Azure Data Explorer (OBO)
+    secureJsonData:
+      clientSecret: $CLIENT_SECRET
+    type: grafana-azure-data-explorer-datasource
+    version: 1
