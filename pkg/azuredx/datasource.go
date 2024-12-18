@@ -14,6 +14,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/client"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -140,6 +141,10 @@ func (adx *AzureDataExplorer) handleQuery(ctx context.Context, q backend.DataQue
 			Meta:  &data.FrameMeta{ExecutedQueryString: qm.Query},
 		})
 		resp.Error = err
+		errWithSource, ok := err.(errorsource.Error)
+		if ok {
+			resp.ErrorSource = errWithSource.ErrorSource()
+		}
 	}
 	return resp
 }
@@ -163,14 +168,15 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	database := q.Database
 	if database == "" {
 		if adx.settings.DefaultDatabase == "" {
-			return backend.DataResponse{}, fmt.Errorf("query submitted without database specified and data source does not have a default database")
+			return backend.DataResponse{}, errorsource.DownstreamError(fmt.Errorf("query submitted without database specified and data source does not have a default database"), false)
 		}
 		database = adx.settings.DefaultDatabase
 	}
 
 	sanitized, err := helpers.SanitizeClusterUri(clusterURL)
 	if err != nil {
-		return backend.DataResponse{}, fmt.Errorf("invalid clusterUri: %w", err)
+		// errorsource set in SanitizeClusterUri
+		return backend.DataResponse{}, err
 	}
 
 	tableRes, err := adx.client.KustoRequest(ctx, sanitized, "/v1/rest/query", models.RequestPayload{
@@ -181,6 +187,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	}, adx.settings.EnableUserTracking)
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
+		// errorsource set in KustoRequest
 		return backend.DataResponse{}, err
 	}
 
@@ -236,7 +243,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 		for _, f := range originalDFs {
 			formattedDF, err := models.ToADXTimeSeries(f)
 			if err != nil {
-				return resp, err
+				return resp, errorsource.DownstreamError(err, false)
 			}
 			resp.Frames = append(resp.Frames, formattedDF)
 		}

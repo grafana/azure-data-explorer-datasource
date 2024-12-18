@@ -2,7 +2,6 @@ package azuredx
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -86,7 +85,8 @@ func TestDatasource(t *testing.T) {
 
 		res := adx.handleQuery(context.Background(), query, &backend.User{Login: UserLogin})
 		require.Error(t, res.Error)
-		require.Equal(t, res.Error, fmt.Errorf("query submitted without database specified and data source does not have a default database"))
+		require.Equal(t, res.ErrorSource, backend.ErrorSourceDownstream)
+		require.Equal(t, res.Error.Error(), "query submitted without database specified and data source does not have a default database")
 	})
 }
 

@@ -32,9 +32,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         <EditorFieldGroup>
           <EditorField label="Filters" optional={true}>
             <>
-              {query.expression.where.expressions.length ? (
+              {query.expression?.where?.expressions.length ? (
                 <div className={styles.filters}>
-                  {query.expression.where.expressions.map((_, i) => (
+                  {query.expression?.where?.expressions.map((_, i) => (
                     <div key={`filter${i}`}>
                       <KQLFilter
                         index={i}

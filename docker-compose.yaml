@@ -6,9 +6,15 @@ services:
     build:
       context: ./.config
       args:
+        grafana_image: ${GRAFANA_IMAGE:-grafana-enterprise}
         grafana_version: ${GRAFANA_VERSION:-9.1.2}
     ports:
       - 3000:3000/tcp
     volumes:
       - ./dist:/var/lib/grafana/plugins/azure-data-explorer-datasource
       - ./provisioning:/etc/grafana/provisioning
+    environment:
+      TENANT_ID: ${TENANT_ID}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      CLUSTER_URL: ${CLUSTER_URL}

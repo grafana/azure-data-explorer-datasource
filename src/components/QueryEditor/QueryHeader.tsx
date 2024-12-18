@@ -188,6 +188,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       ></ConfirmModal>
       <InlineSelect
         label="Cluster"
+        data-testid={selectors.components.queryEditor.cluster.input.label}
         aria-label="Cluster"
         options={clusters.concat({
           ...templateVariableOptions,
@@ -200,6 +201,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       />
       <InlineSelect
         label="Database"
+        data-testid={selectors.components.queryEditor.database.input.label}
         aria-label="Database"
         options={databases.concat({
           ...templateVariableOptions,

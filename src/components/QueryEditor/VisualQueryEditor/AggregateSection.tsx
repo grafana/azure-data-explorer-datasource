@@ -23,24 +23,24 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
   templateVariableOptions,
   onChange: onQueryChange,
 }) => {
-  const expressions = query.expression.reduce.expressions;
+  const expressions = query.expression?.reduce?.expressions;
   const [aggregates, setAggregates] = useState(expressions);
-  const [currentTable, setCurrentTable] = useState(query.expression.from?.property.name);
+  const [currentTable, setCurrentTable] = useState(query.expression?.from?.property.name);
 
   useEffect(() => {
     if (!aggregates.length && expressions?.length) {
       setAggregates(expressions);
     }
-  }, [aggregates.length, expressions]);
+  }, [aggregates?.length, expressions]);
 
   useEffect(() => {
     // New table
     if (currentTable !== query.expression.from?.property.name) {
       // Reset state
       setAggregates([]);
-      setCurrentTable(query.expression.from?.property.name);
+      setCurrentTable(query.expression?.from?.property.name);
     }
-  }, [currentTable, query.expression.from?.property.name]);
+  }, [currentTable, query.expression?.from?.property.name]);
 
   const onChange = (newItems: Array<Partial<QueryEditorReduceExpression>>) => {
     const cleaned = newItems.map((v): QueryEditorReduceExpression => {
@@ -67,7 +67,7 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
 
     const newExpression = {
       ...query.expression,
-      reduce: { ...query.expression.reduce, expressions: validExpressions },
+      reduce: { ...query.expression?.reduce, expressions: validExpressions },
     };
     onQueryChange({
       ...query,

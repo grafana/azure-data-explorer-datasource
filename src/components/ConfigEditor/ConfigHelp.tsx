@@ -1,15 +1,16 @@
-import { DataSourceSettings } from '@grafana/data';
+import { getCredentials } from './AzureCredentialsConfig';
+
+import { isCredentialsComplete } from '@grafana/azure-sdk';
 import { ConfigSection } from '@grafana/experimental';
 import React, { useMemo } from 'react';
-import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
-import { isCredentialsComplete } from './AzureCredentials';
+import { AdxDataSourceSettings } from 'types';
 
 interface ConfigHelpProps {
-  options: DataSourceSettings<AdxDataSourceOptions, AdxDataSourceSecureOptions>;
+  options: AdxDataSourceSettings;
 }
 
 const ConfigHelp: React.FC<ConfigHelpProps> = ({ options }) => {
-  const isHelpOpen = useMemo(() => !isCredentialsComplete(options), [options]);
+  const isHelpOpen = useMemo(() => !isCredentialsComplete(getCredentials(options)), [options]);
 
   return (
     <ConfigSection title="Configuration Help" isCollapsible isInitiallyOpen={isHelpOpen}>
