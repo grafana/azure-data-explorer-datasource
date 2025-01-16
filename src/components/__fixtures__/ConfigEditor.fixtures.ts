@@ -29,6 +29,7 @@ export const mockConfigEditorProps = (optionsOverrides?: Partial<ConfigEditorPro
       useSchemaMapping: false,
       enableUserTracking: true,
       clusterUrl: Chance().url(),
+      application: Chance().word(),
     },
     readOnly: true,
     withCredentials: true,

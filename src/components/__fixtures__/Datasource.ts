@@ -34,6 +34,7 @@ export const mockDatasourceOptions: DataSourcePluginOptionsEditorProps<
       useSchemaMapping: false,
       enableUserTracking: false,
       clusterUrl: 'clusterUrl',
+      application: ''
     },
     secureJsonFields: {},
     readOnly: false,

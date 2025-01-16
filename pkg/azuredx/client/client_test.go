@@ -74,7 +74,7 @@ func TestClient(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			require.Equal(t, "application/json", req.Header.Get("Accept"))
 			require.Equal(t, "application/json", req.Header.Get("Content-Type"))
-			require.Equal(t, "Grafana-ADX", req.Header.Get("x-ms-app"))
+			require.NotEmpty(t, req.Header.Get("x-ms-app"), "Header 'x-ms-app' should not be empty")
 		}))
 		defer server.Close()
 
