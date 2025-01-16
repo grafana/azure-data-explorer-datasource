@@ -20,6 +20,8 @@ type DatasourceSettings struct {
 	CacheMaxAge        string `json:"cacheMaxAge"`
 	DynamicCaching     bool   `json:"dynamicCaching"`
 	EnableUserTracking bool   `json:"enableUserTracking"`
+	Application        string `json:"application"`
+	
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
 	// to the server execution timeout.

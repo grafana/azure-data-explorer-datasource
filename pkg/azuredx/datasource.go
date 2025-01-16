@@ -178,13 +178,13 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 		// errorsource set in SanitizeClusterUri
 		return backend.DataResponse{}, err
 	}
-
+	application := adx.settings.Application
 	tableRes, err := adx.client.KustoRequest(ctx, sanitized, "/v1/rest/query", models.RequestPayload{
 		CSL:         q.Query,
 		DB:          database,
 		Properties:  props,
 		QuerySource: q.QuerySource,
-	}, adx.settings.EnableUserTracking)
+	}, adx.settings.EnableUserTracking, application)
 	if err != nil {
 		backend.Logger.Debug("error building kusto request", "error", err.Error())
 		// errorsource set in KustoRequest

@@ -27,11 +27,12 @@ func TestDatasource(t *testing.T) {
 	var adx AzureDataExplorer
 	const UserLogin string = "user-login"
 	const ClusterURL string = "base-url"
+	const Application string = "Grafana-ADX"
 
 	t.Run("When running a query the right args should be passed to KustoRequest", func(t *testing.T) {
 		adx = AzureDataExplorer{}
 		adx.client = &fakeClient{}
-		adx.settings = &models.DatasourceSettings{EnableUserTracking: true, ClusterURL: ClusterURL}
+		adx.settings = &models.DatasourceSettings{EnableUserTracking: true, ClusterURL: ClusterURL, Applicaton: Application}
 		query := backend.DataQuery{
 			RefID:         "",
 			QueryType:     "",
