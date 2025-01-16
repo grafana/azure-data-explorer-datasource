@@ -32,7 +32,7 @@ func TestDatasource(t *testing.T) {
 	t.Run("When running a query the right args should be passed to KustoRequest", func(t *testing.T) {
 		adx = AzureDataExplorer{}
 		adx.client = &fakeClient{}
-		adx.settings = &models.DatasourceSettings{EnableUserTracking: true, ClusterURL: ClusterURL, Applicaton: Application}
+		adx.settings = &models.DatasourceSettings{EnableUserTracking: true, ClusterURL: ClusterURL, Application: Application}
 		query := backend.DataQuery{
 			RefID:         "",
 			QueryType:     "",
