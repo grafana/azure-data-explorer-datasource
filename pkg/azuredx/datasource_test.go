@@ -41,7 +41,7 @@ func TestDatasource(t *testing.T) {
 			TimeRange:     backend.TimeRange{},
 			JSON:          []byte(`{"resultFormat": "table","querySource": "schema","database":"test-database"}`),
 		}
-		kustoRequestMock = func(url string, cluster string, payload models.RequestPayload, enableUserTracking bool) (*models.TableResponse, error) {
+		kustoRequestMock = func(url string, cluster string, payload models.RequestPayload, enableUserTracking bool, application string) (*models.TableResponse, error) {
 			require.Equal(t, "/v1/rest/query", url)
 			require.Equal(t, ClusterURL, cluster)
 			require.Equal(t, payload.DB, "test-database")
@@ -101,8 +101,8 @@ func (c *fakeClient) TestARGsRequest(_ context.Context, _ *models.DatasourceSett
 	panic("not implemented")
 }
 
-func (c *fakeClient) KustoRequest(_ context.Context, cluster string, url string, payload models.RequestPayload, enableUserTracking bool) (*models.TableResponse, error) {
-	return kustoRequestMock(url, cluster, payload, enableUserTracking)
+func (c *fakeClient) KustoRequest(_ context.Context, cluster string, url string, payload models.RequestPayload, enableUserTracking bool, application string) (*models.TableResponse, error) {
+	return kustoRequestMock(url, cluster, payload, enableUserTracking, application)
 }
 
 func (c *fakeClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
