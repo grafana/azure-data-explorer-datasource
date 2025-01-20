@@ -63,7 +63,7 @@ func TestDatasource(t *testing.T) {
 			TimeRange:     backend.TimeRange{},
 			JSON:          []byte(`{"resultFormat": "table","querySource": "schema"}`),
 		}
-		kustoRequestMock = func(_ string, _ string, payload models.RequestPayload, _ bool) (*models.TableResponse, error) {
+		kustoRequestMock = func(_ string, _ string, payload models.RequestPayload, _ bool, _ string) (*models.TableResponse, error) {
 			require.Equal(t, payload.DB, "test-default-database")
 			return table, nil
 		}
