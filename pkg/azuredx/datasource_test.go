@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	kustoRequestMock      func(url string, cluster string, payload models.RequestPayload, enableUserTracking bool) (*models.TableResponse, error)
+	kustoRequestMock      func(url string, cluster string, payload models.RequestPayload, enableUserTracking bool, application string) (*models.TableResponse, error)
 	ARGClusterRequestMock func(payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error)
 	table                 = &models.TableResponse{
 		Tables: []models.Table{
