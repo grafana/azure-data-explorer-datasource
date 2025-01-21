@@ -91,7 +91,7 @@
     "@stylistic/eslint-plugin-ts": "^2.9.0",
     "imports-loader": "^5.0.0",
     "semver": "^7.6.3",
-    "terser-webpack-plugin": "^5.3.10",
+    "terser-webpack-plugin": "^5.3.11",
     "webpack-subresource-integrity": "^5.1.0",
     "webpack-virtual-modules": "^0.6.2"
   },
