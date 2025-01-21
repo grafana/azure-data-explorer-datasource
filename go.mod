@@ -1,7 +1,8 @@
 module github.com/grafana/azure-data-explorer-datasource
 
-go 1.22
-toolchain go1.22.11
+go 1.22.7
+
+toolchain go1.23.5
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.16.0
