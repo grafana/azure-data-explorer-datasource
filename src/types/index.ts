@@ -122,6 +122,7 @@ export interface AdxDataSourceOptions extends AzureDataSourceJsonData {
   schemaMappings?: Array<Partial<SchemaMapping>>;
   enableUserTracking: boolean;
   clusterUrl: string;
+  application: string;
   enableSecureSocksProxy?: boolean;
   // legacy options
   azureCloud?: string;

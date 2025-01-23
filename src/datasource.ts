@@ -48,13 +48,14 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   private expressionParser: KustoExpressionParser;
   private defaultEditorMode: EditorMode;
   private schemaMapper: AdxSchemaMapper;
+  private application: string;
 
   constructor(private instanceSettings: DataSourceInstanceSettings<AdxDataSourceOptions>) {
     super(instanceSettings);
 
     const useSchemaMapping = instanceSettings.jsonData.useSchemaMapping ?? false;
     const schemaMapping = instanceSettings.jsonData.schemaMappings ?? [];
-
+    const application = instanceSettings.jsonData.application ?? 'Grafana-ADX';
     this.backendSrv = getBackendSrv();
     this.templateSrv = getTemplateSrv();
     this.defaultOrFirstDatabase = instanceSettings.jsonData.defaultDatabase;
@@ -63,6 +64,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     this.defaultEditorMode = instanceSettings.jsonData.defaultEditorMode ?? EditorMode.Visual;
     this.schemaMapper = new AdxSchemaMapper(useSchemaMapping, schemaMapping);
     this.expressionParser = new KustoExpressionParser(this.templateSrv);
+    this.application = application;
     this.parseExpression = this.parseExpression.bind(this);
     this.autoCompleteQuery = this.autoCompleteQuery.bind(this);
     this.getSchemaMapper = this.getSchemaMapper.bind(this);
@@ -313,6 +315,9 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
   getDefaultEditorMode(): EditorMode {
     return this.defaultEditorMode;
   }
+  getApplication(): string {
+    return this.application
+  }
 
   async autoCompleteQuery(query: AutoCompleteQuery, columns: AdxColumnSchema[] | undefined): Promise<string[]> {
     const autoQuery = this.expressionParser.toAutoCompleteQuery(query, columns);
@@ -329,7 +334,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       query: autoQuery,
       resultFormat: 'table',
       querySource: 'autocomplete',
-      clusterUri: query.clusterUri,
+      clusterUri: query.clusterUri
     };
 
     const response = await lastValueFrom(
