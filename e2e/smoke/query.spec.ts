@@ -2,7 +2,7 @@ import { expect, test } from '@grafana/plugin-e2e';
 import { selectors } from '../../src/test/selectors';
 import { isVersionGtOrEq } from '../../src/version';
 
-test.describe('Azure Data Explorer queries', () => {
+test.describe('Azure Data Explorer queries - smoke', () => {
   test('renders KQL editor', async ({ panelEditPage, page, grafanaVersion }) => {
     await panelEditPage.datasource.set('Azure Data Explorer');
 
