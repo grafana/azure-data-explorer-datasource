@@ -100,7 +100,7 @@ jobs:
           version-resolver-type: version-support-policy
 
   playwright-tests:
-    if: !github.event.pull_request.head.repo.fork
+    if: ${{!github.event.pull_request.head.repo.fork}}
     needs: [resolve-versions, build]
     timeout-minutes: 60
     strategy:
@@ -159,7 +159,7 @@ jobs:
         run: yarn run e2e:playwright
 
   playwright-tests-fork:
-    if: github.event.pull_request.head.repo.fork
+    if: ${{github.event.pull_request.head.repo.fork}}
     needs: [resolve-versions, build]
     timeout-minutes: 60
     strategy:
