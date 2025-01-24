@@ -48,11 +48,11 @@ test.describe('Azure Data Explorer queries - smoke', () => {
     ).toBeVisible();
     await expect(page.getByTestId(selectors.components.queryEditor.tableFrom.input)).toBeVisible();
     await expect(page.getByTestId(selectors.components.queryEditor.columns.input)).toBeVisible();
-    await expect(page.getByLabel('Filters')).toBeVisible();
-    await expect(page.getByLabel('Aggregate')).toBeVisible();
-    await expect(page.getByLabel('Group by')).toBeVisible();
-    await expect(page.getByLabel('Timeshift')).toBeVisible();
-    await expect(page.getByLabel('Query Preview')).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.filters.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.aggregate.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.groupBy.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.timeshift.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.queryPreview.field)).toBeVisible();
     await page.getByTestId(selectors.components.queryEditor.runQuery.button).click();
   });
 });

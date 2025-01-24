@@ -7,6 +7,7 @@ import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeGroupBy } from './utils/utils';
 import GroupByItem from './GroupByItem';
+import { selectors } from 'test/selectors';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -78,7 +79,7 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
     <>
       <EditorRow>
         <EditorFieldGroup>
-          <EditorField label="Group by" optional={true}>
+          <EditorField label="Group by" optional={true} data-testid={selectors.components.queryEditor.groupBy.field}>
             <EditorList
               items={groupBys}
               onChange={onChange}

@@ -6,6 +6,7 @@ import { AccessoryButton, EditorField, EditorFieldGroup, EditorRow, InputGroup }
 import { KustoQuery } from '../../../types';
 import { QueryEditorExpressionType } from 'types/expressions';
 import { QueryEditorPropertyType } from 'schema/types';
+import { selectors } from 'test/selectors';
 
 interface TimeshiftProps {
   query: KustoQuery;
@@ -35,7 +36,7 @@ const Timeshift: React.FC<TimeshiftProps> = (props) => {
   return (
     <EditorRow>
       <EditorFieldGroup>
-        <EditorField label="Timeshift" optional={true}>
+        <EditorField label="Timeshift" optional={true} data-testid={selectors.components.queryEditor.timeshift.field}>
           <InputGroup>
             <Button
               onClick={() => setDisplaySelect(true)}
