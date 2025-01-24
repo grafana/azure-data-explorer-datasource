@@ -38,14 +38,18 @@ test.describe('Azure Data Explorer queries - smoke', () => {
         panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.cluster.input.selector)
       ).toBeVisible();
     } else {
+      // data-testid was not passed to the select component prior to 11.1.0
       await expect(panelEditPage.getQueryEditorRow('A').getByText('Cluster')).toBeVisible();
     }
-    await expect(
-      panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
-    ).toBeVisible();
-    await expect(
-      panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
-    ).toBeVisible();
+    if (versionValue) {
+      await expect(
+        panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
+      ).toBeVisible();
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await expect(panelEditPage.getQueryEditorRow('A').getByText('Database')).toBeVisible();
+    }
+
     await expect(page.getByTestId(selectors.components.queryEditor.tableFrom.input)).toBeVisible();
     await expect(page.getByTestId(selectors.components.queryEditor.columns.input)).toBeVisible();
     await expect(page.getByTestId(selectors.components.queryEditor.filters.field)).toBeVisible();
