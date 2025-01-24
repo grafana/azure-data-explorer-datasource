@@ -43,17 +43,16 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
     },
     [props]
   );
-    reportInteraction('grafana_ds_adx_raw_editor_query_blurred');
-    const kql = editorRef.current?.getValue() || '';
-    if (kql !== props.query.query) {
-      props.setDirty();
-      props.onChange({
-        ...props.query,
-        query: kql,
-      });
-      props.onRunQuery();
-    }
-  };
+
+  const kql = editorRef.current?.getValue() || '';
+  if (kql !== props.query.query) {
+    props.setDirty();
+    props.onChange({
+      ...props.query,
+      query: kql,
+    });
+    props.onRunQuery();
+  }
 
   const onKeyDownCapture = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
