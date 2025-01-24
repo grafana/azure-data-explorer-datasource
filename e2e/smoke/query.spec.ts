@@ -16,12 +16,15 @@ test.describe('Azure Data Explorer queries - smoke', () => {
       // data-testid was not passed to the select component prior to 11.1.0
       await expect(panelEditPage.getQueryEditorRow('A').getByText('Cluster')).toBeVisible();
     }
-    await expect(
-      panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
-    ).toBeVisible();
-    await expect(
-      panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
-    ).toBeVisible();
+    if (versionValue) {
+      await expect(
+        panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
+      ).toBeVisible();
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await expect(panelEditPage.getQueryEditorRow('A').getByText('Database')).toBeVisible();
+    }
+
     await page.getByText('KQL').click({ force: true });
     await expect(
       panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.codeEditor.container)
