@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	kustoRequestMock      func(url string, cluster string, payload models.RequestPayload, enableUserTracking bool) (*models.TableResponse, error)
+	kustoRequestMock      func(url string, cluster string, payload models.RequestPayload, enableUserTracking bool, application string) (*models.TableResponse, error)
 	ARGClusterRequestMock func(payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error)
 	table                 = &models.TableResponse{
 		Tables: []models.Table{
@@ -27,11 +27,12 @@ func TestDatasource(t *testing.T) {
 	var adx AzureDataExplorer
 	const UserLogin string = "user-login"
 	const ClusterURL string = "base-url"
+	const Application string = "Grafana-ADX"
 
 	t.Run("When running a query the right args should be passed to KustoRequest", func(t *testing.T) {
 		adx = AzureDataExplorer{}
 		adx.client = &fakeClient{}
-		adx.settings = &models.DatasourceSettings{EnableUserTracking: true, ClusterURL: ClusterURL}
+		adx.settings = &models.DatasourceSettings{EnableUserTracking: true, ClusterURL: ClusterURL, Application: Application}
 		query := backend.DataQuery{
 			RefID:         "",
 			QueryType:     "",
@@ -40,7 +41,7 @@ func TestDatasource(t *testing.T) {
 			TimeRange:     backend.TimeRange{},
 			JSON:          []byte(`{"resultFormat": "table","querySource": "schema","database":"test-database"}`),
 		}
-		kustoRequestMock = func(url string, cluster string, payload models.RequestPayload, enableUserTracking bool) (*models.TableResponse, error) {
+		kustoRequestMock = func(url string, cluster string, payload models.RequestPayload, enableUserTracking bool, application string) (*models.TableResponse, error) {
 			require.Equal(t, "/v1/rest/query", url)
 			require.Equal(t, ClusterURL, cluster)
 			require.Equal(t, payload.DB, "test-database")
@@ -62,7 +63,7 @@ func TestDatasource(t *testing.T) {
 			TimeRange:     backend.TimeRange{},
 			JSON:          []byte(`{"resultFormat": "table","querySource": "schema"}`),
 		}
-		kustoRequestMock = func(_ string, _ string, payload models.RequestPayload, _ bool) (*models.TableResponse, error) {
+		kustoRequestMock = func(_ string, _ string, payload models.RequestPayload, _ bool, _ string) (*models.TableResponse, error) {
 			require.Equal(t, payload.DB, "test-default-database")
 			return table, nil
 		}
@@ -100,8 +101,8 @@ func (c *fakeClient) TestARGsRequest(_ context.Context, _ *models.DatasourceSett
 	panic("not implemented")
 }
 
-func (c *fakeClient) KustoRequest(_ context.Context, cluster string, url string, payload models.RequestPayload, enableUserTracking bool) (*models.TableResponse, error) {
-	return kustoRequestMock(url, cluster, payload, enableUserTracking)
+func (c *fakeClient) KustoRequest(_ context.Context, cluster string, url string, payload models.RequestPayload, enableUserTracking bool, application string) (*models.TableResponse, error) {
+	return kustoRequestMock(url, cluster, payload, enableUserTracking, application)
 }
 
 func (c *fakeClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {

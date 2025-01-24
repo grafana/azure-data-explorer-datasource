@@ -1,6 +1,11 @@
 import { E2ESelectors } from '@grafana/e2e-selectors';
 
 export const components = {
+  applicationEditor: {
+    application : {
+      input: 'data-testid application'
+    }
+  },
   configEditor: {
     authType: {
       input: 'data-testid azure-auth',

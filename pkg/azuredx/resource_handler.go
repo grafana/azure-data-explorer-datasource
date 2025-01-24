@@ -147,9 +147,9 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 		respondWithError(rw, http.StatusBadRequest, "Invalid clusterUri", err)
 		return
 	}
-
+	application := adx.settings.Application
 	// Default to not sending the user request headers for schema requests
-	response, err := adx.client.KustoRequest(req.Context(), sanitized, ManagementApiPath, payload, false)
+	response, err := adx.client.KustoRequest(req.Context(), sanitized, ManagementApiPath, payload, false, application)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return
@@ -196,9 +196,9 @@ func (adx *AzureDataExplorer) getDatabases(rw http.ResponseWriter, req *http.Req
 		respondWithError(rw, http.StatusBadRequest, "Invalid clusterUri", err)
 		return
 	}
-
+	application := adx.settings.Application
 	// Default to not sending the user request headers for schema requests
-	response, err := adx.client.KustoRequest(req.Context(), sanitized, ManagementApiPath, payload, false)
+	response, err := adx.client.KustoRequest(req.Context(), sanitized, ManagementApiPath, payload, false, application)
 	if err != nil {
 		respondWithError(rw, http.StatusInternalServerError, "Azure query unsuccessful", err)
 		return

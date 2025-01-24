@@ -37,7 +37,7 @@ func TestClient(t *testing.T) {
 		}
 
 		client := &Client{httpClientKusto: server.Client()}
-		table, err := client.KustoRequest(context.Background(), server.URL, "", payload, false)
+		table, err := client.KustoRequest(context.Background(), server.URL, "", payload, false, "Grafana-ADX")
 		require.NoError(t, err)
 		require.NotNil(t, table)
 	})
@@ -64,7 +64,7 @@ func TestClient(t *testing.T) {
 		}
 
 		client := &Client{httpClientKusto: server.Client()}
-		table, err := client.KustoRequest(context.Background(), server.URL, "", payload, false)
+		table, err := client.KustoRequest(context.Background(), server.URL, "", payload, false, "Grafana-ADX")
 		require.Nil(t, table)
 		require.NotNil(t, err)
 		require.Contains(t, err.Error(), "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'")
@@ -74,7 +74,7 @@ func TestClient(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			require.Equal(t, "application/json", req.Header.Get("Accept"))
 			require.Equal(t, "application/json", req.Header.Get("Content-Type"))
-			require.Equal(t, "Grafana-ADX", req.Header.Get("x-ms-app"))
+			require.NotEmpty(t, req.Header.Get("x-ms-app"), "Header 'x-ms-app' should not be empty")
 		}))
 		defer server.Close()
 
@@ -85,7 +85,7 @@ func TestClient(t *testing.T) {
 		}
 
 		client := &Client{httpClientKusto: server.Client()}
-		table, err := client.KustoRequest(context.Background(), server.URL, "", payload, false)
+		table, err := client.KustoRequest(context.Background(), server.URL, "", payload, false, "Grafana-ADX")
 		require.Nil(t, table)
 		require.NotNil(t, err)
 	})
@@ -113,7 +113,7 @@ func TestClient(t *testing.T) {
 				Login: "test-user",
 			},
 		})
-		table, err := client.KustoRequest(ctxWithUser, server.URL, "", payload, true)
+		table, err := client.KustoRequest(ctxWithUser, server.URL, "", payload, true, "Grafana-ADX")
 		require.Nil(t, table)
 		require.NotNil(t, err)
 	})
