@@ -100,7 +100,7 @@ jobs:
           version-resolver-type: version-support-policy
 
   playwright-tests:
-    if: github.repository == 'grafana/azure-data-explorer-datasource'
+    if: !github.event.pull_request.head.repo.fork
     needs: [resolve-versions, build]
     timeout-minutes: 60
     strategy:
@@ -159,14 +159,14 @@ jobs:
         run: yarn run e2e:playwright
 
   playwright-tests-fork:
-    if: github.repository != 'grafana/azure-data-explorer-datasource'
+    if: github.event.pull_request.head.repo.fork
     needs: [resolve-versions, build]
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         GRAFANA_IMAGE: ${{fromJson(needs.resolve-versions.outputs.matrix)}}
-    name: ${{ matrix.GRAFANA_IMAGE.name }}@${{ matrix.GRAFANA_IMAGE.VERSION }}
+    name: ${{ matrix.GRAFANA_IMAGE.name }}@${{ matrix.GRAFANA_IMAGE.VERSION }}-fork
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
