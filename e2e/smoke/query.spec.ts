@@ -2,7 +2,7 @@ import { expect, test } from '@grafana/plugin-e2e';
 import { selectors } from '../../src/test/selectors';
 import { isVersionGtOrEq } from '../../src/version';
 
-test.describe('Azure Data Explorer queries', () => {
+test.describe('Azure Data Explorer queries - smoke', () => {
   test('renders KQL editor', async ({ panelEditPage, page, grafanaVersion }) => {
     await panelEditPage.datasource.set('Azure Data Explorer');
 
@@ -16,12 +16,15 @@ test.describe('Azure Data Explorer queries', () => {
       // data-testid was not passed to the select component prior to 11.1.0
       await expect(panelEditPage.getQueryEditorRow('A').getByText('Cluster')).toBeVisible();
     }
-    await expect(
-      panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
-    ).toBeVisible();
-    await expect(
-      panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
-    ).toBeVisible();
+    if (versionValue) {
+      await expect(
+        panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
+      ).toBeVisible();
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await expect(panelEditPage.getQueryEditorRow('A').getByText('Database')).toBeVisible();
+    }
+
     await page.getByText('KQL').click({ force: true });
     await expect(
       panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.codeEditor.container)
@@ -38,21 +41,25 @@ test.describe('Azure Data Explorer queries', () => {
         panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.cluster.input.selector)
       ).toBeVisible();
     } else {
+      // data-testid was not passed to the select component prior to 11.1.0
       await expect(panelEditPage.getQueryEditorRow('A').getByText('Cluster')).toBeVisible();
     }
-    await expect(
-      panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
-    ).toBeVisible();
-    await expect(
-      panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
-    ).toBeVisible();
+    if (versionValue) {
+      await expect(
+        panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
+      ).toBeVisible();
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await expect(panelEditPage.getQueryEditorRow('A').getByText('Database')).toBeVisible();
+    }
+
     await expect(page.getByTestId(selectors.components.queryEditor.tableFrom.input)).toBeVisible();
     await expect(page.getByTestId(selectors.components.queryEditor.columns.input)).toBeVisible();
-    await expect(page.getByLabel('Filters')).toBeVisible();
-    await expect(page.getByLabel('Aggregate')).toBeVisible();
-    await expect(page.getByLabel('Group by')).toBeVisible();
-    await expect(page.getByLabel('Timeshift')).toBeVisible();
-    await expect(page.getByLabel('Query Preview')).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.filters.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.aggregate.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.groupBy.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.timeshift.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.queryPreview.field)).toBeVisible();
     await page.getByTestId(selectors.components.queryEditor.runQuery.button).click();
   });
 });

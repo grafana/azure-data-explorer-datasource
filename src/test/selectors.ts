@@ -2,9 +2,9 @@ import { E2ESelectors } from '@grafana/e2e-selectors';
 
 export const components = {
   applicationEditor: {
-    application : {
-      input: 'data-testid application'
-    }
+    application: {
+      input: 'data-testid application',
+    },
   },
   configEditor: {
     authType: {
@@ -57,6 +57,21 @@ export const components = {
     },
     columns: {
       input: 'data-testid columns',
+    },
+    filters: {
+      field: 'data-testid filters',
+    },
+    aggregate: {
+      field: 'data-testid aggregate',
+    },
+    groupBy: {
+      field: 'data-testid group-by',
+    },
+    timeshift: {
+      field: 'data-testid timeshift',
+    },
+    queryPreview: {
+      field: 'data-testid query-preview',
     },
     runQuery: {
       button: 'data-testid run-query',

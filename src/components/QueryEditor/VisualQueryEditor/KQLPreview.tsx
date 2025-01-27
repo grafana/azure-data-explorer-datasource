@@ -6,6 +6,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-kusto';
 import 'prismjs/themes/prism-tomorrow.min.css';
+import { selectors } from 'test/selectors';
 
 interface KQLPreviewProps {
   query: string;
@@ -22,7 +23,7 @@ const KQLPreview: React.FC<KQLPreviewProps> = ({ query }) => {
   return (
     <EditorRow>
       <EditorFieldGroup>
-        <EditorField label="Query Preview">
+        <EditorField label="Query Preview" data-testid={selectors.components.queryEditor.queryPreview.field}>
           <>
             <Button hidden={!hidden} variant="secondary" onClick={() => setHidden(false)} size="sm">
               show

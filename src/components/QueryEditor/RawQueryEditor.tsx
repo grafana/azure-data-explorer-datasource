@@ -2,10 +2,10 @@ import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
 import { CodeEditor, Monaco, MonacoEditor } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
-import React, { useEffect, useState } from 'react';
+import { cloneDeep } from 'lodash';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
-import { cloneDeep } from 'lodash';
 
 import { getFunctions, getSignatureHelp } from './Suggestions';
 
@@ -27,17 +27,43 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [worker, setWorker] = useState<Worker>();
   const [variables] = useState(getTemplateSrv().getVariables());
   const [stateSchema, setStateSchema] = useState(cloneDeep(schema));
+  const editorRef = useRef<MonacoEditor | null>(null);
 
-  const onRawQueryChange = (kql: string) => {
-    reportInteraction('grafana_ds_adx_raw_editor_query_blurred');
-    if (kql !== props.query.query) {
-      props.setDirty();
-      props.onChange({
-        ...props.query,
-        query: kql,
-      });
-    }
-  };
+  const onRawQueryChange = useCallback(
+    (kql: string) => {
+      reportInteraction('grafana_ds_adx_raw_editor_query_blurred');
+      if (kql !== props.query.query) {
+        props.setDirty();
+        props.onChange({
+          ...props.query,
+          query: kql,
+        });
+        props.onRunQuery();
+      }
+    },
+    [props]
+  );
+
+  const kql = editorRef.current?.getValue() || '';
+  if (kql !== props.query.query) {
+    props.setDirty();
+    props.onChange({
+      ...props.query,
+      query: kql,
+    });
+    props.onRunQuery();
+  }
+
+  const onKeyDownCapture = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Enter' && e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        onRawQueryChange(editorRef.current?.getValue() || '');
+      }
+    },
+    [onRawQueryChange]
+  );
 
   useEffect(() => {
     if (schema && !stateSchema) {
@@ -46,6 +72,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   }, [schema, stateSchema]);
 
   const handleEditorMount = (editor: MonacoEditor, monaco: Monaco) => {
+    editorRef.current = editor;
     monaco.languages.registerSignatureHelpProvider('kusto', {
       signatureHelpTriggerCharacters: ['(', ')'],
       provideSignatureHelp: getSignatureHelp,
@@ -87,7 +114,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   };
 
   useEffect(() => {
-    if (worker && stateSchema) {
+    if (worker && stateSchema && stateSchema.Databases) {
       // Populate Database schema with macros
       Object.keys(stateSchema.Databases).forEach((db) =>
         Object.assign(stateSchema.Databases[db].Functions, getFunctions(variables))
@@ -101,7 +128,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   }
 
   return (
-    <div>
+    <div onKeyDownCapture={onKeyDownCapture}>
       <div data-testid={selectors.components.queryEditor.codeEditor.container}>
         <CodeEditor
           language="kusto"

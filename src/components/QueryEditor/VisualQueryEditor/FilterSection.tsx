@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import KQLFilter from './KQLFilter';
 import { css } from '@emotion/css';
+import { selectors } from 'test/selectors';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -30,7 +31,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
     <>
       <EditorRow>
         <EditorFieldGroup>
-          <EditorField label="Filters" optional={true}>
+          <EditorField label="Filters" optional={true} data-testid={selectors.components.queryEditor.filters.field}>
             <>
               {query.expression?.where?.expressions.length ? (
                 <div className={styles.filters}>

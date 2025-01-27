@@ -7,6 +7,7 @@ import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeAggregate } from './utils/utils';
 import AggregateItem from './AggregateItem';
+import { selectors } from 'test/selectors';
 
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
@@ -79,7 +80,7 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
     <div data-testid="aggregate-section">
       <EditorRow>
         <EditorFieldGroup>
-          <EditorField label="Aggregate" optional={true}>
+          <EditorField label="Aggregate" optional={true} data-testid={selectors.components.queryEditor.aggregate.field}>
             <EditorList
               items={aggregates}
               onChange={onChange}
