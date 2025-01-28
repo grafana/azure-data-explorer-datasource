@@ -1,5 +1,5 @@
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpressionType } from 'types/expressions';
 import React, { useEffect, useState } from 'react';
 import { AsyncState } from 'react-use/lib/useAsyncFn';

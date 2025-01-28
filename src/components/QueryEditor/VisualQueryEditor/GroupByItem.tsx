@@ -2,7 +2,7 @@ import React from 'react';
 
 import { SelectableValue } from '@grafana/data';
 import { Select } from '@grafana/ui';
-import { AccessoryButton, InputGroup } from '@grafana/experimental';
+import { AccessoryButton, InputGroup } from '@grafana/plugin-ui';
 
 import { AdxColumnSchema, KustoQuery } from '../../../types';
 import { QueryEditorExpressionType, QueryEditorGroupByExpression } from 'types/expressions';

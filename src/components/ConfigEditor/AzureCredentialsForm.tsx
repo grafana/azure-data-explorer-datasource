@@ -5,7 +5,7 @@ import { SelectableValue } from '@grafana/data';
 import { Alert, Button, Select, Input, Field } from '@grafana/ui';
 
 import { selectors } from 'test/selectors';
-import { ConfigSection } from '@grafana/experimental';
+import { ConfigSection } from '@grafana/plugin-ui';
 
 export interface Props {
   userIdentityEnabled: boolean;

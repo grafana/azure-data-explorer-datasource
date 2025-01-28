@@ -1,5 +1,5 @@
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
-import { llms } from '@grafana/experimental';
+import { llms } from '@grafana/plugin-ui';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
 import { Alert, Button, CodeEditor, Spinner, Monaco, MonacoEditor, useStyles2, TextArea, Stack } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';

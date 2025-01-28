@@ -19,7 +19,7 @@ import {
   updateCredentials,
 } from './AzureCredentialsConfig';
 import AzureCredentialsForm from './AzureCredentialsForm';
-import { DataSourceDescription, ConfigSection } from '@grafana/experimental';
+import { DataSourceDescription, ConfigSection } from '@grafana/plugin-ui';
 import { Divider } from './Divider';
 import { css } from '@emotion/css';
 

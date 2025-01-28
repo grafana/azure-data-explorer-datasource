@@ -7,7 +7,7 @@ import { useEffectOnce } from 'react-use';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
 import { hasCredentials } from './AzureCredentialsConfig';
 import { refreshSchema, Schema } from './refreshSchema';
-import { ConfigSubSection } from '@grafana/experimental';
+import { ConfigSubSection } from '@grafana/plugin-ui';
 
 interface DatabaseConfigProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {
