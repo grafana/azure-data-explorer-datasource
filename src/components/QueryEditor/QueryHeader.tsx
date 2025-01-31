@@ -136,7 +136,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const showExplanation = () => {
     setWaiting(true);
     reportInteraction('grafana_ds_adx_openai_kql_query_explanation_generated_with_llm_plugin');
-    const stream = llms.openai
+    const stream = openai
       .streamChatCompletions({
         model: 'gpt-3.5-turbo',
         messages: [
@@ -144,7 +144,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           { role: 'user', content: `${query.query}"""` },
         ],
       })
-      .pipe(llms.openai.accumulateContent());
+      .pipe(openai.accumulateContent());
     stream.subscribe({
       next: (m) => {
         setGeneratedExplanation(m);
