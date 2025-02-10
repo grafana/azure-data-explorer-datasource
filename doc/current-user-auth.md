@@ -19,7 +19,7 @@ enabled = true
 
 auth_url = https://login.microsoftonline.com/fd719c11-a91c-40fd-8379-1e6cd3c59568//oauth2/v2.0/authorize
 token_url = https://login.microsoftonline.com/fd719c11-a91c-40fd-8379-1e6cd3c59568/oauth2/v2.0/token
-client_authentication = client_secret_post
+client_authentication = # defaults to 'client_secret_post' (client secret)
 client_id = f85aa887-490d-4fac-9306-9b99ad0aa31d
 client_secret = 87808761-ff7b-492e-bb0d-5de2437ffa55
 managed_identity_client_id =
@@ -54,7 +54,6 @@ For example, it's possible to provide another AAD app for token exchange (On-Beh
 user_identity_enabled = true
 
 # Use different AAD app (OBO)
-client_authentication = client_secret_post
 user_identity_client_id = 4fc34037-97bd-4e84-9db4-86238c78e32a
 user_identity_client_secret = 4479f5a6-444c-4271-8790-60eeb42225ae
 ```
@@ -66,7 +65,6 @@ In another example, it's possible to customize the token endpoint:
 user_identity_enabled = true
 
 user_identity_token_url = https://custom-token-endpoint/oauth2/v2.0/token
-client_authentication = client_secret_post
 user_identity_client_id = 4fc34037-97bd-4e84-9db4-86238c78e32a
 user_identity_client_secret = 4479f5a6-444c-4271-8790-60eeb42225ae
 ```
