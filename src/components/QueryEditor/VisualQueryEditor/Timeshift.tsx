@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button, Select } from '@grafana/ui';
-import { AccessoryButton, EditorField, EditorFieldGroup, EditorRow, InputGroup } from '@grafana/experimental';
+import { AccessoryButton, EditorField, EditorFieldGroup, EditorRow, InputGroup } from '@grafana/plugin-ui';
 
 import { KustoQuery } from '../../../types';
 import { QueryEditorExpressionType } from 'types/expressions';

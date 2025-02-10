@@ -1,6 +1,6 @@
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { Button, Label, useStyles2 } from '@grafana/ui';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpressionType } from 'types/expressions';
 import { AdxDataSource } from 'datasource';
 import React, { useState } from 'react';

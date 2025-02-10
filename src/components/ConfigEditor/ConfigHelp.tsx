@@ -1,7 +1,7 @@
 import { getCredentials } from './AzureCredentialsConfig';
 
 import { isCredentialsComplete } from '@grafana/azure-sdk';
-import { ConfigSection } from '@grafana/experimental';
+import { ConfigSection } from '@grafana/plugin-ui';
 import React, { useMemo } from 'react';
 import { AdxDataSourceSettings } from 'types';
 

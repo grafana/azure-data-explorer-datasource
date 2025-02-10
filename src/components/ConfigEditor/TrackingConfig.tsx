@@ -1,5 +1,5 @@
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { ConfigSubSection } from '@grafana/experimental';
+import { ConfigSubSection } from '@grafana/plugin-ui';
 import { Field, Switch } from '@grafana/ui';
 import React from 'react';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from 'types';
