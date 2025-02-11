@@ -57,6 +57,7 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     needs: build
+    if: false
     steps:
       - name: Download plugin build artifacts
         uses: actions/download-artifact@v4
@@ -124,7 +125,7 @@ jobs:
     name: Add PR comment
     runs-on: ubuntu-latest
     needs: push_to_registry
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' }} && false
     steps:
       - name: Find previous comment (if any)
         uses: peter-evans/find-comment@v3
