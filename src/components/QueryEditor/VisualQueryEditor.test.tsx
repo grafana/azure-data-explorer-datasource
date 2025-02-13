@@ -72,7 +72,7 @@ const schemaNoColumns = {
 describe('VisualQueryEditor', () => {
   it('should render the VisualQueryEditor', async () => {
     render(<VisualQueryEditor {...defaultProps} schema={{ Databases: {} }} />);
-    await waitFor(() => screen.getByLabelText('Table'));
+    await waitFor(() => screen.findByLabelText('Table'));
   });
 
   it('should render the VisualQueryEditor and display error if no columns are available', async () => {
@@ -90,10 +90,10 @@ describe('VisualQueryEditor', () => {
       />
     );
 
-    const tableSelect = screen.getByLabelText('Table');
-    openMenu(tableSelect);
-    await act(() => {
-      screen.getByText('bar').click();
+    await waitFor(async () => {
+      const tableSelect = await screen.findByLabelText('Table');
+      act(() => openMenu(tableSelect));
+      (await screen.findByText('bar')).click();
 
       rerender(
         <VisualQueryEditor
@@ -117,11 +117,9 @@ describe('VisualQueryEditor', () => {
       <VisualQueryEditor {...defaultProps} datasource={datasource} database="foo" schema={schema} onChange={onChange} />
     );
 
-    const tableSelect = screen.getByLabelText('Table');
-    openMenu(tableSelect);
-    await waitFor(() => {
-      screen.getByText('bar');
-    });
+    const tableSelect = await screen.findByLabelText('Table');
+    act(() => openMenu(tableSelect));
+    await screen.findByText('bar');
     expect(document.body).not.toHaveTextContent('Could not load table schema');
   });
 
@@ -133,10 +131,10 @@ describe('VisualQueryEditor', () => {
       <VisualQueryEditor {...defaultProps} datasource={datasource} database="foo" schema={schema} onChange={onChange} />
     );
 
-    const tableSelect = screen.getByLabelText('Table');
-    openMenu(tableSelect);
-    await act(() => {
-      screen.getByText('bar').click();
+    await waitFor(async () => {
+      const tableSelect = await screen.getByLabelText('Table');
+      act(() => openMenu(tableSelect));
+      (await screen.findByText('bar')).click();
 
       rerender(
         <VisualQueryEditor
@@ -160,9 +158,9 @@ describe('VisualQueryEditor', () => {
       })
     );
 
-    const sel = screen.getByLabelText('Columns');
-    openMenu(sel);
-    await act(() => screen.getByText('foobar').click());
+    const sel = await screen.findByLabelText('Columns');
+    act(() => openMenu(sel));
+    await waitFor(async () => (await screen.findByText('foobar')).click());
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({
@@ -185,12 +183,12 @@ describe('VisualQueryEditor', () => {
       />
     );
     const as = screen.getByTestId('aggregate-section');
-    await act(() => {
+    await waitFor(async () => {
       // Add a section
-      within(as).getByLabelText('Add').click();
+      (await within(as).findByLabelText('Add')).click();
     });
-    const selCol = within(as).getByLabelText('column');
-    openMenu(selCol);
+    const selCol = await within(as).findByLabelText('column');
+    act(() => openMenu(selCol));
     // The column is now displayed in the both selectors
     expect(screen.getAllByText('foobar')).toHaveLength(2);
     // But the other column is not

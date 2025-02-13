@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { act } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { mockConfigEditorProps } from 'components/__fixtures__/ConfigEditor.fixtures';
 import DatabaseConfig from './DatabaseConfig';
@@ -58,8 +58,8 @@ describe('DatabaseConfig', () => {
     refreshButton.click();
     expect(jestPut).toHaveBeenCalled();
     expect(mockDS.getSchema).toHaveBeenCalled();
-    const sel = screen.getByLabelText('choose default database');
-    openMenu(sel);
+    const sel = await screen.findByLabelText('choose default database');
+    act(() => openMenu(sel));
     await waitFor(() => expect(screen.getByText('testdb')).toBeInTheDocument());
   });
 });
