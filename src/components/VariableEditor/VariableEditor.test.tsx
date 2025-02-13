@@ -41,8 +41,10 @@ const defaultProps = (overrides?: Partial<VariableProps>): VariableProps => {
 
 describe('VariableEditor', () => {
   it('should render the VariableEditor', async () => {
-    await waitFor(() => render(<VariableEditor {...defaultProps()} />));
-    await waitFor(() => screen.getByText('Query Type'));
+    await waitFor(async () => {
+      render(<VariableEditor {...defaultProps()} />);
+      await screen.getByText('Query Type');
+    });
   });
 
   it('will migrate a legacy database variable query', async () => {
@@ -60,7 +62,7 @@ describe('VariableEditor', () => {
       queryType: AdxQueryType.Databases,
       clusterUri: '',
     };
-    await act(async () => {
+    await waitFor(async () => {
       render(<VariableEditor {...props} query={'databases()' as any} />);
     });
     expect(props.onChange).toHaveBeenCalled();
@@ -76,62 +78,56 @@ describe('VariableEditor', () => {
   it('will run cluster query', async () => {
     const props = defaultProps();
     const { rerender } = render(<VariableEditor {...props} />);
-    await waitFor(() => screen.getByLabelText('select query type'));
+    await waitFor(async () => {
+      await screen.getByLabelText('select query type');
+      const querySelector = await screen.getByLabelText('select query type');
+      act(() => openMenu(querySelector));
 
-    const querySelector = await screen.getByLabelText('select query type');
-    await openMenu(querySelector);
-    await act(async () => {
-      screen.getByText('Clusters').click();
+      (await screen.getByText('Clusters')).click();
       const newQuery = { ...props.query, queryType: AdxQueryType.Clusters };
       rerender(<VariableEditor {...props} query={newQuery} />);
     });
 
     expect(props.onChange).toHaveBeenCalledWith(expect.objectContaining({ queryType: AdxQueryType.Clusters }));
-    expect(props.datasource.getClusters).toBeCalled();
+    expect(props.datasource.getClusters).toHaveBeenCalled();
   });
 
   it('will run database query', async () => {
     const props = defaultProps();
     const { rerender } = render(<VariableEditor {...props} />);
-    await waitFor(() => screen.getByLabelText('select query type'));
-
-    const querySelector = await screen.getByLabelText('select query type');
-    await openMenu(querySelector);
-    await act(async () => {
-      screen.getByText('Databases').click();
+    await waitFor(async () => {
+      await screen.getByLabelText('select query type');
+      const querySelector = await screen.getByLabelText('select query type');
+      act(() => openMenu(querySelector));
+      (await screen.getByText('Databases')).click();
       const newQuery = { ...props.query, queryType: AdxQueryType.Databases };
       rerender(<VariableEditor {...props} query={newQuery} />);
     });
 
     expect(props.onChange).toHaveBeenCalledWith(expect.objectContaining({ queryType: AdxQueryType.Databases }));
-    expect(props.datasource.getDatabases).toBeCalled();
+    expect(props.datasource.getDatabases).toHaveBeenCalled();
   });
 
   it('will run tables query', async () => {
     const props = defaultProps();
     props.query = '' as any;
     const { rerender } = render(<VariableEditor {...props} />);
-    await waitFor(() => screen.getByLabelText('select query type'));
-
-    const querySelector = await screen.getByLabelText('select query type');
-    await openMenu(querySelector);
-    await act(async () => {
-      screen.getByText('Tables').click();
+    await waitFor(async () => {
+      await screen.getByLabelText('select query type');
+      const querySelector = await screen.getByLabelText('select query type');
+      act(() => openMenu(querySelector));
+      (await screen.getByText('Tables')).click();
       const newQuery = { ...props.query, queryType: AdxQueryType.Tables };
       rerender(<VariableEditor {...props} query={newQuery} />);
-    });
-
-    const databasesSelector = await screen.getByLabelText('select database');
-    await openMenu(databasesSelector);
-
-    await act(async () => {
-      screen.getByText('test_db').click();
-      const newQuery = { ...props.query, database: 'test_db' };
-      rerender(<VariableEditor {...props} query={newQuery} />);
+      const databasesSelector = await screen.getByLabelText('select database');
+      act(() => openMenu(databasesSelector));
+      (await screen.getByText('test_db')).click();
+      const newerQuery = { ...props.query, database: 'test_db' };
+      rerender(<VariableEditor {...props} query={newerQuery} />);
     });
 
     expect(props.onChange).toHaveBeenNthCalledWith(1, expect.objectContaining({ queryType: AdxQueryType.Tables }));
-    expect(props.datasource.getDatabases).toBeCalled();
+    expect(props.datasource.getDatabases).toHaveBeenCalled();
     expect(props.onChange).toHaveBeenNthCalledWith(2, expect.objectContaining({ database: 'test_db' }));
   });
 
@@ -151,36 +147,28 @@ describe('VariableEditor', () => {
     const props = defaultProps();
     props.query = '' as any;
     const { rerender } = render(<VariableEditor {...props} />);
-    await waitFor(() => screen.getByLabelText('select query type'));
-
-    const querySelector = await screen.getByLabelText('select query type');
-    await openMenu(querySelector);
-    await act(async () => {
-      screen.getByText('Columns').click();
+    await waitFor(async () => {
+      const querySelector = await screen.getByLabelText('select query type');
+      act(() => openMenu(querySelector));
+      (await screen.getByText('Columns')).click();
       const newQuery = { ...props.query, queryType: AdxQueryType.Columns };
       rerender(<VariableEditor {...props} query={newQuery} />);
-    });
-
-    const databasesSelector = await screen.getByLabelText('select database');
-    await openMenu(databasesSelector);
-    await act(async () => {
-      screen.getByText('test_db').click();
-      const newQuery = { ...props.query, queryType: AdxQueryType.Columns, database: 'test_db' };
-      rerender(<VariableEditor {...props} query={newQuery} />);
-    });
-
-    const tablesSelector = await screen.getByLabelText('select table');
-    await openMenu(tablesSelector);
-    await act(async () => {
-      screen.getByText('test_table').click();
-      const newQuery = { ...props.query, queryType: AdxQueryType.Columns, database: 'test_db', table: 'test_table' };
-      rerender(<VariableEditor {...props} query={newQuery} />);
+      const databasesSelector = await screen.getByLabelText('select database');
+      act(() => openMenu(databasesSelector));
+      (await screen.getByText('test_db')).click();
+      const newerQuery = { ...props.query, queryType: AdxQueryType.Columns, database: 'test_db' };
+      rerender(<VariableEditor {...props} query={newerQuery} />);
+      const tablesSelector = await screen.getByLabelText('select table');
+      act(() => openMenu(tablesSelector));
+      (await screen.getByText('test_table')).click();
+      const newestQuery = { ...props.query, queryType: AdxQueryType.Columns, database: 'test_db', table: 'test_table' };
+      rerender(<VariableEditor {...props} query={newestQuery} />);
     });
 
     expect(props.onChange).toHaveBeenNthCalledWith(1, expect.objectContaining({ queryType: AdxQueryType.Columns }));
-    expect(props.datasource.getDatabases).toBeCalled();
+    expect(props.datasource.getDatabases).toHaveBeenCalled();
     expect(props.onChange).toHaveBeenNthCalledWith(2, expect.objectContaining({ database: 'test_db' }));
-    expect(getTablesForDatabaseMock).toBeCalled();
+    expect(getTablesForDatabaseMock).toHaveBeenCalled();
     expect(props.onChange).toHaveBeenNthCalledWith(
       3,
       expect.objectContaining({

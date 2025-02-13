@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { QueryEditorExpressionType } from 'types/expressions';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
@@ -20,11 +20,14 @@ describe('GroupBySection', () => {
   it('add a grouping', async () => {
     const onChange = jest.fn();
     render(<GroupBySection {...defaultProps} onChange={onChange} />);
-    await act(() => screen.getByLabelText('Add').click());
-    // Select a function
-    const sel = screen.getByLabelText('column');
-    openMenu(sel);
-    await act(() => screen.getByText('foo').click());
+    await waitFor(async () => {
+      screen.getByLabelText('Add').click();
+      // Select a function
+      const sel = await screen.getByLabelText('column');
+      act(() => openMenu(sel));
+      (await screen.getByText('foo')).click();
+    });
+
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({

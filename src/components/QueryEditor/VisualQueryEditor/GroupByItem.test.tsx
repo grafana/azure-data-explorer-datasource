@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { mockQuery } from 'components/__fixtures__/Datasource';
 import { AdxColumnSchema } from 'types';
 import React from 'react';
@@ -25,9 +25,11 @@ describe('GroupByItem', () => {
       },
     ];
     render(<GroupByItem {...defaultProps} columns={columns} onChange={onChange} />);
-    const sel = screen.getByLabelText('column');
-    openMenu(sel);
-    await act(() => screen.getByText('foo').click());
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('column');
+      act(() => openMenu(sel));
+      (await screen.getByText('foo')).click();
+    });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ property: { name: 'foo', type: QueryEditorPropertyType.String } })
     );
@@ -40,15 +42,11 @@ describe('GroupByItem', () => {
       options: [{ label: '$foo', value: '$foo' }],
     };
     render(<GroupByItem {...defaultProps} onChange={onChange} templateVariableOptions={templateVariableOptions} />);
-    const sel = screen.getByLabelText('column');
-    openMenu(sel);
-    const templateVariables = await screen.findByText('Template Variables');
-    await act(() => {
-      templateVariables.click();
-    });
-    const templateVariable = await screen.findByText('$foo');
-    await act(() => {
-      templateVariable.click();
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('column');
+      act(() => openMenu(sel));
+      (await screen.getByText('Template Variables')).click();
+      (await screen.findByText('$foo')).click();
     });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ property: { name: '$foo', type: QueryEditorPropertyType.String } })
@@ -61,9 +59,11 @@ describe('GroupByItem', () => {
       property: { name: 'Time', type: QueryEditorPropertyType.DateTime },
     };
     render(<GroupByItem {...defaultProps} onChange={onChange} groupBy={groupBy} />);
-    const sel = screen.getByLabelText('interval');
-    openMenu(sel);
-    await act(() => screen.getByText('1 minute').click());
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('interval');
+      act(() => openMenu(sel));
+      (await screen.getByText('1 minute')).click();
+    });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ interval: { name: '1m', type: QueryEditorPropertyType.Interval } })
     );
