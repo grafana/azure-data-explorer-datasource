@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import { AdxColumnSchema } from 'types';
 import FilterItem from './FilterItem';
@@ -28,9 +28,11 @@ describe('FilterItem', () => {
       },
     ];
     render(<FilterItem {...defaultProps} columns={columns} onChange={onChange} />);
-    const sel = screen.getByLabelText('column');
-    openMenu(sel);
-    await act(() => screen.getByText('foo').click());
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('column');
+      act(() => openMenu(sel));
+      (await screen.getByText('foo')).click();
+    });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ property: { name: 'foo', type: QueryEditorPropertyType.String } })
     );
@@ -39,9 +41,11 @@ describe('FilterItem', () => {
   it('should select an operator', async () => {
     const onChange = jest.fn();
     render(<FilterItem {...defaultProps} onChange={onChange} />);
-    const sel = screen.getByLabelText('operator');
-    openMenu(sel);
-    await act(() => screen.getByText('!=').click());
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('operator');
+      act(() => openMenu(sel));
+      (await screen.getByText('!=')).click();
+    });
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '!=', value: '' } }));
   });
 
@@ -51,10 +55,10 @@ describe('FilterItem', () => {
     const onChange = jest.fn();
     const filter = { property: { name: 'col', type: QueryEditorPropertyType.String } };
     render(<FilterItem {...defaultProps} datasource={datasource} onChange={onChange} filter={filter} />);
-    const sel = screen.getByLabelText('column value');
-    openMenu(sel);
-    const value = await screen.findByText('foo');
-    await act(() => {
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('column value');
+      act(() => openMenu(sel));
+      const value = await screen.getByText('foo');
       value.click();
     });
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: 'foo' } }));
@@ -78,15 +82,11 @@ describe('FilterItem', () => {
         templateVariableOptions={templateVariableOptions}
       />
     );
-    const sel = screen.getByLabelText('column value');
-    openMenu(sel);
-    const templateVariables = await screen.findByText('Template Variables');
-    await act(() => {
-      templateVariables.click();
-    });
-    const templateVariable = await screen.findByText('$foo');
-    await act(() => {
-      templateVariable.click();
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('column value');
+      act(() => openMenu(sel));
+      (await screen.getByText('Template Variables')).click();
+      (await screen.findByText('$foo')).click();
     });
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: '$foo' } }));
   });

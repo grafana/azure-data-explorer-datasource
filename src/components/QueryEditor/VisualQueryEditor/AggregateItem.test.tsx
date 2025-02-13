@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import { AdxColumnSchema } from 'types';
 import React from 'react';
@@ -20,9 +20,11 @@ describe('AggregateItem', () => {
   it('should select an function', async () => {
     const onChange = jest.fn();
     render(<AggregateItem {...defaultProps} onChange={onChange} />);
-    const sel = screen.getByLabelText('function');
-    openMenu(sel);
-    await act(() => screen.getByText(AggregateFunctions.Avg).click());
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('function');
+      act(() => openMenu(sel));
+      (await screen.getByText(AggregateFunctions.Avg)).click();
+    });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ reduce: { name: AggregateFunctions.Avg, type: QueryEditorPropertyType.Function } })
     );
@@ -37,9 +39,11 @@ describe('AggregateItem', () => {
       },
     ];
     render(<AggregateItem {...defaultProps} columns={columns} onChange={onChange} />);
-    const sel = screen.getByLabelText('column');
-    openMenu(sel);
-    await act(() => screen.getByText('foo').click());
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('column');
+      act(() => openMenu(sel));
+      (await screen.getByText('foo')).click();
+    });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ property: { name: 'foo', type: QueryEditorPropertyType.String } })
     );
@@ -61,15 +65,11 @@ describe('AggregateItem', () => {
         templateVariableOptions={templateVariableOptions}
       />
     );
-    const sel = screen.getByLabelText('column');
-    openMenu(sel);
-    const templateVariables = await screen.findByText('Template Variables');
-    await act(() => {
-      templateVariables.click();
-    });
-    const templateVariable = await screen.findByText('$foo');
-    await act(() => {
-      templateVariable.click();
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('column');
+      act(() => openMenu(sel));
+      (await screen.getByText('Template Variables')).click();
+      (await screen.findByText('$foo')).click();
     });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ property: { name: '$foo', type: QueryEditorPropertyType.String } })
@@ -93,9 +93,11 @@ describe('AggregateItem', () => {
       reduce: { name: AggregateFunctions.Percentile, type: QueryEditorPropertyType.Function },
     };
     render(<AggregateItem {...defaultProps} onChange={onChange} aggregate={aggregate} />);
-    const sel = screen.getByLabelText('percentile');
-    openMenu(sel);
-    await act(() => screen.getByText('95').click());
+    await waitFor(async () => {
+      const sel = await screen.getByLabelText('percentile');
+      act(() => openMenu(sel));
+      (await screen.getByText('95')).click();
+    });
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         parameters: [{ fieldType: 'number', name: 'percentileParam', type: 'functionParameter', value: '95' }],

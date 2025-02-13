@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { QueryEditorExpressionType } from 'types/expressions';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
@@ -21,21 +21,26 @@ describe('AggregateSection', () => {
   it('add an aggregation function', async () => {
     const onChange = jest.fn();
     render(<AggregateSection {...defaultProps} onChange={onChange} />);
-    await act(() => screen.getByLabelText('Add').click());
-    // Select a function
-    const sel = screen.getByLabelText('function');
-    openMenu(sel);
-    await act(() => screen.getByText(AggregateFunctions.Avg).click());
+    await waitFor(async () => {
+      (await screen.findByLabelText('Add')).click();
+      // Select a function
+      const sel = await screen.findByLabelText('function');
+      act(() => openMenu(sel));
+      (await screen.getByText(AggregateFunctions.Avg)).click();
+    });
     // The info is not complete so onChange is called with an empty aggregation
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         expression: expect.objectContaining({ reduce: { expressions: [], type: QueryEditorExpressionType.And } }),
       })
     );
-    // Select a column
-    const selCol = screen.getByLabelText('column');
-    openMenu(selCol);
-    await act(() => screen.getByText('foo').click());
+
+    await waitFor(async () => {
+      // Select a column
+      const selCol = await screen.findByLabelText('column');
+      act(() => openMenu(selCol));
+      (await screen.findByText('foo')).click();
+    });
     // Now it's a complete aggregation function so it should change the expression
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({

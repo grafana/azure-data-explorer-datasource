@@ -82,11 +82,14 @@ describe('QueryEditor', () => {
 
     it('should select a database', async () => {
       const onChange = jest.fn();
-      await waitFor(() => render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />));
-      await waitFor(() => screen.getByText('foo'));
-      const sel = screen.getByLabelText('Database:');
-      openMenu(sel);
-      await act(() => screen.getByText('bar').click());
+      await waitFor(async () => {
+        render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />);
+
+        await screen.getByText('foo');
+        const sel = await screen.getByLabelText('Database:');
+        act(() => openMenu(sel));
+        (await screen.getByText('bar')).click();
+      });
       expect(onChange).toHaveBeenCalledWith(
         expect.objectContaining({ database: 'bar', expression: defaultQuery.expression })
       );
@@ -110,20 +113,22 @@ describe('QueryEditor', () => {
           />
         )
       );
-      const s = await waitFor(() => screen.getByLabelText('Builder'));
-      s.click();
-      await waitFor(() => screen.getByText('Are you sure?'));
-      const b = screen.getByText('Confirm');
-      await act(() => b.click());
+      await waitFor(async () => {
+        (await screen.getByLabelText('Builder')).click();
+        await screen.getByText('Are you sure?');
+        (await screen.getByText('Confirm')).click();
+      });
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ rawMode: false }));
       expect(setDirty).toHaveBeenCalledWith(false);
     });
 
     it('runs a query', async () => {
       const onRunQuery = jest.fn();
-      await waitFor(() => render(<QueryHeader {...defaultProps} schema={schema} onRunQuery={onRunQuery} />));
-      await waitFor(() => screen.getByText('foo'));
-      await act(() => screen.getByText('Run query').click());
+      await waitFor(async () => {
+        render(<QueryHeader {...defaultProps} schema={schema} onRunQuery={onRunQuery} />);
+        screen.getByText('foo');
+        (await screen.getByText('Run query')).click();
+      });
       expect(onRunQuery).toHaveBeenCalledTimes(1);
     });
   });
@@ -131,10 +136,12 @@ describe('QueryEditor', () => {
   describe('format selector', () => {
     it('should select a format', async () => {
       const onChange = jest.fn();
-      await waitFor(() => render(<QueryHeader {...defaultProps} onChange={onChange} />));
-      const sel = await waitFor(() => screen.getByLabelText('Format as:'));
-      openMenu(sel);
-      await act(() => screen.getByText('Time series').click());
+      await waitFor(async () => {
+        render(<QueryHeader {...defaultProps} onChange={onChange} />);
+        const sel = await screen.getByLabelText('Format as:');
+        act(() => openMenu(sel));
+        (await screen.getByText('Time series')).click();
+      });
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'time_series' }));
     });
 
@@ -142,9 +149,11 @@ describe('QueryEditor', () => {
       const onChange = jest.fn();
       let query = { ...defaultProps.query, rawMode: true };
       const { rerender } = render(<QueryHeader {...defaultProps} onChange={onChange} query={query} />);
-      const sel = await waitFor(() => screen.getByLabelText('Format as:'));
-      openMenu(sel);
-      await act(() => screen.getByText('ADX Time series').click());
+      await waitFor(async () => {
+        const sel = await screen.getByLabelText('Format as:');
+        act(() => openMenu(sel));
+        (await screen.getByText('ADX Time series')).click();
+      });
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'time_series_adx_series' }));
       // simulate change of mode
       query = { ...defaultProps.query, rawMode: false, resultFormat: 'time_series_adx_series' };

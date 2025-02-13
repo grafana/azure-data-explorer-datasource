@@ -1,5 +1,3 @@
-import { E2ESelectors } from '@grafana/e2e-selectors';
-
 export const components = {
   applicationEditor: {
     application: {
@@ -93,6 +91,6 @@ export const components = {
   },
 };
 
-export const selectors: { components: E2ESelectors<typeof components> } = {
+export const selectors: { components } = {
   components: components,
 };

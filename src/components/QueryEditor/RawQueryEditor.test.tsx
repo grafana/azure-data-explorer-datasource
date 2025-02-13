@@ -5,14 +5,6 @@ import { selectors } from 'test/selectors';
 import { mockDatasource, mockQuery } from '../__fixtures__/Datasource';
 import { RawQueryEditor } from './RawQueryEditor';
 
-jest.mock('../../monaco/KustoMonacoEditor', () => {
-  return {
-    KustoMonacoEditor: function C() {
-      return <></>;
-    },
-  };
-});
-
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
   return {
@@ -42,9 +34,9 @@ const defaultProps = {
 };
 
 describe('RawQueryEditor', () => {
-  it('should render the new code editor', async () => {
+  it('should render the  code editor', async () => {
     render(<RawQueryEditor {...defaultProps} />);
     expect(screen.getByTestId(selectors.components.queryEditor.codeEditor.container)).toBeInTheDocument();
-    await screen.findByText('Loading...');
+    await screen.findByTestId('Spinner');
   });
 });
