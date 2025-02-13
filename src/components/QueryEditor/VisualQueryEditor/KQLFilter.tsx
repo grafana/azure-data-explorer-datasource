@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { SelectableValue } from '@grafana/data';
-import { EditorList } from '@grafana/experimental';
+import { EditorList } from '@grafana/plugin-ui';
 
 import { AdxDataSource } from '../../../datasource';
 import { AdxColumnSchema, KustoQuery } from '../../../types';
