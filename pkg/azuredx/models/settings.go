@@ -21,7 +21,6 @@ type DatasourceSettings struct {
 	DynamicCaching     bool   `json:"dynamicCaching"`
 	EnableUserTracking bool   `json:"enableUserTracking"`
 	Application        string `json:"application"`
-	
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
 	// to the server execution timeout.
@@ -87,16 +86,13 @@ func formatTimeout(d time.Duration) (string, error) {
 	if d > time.Hour {
 		return "", fmt.Errorf("timeout must be one hour or less")
 	}
-	if d == time.Hour {
-		return "01:00:00", nil
-	}
-	if d < time.Minute {
-		return fmt.Sprintf("00:00:%02.0f", d.Seconds()), nil
-	}
-	tMinutes := d.Truncate(time.Minute)
+	hours := d / time.Hour
+	d -= hours * time.Hour
+	minutes := d / time.Minute
+	d -= minutes * time.Minute
+	seconds := d / time.Second
 
-	tSeconds := d - tMinutes
-	return fmt.Sprintf("00:%02.0f:%02.0f)", tMinutes.Minutes(), tSeconds.Seconds()), nil
+	return fmt.Sprintf("%02.0f:%02.0f:%02.0f", hours, minutes, seconds), nil
 }
 
 func envBoolOrDefault(key string, defaultValue bool) (bool, error) {
