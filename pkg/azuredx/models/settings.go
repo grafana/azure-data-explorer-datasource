@@ -92,7 +92,7 @@ func formatTimeout(d time.Duration) (string, error) {
 	d -= minutes * time.Minute
 	seconds := d / time.Second
 
-	return fmt.Sprintf("%02.0f:%02.0f:%02.0f", hours, minutes, seconds), nil
+	return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds), nil
 }
 
 func envBoolOrDefault(key string, defaultValue bool) (bool, error) {
