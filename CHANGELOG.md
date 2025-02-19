@@ -1,11 +1,19 @@
 # CHANGELOG
 
+## [5.1.0]
+
+- Support running queries using Shift+Enter [#971](https://github.com/grafana/azure-data-explorer-datasource/pull/971)
+- Unify credentials using `grafana-azure-sdk-react` [#1075](https://github.com/grafana/azure-data-explorer-datasource/pull/1075)
+- Support setting an `application` value in data source configuration [#1107](https://github.com/grafana/azure-data-explorer-datasource/pull/1107)
+- Migrate from `@grafana/experimental` to `@grafana/plugin-ui` [#1168](https://github.com/grafana/azure-data-explorer-datasource/pull/1168)
+- Dependency updates
+
 ## [5.0.7]
 
 - `errorsource` improvements [#1030](https://github.com/grafana/azure-data-explorer-datasource/pull/1030)
 - Fix: Query row not displaying [#1001](https://github.com/grafana/azure-data-explorer-datasource/pull/1001)
 - Dependency updates
-  
+
 ## [5.0.6]
 
 - Add `errorsource` [#996](https://github.com/grafana/azure-data-explorer-datasource/pull/996)
@@ -68,15 +76,15 @@
 ## [4.7.0]
 
 - New feature: Add support for [Workload Identity authentication](https://azure.github.io/azure-workload-identity/docs/).
-  
+
 ## [4.6.3]
 
 - New feature: Add support for enforcing only known Azure Data Explorer endpoints in cluster URL.
-  
+
 ## [4.6.2]
 
 - Fix: Infinite re-render in QueryEditor component.
-  
+
 ## [4.6.1]
 
 - Fix: Allow dynamic values to be empty for traces.
@@ -93,7 +101,7 @@
 
 - Add OpenAI integration which allows users to generate KQL queries via natural language.
 - Experimental - Add support for [current user authorization](https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md).
-  
+
 ## [4.4.1]
 
 Build with latest Go version 1.20.4
