@@ -87,13 +87,8 @@ func formatTimeout(d time.Duration) (string, error) {
 	if d > time.Hour {
 		return "", fmt.Errorf("timeout must be one hour or less")
 	}
-	hours := d / time.Hour
-	d -= hours * time.Hour
-	minutes := d / time.Minute
-	d -= minutes * time.Minute
-	seconds := d / time.Second
 
-	return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds), nil
+	return fmt.Sprintf("%02d:%02d:%02d", int(d.Hours()), int(d.Minutes())%60, int(d.Seconds())%60), nil
 }
 
 func envBoolOrDefault(key string, defaultValue bool) (bool, error) {
