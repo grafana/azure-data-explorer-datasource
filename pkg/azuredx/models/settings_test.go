@@ -18,7 +18,6 @@ func TestSettings(t *testing.T) {
 
 func (s *TestSettingsSuite) TestFormatTimeout() {
 	r := s.Require()
-	// create all tests for the function formatTimeout
 	tests := []struct {
 		name     string
 		duration time.Duration
