@@ -7,8 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 )
 
 // DatasourceSettings holds the datasource configuration information for Azure Data Explorer's API
@@ -21,7 +22,6 @@ type DatasourceSettings struct {
 	DynamicCaching     bool   `json:"dynamicCaching"`
 	EnableUserTracking bool   `json:"enableUserTracking"`
 	Application        string `json:"application"`
-	
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
 	// to the server execution timeout.
@@ -87,16 +87,8 @@ func formatTimeout(d time.Duration) (string, error) {
 	if d > time.Hour {
 		return "", fmt.Errorf("timeout must be one hour or less")
 	}
-	if d == time.Hour {
-		return "01:00:00", nil
-	}
-	if d < time.Minute {
-		return fmt.Sprintf("00:00:%02.0f", d.Seconds()), nil
-	}
-	tMinutes := d.Truncate(time.Minute)
 
-	tSeconds := d - tMinutes
-	return fmt.Sprintf("00:%02.0f:%02.0f)", tMinutes.Minutes(), tSeconds.Seconds()), nil
+	return fmt.Sprintf("%02d:%02d:%02d", int(d.Hours()), int(d.Minutes())%60, int(d.Seconds())%60), nil
 }
 
 func envBoolOrDefault(key string, defaultValue bool) (bool, error) {
