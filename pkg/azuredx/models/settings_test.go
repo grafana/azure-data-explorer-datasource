@@ -12,7 +12,7 @@ type TestSettingsSuite struct {
 	suite.Suite
 }
 
-func Test(t *testing.T) {
+func TestSettings(t *testing.T) {
 	suite.Run(t, new(TestSettingsSuite))
 }
 
