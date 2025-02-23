@@ -29,20 +29,18 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const [stateSchema, setStateSchema] = useState(cloneDeep(schema));
   const editorRef = useRef<MonacoEditor | null>(null);
 
-  const onRawQueryChange = useCallback(
-    (kql: string) => {
-      reportInteraction('grafana_ds_adx_raw_editor_query_blurred');
-      if (kql !== props.query.query) {
-        props.setDirty();
-        props.onChange({
-          ...props.query,
-          query: kql,
-        });
-        props.onRunQuery();
-      }
-    },
-    [props]
-  );
+  const onRawQueryChange = useCallback(() => {
+    reportInteraction('grafana_ds_adx_raw_editor_query_blurred');
+    const kql = editorRef.current?.getValue() || '';
+    if (kql !== props.query.query) {
+      props.setDirty();
+      props.onChange({
+        ...props.query,
+        query: kql,
+      });
+      props.onRunQuery();
+    }
+  }, [props]);
 
   const kql = editorRef.current?.getValue() || '';
   if (kql !== props.query.query) {
@@ -59,7 +57,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
       if (e.key === 'Enter' && e.shiftKey) {
         e.preventDefault();
         e.stopPropagation();
-        onRawQueryChange(editorRef.current?.getValue() || '');
+        onRawQueryChange();
       }
     },
     [onRawQueryChange]
