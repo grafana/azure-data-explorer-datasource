@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [5.1.1]
+
+- Fix query timeout formatting for timeouts > `1m` [#1196](https://github.com/grafana/azure-data-explorer-datasource/pull/1196)
+- Correctly set KQL in KQL editor [#1202](https://github.com/grafana/azure-data-explorer-datasource/pull/1202)
+- Dependency updates
+
 ## [5.1.0]
 
 - Support running queries using Shift+Enter [#971](https://github.com/grafana/azure-data-explorer-datasource/pull/971)
