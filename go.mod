@@ -8,7 +8,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.17.0
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.0
 	github.com/grafana/grafana-azure-sdk-go/v2 v2.1.6
-	github.com/grafana/grafana-plugin-sdk-go v0.266.0
+	github.com/grafana/grafana-plugin-sdk-go v0.267.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.35.0
@@ -26,7 +26,7 @@ require (
 	github.com/chromedp/cdproto v0.0.0-20220208224320-6efb837e6bc2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/elazarl/goproxy v1.7.0 // indirect
+	github.com/elazarl/goproxy v1.7.1 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/getkin/kin-openapi v0.129.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
@@ -38,7 +38,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/flatbuffers v24.3.25+incompatible // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/grafana/otel-profiling-go v0.5.1 // indirect
@@ -104,7 +104,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20250115164207-1a7da9e5054f // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
 	google.golang.org/grpc v1.70.0 // indirect
-	google.golang.org/protobuf v1.36.4 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/fsnotify/fsnotify.v1 v1.4.7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
