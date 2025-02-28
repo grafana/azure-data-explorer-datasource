@@ -1,5 +1,7 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
+import { openai } from '@grafana/llm';
+import { EditorHeader, FlexItem, InlineSelect } from '@grafana/plugin-ui';
 import {
   Alert,
   Button,
@@ -8,22 +10,20 @@ import {
   CustomScrollbar,
   LoadingPlaceholder,
   RadioButtonGroup,
-  useStyles2,
+  useStyles2
 } from '@grafana/ui';
-import { EditorHeader, FlexItem, InlineSelect } from '@grafana/plugin-ui';
-import { openai } from '@grafana/llm';
 
-import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
-import { AsyncState } from 'react-use/lib/useAsyncFn';
-import { AdxDataSource } from 'datasource';
-import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
-import { useAsync } from 'react-use';
-import { databaseToDefinition } from 'schema/mapper';
+import { css } from '@emotion/css';
 import { GrafanaTheme2, renderMarkdown, SelectableValue } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
+import { AdxDataSource } from 'datasource';
+import { useAsync } from 'react-use';
+import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { parseClustersResponse } from 'response_parser';
-import { css } from '@emotion/css';
+import { databaseToDefinition } from 'schema/mapper';
+import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { selectors } from 'test/selectors';
+import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
@@ -34,6 +34,7 @@ export interface QueryEditorHeaderProps {
   onChange: (value: KustoQuery) => void;
   onRunQuery: () => void;
   templateVariableOptions: SelectableValue<string>;
+  isLoading?: boolean;
 }
 
 const EDITOR_MODES = [
@@ -56,7 +57,7 @@ const adxTimeFormat: SelectableValue<string> = {
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
-  const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions } = props;
+  const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions, isLoading } = props;
   const { rawMode, OpenAI } = query;
   const [clusterUri, setClusterUri] = useState(query.clusterUri);
   const [clusters, setClusters] = useState<Array<SelectableValue<string>>>([]);
@@ -230,7 +231,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       {!query.OpenAI && (
         <Button
           variant="primary"
-          icon="play"
+          icon={isLoading ? 'spinner' : 'play'}
           size="sm"
           onClick={onRunQuery}
           data-testid={selectors.components.queryEditor.runQuery.button}
