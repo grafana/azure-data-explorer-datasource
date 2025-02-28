@@ -82,7 +82,7 @@
     "semver": "^7.7.1",
     "style-loader": "3.3.4",
     "swc-loader": "^0.2.3",
-    "terser-webpack-plugin": "^5.3.11",
+    "terser-webpack-plugin": "^5.3.12",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "5.5.4",
