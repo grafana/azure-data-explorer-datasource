@@ -55,7 +55,6 @@ const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) =>
         <Switch
           value={jsonData.dynamicCaching}
           id="adx-caching"
-          transparent={false}
           onChange={(ev: React.ChangeEvent<HTMLInputElement>) => updateJsonData('dynamicCaching', ev.target.checked)}
         />
       </Field>
