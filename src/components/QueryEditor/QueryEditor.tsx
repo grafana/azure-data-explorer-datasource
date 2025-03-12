@@ -1,5 +1,5 @@
-import { QueryEditorProps } from '@grafana/data';
-import { Alert } from '@grafana/ui';
+import { LoadingState, QueryEditorProps } from '@grafana/data';
+import { Alert, LoadingBar } from '@grafana/ui';
 import { get } from 'lodash';
 import { migrateQuery, needsToBeMigrated } from 'migrations/query';
 import React, { useMemo, useState } from 'react';
@@ -19,6 +19,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
   const schema = useAsync(() => datasource.getSchema(query.clusterUri, false), [datasource.id, query.clusterUri]);
   const templateVariables = useTemplateVariables(datasource);
   const [dirty, setDirty] = useState(false);
+  const isLoading = useMemo(()=> props.data?.state === LoadingState.Loading, [props.data?.state]);
 
   useEffectOnce(() => {
     let processedQuery = query;
@@ -35,6 +36,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
   return (
     <>
       {schema.error && <Alert title="Could not load datasource schema">{parseSchemaError(schema.error)}</Alert>}
+      {isLoading ? <LoadingBar width={window.innerWidth} /> : <div style={{ height: 1 }} />}
       <QueryHeader
         query={query}
         onChange={onChange}
@@ -44,6 +46,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
         setDirty={setDirty}
         onRunQuery={onRunQuery}
         templateVariableOptions={templateVariables}
+        isLoading={isLoading}
       />
       {query.OpenAI ? (
         <OpenAIEditor
