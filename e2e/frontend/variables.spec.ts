@@ -1,7 +1,7 @@
-import { PluginTestCtx, test, expect, VariablePage } from '@grafana/plugin-e2e';
+import { expect, PluginTestCtx, test, VariablePage } from '@grafana/plugin-e2e';
+import { Page } from '@playwright/test';
 import { selectors } from '../../src/test/selectors';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxQueryType } from '../../src/types';
-import { Page } from '@playwright/test';
 
 const addAdxVariable = async (
   context: PluginTestCtx,
@@ -121,33 +121,31 @@ test.skip('Template variables', () => {
       .click();
     await dashboardPage
       .getByGrafanaSelector(
-        context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('grafanaadxdev')
+        context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('adxtestclustere2e')
       )
       .click();
     await dashboardPage
       .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemLabels('database'))
       .click();
     await dashboardPage
-      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest'))
+      .getByGrafanaSelector(
+        context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('adx-test-db')
+      )
       .click();
     await dashboardPage
       .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemLabels('table'))
       .click();
     await dashboardPage
-      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('PerfTest'))
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('adxe2etest'))
       .click();
     await dashboardPage
       .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemLabels('column'))
       .click();
     await dashboardPage
-      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('_val1_'))
+      .getByGrafanaSelector(context.selectors.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('static'))
       .click();
 
     const panel = await dashboardPage.addPanel();
-    await dashboardPage.timeRange.set({
-      from: '2017-09-22 12:00:00',
-      to: '2017-09-23 12:00:00',
-    });
     await panel.datasource.set(datasource.name);
     await panel.setVisualization('Table');
 
@@ -164,7 +162,7 @@ test.skip('Template variables', () => {
     await page.getByLabel('Select options menu').getByText('$table').click({ force: true });
     await page.getByTestId(selectors.components.queryEditor.runQuery.button).click();
     await page.waitForTimeout(6000);
-    expect(panel.panel.fieldNames).toContainText(['_val1_', '_val2_']);
+    expect(panel.panel.fieldNames).toContainText(['timestamp', 'name', 'index', 'jsonData', 'array', 'static']);
 
     // Delete dashboard for clean-up
     await dashboardPage.deleteDashboard();
