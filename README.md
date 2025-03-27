@@ -141,7 +141,7 @@ Queries can be formatted as _Table_, _Time Series_, _Trace_, or _ADX time series
   | order by TimeGenerated desc
   ```
 
-- **Time series** queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
+- **Time series** queries are for the Graph Panel (and other panels like the Single Stat panel). The query must contain exactly one datetime column, one or more number valued columns, and optionally one more more string columns as labels. The time column should also be in ascending order. Here is an example query that returns the aggregated count grouped by the Category column and grouped by hour:
 
   ```kusto
   AzureActivity
@@ -152,7 +152,7 @@ Queries can be formatted as _Table_, _Time Series_, _Trace_, or _ADX time series
 
   The number of valued columns is considered metrics, and the optional string columns are treated as tags. A time series is returned for each value column + a unique set of string column values. Each series has name of valueColumnName {stringColumnName=columnValue, ... }.
 
-  For example, the following query will produce series like ` AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY} `:
+  For example, the following query will produce series like `AvgDirectDeaths {EventType=Excessive Heat, State=DELAWARE}``EventCount {EventType=Excessive Heat, State=NEW JERSEY}`:
 
   ```kusto
   StormEvents
