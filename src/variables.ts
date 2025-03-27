@@ -78,6 +78,9 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
             };
           default:
             const query = this.datasource.buildQuery(queryObj.query, {}, queryObj.database, queryObj.clusterUri);
+            if (query.query === '') {
+              return { data: [] };
+            }
             const queryRes = await lastValueFrom(
               this.datasource.query(includeTimeRange({ targets: [query] } as DataQueryRequest<KustoQuery>))
             );
