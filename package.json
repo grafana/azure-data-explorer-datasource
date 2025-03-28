@@ -74,7 +74,7 @@
     "monaco-editor": "0.34.1",
     "node-notifier": "^10.0.1",
     "prettier": "^3.2.5",
-    "prismjs": "1.29.0",
+    "prismjs": "1.30.0",
     "react-select-event": "^5.5.1",
     "replace-in-file-webpack-plugin": "^1.0.6",
     "sass": "1.72.0",
