@@ -11,7 +11,7 @@ require (
 	github.com/grafana/grafana-plugin-sdk-go v0.274.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 )
 
 require (
