@@ -3,7 +3,9 @@ package adxauth
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
+	"time"
 
 	"github.com/grafana/grafana-azure-sdk-go/v2/azcredentials"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
@@ -13,6 +15,23 @@ import (
 
 type onBehalfOfTokenProvider struct {
 	aadClient aadClient
+}
+
+var defaultTransport = &http.Transport{
+	Proxy: http.ProxyFromEnvironment,
+	DialContext: defaultTransportDialContext(&net.Dialer{
+		Timeout:   30 * time.Second,
+		KeepAlive: 30 * time.Second,
+	}),
+	ForceAttemptHTTP2:     true,
+	MaxIdleConns:          100,
+	IdleConnTimeout:       90 * time.Second,
+	TLSHandshakeTimeout:   10 * time.Second,
+	ExpectContinueTimeout: 1 * time.Second,
+}
+
+func defaultTransportDialContext(dialer *net.Dialer) func(context.Context, string, string) (net.Conn, error) {
+	return dialer.DialContext
 }
 
 func NewOnBehalfOfAccessTokenProvider(settings *azsettings.AzureSettings, credentials azcredentials.AzureCredentials) (aztokenprovider.AzureTokenProvider, error) {
@@ -29,7 +48,8 @@ func NewOnBehalfOfAccessTokenProvider(settings *azsettings.AzureSettings, creden
 
 	switch c := credentials.(type) {
 	case *azcredentials.AzureClientSecretOboCredentials:
-		aadClient, err := newAADClient(&c.ClientSecretCredentials, http.DefaultClient, settings)
+		httpClient := &http.Client{Transport: defaultTransport}
+		aadClient, err := newAADClient(&c.ClientSecretCredentials, httpClient, settings)
 		if err != nil {
 			return nil, fmt.Errorf("invalid Azure configuration: %w", err)
 		}
