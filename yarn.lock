@@ -987,10 +987,20 @@
     uplot "1.6.31"
     xss "^1.0.14"
 
-"@grafana/e2e-selectors@11.6.0", "@grafana/e2e-selectors@^11.6.0-229231":
+"@grafana/e2e-selectors@11.6.0":
   version "11.6.0"
   resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-11.6.0.tgz#50ac0cecf09ea680b700bc3a9d3109acb554630e"
   integrity sha512-3nJBRYjOTIi9WbclY6tp0NOj6KUpN7mJW4xBV6nYvqK5X48PWQ8u7SUG+nZyTSYQ/9AY88V2EMZmkCMNfE99hA==
+  dependencies:
+    "@grafana/tsconfig" "^2.0.0"
+    semver "^7.7.0"
+    tslib "2.8.1"
+    typescript "5.7.3"
+
+"@grafana/e2e-selectors@^12.0.0-235294":
+  version "12.0.0-238515"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-12.0.0-238515.tgz#c08fb5d5ef4c6bd97feec2361af4d87be0163bdb"
+  integrity sha512-fC/E7YDZbXldCxX7QWTe8QRwiqW6UFjJ5Do5FxOXEi9Sy/u2NWI4I2TagwGYEmPir3RVYPO/KD8EM8QINlGL9Q==
   dependencies:
     "@grafana/tsconfig" "^2.0.0"
     semver "^7.7.0"
@@ -1019,45 +1029,45 @@
     ua-parser-js "^1.0.32"
     web-vitals "^4.0.1"
 
-"@grafana/llm@^0.14.1":
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/@grafana/llm/-/llm-0.14.1.tgz#467c55c738f6fcf6cf363dab6f0196f937d60d70"
-  integrity sha512-ohornN5ILCRliBNqZKtEOATjVWXGrZWJYOLyo8gMgX5W6VnUQsemAeIFfPKJ/Aw90QdwEzofhcMYaK0JJlaIPg==
+"@grafana/llm@^0.16.0":
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/@grafana/llm/-/llm-0.16.0.tgz#d29c99c186af916b1ffb8e66ac3d9d096fc51800"
+  integrity sha512-xrosFcHFrvWGtjYeJdeCNRGOAkuDz9WKxsf5LrPNoPOno1A5bY5ELR7ddzzsrg136XVy2VSTNedhm+npMZt2gg==
   dependencies:
     "@modelcontextprotocol/sdk" "^1.7.0"
     react-use "^17.6.0"
     semver "^7.6.3"
     uuid "^11.0.5"
 
-"@grafana/plugin-e2e@^1.19.1":
-  version "1.19.1"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-e2e/-/plugin-e2e-1.19.1.tgz#58fbc43f957b2307365f0ec8491b38205dba4dd5"
-  integrity sha512-2xEZfUS3zg5CR+l5yj8nAfPn5oyQTF4UDxEjkQdp4qly4kulxq/bklRChxjD6pmfp5E1rmtxI/EQT8PaHVK9+g==
+"@grafana/plugin-e2e@^1.19.5":
+  version "1.19.5"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-e2e/-/plugin-e2e-1.19.5.tgz#feec36408751f5d72f22fdec0dd16ebf31285799"
+  integrity sha512-M5vAwcidbm8tosc9aOnDoKkz9nXrlcryrVKR065x2fnIH7PMPItg/LORYcZUZhNbtozEmV7HJosD8rntDZZFOg==
   dependencies:
-    "@grafana/e2e-selectors" "^11.6.0-229231"
+    "@grafana/e2e-selectors" "^12.0.0-235294"
     semver "^7.5.4"
     uuid "^11.0.2"
     yaml "^2.3.4"
 
-"@grafana/plugin-meta-extractor@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-meta-extractor/-/plugin-meta-extractor-0.5.0.tgz#73db7124bb2093706f246ac29af5ef20e06f5ae4"
-  integrity sha512-mRCenB4c9su6cy3cJQBvKhkY8wAnqsRV1inN4+cBDB2GFp1sh6h/M+iJjhJDjX1mz0/YZmQvNZdsJY9QiCTlhA==
+"@grafana/plugin-meta-extractor@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-meta-extractor/-/plugin-meta-extractor-0.5.3.tgz#eacafd14c6f3b2ef3e7848f64fbb351521a62616"
+  integrity sha512-CP8hDX+pmj1/nFkHGMzEYShRHcPDtmxTvbBmGHYnEDyXmdYkRZzbSOhommtJWx+WglI+xBtwwz0ZvUjab+j+Cg==
   dependencies:
     debug "^4.3.4"
     typescript "^5.4.5"
 
-"@grafana/plugin-ui@^0.10.4":
-  version "0.10.4"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.10.4.tgz#2db8663f3a93f78cccc82d6eda49952c6459cf62"
-  integrity sha512-ZHCA4cqM5r4mxtjiBxq31byru5/b+GnfP3edWK9aTgmU/0qbdgu5wNSrBvKg4qgtvrzp6PNt2t5R3geibJjUbA==
+"@grafana/plugin-ui@^0.10.5":
+  version "0.10.5"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.10.5.tgz#8a0ac1c723f5aa6351a133e6cebfaae1b1627511"
+  integrity sha512-UNkfg1jSFbxNrgS35PNOfZ4NpexnLZa0e+nwiuXGugZ3Ie5+mcpHBeALmyI2LawYsU2AYdG9hm0wRMrW83z46A==
   dependencies:
     "@emotion/css" "^11.11.2"
     "@hello-pangea/dnd" "^17.0.0"
     "@react-awesome-query-builder/ui" "^6.6.4"
     "@types/prismjs" "^1.26.4"
     lodash "^4.17.21"
-    prismjs "^1.29.0"
+    prismjs "^1.30.0"
     react-calendar "^4.8.0"
     react-popper-tooltip "^4.4.2"
     react-use "^17.3.1"
@@ -7481,7 +7491,7 @@ prismjs@1.29.0:
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.29.0.tgz#f113555a8fa9b57c35e637bba27509dcf802dd12"
   integrity sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==
 
-prismjs@1.30.0, prismjs@^1.29.0:
+prismjs@1.30.0, prismjs@^1.30.0:
   version "1.30.0"
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.30.0.tgz#d9709969d9d4e16403f6f348c63553b19f0975a9"
   integrity sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==
