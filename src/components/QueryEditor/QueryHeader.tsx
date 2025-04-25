@@ -65,7 +65,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const database = useSelectedDatabase(databases, query, datasource);
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
-  const [enabled, setEnabled] = useState(false);
+  const [isAiEnabled, setIsAiEnabled] = useState(false);
   const [waiting, setWaiting] = useState(false);
   const [hasError, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState(TOKEN_NOT_FOUND);
@@ -76,7 +76,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
 
   useAsync(async () => {
     const enabled = await llm.enabled();
-    setEnabled(enabled);
+    setIsAiEnabled(enabled);
   });
 
   const changeEditorMode = (value: EditorMode) => {
@@ -224,7 +224,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       />
       <FlexItem grow={1} />
       {query.rawMode && (
-        <Button variant="secondary" size="sm" onClick={showExplanation} disabled={!enabled}>
+        <Button variant="secondary" size="sm" onClick={showExplanation} disabled={!isAiEnabled}>
           Explain KQL
         </Button>
       )}
