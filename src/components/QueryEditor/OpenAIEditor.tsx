@@ -154,7 +154,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
   };
 
   useEffect(() => {
-    if (worker && stateSchema) {
+    if (worker && stateSchema?.Databases) {
       // Populate Database schema with macros
       Object.keys(stateSchema.Databases).forEach((db) =>
         Object.assign(stateSchema.Databases[db].Functions, getFunctions(variables))

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { openai } from '@grafana/llm';
+import { llm } from '@grafana/llm';
 import { EditorHeader, FlexItem, InlineSelect } from '@grafana/plugin-ui';
 import {
   Alert,
@@ -65,7 +65,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const database = useSelectedDatabase(databases, query, datasource);
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
-  const [enabled, setEnabled] = useState(false);
+  const [isAiEnabled, setIsAiEnabled] = useState(false);
   const [waiting, setWaiting] = useState(false);
   const [hasError, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState(TOKEN_NOT_FOUND);
@@ -75,8 +75,8 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const styles = useStyles2(getStyles);
 
   useAsync(async () => {
-    const enabled = await openai.enabled();
-    setEnabled(enabled);
+    const enabled = await llm.enabled();
+    setIsAiEnabled(enabled);
   });
 
   const changeEditorMode = (value: EditorMode) => {
@@ -137,7 +137,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const showExplanation = () => {
     setWaiting(true);
     reportInteraction('grafana_ds_adx_openai_kql_query_explanation_generated_with_llm_plugin');
-    const stream = openai
+    const stream = llm
       .streamChatCompletions({
         model: 'gpt-3.5-turbo',
         messages: [
@@ -145,7 +145,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           { role: 'user', content: `${query.query}"""` },
         ],
       })
-      .pipe(openai.accumulateContent());
+      .pipe(llm.accumulateContent());
     stream.subscribe({
       next: (m) => {
         setGeneratedExplanation(m);
@@ -224,7 +224,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       />
       <FlexItem grow={1} />
       {query.rawMode && (
-        <Button variant="secondary" size="sm" onClick={showExplanation} disabled={!enabled}>
+        <Button variant="secondary" size="sm" onClick={showExplanation} disabled={!isAiEnabled}>
           Explain KQL
         </Button>
       )}
