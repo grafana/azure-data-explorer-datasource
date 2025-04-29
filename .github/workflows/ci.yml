@@ -86,13 +86,9 @@ jobs:
 
       - name: Archive Build
         uses: actions/upload-artifact@v4
-        env:
-          PLUGIN_ID: ${{ steps.metadata.outputs.plugin-id }}
-          PLUGIN_VERSION: ${{ steps.metadata.outputs.plugin-version }}
-          PLUGIN_ARCHIVE: ${{ steps.metadata.outputs.archive }}
         with:
-          name: ${PLUGIN_ID}-${PLUGIN_VERSION}
-          path: ${PLUGIN_ARCHIVE}
+          name: ${{ steps.metadata.outputs.plugin-id }}-${{ steps.metadata.outputs.plugin-version }}
+          path: ${{ steps.metadata.outputs.archive }}
           retention-days: 5
 
   resolve-versions:
