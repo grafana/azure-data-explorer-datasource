@@ -957,13 +957,13 @@
     react-dom "^18.3.1"
     ts-jest "29.2.5"
 
-"@grafana/data@11.6.0", "@grafana/data@^11.6.0":
-  version "11.6.0"
-  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-11.6.0.tgz#34cadb2d4279925de5c5b993ba9df8d921d8c97a"
-  integrity sha512-3NIQ5mO1punUdz2jeKuLR9Zki+FLCuvsXMarpZjXBpnefvJIXRP2FKfQJAGw7v+eNzty2NVbcmjrdnhIQ61mIQ==
+"@grafana/data@11.6.1", "@grafana/data@^11.6.1":
+  version "11.6.1"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-11.6.1.tgz#92f53563bd9ab4554b73a8173188a3d0cbcfc674"
+  integrity sha512-J6RuRbM/xhz9ZzsD6Hg3vfgH1JTAW2stFAvGVxAYS+emALD6ZyrrXUyZCqrwaLLWr7xXDQ3PoXCgwWFAKmN+Ug==
   dependencies:
     "@braintree/sanitize-url" "7.0.1"
-    "@grafana/schema" "11.6.0"
+    "@grafana/schema" "11.6.1"
     "@types/d3-interpolate" "^3.0.0"
     "@types/string-hash" "1.1.3"
     d3-interpolate "3.0.1"
@@ -987,10 +987,20 @@
     uplot "1.6.31"
     xss "^1.0.14"
 
-"@grafana/e2e-selectors@11.6.0", "@grafana/e2e-selectors@^11.6.0-229231":
-  version "11.6.0"
-  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-11.6.0.tgz#50ac0cecf09ea680b700bc3a9d3109acb554630e"
-  integrity sha512-3nJBRYjOTIi9WbclY6tp0NOj6KUpN7mJW4xBV6nYvqK5X48PWQ8u7SUG+nZyTSYQ/9AY88V2EMZmkCMNfE99hA==
+"@grafana/e2e-selectors@11.6.1":
+  version "11.6.1"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-11.6.1.tgz#296698c2eba4a66e9cf8f5c412f053dec52d7693"
+  integrity sha512-TQU1xSCSPKOF6b5/ulj3PU/XGYcbl1U4bGaZrYqTf09sMdG7dhewokro7u64BWBDc3qFYSGu+GQwBVcdKYBk6w==
+  dependencies:
+    "@grafana/tsconfig" "^2.0.0"
+    semver "^7.7.0"
+    tslib "2.8.1"
+    typescript "5.7.3"
+
+"@grafana/e2e-selectors@^12.1.0-240060":
+  version "12.1.0-240638"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-12.1.0-240638.tgz#cbfe05febe5c41662910d759973e667e0fb7b805"
+  integrity sha512-7XTjlmgVT45O1YV4IgFnBkm8Vhdw+Js6ielc4i2E1Mznma5GpGO2dByms4bSngYWinKzgeunKkAjxbBuGSshMg==
   dependencies:
     "@grafana/tsconfig" "^2.0.0"
     semver "^7.7.0"
@@ -1019,45 +1029,45 @@
     ua-parser-js "^1.0.32"
     web-vitals "^4.0.1"
 
-"@grafana/llm@^0.14.1":
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/@grafana/llm/-/llm-0.14.1.tgz#467c55c738f6fcf6cf363dab6f0196f937d60d70"
-  integrity sha512-ohornN5ILCRliBNqZKtEOATjVWXGrZWJYOLyo8gMgX5W6VnUQsemAeIFfPKJ/Aw90QdwEzofhcMYaK0JJlaIPg==
+"@grafana/llm@^0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@grafana/llm/-/llm-0.17.0.tgz#e3980d53ff69a0b68a346e30d933bbbbfd659e53"
+  integrity sha512-xNQ2PbVdAMnLnM3W+ZQ2ONXF0gdZGd4/kYphR2EIdGzkWCB1Bf+Ruoxxm31VPsrGOuYMBvDg6Vxscmul2v1U6w==
   dependencies:
     "@modelcontextprotocol/sdk" "^1.7.0"
     react-use "^17.6.0"
     semver "^7.6.3"
     uuid "^11.0.5"
 
-"@grafana/plugin-e2e@^1.19.1":
-  version "1.19.1"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-e2e/-/plugin-e2e-1.19.1.tgz#58fbc43f957b2307365f0ec8491b38205dba4dd5"
-  integrity sha512-2xEZfUS3zg5CR+l5yj8nAfPn5oyQTF4UDxEjkQdp4qly4kulxq/bklRChxjD6pmfp5E1rmtxI/EQT8PaHVK9+g==
+"@grafana/plugin-e2e@^1.19.9":
+  version "1.19.9"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-e2e/-/plugin-e2e-1.19.9.tgz#71c52005121ed0637285f1ac10c1fda7d3eaccee"
+  integrity sha512-f8qBQhqQ6PtqzFgTwiIRlVC3Obbad0sgugEfS4B8C0tziHW9akjjcP2fu0+qtPSlUXqQmDsusyAATZKM2MtiIw==
   dependencies:
-    "@grafana/e2e-selectors" "^11.6.0-229231"
+    "@grafana/e2e-selectors" "^12.1.0-240060"
     semver "^7.5.4"
     uuid "^11.0.2"
     yaml "^2.3.4"
 
-"@grafana/plugin-meta-extractor@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-meta-extractor/-/plugin-meta-extractor-0.5.0.tgz#73db7124bb2093706f246ac29af5ef20e06f5ae4"
-  integrity sha512-mRCenB4c9su6cy3cJQBvKhkY8wAnqsRV1inN4+cBDB2GFp1sh6h/M+iJjhJDjX1mz0/YZmQvNZdsJY9QiCTlhA==
+"@grafana/plugin-meta-extractor@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-meta-extractor/-/plugin-meta-extractor-0.5.3.tgz#eacafd14c6f3b2ef3e7848f64fbb351521a62616"
+  integrity sha512-CP8hDX+pmj1/nFkHGMzEYShRHcPDtmxTvbBmGHYnEDyXmdYkRZzbSOhommtJWx+WglI+xBtwwz0ZvUjab+j+Cg==
   dependencies:
     debug "^4.3.4"
     typescript "^5.4.5"
 
-"@grafana/plugin-ui@^0.10.4":
-  version "0.10.4"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.10.4.tgz#2db8663f3a93f78cccc82d6eda49952c6459cf62"
-  integrity sha512-ZHCA4cqM5r4mxtjiBxq31byru5/b+GnfP3edWK9aTgmU/0qbdgu5wNSrBvKg4qgtvrzp6PNt2t5R3geibJjUbA==
+"@grafana/plugin-ui@^0.10.5":
+  version "0.10.5"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.10.5.tgz#8a0ac1c723f5aa6351a133e6cebfaae1b1627511"
+  integrity sha512-UNkfg1jSFbxNrgS35PNOfZ4NpexnLZa0e+nwiuXGugZ3Ie5+mcpHBeALmyI2LawYsU2AYdG9hm0wRMrW83z46A==
   dependencies:
     "@emotion/css" "^11.11.2"
     "@hello-pangea/dnd" "^17.0.0"
     "@react-awesome-query-builder/ui" "^6.6.4"
     "@types/prismjs" "^1.26.4"
     lodash "^4.17.21"
-    prismjs "^1.29.0"
+    prismjs "^1.30.0"
     react-calendar "^4.8.0"
     react-popper-tooltip "^4.4.2"
     react-use "^17.3.1"
@@ -1065,16 +1075,16 @@
     sql-formatter-plus "^1.3.6"
     uuid "^11.0.0"
 
-"@grafana/runtime@^11.6.0":
-  version "11.6.0"
-  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-11.6.0.tgz#db3c7fa8de3a7d6719ee9614d4e8d6b5503ffe7b"
-  integrity sha512-FuZzmpfOo7ZAX6BA4ijJ7Vhih3q51hIe5SsmsXYxFrMMtAycjjdOfyaOHTtbY8e+k9gV6UlMlNFoQ8CNNlN3xw==
+"@grafana/runtime@^11.6.1":
+  version "11.6.1"
+  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-11.6.1.tgz#22294235e70e23ead7a2d4084b3523afd1816457"
+  integrity sha512-geLR3G0VPK4Fq9AbfdNkC+fB90osqS0xcvaWLaB/yOgYylkPxwZxN45UT4Jhtx80Sw7s3LiZejZW7+5++xyWyQ==
   dependencies:
-    "@grafana/data" "11.6.0"
-    "@grafana/e2e-selectors" "11.6.0"
+    "@grafana/data" "11.6.1"
+    "@grafana/e2e-selectors" "11.6.1"
     "@grafana/faro-web-sdk" "^1.13.2"
-    "@grafana/schema" "11.6.0"
-    "@grafana/ui" "11.6.0"
+    "@grafana/schema" "11.6.1"
+    "@grafana/ui" "11.6.1"
     history "4.10.1"
     lodash "4.17.21"
     react-loading-skeleton "3.5.0"
@@ -1082,10 +1092,10 @@
     rxjs "7.8.1"
     tslib "2.8.1"
 
-"@grafana/schema@11.6.0", "@grafana/schema@^11.5.2":
-  version "11.6.0"
-  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-11.6.0.tgz#9c2c7ff5277ecf4f967af308d3aa71308d20bcfc"
-  integrity sha512-+kLlXVf9T7Tq6GX19JjCTGNpyE2a13Isd4JHY4wI6fk1mFirbr2yDC09DdGJjCvcoDYVkPwKvntuDRIPheIBhA==
+"@grafana/schema@11.6.1", "@grafana/schema@^11.5.2":
+  version "11.6.1"
+  resolved "https://registry.yarnpkg.com/@grafana/schema/-/schema-11.6.1.tgz#a85b44d3e4c73eeb6e8243ab7d78642bc292fc60"
+  integrity sha512-117D6g9TQ3w3ERx01EG61Meokd5Cws5fwVnlkHFvx45zk7HqPtnH0kPYKLj3JyLFN+A8xyuqiUI5rKFZ0MRyjw==
   dependencies:
     tslib "2.8.1"
 
@@ -1094,19 +1104,19 @@
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-2.0.0.tgz#277aba907ddbe0301dc37248923e6bd2b68f5151"
   integrity sha512-cxC3Htv/GidI5FeVGAzj/lYZTMMz/Cfsc8VOQFO3Ichjx3hUjyjeoBUIpVSVMnIjKUdA5ycdxtMYPHIuIrk8+A==
 
-"@grafana/ui@11.6.0", "@grafana/ui@^11.5.2":
-  version "11.6.0"
-  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-11.6.0.tgz#eed3efed294fd75b41de6c3029d254bfaec57bec"
-  integrity sha512-3D24it+otNduEsmgW/CajF5Mf+gwmiS02KgGe1ExVY45rhMF0yqq7CnHhXkNBWnVaug8lQLR1vVDC+z/bCOPaw==
+"@grafana/ui@11.6.1", "@grafana/ui@^11.5.2":
+  version "11.6.1"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-11.6.1.tgz#ea58d636cd4b460a2170339d7a6862daf9ba2b32"
+  integrity sha512-JtuhMBPrMYFj0hU11qs+6yUuakidjwKUHRPFLouWmbll5ygRUJ/uh5195mmMsW7fgKhgqWlnt3YiW88PAnbePw==
   dependencies:
     "@emotion/css" "11.13.5"
     "@emotion/react" "11.14.0"
     "@emotion/serialize" "1.3.3"
     "@floating-ui/react" "0.27.5"
-    "@grafana/data" "11.6.0"
-    "@grafana/e2e-selectors" "11.6.0"
+    "@grafana/data" "11.6.1"
+    "@grafana/e2e-selectors" "11.6.1"
     "@grafana/faro-web-sdk" "^1.13.2"
-    "@grafana/schema" "11.6.0"
+    "@grafana/schema" "11.6.1"
     "@hello-pangea/dnd" "17.0.0"
     "@leeoniya/ufuzzy" "1.0.18"
     "@monaco-editor/react" "4.6.0"
@@ -1135,7 +1145,7 @@
     moment "2.30.1"
     monaco-editor "0.34.1"
     ol "7.4.0"
-    prismjs "1.29.0"
+    prismjs "1.30.0"
     rc-cascader "3.33.0"
     rc-drawer "7.2.0"
     rc-picker "4.9.2"
@@ -7476,12 +7486,7 @@ pretty-format@^29.0.0, pretty-format@^29.7.0:
     ansi-styles "^5.0.0"
     react-is "^18.0.0"
 
-prismjs@1.29.0:
-  version "1.29.0"
-  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.29.0.tgz#f113555a8fa9b57c35e637bba27509dcf802dd12"
-  integrity sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==
-
-prismjs@1.30.0, prismjs@^1.29.0:
+prismjs@1.30.0, prismjs@^1.30.0:
   version "1.30.0"
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.30.0.tgz#d9709969d9d4e16403f6f348c63553b19f0975a9"
   integrity sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==
