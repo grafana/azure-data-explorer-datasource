@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [6.0.1]
+
+- Update import from Grafana llm library [#1267](https://github.com/grafana/azure-data-explorer-datasource/pull/1267)
+- Fix: Remove us of http.DefaultClient
+
 ## [6.0.0]
 
 - Add loading indicator [#1210](https://github.com/grafana/azure-data-explorer-datasource/pull/1210)
