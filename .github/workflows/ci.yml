@@ -10,10 +10,11 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   build:
+    permissions:
+      id-token: write
     runs-on: ubuntu-latest
     outputs:
       plugin-id: ${{ steps.metadata.outputs.plugin-id }}
@@ -21,7 +22,8 @@ jobs:
       archive: ${{ steps.metadata.outputs.archive }}
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          persist-credentials: false
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
@@ -49,13 +51,13 @@ jobs:
           go-version-file: go.mod
 
       - name: Test backend
-        uses: magefile/mage-action@v3
+        uses: magefile/mage-action@6f50bbb8ea47d56e62dee92392788acbc8192d0b
         with:
           version: latest
           args: coverage
 
       - name: Build backend
-        uses: magefile/mage-action@v3
+        uses: magefile/mage-action@6f50bbb8ea47d56e62dee92392788acbc8192d0b
         with:
           version: latest
           args: buildAll
@@ -75,9 +77,12 @@ jobs:
 
       - name: Package plugin
         id: package-plugin
+        env:
+          PLUGIN_ID: ${{ steps.metadata.outputs.plugin-id }}
+          PLUGIN_ARCHIVE: ${{ steps.metadata.outputs.archive }}
         run: |
-          mv dist ${{ steps.metadata.outputs.plugin-id }}
-          zip ${{ steps.metadata.outputs.archive }} ${{ steps.metadata.outputs.plugin-id }} -r
+          mv dist ${PLUGIN_ID}
+          zip ${PLUGIN_ARCHIVE} ${PLUGIN_ID} -r
 
       - name: Archive Build
         uses: actions/upload-artifact@v4
@@ -95,7 +100,7 @@ jobs:
     steps:
       - name: Resolve Grafana E2E versions
         id: resolve-versions
-        uses: grafana/plugin-actions/e2e-version@main
+        uses: grafana/plugin-actions/e2e-version@bf335ac99375f0ba8828497abdf1a22897b5d888
         with:
           version-resolver-type: version-support-policy
 
@@ -111,6 +116,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
@@ -131,13 +138,16 @@ jobs:
           name: ${{ needs.build.outputs.plugin-id }}-${{ needs.build.outputs.plugin-version }}
 
       - name: Unpack build
+        env:
+          PLUGIN_ID: ${{ needs.build.outputs.plugin-id }}
+          PLUGIN_ARCHIVE: ${{ needs.build.outputs.archive }}
         run: |
-          unzip ${{ needs.build.outputs.archive }}
-          mv ${{ needs.build.outputs.plugin-id }} dist
+          unzip ${PLUGIN_ARCHIVE}
+          mv ${PLUGIN_ID} dist
 
       - name: Get secrets
         id: get-secrets
-        uses: grafana/shared-workflows/actions/get-vault-secrets@main
+        uses: grafana/shared-workflows/actions/get-vault-secrets@5d7e361bc7e0a183cde8afe9899fb7b596d2659b
         with:
           repo_secrets: |
             TENANT_ID=e2e:tenantId
@@ -170,6 +180,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
@@ -190,9 +202,12 @@ jobs:
           name: ${{ needs.build.outputs.plugin-id }}-${{ needs.build.outputs.plugin-version }}
 
       - name: Unpack build
+        env:
+          PLUGIN_ID: ${{ needs.build.outputs.plugin-id }}
+          PLUGIN_ARCHIVE: ${{ needs.build.outputs.archive }}
         run: |
-          unzip ${{ needs.build.outputs.archive }}
-          mv ${{ needs.build.outputs.plugin-id }} dist
+          unzip ${PLUGIN_ARCHIVE}
+          mv ${PLUGIN_ID} dist
 
       - name: Start Grafana
         shell: bash

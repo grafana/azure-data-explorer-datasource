@@ -6,6 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
@@ -14,7 +17,7 @@ jobs:
       - name: Build plugin
         run: yarn build
       - name: Compatibility check
-        uses: grafana/plugin-actions/is-compatible@v1
+        uses: grafana/plugin-actions/is-compatible@f567fc6454619e6c8dbc2f91692197457c10a02b
         with:
           module: './src/module.ts'
           comment-pr: 'yes'
