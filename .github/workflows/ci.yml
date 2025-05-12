@@ -100,7 +100,7 @@ jobs:
     steps:
       - name: Resolve Grafana E2E versions
         id: resolve-versions
-        uses: grafana/plugin-actions/e2e-version@main
+        uses: grafana/plugin-actions/e2e-version@bf335ac99375f0ba8828497abdf1a22897b5d888
         with:
           version-resolver-type: version-support-policy
 
@@ -147,7 +147,7 @@ jobs:
 
       - name: Get secrets
         id: get-secrets
-        uses: grafana/shared-workflows/actions/get-vault-secrets@main
+        uses: grafana/shared-workflows/actions/get-vault-secrets@5d7e361bc7e0a183cde8afe9899fb7b596d2659b
         with:
           repo_secrets: |
             TENANT_ID=e2e:tenantId
