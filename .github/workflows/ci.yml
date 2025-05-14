@@ -10,9 +10,6 @@ on:
 
 permissions:
   contents: read
-  # The "id-token: write" permission is required by "get-vault-secrets" action. We request it here
-  # instead of the whole workflow, in order to reduce the scope of the permission.
-  id-token: write
 
 jobs:
   build:
