@@ -1,6 +1,5 @@
 import { CustomVariableSupport, DataQueryRequest, DataQueryResponse, toDataFrame } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
-import { firstStringFieldToMetricFindValue } from 'common/responseHelpers';
 import { toColumnNames } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 import VariableEditor from 'components/VariableEditor/VariableEditor';
 import { AdxDataSource, includeTimeRange } from 'datasource';
@@ -91,7 +90,7 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
             }
             if (queryRes?.data && queryRes.data.length) {
               return {
-                data: firstStringFieldToMetricFindValue(queryRes.data[0]),
+                data: queryRes.data,
                 error: queryError ? new Error(queryError) : undefined,
               };
             }
