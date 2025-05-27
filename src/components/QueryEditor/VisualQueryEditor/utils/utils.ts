@@ -1,4 +1,8 @@
 import { SelectableValue, toOption } from '@grafana/data';
+import { intersection, isUndefined, uniq } from 'lodash';
+import { toPropertyType } from 'schema/mapper';
+import { QueryEditorOperatorValueType, QueryEditorPropertyType } from 'schema/types';
+import { AdxColumnSchema, QueryExpression } from 'types';
 import {
   QueryEditorArrayExpression,
   QueryEditorColumnsExpression,
@@ -7,10 +11,6 @@ import {
   QueryEditorOperatorExpression,
   QueryEditorReduceExpression,
 } from 'types/expressions';
-import { intersection, isUndefined, uniq } from 'lodash';
-import { toPropertyType } from 'schema/mapper';
-import { QueryEditorOperatorValueType, QueryEditorPropertyType } from 'schema/types';
-import { AdxColumnSchema, QueryExpression } from 'types';
 import { AggregateFunctions } from '../AggregateItem';
 import { FilterExpression } from '../KQLFilter';
 import { isMulti, OPERATORS } from './operators';
@@ -278,12 +278,17 @@ export function defaultTimeSeriesColumns(expression: QueryExpression, tableColum
   return res;
 }
 
-export const createOperator = (property: string, operator: string, value: any): QueryEditorOperatorExpression => {
+export const createOperator = (
+  property: string,
+  operator: string,
+  value: any,
+  typeOverride?: QueryEditorPropertyType
+): QueryEditorOperatorExpression => {
   return {
     type: QueryEditorExpressionType.Operator,
     property: {
       name: property,
-      type: valueToPropertyType(value),
+      type: valueToPropertyType(value, typeOverride),
     },
     operator: {
       name: operator,
@@ -292,9 +297,13 @@ export const createOperator = (property: string, operator: string, value: any): 
   };
 };
 
-export const valueToPropertyType = (value: any): QueryEditorPropertyType => {
+export const valueToPropertyType = (value: any, typeOverride?: QueryEditorPropertyType): QueryEditorPropertyType => {
   if (Array.isArray(value) && value.length > 0) {
     return valueToPropertyType(value[0]);
+  }
+
+  if (typeOverride) {
+    return typeOverride;
   }
 
   switch (typeof value) {

@@ -1,20 +1,20 @@
+import { TemplateSrv } from '@grafana/runtime';
+import { createOperator, valueToPropertyType } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
+import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
 import { DYNAMIC_TYPE_ARRAY_DELIMITER, KustoExpressionParser } from './KustoExpressionParser';
 import { QueryEditorPropertyType } from './schema/types';
-import { TemplateSrv } from '@grafana/runtime';
 import {
-  QueryEditorPropertyExpression,
-  QueryEditorOperatorExpression,
   QueryEditorExpressionType,
-  QueryEditorReduceExpression,
-  QueryEditorGroupByExpression,
   QueryEditorFunctionParameterExpression,
-  QueryEditorReduceExpressionArray,
+  QueryEditorGroupByExpression,
   QueryEditorGroupByExpressionArray,
+  QueryEditorOperatorExpression,
+  QueryEditorPropertyExpression,
+  QueryEditorReduceExpression,
+  QueryEditorReduceExpressionArray,
   QueryEditorWhereArrayExpression,
   QueryEditorWhereExpression,
 } from './types/expressions';
-import { AdxColumnSchema, AutoCompleteQuery, defaultQuery, QueryExpression } from 'types';
-import { createOperator, valueToPropertyType } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 
 describe('KustoExpressionParser', () => {
   const templateSrv: TemplateSrv = {
@@ -1394,6 +1394,30 @@ describe('KustoExpressionParser', () => {
           "\n| where array_2 == 'ThunderStorm' or foo == 'bar'" +
           '\n| project-away array_1, array_2'
       );
+    });
+
+    it('should parse expression with a datetime and a comparison operator', () => {
+      const expression = createQueryExpression({
+        from: createProperty('TestDB'),
+        where: createWhereArray(
+          [createOperator(`TimeValue`, '<', '2025-01-01 00:00:00', QueryEditorPropertyType.DateTime)],
+          QueryEditorExpressionType.And
+        ),
+      });
+
+      expect(parser.toQuery(expression)).toEqual('TestDB' + "\n| where TimeValue < datetime('2025-01-01 00:00:00')");
+    });
+
+    it('should parse expression with a timespan and a comparison operator', () => {
+      const expression = createQueryExpression({
+        from: createProperty('TestDB'),
+        where: createWhereArray(
+          [createOperator(`Duration`, '<', '00:10:00', QueryEditorPropertyType.TimeSpan)],
+          QueryEditorExpressionType.And
+        ),
+      });
+
+      expect(parser.toQuery(expression)).toEqual('TestDB' + "\n| where Duration < timespan('00:10:00')");
     });
   });
 });
