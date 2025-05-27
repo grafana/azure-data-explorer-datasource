@@ -1,23 +1,23 @@
-import { QueryExpression, AdxColumnSchema, AutoCompleteQuery } from './types';
-import { QueryEditorPropertyType } from './schema/types';
+import { SelectableValue } from '@grafana/data';
 import { getTemplateSrv, TemplateSrv } from '@grafana/runtime';
+import { filterColumns } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
+import { cloneDeep } from 'lodash';
 import {
-  isReduceExpression,
+  isAndExpression,
+  isArrayExpression,
   isFieldAndOperator,
   isGroupBy,
   isOrExpression,
-  isAndExpression,
-  isArrayExpression,
+  isReduceExpression,
 } from './guards';
+import { QueryEditorPropertyType } from './schema/types';
+import { AdxColumnSchema, AutoCompleteQuery, QueryExpression } from './types';
 import {
+  QueryEditorArrayExpression,
   QueryEditorExpression,
   QueryEditorOperatorExpression,
-  QueryEditorArrayExpression,
   QueryEditorPropertyExpression,
 } from './types/expressions';
-import { cloneDeep } from 'lodash';
-import { SelectableValue } from '@grafana/data';
-import { filterColumns } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 
 interface ParseContext {
   timeColumn?: string;
@@ -321,6 +321,10 @@ export class KustoExpressionParser {
       case QueryEditorPropertyType.Number:
       case QueryEditorPropertyType.Boolean:
         return val;
+      case QueryEditorPropertyType.DateTime:
+        return `datetime('${val}')`;
+      case QueryEditorPropertyType.TimeSpan:
+        return `timespan('${val}')`;
       default:
         return `'${val}'`;
     }
