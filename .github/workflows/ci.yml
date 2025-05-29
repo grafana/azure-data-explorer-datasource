@@ -149,7 +149,7 @@ jobs:
 
       - name: Get secrets
         id: get-secrets
-        uses: grafana/shared-workflows/actions/get-vault-secrets@62d134060a0479b86b1a9814b023b8403e1b36cf
+        uses: grafana/shared-workflows/actions/get-vault-secrets@f797fbd07354fd4727f952291bfa6b85eab568ef
         with:
           repo_secrets: |
             TENANT_ID=e2e:tenantId
