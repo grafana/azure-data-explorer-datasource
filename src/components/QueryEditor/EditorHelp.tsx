@@ -97,7 +97,7 @@ T | make-series avg(HatInventory) on Timestamp from $__timeFrom to $__timeTo ste
             &le; datetime(2018-06-05T20:09:58.907Z)
           </li>
           <li>
-            <Trans i18nKey="" values={{ macro: '$__timeFrom', example: 'datetime(2018-06-05T18:09:58.907Z)' }}>
+            <Trans i18nKey="components.editor-help.time-from" values={{ macro: '$__timeFrom', example: 'datetime(2018-06-05T18:09:58.907Z)' }}>
               {'{{macro}}'}: {'{{example}}'}. The start time of the query
             </Trans>
           </li>

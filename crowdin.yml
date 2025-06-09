@@ -7,6 +7,5 @@ files: [
     "source": "src/locales/en-US/grafana-azure-data-explorer-datasource.json",
     "translation": "src/locales/%locale%/%original_file_name%",
     "type": "i18next_json",
-    "dest": "plugins/grafana-azure-data-explorer-datasource/en-US/%original_file_name%"
   },
 ]

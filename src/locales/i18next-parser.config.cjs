@@ -8,5 +8,5 @@ module.exports = {
 
   defaultNamespace: 'grafana-azure-data-explorer-datasource',
   input: ['../**/*.{tsx,ts}'],
-  output: './locales/$LOCALE/$NAMESPACE.json',
+  output: './src/locales/$LOCALE/$NAMESPACE.json',
 };
