@@ -3,8 +3,8 @@
   "version": "6.0.1",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
-    "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
-    "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
+    "build": "webpack -c ./webpack.config.ts --env production",
+    "dev": "webpack -w -c ./webpack.config.ts --env development",
     "e2e:playwright": "yarn playwright test",
     "e2e:playwright:ui": "yarn playwright test --ui",
     "e2e:playwright:report": "yarn playwright show-report",
