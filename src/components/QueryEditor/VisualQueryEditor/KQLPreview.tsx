@@ -1,3 +1,4 @@
+import { useTranslate, Trans } from '@grafana/i18n';
 import React, { useState, useEffect } from 'react';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { Button, useStyles2 } from '@grafana/ui';
@@ -13,7 +14,8 @@ interface KQLPreviewProps {
 }
 
 const KQLPreview: React.FC<KQLPreviewProps> = ({ query }) => {
-  const styles = useStyles2(getStyles);
+  const { t } = useTranslate();
+const styles = useStyles2(getStyles);
   const [hidden, setHidden] = useState(true);
 
   useEffect(() => {
@@ -23,19 +25,19 @@ const KQLPreview: React.FC<KQLPreviewProps> = ({ query }) => {
   return (
     <EditorRow>
       <EditorFieldGroup>
-        <EditorField label="Query Preview" data-testid={selectors.components.queryEditor.queryPreview.field}>
+        <EditorField label={t("components.kqlpreview.label-query-preview", "Query Preview")} data-testid={selectors.components.queryEditor.queryPreview.field}>
           <>
-            <Button hidden={!hidden} variant="secondary" onClick={() => setHidden(false)} size="sm">
+            <Button hidden={!hidden} variant="secondary" onClick={() => setHidden(false)} size="sm"><Trans i18nKey="components.kqlpreview.show">
               show
-            </Button>
+            </Trans></Button>
             <div className={styles.codeBlock} hidden={hidden}>
               <pre className={styles.code}>
                 <code className="language-kusto">{query}</code>
               </pre>
             </div>
-            <Button hidden={hidden} variant="secondary" onClick={() => setHidden(true)} size="sm">
+            <Button hidden={hidden} variant="secondary" onClick={() => setHidden(true)} size="sm"><Trans i18nKey="components.kqlpreview.hide">
               hide
-            </Button>
+            </Trans></Button>
           </>
         </EditorField>
       </EditorFieldGroup>

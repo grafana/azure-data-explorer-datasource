@@ -1,7 +1,8 @@
+import { useTranslate, Trans } from '@grafana/i18n';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { AzureCredentials, getAzureClouds } from '@grafana/azure-sdk';
 import { FeatureToggles, DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
-import { Switch, InlineField } from '@grafana/ui';
+import { Switch, InlineField, TextLink } from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { gte } from 'semver';
 import ConfigHelp from './ConfigHelp';
@@ -34,7 +35,8 @@ export interface ConfigEditorProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {}
 
 const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
-  const { options, onOptionsChange } = props;
+  const { t } = useTranslate();
+const { options, onOptionsChange } = props;
   const { jsonData } = options;
 
   const clouds = useMemo(() => {
@@ -113,8 +115,8 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
       <ConnectionConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
       <Divider />
       <ConfigSection
-        title="Additional settings"
-        description="Additional settings are optional settings that can be configured for more control over your data source. This includes query optimizations, schema settings, tracking configuration, and OpenAI configuration."
+        title={t("components.config-editor.title-additional-settings", "Additional settings")}
+        description={t('components.config-editor.description-additional-settings', 'Additional settings are optional settings that can be configured for more control over your data source. This includes query optimizations, schema settings, tracking configuration, and OpenAI configuration.')}
         isCollapsible
         isInitiallyOpen={hasAdditionalSettings}
       >
@@ -129,20 +131,21 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         gte(config.buildInfo.version, '10.0.0') && (
           <>
             <div className="gf-form-group">
-              <h3 className="page-heading">Secure Socks Proxy</h3>
+              <h3 className="page-heading"><Trans i18nKey="components.config-editor.secure-socks-proxy">Secure Socks Proxy</Trans></h3>
               <br />
               <InlineField
-                label="Enable"
+                label={t("components.config-editor.label-enable", "Enable")}
                 tooltip={
                   <>
-                    Enable proxying the datasource connection through the secure socks proxy to a different network. See{' '}
-                    <a
-                      href="https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Configure a datasource connection proxy.
-                    </a>
+                    <Trans i18nKey="components.config-editor.tooltip-enable">
+                      Enable proxying the datasource connection through the secure socks proxy to a different network. See{' '}
+                      <TextLink
+                        href="https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/"
+                        external
+                      >
+                        Configure a datasource connection proxy.
+                      </TextLink>
+                    </Trans>
                   </>
                 }
               >

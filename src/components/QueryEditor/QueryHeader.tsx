@@ -1,3 +1,4 @@
+import { useTranslate, Trans } from '@grafana/i18n';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { llm } from '@grafana/llm';
@@ -56,7 +57,8 @@ const adxTimeFormat: SelectableValue<string> = {
 };
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
-  const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
+  const { t } = useTranslate();
+const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
   const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions, isLoading } = props;
   const { rawMode, OpenAI } = query;
   const [clusterUri, setClusterUri] = useState(query.clusterUri);
@@ -176,9 +178,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
     <EditorHeader>
       <ConfirmModal
         isOpen={showWarning}
-        title="Are you sure?"
-        body="You will lose manual changes done to the query if you go back to the visual builder."
-        confirmText="Confirm"
+        title={t("components.query-header.title-are-you-sure", "Are you sure?")}
+        body={t('components.query-header.body-lose-manual-changes', 'You will lose manual changes done to the query if you go back to the visual builder.')}
+        confirmText={t('components.query-header.confirm-text', 'Confirm')}
         onConfirm={() => {
           setShowWarning(false);
           onChange({ ...query, rawMode: false });
@@ -189,9 +191,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         }}
       ></ConfirmModal>
       <InlineSelect
-        label="Cluster"
+        label={t("components.query-header.label-cluster", "Cluster")}
         data-testid={selectors.components.queryEditor.cluster.input.label}
-        aria-label="Cluster"
+        aria-label={t("components.query-header.aria-label-cluster", "Cluster")}
         options={clusters.concat({
           ...templateVariableOptions,
           value: templateVariableOptions.value || '',
@@ -202,9 +204,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         allowCustomValue={true}
       />
       <InlineSelect
-        label="Database"
+        label={t("components.query-header.label-database", "Database")}
         data-testid={selectors.components.queryEditor.database.input.label}
-        aria-label="Database"
+        aria-label={t("components.query-header.aria-label-database", "Database")}
         options={databases.concat({
           ...templateVariableOptions,
           value: templateVariableOptions.value || '',
@@ -215,7 +217,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
         onChange={onDatabaseChange}
       />
       <InlineSelect
-        label="Format as"
+        label={t("components.query-header.label-format-as", "Format as")}
         options={formats}
         value={query.resultFormat}
         onChange={({ value }) => {
@@ -224,9 +226,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       />
       <FlexItem grow={1} />
       {query.rawMode && (
-        <Button variant="secondary" size="sm" onClick={showExplanation} disabled={!isAiEnabled}>
+        <Button variant="secondary" size="sm" onClick={showExplanation} disabled={!isAiEnabled}><Trans i18nKey="components.query-header.explain-kql">
           Explain KQL
-        </Button>
+        </Trans></Button>
       )}
       {!query.OpenAI && (
         <Button
@@ -235,9 +237,9 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           size="sm"
           onClick={onRunQuery}
           data-testid={selectors.components.queryEditor.runQuery.button}
-        >
+        ><Trans i18nKey="components.query-header.run-query">
           Run query
-        </Button>
+        </Trans></Button>
       )}
       <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
       {hasError && (
@@ -253,7 +255,8 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
       {query.rawMode && generatedExplanation && !hasError && (
         <Card className={styles.card}>
           <Card.Heading>
-            <div>KQL Explanation</div>
+            <div><Trans i18nKey="components.query-header.kql-explanation">KQL Explanation</Trans></div>
+            {/* eslint-disable-next-line @grafana/i18n/no-untranslated-strings */}
             <Button
               variant="secondary"
               size="sm"
@@ -266,7 +269,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           <CustomScrollbar hideTracksWhenNotNeeded={true} showScrollIndicators={true} autoHeightMax="175px">
             <Card.Description>
               {waiting ? (
-                <LoadingPlaceholder text="Loading..." />
+                <LoadingPlaceholder text={t("components.query-header.text-loading", "Loading...")} />
               ) : (
                 <div dangerouslySetInnerHTML={{ __html: renderMarkdown(generatedExplanation) }}></div>
               )}

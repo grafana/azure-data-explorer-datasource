@@ -1,3 +1,4 @@
+import { useTranslate } from '@grafana/i18n';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
 import { Alert } from '@grafana/ui';
@@ -25,7 +26,8 @@ interface VisualQueryEditorProps extends Props {
 }
 
 export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
-  const templateSrv = getTemplateSrv();
+  const { t } = useTranslate();
+const templateSrv = getTemplateSrv();
   const { schema, database, datasource, query, onChange } = props;
   const { id: datasourceId, parseExpression, getSchemaMapper } = datasource;
   const databaseName = templateSrv.replace(database);
@@ -64,12 +66,12 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
   return (
     <EditorRows>
       {tableSchema.error && (
-        <Alert severity="error" title="Could not load table schema">
+        <Alert severity="error" title={t("components.visual-query-editor.title-could-not-load-table-schema", "Could not load table schema")}>
           {tableSchema.error?.message}
         </Alert>
       )}
       {!tableSchema.loading && tableSchema.value?.length === 0 && clusterName && table && (
-        <Alert severity="warning" title="Table schema loaded successfully but without any columns" />
+        <Alert severity="warning" title={t("components.visual-query-editor.title-table-schema-loaded-successfully-without-columns", "Table schema loaded successfully but without any columns")} />
       )}
       <TableSection {...props} tableSchema={tableSchema} tables={tables} table={table} />
       <FilterSection {...props} columns={tableColumns} />

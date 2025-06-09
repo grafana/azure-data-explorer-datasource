@@ -1,3 +1,4 @@
+import { useTranslate, Trans } from '@grafana/i18n';
 import React from 'react';
 import { useAsyncFn } from 'react-use';
 import { css } from '@emotion/css';
@@ -33,7 +34,8 @@ interface FilterItemProps {
 }
 
 const FilterItem: React.FC<FilterItemProps> = (props) => {
-  const { datasource, query, filter, onChange, onDelete, columns, templateVariableOptions, filtersLength } = props;
+  const { t } = useTranslate();
+const { datasource, query, filter, onChange, onDelete, columns, templateVariableOptions, filtersLength } = props;
   const styles = useStyles2(getStyles);
 
   const loadValues = async () => {
@@ -66,7 +68,7 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
   return (
     <InputGroup>
       <Select
-        aria-label="column"
+        aria-label={t("components.filter-item.aria-label-column", "Column")}
         autoFocus={filter.focus}
         width="auto"
         value={filter.property?.name ? valueToDefinition(filter.property?.name) : null}
@@ -75,7 +77,7 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
         onChange={(e) => e.value && onChange(setOperatorExpressionProperty(filter, e.value, e.type))}
       />
       <Select
-        aria-label="operator"
+        aria-label={t("components.filter-item.aria-label-operator", "Operator")}
         width="auto"
         value={filter.operator?.name && toOption(filter.operator.name)}
         options={toOperatorOptions(filter.property?.type)}
@@ -83,7 +85,7 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
       />
       <div hidden={!isDatetime}>
         <Input
-          aria-label="column datetime value"
+          aria-label={t("components.filter-item.aria-label-column-datetime-value", "Column datetime value")}
           value={typeof filter.operator?.value === 'string' ? filter.operator.value : ''}
           onChange={(e) => {
             onChange(setOperatorExpressionValue(filter, e.currentTarget.value));
@@ -92,7 +94,7 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
       </div>
       <div hidden={!isNumber}>
         <Input
-          aria-label="column number value"
+          aria-label={t("components.filter-item.aria-label-column-number-value", "Column number value")}
           value={typeof filter.operator?.value === 'number' ? filter.operator.value : 0}
           type="number"
           onChange={(e) => {
@@ -102,7 +104,7 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
       </div>
       <div hidden={!isOther}>
         <Select
-          aria-label="column value"
+          aria-label={t("components.filter-item.aria-label-column-value", "Column value")}
           width="auto"
           isLoading={state.loading}
           value={getOperatorExpressionValue(filter.operator?.value)}
@@ -115,8 +117,8 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
           isMulti={isMulti(filter.operator?.name)}
         />
       </div>
-      <AccessoryButton aria-label="remove" icon="times" variant="secondary" onClick={onDelete} />
-      <>{Number(filter.index) < filtersLength - 1 ? <Label className={styles.orLabel}>OR</Label> : null}</>
+      <AccessoryButton aria-label={t("components.filter-item.aria-label-remove", "Remove")} icon="times" variant="secondary" onClick={onDelete} />
+      <>{Number(filter.index) < filtersLength - 1 ? <Label className={styles.orLabel}><Trans i18nKey="components.filter-item.or">OR</Trans></Label> : null}</>
     </InputGroup>
   );
 };
