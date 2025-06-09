@@ -15,7 +15,7 @@ interface KQLPreviewProps {
 
 const KQLPreview: React.FC<KQLPreviewProps> = ({ query }) => {
   const { t } = useTranslate();
-const styles = useStyles2(getStyles);
+  const styles = useStyles2(getStyles);
   const [hidden, setHidden] = useState(true);
 
   useEffect(() => {
@@ -25,19 +25,22 @@ const styles = useStyles2(getStyles);
   return (
     <EditorRow>
       <EditorFieldGroup>
-        <EditorField label={t("components.kqlpreview.label-query-preview", "Query Preview")} data-testid={selectors.components.queryEditor.queryPreview.field}>
+        <EditorField
+          label={t('components.kqlpreview.label-query-preview', 'Query Preview')}
+          data-testid={selectors.components.queryEditor.queryPreview.field}
+        >
           <>
-            <Button hidden={!hidden} variant="secondary" onClick={() => setHidden(false)} size="sm"><Trans i18nKey="components.kqlpreview.show">
-              show
-            </Trans></Button>
+            <Button hidden={!hidden} variant="secondary" onClick={() => setHidden(false)} size="sm">
+              <Trans i18nKey="components.kqlpreview.show">show</Trans>
+            </Button>
             <div className={styles.codeBlock} hidden={hidden}>
               <pre className={styles.code}>
                 <code className="language-kusto">{query}</code>
               </pre>
             </div>
-            <Button hidden={hidden} variant="secondary" onClick={() => setHidden(true)} size="sm"><Trans i18nKey="components.kqlpreview.hide">
-              hide
-            </Trans></Button>
+            <Button hidden={hidden} variant="secondary" onClick={() => setHidden(true)} size="sm">
+              <Trans i18nKey="components.kqlpreview.hide">hide</Trans>
+            </Button>
           </>
         </EditorField>
       </EditorFieldGroup>

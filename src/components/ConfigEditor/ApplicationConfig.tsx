@@ -12,12 +12,18 @@ interface ApplicationConfigProps
 
 const ApplicationConfig: React.FC<ApplicationConfigProps> = ({ options, updateJsonData }) => {
   const { t } = useTranslate();
-const { jsonData } = options;
+  const { jsonData } = options;
 
   return (
-    <Field label={t("components.application-config.label-application-name-optional", "Application name (Optional)")} description={t("components.application-config.description-application-displayed", "Application name to be displayed in ADX.")}>
+    <Field
+      label={t('components.application-config.label-application-name-optional', 'Application name (Optional)')}
+      description={t(
+        'components.application-config.description-application-displayed',
+        'Application name to be displayed in ADX.'
+      )}
+    >
       <Input
-        aria-label={t("components.application-config.aria-label-application", "Application")}
+        aria-label={t('components.application-config.aria-label-application', 'Application')}
         data-testid={selectors.components.applicationEditor.application.input}
         value={jsonData.application}
         id="adx-application"

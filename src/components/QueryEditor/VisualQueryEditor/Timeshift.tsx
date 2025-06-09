@@ -16,7 +16,7 @@ interface TimeshiftProps {
 
 const Timeshift: React.FC<TimeshiftProps> = (props) => {
   const { t } = useTranslate();
-const { query, onChange } = props;
+  const { query, onChange } = props;
   const [displaySelect, setDisplaySelect] = useState(false);
   const onChangeValue = (value?: string) => {
     const newExpression = {
@@ -38,14 +38,18 @@ const { query, onChange } = props;
   return (
     <EditorRow>
       <EditorFieldGroup>
-        <EditorField label={t("components.timeshift.label-timeshift", "Timeshift")} optional={true} data-testid={selectors.components.queryEditor.timeshift.field}>
+        <EditorField
+          label={t('components.timeshift.label-timeshift', 'Timeshift')}
+          optional={true}
+          data-testid={selectors.components.queryEditor.timeshift.field}
+        >
           <InputGroup>
             <Button
               onClick={() => setDisplaySelect(true)}
               variant="secondary"
               size="md"
               icon="plus"
-              aria-label={t("components.timeshift.aria-label-add", "Add")}
+              aria-label={t('components.timeshift.aria-label-add', 'Add')}
               type="button"
               hidden={displaySelect}
             />
@@ -54,24 +58,24 @@ const { query, onChange } = props;
                 <>
                   <Select
                     width={'auto'}
-                    aria-label={t("components.timeshift.aria-label-timeshift", "Timeshift")}
+                    aria-label={t('components.timeshift.aria-label-timeshift', 'Timeshift')}
                     autoFocus={displaySelect}
                     allowCustomValue
                     options={[
                       {
-                        label: t("components.timeshift.label.no-timeshift", "No timeshift"),
+                        label: t('components.timeshift.label.no-timeshift', 'No timeshift'),
                         value: '',
                       },
                       {
-                        label: t("components.timeshift.label.hour-before", "Hour before"),
+                        label: t('components.timeshift.label.hour-before', 'Hour before'),
                         value: '1h',
                       },
                       {
-                        label: t("components.timeshift.label.day-before", "Day before"),
+                        label: t('components.timeshift.label.day-before', 'Day before'),
                         value: '1d',
                       },
                       {
-                        label: t("components.timeshift.label.week-before", "Week before"),
+                        label: t('components.timeshift.label.week-before', 'Week before'),
                         value: '7d',
                       },
                     ]}
@@ -79,7 +83,7 @@ const { query, onChange } = props;
                     onChange={(e) => onChangeValue(e.value)}
                   />
                   <AccessoryButton
-                    aria-label={t("components.timeshift.aria-label-remove", "Remove")}
+                    aria-label={t('components.timeshift.aria-label-remove', 'Remove')}
                     icon="times"
                     variant="secondary"
                     onClick={() => {

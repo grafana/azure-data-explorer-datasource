@@ -12,16 +12,16 @@ interface QueryConfigProps
 
 const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) => {
   const { t } = useTranslate();
-const { jsonData } = options;
+  const { jsonData } = options;
 
   const dataConsistencyOptions: Array<{ value: string; label: string }> = [
-    { value: 'strongconsistency', label: t("components.query-config.data-consistency-options.label.strong", "Strong") },
-    { value: 'weakconsistency', label: t("components.query-config.data-consistency-options.label.weak", "Weak") },
+    { value: 'strongconsistency', label: t('components.query-config.data-consistency-options.label.strong', 'Strong') },
+    { value: 'weakconsistency', label: t('components.query-config.data-consistency-options.label.weak', 'Weak') },
   ];
 
   const editorModeOptions: Array<{ value: EditorMode; label: string }> = [
-    { value: EditorMode.Visual, label: t("components.query-config.editor-mode-options.label.visual", "Visual") },
-    { value: EditorMode.Raw, label: t("components.query-config.editor-mode-options.label.raw", "Raw") },
+    { value: EditorMode.Visual, label: t('components.query-config.editor-mode-options.label.visual', 'Visual') },
+    { value: EditorMode.Raw, label: t('components.query-config.editor-mode-options.label.raw', 'Raw') },
   ];
 
   // Set some default values
@@ -36,11 +36,20 @@ const { jsonData } = options;
 
   return (
     <ConfigSubSection
-      title={t("components.query-config.title-query-optimizations", "Query Optimizations")}
+      title={t('components.query-config.title-query-optimizations', 'Query Optimizations')}
       isCollapsible
-      description={t("components.query-config.description-various-settings-for-controlling-query-behavior", "Various settings for controlling query behavior.")}
+      description={t(
+        'components.query-config.description-various-settings-for-controlling-query-behavior',
+        'Various settings for controlling query behavior.'
+      )}
     >
-      <Field label={t("components.query-config.label-query-timeout", "Query timeout")} description={t("components.query-config.description-value-controls-client-query-timeout", "This value controls the client query timeout.")}>
+      <Field
+        label={t('components.query-config.label-query-timeout', 'Query timeout')}
+        description={t(
+          'components.query-config.description-value-controls-client-query-timeout',
+          'This value controls the client query timeout.'
+        )}
+      >
         <Input
           value={jsonData.queryTimeout}
           id="adx-query-timeout"
@@ -52,8 +61,11 @@ const { jsonData } = options;
       </Field>
 
       <Field
-        label={t("components.query-config.label-use-dynamic-caching", "Use dynamic caching")}
-        description={t('components.query-config.description-use-dynamic-caching', 'By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored. For time series queries we will use the bin size to widen the time range but also as cache max age.')}
+        label={t('components.query-config.label-use-dynamic-caching', 'Use dynamic caching')}
+        description={t(
+          'components.query-config.description-use-dynamic-caching',
+          'By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored. For time series queries we will use the bin size to widen the time range but also as cache max age.'
+        )}
       >
         <Switch
           value={jsonData.dynamicCaching}
@@ -63,8 +75,11 @@ const { jsonData } = options;
       </Field>
 
       <Field
-        label={t("components.query-config.label-cache-max-age", "Cache max age")}
-        description={t('components.query-config.description-cache-max-age', 'By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.')}
+        label={t('components.query-config.label-cache-max-age', 'Cache max age')}
+        description={t(
+          'components.query-config.description-cache-max-age',
+          'By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.'
+        )}
       >
         <Input
           value={jsonData.cacheMaxAge}
@@ -77,7 +92,7 @@ const { jsonData } = options;
       </Field>
 
       <Field
-        label={t("components.query-config.label-data-consistency", "Data consistency")}
+        label={t('components.query-config.label-data-consistency', 'Data consistency')}
         description={
           <span>
             <Trans i18nKey="components.query-config.description-data-consistency">
@@ -105,8 +120,11 @@ const { jsonData } = options;
       </Field>
 
       <Field
-        label={t("components.query-config.label-default-editor-mode", "Default editor mode")}
-        description={t('components.query-config.description-default-editor-mode', 'This setting dictates which mode the editor will open in. Defaults to Visual.')}
+        label={t('components.query-config.label-default-editor-mode', 'Default editor mode')}
+        description={t(
+          'components.query-config.description-default-editor-mode',
+          'This setting dictates which mode the editor will open in. Defaults to Visual.'
+        )}
       >
         <Select
           options={editorModeOptions}

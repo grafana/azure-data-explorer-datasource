@@ -26,7 +26,7 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
   onChange: onQueryChange,
 }) => {
   const { t } = useTranslate();
-const expressions = query.expression?.groupBy?.expressions;
+  const expressions = query.expression?.groupBy?.expressions;
   const [groupBys, setGroupBys] = useState(expressions);
   const [currentTable, setCurrentTable] = useState(query.expression?.from?.property.name);
 
@@ -81,7 +81,11 @@ const expressions = query.expression?.groupBy?.expressions;
     <>
       <EditorRow>
         <EditorFieldGroup>
-          <EditorField label={t("components.group-by-section.label-group-by", "Group by")} optional={true} data-testid={selectors.components.queryEditor.groupBy.field}>
+          <EditorField
+            label={t('components.group-by-section.label-group-by', 'Group by')}
+            optional={true}
+            data-testid={selectors.components.queryEditor.groupBy.field}
+          >
             <EditorList
               items={groupBys}
               onChange={onChange}

@@ -11,7 +11,7 @@ import {
   CustomScrollbar,
   LoadingPlaceholder,
   RadioButtonGroup,
-  useStyles2
+  useStyles2,
 } from '@grafana/ui';
 
 import { css } from '@emotion/css';
@@ -58,8 +58,9 @@ const adxTimeFormat: SelectableValue<string> = {
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const { t } = useTranslate();
-const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
-  const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions, isLoading } = props;
+  const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
+  const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions, isLoading } =
+    props;
   const { rawMode, OpenAI } = query;
   const [clusterUri, setClusterUri] = useState(query.clusterUri);
   const [clusters, setClusters] = useState<Array<SelectableValue<string>>>([]);
@@ -178,8 +179,11 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
     <EditorHeader>
       <ConfirmModal
         isOpen={showWarning}
-        title={t("components.query-header.title-are-you-sure", "Are you sure?")}
-        body={t('components.query-header.body-lose-manual-changes', 'You will lose manual changes done to the query if you go back to the visual builder.')}
+        title={t('components.query-header.title-are-you-sure', 'Are you sure?')}
+        body={t(
+          'components.query-header.body-lose-manual-changes',
+          'You will lose manual changes done to the query if you go back to the visual builder.'
+        )}
         confirmText={t('components.query-header.confirm-text', 'Confirm')}
         onConfirm={() => {
           setShowWarning(false);
@@ -191,9 +195,9 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
         }}
       ></ConfirmModal>
       <InlineSelect
-        label={t("components.query-header.label-cluster", "Cluster")}
+        label={t('components.query-header.label-cluster', 'Cluster')}
         data-testid={selectors.components.queryEditor.cluster.input.label}
-        aria-label={t("components.query-header.aria-label-cluster", "Cluster")}
+        aria-label={t('components.query-header.aria-label-cluster', 'Cluster')}
         options={clusters.concat({
           ...templateVariableOptions,
           value: templateVariableOptions.value || '',
@@ -204,9 +208,9 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
         allowCustomValue={true}
       />
       <InlineSelect
-        label={t("components.query-header.label-database", "Database")}
+        label={t('components.query-header.label-database', 'Database')}
         data-testid={selectors.components.queryEditor.database.input.label}
-        aria-label={t("components.query-header.aria-label-database", "Database")}
+        aria-label={t('components.query-header.aria-label-database', 'Database')}
         options={databases.concat({
           ...templateVariableOptions,
           value: templateVariableOptions.value || '',
@@ -217,7 +221,7 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
         onChange={onDatabaseChange}
       />
       <InlineSelect
-        label={t("components.query-header.label-format-as", "Format as")}
+        label={t('components.query-header.label-format-as', 'Format as')}
         options={formats}
         value={query.resultFormat}
         onChange={({ value }) => {
@@ -226,9 +230,9 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
       />
       <FlexItem grow={1} />
       {query.rawMode && (
-        <Button variant="secondary" size="sm" onClick={showExplanation} disabled={!isAiEnabled}><Trans i18nKey="components.query-header.explain-kql">
-          Explain KQL
-        </Trans></Button>
+        <Button variant="secondary" size="sm" onClick={showExplanation} disabled={!isAiEnabled}>
+          <Trans i18nKey="components.query-header.explain-kql">Explain KQL</Trans>
+        </Button>
       )}
       {!query.OpenAI && (
         <Button
@@ -237,9 +241,9 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
           size="sm"
           onClick={onRunQuery}
           data-testid={selectors.components.queryEditor.runQuery.button}
-        ><Trans i18nKey="components.query-header.run-query">
-          Run query
-        </Trans></Button>
+        >
+          <Trans i18nKey="components.query-header.run-query">Run query</Trans>
+        </Button>
       )}
       <RadioButtonGroup size="sm" options={EDITOR_MODES} value={EditorSelector()} onChange={changeEditorMode} />
       {hasError && (
@@ -255,7 +259,9 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
       {query.rawMode && generatedExplanation && !hasError && (
         <Card className={styles.card}>
           <Card.Heading>
-            <div><Trans i18nKey="components.query-header.kql-explanation">KQL Explanation</Trans></div>
+            <div>
+              <Trans i18nKey="components.query-header.kql-explanation">KQL Explanation</Trans>
+            </div>
             {/* eslint-disable-next-line @grafana/i18n/no-untranslated-strings */}
             <Button
               variant="secondary"
@@ -269,7 +275,7 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
           <CustomScrollbar hideTracksWhenNotNeeded={true} showScrollIndicators={true} autoHeightMax="175px">
             <Card.Description>
               {waiting ? (
-                <LoadingPlaceholder text={t("components.query-header.text-loading", "Loading...")} />
+                <LoadingPlaceholder text={t('components.query-header.text-loading', 'Loading...')} />
               ) : (
                 <div dangerouslySetInnerHTML={{ __html: renderMarkdown(generatedExplanation) }}></div>
               )}

@@ -26,14 +26,18 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   templateVariableOptions,
 }) => {
   const { t } = useTranslate();
-const [focus, setFocus] = useState(false);
+  const [focus, setFocus] = useState(false);
   const styles = useStyles2(getStyles);
 
   return (
     <>
       <EditorRow>
         <EditorFieldGroup>
-          <EditorField label={t("components.filter-section.label-filters", "Filters")} optional={true} data-testid={selectors.components.queryEditor.filters.field}>
+          <EditorField
+            label={t('components.filter-section.label-filters', 'Filters')}
+            optional={true}
+            data-testid={selectors.components.queryEditor.filters.field}
+          >
             <>
               {query.expression?.where?.expressions.length ? (
                 <div className={styles.filters}>
@@ -50,7 +54,9 @@ const [focus, setFocus] = useState(false);
                         templateVariableOptions={templateVariableOptions}
                       />
                       {i < query.expression.where.expressions.length - 1 ? (
-                        <Label className={styles.andLabel}><Trans i18nKey="components.filter-section.and">AND</Trans></Label>
+                        <Label className={styles.andLabel}>
+                          <Trans i18nKey="components.filter-section.and">AND</Trans>
+                        </Label>
                       ) : null}
                     </div>
                   ))}
@@ -75,9 +81,9 @@ const [focus, setFocus] = useState(false);
                   });
                   setFocus(true);
                 }}
-              ><Trans i18nKey="components.filter-section.add-group">
-                Add group
-              </Trans></Button>
+              >
+                <Trans i18nKey="components.filter-section.add-group">Add group</Trans>
+              </Button>
             </>
           </EditorField>
         </EditorFieldGroup>

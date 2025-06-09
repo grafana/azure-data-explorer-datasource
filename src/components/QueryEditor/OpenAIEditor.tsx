@@ -2,7 +2,18 @@ import { Trans, useTranslate } from '@grafana/i18n';
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { llm } from '@grafana/llm';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
-import { Alert, Button, CodeEditor, Spinner, Monaco, MonacoEditor, useStyles2, TextArea, Stack, TextLink } from '@grafana/ui';
+import {
+  Alert,
+  Button,
+  CodeEditor,
+  Spinner,
+  Monaco,
+  MonacoEditor,
+  useStyles2,
+  TextArea,
+  Stack,
+  TextLink,
+} from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { selectors } from 'test/selectors';
@@ -28,7 +39,7 @@ interface Worker {
 
 export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
   const { t } = useTranslate();
-const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
+  const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
   const { schema, datasource, onRunQuery } = props;
   const [worker, setWorker] = useState<Worker>();
   const [prompt, setPrompt] = useState('');
@@ -188,7 +199,10 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
             setErrorMessage(TOKEN_NOT_FOUND);
           }}
           severity="info"
-          title={t("components.open-aieditor.title-enable-plugin-feature", "You need to enable the LLM plugin to use this feature.")}
+          title={t(
+            'components.open-aieditor.title-enable-plugin-feature',
+            'You need to enable the LLM plugin to use this feature.'
+          )}
         >
           <Trans i18nKey="components.open-aieditor.alert-enable-plugin-feature">
             Install the LLM plugin from the{' '}
@@ -205,7 +219,9 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
       )}
       <div className={styles.outerMargin}>
         <Stack justifyContent="flex-start" alignItems="flex-start" direction={'row'}>
-          <h5><Trans i18nKey="components.open-aieditor.open-ai-generate-query">Ask OpenAI to generate a KQL query</Trans></h5>
+          <h5>
+            <Trans i18nKey="components.open-aieditor.open-ai-generate-query">Ask OpenAI to generate a KQL query</Trans>
+          </h5>
           <Button
             className={styles.buttonLeftMargin}
             onClick={generateQuery}
@@ -213,7 +229,8 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
             variant="primary"
             size="sm"
           >
-            {isWaiting && <Spinner className={styles.spinnerSpace} inline={true} />} <Trans i18nKey="components.open-aieditor.button-generate-query">Generate query</Trans>
+            {isWaiting && <Spinner className={styles.spinnerSpace} inline={true} />}{' '}
+            <Trans i18nKey="components.open-aieditor.button-generate-query">Generate query</Trans>
           </Button>
         </Stack>
         <TextArea
@@ -225,7 +242,9 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
       </div>
       <div className={styles.dividerSpace}>
         <Stack justifyContent="flex-start" alignItems="flex-start" direction={'row'}>
-          <h5><Trans i18nKey="components.open-aieditor.generated-query">Generated query</Trans></h5>
+          <h5>
+            <Trans i18nKey="components.open-aieditor.generated-query">Generated query</Trans>
+          </h5>
           <Button
             className={styles.buttonLeftMargin}
             variant="primary"
@@ -236,9 +255,9 @@ const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your pro
               onRunQuery();
             }}
             data-testid={selectors.components.queryEditor.runQuery.button}
-          ><Trans i18nKey="components.open-aieditor.run-query">
-            Run query
-          </Trans></Button>
+          >
+            <Trans i18nKey="components.open-aieditor.run-query">Run query</Trans>
+          </Button>
         </Stack>
         <div className={styles.editorSpace} data-testid={selectors.components.queryEditor.codeEditor.container}>
           <CodeEditor

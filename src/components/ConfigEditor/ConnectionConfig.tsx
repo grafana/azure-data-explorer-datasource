@@ -12,12 +12,18 @@ interface ConnectionConfigProps
 
 const ConnectionConfig: React.FC<ConnectionConfigProps> = ({ options, updateJsonData }) => {
   const { t } = useTranslate();
-const { jsonData } = options;
+  const { jsonData } = options;
 
   return (
-    <Field label={t("components.connection-config.label-default-cluster-url-optional", "Default cluster URL (Optional)")} description={t("components.connection-config.description-default-cluster-source", "The default cluster url for this data source.")}>
+    <Field
+      label={t('components.connection-config.label-default-cluster-url-optional', 'Default cluster URL (Optional)')}
+      description={t(
+        'components.connection-config.description-default-cluster-source',
+        'The default cluster url for this data source.'
+      )}
+    >
       <Input
-        aria-label={t("components.connection-config.aria-label-cluster-url", "Cluster URL")}
+        aria-label={t('components.connection-config.aria-label-cluster-url', 'Cluster URL')}
         data-testid={selectors.components.configEditor.clusterURL.input}
         value={jsonData.clusterUrl}
         id="adx-cluster-url"

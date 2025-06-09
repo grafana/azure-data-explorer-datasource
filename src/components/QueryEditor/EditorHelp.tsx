@@ -8,8 +8,12 @@ export default class EditorHelp extends PureComponent<QueryEditorHelpProps<Kusto
   render() {
     return (
       <div>
-        <h3><Trans i18nKey="components.editor-help.adx-query-editor-help">ADX query editor help</Trans></h3>
-        <h5><Trans i18nKey="components.editor-help.format">Format</Trans></h5>
+        <h3>
+          <Trans i18nKey="components.editor-help.adx-query-editor-help">ADX query editor help</Trans>
+        </h3>
+        <h5>
+          <Trans i18nKey="components.editor-help.format">Format</Trans>
+        </h5>
         <p>
           <Trans i18nKey="components.editor-help.format-description">
             It&apos;s possible to modify the format of the data returned by ADX with the &quot;Format as&quot; selector.
@@ -17,16 +21,25 @@ export default class EditorHelp extends PureComponent<QueryEditorHelpProps<Kusto
           </Trans>
         </p>
         <p>
-          <span><Trans i18nKey="components.editor-help.format-as-table">Format as Table:</Trans></span>
-          <li><Trans i18nKey="components.editor-help.can-return-any-set-of-columns">Can return any set of columns.</Trans></li>
+          <span>
+            <Trans i18nKey="components.editor-help.format-as-table">Format as Table:</Trans>
+          </span>
+          <li>
+            <Trans i18nKey="components.editor-help.can-return-any-set-of-columns">Can return any set of columns.</Trans>
+          </li>
         </p>
 
         <p>
-          <span><Trans i18nKey="components.editor-help.format-as-time-series">Format as Time series:</Trans></span>
+          <span>
+            <Trans i18nKey="components.editor-help.format-as-time-series">Format as Time series:</Trans>
+          </span>
           <li>
-            <Trans i18nKey="components.editor-help.format-as-time-series-description" values={{ operatorName: 'project-away'}}>
-              Requires exactly one column of Kusto type datetime. (tip: can use Kusto&apos;s {'{{operatorName}}'} operator to
-              remove columns).
+            <Trans
+              i18nKey="components.editor-help.format-as-time-series-description"
+              values={{ operatorName: 'project-away' }}
+            >
+              Requires exactly one column of Kusto type datetime. (tip: can use Kusto&apos;s {'{{operatorName}}'}{' '}
+              operator to remove columns).
             </Trans>
           </li>
           <li>
@@ -42,12 +55,14 @@ export default class EditorHelp extends PureComponent<QueryEditorHelpProps<Kusto
           </li>
           <li>
             <Trans i18nKey="components.editor-help.time-series-returned">
-              A time series is returned for each value column and unique set of string column values. Each series has name
-              of valueColumnName stringColumnName=columnValue, ... If there are no string columns in the request, the name
-              will just be valueColumnName.
+              A time series is returned for each value column and unique set of string column values. Each series has
+              name of valueColumnName stringColumnName=columnValue, ... If there are no string columns in the request,
+              the name will just be valueColumnName.
             </Trans>
           </li>
-          <li><Trans i18nKey="components.editor-help.example-time-series-query">Example Time Series Query:</Trans></li>
+          <li>
+            <Trans i18nKey="components.editor-help.example-time-series-query">Example Time Series Query:</Trans>
+          </li>
           <pre>
             {`AzureActivity
 | where $__timeFilter()
@@ -58,14 +73,23 @@ export default class EditorHelp extends PureComponent<QueryEditorHelpProps<Kusto
         </p>
 
         <p>
-          <span><Trans i18nKey="components.editor-help.format-as-adx-time-series">Format as ADX Time series:</Trans></span>
+          <span>
+            <Trans i18nKey="components.editor-help.format-as-adx-time-series">Format as ADX Time series:</Trans>
+          </span>
           <li>
             <Trans i18nKey="components.editor-help.return-time-series" values={{ operatorName: 'make-series' }}>
-              Used for queries that return Kusto&apos;s &quot;time series&quot; type, such as the {'{{operatorName}}'} operator
+              Used for queries that return Kusto&apos;s &quot;time series&quot; type, such as the {'{{operatorName}}'}{' '}
+              operator
             </Trans>
           </li>
-          <li><Trans i18nKey="components.editor-help.must-have-timestamp" values={{ requiredColumn: 'Timestamp' }}>Must have a datetime column named &quot;{'{{requiredColumn}}'}&quot;</Trans></li>
-          <li><Trans i18nKey="components.editor-help.example-adx-time-series-query">Example ADX Time series query:</Trans></li>
+          <li>
+            <Trans i18nKey="components.editor-help.must-have-timestamp" values={{ requiredColumn: 'Timestamp' }}>
+              Must have a datetime column named &quot;{'{{requiredColumn}}'}&quot;
+            </Trans>
+          </li>
+          <li>
+            <Trans i18nKey="components.editor-help.example-adx-time-series-query">Example ADX Time series query:</Trans>
+          </li>
           <pre>
             {`let T = range Timestamp from $__timeFrom to $__timeTo step $__timeInterval * 4
 | extend   Person = dynamic(["Torkel", "Daniel", "Kyle", "Sofia"]) 
@@ -78,14 +102,18 @@ T | make-series avg(HatInventory) on Timestamp from $__timeFrom to $__timeTo ste
           </pre>
         </p>
 
-        <h5><Trans i18nKey="components.editor-help.macros">Macros</Trans></h5>
+        <h5>
+          <Trans i18nKey="components.editor-help.macros">Macros</Trans>
+        </h5>
         <p>
           <Trans i18nKey="components.editor-help.macros-description">
             Macros can be used to automatically substitute certain values based on parameters set in Grafana:
           </Trans>
         </p>
         <p>
-          <span><Trans i18nKey="components.editor-help.time-macros">Time Macros:</Trans></span>
+          <span>
+            <Trans i18nKey="components.editor-help.time-macros">Time Macros:</Trans>
+          </span>
           {/* eslint-disable-next-line @grafana/i18n/no-untranslated-strings */}
           <li>
             $__timeFilter: TimeGenerated &ge; datetime(2018-06-05T18:09:58.907Z) and TimeGenerated &le;
@@ -97,24 +125,36 @@ T | make-series avg(HatInventory) on Timestamp from $__timeFrom to $__timeTo ste
             &le; datetime(2018-06-05T20:09:58.907Z)
           </li>
           <li>
-            <Trans i18nKey="components.editor-help.time-from" values={{ macro: '$__timeFrom', example: 'datetime(2018-06-05T18:09:58.907Z)' }}>
+            <Trans
+              i18nKey="components.editor-help.time-from"
+              values={{ macro: '$__timeFrom', example: 'datetime(2018-06-05T18:09:58.907Z)' }}
+            >
               {'{{macro}}'}: {'{{example}}'}. The start time of the query
             </Trans>
           </li>
           <li>
-            <Trans i18nKey="components.editor-help.time-to" values={{ macro: '$__timeTo', example: 'datetime(2018-06-05T20:09:58.907Z)' }}>
+            <Trans
+              i18nKey="components.editor-help.time-to"
+              values={{ macro: '$__timeTo', example: 'datetime(2018-06-05T20:09:58.907Z)' }}
+            >
               {'{{macro}}'}: {'{{example}}'}. The end time of the query
             </Trans>
           </li>
           <li>
-            <Trans i18nKey="components.editor-help.time-interval" values={{ macro: '$__timeInterval', example: '5000ms' }}>
-              {'{{macro}}'}: {'{{example}}'}. Grafana&apos;s recommended bin size based on the timespan of the query, in ms
+            <Trans
+              i18nKey="components.editor-help.time-interval"
+              values={{ macro: '$__timeInterval', example: '5000ms' }}
+            >
+              {'{{macro}}'}: {'{{example}}'}. Grafana&apos;s recommended bin size based on the timespan of the query, in
+              ms
             </Trans>
           </li>
         </p>
 
         <p>
-          <span><Trans i18nKey="components.editor-help.templating-macros">Templating Macros:</Trans></span>
+          <span>
+            <Trans i18nKey="components.editor-help.templating-macros">Templating Macros:</Trans>
+          </span>
           <li>
             <Trans i18nKey="components.editor-help.escape-multi" values={{ macro: '$__escapeMulti' }}>
               {'{{macro}}'}($myTemplateVar): $myTemplateVar should be a multi-value template variables that contains
@@ -132,7 +172,9 @@ T | make-series avg(HatInventory) on Timestamp from $__timeFrom to $__timeTo ste
         </p>
 
         <p>
-          <span><Trans i18nKey="components.editor-help.macro-examples">Macro Examples:</Trans></span>
+          <span>
+            <Trans i18nKey="components.editor-help.macro-examples">Macro Examples:</Trans>
+          </span>
           {/* eslint-disable-next-line @grafana/i18n/no-untranslated-strings */}
           <pre>| where $__timeFilter()</pre>
           {/* eslint-disable-next-line @grafana/i18n/no-untranslated-strings */}

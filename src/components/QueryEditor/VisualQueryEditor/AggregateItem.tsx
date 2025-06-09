@@ -34,7 +34,7 @@ interface AggregateItemProps {
 
 const AggregateItem: React.FC<AggregateItemProps> = (props) => {
   const { t } = useTranslate();
-const { aggregate, onChange, onDelete, columns, templateVariableOptions } = props;
+  const { aggregate, onChange, onDelete, columns, templateVariableOptions } = props;
 
   let columnOptions: Array<SelectableValue<string>> = columns
     ? columnsToDefinition(columns).map((c) => ({ label: c.label, value: c.value }))
@@ -45,7 +45,7 @@ const { aggregate, onChange, onDelete, columns, templateVariableOptions } = prop
     <InputGroup>
       <Select
         data-testid="aggregate-item-function"
-        aria-label={t("components.aggregate-item.aggregate-item-function-aria-label-function", "Function")}
+        aria-label={t('components.aggregate-item.aggregate-item-function-aria-label-function', 'Function')}
         autoFocus={aggregate.focus}
         width="auto"
         value={aggregate.reduce?.name ? valueToDefinition(aggregate.reduce?.name) : null}
@@ -67,7 +67,7 @@ const { aggregate, onChange, onDelete, columns, templateVariableOptions } = prop
       <>
         {aggregate.reduce?.name === AggregateFunctions.Percentile && (
           <Select
-            aria-label={t("components.aggregate-item.aria-label-percentile", "Percentile")}
+            aria-label={t('components.aggregate-item.aria-label-percentile', 'Percentile')}
             options={range(0, 100, 5).map((n) => ({ label: n.toString(), value: n.toString() }))}
             value={aggregate.parameters?.length ? aggregate.parameters[0].value : undefined}
             width="auto"
@@ -100,9 +100,11 @@ const { aggregate, onChange, onDelete, columns, templateVariableOptions } = prop
       <>
         {aggregate.reduce?.name !== AggregateFunctions.Count && (
           <>
-            <Label style={{ margin: '9px 9px 0 9px' }}><Trans i18nKey="components.aggregate-item.of">of</Trans></Label>
+            <Label style={{ margin: '9px 9px 0 9px' }}>
+              <Trans i18nKey="components.aggregate-item.of">of</Trans>
+            </Label>
             <Select
-              aria-label={t("components.aggregate-item.aria-label-column", "Column")}
+              aria-label={t('components.aggregate-item.aria-label-column', 'Column')}
               width={'auto'}
               value={aggregate.property?.name ? valueToDefinition(aggregate.property?.name) : null}
               options={columnOptions}
@@ -128,7 +130,12 @@ const { aggregate, onChange, onDelete, columns, templateVariableOptions } = prop
           </>
         )}
       </>
-      <AccessoryButton aria-label={t("components.aggregate-item.aria-label-remove", "Remove")} icon="times" variant="secondary" onClick={onDelete} />
+      <AccessoryButton
+        aria-label={t('components.aggregate-item.aria-label-remove', 'Remove')}
+        icon="times"
+        variant="secondary"
+        onClick={onDelete}
+      />
     </InputGroup>
   );
 };

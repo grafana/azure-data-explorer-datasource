@@ -26,7 +26,7 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
   onChange: onQueryChange,
 }) => {
   const { t } = useTranslate();
-const expressions = query.expression?.reduce?.expressions;
+  const expressions = query.expression?.reduce?.expressions;
   const [aggregates, setAggregates] = useState(expressions);
   const [currentTable, setCurrentTable] = useState(query.expression?.from?.property.name);
 
@@ -82,7 +82,11 @@ const expressions = query.expression?.reduce?.expressions;
     <div data-testid="aggregate-section">
       <EditorRow>
         <EditorFieldGroup>
-          <EditorField label={t("components.aggregate-section.label-aggregate", "Aggregate")} optional={true} data-testid={selectors.components.queryEditor.aggregate.field}>
+          <EditorField
+            label={t('components.aggregate-section.label-aggregate', 'Aggregate')}
+            optional={true}
+            data-testid={selectors.components.queryEditor.aggregate.field}
+          >
             <EditorList
               items={aggregates}
               onChange={onChange}

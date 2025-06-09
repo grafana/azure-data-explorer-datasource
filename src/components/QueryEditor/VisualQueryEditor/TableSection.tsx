@@ -29,7 +29,7 @@ const TableSection: React.FC<TableSectionProps> = ({
   onChange,
 }) => {
   const { t } = useTranslate();
-const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateVariableOptions);
+  const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateVariableOptions);
   const [tableColumns, setTableColumns] = useState(tableSchema.value);
 
   useEffect(() => {
@@ -74,9 +74,9 @@ const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateV
   return (
     <EditorRow>
       <EditorFieldGroup>
-        <EditorField label={t("components.table-section.label-table", "Table")}>
+        <EditorField label={t('components.table-section.label-table', 'Table')}>
           <Select
-            aria-label={t("components.table-section.aria-label-table", "Table")}
+            aria-label={t('components.table-section.aria-label-table', 'Table')}
             data-testid={selectors.components.queryEditor.tableFrom.input}
             isLoading={tableSchema.loading}
             value={table}
@@ -99,17 +99,14 @@ const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateV
           />
         </EditorField>
         <EditorField
-          label={t("components.table-section.label-columns", "Columns")}
+          label={t('components.table-section.label-columns', 'Columns')}
           tooltipInteractive={true}
           tooltip={
             <>
               <Trans i18nKey="components.table-section.tooltip-columns">
                 Select a subset of columns for faster results. Time series requires both time and number values, other
                 columns are rendered as{' '}
-                <TextLink
-                  href="https://grafana.com/docs/grafana/latest/basics/timeseries-dimensions/"
-                  external
-                >
+                <TextLink href="https://grafana.com/docs/grafana/latest/basics/timeseries-dimensions/" external>
                   dimensions
                 </TextLink>
                 .
@@ -118,7 +115,7 @@ const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateV
           }
         >
           <Select
-            aria-label={t("components.table-section.aria-label-columns", "Columns")}
+            aria-label={t('components.table-section.aria-label-columns', 'Columns')}
             data-testid={selectors.components.queryEditor.columns.input}
             isMulti
             value={query.expression?.columns?.columns ? query.expression?.columns?.columns : []}
@@ -129,7 +126,7 @@ const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateV
                 label: templateVariableOptions.label || '',
                 ...templateVariableOptions,
               })}
-            placeholder={t("components.table-section.placeholder-all", "All")}
+            placeholder={t('components.table-section.placeholder-all', 'All')}
             onChange={(e) => {
               onChange({
                 ...query,
