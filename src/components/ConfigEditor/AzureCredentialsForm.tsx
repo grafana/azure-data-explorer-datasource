@@ -69,7 +69,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
     }
 
     return opts;
-  }, [userIdentityEnabled, managedIdentityEnabled, workloadIdentityEnabled, props.oboEnabled]);
+  }, [userIdentityEnabled, managedIdentityEnabled, workloadIdentityEnabled, props.oboEnabled, t]);
 
   const onAuthTypeChange = (selected: SelectableValue<AzureAuthType>) => {
     const defaultAuthType = userIdentityEnabled

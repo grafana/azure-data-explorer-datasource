@@ -111,5 +111,5 @@ const useTemplateVariables = (datasource: AdxDataSource) => {
         return { label: variable, value: variable };
       }),
     };
-  }, [variables]);
+  }, [variables, t]);
 };

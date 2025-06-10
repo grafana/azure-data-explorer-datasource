@@ -77,7 +77,7 @@ const VariableEditor = (props: VariableProps) => {
       label: t('components.variable-editor.label.template-variables', 'Template Variables'),
       options,
     });
-  }, [datasource, queryType]);
+  }, [datasource, queryType, t]);
 
   useEffect(() => {
     setRequireCluster(false);
