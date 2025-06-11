@@ -227,7 +227,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
             htmlFor="aad-tenant-id"
             required
             invalid={!credentials.tenantId}
-            error={'Tenant ID is required'}
+            error={t('components.azure-credentials-form.error-tenant-id-required', 'Tenant ID is required')}
           >
             <Input
               id="aad-tenant-id"
@@ -245,7 +245,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
             htmlFor="aad-client-id"
             required
             invalid={!credentials.clientId}
-            error={'Client ID is required'}
+            error={t('components.azure-credentials-form.error-client-id-required', 'Client ID is required')}
           >
             <Input
               id="aad-client-id"
@@ -289,7 +289,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
               htmlFor="aad-client-secret"
               required
               invalid={!credentials.clientSecret}
-              error={'Client secret is required'}
+              error={t('components.azure-credentials-form.error-client-secret-required', 'Client secret is required')}
             >
               <Input
                 id="aad-client-secret"
