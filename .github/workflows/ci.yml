@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      - run: corepack enable
+          cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install
@@ -125,7 +125,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      - run: corepack enable
+          cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install
@@ -189,7 +189,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-      - run: corepack enable
+          cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install
