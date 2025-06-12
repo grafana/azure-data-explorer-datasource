@@ -1,4 +1,4 @@
-import { useTranslate } from '@grafana/i18n';
+import { t } from '@grafana/i18n';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorList, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorGroupByExpression } from 'types/expressions';
@@ -25,7 +25,6 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
   templateVariableOptions,
   onChange: onQueryChange,
 }) => {
-  const { t } = useTranslate();
   const expressions = query.expression?.groupBy?.expressions;
   const [groupBys, setGroupBys] = useState(expressions);
   const [currentTable, setCurrentTable] = useState(query.expression?.from?.property.name);

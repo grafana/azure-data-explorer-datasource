@@ -1,4 +1,4 @@
-import { Trans, useTranslate } from '@grafana/i18n';
+import { Trans, t } from '@grafana/i18n';
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { llm } from '@grafana/llm';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
@@ -38,7 +38,6 @@ interface Worker {
 }
 
 export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
-  const { t } = useTranslate();
   const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
   const { schema, datasource, onRunQuery } = props;
   const [worker, setWorker] = useState<Worker>();

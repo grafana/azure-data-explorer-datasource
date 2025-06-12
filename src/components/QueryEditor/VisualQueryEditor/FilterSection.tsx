@@ -1,4 +1,4 @@
-import { useTranslate, Trans } from '@grafana/i18n';
+import { t, Trans } from '@grafana/i18n';
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { Button, Label, useStyles2 } from '@grafana/ui';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
@@ -25,7 +25,6 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   columns,
   templateVariableOptions,
 }) => {
-  const { t } = useTranslate();
   const [focus, setFocus] = useState(false);
   const styles = useStyles2(getStyles);
 

@@ -1,4 +1,4 @@
-import { useTranslate, Trans } from '@grafana/i18n';
+import { t, Trans } from '@grafana/i18n';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { AzureCredentials, getAzureClouds } from '@grafana/azure-sdk';
 import { FeatureToggles, DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
@@ -35,7 +35,6 @@ export interface ConfigEditorProps
   extends DataSourcePluginOptionsEditorProps<AdxDataSourceOptions, AdxDataSourceSecureOptions> {}
 
 const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
-  const { t } = useTranslate();
   const { options, onOptionsChange } = props;
   const { jsonData } = options;
 

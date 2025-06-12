@@ -1,4 +1,4 @@
-import { Trans, useTranslate } from '@grafana/i18n';
+import { Trans, t } from '@grafana/i18n';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpressionType } from 'types/expressions';
@@ -28,7 +28,6 @@ const TableSection: React.FC<TableSectionProps> = ({
   templateVariableOptions,
   onChange,
 }) => {
-  const { t } = useTranslate();
   const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateVariableOptions);
   const [tableColumns, setTableColumns] = useState(tableSchema.value);
 

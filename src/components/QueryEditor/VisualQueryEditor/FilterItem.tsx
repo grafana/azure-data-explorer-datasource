@@ -1,4 +1,4 @@
-import { useTranslate, Trans } from '@grafana/i18n';
+import { t, Trans } from '@grafana/i18n';
 import React from 'react';
 import { useAsyncFn } from 'react-use';
 import { css } from '@emotion/css';
@@ -34,7 +34,6 @@ interface FilterItemProps {
 }
 
 const FilterItem: React.FC<FilterItemProps> = (props) => {
-  const { t } = useTranslate();
   const { datasource, query, filter, onChange, onDelete, columns, templateVariableOptions, filtersLength } = props;
   const styles = useStyles2(getStyles);
 

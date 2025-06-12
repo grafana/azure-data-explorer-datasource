@@ -1,4 +1,4 @@
-import { useTranslate, Trans } from '@grafana/i18n';
+import { t, Trans } from '@grafana/i18n';
 import React, { ChangeEvent, FunctionComponent, useMemo } from 'react';
 
 import { AzureAuthType, AzureCredentials } from '@grafana/azure-sdk';
@@ -19,7 +19,6 @@ export interface Props {
 }
 
 export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => {
-  const { t } = useTranslate();
   const {
     credentials,
     azureCloudOptions,

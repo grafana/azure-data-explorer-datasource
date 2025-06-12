@@ -1,4 +1,4 @@
-import { useTranslate } from '@grafana/i18n';
+import { t } from '@grafana/i18n';
 import React, { useState } from 'react';
 
 import { Button, Select } from '@grafana/ui';
@@ -15,7 +15,6 @@ interface TimeshiftProps {
 }
 
 const Timeshift: React.FC<TimeshiftProps> = (props) => {
-  const { t } = useTranslate();
   const { query, onChange } = props;
   const [displaySelect, setDisplaySelect] = useState(false);
   const onChangeValue = (value?: string) => {

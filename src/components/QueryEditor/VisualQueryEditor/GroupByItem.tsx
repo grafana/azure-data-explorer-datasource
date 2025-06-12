@@ -1,4 +1,4 @@
-import { useTranslate } from '@grafana/i18n';
+import { t } from '@grafana/i18n';
 import React from 'react';
 
 import { SelectableValue } from '@grafana/data';
@@ -20,7 +20,6 @@ interface GroupByItemProps {
 }
 
 const GroupByItem: React.FC<GroupByItemProps> = (props) => {
-  const { t } = useTranslate();
   const { groupBy, onChange, onDelete, columns, templateVariableOptions } = props;
 
   let columnOptions: Array<SelectableValue<string>> = columns

@@ -1,4 +1,4 @@
-import { useTranslate } from '@grafana/i18n';
+import { t } from '@grafana/i18n';
 import { SelectableValue } from '@grafana/data';
 import { Field, Select } from '@grafana/ui';
 import { QueryEditor } from 'components/QueryEditor/QueryEditor';
@@ -24,7 +24,6 @@ interface VariableOptions<T = string> {
 }
 
 const VariableEditor = (props: VariableProps) => {
-  const { t } = useTranslate();
   const { query, onChange, datasource } = props;
   const VARIABLE_TYPE_OPTIONS = [
     {

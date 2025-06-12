@@ -1,4 +1,4 @@
-import { useTranslate, Trans } from '@grafana/i18n';
+import { t, Trans } from '@grafana/i18n';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { llm } from '@grafana/llm';
@@ -57,7 +57,6 @@ const adxTimeFormat: SelectableValue<string> = {
 };
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
-  const { t } = useTranslate();
   const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
   const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions, isLoading } =
     props;

@@ -1,4 +1,4 @@
-import { useTranslate, Trans } from '@grafana/i18n';
+import { t, Trans } from '@grafana/i18n';
 import React, { useState, useEffect } from 'react';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { Button, useStyles2 } from '@grafana/ui';
@@ -14,7 +14,6 @@ interface KQLPreviewProps {
 }
 
 const KQLPreview: React.FC<KQLPreviewProps> = ({ query }) => {
-  const { t } = useTranslate();
   const styles = useStyles2(getStyles);
   const [hidden, setHidden] = useState(true);
 

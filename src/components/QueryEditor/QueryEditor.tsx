@@ -1,4 +1,4 @@
-import { useTranslate } from '@grafana/i18n';
+import { t } from '@grafana/i18n';
 import { LoadingState, QueryEditorProps } from '@grafana/data';
 import { Alert, LoadingBar } from '@grafana/ui';
 import { get } from 'lodash';
@@ -16,7 +16,6 @@ import { VisualQueryEditor } from './VisualQueryEditor';
 type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = (props) => {
-  const { t } = useTranslate();
   const { onChange, onRunQuery, query, datasource } = props;
   const schema = useAsync(() => datasource.getSchema(query.clusterUri, false), [datasource.id, query.clusterUri]);
   const templateVariables = useTemplateVariables(datasource);
@@ -100,7 +99,6 @@ function parseSchemaError(error: Error) {
 }
 
 const useTemplateVariables = (datasource: AdxDataSource) => {
-  const { t } = useTranslate();
   const variables = datasource.getVariables();
 
   return useMemo(() => {
@@ -111,5 +109,5 @@ const useTemplateVariables = (datasource: AdxDataSource) => {
         return { label: variable, value: variable };
       }),
     };
-  }, [variables, t]);
+  }, [variables]);
 };

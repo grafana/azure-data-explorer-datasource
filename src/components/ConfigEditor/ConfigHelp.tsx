@@ -1,4 +1,4 @@
-import { useTranslate, Trans } from '@grafana/i18n';
+import { t, Trans } from '@grafana/i18n';
 import { getCredentials } from './AzureCredentialsConfig';
 
 import { isCredentialsComplete } from '@grafana/azure-sdk';
@@ -12,7 +12,6 @@ interface ConfigHelpProps {
 }
 
 const ConfigHelp: React.FC<ConfigHelpProps> = ({ options }) => {
-  const { t } = useTranslate();
   const isHelpOpen = useMemo(() => !isCredentialsComplete(getCredentials(options)), [options]);
 
   return (

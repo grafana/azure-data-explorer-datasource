@@ -1,4 +1,4 @@
-import { useTranslate } from '@grafana/i18n';
+import { t } from '@grafana/i18n';
 import React from 'react';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { Field, Input } from '@grafana/ui';
@@ -11,7 +11,6 @@ interface ApplicationConfigProps
 }
 
 const ApplicationConfig: React.FC<ApplicationConfigProps> = ({ options, updateJsonData }) => {
-  const { t } = useTranslate();
   const { jsonData } = options;
 
   return (

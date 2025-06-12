@@ -1,4 +1,4 @@
-import { Trans, useTranslate } from '@grafana/i18n';
+import { Trans, t } from '@grafana/i18n';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { ConfigSubSection } from '@grafana/plugin-ui';
 import { Field, Switch } from '@grafana/ui';
@@ -11,7 +11,6 @@ interface TrackingConfigProps
 }
 
 const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData }) => {
-  const { t } = useTranslate();
   const { jsonData } = options;
 
   return (

@@ -1,4 +1,4 @@
-import { Trans, useTranslate } from '@grafana/i18n';
+import { Trans, t } from '@grafana/i18n';
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
 import { ConfigSubSection } from '@grafana/plugin-ui';
 import { Field, Input, Select, Switch, TextLink } from '@grafana/ui';
@@ -11,18 +11,17 @@ interface QueryConfigProps
 }
 
 const QueryConfig: React.FC<QueryConfigProps> = ({ options, updateJsonData }) => {
-  const { t } = useTranslate();
   const { jsonData } = options;
 
   const dataConsistencyOptions: Array<{ value: string; label: string }> = useMemo(() => [
     { value: 'strongconsistency', label: t('components.query-config.data-consistency-options.label.strong', 'Strong') },
     { value: 'weakconsistency', label: t('components.query-config.data-consistency-options.label.weak', 'Weak') },
-  ], [t]);
+  ], []);
 
   const editorModeOptions: Array<{ value: EditorMode; label: string }> = useMemo(() => [
     { value: EditorMode.Visual, label: t('components.query-config.editor-mode-options.label.visual', 'Visual') },
     { value: EditorMode.Raw, label: t('components.query-config.editor-mode-options.label.raw', 'Raw') },
-  ], [t]);
+  ], []);
 
   // Set some default values
   useEffect(() => {

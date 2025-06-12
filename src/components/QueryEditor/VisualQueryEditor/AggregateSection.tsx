@@ -1,4 +1,4 @@
-import { useTranslate } from '@grafana/i18n';
+import { t } from '@grafana/i18n';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorList, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorReduceExpression } from 'types/expressions';
@@ -25,7 +25,6 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
   templateVariableOptions,
   onChange: onQueryChange,
 }) => {
-  const { t } = useTranslate();
   const expressions = query.expression?.reduce?.expressions;
   const [aggregates, setAggregates] = useState(expressions);
   const [currentTable, setCurrentTable] = useState(query.expression?.from?.property.name);

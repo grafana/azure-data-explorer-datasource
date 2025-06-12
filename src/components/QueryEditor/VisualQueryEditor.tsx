@@ -1,4 +1,4 @@
-import { useTranslate } from '@grafana/i18n';
+import { t } from '@grafana/i18n';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
 import { Alert } from '@grafana/ui';
@@ -26,7 +26,6 @@ interface VisualQueryEditorProps extends Props {
 }
 
 export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
-  const { t } = useTranslate();
   const templateSrv = getTemplateSrv();
   const { schema, database, datasource, query, onChange } = props;
   const { id: datasourceId, parseExpression, getSchemaMapper } = datasource;

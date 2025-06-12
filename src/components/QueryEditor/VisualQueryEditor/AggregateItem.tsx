@@ -1,4 +1,4 @@
-import { useTranslate, Trans } from '@grafana/i18n';
+import { t, Trans } from '@grafana/i18n';
 import React from 'react';
 
 import { SelectableValue } from '@grafana/data';
@@ -33,7 +33,6 @@ interface AggregateItemProps {
 }
 
 const AggregateItem: React.FC<AggregateItemProps> = (props) => {
-  const { t } = useTranslate();
   const { aggregate, onChange, onDelete, columns, templateVariableOptions } = props;
 
   let columnOptions: Array<SelectableValue<string>> = columns

@@ -1,4 +1,4 @@
-import { useTranslate, Trans } from '@grafana/i18n';
+import { t, Trans } from '@grafana/i18n';
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
 import { FetchError, FetchResponse, getBackendSrv, getDataSourceSrv } from '@grafana/runtime';
 import { Alert, Button, Icon, Field, InlineLabel, Input, Select, Switch, Stack } from '@grafana/ui';
@@ -36,7 +36,6 @@ type FetchErrorResponse = FetchResponse<{
 }>;
 
 const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProps) => {
-  const { t } = useTranslate();
   const { options, updateJsonData } = props;
   const { jsonData } = options;
   const mappings = useMemo(() => jsonData.schemaMappings ?? [], [jsonData.schemaMappings]);

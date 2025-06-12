@@ -1226,9 +1226,9 @@
     web-vitals "^4.0.1"
 
 "@grafana/i18n@canary":
-  version "12.1.0-247497"
-  resolved "https://registry.yarnpkg.com/@grafana/i18n/-/i18n-12.1.0-247497.tgz#c908f46f691f50bf7797a639e9869eb197a41f33"
-  integrity sha512-p4NL+bgPM2N/Zxw+nUqVL+t3eJMqiaBq4TyeiFv2gqiL7z6KWB2B+zXqy9KNVncYumqhrn/OLnGLkJIt2nv8NQ==
+  version "12.1.0-247756"
+  resolved "https://registry.yarnpkg.com/@grafana/i18n/-/i18n-12.1.0-247756.tgz#8af2cc12911a4eab70baea3d7e2ca2d8e4cf7dde"
+  integrity sha512-TwPIh+1LKrEYdOtVZ9MTquL7J9TFAAALdh1Kk2+WxY56AjWH2JCCoGYZuoeJ/dFZeI1zGoFARVRXUT9tco23hw==
   dependencies:
     "@formatjs/intl-durationformat" "^0.7.0"
     "@typescript-eslint/utils" "^8.33.1"
