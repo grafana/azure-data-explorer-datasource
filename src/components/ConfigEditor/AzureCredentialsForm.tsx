@@ -1,8 +1,9 @@
+import { t, Trans } from '@grafana/i18n';
 import React, { ChangeEvent, FunctionComponent, useMemo } from 'react';
 
 import { AzureAuthType, AzureCredentials } from '@grafana/azure-sdk';
 import { SelectableValue } from '@grafana/data';
-import { Alert, Button, Select, Input, Field } from '@grafana/ui';
+import { Alert, Button, Select, Input, Field, TextLink } from '@grafana/ui';
 
 import { selectors } from 'test/selectors';
 import { ConfigSection } from '@grafana/plugin-ui';
@@ -31,35 +32,38 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
     let opts: Array<SelectableValue<AzureAuthType>> = [
       {
         value: 'clientsecret',
-        label: 'App Registration',
+        label: t('components.azure-credentials-form.auth-type-options.opts.label.app-registration', 'App Registration'),
       },
     ];
 
     if (managedIdentityEnabled) {
       opts.unshift({
         value: 'msi',
-        label: 'Managed Identity',
+        label: t('components.azure-credentials-form.auth-type-options.label.managed-identity', 'Managed Identity'),
       });
     }
 
     if (workloadIdentityEnabled) {
       opts.unshift({
         value: 'workloadidentity',
-        label: 'Workload Identity',
+        label: t('components.azure-credentials-form.auth-type-options.label.workload-identity', 'Workload Identity'),
       });
     }
 
     if (userIdentityEnabled) {
       opts.unshift({
         value: 'currentuser',
-        label: 'Current User',
+        label: t('components.azure-credentials-form.auth-type-options.label.current-user', 'Current User'),
       });
     }
 
     if (props.oboEnabled) {
       opts.push({
         value: 'clientsecret-obo',
-        label: 'App Registration (On-Behalf-Of)',
+        label: t(
+          'components.azure-credentials-form.auth-type-options.label.app-registration-on-behalf-of',
+          'App Registration (On-Behalf-Of)'
+        ),
       });
     }
 
@@ -70,10 +74,10 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
     const defaultAuthType = userIdentityEnabled
       ? 'currentuser'
       : managedIdentityEnabled
-      ? 'msi'
-      : workloadIdentityEnabled
-      ? 'workloadidentity'
-      : 'clientsecret';
+        ? 'msi'
+        : workloadIdentityEnabled
+          ? 'workloadidentity'
+          : 'clientsecret';
     if (onCredentialsChange) {
       const updated: AzureCredentials = {
         ...credentials,
@@ -134,11 +138,14 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
   };
 
   return (
-    <ConfigSection title="Authentication">
+    <ConfigSection title={t('components.azure-credentials-form.title-authentication', 'Authentication')}>
       {authTypeOptions.length > 1 && (
         <Field
-          label="Authentication Method"
-          description="Choose the type of authentication to Azure services"
+          label={t('components.azure-credentials-form.label-authentication-method', 'Authentication Method')}
+          description={t(
+            'components.azure-credentials-form.description-choose-authentication-azure-services',
+            'Choose the type of authentication to Azure services'
+          )}
           htmlFor="azure-auth-type"
           data-testid={selectors.components.configEditor.authType.input}
         >
@@ -153,32 +160,46 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
       )}
       {credentials.authType === 'currentuser' && (
         <>
-          <Alert title="Current user authentication is experimental" severity="warning">
-            Certain Grafana features (e.g. alerting) may not work as expected. For other known limitations and issues,
-            bug reports, or feedback, please visit{' '}
-            <a
-              href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md"
-              target="_blank"
-              rel="noreferrer"
-            >
-              the documentation
-            </a>
-            .
+          <Alert
+            title={t(
+              'components.azure-credentials-form.title-current-user-authentication-is-experimental',
+              'Current user authentication is experimental'
+            )}
+            severity="warning"
+          >
+            <Trans i18nKey="components.azure-credentials-form.description-current-user-authentication-is-experimental">
+              Certain Grafana features (e.g. alerting) may not work as expected. For other known limitations and issues,
+              bug reports, or feedback, please visit{' '}
+              <TextLink
+                href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md"
+                external
+              >
+                the documentation
+              </TextLink>
+              .
+            </Trans>
           </Alert>
         </>
       )}
       {credentials.authType === 'clientsecret-obo' && (
         <>
-          <Alert title="On-Behalf-Of feature is in beta" severity="warning">
-            For known limitations and issues, bug report, or feedback, please visit{' '}
-            <a
-              href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md"
-              target="_blank"
-              rel="noreferrer"
-            >
-              the documentation
-            </a>
-            .
+          <Alert
+            title={t(
+              'components.azure-credentials-form.title-on-behalf-of-feature-is-in-beta',
+              'On-Behalf-Of feature is in beta'
+            )}
+            severity="warning"
+          >
+            <Trans i18nKey="components.azure-credentials-form.description-on-behalf-of-feature-is-in-beta">
+              For known limitations and issues, bug report, or feedback, please visit{' '}
+              <TextLink
+                href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md"
+                external
+              >
+                the documentation
+              </TextLink>
+              .
+            </Trans>
           </Alert>
         </>
       )}
@@ -186,14 +207,14 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
         <>
           {azureCloudOptions && (
             <Field
-              label="Azure Cloud"
+              label={t('components.azure-credentials-form.label-azure-cloud', 'Azure Cloud')}
               htmlFor="azure-cloud-type"
               data-testid={selectors.components.configEditor.azureCloud.input}
             >
               <Select
                 inputId="azure-cloud-type"
                 className="width-15"
-                aria-label="Azure Cloud"
+                aria-label={t('components.azure-credentials-form.aria-label-azure-cloud', 'Azure Cloud')}
                 value={azureCloudOptions.find((opt) => opt.value === credentials.azureCloud)}
                 options={azureCloudOptions}
                 onChange={onAzureCloudChange}
@@ -201,16 +222,17 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
             </Field>
           )}
           <Field
-            label="Directory (tenant) ID"
+            label={t('components.azure-credentials-form.label-directory-tenant-id', 'Directory (tenant) ID')}
             htmlFor="aad-tenant-id"
             required
             invalid={!credentials.tenantId}
-            error={'Tenant ID is required'}
+            error={t('components.azure-credentials-form.error-tenant-id-required', 'Tenant ID is required')}
           >
             <Input
               id="aad-tenant-id"
               className="width-30"
-              aria-label="Tenant ID"
+              aria-label={t('components.azure-credentials-form.aad-tenant-id-aria-label-tenant-id', 'Tenant ID')}
+              // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
               placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
               value={credentials.tenantId || ''}
               onChange={onTenantIdChange}
@@ -218,16 +240,17 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
             />
           </Field>
           <Field
-            label="Application (client) ID"
+            label={t('components.azure-credentials-form.label-application-client-id', 'Application (client) ID')}
             htmlFor="aad-client-id"
             required
             invalid={!credentials.clientId}
-            error={'Client ID is required'}
+            error={t('components.azure-credentials-form.error-client-id-required', 'Client ID is required')}
           >
             <Input
               id="aad-client-id"
               className="width-30"
-              aria-label="Client ID"
+              aria-label={t('components.azure-credentials-form.aad-client-id-aria-label-client-id', 'Client ID')}
+              // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
               placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
               value={credentials.clientId || ''}
               onChange={onClientIdChange}
@@ -236,31 +259,45 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
           </Field>
 
           {typeof credentials.clientSecret === 'symbol' ? (
-            <Field label="Client Secret" htmlFor="aad-client-secret-configured" required>
+            <Field
+              label={t('components.azure-credentials-form.label-client-secret', 'Client Secret')}
+              htmlFor="aad-client-secret-configured"
+              required
+            >
               <div className="width-30" style={{ display: 'flex', gap: '4px' }}>
                 <Input
                   id="aad-client-secret-configured"
-                  aria-label="Client Secret"
-                  placeholder="configured"
+                  aria-label={t(
+                    'components.azure-credentials-form.aad-client-secret-configured-aria-label-client-secret',
+                    'Client Secret'
+                  )}
+                  placeholder={t(
+                    'components.azure-credentials-form.aad-client-secret-configured-placeholder-configured',
+                    'configured'
+                  )}
                   disabled={true}
                 />
                 <Button variant="secondary" type="button" onClick={onClientSecretReset}>
-                  Reset
+                  <Trans i18nKey="components.azure-credentials-form.reset">Reset</Trans>
                 </Button>
               </div>
             </Field>
           ) : (
             <Field
-              label="Client Secret"
+              label={t('components.azure-credentials-form.label-client-secret', 'Client Secret')}
               htmlFor="aad-client-secret"
               required
               invalid={!credentials.clientSecret}
-              error={'Client secret is required'}
+              error={t('components.azure-credentials-form.error-client-secret-required', 'Client secret is required')}
             >
               <Input
                 id="aad-client-secret"
                 className="width-30"
-                aria-label="Client Secret"
+                aria-label={t(
+                  'components.azure-credentials-form.aad-client-secret-aria-label-client-secret',
+                  'Client Secret'
+                )}
+                // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
                 placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
                 value={credentials.clientSecret || ''}
                 onChange={onClientSecretChange}
