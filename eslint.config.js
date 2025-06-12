@@ -1,11 +1,14 @@
 // @ts-check
+const path = require('path');
 const grafanaConfig = require('@grafana/eslint-config/flat');
 const grafanaI18nPlugin = require('@grafana/i18n/eslint-plugin')
+const { includeIgnoreFile } = require('@eslint/compat');
 
 /**
  * @type {Array<import('eslint').Linter.Config>}
  */
 module.exports = [
+  includeIgnoreFile(path.resolve(__dirname, '.gitignore')),
   {
     name: 'ignores',
     ignores: [
