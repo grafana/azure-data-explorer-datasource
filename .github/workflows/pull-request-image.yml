@@ -25,6 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+      - run: corepack enable
 
       - name: Install Go environment
         uses: actions/setup-go@v5
