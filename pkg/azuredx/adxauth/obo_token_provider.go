@@ -11,6 +11,7 @@ import (
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/v2/aztokenprovider"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
 type onBehalfOfTokenProvider struct {
@@ -73,14 +74,20 @@ func (provider *onBehalfOfTokenProvider) GetAccessToken(ctx context.Context, sco
 		return "", err
 	}
 
+	grafanaConfig := backend.GrafanaConfigFromContext(ctx)
+	if !grafanaConfig.FeatureToggles().IsEnabled("adxOnBehalfOf") {
+		err := fmt.Errorf("adxOnBehalfOf feature toggle is not enabled")
+		return "", err
+	}
+
 	currentUser, ok := azusercontext.GetCurrentUser(ctx)
 	if !ok {
-		err := fmt.Errorf("user context not configured")
+		err := fmt.Errorf("user context not configured, are you signed in with Azure AD?")
 		return "", err
 	}
 
 	if currentUser.IdToken == "" {
-		err := fmt.Errorf("user context doesn't have ID token")
+		err := fmt.Errorf("user context doesn't have ID token, , are you signed in with Azure AD?")
 		return "", err
 	}
 
