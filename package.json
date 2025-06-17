@@ -1,6 +1,6 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "webpack -c ./webpack.config.ts --env production",
