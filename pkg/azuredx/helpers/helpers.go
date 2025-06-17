@@ -3,9 +3,11 @@ package helpers
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 )
 
@@ -36,4 +38,10 @@ func SanitizeClusterUri(clusterUri string) (string, error) {
 	}
 
 	return parsedUrl.String(), nil
+}
+
+func HandleResponseBodyClose(resp *http.Response) {
+	if err := resp.Body.Close(); err != nil {
+		backend.Logger.Warn("Error closing response body: %s", err.Error())
+	}
 }
