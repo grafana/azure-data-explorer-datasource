@@ -81,10 +81,10 @@ func (c *Client) TestKustoRequest(ctx context.Context, datasourceSettings *model
 
 		clusters, err := c.ARGClusterRequest(ctx, payload, headers)
 		if err != nil {
-			return fmt.Errorf("Unable to connect to Azure Resource Graph. Add access to ARG in Azure or add a default cluster URL. %w", err)
+			return fmt.Errorf("unable to connect to Azure Resource Graph. Add access to ARG in Azure or add a default cluster URL %w", err)
 		}
 		if len(clusters) == 0 {
-			return errors.New("Azure Resource Graph resource query returned 0 clusters.")
+			return errors.New("the Azure Resource Graph resource query returned 0 clusters")
 		}
 		clusterURL = clusters[0].Uri
 	}
@@ -131,10 +131,10 @@ func (c *Client) testKustoClient(ctx context.Context, datasourceSettings *models
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer helpers.HandleResponseBodyClose(resp)
 
 	if resp.StatusCode == 403 {
-		return fmt.Errorf("The client does not have permission to get schemas on %q. The query editor will have limited options.", clusterURL)
+		return fmt.Errorf("the client does not have permission to get schemas on %q, the query editor will have limited options", clusterURL)
 	}
 	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("azure HTTP %q", resp.Status)
@@ -181,10 +181,10 @@ func (c *Client) testManagementClient(ctx context.Context, _ *models.DatasourceS
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer helpers.HandleResponseBodyClose(resp)
 
 	if resp.StatusCode == 403 {
-		return errors.New("The client does not have permission to use Azure Resource Graph. The cluster select in the query editor config will not be populated.")
+		return errors.New("the client does not have permission to use Azure Resource Graph, the cluster select in the query editor config will not be populated")
 	}
 	if resp.StatusCode/100 != 2 {
 		return fmt.Errorf("azure HTTP %q", resp.Status)
@@ -214,10 +214,10 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-    if application == "" {
-        application = "Grafana-ADX"
-    }
-    req.Header.Set("x-ms-app", application)
+	if application == "" {
+		application = "Grafana-ADX"
+	}
+	req.Header.Set("x-ms-app", application)
 	// req.Header.Set("x-ms-app", "Grafana-ADX")
 	if payload.QuerySource == "" {
 		payload.QuerySource = "unspecified"
@@ -237,7 +237,7 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 		return nil, errorsource.DownstreamError(err, false)
 	}
 
-	defer resp.Body.Close()
+	defer helpers.HandleResponseBodyClose(resp)
 
 	switch {
 	case resp.StatusCode == http.StatusUnauthorized:
@@ -297,7 +297,7 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 		return nil, errorsource.DownstreamError(err, false)
 	}
 
-	defer resp.Body.Close()
+	defer helpers.HandleResponseBodyClose(resp)
 
 	switch {
 	case resp.StatusCode == http.StatusUnauthorized:

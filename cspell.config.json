@@ -171,6 +171,8 @@
     "Ymin",
     "llms",
     "proxying",
+    "nolint",
+    "errcheck",
     ""
   ]
 }

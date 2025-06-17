@@ -91,14 +91,14 @@ func (adx *AzureDataExplorer) generateQuery(rw http.ResponseWriter, req *http.Re
 		respondWithError(rw, http.StatusInternalServerError, "Error during query generation", err)
 		return
 	}
-	defer resp.Body.Close()
+	helpers.HandleResponseBodyClose(resp)
 
 	var content openaiResponse
 
 	body, err = io.ReadAll(resp.Body)
-
 	if err != nil {
-		rw.WriteHeader(http.StatusInternalServerError)
+		respondWithError(rw, http.StatusInternalServerError, "Error reading response body", err)
+		return
 	}
 
 	err = json.Unmarshal(body, &content)
