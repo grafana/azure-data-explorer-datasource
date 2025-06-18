@@ -3,6 +3,7 @@ package azuredx
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -126,6 +127,7 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 
 	var cluster struct {
 		ClusterUri string `json:"clusterUri,omitempty"`
+		Database   string `json:"database,omitempty"`
 	}
 
 	err = json.Unmarshal(body, &cluster)
@@ -137,8 +139,14 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 		cluster.ClusterUri = adx.settings.ClusterURL
 	}
 
+	query := fmt.Sprintf(".show databases (['%s']) schema as json", cluster.Database)
+
+	if cluster.Database == "" {
+		query = ".show databases schema as json"
+	}
+
 	payload := models.RequestPayload{
-		CSL:         ".show databases schema as json",
+		CSL:         query,
 		QuerySource: "schema",
 	}
 
