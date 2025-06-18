@@ -87,7 +87,7 @@ func (provider *onBehalfOfTokenProvider) GetAccessToken(ctx context.Context, sco
 	}
 
 	if currentUser.IdToken == "" {
-		err := fmt.Errorf("user context doesn't have ID token, , are you signed in with Azure AD?")
+		err := fmt.Errorf("user context doesn't have ID token, are you signed in with Azure AD?")
 		return "", err
 	}
 
