@@ -1,3 +1,4 @@
+import { AdxDataSource } from '../datasource';
 import {
   AdxColumnSchema,
   AdxDatabaseSchema,
@@ -6,7 +7,6 @@ import {
   SchemaMapping,
   SchemaMappingType,
 } from '../types';
-import { AdxDataSource } from '../datasource';
 import { cache } from './cache';
 
 const schemaKey = 'AdxSchemaResolver';
@@ -18,13 +18,13 @@ export class AdxSchemaResolver {
     return `${schemaKey}.${this.datasource.id}.${addition}`;
   }
 
-  async getDatabases(clusterUri: string): Promise<AdxDatabaseSchema[]> {
-    const schema = await this.datasource.getSchema(clusterUri);
+  async getDatabaseSchema(clusterUri: string, database: string): Promise<AdxDatabaseSchema[]> {
+    const schema = await this.datasource.getSchema(clusterUri, database);
     return Object.keys(schema.Databases).map((key) => schema.Databases[key]);
   }
 
   async getTablesForDatabase(databaseName: string, clusterUri: string): Promise<AdxTableSchema[]> {
-    const databases = await this.getDatabases(clusterUri);
+    const databases = await this.getDatabaseSchema(clusterUri, databaseName);
     const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
@@ -34,7 +34,7 @@ export class AdxSchemaResolver {
   }
 
   async getViewsForDatabase(databaseName: string, clusterUri: string): Promise<AdxTableSchema[]> {
-    const databases = await this.getDatabases(clusterUri);
+    const databases = await this.getDatabaseSchema(clusterUri, databaseName);
     const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {
@@ -44,7 +44,7 @@ export class AdxSchemaResolver {
   }
 
   async getFunctionsForDatabase(databaseName: string, clusterUri: string): Promise<AdxFunctionSchema[]> {
-    const databases = await this.getDatabases(clusterUri);
+    const databases = await this.getDatabaseSchema(clusterUri, databaseName);
     const database = databases.find((db) => db.Name === databaseName);
 
     if (!database) {

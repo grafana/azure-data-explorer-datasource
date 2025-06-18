@@ -1,11 +1,11 @@
 import { t } from '@grafana/i18n';
 import { LoadingState, QueryEditorProps } from '@grafana/data';
 import { Alert, LoadingBar } from '@grafana/ui';
-import { get } from 'lodash';
+import { get, set } from 'lodash';
 import { migrateQuery, needsToBeMigrated } from 'migrations/query';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAsync, useEffectOnce } from 'react-use';
-import { AdxDataSourceOptions, EditorMode, KustoQuery } from 'types';
+import { AdxDataSourceOptions, AdxSchema, EditorMode, KustoQuery } from 'types';
 
 import { AdxDataSource } from '../../datasource';
 import { OpenAIEditor } from './OpenAIEditor';
@@ -17,7 +17,14 @@ type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = (props) => {
   const { onChange, onRunQuery, query, datasource } = props;
-  const schema = useAsync(() => datasource.getSchema(query.clusterUri, false), [datasource.id, query.clusterUri]);
+  const [schema, setSchema] = useState<AdxSchema>();
+  const [schemaError, setSchemaError] = useState<Error | null>(null);
+
+  const databases = useAsync(
+    () => datasource.getDatabases(query.clusterUri),
+    [datasource.id, query.clusterUri, query.database]
+  );
+
   const templateVariables = useTemplateVariables(datasource);
   const [dirty, setDirty] = useState(false);
   const isLoading = useMemo(() => props.data?.state === LoadingState.Loading, [props.data?.state]);
@@ -34,34 +41,49 @@ export const QueryEditor: React.FC<Props> = (props) => {
     onRunQuery();
   });
 
+  useEffect(() => {
+    if (query.clusterUri && query.database) {
+      datasource
+        .getSchema(query.clusterUri, query.database, false)
+        .then((schema) => {
+          setSchema(schema);
+          setSchemaError(null);
+        })
+        .catch((error) => {
+          console.error('Error loading schema:', error);
+          setSchemaError(error);
+        });
+    }
+  }, [query.clusterUri, query.database]);
+
   return (
     <>
-      {schema.error && (
+      {schemaError && (
         <Alert
           title={t(
             'components.query-editor.title-could-not-load-datasource-schema',
             'Could not load datasource schema'
           )}
         >
-          {parseSchemaError(schema.error)}
+          {parseSchemaError(schemaError)}
         </Alert>
       )}
       {isLoading ? <LoadingBar width={window.innerWidth} /> : <div style={{ height: 1 }} />}
       <QueryHeader
         query={query}
         onChange={onChange}
-        schema={schema}
         datasource={datasource}
         dirty={dirty}
         setDirty={setDirty}
         onRunQuery={onRunQuery}
         templateVariableOptions={templateVariables}
         isLoading={isLoading}
+        databases={databases}
       />
       {query.OpenAI ? (
         <OpenAIEditor
           {...props}
-          schema={schema.value}
+          schema={schema}
           database={query.database}
           datasource={datasource}
           templateVariableOptions={templateVariables}
@@ -71,7 +93,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
       {query.rawMode ? (
         <RawQueryEditor
           {...props}
-          schema={schema.value}
+          schema={schema}
           database={query.database}
           templateVariableOptions={templateVariables}
           setDirty={() => !dirty && setDirty(true)}
@@ -80,7 +102,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
       {!query.rawMode && !query.OpenAI ? (
         <VisualQueryEditor
           {...props}
-          schema={schema.value}
+          schema={schema}
           database={query.database}
           templateVariableOptions={templateVariables}
         />

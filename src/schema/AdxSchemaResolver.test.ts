@@ -14,7 +14,7 @@ describe('Test schema resolution', () => {
   });
 
   it('Will correctly retrieve databases', async () => {
-    const databases = await schemaResolver.getDatabases('testClusterUri');
+    const databases = await schemaResolver.getSchemaForDatabase('testClusterUri');
     expect(databases).toHaveLength(1);
     expect(databases[0]).toEqual(schema.Databases['testdb']);
   });
