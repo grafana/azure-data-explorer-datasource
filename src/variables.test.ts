@@ -1,6 +1,6 @@
 import { CoreApp, DataQueryRequest, getDefaultTimeRange, toDataFrame } from '@grafana/data';
-import { lastValueFrom, of } from 'rxjs';
 import { mockDatasource } from 'components/__fixtures__/Datasource';
+import { lastValueFrom, of } from 'rxjs';
 import { AdxQueryType, KustoQuery, defaultQuery } from 'types';
 import { VariableSupport } from 'variables';
 
@@ -89,6 +89,54 @@ const mockSchema = {
   },
 };
 
+const mockResponse = [
+  {
+    refId: 'test',
+    meta: {
+      typeVersion: [0, 0],
+      custom: {
+        ColumnTypes: ['datetime', 'real', 'string'],
+      },
+      executedQueryString: 'test',
+    },
+    fields: [
+      {
+        name: 'timestamp',
+        type: 'time',
+        typeInfo: {
+          frame: 'time.Time',
+          nullable: true,
+        },
+        config: {},
+        values: [1000000000],
+        entities: {},
+      },
+      {
+        name: 'value',
+        type: 'number',
+        typeInfo: {
+          frame: 'float64',
+          nullable: true,
+        },
+        config: {},
+        values: [9.9],
+        entities: {},
+      },
+      {
+        name: 'string',
+        type: 'string',
+        typeInfo: {
+          frame: 'string',
+          nullable: true,
+        },
+        config: {},
+        values: ['test_string'],
+        entities: {},
+      },
+    ],
+    length: 1,
+  },
+];
 const datasource = mockDatasource({
   getDefaultOrFirstDatabase: jest.fn().mockResolvedValue('test_db'),
   getDatabases: jest.fn().mockResolvedValue([{ text: 'test_db', value: 'test_db' }]),
@@ -96,54 +144,7 @@ const datasource = mockDatasource({
   getClusters: jest.fn().mockResolvedValue([{ name: 'cluster_name', value: 'cluster_value' }]),
   query: jest.fn().mockReturnValue(
     of({
-      data: [
-        {
-          refId: 'test',
-          meta: {
-            typeVersion: [0, 0],
-            custom: {
-              ColumnTypes: ['datetime', 'real', 'string'],
-            },
-            executedQueryString: 'test',
-          },
-          fields: [
-            {
-              name: 'timestamp',
-              type: 'time',
-              typeInfo: {
-                frame: 'time.Time',
-                nullable: true,
-              },
-              config: {},
-              values: [1000000000],
-              entities: {},
-            },
-            {
-              name: 'value',
-              type: 'number',
-              typeInfo: {
-                frame: 'float64',
-                nullable: true,
-              },
-              config: {},
-              values: [9.9],
-              entities: {},
-            },
-            {
-              name: 'string',
-              type: 'string',
-              typeInfo: {
-                frame: 'string',
-                nullable: true,
-              },
-              config: {},
-              values: ['test_string'],
-              entities: {},
-            },
-          ],
-          length: 1,
-        },
-      ],
+      data: mockResponse,
       state: 'Done',
     })
   ),
@@ -172,7 +173,7 @@ describe('variables', () => {
       expect(datasource.getDefaultOrFirstDatabase).toBeCalled();
       expect(buildQuerySpy).toBeCalledWith('test', { scopedVars: {} }, 'test_db', 'clusterUrl');
       expect(datasource.query).toBeCalled();
-      expect(res.data).toEqual([{ text: 'test_string' }]);
+      expect(res.data).toEqual(mockResponse);
     });
   });
 
