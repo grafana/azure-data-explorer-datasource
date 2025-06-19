@@ -17,8 +17,7 @@ type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = (props) => {
   const { onChange, onRunQuery, query, datasource } = props;
-  const [schema, setSchema] = useState<AdxSchema>();
-  const [schemaError, setSchemaError] = useState<Error | null>(null);
+  const schema = useAsync(() => datasource.getSchema(query.clusterUri, query.database, false), [datasource.id, query.clusterUri, query.database]);
 
   const databases = useAsync(
     () => datasource.getDatabases(query.clusterUri),
@@ -41,31 +40,17 @@ export const QueryEditor: React.FC<Props> = (props) => {
     onRunQuery();
   });
 
-  useEffect(() => {
-    if (query.clusterUri && query.database) {
-      datasource
-        .getSchema(query.clusterUri, query.database, false)
-        .then((schema) => {
-          setSchema(schema);
-          setSchemaError(null);
-        })
-        .catch((error) => {
-          console.error('Error loading schema:', error);
-          setSchemaError(error);
-        });
-    }
-  }, [query.clusterUri, query.database]);
 
   return (
     <>
-      {schemaError && (
+      {schema.error && (
         <Alert
           title={t(
             'components.query-editor.title-could-not-load-datasource-schema',
             'Could not load datasource schema'
           )}
         >
-          {parseSchemaError(schemaError)}
+          {parseSchemaError(schema.error)}
         </Alert>
       )}
       {isLoading ? <LoadingBar width={window.innerWidth} /> : <div style={{ height: 1 }} />}
@@ -83,7 +68,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
       {query.OpenAI ? (
         <OpenAIEditor
           {...props}
-          schema={schema}
+          schema={schema.value}
           database={query.database}
           datasource={datasource}
           templateVariableOptions={templateVariables}
@@ -93,7 +78,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
       {query.rawMode ? (
         <RawQueryEditor
           {...props}
-          schema={schema}
+          schema={schema.value}
           database={query.database}
           templateVariableOptions={templateVariables}
           setDirty={() => !dirty && setDirty(true)}
@@ -102,7 +87,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
       {!query.rawMode && !query.OpenAI ? (
         <VisualQueryEditor
           {...props}
-          schema={schema}
+          schema={schema.value}
           database={query.database}
           templateVariableOptions={templateVariables}
         />
