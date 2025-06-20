@@ -1,11 +1,11 @@
 import { t } from '@grafana/i18n';
 import { LoadingState, QueryEditorProps } from '@grafana/data';
 import { Alert, LoadingBar } from '@grafana/ui';
-import { get, set } from 'lodash';
+import { get } from 'lodash';
 import { migrateQuery, needsToBeMigrated } from 'migrations/query';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useAsync, useEffectOnce } from 'react-use';
-import { AdxDataSourceOptions, AdxSchema, EditorMode, KustoQuery } from 'types';
+import { AdxDataSourceOptions, EditorMode, KustoQuery } from 'types';
 
 import { AdxDataSource } from '../../datasource';
 import { OpenAIEditor } from './OpenAIEditor';
@@ -18,11 +18,7 @@ type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 export const QueryEditor: React.FC<Props> = (props) => {
   const { onChange, onRunQuery, query, datasource } = props;
   const schema = useAsync(() => datasource.getSchema(query.clusterUri, query.database, false), [datasource.id, query.clusterUri, query.database]);
-
-  const databases = useAsync(
-    () => datasource.getDatabases(query.clusterUri),
-    [datasource.id, query.clusterUri, query.database]
-  );
+  const databases = useAsync(() => datasource.getDatabases(query.clusterUri), [datasource.id, query.clusterUri, query.database]);
 
   const templateVariables = useTemplateVariables(datasource);
   const [dirty, setDirty] = useState(false);
@@ -39,7 +35,6 @@ export const QueryEditor: React.FC<Props> = (props) => {
     onChange(processedQuery);
     onRunQuery();
   });
-
 
   return (
     <>

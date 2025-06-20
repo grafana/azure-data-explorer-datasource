@@ -6,7 +6,6 @@ import { openMenu } from 'react-select-event';
 import { mockDatasource, mockQuery } from '../__fixtures__/Datasource';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { defaultQuery } from 'types';
-import schema from 'components/__fixtures__/schema';
 import { DatabaseItem } from 'response_parser';
 
 jest.mock('@grafana/runtime', () => {
@@ -175,18 +174,7 @@ describe('QueryEditor', () => {
               rawMode: true,
             }}
             onChange={onChange}
-            databases={{
-              loading: false,
-              value: Object.values(schema().Databases).map((db) => ({
-                text: db.Name,
-                value: db.Name,
-                name: db.Name,
-                tables: db.Tables,
-                externalTables: db.ExternalTables,
-                functions: db.Functions,
-                materializedViews: db.MaterializedViews,
-              })),
-            }}
+            databases={databases}
           />
         )
       );

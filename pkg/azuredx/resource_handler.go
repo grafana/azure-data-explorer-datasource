@@ -139,12 +139,11 @@ func (adx *AzureDataExplorer) getSchema(rw http.ResponseWriter, req *http.Reques
 		cluster.ClusterUri = adx.settings.ClusterURL
 	}
 
-	query := fmt.Sprintf(".show databases (['%s']) schema as json", cluster.Database)
+	query := ".show databases schema as json"
 
-	if cluster.Database == "" {
-		query = ".show databases schema as json"
+	if cluster.Database != "" {
+		query = fmt.Sprintf(".show databases (['%s']) schema as json", cluster.Database)
 	}
-
 	payload := models.RequestPayload{
 		CSL:         query,
 		QuerySource: "schema",
