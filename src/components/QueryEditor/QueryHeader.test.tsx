@@ -5,7 +5,9 @@ import { openMenu } from 'react-select-event';
 
 import { mockDatasource, mockQuery } from '../__fixtures__/Datasource';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
-import { AdxSchema, defaultQuery } from 'types';
+import { defaultQuery } from 'types';
+import schema from 'components/__fixtures__/schema';
+import { DatabaseItem } from 'response_parser';
 
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
@@ -26,13 +28,10 @@ jest.mock('@grafana/runtime', () => {
   };
 });
 
-const defaultSchema: AsyncState<AdxSchema> = { loading: false };
-
 const defaultProps = {
   onChange: jest.fn(),
   datasource: mockDatasource(),
   query: mockQuery,
-  schema: defaultSchema,
   dirty: false,
   setDirty: jest.fn(),
   onRunQuery: jest.fn(),
@@ -40,35 +39,32 @@ const defaultProps = {
 };
 
 describe('QueryEditor', () => {
-  describe('it is loading the schema', () => {
+  describe('it is loading the databases', () => {
     it('should render a loading message', async () => {
-      const schema: AsyncState<AdxSchema> = { loading: true };
-      await waitFor(() => render(<QueryHeader {...defaultProps} schema={schema} />));
+      const databases: AsyncState<DatabaseItem[]> = { loading: true };
+      await waitFor(() => render(<QueryHeader {...defaultProps} databases={databases} />));
       await waitFor(() => screen.getByTestId('Spinner'));
     });
   });
+  const databases: AsyncState<DatabaseItem[]> = {
+    loading: false,
+    value: [
+      { text: 'foo', value: 'foo' },
+      { text: 'bar', value: 'bar' },
+    ],
+  };
 
-  describe('when there is a schema', () => {
-    const schema: AsyncState<AdxSchema> = {
-      loading: false,
-      value: {
-        Databases: {
-          foo: { Name: 'foo', Tables: {}, ExternalTables: {}, Functions: {}, MaterializedViews: {} },
-          bar: { Name: 'bar', Tables: {}, ExternalTables: {}, Functions: {}, MaterializedViews: {} },
-        },
-      },
-    };
-
+  describe('when there are databases', () => {
     it('should select a format by default', async () => {
       const onChange = jest.fn();
-      await waitFor(() => render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />));
+      await waitFor(() => render(<QueryHeader {...defaultProps} databases={databases} onChange={onChange} />));
       await waitFor(() => screen.getByText('foo'));
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'table' }));
     });
 
     it('should select a database by default', async () => {
       const onChange = jest.fn();
-      await waitFor(() => render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />));
+      await waitFor(() => render(<QueryHeader {...defaultProps} databases={databases} onChange={onChange} />));
       await waitFor(() => screen.getByText('foo'));
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ database: 'foo' }));
     });
@@ -76,14 +72,14 @@ describe('QueryEditor', () => {
     it('should render with the default database selected', async () => {
       const ds = mockDatasource();
       ds.getDefaultOrFirstDatabase = jest.fn().mockResolvedValue('bar');
-      await waitFor(() => render(<QueryHeader {...defaultProps} schema={schema} datasource={ds} />));
+      await waitFor(() => render(<QueryHeader {...defaultProps} databases={databases} datasource={ds} />));
       await waitFor(() => screen.getByText('bar'));
     });
 
     it('should select a database', async () => {
       const onChange = jest.fn();
       await waitFor(async () => {
-        render(<QueryHeader {...defaultProps} schema={schema} onChange={onChange} />);
+        render(<QueryHeader {...defaultProps} databases={databases} onChange={onChange} />);
 
         await screen.getByText('foo');
         const sel = await screen.getByLabelText('Database:');
@@ -106,7 +102,7 @@ describe('QueryEditor', () => {
               ...mockQuery,
               rawMode: true,
             }}
-            schema={schema}
+            databases={databases}
             onChange={onChange}
             dirty={true}
             setDirty={setDirty}
@@ -125,7 +121,7 @@ describe('QueryEditor', () => {
     it('runs a query', async () => {
       const onRunQuery = jest.fn();
       await waitFor(async () => {
-        render(<QueryHeader {...defaultProps} schema={schema} onRunQuery={onRunQuery} />);
+        render(<QueryHeader {...defaultProps} databases={databases} onRunQuery={onRunQuery} />);
         screen.getByText('foo');
         (await screen.getByText('Run query')).click();
       });
@@ -137,7 +133,7 @@ describe('QueryEditor', () => {
     it('should select a format', async () => {
       const onChange = jest.fn();
       await waitFor(async () => {
-        render(<QueryHeader {...defaultProps} onChange={onChange} />);
+        render(<QueryHeader {...defaultProps} onChange={onChange} databases={databases} />);
         const sel = await screen.getByLabelText('Format as:');
         act(() => openMenu(sel));
         (await screen.getByText('Time series')).click();
@@ -148,7 +144,9 @@ describe('QueryEditor', () => {
     it('should select handle ADX time series format', async () => {
       const onChange = jest.fn();
       let query = { ...defaultProps.query, rawMode: true };
-      const { rerender } = render(<QueryHeader {...defaultProps} onChange={onChange} query={query} />);
+      const { rerender } = render(
+        <QueryHeader {...defaultProps} onChange={onChange} query={query} databases={databases} />
+      );
       await waitFor(async () => {
         const sel = await screen.getByLabelText('Format as:');
         act(() => openMenu(sel));
@@ -157,7 +155,9 @@ describe('QueryEditor', () => {
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'time_series_adx_series' }));
       // simulate change of mode
       query = { ...defaultProps.query, rawMode: false, resultFormat: 'time_series_adx_series' };
-      await waitFor(() => rerender(<QueryHeader {...defaultProps} onChange={onChange} query={query} />));
+      await waitFor(() =>
+        rerender(<QueryHeader {...defaultProps} onChange={onChange} query={query} databases={databases} />)
+      );
       // it should change to time_series since it's using the visual editor
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resultFormat: 'time_series' }));
     });
@@ -175,6 +175,18 @@ describe('QueryEditor', () => {
               rawMode: true,
             }}
             onChange={onChange}
+            databases={{
+              loading: false,
+              value: Object.values(schema().Databases).map((db) => ({
+                text: db.Name,
+                value: db.Name,
+                name: db.Name,
+                tables: db.Tables,
+                externalTables: db.ExternalTables,
+                functions: db.Functions,
+                materializedViews: db.MaterializedViews,
+              })),
+            }}
           />
         )
       );
