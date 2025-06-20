@@ -1,3 +1,4 @@
+import { t } from '@grafana/i18n';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorList, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorGroupByExpression } from 'types/expressions';
@@ -79,7 +80,11 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
     <>
       <EditorRow>
         <EditorFieldGroup>
-          <EditorField label="Group by" optional={true} data-testid={selectors.components.queryEditor.groupBy.field}>
+          <EditorField
+            label={t('components.group-by-section.label-group-by', 'Group by')}
+            optional={true}
+            data-testid={selectors.components.queryEditor.groupBy.field}
+          >
             <EditorList
               items={groupBys}
               onChange={onChange}

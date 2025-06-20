@@ -84,15 +84,16 @@ func converterFrameForTable(t Table, executedQueryString string, format string) 
 		colNames[i] = col.ColumnName
 		colTypes[i] = col.ColumnType
 		converter, ok := converterMap[col.ColumnType]
-		if format == "trace" {
-			if col.ColumnName == "serviceTags" || col.ColumnName == "tags" {
-				converter = tagsConverter
-			} else if col.ColumnName == "logs" {
-				converter = logsConverter
-			}
-		}
 		if !ok {
 			return nil, fmt.Errorf("unsupported analytics column type %v", col.ColumnType)
+		}
+		if format == "trace" {
+			switch col.ColumnName {
+			case "serviceTags", "tags":
+				converter = tagsConverter
+			case "logs":
+				converter = logsConverter
+			}
 		}
 		converters = append(converters, converter)
 	}

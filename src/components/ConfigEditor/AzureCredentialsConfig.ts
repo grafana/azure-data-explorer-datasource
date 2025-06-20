@@ -1,4 +1,11 @@
-import { AzureCredentials, getClientSecret, getDatasourceCredentials, getDefaultAzureCloud, updateDatasourceCredentials, resolveLegacyCloudName } from '@grafana/azure-sdk';
+import {
+  AzureCredentials,
+  getClientSecret,
+  getDatasourceCredentials,
+  getDefaultAzureCloud,
+  updateDatasourceCredentials,
+  resolveLegacyCloudName,
+} from '@grafana/azure-sdk';
 import { DataSourceSettings } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
@@ -28,8 +35,7 @@ export function getDefaultCredentials(): AzureCredentials {
 
 export function getCredentials(options: AdxDataSourceSettings): AzureCredentials {
   const credentials = getDatasourceCredentials(options, getOboEnabled());
-  if (credentials)
-  {
+  if (credentials) {
     return credentials;
   }
 

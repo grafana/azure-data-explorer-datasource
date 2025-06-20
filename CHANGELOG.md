@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## [6.0.2]
+
+- Bump golang.org/x/net from 0.38.0 to 0.41.0 (#1299)
+- Bump @playwright/test from 1.50.1 to 1.53.0 (#1304)
+- Bump github.com/grafana/grafana-plugin-sdk-go from 0.274.0 to 0.277.1 (#1275)
+- Bump @stylistic/eslint-plugin-ts from 3.1.0 to 4.4.1 (#1306)
+- Update grafana/plugin-actions requirement to bf335ac99375f0ba8828497abdf1a22897b5d888 (#1277)
+- Bump grafana/shared-workflows (#1309)
+- Add publish GHA for releases (#1308)
+- Remove docker image workflow (#1287)
+- Internationalization: Add markup for translations (#1301)
+- Bump github.com/Azure/azure-sdk-for-go/sdk/azcore from 1.17.1 to 1.18.0 (#1255)
+- Bump @types/testing-library\_\_jest-dom from 5.14.8 to 5.14.9 (#1253)
+- Add missing permission (#1284)
+- Replace pull_request_target (#1278)
+- Fix template variable return values (#1282)
+
 ## [6.0.1]
 
 - Update import from Grafana llm library [#1267](https://github.com/grafana/azure-data-explorer-datasource/pull/1267)

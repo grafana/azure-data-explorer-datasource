@@ -17,7 +17,7 @@ func tableFromJSONFile(name string) (tr *TableResponse, err error) {
 	if err != nil {
 		return
 	}
-	defer file.Close()
+	defer file.Close() //nolint:errcheck
 	return TableFromJSON(file)
 }
 

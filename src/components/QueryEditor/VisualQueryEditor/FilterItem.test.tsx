@@ -29,7 +29,7 @@ describe('FilterItem', () => {
     ];
     render(<FilterItem {...defaultProps} columns={columns} onChange={onChange} />);
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('column');
+      const sel = await screen.getByLabelText('Column');
       act(() => openMenu(sel));
       (await screen.getByText('foo')).click();
     });
@@ -42,7 +42,7 @@ describe('FilterItem', () => {
     const onChange = jest.fn();
     render(<FilterItem {...defaultProps} onChange={onChange} />);
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('operator');
+      const sel = await screen.getByLabelText('Operator');
       act(() => openMenu(sel));
       (await screen.getByText('!=')).click();
     });
@@ -56,7 +56,7 @@ describe('FilterItem', () => {
     const filter = { property: { name: 'col', type: QueryEditorPropertyType.String } };
     render(<FilterItem {...defaultProps} datasource={datasource} onChange={onChange} filter={filter} />);
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('column value');
+      const sel = await screen.getByLabelText('Column value');
       act(() => openMenu(sel));
       const value = await screen.getByText('foo');
       value.click();
@@ -83,7 +83,7 @@ describe('FilterItem', () => {
       />
     );
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('column value');
+      const sel = await screen.getByLabelText('Column value');
       act(() => openMenu(sel));
       (await screen.getByText('Template Variables')).click();
       (await screen.findByText('$foo')).click();
@@ -97,7 +97,7 @@ describe('FilterItem', () => {
     const onChange = jest.fn();
     const filter = { property: { name: 'col', type: QueryEditorPropertyType.Number } };
     render(<FilterItem {...defaultProps} datasource={datasource} onChange={onChange} filter={filter} />);
-    const input = screen.getByLabelText('column number value');
+    const input = screen.getByLabelText('Column number value');
     await userEvent.type(input, '1');
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: 1 } }));
   });
@@ -108,7 +108,7 @@ describe('FilterItem', () => {
     const onChange = jest.fn();
     const filter = { property: { name: 'col', type: QueryEditorPropertyType.DateTime } };
     render(<FilterItem {...defaultProps} datasource={datasource} onChange={onChange} filter={filter} />);
-    const input = screen.getByLabelText('column datetime value');
+    const input = screen.getByLabelText('Column datetime value');
     await userEvent.type(input, '1');
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ operator: { name: '==', value: '1' } }));
   });
