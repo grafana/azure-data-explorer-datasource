@@ -12,9 +12,10 @@
 - Remove docker image workflow (#1287)
 - Internationalization: Add markup for translations (#1301)
 - Bump github.com/Azure/azure-sdk-for-go/sdk/azcore from 1.17.1 to 1.18.0 (#1255)
-- Bump @types/testing-library__jest-dom from 5.14.8 to 5.14.9 (#1253)
+- Bump @types/testing-library\_\_jest-dom from 5.14.8 to 5.14.9 (#1253)
 - Add missing permission (#1284)
 - Replace pull_request_target (#1278)
+- Fix template variable return values (#1282)
 
 ## [6.0.1]
 
