@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [6.0.3]
+
+- Improve OBO related error messages (#1283)
+- Internationalization: Add `verify-i18n` workflow to ensure translation extraction has been committed (#1320)
+- Bump eslint from 9.28.0 to 9.29.0 (#1315)
+- Bump @typescript-eslint/eslint-plugin from 8.34.0 to 8.34.1 (#1313)
+- Bump cspell from 8.18.1 to 9.1.1 (#1316)
+- Bump grafana/shared-workflows (#1318)
+- Bump eslint-plugin-jsdoc from 50.8.0 to 51.0.3 (#1319)
+- Fix code style warnings, add shared GHA for push. (#1317)
+
 ## [6.0.2]
 
 - Bump golang.org/x/net from 0.38.0 to 0.41.0 (#1299)
