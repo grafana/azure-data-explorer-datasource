@@ -3,7 +3,6 @@ import React from 'react';
 import { QueryEditor } from './QueryEditor';
 import { render, screen, waitFor } from '@testing-library/react';
 import { AdxQueryType, defaultQuery, EditorMode } from 'types';
-import { QueryEditorExpressionType } from 'types/expressions';
 
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
