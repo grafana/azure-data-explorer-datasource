@@ -2,7 +2,6 @@ import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
 import { CodeEditor, Monaco, MonacoEditor } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
-import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { selectors } from 'test/selectors';
 import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
@@ -26,7 +25,6 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const { query, schema } = props;
   const [worker, setWorker] = useState<Worker>();
   const [variables] = useState(getTemplateSrv().getVariables());
-  const [stateSchema, setStateSchema] = useState(cloneDeep(schema));
   const editorRef = useRef<MonacoEditor | null>(null);
 
   const onRawQueryChange = useCallback(() => {
@@ -53,12 +51,6 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
     [onRawQueryChange]
   );
 
-  useEffect(() => {
-    if (schema && !stateSchema) {
-      setStateSchema(cloneDeep(schema));
-    }
-  }, [schema, stateSchema]);
-
   const handleEditorMount = (editor: MonacoEditor, monaco: Monaco) => {
     editorRef.current = editor;
     monaco.languages.registerSignatureHelpProvider('kusto', {
@@ -68,7 +60,7 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
 
     const model = editor.getModel();
 
-    if (stateSchema && stateSchema.Databases) {
+    if (schema && schema.Databases) {
       // Handle cases where kusto is already loaded or will be loaded via AMD
       if (monaco.languages['kusto'] && monaco.languages['kusto'].getKustoWorker) {
         monaco.languages['kusto']
@@ -102,16 +94,16 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   };
 
   useEffect(() => {
-    if (worker && stateSchema && stateSchema.Databases) {
+    if (worker && schema && schema.Databases) {
       // Populate Database schema with macros
-      Object.keys(stateSchema.Databases).forEach((db) =>
-        Object.assign(stateSchema.Databases[db].Functions, getFunctions(variables))
+      Object.keys(schema.Databases).forEach((db) =>
+        Object.assign(schema.Databases[db].Functions, getFunctions(variables))
       );
-      worker.setSchemaFromShowSchema(stateSchema, 'https://help.kusto.windows.net', props.database);
+      worker.setSchemaFromShowSchema(schema, 'https://help.kusto.windows.net', props.database);
     }
-  }, [worker, stateSchema, variables, props.database]);
+  }, [worker, schema, variables, props.database]);
 
-  if (!stateSchema) {
+  if (!schema) {
     return null;
   }
 

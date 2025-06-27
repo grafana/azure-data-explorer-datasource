@@ -99,7 +99,7 @@ describe('AdxDataSource', () => {
     });
 
     it('should return a parsed schema', () => {
-      return ctx.ds.getSchema('clusterUri').then((result) => {
+      return ctx.ds.getSchema('clusterUri', 'database').then((result) => {
         expect(Object.keys(result.Databases.Grafana.Tables).length).toBe(1);
         expect(result.Databases.Grafana.Tables.MyLogs.Name).toBe('MyLogs');
       });

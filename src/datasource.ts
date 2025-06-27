@@ -7,13 +7,14 @@ import {
   TimeRange,
 } from '@grafana/data';
 import { BackendSrv, DataSourceWithBackend, getBackendSrv, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
-import { QueryEditorPropertyType } from './schema/types';
-import { KustoExpressionParser, escapeColumn } from 'KustoExpressionParser';
+import { escapeColumn, KustoExpressionParser } from 'KustoExpressionParser';
 import { map } from 'lodash';
 import { AdxSchemaMapper } from 'schema/AdxSchemaMapper';
 import { cache } from 'schema/cache';
 import { toPropertyType } from 'schema/mapper';
+import { QueryEditorPropertyType } from './schema/types';
 
+import { VariableSupport } from 'variables';
 import { migrateAnnotation } from './migrations/annotation';
 import interpolateKustoQuery from './query_builder';
 import { DatabaseItem, KustoDatabaseList, ResponseParser } from './response_parser';
@@ -29,15 +30,14 @@ import {
   KustoQuery,
   QueryExpression,
 } from './types';
-import { VariableSupport } from 'variables';
 
+import { createOperator } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 import { lastValueFrom } from 'rxjs';
 import {
   QueryEditorExpressionType,
   QueryEditorOperatorExpression,
   QueryEditorWhereExpression,
 } from 'types/expressions';
-import { createOperator } from 'components/QueryEditor/VisualQueryEditor/utils/utils';
 
 export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSourceOptions> {
   private backendSrv: BackendSrv;
@@ -161,17 +161,25 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     });
   }
 
-  async getSchema(clusterUri: string, refreshCache = false): Promise<AdxSchema> {
-    if (!clusterUri && !this.instanceSettings?.jsonData?.clusterUrl) {
+  async getSchema(clusterUri: string, database: string, refreshCache = false): Promise<AdxSchema> {
+    if (
+      !clusterUri &&
+      !this.instanceSettings?.jsonData?.clusterUrl ||
+      !database &&
+      !this.instanceSettings?.jsonData?.defaultDatabase
+    ) {
       return new Promise((resolve) => {
         resolve({} as AdxSchema);
       });
     }
     const replacedClusterUri = this.templateSrv.replace(clusterUri, this.templateSrv.getVariables() as any);
+    const replacedDatabase = this.templateSrv.replace(database, this.templateSrv.getVariables() as any);
     return cache<AdxSchema>(
-      `${this.id}.${replacedClusterUri}.schema.overview`,
+      `${this.id}.${replacedClusterUri}.${replacedDatabase}.schema.overview`,
       () =>
-        this.postResource(`schema`, { clusterUri: replacedClusterUri }).then(new ResponseParser().parseSchemaResult),
+        this.postResource(`schema`, { clusterUri: replacedClusterUri, database: replacedDatabase }).then(
+          new ResponseParser().parseSchemaResult
+        ),
       refreshCache
     );
   }
@@ -316,7 +324,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
     return this.defaultEditorMode;
   }
   getApplication(): string {
-    return this.application
+    return this.application;
   }
 
   async autoCompleteQuery(query: AutoCompleteQuery, columns: AdxColumnSchema[] | undefined): Promise<string[]> {
@@ -334,7 +342,7 @@ export class AdxDataSource extends DataSourceWithBackend<KustoQuery, AdxDataSour
       query: autoQuery,
       resultFormat: 'table',
       querySource: 'autocomplete',
-      clusterUri: query.clusterUri
+      clusterUri: query.clusterUri,
     };
 
     const response = await lastValueFrom(

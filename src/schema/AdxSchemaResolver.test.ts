@@ -2,19 +2,24 @@ import { mockDatasource } from 'components/__fixtures__/Datasource';
 import createMockSchema from 'components/__fixtures__/schema';
 
 import { AdxSchemaResolver } from './AdxSchemaResolver';
+import { DatabaseItem } from 'response_parser';
 
 describe('Test schema resolution', () => {
   const datasource = mockDatasource();
   const schemaResolver = new AdxSchemaResolver(datasource);
   const schema = createMockSchema();
+  const databaseItems: DatabaseItem[] = [
+    { text: 'foo', value: 'foo' },
+  ];
 
   beforeEach(() => {
     datasource.getSchema = jest.fn().mockResolvedValue(schema);
+    datasource.getDatabases = jest.fn().mockResolvedValue(databaseItems);
     datasource.getDynamicSchema = jest.fn().mockResolvedValue([{ Name: 'testprop', CslType: 'string' }]);
   });
 
   it('Will correctly retrieve databases', async () => {
-    const databases = await schemaResolver.getDatabases('testClusterUri');
+    const databases = await schemaResolver.getDatabaseSchema('testClusterUri', 'test');
     expect(databases).toHaveLength(1);
     expect(databases[0]).toEqual(schema.Databases['testdb']);
   });

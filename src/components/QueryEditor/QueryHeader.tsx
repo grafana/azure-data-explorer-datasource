@@ -20,22 +20,21 @@ import { reportInteraction } from '@grafana/runtime';
 import { AdxDataSource } from 'datasource';
 import { useAsync } from 'react-use';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
-import { parseClustersResponse } from 'response_parser';
-import { databaseToDefinition } from 'schema/mapper';
+import { DatabaseItem, parseClustersResponse } from 'response_parser';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
 import { selectors } from 'test/selectors';
-import { AdxSchema, ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
+import { ClusterOption, defaultQuery, EditorMode, FormatOptions, KustoQuery } from '../../types';
 
 export interface QueryEditorHeaderProps {
   datasource: AdxDataSource;
   query: KustoQuery;
-  schema: AsyncState<AdxSchema>;
   dirty: boolean;
   setDirty: (b: boolean) => void;
   onChange: (value: KustoQuery) => void;
   onRunQuery: () => void;
   templateVariableOptions: SelectableValue<string>;
   isLoading?: boolean;
+  databases: AsyncState<DatabaseItem[]>;
 }
 
 const EDITOR_MODES = [
@@ -58,12 +57,11 @@ const adxTimeFormat: SelectableValue<string> = {
 
 export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const TOKEN_NOT_FOUND = 'An error occurred generating your query, tweak your prompt and try again.';
-  const { query, onChange, schema, datasource, dirty, setDirty, onRunQuery, templateVariableOptions, isLoading } =
-    props;
+  const { query, onChange, datasource, dirty, setDirty, onRunQuery, templateVariableOptions, isLoading } = props;
   const { rawMode, OpenAI } = query;
   const [clusterUri, setClusterUri] = useState(query.clusterUri);
   const [clusters, setClusters] = useState<Array<SelectableValue<string>>>([]);
-  const databases = useDatabaseOptions(schema.value);
+  const databases = useDatabaseOptions(props.databases);
   const database = useSelectedDatabase(databases, query, datasource);
   const [formats, setFormats] = useState(EDITOR_FORMATS);
   const [showWarning, setShowWarning] = useState(false);
@@ -216,7 +214,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
           type: QueryEditorPropertyType.String,
         })}
         value={database}
-        isLoading={schema.loading}
+        isLoading={props.databases.loading}
         onChange={onDatabaseChange}
       />
       <InlineSelect
@@ -321,21 +319,17 @@ const useSelectedDatabase = (
   }, [options, variables, query.database, defaultDB.value]);
 };
 
-const useDatabaseOptions = (schema?: AdxSchema): QueryEditorPropertyDefinition[] => {
+const useDatabaseOptions = (databases: AsyncState<DatabaseItem[]>): QueryEditorPropertyDefinition[] => {
   return useMemo(() => {
-    const databases: QueryEditorPropertyDefinition[] = [];
-
-    if (!schema || !schema.Databases) {
-      return databases;
+    if (!databases.value || databases.loading) {
+      return [];
     }
-
-    for (const name of Object.keys(schema.Databases)) {
-      const database = schema.Databases[name];
-      databases.push(databaseToDefinition(database));
-    }
-
-    return databases;
-  }, [schema]);
+    return databases.value.map((db) => ({
+      value: db.value,
+      label: db.text,
+      type: QueryEditorPropertyType.String,
+    }));
+  }, [databases]);
 };
 
 const getStyles = (theme: GrafanaTheme2) => {

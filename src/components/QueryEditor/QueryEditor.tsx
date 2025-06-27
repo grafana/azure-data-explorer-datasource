@@ -17,7 +17,19 @@ type Props = QueryEditorProps<AdxDataSource, KustoQuery, AdxDataSourceOptions>;
 
 export const QueryEditor: React.FC<Props> = (props) => {
   const { onChange, onRunQuery, query, datasource } = props;
-  const schema = useAsync(() => datasource.getSchema(query.clusterUri, false), [datasource.id, query.clusterUri]);
+  const schema = useAsync(() => {
+    if (query.database) {
+      const schema = datasource.getSchema(query.clusterUri, query.database, false);
+      return schema;
+    }
+
+    return Promise.resolve(undefined);
+  }, [datasource.id, query.clusterUri, query.database]);
+  const databases = useAsync(
+    () => datasource.getDatabases(query.clusterUri),
+    [datasource.id, query.clusterUri, query.database]
+  );
+
   const templateVariables = useTemplateVariables(datasource);
   const [dirty, setDirty] = useState(false);
   const isLoading = useMemo(() => props.data?.state === LoadingState.Loading, [props.data?.state]);
@@ -50,13 +62,13 @@ export const QueryEditor: React.FC<Props> = (props) => {
       <QueryHeader
         query={query}
         onChange={onChange}
-        schema={schema}
         datasource={datasource}
         dirty={dirty}
         setDirty={setDirty}
         onRunQuery={onRunQuery}
         templateVariableOptions={templateVariables}
         isLoading={isLoading}
+        databases={databases}
       />
       {query.OpenAI ? (
         <OpenAIEditor

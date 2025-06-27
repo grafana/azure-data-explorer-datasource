@@ -28,7 +28,7 @@ describe('QueryEditor', () => {
       const onChange = jest.fn();
       const ds = mockDatasource();
       ds.getClusters = jest.fn().mockResolvedValue([]);
-      const query = { ...mockQuery, pluginVersion: '', queryType: '' as AdxQueryType };
+      const query = { ...mockQuery, database: 'test-db', pluginVersion: '', queryType: '' as AdxQueryType };
       render(<QueryEditor {...defaultProps} onChange={onChange} query={query} datasource={ds} />);
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ pluginVersion: defaultQuery.pluginVersion }));
       // wait to load
@@ -37,7 +37,7 @@ describe('QueryEditor', () => {
 
     it('should set the default raw mode', async () => {
       const onChange = jest.fn();
-      const query = { ...mockQuery, rawMode: undefined };
+      const query = { ...mockQuery, rawMode: undefined, database: 'test-db' };
       const ds = mockDatasource();
       ds.getDefaultEditorMode = jest.fn().mockReturnValue(EditorMode.Raw);
       ds.getClusters = jest.fn().mockResolvedValue([]);
@@ -62,7 +62,16 @@ describe('QueryEditor', () => {
         },
       });
       ds.getClusters = jest.fn().mockResolvedValue([]);
-      render(<QueryEditor {...defaultProps} datasource={ds} />);
+      render(
+        <QueryEditor
+          {...defaultProps}
+          datasource={ds}
+          query={{
+            ...mockQuery,
+            database: 'test-db',
+          }}
+        />
+      );
       await waitFor(() => screen.getByText('Could not load datasource schema'));
       await waitFor(() => screen.getByText('Boom!'));
     });
@@ -71,7 +80,16 @@ describe('QueryEditor', () => {
       const ds = mockDatasource();
       ds.getClusters = jest.fn().mockResolvedValue([]);
       ds.getSchema = jest.fn().mockRejectedValue('Boom!');
-      render(<QueryEditor {...defaultProps} datasource={ds} />);
+      render(
+        <QueryEditor
+          {...defaultProps}
+          datasource={ds}
+          query={{
+            ...mockQuery,
+            database: 'test-db',
+          }}
+        />
+      );
       await waitFor(() => screen.getByText('Could not load datasource schema'));
       await waitFor(() => screen.getByText('Boom!'));
     });

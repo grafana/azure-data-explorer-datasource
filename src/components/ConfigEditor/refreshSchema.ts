@@ -13,7 +13,7 @@ export async function refreshSchema(datasource: AdxDataSource): Promise<Schema> 
   const databases: Array<{ label: string; value: string }> = [];
   const schemaMappingOptions: SchemaMappingOption[] = [];
 
-  const schema = await datasource.getSchema('');
+  const schema = await datasource.getSchema('', '');
   for (const database of Object.values(schema.Databases)) {
     databases.push({
       label: database.Name,
