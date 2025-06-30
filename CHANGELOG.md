@@ -4,6 +4,7 @@
 
 - Improve performance of schema loading (#1333)
 - Add support for comparison operators with `datetime` and `timespan` types (#1291)
+- Dependency updates
 
 ## [6.0.3]
 
@@ -36,7 +37,7 @@
 ## [6.0.1]
 
 - Update import from Grafana llm library [#1267](https://github.com/grafana/azure-data-explorer-datasource/pull/1267)
-- Fix: Remove us of http.DefaultClient
+- Fix: Remove use of http.DefaultClient
 
 ## [6.0.0]
 
