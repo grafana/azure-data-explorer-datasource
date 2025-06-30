@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [6.1.0]
+
+- Improve performance of schema loading (#1333)
+- Add support for comparison operators with `datetime` and `timespan` types (#1291)
+
 ## [6.0.3]
 
 - Improve OBO related error messages (#1283)
