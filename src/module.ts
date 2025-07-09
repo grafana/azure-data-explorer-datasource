@@ -10,7 +10,7 @@ import { AdxDataSourceOptions, AdxDataSourceSecureOptions, KustoQuery } from './
 import EditorHelp from 'components/QueryEditor/EditorHelp';
 import { analyzeQueries, trackADXMonitorDashboardLoaded } from 'tracking';
 
-initPluginTranslations(pluginJson.id);
+await initPluginTranslations(pluginJson.id);
 
 export const plugin = new DataSourcePlugin<AdxDataSource, KustoQuery, AdxDataSourceOptions, AdxDataSourceSecureOptions>(
   AdxDataSource
