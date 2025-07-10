@@ -1,0 +1,266 @@
+{
+  "components": {
+    "aggregate-item": {
+      "aggregate-item-function-aria-label-function": "함수",
+      "aria-label-column": "열",
+      "aria-label-percentile": "백분위",
+      "aria-label-remove": "제거",
+      "of": "/"
+    },
+    "aggregate-section": {
+      "label-aggregate": "집계"
+    },
+    "application-config": {
+      "aria-label-application": "애플리케이션",
+      "description-application-displayed": "ADX에 표시할 애플리케이션 이름입니다.",
+      "label-application-name-optional": "애플리케이션 이름(선택 사항)"
+    },
+    "azure-credentials-form": {
+      "aad-client-id-aria-label-client-id": "클라이언트 ID",
+      "aad-client-secret-aria-label-client-secret": "클라이언트 시크릿",
+      "aad-client-secret-configured-aria-label-client-secret": "클라이언트 시크릿",
+      "aad-client-secret-configured-placeholder-configured": "구성됨",
+      "aad-tenant-id-aria-label-tenant-id": "테넌트 ID",
+      "aria-label-azure-cloud": "Azure Cloud",
+      "auth-type-options": {
+        "label": {
+          "app-registration-on-behalf-of": "앱 등록(대리)",
+          "current-user": "현재 사용자",
+          "managed-identity": "관리 ID",
+          "workload-identity": "워크로드 ID"
+        },
+        "opts": {
+          "label": {
+            "app-registration": "앱 등록"
+          }
+        }
+      },
+      "description-choose-authentication-azure-services": "Azure 서비스에 대한 인증 유형을 선택하세요.",
+      "description-current-user-authentication-is-experimental": "특정 Grafana 기능(예: 경고)이 예상대로 작동하지 않을 수 있습니다. 기타 알려진 제한 사항 및 문제, 버그 신고 또는 피드백은 <2>문서</2>를 참조하세요.",
+      "description-on-behalf-of-feature-is-in-beta": "알려진 제한 사항 및 문제, 버그 신고 또는 피드백은 <2>문서</2>를 참조하세요.",
+      "error-client-id-required": "클라이언트 ID가 필요합니다",
+      "error-client-secret-required": "클라이언트 시크릿이 필요합니다",
+      "error-tenant-id-required": "테넌트 ID가 필요합니다",
+      "label-application-client-id": "애플리케이션(클라이언트) ID",
+      "label-authentication-method": "인증 방법",
+      "label-azure-cloud": "Azure Cloud",
+      "label-client-secret": "클라이언트 시크릿",
+      "label-directory-tenant-id": "디렉터리(테넌트) ID",
+      "reset": "재설정",
+      "title-authentication": "인증",
+      "title-current-user-authentication-is-experimental": "현재 사용자 인증은 시험 단계입니다.",
+      "title-on-behalf-of-feature-is-in-beta": "대리 기능은 베타 버전입니다."
+    },
+    "config-editor": {
+      "description-additional-settings": "추가 설정은 데이터 소스를 보다 세부적으로 제어하기 위해 구성할 수 있는 선택적 설정입니다. 여기에는 쿼리 최적화, 스키마 설정, 추적 구성 및 OpenAI 구성이 포함됩니다.",
+      "label-enable": "활성화",
+      "secure-socks-proxy": "보안 SOCKS 프록시",
+      "title-additional-settings": "추가 설정",
+      "tooltip-enable": "보안 SOCKS 프록시를 통해 다른 네트워크로의 데이터 소스 연결에 프록시를 사용 설정합니다. <2>데이터 소스 연결 프록시 구성</2>에서 확인할 수 있습니다."
+    },
+    "config-help": {
+      "configure-the-connection-in-grafana": "3. Grafana에서 연결 구성",
+      "configuring-azure-explorer-database": "Azure 및 Azure 데이터 탐색기 데이터베이스 구성",
+      "connect-application-database": "2. AAD 애플리케이션을 데이터베이스 사용자에 연결",
+      "connect-application-database-description": "Azure Portal을 통해 Azure 데이터 탐색기 웹 UI로 이동합니다. 1단계에서 만든 AAD 애플리케이션에 Azure 데이터 탐색기 데이터베이스에 대한 뷰어 액세스 권한을 부여해야 합니다. 도트 명령어 <1>{{dotCommand}}</1>을 사용하여 수행할 수 있습니다.",
+      "create-an-aad-application": "1. AAD 애플리케이션 생성",
+      "create-an-aad-application-description": "Azure Portal 또는 Azure CLI를 사용하여 생성하는 방법에 대한 자세한 내용은 <2>여기</2>에서 확인할 수 있습니다.",
+      "detailed-instructions": "세 단계 모두에 대한 자세한 지침은 <2>문서</2>에서 확인할 수 있습니다.",
+      "dot-command-example": "{{dotCommand}} database your_db_name viewers (&lsquo;{{key}}=your_client_id;your_tenant_id&rsquo;)",
+      "save-and-test": "1단계의 AAD 서비스 원칙의 세부 정보를 사용하여 아래 필드를 채웁니다. 그다음 저장 및 테스트 버튼을 클릭합니다.",
+      "title-configuration-help": "구성 도움말"
+    },
+    "connection-config": {
+      "aria-label-cluster-url": "클러스터 URL",
+      "description-default-cluster-source": "이 데이터 소스의 기본 클러스터 URL입니다.",
+      "label-default-cluster-url-optional": "기본 클러스터 URL(선택 사항)"
+    },
+    "database-config": {
+      "add-mapping": "매핑 추가",
+      "aria-label-choose-default-database": "기본 데이터베이스 선택",
+      "aria-label-remove": "제거",
+      "description-configuration-database-schema-including-default": "기본 데이터베이스를 포함한 데이터베이스 스키마에 대한 구성입니다.",
+      "description-use-managed-schema": "활성화하면 테이블, 함수 및 구현된 뷰를 사용자 친화적인 이름으로 매핑할 수 있습니다.",
+      "label-default-database": "기본 데이터베이스",
+      "label-schema-mappings": "스키마 매핑",
+      "label-use-managed-schema": "관리형 스키마 사용",
+      "placeholder-name": "이름",
+      "placeholder-target": "대상",
+      "reload-schema": "스키마 다시 불러오기",
+      "title-database-schema-settings": "데이터베이스 스키마 설정",
+      "title-error-updating-azure-data-explorer-schema": "Azure 데이터 탐색기 스키마 업데이트 중 오류 발생"
+    },
+    "editor-help": {
+      "adx-query-editor-help": "ADX 쿼리 편집기 도움말",
+      "can-return-any-set-of-columns": "모든 열 세트를 반환할 수 있습니다.",
+      "escape-multi": "{{macro}}($myTemplateVar): $myTemplateVar는 부적절한 문자를 포함한 다중 값 템플릿 변수여야 합니다.",
+      "example-adx-time-series-query": "ADX 시계열 쿼리 예:",
+      "example-time-series-query": "예시 시계열 쿼리:",
+      "format": "형식",
+      "format-as-adx-time-series": "ADX 시계열 형식:",
+      "format-as-table": "테이블 형식:",
+      "format-as-time-series": "시계열 형식:",
+      "format-as-time-series-description": "정확히 하나의 Kusto 유형 날짜/시간 열이 필요합니다. (팁: Kusto의 {{operatorName}} 연산자를 사용하여 열을 제거할 수 있습니다).",
+      "format-description": "'형식 지정' 선택기로 ADX에서 반환된 데이터 형식을 수정할 수 있습니다. 각 옵션에 대한 상세 정보는 다음과 같습니다.",
+      "macro-examples": "매크로 예시:",
+      "macros": "매크로",
+      "macros-description": "매크로를 사용하여 Grafana에서 설정한 매개변수에 따라 특정 값을 자동으로 대체할 수 있습니다.",
+      "must-have-timestamp": "'{{requiredColumn}}'라는 이름의 날짜/시간 열이 있어야 합니다.",
+      "optional-string-columns": "선택적으로 하나 이상의 문자열 열을 포함할 수 있습니다. 각 문자열 열은 key=value 태그 쌍으로 간주됩니다(key는 열 이름, value는 각 행의 열 값입니다).",
+      "requires-one-number-column": "숫자 유형의 값 열이 하나 이상 필요합니다. 각 값 열은 메트릭으로 간주됩니다.",
+      "return-time-series": "{{operatorName}} 연산자와 같이 Kusto의 '시계열' 유형을 반환하는 쿼리에 사용됩니다.",
+      "templating-macros": "템플릿 매크로:",
+      "time-from": "{{macro}}: {{example}}. 쿼리 시작 시간",
+      "time-interval": "{{macro}}: {{example}}. 쿼리 시간 범위를 기준으로 Grafana에서 권장하는 구간(bin) 크기(ms)",
+      "time-macros": "시간 매크로:",
+      "time-series-returned": "각 값 열과 고유 문자열 열 값 세트에 대해 시계열이 반환됩니다. 각 시계열에는 valueColumnName stringColumnName=columnValue, ...등의 이름이 있습니다. 요청에 문자열 열이 없는 경, 이름은 그냥 valueColumnName으로 지정됩니다.",
+      "time-to": "{{macro}}: {{example}}. 쿼리 종료 시간",
+      "using-all": "'모두' 옵션을 사용하는 경우 모든 옵션 포함 확인란을 선택하고 모든 값 사용자 지정 필드에 다음을 입력: {{valueToType}}. '모두'가 선택된 경우 -> 1 == 1"
+    },
+    "filter-item": {
+      "aria-label-column": "열",
+      "aria-label-column-datetime-value": "열 날짜/시간 값",
+      "aria-label-column-number-value": "열 번호 값",
+      "aria-label-column-value": "열 값",
+      "aria-label-operator": "작업 수행자",
+      "aria-label-remove": "제거",
+      "or": "또는"
+    },
+    "filter-section": {
+      "add-group": "그룹 추가",
+      "and": "그리고",
+      "label-filters": "필터"
+    },
+    "group-by-item": {
+      "aria-label-column": "열",
+      "aria-label-interval": "간격",
+      "aria-label-remove": "제거",
+      "label": {
+        "1-day": "1일",
+        "1-hour": "1시간",
+        "1-minute": "1분",
+        "12-hours": "12시간",
+        "15-minutes": "15분",
+        "30-minutes": "30분",
+        "5-minutes": "5분",
+        "6-hours": "6시간",
+        "auto": "자동"
+      }
+    },
+    "group-by-section": {
+      "label-group-by": "그룹화 기준"
+    },
+    "kqlpreview": {
+      "hide": "숨기기",
+      "label-query-preview": "쿼리 미리보기",
+      "show": "표시"
+    },
+    "open-aieditor": {
+      "alert-enable-plugin-feature": "<2>카탈로그</2>에서 LLM 플러그인을 설치합니다. 그런 다음 <5>활성화</5>할 수 있습니다.",
+      "button-generate-query": "쿼리 생성",
+      "generated-query": "생성된 쿼리",
+      "open-ai-generate-query": "OpenAI에 KQL 쿼리 생성 요청",
+      "run-query": "쿼리 실행",
+      "title-enable-plugin-feature": "이 기능을 사용하려면 LLM 플러그인을 활성화해야 합니다."
+    },
+    "query-config": {
+      "data-consistency-options": {
+        "label": {
+          "strong": "강함",
+          "weak": "약함"
+        }
+      },
+      "description-cache-max-age": "기본적으로 캐시는 비활성화되어 있습니다. 쿼리 캐싱을 사용하려면 캐시가 유지되는 최대 시간을 지정하세요.",
+      "description-data-consistency": "쿼리 일관성은 쿼리 및 업데이트가 동기화되는 방식을 제어합니다. 기본값은 '강함'입니다. 자세한 내용은 <2>Azure 데이터 탐색기 문서</2>에서 확인할 수 있습니다.",
+      "description-default-editor-mode": "이 설정은 편집기가 열리는 모드를 지정합니다. 기본값은 '비주얼'입니다.",
+      "description-use-dynamic-caching": "이 기능을 활성화하면 Grafana가 쿼리별로 캐시 설정을 동적으로 적용하며, 기본 캐시 최대 사용 기간은 무시됩니다. 시계열 쿼리의 경우 구간 크기를 사용하여 시간 범위를 넓히고 캐시 최대 기간으로도 사용합니다.",
+      "description-value-controls-client-query-timeout": "이 값은 클라이언트 쿼리 타임아웃을 제어합니다.",
+      "description-various-settings-for-controlling-query-behavior": "쿼리 동작을 제어하기 위한 다양한 설정입니다.",
+      "editor-mode-options": {
+        "label": {
+          "raw": "Raw",
+          "visual": "비주얼"
+        }
+      },
+      "label-cache-max-age": "캐시 최대 기간",
+      "label-data-consistency": "데이터 일관성",
+      "label-default-editor-mode": "기본 편집기 모드",
+      "label-query-timeout": "쿼리 시간 초과",
+      "label-use-dynamic-caching": "동적 캐싱 사용",
+      "title-query-optimizations": "쿼리 최적화"
+    },
+    "query-editor": {
+      "title-could-not-load-datasource-schema": "데이터 소스 스키마를 불러올 수 없습니다."
+    },
+    "query-header": {
+      "aria-label-cluster": "클러스터",
+      "aria-label-database": "데이터베이스",
+      "body-lose-manual-changes": "비주얼 빌더로 돌아가면 쿼리에 대한 수동 변경 사항이 손실됩니다.",
+      "confirm-text": "확인",
+      "explain-kql": "KQL 설명",
+      "kql-explanation": "KQL 설명",
+      "label-cluster": "클러스터",
+      "label-database": "데이터베이스",
+      "label-format-as": "형식:",
+      "run-query": "쿼리 실행",
+      "text-loading": "로딩 중...",
+      "title-are-you-sure": "정말 진행하시겠어요?"
+    },
+    "table-section": {
+      "aria-label-columns": "열",
+      "aria-label-table": "테이블",
+      "label-columns": "열",
+      "label-table": "테이블",
+      "placeholder-all": "전체",
+      "tooltip-columns": "결과를 더 빠르게 확인하려면 열의 하위 집합을 선택하세요. 시계열에는 시간 값과 숫자 값이 모두 필요하며, 다른 열은 <2>차원</2>으로 렌더링됩니다."
+    },
+    "timeshift": {
+      "aria-label-add": "추가",
+      "aria-label-remove": "제거",
+      "aria-label-timeshift": "타임시프트",
+      "label": {
+        "day-before": "일 전",
+        "hour-before": "시간 전",
+        "no-timeshift": "타임시프트 없음",
+        "week-before": "주 전"
+      },
+      "label-timeshift": "타임시프트"
+    },
+    "tracking-config": {
+      "description-send-username-header-to-host": "이 기능을 활성화하면 Grafana는 ADX에 요청을 보낼 때 <2>{{userHeader}}</2> 헤더와 <4>{{clientRequestIdHeader}}</4> 헤더에서 로그인한 사용자의 사용자 이름을 전달합니다. ADX에서 추적이 필요한 경우 유용하게 사용할 수 있습니다.",
+      "label-send-username-header-to-host": "호스트에게 사용자 이름 헤더 보내기",
+      "title-tracking": "추적 중"
+    },
+    "use-template-variables": {
+      "label": {
+        "template-variables": "템플릿 변수"
+      }
+    },
+    "variable-editor": {
+      "aria-label-select-cluster": "클러스터 선택",
+      "aria-label-select-database": "데이터베이스 선택",
+      "aria-label-select-query-type": "쿼리 유형 선택",
+      "aria-label-select-table": "테이블 선택",
+      "label": {
+        "template-variables": "템플릿 변수"
+      },
+      "label-cluster": "클러스터",
+      "label-database": "데이터베이스",
+      "label-query-type": "쿼리 유형",
+      "label-table": "테이블",
+      "variable_type_options": {
+        "label": {
+          "clusters": "클러스터",
+          "columns": "열",
+          "databases": "데이터베이스",
+          "kusto-query": "Kusto 쿼리",
+          "tables": "테이블"
+        }
+      }
+    },
+    "visual-query-editor": {
+      "title-could-not-load-table-schema": "테이블 스키마를 불러올 수 없습니다.",
+      "title-table-schema-loaded-successfully-without-columns": "테이블 스키마를 불러왔지만 열이 없습니다."
+    }
+  }
+}
