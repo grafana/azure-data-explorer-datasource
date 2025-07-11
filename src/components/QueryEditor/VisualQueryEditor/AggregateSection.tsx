@@ -3,7 +3,7 @@ import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorList, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorReduceExpression } from 'types/expressions';
 import { AdxDataSource } from 'datasource';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeAggregate } from './utils/utils';
@@ -25,7 +25,10 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
   templateVariableOptions,
   onChange: onQueryChange,
 }) => {
-  const expressions = query.expression?.reduce?.expressions;
+  const expressions = useMemo(
+    () => query.expression?.reduce?.expressions || [],
+    [query.expression?.reduce?.expressions]
+  );
   const [aggregates, setAggregates] = useState(expressions);
   const [currentTable, setCurrentTable] = useState(query.expression?.from?.property.name);
 
@@ -37,7 +40,7 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
 
   useEffect(() => {
     // New table
-    if (currentTable !== query.expression.from?.property.name) {
+    if (currentTable !== query.expression?.from?.property.name) {
       // Reset state
       setAggregates([]);
       setCurrentTable(query.expression?.from?.property.name);

@@ -67,7 +67,7 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
   const ref = React.createRef<HTMLButtonElement>();
 
   useEffect(() => {
-    if (!filters.length && expressions?.length) {
+    if (!filters?.length && expressions?.length) {
       setFilters(expressions);
     }
   }, [filters.length, expressions]);
