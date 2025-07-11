@@ -1,0 +1,266 @@
+{
+  "components": {
+    "aggregate-item": {
+      "aggregate-item-function-aria-label-function": "Függvény",
+      "aria-label-column": "Oszlop",
+      "aria-label-percentile": "Percentilis",
+      "aria-label-remove": "Eltávolítás",
+      "of": "/"
+    },
+    "aggregate-section": {
+      "label-aggregate": "Összesített"
+    },
+    "application-config": {
+      "aria-label-application": "Alkalmazás",
+      "description-application-displayed": "Az ADX-ben megjelenítendő alkalmazás neve.",
+      "label-application-name-optional": "Alkalmazás neve (opcionális)"
+    },
+    "azure-credentials-form": {
+      "aad-client-id-aria-label-client-id": "Kliensazonosító",
+      "aad-client-secret-aria-label-client-secret": "Klienstitok",
+      "aad-client-secret-configured-aria-label-client-secret": "Klienstitok",
+      "aad-client-secret-configured-placeholder-configured": "konfigurált",
+      "aad-tenant-id-aria-label-tenant-id": "Bérlőazonosító",
+      "aria-label-azure-cloud": "Azure Cloud",
+      "auth-type-options": {
+        "label": {
+          "app-registration-on-behalf-of": "Alkalmazás regisztrációja (valaki nevében)",
+          "current-user": "Jelenlegi felhasználó",
+          "managed-identity": "Felügyelt identitás",
+          "workload-identity": "Munkaterhelés-azonosító"
+        },
+        "opts": {
+          "label": {
+            "app-registration": "Alkalmazás regisztrációja"
+          }
+        }
+      },
+      "description-choose-authentication-azure-services": "Válassza ki az Azure-szolgáltatások hitelesítési típusát",
+      "description-current-user-authentication-is-experimental": "Előfordulhat, hogy bizonyos Grafana-funkciók (pl. riasztás) nem az elvárt módon működnek. Egyéb ismert korlátozásokkal, problémákkal és hibajelentésekkel kapcsolatban vagy visszajelzésért tekintse meg a <2>dokumentációt</2>.",
+      "description-on-behalf-of-feature-is-in-beta": "Ismert korlátozásokkal, problémákkal és hibajelentésekkel kapcsolatban vagy visszajelzésért tekintse meg a <2>dokumentációt</2>.",
+      "error-client-id-required": "A kliensazonosító megadása kötelező",
+      "error-client-secret-required": "A klienstitok megadása kötelező",
+      "error-tenant-id-required": "A bérlőazonosító megadása kötelező",
+      "label-application-client-id": "Alkalmazás (kliens) azonosítója",
+      "label-authentication-method": "Hitelesítési módszer",
+      "label-azure-cloud": "Azure Cloud",
+      "label-client-secret": "Klienstitok",
+      "label-directory-tenant-id": "Címtár (bérlő) azonosítója",
+      "reset": "Visszaállítás",
+      "title-authentication": "Hitelesítés",
+      "title-current-user-authentication-is-experimental": "A jelenlegi felhasználói hitelesítés kísérleti jellegű",
+      "title-on-behalf-of-feature-is-in-beta": "A Valaki nevében funkció bétaverzióban érhető el"
+    },
+    "config-editor": {
+      "description-additional-settings": "A további beállítások olyan opcionális beállítások, amelyek konfigurálhatók az adatforrás nagyobb mértékű ellenőrzése érdekében. Ez magában foglalja a lekérdezésoptimalizálást, a sémabeállításokat, a nyomkövetési konfigurációt és az OpenAI-konfigurációt.",
+      "label-enable": "Engedélyezés",
+      "secure-socks-proxy": "Secure Socks Proxy",
+      "title-additional-settings": "További beállítások",
+      "tooltip-enable": "Engedélyezze az adatforrás-kapcsolat proxyelérését a biztonságos Socks-proxyn keresztül egy másik hálózathoz. Lásd: <2>Adatforrás-kapcsolat proxyjának konfigurálása.</2>"
+    },
+    "config-help": {
+      "configure-the-connection-in-grafana": "3. Konfigurálja a kapcsolatot a Grafanában",
+      "configuring-azure-explorer-database": "Az Azure és az Azure Data Explorer-adatbázis konfigurálása",
+      "connect-application-database": "2. Csatlakoztassa az AAD-alkalmazást egy adatbázis-felhasználóhoz",
+      "connect-application-database-description": "Navigáljon az Azure Data Explorer webes felhasználói felületére az Azure Portalon keresztül. Az 1. lépésben létrehozott AAD-alkalmazásnak megtekintői hozzáférést kell kapnia az Azure Data Explorer-adatbázishoz. Ezt a(z) <1>{{dotCommand}}</1> dot parancs segítségével teheti meg:",
+      "create-an-aad-application": "1. Hozzon létre egy AAD-alkalmazást",
+      "create-an-aad-application-description": "Az Azure portálon vagy az Azure CLI használatával történő létrehozás részletei <2>itt találhatók.</2>",
+      "detailed-instructions": "A három lépésről részletes leírás található a <2>dokumentációban.</2>",
+      "dot-command-example": "{{dotCommand}} database saját_adatbázis_neve viewers (&lsquo;{{key}}=saját_kliens_azonosítója;saját_bérlő_azonosítója&rsquo;)",
+      "save-and-test": "Használja az 1. lépésben szereplő AAD-szolgáltatási elv adatait az alábbi mező kitöltéséhez. Ezután kattintson a Mentés és tesztelés gombra.",
+      "title-configuration-help": "Konfigurációs súgó"
+    },
+    "connection-config": {
+      "aria-label-cluster-url": "Fürt-URL",
+      "description-default-cluster-source": "Az adatforrás alapértelmezett fürt-URL-címe.",
+      "label-default-cluster-url-optional": "Alapértelmezett fürt-URL (opcionális)"
+    },
+    "database-config": {
+      "add-mapping": "Hozzárendelés hozzáadása",
+      "aria-label-choose-default-database": "Válassza ki az alapértelmezett adatbázist",
+      "aria-label-remove": "Eltávolítás",
+      "description-configuration-database-schema-including-default": "Az adatbázisséma konfigurációja, beleértve az alapértelmezett adatbázist is.",
+      "description-use-managed-schema": "Ha engedélyezve van, lehetővé teszi a táblázatok, függvények és materializált nézetek hozzárendelését felhasználóbarát nevekhez.",
+      "label-default-database": "Alapértelmezett adatbázis",
+      "label-schema-mappings": "Séma-hozzárendelések",
+      "label-use-managed-schema": "Felügyelt séma használata",
+      "placeholder-name": "Név",
+      "placeholder-target": "Cél",
+      "reload-schema": "Séma újbóli betöltése",
+      "title-database-schema-settings": "Adatbázisséma beállításai",
+      "title-error-updating-azure-data-explorer-schema": "Hiba történt az Azure Data Explorer-séma frissítésekor"
+    },
+    "editor-help": {
+      "adx-query-editor-help": "ADX-lekérdezésszerkesztő súgója",
+      "can-return-any-set-of-columns": "Bármely oszlopkészletet visszaadhatja.",
+      "escape-multi": "{{macro}}($myTemplateVar): A $myTemplateVar változónak többértékű sablonváltozónak kell lennie, amely nem megengedett karaktereket tartalmaz",
+      "example-adx-time-series-query": "Példa ADX-idősorlekérdezésre:",
+      "example-time-series-query": "Példa idősorlekérdezésre:",
+      "format": "Formátum",
+      "format-as-adx-time-series": "Formázás ADX-idősorként:",
+      "format-as-table": "Formázás táblázatként:",
+      "format-as-time-series": "Formázás idősorként:",
+      "format-as-time-series-description": "Pontosan egy Kusto típusú dátum-idő oszlopot igényel. (Tipp: a Kusto {{operatorName}} operátorával eltávolíthatja az oszlopokat.)",
+      "format-description": "Az ADX által visszaküldött adatok formátuma a „Formázás másként” választóval módosítható. Íme az egyes lehetőségek további részletei:",
+      "macro-examples": "Példák makrókra:",
+      "macros": "Makrók",
+      "macros-description": "A makrók segítségével automatikusan helyettesíthetők bizonyos értékek a Grafanában beállított paraméterek alapján:",
+      "must-have-timestamp": "Szükség van egy „{{requiredColumn}}” nevű dátum-idő oszlopra",
+      "optional-string-columns": "Opcionálisan rendelkezhet egy vagy több karakterláncos oszloppal. Minden karakterláncos oszlop kulcs=érték címkepárnak minősül (ahol a kulcs az oszlop neve, az érték pedig az oszlop értéke az egyes sorok esetében).",
+      "requires-one-number-column": "Legalább egy szám típusú értékoszlop szükséges. Minden értékoszlop metrikának minősül.",
+      "return-time-series": "Olyan lekérdezésekhez használható, amelyek a Kusto „idősor” típusát adják vissza, például a(z) {{operatorName}} operátor",
+      "templating-macros": "Makrók sablonozása:",
+      "time-from": "{{macro}}: {{example}}. A lekérdezés kezdési időpontja",
+      "time-interval": "{{macro}}: {{example}}. A Grafana által ajánlott tárolóméret a lekérdezés időtartama alapján, ms-ban",
+      "time-macros": "Időmakrók:",
+      "time-series-returned": "Minden egyes értékoszlophoz és a karakterlánc-oszlopértékek minden egyes egyedi készletéhez a program egy idősort ad vissza. Minden sorozat neve valueColumnName stringColumnName=columnValue, … Ha a kérésben nincsenek karakterláncoszlopok, a név csak valueColumnName lesz.",
+      "time-to": "{{macro}}: {{example}}. A lekérdezés befejezési időpontja",
+      "using-all": "Ha az Összes lehetőséget használja, akkor jelölje be az Összes használata jelölőnégyzetet, és az Összes egyedi érték mezőbe írja be a következőt: {{valueToType}}. Ha az Összes lehetőséget választotta -> 1 == 1"
+    },
+    "filter-item": {
+      "aria-label-column": "Oszlop",
+      "aria-label-column-datetime-value": "Oszlop dátum-idő értéke",
+      "aria-label-column-number-value": "Oszlop számértéke",
+      "aria-label-column-value": "Oszlopérték",
+      "aria-label-operator": "Operátor",
+      "aria-label-remove": "Eltávolítás",
+      "or": "VAGY"
+    },
+    "filter-section": {
+      "add-group": "Csoport hozzáadása",
+      "and": "ÉS",
+      "label-filters": "Szűrők"
+    },
+    "group-by-item": {
+      "aria-label-column": "Oszlop",
+      "aria-label-interval": "Intervallum",
+      "aria-label-remove": "Eltávolítás",
+      "label": {
+        "1-day": "1 nap",
+        "1-hour": "1 óra",
+        "1-minute": "1 perc",
+        "12-hours": "12 óra",
+        "15-minutes": "15 perc",
+        "30-minutes": "30 perc",
+        "5-minutes": "5 perc",
+        "6-hours": "6 óra",
+        "auto": "automatikus"
+      }
+    },
+    "group-by-section": {
+      "label-group-by": "Csoportosítási szempont"
+    },
+    "kqlpreview": {
+      "hide": "elrejtés",
+      "label-query-preview": "Lekérdezés előnézete",
+      "show": "megjelenítés"
+    },
+    "open-aieditor": {
+      "alert-enable-plugin-feature": "Telepítse az LLM-bővítményt a <2>katalógusból</2>. Ezután <5>engedélyezheti</5>.",
+      "button-generate-query": "Lekérdezés generálása",
+      "generated-query": "Generált lekérdezés",
+      "open-ai-generate-query": "Kérje meg az OpenAI-t, hogy hozzon létre egy KQL-lekérdezést",
+      "run-query": "Lekérdezés futtatása",
+      "title-enable-plugin-feature": "A funkció használatához engedélyeznie kell az LLM-bővítményt."
+    },
+    "query-config": {
+      "data-consistency-options": {
+        "label": {
+          "strong": "Erős",
+          "weak": "Gyenge"
+        }
+      },
+      "description-cache-max-age": "Alapértelmezés szerint a gyorsítótár le van tiltva. Ha engedélyezni szeretné a lekérdezés gyorsítótárazását, adja meg a gyorsítótár maximális időtartamát.",
+      "description-data-consistency": "A lekérdezési konzisztencia szabályozza a lekérdezések és frissítések szinkronizálási módját. Alapértelmezett érték: Erős. További információért tekintse meg az <2>Azure Data Explorer dokumentációját.</2>",
+      "description-default-editor-mode": "Ez a beállítás határozza meg, hogy a szerkesztő melyik módban nyílik meg. Alapértelmezett érték: Vizuális.",
+      "description-use-dynamic-caching": "A funkció engedélyezésével a Grafana dinamikusan lekérdezésenként alkalmazza a gyorsítótár-beállításokat, és a gyorsítótár alapértelmezett maximális korát figyelmen kívül hagyja. Az idősor-lekérdezésekhez a tárolóméretet fogjuk használni az időtartomány kiszélesítéséhez, valamint a gyorsítótár maximális koraként is.",
+      "description-value-controls-client-query-timeout": "Ez az érték szabályozza a klienslekérdezés időtúllépését.",
+      "description-various-settings-for-controlling-query-behavior": "Különböző beállítások a lekérdezési viselkedés vezérléséhez.",
+      "editor-mode-options": {
+        "label": {
+          "raw": "Nyers",
+          "visual": "Vizuális"
+        }
+      },
+      "label-cache-max-age": "Gyorsítótár maximális kora",
+      "label-data-consistency": "Adatkonzisztencia",
+      "label-default-editor-mode": "Alapértelmezett szerkesztési mód",
+      "label-query-timeout": "Lekérdezési időtúllépés",
+      "label-use-dynamic-caching": "Dinamikus gyorsítótár használata",
+      "title-query-optimizations": "Lekérdezésoptimalizálás"
+    },
+    "query-editor": {
+      "title-could-not-load-datasource-schema": "Nem sikerült betölteni az adatforrás sémáját"
+    },
+    "query-header": {
+      "aria-label-cluster": "Fürt",
+      "aria-label-database": "Adatbázis",
+      "body-lose-manual-changes": "Ha visszatér a vizuális építőhöz, elveszíti a lekérdezésen végzett manuális módosításokat.",
+      "confirm-text": "Megerősítés",
+      "explain-kql": "KQL-magyarázat",
+      "kql-explanation": "A KQL magyarázata",
+      "label-cluster": "Fürt",
+      "label-database": "Adatbázis",
+      "label-format-as": "Formázás másként",
+      "run-query": "Lekérdezés futtatása",
+      "text-loading": "Betöltés…",
+      "title-are-you-sure": "Biztos benne?"
+    },
+    "table-section": {
+      "aria-label-columns": "Oszlopok",
+      "aria-label-table": "Táblázat",
+      "label-columns": "Oszlopok",
+      "label-table": "Táblázat",
+      "placeholder-all": "Összes",
+      "tooltip-columns": "Válassza ki az oszlopok egy részhalmazát a gyorsabb eredmények érdekében. Az idősorokhoz idő- és számértékek egyaránt szükségesek, a többi oszlop <2>dimenzióként</2> jelenik meg."
+    },
+    "timeshift": {
+      "aria-label-add": "Hozzáadás",
+      "aria-label-remove": "Eltávolítás",
+      "aria-label-timeshift": "Időeltolás",
+      "label": {
+        "day-before": "1 nappal korábban",
+        "hour-before": "1 órával korábban",
+        "no-timeshift": "Nincs időeltolás",
+        "week-before": "1 héttel korábban"
+      },
+      "label-timeshift": "Időeltolás"
+    },
+    "tracking-config": {
+      "description-send-username-header-to-host": "Ha ez a funkció engedélyezve van, a Grafana átadja a bejelentkezett felhasználó felhasználónevét a(z) <2>{{userHeader}}</2> fejlécben és a(z) <4>{{clientRequestIdHeader}}</4> fejlécben, amikor kéréseket küld az ADX-nek. Hasznos lehet, ha a nyomkövetést az ADX-ben kell elvégezni.",
+      "label-send-username-header-to-host": "Felhasználónév-fejléc küldése az állomásnak",
+      "title-tracking": "Nyomkövetés"
+    },
+    "use-template-variables": {
+      "label": {
+        "template-variables": "Sablonváltozók"
+      }
+    },
+    "variable-editor": {
+      "aria-label-select-cluster": "Fürt kiválasztása",
+      "aria-label-select-database": "Adatbázis kiválasztása",
+      "aria-label-select-query-type": "Lekérdezéstípus kiválasztása",
+      "aria-label-select-table": "Táblázat kiválasztása",
+      "label": {
+        "template-variables": "Sablonváltozók"
+      },
+      "label-cluster": "Fürt",
+      "label-database": "Adatbázis",
+      "label-query-type": "Lekérdezés típusa",
+      "label-table": "Táblázat",
+      "variable_type_options": {
+        "label": {
+          "clusters": "Fürtök",
+          "columns": "Oszlopok",
+          "databases": "Adatbázisok",
+          "kusto-query": "Kusto-lekérdezés",
+          "tables": "Táblázatok"
+        }
+      }
+    },
+    "visual-query-editor": {
+      "title-could-not-load-table-schema": "Nem sikerült betölteni a táblázatsémát",
+      "title-table-schema-loaded-successfully-without-columns": "A táblázatséma sikeresen betöltődött, de oszlopok nélkül"
+    }
+  }
+}

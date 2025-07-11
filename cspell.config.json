@@ -14,7 +14,8 @@
     "playwright-report",
     "src/dashboards/**",
     "src/libs/**",
-    "yarn.lock"
+    "yarn.lock",
+    "src/locales/**"
   ],
   "words": [
     "",

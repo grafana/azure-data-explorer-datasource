@@ -1,0 +1,266 @@
+{
+  "components": {
+    "aggregate-item": {
+      "aggregate-item-function-aria-label-function": "Функция",
+      "aria-label-column": "Столбец",
+      "aria-label-percentile": "Процентиль",
+      "aria-label-remove": "Удалить",
+      "of": "из"
+    },
+    "aggregate-section": {
+      "label-aggregate": "Агрегировать"
+    },
+    "application-config": {
+      "aria-label-application": "Приложение",
+      "description-application-displayed": "Имя приложения, которое будет отображаться в ADX.",
+      "label-application-name-optional": "Имя приложения (необязательно)"
+    },
+    "azure-credentials-form": {
+      "aad-client-id-aria-label-client-id": "Идентификатор клиента",
+      "aad-client-secret-aria-label-client-secret": "Секрет клиента",
+      "aad-client-secret-configured-aria-label-client-secret": "Секрет клиента",
+      "aad-client-secret-configured-placeholder-configured": "установлен",
+      "aad-tenant-id-aria-label-tenant-id": "Идентификатор клиента",
+      "aria-label-azure-cloud": "Azure Cloud",
+      "auth-type-options": {
+        "label": {
+          "app-registration-on-behalf-of": "Регистрация приложения (поток «От имени»)",
+          "current-user": "Текущий пользователь",
+          "managed-identity": "Управляемое удостоверение",
+          "workload-identity": "Удостоверение рабочей нагрузки"
+        },
+        "opts": {
+          "label": {
+            "app-registration": "Регистрация приложения"
+          }
+        }
+      },
+      "description-choose-authentication-azure-services": "Выберите тип аутентификации для служб Azure",
+      "description-current-user-authentication-is-experimental": "Некоторые функции Grafana (например, оповещения) могут работать не так, как ожидается. Подробнее о других известных ограничениях и проблемах, отчетах об ошибках и обратной связи см. в <2>документации</2>.",
+      "description-on-behalf-of-feature-is-in-beta": "Подробнее об известных ограничениях и проблемах, отчетах об ошибках и обратной связи см. в <2>документации</2>.",
+      "error-client-id-required": "Требуется идентификатор клиента",
+      "error-client-secret-required": "Требуется секрет клиента",
+      "error-tenant-id-required": "Требуется идентификатор клиента",
+      "label-application-client-id": "Идентификатор приложения (клиента)",
+      "label-authentication-method": "Метод аутентификации",
+      "label-azure-cloud": "Azure Cloud",
+      "label-client-secret": "Секрет клиента",
+      "label-directory-tenant-id": "Идентификатор каталога (клиента)",
+      "reset": "Сброс",
+      "title-authentication": "Аутентификация",
+      "title-current-user-authentication-is-experimental": "Аутентификация текущего пользователя осуществляется в экспериментальном режиме",
+      "title-on-behalf-of-feature-is-in-beta": "Функция «От имени» находится в режиме бета-тестирования"
+    },
+    "config-editor": {
+      "description-additional-settings": "Дополнительные параметры — это необязательные параметры, которые можно настроить для получения большего контроля над источником данных. Сюда входят оптимизация запросов, параметры схемы, настройка отслеживания и конфигурация OpenAI.",
+      "label-enable": "Включить",
+      "secure-socks-proxy": "Безопасный Socks-прокси",
+      "title-additional-settings": "Дополнительные параметры",
+      "tooltip-enable": "Включите проксирование подключения источника данных через безопасный Socks-прокси к другой сети. См. раздел <2>Настройка прокси для подключения источника данных.</2>"
+    },
+    "config-help": {
+      "configure-the-connection-in-grafana": "3. Настройте подключение в Grafana",
+      "configuring-azure-explorer-database": "Настройка Azure и базы данных Azure Data Explorer",
+      "connect-application-database": "2. Подключите приложение AAD к пользователю базы данных",
+      "connect-application-database-description": "Перейдите в веб-интерфейс Azure Data Explorer через портал Azure. Приложению AAD, созданному при выполнении шага 1, необходим доступ для просмотра базы данных Azure Data Explorer. Для этого используйте команду с точкой <1>{{dotCommand}}</1>:",
+      "create-an-aad-application": "1. Создайте приложение AAD",
+      "create-an-aad-application-description": "Подробнее о создании приложения через портал Azure или Azure CLI см. <2>здесь.</2>",
+      "detailed-instructions": "Подробные инструкции по всем трем шагам см. <2>в документации.</2>",
+      "dot-command-example": "{{dotCommand}} средства просмотра базы данных your_db_name (&lsquo;{{key}}=your_client_id;your_tenant_id&rsquo;)",
+      "save-and-test": "Используйте данные, полученные от субъекта-службы AAD при выполнении шага 1, чтобы заполнить поле ниже. Затем нажмите кнопку «Сохранить и протестировать».",
+      "title-configuration-help": "Справка по конфигурации"
+    },
+    "connection-config": {
+      "aria-label-cluster-url": "URL-адрес кластера",
+      "description-default-cluster-source": "URL-адрес кластера, используемый по умолчанию для этого источника данных.",
+      "label-default-cluster-url-optional": "URL-адрес кластера по умолчанию (необязательно)"
+    },
+    "database-config": {
+      "add-mapping": "Добавить сопоставление",
+      "aria-label-choose-default-database": "выбрать базу данных по умолчанию",
+      "aria-label-remove": "Удалить",
+      "description-configuration-database-schema-including-default": "Конфигурация для схемы базы данных, включая базу данных по умолчанию.",
+      "description-use-managed-schema": "Если этот параметр включен, таблицы, функции и материализованные представления могут быть сопоставлены с простыми для пользователя именами.",
+      "label-default-database": "База данных по умолчанию",
+      "label-schema-mappings": "Сопоставления схем",
+      "label-use-managed-schema": "Использовать управляемую схему",
+      "placeholder-name": "Имя",
+      "placeholder-target": "Цель",
+      "reload-schema": "Перезагрузить схему",
+      "title-database-schema-settings": "Параметры схемы базы данных",
+      "title-error-updating-azure-data-explorer-schema": "Ошибка обновления схемы Azure Data Explorer"
+    },
+    "editor-help": {
+      "adx-query-editor-help": "Справка по редактору запросов ADX",
+      "can-return-any-set-of-columns": "Возвращает любой набор столбцов.",
+      "escape-multi": "{{macro}}($myTemplateVar): переменная $myTemplateVar должна быть многозначной переменной шаблона, содержащей недопустимые символы",
+      "example-adx-time-series-query": "Пример запроса временных рядов в ADX:",
+      "example-time-series-query": "Пример запроса временных рядов:",
+      "format": "Формат",
+      "format-as-adx-time-series": "Форматировать как временные ряды в ADX:",
+      "format-as-table": "Форматировать как таблицу:",
+      "format-as-time-series": "Форматировать как временные ряды:",
+      "format-as-time-series-description": "Требуется ровно один столбец даты и времени Kusto. (Совет: для удаления столбцов можно использовать оператор {{operatorName}} Kusto.)",
+      "format-description": "Формат данных, возвращаемых ADX, можно изменить с помощью селектора «Форматировать как». Ниже приведены подробные сведения о каждом параметре:",
+      "macro-examples": "Примеры макросов:",
+      "macros": "Макросы",
+      "macros-description": "Макросы можно использовать для автоматической подстановки определенных значений на основе параметров, заданных в Grafana:",
+      "must-have-timestamp": "Требуется столбец даты и времени с именем «{{requiredColumn}}»",
+      "optional-string-columns": "Может дополнительно иметь один или несколько столбцов строк. Каждый столбец строк рассматривается как пара тегов «ключ=значение» (где ключ — это имя столбца, а значение — это значение столбца для каждой строки).",
+      "requires-one-number-column": "Требуется хотя бы один столбец значений числового типа. Каждый столбец значений считается метрикой.",
+      "return-time-series": "Используется для запросов, которые возвращают «временной ряд» Kusto, например, оператор {{operatorName}}",
+      "templating-macros": "Обработка шаблонов макросов:",
+      "time-from": "{{macro}}: {{example}}. Время начала запроса",
+      "time-interval": "{{macro}}: {{example}}. Рекомендуемый Grafana размер бина на основе временного диапазона запроса в мс",
+      "time-macros": "Макросы времени:",
+      "time-series-returned": "Временной ряд возвращается для каждого столбца значений и уникального набора значений столбца строк. Каждый ряд имеет имя valueColumnName stringColumnName=columnValue, ... Если запрос не содержит столбцов строк, именем будет просто valueColumnName.",
+      "time-to": "{{macro}}: {{example}}. Время окончания запроса",
+      "using-all": "Если используется параметр «Все», установите флажок «Включить все» и в поле «Настроить все» введите: {{valueToType}}. Если выбран параметр «Все» -> 1 == 1"
+    },
+    "filter-item": {
+      "aria-label-column": "Столбец",
+      "aria-label-column-datetime-value": "Значение столбца даты и времени",
+      "aria-label-column-number-value": "Значение номера столбца",
+      "aria-label-column-value": "Значение столбца",
+      "aria-label-operator": "Оператор",
+      "aria-label-remove": "Удалить",
+      "or": "ИЛИ"
+    },
+    "filter-section": {
+      "add-group": "Добавить группу",
+      "and": "И",
+      "label-filters": "Фильтры"
+    },
+    "group-by-item": {
+      "aria-label-column": "Столбец",
+      "aria-label-interval": "Интервал",
+      "aria-label-remove": "Удалить",
+      "label": {
+        "1-day": "1 день",
+        "1-hour": "1 час",
+        "1-minute": "1 минута",
+        "12-hours": "12 часов",
+        "15-minutes": "15 минут",
+        "30-minutes": "30 минут",
+        "5-minutes": "5 минут",
+        "6-hours": "6 часов",
+        "auto": "авто"
+      }
+    },
+    "group-by-section": {
+      "label-group-by": "Группировать по"
+    },
+    "kqlpreview": {
+      "hide": "скрыть",
+      "label-query-preview": "Предварительный просмотр запроса",
+      "show": "показать"
+    },
+    "open-aieditor": {
+      "alert-enable-plugin-feature": "Установите плагин LLM из <2>каталога</2>. Затем можно его <5>включить</5>.",
+      "button-generate-query": "Создать запрос",
+      "generated-query": "Созданный запрос",
+      "open-ai-generate-query": "Попросить OpenAI создать запрос KQL",
+      "run-query": "Выполнить запрос",
+      "title-enable-plugin-feature": "Чтобы использовать эту функцию, необходимо включить плагин LLM."
+    },
+    "query-config": {
+      "data-consistency-options": {
+        "label": {
+          "strong": "Сильная",
+          "weak": "Слабая"
+        }
+      },
+      "description-cache-max-age": "По умолчанию кэш отключен. Чтобы включить кэширование запросов, укажите максимальное время жизни кэша.",
+      "description-data-consistency": "Параметр согласованности запросов управляет синхронизацией запросов и обновлений. По умолчанию: сильная. Подробнее см. в <2>документации Azure Data Explorer.</2>",
+      "description-default-editor-mode": "Данный параметр определяет, в каком режиме открывать редактор. По умолчанию: визуальный.",
+      "description-use-dynamic-caching": "При включении этой функции Grafana будет динамически применять настройки кэша к каждому запросу, а максимальный возраст кэша по умолчанию будет игнорироваться. Для запросов временных рядов размер бина будет использоваться, чтобы расширить временной диапазон, а также в качестве максимального возраста кэша.",
+      "description-value-controls-client-query-timeout": "Данное значение определяет время ожидания запроса клиента.",
+      "description-various-settings-for-controlling-query-behavior": "Различные параметры для управления поведением запроса.",
+      "editor-mode-options": {
+        "label": {
+          "raw": "Без обработки",
+          "visual": "Визуальный"
+        }
+      },
+      "label-cache-max-age": "Макс. возраст кэша",
+      "label-data-consistency": "Согласованность данных",
+      "label-default-editor-mode": "Режим редактора по умолчанию",
+      "label-query-timeout": "Время ожидания запроса",
+      "label-use-dynamic-caching": "Использовать динамическое кэширование",
+      "title-query-optimizations": "Оптимизация запросов"
+    },
+    "query-editor": {
+      "title-could-not-load-datasource-schema": "Не удалось загрузить схему источника данных"
+    },
+    "query-header": {
+      "aria-label-cluster": "Кластер",
+      "aria-label-database": "База данных",
+      "body-lose-manual-changes": "Если вы вернетесь к визуальному конструктору, изменения, внесенные в запрос вручную, будут потеряны.",
+      "confirm-text": "Подтвердить",
+      "explain-kql": "Объяснить KQL",
+      "kql-explanation": "Объяснение KQL",
+      "label-cluster": "Кластер",
+      "label-database": "База данных",
+      "label-format-as": "Форматировать как",
+      "run-query": "Выполнить запрос",
+      "text-loading": "Загрузка…",
+      "title-are-you-sure": "Вы уверены?"
+    },
+    "table-section": {
+      "aria-label-columns": "Столбцы",
+      "aria-label-table": "Таблица",
+      "label-columns": "Столбцы",
+      "label-table": "Таблица",
+      "placeholder-all": "Все",
+      "tooltip-columns": "Выберите подмножество столбцов для более быстрого получения результатов. Временные ряды требуют как значений времени, так и числовых значений. Другие столбцы отображаются как <2>измерения</2>."
+    },
+    "timeshift": {
+      "aria-label-add": "Добавить",
+      "aria-label-remove": "Удалить",
+      "aria-label-timeshift": "Сдвиг времени",
+      "label": {
+        "day-before": "На день раньше",
+        "hour-before": "На час раньше",
+        "no-timeshift": "Без сдвига времени",
+        "week-before": "На неделю раньше"
+      },
+      "label-timeshift": "Сдвиг времени"
+    },
+    "tracking-config": {
+      "description-send-username-header-to-host": "При включении этой функции Grafana будет передавать имя пользователя, вошедшего в систему, в заголовках <2>{{userHeader}}</2> и <4>{{clientRequestIdHeader}}</4> при отправке запросов в ADX. Функция может быть полезной, когда необходимо выполнить отслеживание в ADX.",
+      "label-send-username-header-to-host": "Отправить заголовок с именем пользователя на хост",
+      "title-tracking": "Отслеживание"
+    },
+    "use-template-variables": {
+      "label": {
+        "template-variables": "Переменные шаблона"
+      }
+    },
+    "variable-editor": {
+      "aria-label-select-cluster": "Выбрать кластер",
+      "aria-label-select-database": "Выбрать базу данных",
+      "aria-label-select-query-type": "Выбрать тип запроса",
+      "aria-label-select-table": "Выбрать таблицу",
+      "label": {
+        "template-variables": "Переменные шаблона"
+      },
+      "label-cluster": "Кластер",
+      "label-database": "База данных",
+      "label-query-type": "Тип запроса",
+      "label-table": "Таблица",
+      "variable_type_options": {
+        "label": {
+          "clusters": "Кластеры",
+          "columns": "Столбцы",
+          "databases": "Базы данных",
+          "kusto-query": "Запрос Kusto",
+          "tables": "Таблицы"
+        }
+      }
+    },
+    "visual-query-editor": {
+      "title-could-not-load-table-schema": "Не удалось загрузить схему таблицы",
+      "title-table-schema-loaded-successfully-without-columns": "Схема таблицы загружена без столбцов"
+    }
+  }
+}
