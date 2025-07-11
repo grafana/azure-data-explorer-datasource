@@ -2552,14 +2552,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:1.53.1":
-  version: 1.53.1
-  resolution: "@playwright/test@npm:1.53.1"
+"@playwright/test@npm:1.54.0":
+  version: 1.54.0
+  resolution: "@playwright/test@npm:1.54.0"
   dependencies:
-    playwright: "npm:1.53.1"
+    playwright: "npm:1.54.0"
   bin:
     playwright: cli.js
-  checksum: 10c0/f2ef7899ca6bc178c9f2ba6c8633d0bbeb5ba135048e9df01ecb949c6f743811ba5ef76d495f619454074c81dbfa28be12e4c0a1224bb2af0d4cb403182c716f
+  checksum: 10c0/cd0fe9f8f0e0147d446fa11be9da27eb5227099533644be18212c89dc312f269599525fb139c1a3210c1fdb62a5a1a099af33d69632f0153f6317e1807911b42
   languageName: node
   linkType: hard
 
@@ -8062,7 +8062,7 @@ __metadata:
     "@grafana/schema": "npm:^11.5.2"
     "@grafana/tsconfig": "npm:^2.0.0"
     "@grafana/ui": "npm:^11.5.2"
-    "@playwright/test": "npm:1.53.1"
+    "@playwright/test": "npm:1.54.0"
     "@stylistic/eslint-plugin-ts": "npm:^4.4.1"
     "@swc/core": "npm:^1.3.90"
     "@swc/helpers": "npm:^0.5.0"
@@ -11072,27 +11072,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.53.1":
-  version: 1.53.1
-  resolution: "playwright-core@npm:1.53.1"
+"playwright-core@npm:1.54.0":
+  version: 1.54.0
+  resolution: "playwright-core@npm:1.54.0"
   bin:
     playwright-core: cli.js
-  checksum: 10c0/8780552740741b94c346373ab6f949e9a44d3df54016b12123da9fe2f5fb60c1838197642916789b0a2ffb567e4ba0089f2e57d496bef7e460ddc4526f9b3b0f
+  checksum: 10c0/1374656638d02e948a871f63ce7596f768efd767d7b4425ded15a65f580786a6d667fc94fc0e9e32db7ec49540c5fb66ad79755066b93655ec3167b3a3615eb3
   languageName: node
   linkType: hard
 
-"playwright@npm:1.53.1":
-  version: 1.53.1
-  resolution: "playwright@npm:1.53.1"
+"playwright@npm:1.54.0":
+  version: 1.54.0
+  resolution: "playwright@npm:1.54.0"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.53.1"
+    playwright-core: "npm:1.54.0"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 10c0/3dcbcd3791a7f0d1007db4d3126c8136258a2002c2fbfc8b840086b64cbc1fb628b2e25dd3b345d685fb27ba39790ab0f4ce81a8faade7dc748af3a63bdf3550
+  checksum: 10c0/3e9597620d7857678c6e131fe9399a56486d89420d6b3f15282d43a0d7dc28bcd6b15381f58017c618a5d61d030dd654e456ad4fdeebb043168a3630a526b131
   languageName: node
   linkType: hard
 
