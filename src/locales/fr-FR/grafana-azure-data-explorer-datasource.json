@@ -1,0 +1,266 @@
+{
+  "components": {
+    "aggregate-item": {
+      "aggregate-item-function-aria-label-function": "Fonction",
+      "aria-label-column": "Colonne",
+      "aria-label-percentile": "Centile",
+      "aria-label-remove": "Supprimer",
+      "of": "de"
+    },
+    "aggregate-section": {
+      "label-aggregate": "Agrégat"
+    },
+    "application-config": {
+      "aria-label-application": "Application",
+      "description-application-displayed": "Nom de l’application à afficher dans ADX.",
+      "label-application-name-optional": "Nom de l’application (facultatif)"
+    },
+    "azure-credentials-form": {
+      "aad-client-id-aria-label-client-id": "ID du client",
+      "aad-client-secret-aria-label-client-secret": "Clé secrète du client",
+      "aad-client-secret-configured-aria-label-client-secret": "Clé secrète du client",
+      "aad-client-secret-configured-placeholder-configured": "configuré",
+      "aad-tenant-id-aria-label-tenant-id": "ID du locataire",
+      "aria-label-azure-cloud": "Azure Cloud",
+      "auth-type-options": {
+        "label": {
+          "app-registration-on-behalf-of": "Enregistrement de l’application (au nom de)",
+          "current-user": "Utilisateur actuel",
+          "managed-identity": "Identité gérée",
+          "workload-identity": "Identité de la workload"
+        },
+        "opts": {
+          "label": {
+            "app-registration": "Enregistrement de l’application"
+          }
+        }
+      },
+      "description-choose-authentication-azure-services": "Choisissez le type d’authentification aux services Azure",
+      "description-current-user-authentication-is-experimental": "Certaines fonctionnalités de Grafana (par exemple, les alertes) peuvent ne pas fonctionner comme prévu. Pour d’autres limitations et problèmes connus, rapports de bugs ou commentaires, veuillez consulter <2>la documentation</2>.",
+      "description-on-behalf-of-feature-is-in-beta": "Pour les limitations et les problèmes connus, les rapports de bugs ou les commentaires, veuillez consulter <2>la documentation</2>.",
+      "error-client-id-required": "L’ID client est requis",
+      "error-client-secret-required": "La question secrète du client est requise",
+      "error-tenant-id-required": "L’ID du locataire est requis",
+      "label-application-client-id": "ID de l’application (client)",
+      "label-authentication-method": "Méthode d’authentification",
+      "label-azure-cloud": "Azure Cloud",
+      "label-client-secret": "Clé secrète du client",
+      "label-directory-tenant-id": "ID du répertoire (locataire)",
+      "reset": "Réinitialiser",
+      "title-authentication": "Authentification",
+      "title-current-user-authentication-is-experimental": "L’authentification de l’utilisateur actuel est expérimentale",
+      "title-on-behalf-of-feature-is-in-beta": "La fonctionnalité « Au nom de » est en version bêta"
+    },
+    "config-editor": {
+      "description-additional-settings": "Les paramètres supplémentaires sont facultatifs et permettent de mieux contrôler votre source de données. Cela inclut les optimisations de requête, les paramètres de schéma, la configuration de suivi et la configuration OpenAI.",
+      "label-enable": "Activer",
+      "secure-socks-proxy": "Proxy Socks sécurisé",
+      "title-additional-settings": "Paramètres supplémentaires",
+      "tooltip-enable": "Activez le proxy sécurisé SOCKS pour acheminer la connexion de la source de données vers un autre réseau. Consultez <2>Configurer un proxy de connexion à la source de données.</2>"
+    },
+    "config-help": {
+      "configure-the-connection-in-grafana": "3. Configurez la connexion dans Grafana",
+      "configuring-azure-explorer-database": "Configurez Azure et votre base de données Azure Data Explorer",
+      "connect-application-database": "2. Connectez l’application AAD à un utilisateur de base de données",
+      "connect-application-database-description": "Accédez à l’interface utilisateur Web Azure Data Explorer via Azure Portal. L’application AAD que vous avez créée à l’étape 1 doit avoir un accès de visualisation à votre base de données Azure Data Explorer. Cela se fait à l’aide de la commande dot <1>{{dotCommand}}</1> :",
+      "create-an-aad-application": "1. Créez une application AAD",
+      "create-an-aad-application-description": "Vous trouverez des détails sur la façon de créer une application via Azure Portal ou avec Azure CLI <2>ici.</2>",
+      "detailed-instructions": "Vous trouverez des instructions détaillées sur les trois étapes <2>dans la documentation.</2>",
+      "dot-command-example": "{{dotCommand}} base de données your_db_name vues (&lsquo;{{key}}=your_client_id;your_tenant_id&rsquo;)",
+      "save-and-test": "Utilisez les détails du principe de service AAD de l’étape 1 pour remplir le champ ci-dessous. Cliquez ensuite sur le bouton Enregistrer et tester.",
+      "title-configuration-help": "Aide à la configuration"
+    },
+    "connection-config": {
+      "aria-label-cluster-url": "URL du cluster",
+      "description-default-cluster-source": "L’URL du cluster par défaut pour cette source de données.",
+      "label-default-cluster-url-optional": "URL du cluster par défaut (facultatif)"
+    },
+    "database-config": {
+      "add-mapping": "Ajouter un mappage",
+      "aria-label-choose-default-database": "sélectionner la base de données par défaut",
+      "aria-label-remove": "Supprimer",
+      "description-configuration-database-schema-including-default": "Configuration du schéma de la base de données, y compris la base de données par défaut.",
+      "description-use-managed-schema": "Si cette option est activée, les tableaux, les fonctions et les vues matérialisées peuvent être mappés sous des noms facilement compréhensibles.",
+      "label-default-database": "Base de données par défaut",
+      "label-schema-mappings": "Mappages de schéma",
+      "label-use-managed-schema": "Utiliser un schéma géré",
+      "placeholder-name": "Nom",
+      "placeholder-target": "Objectif",
+      "reload-schema": "Recharger le schéma",
+      "title-database-schema-settings": "Paramètres du schéma de base de données",
+      "title-error-updating-azure-data-explorer-schema": "Erreur lors de la mise à jour du schéma Azure Data Explorer"
+    },
+    "editor-help": {
+      "adx-query-editor-help": "Aide de l’éditeur de requêtes ADX",
+      "can-return-any-set-of-columns": "Peut renvoyer n’importe quel ensemble de colonnes.",
+      "escape-multi": "{{macro}}($myTemplateVar) : $myTemplateVar doit être une variable de modèle à valeurs multiples qui contient des caractères illégaux",
+      "example-adx-time-series-query": "Exemple de requête de série chronologique ADX :",
+      "example-time-series-query": "Exemple de requête de série chronologique :",
+      "format": "Format",
+      "format-as-adx-time-series": "Formater en tant que série chronologique ADX :",
+      "format-as-table": "Formater en tant que tableau :",
+      "format-as-time-series": "Formater en tant que série chronologique :",
+      "format-as-time-series-description": "Nécessite exactement une colonne datetime de type Kusto. (Astuce : vous pouvez utiliser l’opérateur {{operatorName}} de Kusto pour supprimer des colonnes).",
+      "format-description": "Il est possible de modifier le format des données renvoyées par ADX avec le sélecteur « Formater en tant que ». Voici plus de détails sur chaque option :",
+      "macro-examples": "Exemples de macros :",
+      "macros": "Macros",
+      "macros-description": "Les macros peuvent être utilisées pour remplacer automatiquement certaines valeurs en fonction des paramètres définis dans Grafana :",
+      "must-have-timestamp": "Doit avoir une colonne datetime nommée « {{requiredColumn}} »",
+      "optional-string-columns": "Peut éventuellement avoir une ou plusieurs colonne(s) de chaîne de caractères. Chaque colonne de chaîne de caractères est considérée comme une paire de balises clé=valeur (où la clé est le nom de la colonne et la valeur est la valeur de la colonne pour chaque ligne).",
+      "requires-one-number-column": "Nécessite au moins une colonne de valeur d’un type numérique. Chaque colonne de valeur est considérée comme une métrique.",
+      "return-time-series": "Utilisé pour les requêtes qui renvoient le type « séries chronologiques » de Kusto, telles que l’opérateur {{operatorName}}",
+      "templating-macros": "Macros de modèles :",
+      "time-from": "{{macro}} : {{example}}. L’heure de début de la requête",
+      "time-interval": "{{macro}} : {{example}}. Taille de regroupement recommandée par Grafana en fonction de la période de la requête, en millisecondes",
+      "time-macros": "Macros de temps :",
+      "time-series-returned": "Une série chronologique est renvoyée pour chaque colonne de valeurs numériques et chaque combinaison unique de valeurs textuelles. Chaque série a un nom de valueColumnName stringColumnName=columnValue, ... S’il n’y a pas de colonnes de chaîne de caractères dans la requête, le nom sera simplement valueColumnName.",
+      "time-to": "{{macro}} : {{example}}. L’heure de fin de la requête",
+      "using-all": "Si vous utilisez l’option Tout, cochez l’option Inclure tout et dans le champ Personnaliser toutes les valeurs, saisissez : {{valueToType}}. Si Tout est sélectionné -> 1 == 1"
+    },
+    "filter-item": {
+      "aria-label-column": "Colonne",
+      "aria-label-column-datetime-value": "Valeur datetime de la colonne",
+      "aria-label-column-number-value": "Valeur du numéro de colonne",
+      "aria-label-column-value": "Valeur de la colonne",
+      "aria-label-operator": "Opérateur",
+      "aria-label-remove": "Supprimer",
+      "or": "OU"
+    },
+    "filter-section": {
+      "add-group": "Ajouter un groupe",
+      "and": "ET",
+      "label-filters": "Filtres"
+    },
+    "group-by-item": {
+      "aria-label-column": "Colonne",
+      "aria-label-interval": "Intervalle",
+      "aria-label-remove": "Supprimer",
+      "label": {
+        "1-day": "1 jour",
+        "1-hour": "1 heure",
+        "1-minute": "1 minute",
+        "12-hours": "12 heures",
+        "15-minutes": "15 minutes",
+        "30-minutes": "30 minutes",
+        "5-minutes": "5 minutes",
+        "6-hours": "6 heures",
+        "auto": "auto"
+      }
+    },
+    "group-by-section": {
+      "label-group-by": "Regrouper par"
+    },
+    "kqlpreview": {
+      "hide": "masquer",
+      "label-query-preview": "Aperçu de la requête",
+      "show": "afficher"
+    },
+    "open-aieditor": {
+      "alert-enable-plugin-feature": "Installez le plugin LLM à partir du <2>catalogue</2>. Vous pouvez ensuite l’<5>activer</5>.",
+      "button-generate-query": "Générer une requête",
+      "generated-query": "Requête générée",
+      "open-ai-generate-query": "Demander à OpenAI de générer une requête KQL",
+      "run-query": "Exécuter la requête",
+      "title-enable-plugin-feature": "Vous devez activer le plugin LLM pour utiliser cette fonctionnalité."
+    },
+    "query-config": {
+      "data-consistency-options": {
+        "label": {
+          "strong": "Fort",
+          "weak": "Faible"
+        }
+      },
+      "description-cache-max-age": "Par défaut, le cache est désactivé. Si vous souhaitez activer la mise en cache des requêtes, veuillez spécifier une durée maximale de vie du cache.",
+      "description-data-consistency": "La cohérence des requêtes contrôle la façon dont les requêtes et les mises à jour sont synchronisées. La valeur par défaut est Fort. Pour en savoir plus, consultez la <2>documentation Azure Data Explorer.</2>",
+      "description-default-editor-mode": "Ce paramètre détermine le mode dans lequel l’éditeur s’ouvrira. La valeur par défaut est Visuel.",
+      "description-use-dynamic-caching": "En activant cette fonctionnalité, Grafana appliquera dynamiquement les paramètres de cache pour chaque requête, en ignorant la durée maximale de conservation définie par défaut. Pour les requêtes de séries chronologiques, la taille du regroupement sera utilisée pour élargir la plage temporelle, mais aussi comme durée maximale de conservation dans le cache.",
+      "description-value-controls-client-query-timeout": "Cette valeur détermine le délai d’expiration des requêtes côté client.",
+      "description-various-settings-for-controlling-query-behavior": "Divers paramètres permettent de contrôler le comportement des requêtes.",
+      "editor-mode-options": {
+        "label": {
+          "raw": "Brut",
+          "visual": "Visuel"
+        }
+      },
+      "label-cache-max-age": "Conservation maximale du cache",
+      "label-data-consistency": "Cohérence des données",
+      "label-default-editor-mode": "Mode d’éditeur par défaut",
+      "label-query-timeout": "Délai d’expiration de la requête",
+      "label-use-dynamic-caching": "Utiliser la mise en cache dynamique",
+      "title-query-optimizations": "Optimisations des requêtes"
+    },
+    "query-editor": {
+      "title-could-not-load-datasource-schema": "Impossible de charger le schéma de la source de données"
+    },
+    "query-header": {
+      "aria-label-cluster": "Cluster",
+      "aria-label-database": "Base de données",
+      "body-lose-manual-changes": "Vous perdrez les modifications manuelles apportées à la requête si vous revenez au générateur visuel.",
+      "confirm-text": "Confirmer",
+      "explain-kql": "Expliquer le KQL",
+      "kql-explanation": "Explication du KQL",
+      "label-cluster": "Cluster",
+      "label-database": "Base de données",
+      "label-format-as": "Formater en tant que",
+      "run-query": "Exécuter la requête",
+      "text-loading": "Chargement en cours...",
+      "title-are-you-sure": "Êtes-vous sûr ?"
+    },
+    "table-section": {
+      "aria-label-columns": "Colonnes",
+      "aria-label-table": "Tableau",
+      "label-columns": "Colonnes",
+      "label-table": "Tableau",
+      "placeholder-all": "Tout",
+      "tooltip-columns": "Sélectionnez un sous-ensemble de colonnes pour obtenir des résultats plus rapides. Les séries chronologiques nécessitent des valeurs temporelles et numériques. Les autres colonnes sont interprétées comme des <2>dimensions</2>."
+    },
+    "timeshift": {
+      "aria-label-add": "Ajouter",
+      "aria-label-remove": "Supprimer",
+      "aria-label-timeshift": "Décalage horaire",
+      "label": {
+        "day-before": "Jour précédent",
+        "hour-before": "Heure précédente",
+        "no-timeshift": "Aucun décalage horaire",
+        "week-before": "Semaine précédente"
+      },
+      "label-timeshift": "Décalage horaire"
+    },
+    "tracking-config": {
+      "description-send-username-header-to-host": "Lorsque cette fonctionnalité est activée, Grafana transmet le nom d’utilisateur de l’utilisateur connecté dans l’en-tête <2>{{userHeader}}</2> et dans l’en-tête <4>{{clientRequestIdHeader}}</4> lors de l’envoi de demandes à ADX. Peut être utile lorsque le suivi doit être effectué dans ADX.",
+      "label-send-username-header-to-host": "Envoyer l’en-tête du nom d’utilisateur à l’hôte",
+      "title-tracking": "Suivi"
+    },
+    "use-template-variables": {
+      "label": {
+        "template-variables": "Variables des modèles"
+      }
+    },
+    "variable-editor": {
+      "aria-label-select-cluster": "Sélectionner un cluster",
+      "aria-label-select-database": "Sélectionner une base de données",
+      "aria-label-select-query-type": "Sélectionner un type de requête",
+      "aria-label-select-table": "Sélectionner un tableau",
+      "label": {
+        "template-variables": "Variables des modèles"
+      },
+      "label-cluster": "Cluster",
+      "label-database": "Base de données",
+      "label-query-type": "Type de requête",
+      "label-table": "Tableau",
+      "variable_type_options": {
+        "label": {
+          "clusters": "Clusters",
+          "columns": "Colonnes",
+          "databases": "Bases de données",
+          "kusto-query": "Requête Kusto",
+          "tables": "Tableaux"
+        }
+      }
+    },
+    "visual-query-editor": {
+      "title-could-not-load-table-schema": "Impossible de charger le schéma du tableau",
+      "title-table-schema-loaded-successfully-without-columns": "Schéma du tableau chargé avec succès, mais sans colonnes"
+    }
+  }
+}

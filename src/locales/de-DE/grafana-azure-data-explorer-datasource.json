@@ -1,0 +1,266 @@
+{
+  "components": {
+    "aggregate-item": {
+      "aggregate-item-function-aria-label-function": "Funktion",
+      "aria-label-column": "Spalte",
+      "aria-label-percentile": "Perzentil",
+      "aria-label-remove": "Entfernen",
+      "of": "von"
+    },
+    "aggregate-section": {
+      "label-aggregate": "Gesamtsumme"
+    },
+    "application-config": {
+      "aria-label-application": "Anwendung",
+      "description-application-displayed": "Anwendungsname, der in ADX angezeigt wird.",
+      "label-application-name-optional": "Anwendungsname (optional)"
+    },
+    "azure-credentials-form": {
+      "aad-client-id-aria-label-client-id": "Client-ID",
+      "aad-client-secret-aria-label-client-secret": "Client Secret",
+      "aad-client-secret-configured-aria-label-client-secret": "Client Secret",
+      "aad-client-secret-configured-placeholder-configured": "konfiguriert",
+      "aad-tenant-id-aria-label-tenant-id": "Tenant-ID",
+      "aria-label-azure-cloud": "Azure Cloud",
+      "auth-type-options": {
+        "label": {
+          "app-registration-on-behalf-of": "App-Registrierung (im Namen von)",
+          "current-user": "Aktueller Nutzer",
+          "managed-identity": "Verwaltete Identität",
+          "workload-identity": "Workload-Identität"
+        },
+        "opts": {
+          "label": {
+            "app-registration": "App-Registrierung"
+          }
+        }
+      },
+      "description-choose-authentication-azure-services": "Wählen Sie die Art der Authentifizierung für Azure-Dienste",
+      "description-current-user-authentication-is-experimental": "Bestimmte Grafana-Funktionen (z. B. Warnungen) funktionieren möglicherweise nicht wie erwartet. Weitere bekannte Einschränkungen und Probleme, Fehlerberichte oder Feedback finden Sie in <2>der Dokumentation</2>.",
+      "description-on-behalf-of-feature-is-in-beta": "Bekannte Einschränkungen und Probleme, Fehlerberichte oder Feedback finden Sie in <2>der Dokumentation</2>.",
+      "error-client-id-required": "Client-ID erforderlich",
+      "error-client-secret-required": "Client Secret erforderlich",
+      "error-tenant-id-required": "Tenant-ID erforderlich",
+      "label-application-client-id": "ID der Anwendung (Client)",
+      "label-authentication-method": "Authentifizierungsverfahren",
+      "label-azure-cloud": "Azure Cloud",
+      "label-client-secret": "Client Secret",
+      "label-directory-tenant-id": "ID des Verzeichnisses (Tenant)",
+      "reset": "Zurücksetzen",
+      "title-authentication": "Authentifizierung",
+      "title-current-user-authentication-is-experimental": "Die derzeitige Nutzerauthentifizierung ist experimentell",
+      "title-on-behalf-of-feature-is-in-beta": "Die Funktion „Im Namen von“ ist in der Beta-Phase"
+    },
+    "config-editor": {
+      "description-additional-settings": "Zusätzliche Einstellungen sind optionale Einstellungen, die für mehr Kontrolle über Ihre Datenquelle konfiguriert werden können. Dazu gehören Abfrageoptimierungen, Schemaeinstellungen, Tracking-Konfiguration und OpenAI-Konfiguration.",
+      "label-enable": "Aktivieren",
+      "secure-socks-proxy": "Sicherer SOCKS-Proxy",
+      "title-additional-settings": "Zusätzliche Einstellungen",
+      "tooltip-enable": "Aktivieren Sie das Proxying der Datenquellenverbindung über den sicheren SOCKS-Proxy zu einem anderen Netzwerk. Weitere Informationen finden Sie unter <2>Konfiguration eines Datenquellenverbindungs-Proxys.</2>"
+    },
+    "config-help": {
+      "configure-the-connection-in-grafana": "3. Konfigurieren Sie die Verbindung in Grafana",
+      "configuring-azure-explorer-database": "Konfiguration von Azure und Ihrer Datenbank in Azure Data Explorer",
+      "connect-application-database": "2. Verbinden Sie die AAD-Anwendung mit einem Datenbanknutzer",
+      "connect-application-database-description": "Navigieren Sie über das Azure-Portal zur Web-Benutzeroberfläche von Azure Data Explorer. Die AAD-Anwendung, die Sie in Schritt 1 erstellt haben, muss Betrachter-Zugriff auf Ihre Datenbank in Azure Data Explorer erhalten. Dies erfolgt mithilfe des Dot-Befehls <1>{{dotCommand}}</1>:",
+      "create-an-aad-application": "1. Erstellen Sie eine AAD-Anwendung",
+      "create-an-aad-application-description": "Details zu deren Erstellung über das Azure-Portal oder mit der Azure-CLI finden Sie <2>hier.</2>",
+      "detailed-instructions": "Detaillierte Anweisungen zu allen drei Schritten finden Sie <2>in der Dokumentation.</2>",
+      "dot-command-example": "{{dotCommand}} Datenbank your_db_name Betrachter (&lsquo;{{key}}=your_client_id;your_tenant_id&rsquo;)",
+      "save-and-test": "Nutzen Sie die Details des AAD-Dienstprinzips von Schritt 1, um folgendes Feld auszufüllen. Klicken Sie anschließend auf die Schaltfläche „Speichern und Testen“.",
+      "title-configuration-help": "Konfigurationshilfe"
+    },
+    "connection-config": {
+      "aria-label-cluster-url": "Cluster-URL",
+      "description-default-cluster-source": "Die standardmäßige Cluster-URL für diese Datenquelle.",
+      "label-default-cluster-url-optional": "Standardmäßige Cluster-URL (optional)"
+    },
+    "database-config": {
+      "add-mapping": "Zuordnung hinzufügen",
+      "aria-label-choose-default-database": "Standarddatenbank auswählen",
+      "aria-label-remove": "Entfernen",
+      "description-configuration-database-schema-including-default": "Konfiguration für das Datenbankschema, einschließlich der Standarddatenbank.",
+      "description-use-managed-schema": "Wenn diese Option aktiviert ist, können Tabellen, Funktionen und materialisierte Ansichten benutzerfreundlichen Namen zugeordnet werden.",
+      "label-default-database": "Standarddatenbank",
+      "label-schema-mappings": "Schemazuordnungen",
+      "label-use-managed-schema": "Verwaltetes Schema verwenden",
+      "placeholder-name": "Name",
+      "placeholder-target": "Ziel",
+      "reload-schema": "Schema neu laden",
+      "title-database-schema-settings": "Datenbankschema-Einstellungen",
+      "title-error-updating-azure-data-explorer-schema": "Fehler bei der Aktualisierung des Schemas in Azure Data Explorer"
+    },
+    "editor-help": {
+      "adx-query-editor-help": "Hilfe zum ADX-Abfrageeditor",
+      "can-return-any-set-of-columns": "Kann einen beliebigen Spaltensatz zurückgeben.",
+      "escape-multi": "{{macro}}($myTemplateVar): $myTemplateVar sollte eine Vorlagenvariable mit mehreren Werten sein, die unzulässige Zeichen enthält",
+      "example-adx-time-series-query": "Beispiel für eine ADX-Zeitreihenabfrage:",
+      "example-time-series-query": "Beispiel für eine Zeitreihenabfrage:",
+      "format": "Format",
+      "format-as-adx-time-series": "Als ADX-Zeitreihe formatieren:",
+      "format-as-table": "Als Tabelle formatieren:",
+      "format-as-time-series": "Als Zeitreihe formatieren:",
+      "format-as-time-series-description": "Erfordert genau eine Spalte vom Kusto-Typ datetime. (Tipp: Sie können den Kusto-Operator {{operatorName}} nutzen, um Spalten zu entfernen).",
+      "format-description": "Es ist möglich, das Format der von ADX zurückgegebenen Daten mit dem Selektor „Formatieren als“ zu ändern. Hier finden Sie weitere Details zu jeder Option:",
+      "macro-examples": "Makro-Beispiele:",
+      "macros": "Makros",
+      "macros-description": "Makros können verwendet werden, um bestimmte Werte je nach den in Grafana festgelegten Parametern automatisch zu ersetzen:",
+      "must-have-timestamp": "Muss eine datetime-Spalte mit dem Namen „{{requiredColumn}}“ haben",
+      "optional-string-columns": "Kann optional eine oder mehrere String-Spalten haben. Jede String-Spalte wird als „key=value“ Tag-Paar betrachtet (wobei „key“ der Spaltenname und „value“ der Wert der Spalte für jede Zeile ist).",
+      "requires-one-number-column": "Erfordert mindestens eine Wertspalte eines Zahlentyps. Jede Wertspalte wird als Metrik betrachtet.",
+      "return-time-series": "Wird für Abfragen verwendet, die den Kusto-Typ „Zeitreihe“ zurückgeben, z. B. den Operator {{operatorName}}",
+      "templating-macros": "Vorlagen-Makros:",
+      "time-from": "{{macro}}: {{example}}. Der Startzeitpunkt der Abfrage",
+      "time-interval": "{{macro}}: {{example}}. Die von Grafana empfohlene bin-Größe basierend auf der Zeitspanne der Abfrage, in ms",
+      "time-macros": "Zeit-Makros:",
+      "time-series-returned": "Für jede Wertspalte und jeden eindeutigen Satz von String-Spaltenwerten wird eine Zeitreihe zurückgegeben. Jede Reihe hat den Namen valueColumnName stringColumnName=columnValue, … Wenn keine String-Spalten in der Anfrage vorhanden sind, lautet der Name nur valueColumnName.",
+      "time-to": "{{macro}}: {{example}}. Der Endzeitpunkt der Abfrage",
+      "using-all": "Wenn Sie die Option „Alle“ verwenden, aktivieren Sie das Kontrollkästchen der Option „Alle einbeziehen“ und geben Sie im Wertfeld „Alle benutzerdefiniert“ Folgendes ein: {{valueToType}}. Wenn „Alle“ ausgewählt wird -> 1 == 1"
+    },
+    "filter-item": {
+      "aria-label-column": "Spalte",
+      "aria-label-column-datetime-value": "Spalte „Datetime-Wert“",
+      "aria-label-column-number-value": "Spalte „Zahlenwert“",
+      "aria-label-column-value": "Spalte „Wert“",
+      "aria-label-operator": "Operator",
+      "aria-label-remove": "Entfernen",
+      "or": "ODER"
+    },
+    "filter-section": {
+      "add-group": "Gruppe hinzufügen",
+      "and": "UND",
+      "label-filters": "Filter"
+    },
+    "group-by-item": {
+      "aria-label-column": "Spalte",
+      "aria-label-interval": "Intervall",
+      "aria-label-remove": "Entfernen",
+      "label": {
+        "1-day": "1 Tag",
+        "1-hour": "1 Stunde",
+        "1-minute": "1 Minute",
+        "12-hours": "12 Stunden",
+        "15-minutes": "15 Minuten",
+        "30-minutes": "30 Minuten",
+        "5-minutes": "5 Minuten",
+        "6-hours": "6 Stunden",
+        "auto": "Auto"
+      }
+    },
+    "group-by-section": {
+      "label-group-by": "Gruppieren nach"
+    },
+    "kqlpreview": {
+      "hide": "ausblenden",
+      "label-query-preview": "Abfragevorschau",
+      "show": "zeigen"
+    },
+    "open-aieditor": {
+      "alert-enable-plugin-feature": "Installieren Sie das LLM-Plugin aus dem <2>Katalog</2>. Anschließend können Sie es <5>aktivieren</5>.",
+      "button-generate-query": "Abfrage generieren",
+      "generated-query": "Generierte Abfrage",
+      "open-ai-generate-query": "OpenAI um Generierung einer KQL-Abfrage bitten",
+      "run-query": "Abfrage ausführen",
+      "title-enable-plugin-feature": "Sie müssen das LLM-Plugin aktivieren, um diese Funktion zu nutzen."
+    },
+    "query-config": {
+      "data-consistency-options": {
+        "label": {
+          "strong": "Stark",
+          "weak": "Schwach"
+        }
+      },
+      "description-cache-max-age": "Standardmäßig ist der Cache deaktiviert. Wenn Sie das Abfrage-Caching aktivieren möchten, geben Sie bitte eine maximale Zeitspanne an, in der der Cache aktiv sein soll.",
+      "description-data-consistency": "Die Konsistenz der Abfrage regelt, wie Abfragen und Updates synchronisiert werden. Standardmäßig auf „Stark“ eingestellt. Weitere Informationen finden Sie in der <2>Dokumentation von Azure Data Explorer.</2>",
+      "description-default-editor-mode": "Diese Einstellung bestimmt, in welchem Modus der Editor geöffnet wird. Standardmäßig auf „Visuell“ eingestellt.",
+      "description-use-dynamic-caching": "Wenn Sie diese Funktion aktivieren, wendet Grafana die Cache-Einstellungen dynamisch pro Abfrage an, wobei das standardmäßige Cache-Höchstalter ignoriert wird. Für Zeitreihenabfragen nutzen wir die bin-Größe, um den Zeitbereich zu erweitern, aber auch als Cache-Höchstalter.",
+      "description-value-controls-client-query-timeout": "Dieser Wert regelt das Timeout der Client-Abfrage.",
+      "description-various-settings-for-controlling-query-behavior": "Verschiedene Einstellungen zur Steuerung des Abfrageverhaltens.",
+      "editor-mode-options": {
+        "label": {
+          "raw": "Unbearbeitet",
+          "visual": "Visuell"
+        }
+      },
+      "label-cache-max-age": "Cache-Höchstalter",
+      "label-data-consistency": "Datenkonsistenz",
+      "label-default-editor-mode": "Standard-Editor-Modus",
+      "label-query-timeout": "Abfrage-Timeout",
+      "label-use-dynamic-caching": "Dynamisches Caching nutzen",
+      "title-query-optimizations": "Abfrageoptimierungen"
+    },
+    "query-editor": {
+      "title-could-not-load-datasource-schema": "Datenquellenschema konnte nicht geladen werden"
+    },
+    "query-header": {
+      "aria-label-cluster": "Cluster",
+      "aria-label-database": "Datenbank",
+      "body-lose-manual-changes": "Manuelle Änderungen an der Abfrage gehen verloren, wenn Sie zum visuellen Builder zurückkehren.",
+      "confirm-text": "Bestätigen",
+      "explain-kql": "KQL erklären",
+      "kql-explanation": "KQL-Erklärung",
+      "label-cluster": "Cluster",
+      "label-database": "Datenbank",
+      "label-format-as": "Formatieren als",
+      "run-query": "Abfrage ausführen",
+      "text-loading": "Wird geladen …",
+      "title-are-you-sure": "Sind Sie sicher?"
+    },
+    "table-section": {
+      "aria-label-columns": "Spalten",
+      "aria-label-table": "Tabelle",
+      "label-columns": "Spalten",
+      "label-table": "Tabelle",
+      "placeholder-all": "Alles",
+      "tooltip-columns": "Wählen Sie für schnellere Ergebnisse eine Untergruppe von Spalten aus. Zeitreihen erfordern sowohl Zeit- als auch Zahlenwerte, andere Spalten werden als <2>Dimensionen</2> gerendert."
+    },
+    "timeshift": {
+      "aria-label-add": "Hinzufügen",
+      "aria-label-remove": "Entfernen",
+      "aria-label-timeshift": "Zeitverschiebung",
+      "label": {
+        "day-before": "Tag davor",
+        "hour-before": "Stunde davor",
+        "no-timeshift": "Keine Zeitverschiebung",
+        "week-before": "Woche davor"
+      },
+      "label-timeshift": "Zeitverschiebung"
+    },
+    "tracking-config": {
+      "description-send-username-header-to-host": "Wenn diese Funktion aktiviert ist, übermittelt Grafana den Benutzernamen des angemeldeten Nutzers im Header <2>{{userHeader}}</2> und im Header <4>{{clientRequestIdHeader}}</4>, wenn Anfragen an ADX gesendet werden. Kann nützlich sein, wenn das Tracking in ADX durchgeführt werden muss.",
+      "label-send-username-header-to-host": "Benutzername-Header an Host senden",
+      "title-tracking": "Tracking"
+    },
+    "use-template-variables": {
+      "label": {
+        "template-variables": "Vorlagenvariablen"
+      }
+    },
+    "variable-editor": {
+      "aria-label-select-cluster": "Cluster auswählen",
+      "aria-label-select-database": "Datenbank auswählen",
+      "aria-label-select-query-type": "Abfragetyp auswählen",
+      "aria-label-select-table": "Tabelle auswählen",
+      "label": {
+        "template-variables": "Vorlagenvariablen"
+      },
+      "label-cluster": "Cluster",
+      "label-database": "Datenbank",
+      "label-query-type": "Abfragetyp",
+      "label-table": "Tabelle",
+      "variable_type_options": {
+        "label": {
+          "clusters": "Clusters",
+          "columns": "Spalten",
+          "databases": "Datenbanken",
+          "kusto-query": "Kusto-Abfrage",
+          "tables": "Tabellen"
+        }
+      }
+    },
+    "visual-query-editor": {
+      "title-could-not-load-table-schema": "Tabellenschema konnte nicht geladen werden",
+      "title-table-schema-loaded-successfully-without-columns": "Tabellenschema erfolgreich geladen, aber ohne Spalten"
+    }
+  }
+}

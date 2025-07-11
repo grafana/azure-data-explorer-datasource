@@ -1,0 +1,266 @@
+{
+  "components": {
+    "aggregate-item": {
+      "aggregate-item-function-aria-label-function": "関数",
+      "aria-label-column": "列",
+      "aria-label-percentile": "百分位数",
+      "aria-label-remove": "削除",
+      "of": "/"
+    },
+    "aggregate-section": {
+      "label-aggregate": "集計"
+    },
+    "application-config": {
+      "aria-label-application": "アプリケーション",
+      "description-application-displayed": "ADXで表示されるアプリケーション名。",
+      "label-application-name-optional": "アプリケーション名（オプション）"
+    },
+    "azure-credentials-form": {
+      "aad-client-id-aria-label-client-id": "クライアントID",
+      "aad-client-secret-aria-label-client-secret": "クライアントシークレット",
+      "aad-client-secret-configured-aria-label-client-secret": "クライアントシークレット",
+      "aad-client-secret-configured-placeholder-configured": "設定済み",
+      "aad-tenant-id-aria-label-tenant-id": "テナントID",
+      "aria-label-azure-cloud": "Azure Cloud",
+      "auth-type-options": {
+        "label": {
+          "app-registration-on-behalf-of": "アプリ登録（代理）",
+          "current-user": "現在のユーザー",
+          "managed-identity": "マネージドID",
+          "workload-identity": "ワークロードID"
+        },
+        "opts": {
+          "label": {
+            "app-registration": "アプリ登録"
+          }
+        }
+      },
+      "description-choose-authentication-azure-services": "Azureサービスへの認証タイプを選択",
+      "description-current-user-authentication-is-experimental": "特定のGrafana機能（アラートなど）が期待通りに動作しない可能性があります。その他の既知の制限事項や問題、バグレポート、フィードバックについては、<2>ドキュメント</2>をご覧ください。",
+      "description-on-behalf-of-feature-is-in-beta": "既知の制限事項や問題、バグレポート、フィードバックについては、<2>ドキュメント</2>をご覧ください。",
+      "error-client-id-required": "クライアントIDが必要です",
+      "error-client-secret-required": "クライアントシークレットが必要です",
+      "error-tenant-id-required": "テナントIDが必要です",
+      "label-application-client-id": "アプリケーション（クライアント）ID",
+      "label-authentication-method": "認証方法",
+      "label-azure-cloud": "Azure Cloud",
+      "label-client-secret": "クライアントシークレット",
+      "label-directory-tenant-id": "ディレクトリ（テナント）ID",
+      "reset": "リセット",
+      "title-authentication": "認証",
+      "title-current-user-authentication-is-experimental": "現在のユーザー認証は実験的機能です",
+      "title-on-behalf-of-feature-is-in-beta": "代理機能はベータ版です"
+    },
+    "config-editor": {
+      "description-additional-settings": "追加設定は、データソースをより詳細に制御するために設定できるオプション項目です。これには、クエリ最適化、スキーマ設定、トラッキング設定、OpenAI設定が含まれます。",
+      "label-enable": "有効化",
+      "secure-socks-proxy": "セキュアSOCKSプロキシ",
+      "title-additional-settings": "追加設定",
+      "tooltip-enable": "セキュアSOCKSプロキシを介して別のネットワークへデータソース接続をプロキシできるようにします。<2>データソース接続プロキシの設定</2>を参照してください。"
+    },
+    "config-help": {
+      "configure-the-connection-in-grafana": "3. Grafanaで接続を設定",
+      "configuring-azure-explorer-database": "AzureとAzure Data Explorerデータベースの設定",
+      "connect-application-database": "2. AADアプリケーションをデータベースユーザーに接続",
+      "connect-application-database-description": "AzureポータルからAzure Data Explorer Web UIに移動します。ステップ1で作成したAADアプリケーションに、Azure Data Explorerデータベースへのビューアーアクセス権を付与する必要があります。これは、ドットコマンド<1>{{dotCommand}}</1>を使用して行います。",
+      "create-an-aad-application": "1. AADアプリケーションを作成",
+      "create-an-aad-application-description": "AzureポータルまたはAzure CLIを使用した作成方法の詳細については、<2>こちら</2>をご覧ください。",
+      "detailed-instructions": "3つのステップすべての詳細な手順は、<2>ドキュメント</2>に記載されています。",
+      "dot-command-example": "{{dotCommand}} database your_db_name viewers (&lsquo;{{key}}=your_client_id;your_tenant_id&rsquo;)",
+      "save-and-test": "ステップ1のAADサービスプリンシパルの詳細を使用して、以下のフィールドに入力します。次に、[保存してテスト]ボタンをクリックします。",
+      "title-configuration-help": "設定ヘルプ"
+    },
+    "connection-config": {
+      "aria-label-cluster-url": "クラスターURL",
+      "description-default-cluster-source": "このデータソースのデフォルトのクラスターURL。",
+      "label-default-cluster-url-optional": "デフォルトのクラスターURL（オプション）"
+    },
+    "database-config": {
+      "add-mapping": "マッピングを追加",
+      "aria-label-choose-default-database": "デフォルトのデータベースを選択",
+      "aria-label-remove": "削除",
+      "description-configuration-database-schema-including-default": "デフォルトのデータベースを含むデータベーススキーマの設定。",
+      "description-use-managed-schema": "有効にすると、テーブル、関数、マテリアライズドビューをユーザーフレンドリーな名前にマッピングできます。",
+      "label-default-database": "デフォルトのデータベース",
+      "label-schema-mappings": "スキーママッピング",
+      "label-use-managed-schema": "管理スキーマを使用",
+      "placeholder-name": "名前",
+      "placeholder-target": "ターゲット",
+      "reload-schema": "スキーマを再読み込み",
+      "title-database-schema-settings": "データベーススキーマ設定",
+      "title-error-updating-azure-data-explorer-schema": "Azure Data Explorerスキーマの更新中にエラーが発生しました"
+    },
+    "editor-help": {
+      "adx-query-editor-help": "ADXクエリエディターヘルプ",
+      "can-return-any-set-of-columns": "任意の列セットを返すことができます。",
+      "escape-multi": "{{macro}}($myTemplateVar): $myTemplateVarは、不正な文字を含む複数値テンプレート変数である必要があります",
+      "example-adx-time-series-query": "ADX時系列クエリの例：",
+      "example-time-series-query": "時系列クエリの例：",
+      "format": "フォーマット",
+      "format-as-adx-time-series": "ADX時系列としてフォーマット：",
+      "format-as-table": "テーブルとしてフォーマット：",
+      "format-as-time-series": "時系列としてフォーマット：",
+      "format-as-time-series-description": "Kusto型datetimeの列が正確に1つ必要です。（ヒント：Kustoの{{operatorName}}演算子を使用して列を削除できます）。",
+      "format-description": "「フォーマット形式：」セレクターを使用して、ADXから返されるデータの形式を変更できます。各オプションの詳細は以下のとおりです。",
+      "macro-examples": "マクロの例：",
+      "macros": "マクロ",
+      "macros-description": "マクロを使用すると、Grafanaで設定されたパラメータに基づいて特定の値を自動的に置換できます。",
+      "must-have-timestamp": "「{{requiredColumn}}」という名前のdatetime列が必要です",
+      "optional-string-columns": "オプションで1つ以上の文字列列を持つことができます。各文字列列はキー=値タグペアとして扱われます（キーは列名、値は各行の列の値）。",
+      "requires-one-number-column": "数値型の値列が少なくとも1つ必要です。各値列はメトリックとして扱われます。",
+      "return-time-series": "{{operatorName}}演算子など、Kustoの「時系列」タイプを返すクエリに使用されます",
+      "templating-macros": "テンプレートマクロ：",
+      "time-from": "{{macro}}：{{example}}。クエリの開始時間",
+      "time-interval": "{{macro}}：{{example}}。クエリの時間範囲に基づくGrafanaの推奨ビンサイズ（ミリ秒）",
+      "time-macros": "時間マクロ：",
+      "time-series-returned": "各値列と文字列列値の一意のセットに対して時系列が返されます。各系列には valueColumnName stringColumnName=columnValue, ... という名前が付けられます。リクエストに文字列列がない場合、名前はvalueColumnNameのみになります。",
+      "time-to": "{{macro}}：{{example}}。クエリの終了時間",
+      "using-all": "[すべて]オプションを使用する場合は、[すべてのオプションを含める]チェックボックスをオンにし、[カスタムのすべての値]フィールドに「{{valueToType}}」と入力してください。すべてを選択した場合 -> 1 == 1"
+    },
+    "filter-item": {
+      "aria-label-column": "列",
+      "aria-label-column-datetime-value": "列の日時値",
+      "aria-label-column-number-value": "列の数値",
+      "aria-label-column-value": "列の値",
+      "aria-label-operator": "演算子",
+      "aria-label-remove": "削除",
+      "or": "または"
+    },
+    "filter-section": {
+      "add-group": "グループを追加",
+      "and": "かつ",
+      "label-filters": "フィルター"
+    },
+    "group-by-item": {
+      "aria-label-column": "列",
+      "aria-label-interval": "間隔",
+      "aria-label-remove": "削除",
+      "label": {
+        "1-day": "1日",
+        "1-hour": "1 時間",
+        "1-minute": "1分",
+        "12-hours": "12時間",
+        "15-minutes": "15分",
+        "30-minutes": "30分",
+        "5-minutes": "5分",
+        "6-hours": "6時間",
+        "auto": "自動"
+      }
+    },
+    "group-by-section": {
+      "label-group-by": "以下でグループ化："
+    },
+    "kqlpreview": {
+      "hide": "非表示",
+      "label-query-preview": "クエリプレビュー",
+      "show": "表示"
+    },
+    "open-aieditor": {
+      "alert-enable-plugin-feature": "<2>カタログ</2>からLLMプラグインをインストールしてください。その後、<5>有効化</5>できます。",
+      "button-generate-query": "クエリを生成",
+      "generated-query": "生成されたクエリ",
+      "open-ai-generate-query": "OpenAIにKQLクエリの生成を依頼",
+      "run-query": "クエリを実行",
+      "title-enable-plugin-feature": "この機能を使用するには、LLMプラグインを有効にする必要があります。"
+    },
+    "query-config": {
+      "data-consistency-options": {
+        "label": {
+          "strong": "強",
+          "weak": "弱"
+        }
+      },
+      "description-cache-max-age": "デフォルトでは、キャッシュは無効です。クエリキャッシュを有効にする場合は、キャッシュの有効期間の最大時間を指定してください。",
+      "description-data-consistency": "クエリの一貫性は、クエリと更新の同期方法を制御します。デフォルトは強です。詳細については、<2>Azure Data Explorerドキュメント</2>をご覧ください。",
+      "description-default-editor-mode": "この設定は、エディターが開くモードを決定します。デフォルトはビジュアルです。",
+      "description-use-dynamic-caching": "この機能を有効にすると、Grafanaはクエリごとにキャッシュ設定を動的に適用し、デフォルトのキャッシュ最大期間は無視されます。時系列クエリでは、ビンサイズを使用して時間範囲を拡張し、同時にキャッシュの最大期間としても使用します。",
+      "description-value-controls-client-query-timeout": "この値は、クライアントクエリのタイムアウトを制御します。",
+      "description-various-settings-for-controlling-query-behavior": "クエリ動作を制御するための各種設定。",
+      "editor-mode-options": {
+        "label": {
+          "raw": "Raw",
+          "visual": "ビジュアル"
+        }
+      },
+      "label-cache-max-age": "キャッシュ最大期間",
+      "label-data-consistency": "データの一貫性",
+      "label-default-editor-mode": "デフォルトエディターモード",
+      "label-query-timeout": "クエリタイムアウト",
+      "label-use-dynamic-caching": "動的キャッシュを使用",
+      "title-query-optimizations": "クエリ最適化"
+    },
+    "query-editor": {
+      "title-could-not-load-datasource-schema": "データソーススキーマを読み込めませんでした"
+    },
+    "query-header": {
+      "aria-label-cluster": "クラスター",
+      "aria-label-database": "データベース",
+      "body-lose-manual-changes": "ビジュアルビルダーに戻ると、クエリに対して行った手動変更が失われます。",
+      "confirm-text": "確認",
+      "explain-kql": "KQLについて説明",
+      "kql-explanation": "KQLの説明",
+      "label-cluster": "クラスター",
+      "label-database": "データベース",
+      "label-format-as": "フォーマット形式：",
+      "run-query": "クエリを実行",
+      "text-loading": "読み込み中...",
+      "title-are-you-sure": "本当によろしいですか？"
+    },
+    "table-section": {
+      "aria-label-columns": "列",
+      "aria-label-table": "テーブル",
+      "label-columns": "列",
+      "label-table": "テーブル",
+      "placeholder-all": "すべて",
+      "tooltip-columns": "より高速な結果を得るために、列のサブセットを選択してください。時系列には時間と数値の両方が必要で、その他の列は<2>ディメンション</2>としてレンダリングされます。"
+    },
+    "timeshift": {
+      "aria-label-add": "追加",
+      "aria-label-remove": "削除",
+      "aria-label-timeshift": "タイムシフト",
+      "label": {
+        "day-before": "1日前",
+        "hour-before": "1時間前",
+        "no-timeshift": "タイムシフトなし",
+        "week-before": "1週間前"
+      },
+      "label-timeshift": "タイムシフト"
+    },
+    "tracking-config": {
+      "description-send-username-header-to-host": "この機能を有効にすると、GrafanaはADXにリクエストを送信する際に、ログインユーザーのユーザー名を<2>{{userHeader}}</2>ヘッダーと<4>{{clientRequestIdHeader}}</4>ヘッダーに渡します。ADXでトラッキングが必要な場合に便利です。",
+      "label-send-username-header-to-host": "ユーザー名ヘッダーをホストに送信",
+      "title-tracking": "トラッキング"
+    },
+    "use-template-variables": {
+      "label": {
+        "template-variables": "テンプレート変数"
+      }
+    },
+    "variable-editor": {
+      "aria-label-select-cluster": "クラスターを選択",
+      "aria-label-select-database": "データベースを選択",
+      "aria-label-select-query-type": "クエリタイプを選択",
+      "aria-label-select-table": "テーブルを選択",
+      "label": {
+        "template-variables": "テンプレート変数"
+      },
+      "label-cluster": "クラスター",
+      "label-database": "データベース",
+      "label-query-type": "クエリタイプ",
+      "label-table": "テーブル",
+      "variable_type_options": {
+        "label": {
+          "clusters": "クラスター",
+          "columns": "列",
+          "databases": "データベース",
+          "kusto-query": "Kustoクエリ",
+          "tables": "テーブル"
+        }
+      }
+    },
+    "visual-query-editor": {
+      "title-could-not-load-table-schema": "テーブルスキーマを読み込めませんでした",
+      "title-table-schema-loaded-successfully-without-columns": "テーブルスキーマは正常に読み込まれましたが、列がありません"
+    }
+  }
+}

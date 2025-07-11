@@ -1,0 +1,266 @@
+{
+  "components": {
+    "aggregate-item": {
+      "aggregate-item-function-aria-label-function": "Fungsi",
+      "aria-label-column": "Kolom",
+      "aria-label-percentile": "Persentil",
+      "aria-label-remove": "Hapus",
+      "of": "dari"
+    },
+    "aggregate-section": {
+      "label-aggregate": "Agregat"
+    },
+    "application-config": {
+      "aria-label-application": "Aplikasi",
+      "description-application-displayed": "Nama aplikasi yang akan ditampilkan di ADX.",
+      "label-application-name-optional": "Nama aplikasi (Opsional)"
+    },
+    "azure-credentials-form": {
+      "aad-client-id-aria-label-client-id": "ID Klien",
+      "aad-client-secret-aria-label-client-secret": "Rahasia Klien",
+      "aad-client-secret-configured-aria-label-client-secret": "Rahasia Klien",
+      "aad-client-secret-configured-placeholder-configured": "dikonfigurasi",
+      "aad-tenant-id-aria-label-tenant-id": "ID Tenant",
+      "aria-label-azure-cloud": "Azure Cloud",
+      "auth-type-options": {
+        "label": {
+          "app-registration-on-behalf-of": "Registrasi Aplikasi (Atas Nama)",
+          "current-user": "Pengguna Saat Ini",
+          "managed-identity": "Identitas Terkelola",
+          "workload-identity": "Identitas Beban Kerja"
+        },
+        "opts": {
+          "label": {
+            "app-registration": "Registrasi Aplikasi"
+          }
+        }
+      },
+      "description-choose-authentication-azure-services": "Pilih jenis autentikasi ke layanan Azure",
+      "description-current-user-authentication-is-experimental": "Fitur Grafana tertentu (misalnya peringatan) mungkin tidak berfungsi seperti yang diharapkan. Untuk keterbatasan dan masalah lain yang diketahui, laporan bug, atau umpan balik, silakan kunjungi <2>dokumentasi</2>.",
+      "description-on-behalf-of-feature-is-in-beta": "Untuk keterbatasan dan masalah yang diketahui, laporan bug, atau umpan balik, silakan kunjungi <2>dokumentasi</2>.",
+      "error-client-id-required": "ID Klien diperlukan",
+      "error-client-secret-required": "Rahasia klien diperlukan",
+      "error-tenant-id-required": "ID Tenant diperlukan",
+      "label-application-client-id": "ID Aplikasi (klien)",
+      "label-authentication-method": "Metode Autentikasi",
+      "label-azure-cloud": "Azure Cloud",
+      "label-client-secret": "Rahasia Klien",
+      "label-directory-tenant-id": "ID Direktori (tenant)",
+      "reset": "Atur ulang",
+      "title-authentication": "Autentikasi",
+      "title-current-user-authentication-is-experimental": "Autentikasi pengguna saat ini bersifat eksperimental",
+      "title-on-behalf-of-feature-is-in-beta": "Fitur Atas Nama berada dalam versi beta"
+    },
+    "config-editor": {
+      "description-additional-settings": "Pengaturan tambahan adalah pengaturan opsional yang dapat dikonfigurasi agar memiliki kendali lebih besar atas sumber data Anda. Ini termasuk pengoptimalan kueri, pengaturan skema, konfigurasi pelacakan, dan konfigurasi OpenAI.",
+      "label-enable": "Aktifkan",
+      "secure-socks-proxy": "Proxy SOCKS yang Aman",
+      "title-additional-settings": "Pengaturan tambahan",
+      "tooltip-enable": "Aktifkan proxy koneksi sumber data melalui proxy SOCKS yang aman ke jaringan lain. Lihat <2>Konfigurasikan proxy koneksi sumber data.</2>"
+    },
+    "config-help": {
+      "configure-the-connection-in-grafana": "3. Konfigurasikan koneksi di Grafana",
+      "configuring-azure-explorer-database": "Mengonfigurasi Azure dan Basis Data Azure Data Explorer Anda",
+      "connect-application-database": "2. Hubungkan Aplikasi AAD ke pengguna basis data",
+      "connect-application-database-description": "Navigasikan ke UI Web Azure Data Explorer melalui Portal Azure. Aplikasi AAD yang Anda buat pada langkah 1 perlu diberikan akses pemirsa ke basis data Azure Data Explorer Anda. Ini dilakukan menggunakan perintah dot <1>{{dotCommand}}</1>:",
+      "create-an-aad-application": "1. Buat aplikasi AAD",
+      "create-an-aad-application-description": "Detail tentang cara membuatnya melalui portal Azure atau dengan Azure CLI dapat ditemukan <2>di sini.</2>",
+      "detailed-instructions": "Petunjuk terperinci tentang ketiga langkah tersebut dapat ditemukan <2>di dokumentasi.</2>",
+      "dot-command-example": "pemirsa your_db_name basis data {{dotCommand}} (&lsquo;{{key}}=your_client_id;your_tenant_id&rsquo;)",
+      "save-and-test": "Gunakan detail dari Prinsip Layanan AAD dari Langkah 1 untuk mengisi bidang di bawah ini. Kemudian klik tombol Simpan & Tes.",
+      "title-configuration-help": "Bantuan Konfigurasi"
+    },
+    "connection-config": {
+      "aria-label-cluster-url": "URL Klaster",
+      "description-default-cluster-source": "URL klaster default untuk sumber data ini.",
+      "label-default-cluster-url-optional": "URL klaster default (Opsional)"
+    },
+    "database-config": {
+      "add-mapping": "Tambahkan pemetaan",
+      "aria-label-choose-default-database": "pilih basis data default",
+      "aria-label-remove": "Hapus",
+      "description-configuration-database-schema-including-default": "Konfigurasi untuk skema basis data termasuk basis data default.",
+      "description-use-managed-schema": "Jika diaktifkan, memungkinkan tabel, fungsi, dan tampilan material dipetakan ke nama yang ramah pengguna.",
+      "label-default-database": "Basis data default",
+      "label-schema-mappings": "Pemetaan skema",
+      "label-use-managed-schema": "Gunakan skema terkelola",
+      "placeholder-name": "Nama",
+      "placeholder-target": "Target",
+      "reload-schema": "Muat ulang skema",
+      "title-database-schema-settings": "Pengaturan skema basis data",
+      "title-error-updating-azure-data-explorer-schema": "Terjadi kesalahan saat memperbarui skema Azure Data Explorer"
+    },
+    "editor-help": {
+      "adx-query-editor-help": "Bantuan editor kueri ADX",
+      "can-return-any-set-of-columns": "Dapat mengembalikan kumpulan kolom apa pun.",
+      "escape-multi": "{{macro}}($myTemplateVar): $myTemplateVar harus berupa variabel templat multi-nilai yang berisi karakter ilegal",
+      "example-adx-time-series-query": "Contoh kueri Deret waktu ADX:",
+      "example-time-series-query": "Contoh Kueri Deret Waktu:",
+      "format": "Format",
+      "format-as-adx-time-series": "Format sebagai Deret waktu ADX:",
+      "format-as-table": "Format sebagai Tabel:",
+      "format-as-time-series": "Format sebagai Deret waktu:",
+      "format-as-time-series-description": "Memerlukan tepat satu kolom datetime tipe Kusto. (tips: dapat menggunakan operator {{operatorName}} Kusto untuk menghapus kolom).",
+      "format-description": "Anda dapat mengubah format data yang dikembalikan oleh ADX dengan selektor \"Format sebagai\". Berikut adalah detail lengkap dari setiap opsi:",
+      "macro-examples": "Contoh Makro:",
+      "macros": "Makro",
+      "macros-description": "Makro dapat digunakan untuk mengganti nilai tertentu secara otomatis berdasarkan parameter yang ditetapkan di Grafana:",
+      "must-have-timestamp": "Harus memiliki kolom datetime bernama \"{{requiredColumn}}\"",
+      "optional-string-columns": "Dapat memilih untuk memiliki satu atau beberapa kolom string. Setiap kolom string dianggap sebagai pasangan tag kunci=nilai (yang kuncinya adalah nama kolom, dan nilainya adalah nilai kolom untuk setiap baris).",
+      "requires-one-number-column": "Membutuhkan setidaknya satu kolom nilai berjenis numerik. Setiap kolom nilai dianggap sebagai metrik.",
+      "return-time-series": "Digunakan untuk kueri yang mengembalikan tipe \"deret waktu\" Kusto, seperti operator {{operatorName}}",
+      "templating-macros": "Membuat Templat Makro:",
+      "time-from": "{{macro}}: {{example}}. Waktu mulai kueri",
+      "time-interval": "{{macro}}: {{example}}. Ukuran bin yang direkomendasikan Grafana berdasarkan rentang waktu kueri, dalam md",
+      "time-macros": "Makro Waktu:",
+      "time-series-returned": "Deret waktu dikembalikan untuk setiap kolom nilai dan serangkaian nilai kolom string yang unik. Setiap seri data memiliki nama yang disebut valueColumnName stringColumnName=columnValue, ... Jika tidak ada kolom string dalam permintaan, namanya hanya akan menjadi valueColumnName.",
+      "time-to": "{{macro}}: {{example}}. Waktu akhir kueri",
+      "using-all": "Jika menggunakan opsi Semua, maka aktifkan kotak centang Sertakan Opsi Semua, lalu di bidang nilai Kustom untuk semua, ketikkan: {{valueToType}}. Jika Semua dipilih -> 1 == 1"
+    },
+    "filter-item": {
+      "aria-label-column": "Kolom",
+      "aria-label-column-datetime-value": "Nilai datetime kolom",
+      "aria-label-column-number-value": "Nilai nomor kolom",
+      "aria-label-column-value": "Nilai kolom",
+      "aria-label-operator": "Operator",
+      "aria-label-remove": "Hapus",
+      "or": "ATAU"
+    },
+    "filter-section": {
+      "add-group": "Tambah grup",
+      "and": "DAN",
+      "label-filters": "Filter"
+    },
+    "group-by-item": {
+      "aria-label-column": "Kolom",
+      "aria-label-interval": "Interval",
+      "aria-label-remove": "Hapus",
+      "label": {
+        "1-day": "1 hari",
+        "1-hour": "1 jam",
+        "1-minute": "1 menit",
+        "12-hours": "12 jam",
+        "15-minutes": "15 menit",
+        "30-minutes": "30 menit",
+        "5-minutes": "5 menit",
+        "6-hours": "6 Jam",
+        "auto": "auto"
+      }
+    },
+    "group-by-section": {
+      "label-group-by": "Kelompokkan berdasarkan"
+    },
+    "kqlpreview": {
+      "hide": "sembunyikan",
+      "label-query-preview": "Pratinjau Kueri",
+      "show": "tampilkan"
+    },
+    "open-aieditor": {
+      "alert-enable-plugin-feature": "Instal plugin LLM dari <2>katalog</2>. Anda kemudian dapat <5>mengaktifkannya</5>.",
+      "button-generate-query": "Buat kueri",
+      "generated-query": "Kueri yang dibuat",
+      "open-ai-generate-query": "Minta OpenAI untuk membuat kueri KQL",
+      "run-query": "Jalankan kueri",
+      "title-enable-plugin-feature": "Anda harus mengaktifkan plugin LLM untuk menggunakan fitur ini."
+    },
+    "query-config": {
+      "data-consistency-options": {
+        "label": {
+          "strong": "Kuat",
+          "weak": "Lemah"
+        }
+      },
+      "description-cache-max-age": "Secara default, cache dinonaktifkan. Jika Anda ingin mengaktifkan penyimpanan sementara kueri, harap tentukan rentang waktu maksimum untuk cache yang aktif.",
+      "description-data-consistency": "Konsistensi kueri mengontrol cara kueri dan pembaruan disinkronkan. Default ke Kuat. Untuk informasi selengkapnya, lihat <2>dokumentasi Azure Data Explorer.</2>",
+      "description-default-editor-mode": "Pengaturan ini menentukan mode yang akan digunakan editor untuk membuka. Default ke Visual.",
+      "description-use-dynamic-caching": "Dengan mengaktifkan fitur ini, Grafana akan menerapkan pengaturan cache secara dinamis berdasarkan setiap kueri dan usia maksimum cache default akan diabaikan. Untuk kueri deret waktu, kami akan menggunakan ukuran bin untuk memperlebar rentang waktu tetapi juga sebagai usia maksimum cache.",
+      "description-value-controls-client-query-timeout": "Nilai ini mengontrol batas waktu kueri klien.",
+      "description-various-settings-for-controlling-query-behavior": "Beragam pengaturan untuk mengontrol perilaku kueri.",
+      "editor-mode-options": {
+        "label": {
+          "raw": "Mentah",
+          "visual": "Visual"
+        }
+      },
+      "label-cache-max-age": "Usia maksimum cache",
+      "label-data-consistency": "Konsistensi data",
+      "label-default-editor-mode": "Mode editor default",
+      "label-query-timeout": "Batas waktu kueri habis",
+      "label-use-dynamic-caching": "Gunakan caching (penyimpanan sementara) dinamis",
+      "title-query-optimizations": "Optimisasi Kueri"
+    },
+    "query-editor": {
+      "title-could-not-load-datasource-schema": "Tidak dapat memuat skema sumber data"
+    },
+    "query-header": {
+      "aria-label-cluster": "Klaster",
+      "aria-label-database": "Basis data",
+      "body-lose-manual-changes": "Anda akan kehilangan perubahan manual yang dilakukan pada kueri jika Anda kembali ke pembuat visual.",
+      "confirm-text": "Konfirmasi",
+      "explain-kql": "Jelaskan KQL",
+      "kql-explanation": "Penjelasan KQL",
+      "label-cluster": "Klaster",
+      "label-database": "Basis data",
+      "label-format-as": "Format sebagai",
+      "run-query": "Jalankan kueri",
+      "text-loading": "Memuat...",
+      "title-are-you-sure": "Anda yakin?"
+    },
+    "table-section": {
+      "aria-label-columns": "Kolom",
+      "aria-label-table": "Tabel",
+      "label-columns": "Kolom",
+      "label-table": "Tabel",
+      "placeholder-all": "Semua",
+      "tooltip-columns": "Pilih subset kolom untuk hasil yang lebih cepat. Deret waktu memerlukan nilai waktu dan angka, kolom lain diperlakukan sebagai <2>dimensi</2>."
+    },
+    "timeshift": {
+      "aria-label-add": "Tambahkan",
+      "aria-label-remove": "Hapus",
+      "aria-label-timeshift": "Timeshift",
+      "label": {
+        "day-before": "Hari sebelumnya",
+        "hour-before": "Jam sebelumnya",
+        "no-timeshift": "Tidak ada timeshift",
+        "week-before": "Minggu sebelumnya"
+      },
+      "label-timeshift": "Timeshift"
+    },
+    "tracking-config": {
+      "description-send-username-header-to-host": "Dengan mengaktifkan fitur ini, Grafana akan meneruskan nama pengguna yang masuk di header <2>{{userHeader}}</2> dan di header <4>{{clientRequestIdHeader}}</4> saat mengirim permintaan ke ADX. Bisa berguna ketika pelacakan perlu dilakukan di ADX.",
+      "label-send-username-header-to-host": "Kirim header nama pengguna ke host",
+      "title-tracking": "Melacak"
+    },
+    "use-template-variables": {
+      "label": {
+        "template-variables": "Variabel Templat"
+      }
+    },
+    "variable-editor": {
+      "aria-label-select-cluster": "Pilih klaster",
+      "aria-label-select-database": "Pilih basis data",
+      "aria-label-select-query-type": "Pilih jenis kueri",
+      "aria-label-select-table": "Pilih tabel",
+      "label": {
+        "template-variables": "Variabel Templat"
+      },
+      "label-cluster": "Klaster",
+      "label-database": "Basis data",
+      "label-query-type": "Jenis Kueri",
+      "label-table": "Tabel",
+      "variable_type_options": {
+        "label": {
+          "clusters": "Klaster",
+          "columns": "Kolom",
+          "databases": "Basis data",
+          "kusto-query": "Kueri Kusto",
+          "tables": "Tabel"
+        }
+      }
+    },
+    "visual-query-editor": {
+      "title-could-not-load-table-schema": "Tidak dapat memuat skema tabel",
+      "title-table-schema-loaded-successfully-without-columns": "Skema tabel berhasil dimuat tetapi tanpa kolom"
+    }
+  }
+}
