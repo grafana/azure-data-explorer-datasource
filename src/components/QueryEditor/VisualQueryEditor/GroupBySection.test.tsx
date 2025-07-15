@@ -73,4 +73,20 @@ describe('GroupBySection', () => {
     rerender(<GroupBySection {...defaultProps} query={query} />);
     expect(screen.queryByText('foo')).not.toBeInTheDocument();
   });
+
+  it('renders with no groupBy set ', async () => {
+    const updatedQuery = {
+      ...defaultProps.query,
+      expression: {
+        where: {},
+        reduce: {},
+      },
+    };
+
+    const onChange = jest.fn();
+    // We use as any here because the query is missing the reduce property
+    render(<GroupBySection {...defaultProps} query={updatedQuery as any} onChange={onChange} />);
+
+    expect(await screen.findByText('Group by')).toBeInTheDocument();
+  });
 });
