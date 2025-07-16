@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [6.1.1]
+
+- Fix: Improve initial variable setting to ensure the query editor loads correctly (#1338)
+- Translation updates (#1349)
+- Dependency updates
+
 ## [6.1.0]
 
 - Improve performance of schema loading (#1333)
