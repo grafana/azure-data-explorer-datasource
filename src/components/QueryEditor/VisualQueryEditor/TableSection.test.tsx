@@ -98,4 +98,22 @@ describe('TableSection', () => {
       })
     );
   });
+
+  it('will not call onChange if missing expression in query', async () => {
+    const onChange = jest.fn();
+    const updatedQuery = {
+      ...defaultProps.query,
+      expression: undefined,
+    };
+    render(
+      <TableSection
+        {...defaultProps}
+        query={updatedQuery as any}
+        onChange={onChange}
+        table={{ label: 'Test table', value: 'test-table' }}
+      />
+    );
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

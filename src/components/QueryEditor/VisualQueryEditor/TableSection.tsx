@@ -32,7 +32,11 @@ const TableSection: React.FC<TableSectionProps> = ({
   const [tableColumns, setTableColumns] = useState(tableSchema.value);
 
   useEffect(() => {
-    if (table?.value && (!query.expression.from || query.expression.from.property.name !== table.value)) {
+    if (
+      table?.value &&
+      query.expression &&
+      (!query.expression.from || query.expression.from?.property.name !== table.value)
+    ) {
       // New table
       onChange({
         ...query,

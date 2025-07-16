@@ -3,7 +3,7 @@ import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorList, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorGroupByExpression } from 'types/expressions';
 import { AdxDataSource } from 'datasource';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeGroupBy } from './utils/utils';
@@ -25,12 +25,15 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
   templateVariableOptions,
   onChange: onQueryChange,
 }) => {
-  const expressions = query.expression?.groupBy?.expressions;
+  const expressions = useMemo(
+    () => query.expression?.groupBy?.expressions || [],
+    [query.expression?.groupBy?.expressions]
+  );
   const [groupBys, setGroupBys] = useState(expressions);
   const [currentTable, setCurrentTable] = useState(query.expression?.from?.property.name);
 
   useEffect(() => {
-    if (!groupBys.length && expressions?.length) {
+    if (!groupBys?.length && expressions?.length) {
       setGroupBys(expressions);
     }
   }, [groupBys?.length, expressions]);

@@ -91,4 +91,20 @@ describe('AggregateSection', () => {
     rerender(<AggregateSection {...defaultProps} query={query} />);
     expect(screen.queryByText('foo')).not.toBeInTheDocument();
   });
+
+  it('renders with no expressions set ', async () => {
+    const updatedQuery = {
+      ...defaultProps.query,
+      expression: {
+        where: {},
+        groupBy: {},
+      },
+    };
+
+    const onChange = jest.fn();
+    // We use as any here because the query is missing the reduce property
+    render(<AggregateSection {...defaultProps} query={updatedQuery as any} onChange={onChange} />);
+
+    expect(await screen.findByText('Aggregate')).toBeInTheDocument();
+  });
 });
