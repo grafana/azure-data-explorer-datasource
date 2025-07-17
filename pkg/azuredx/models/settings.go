@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -35,7 +36,9 @@ type DatasourceSettings struct {
 	ServerTimeoutValue string `json:"-"`
 	OpenAIAPIKey       string
 
-	EnforceTrustedEndpoints bool `json:"-"`
+	EnforceTrustedEndpoints   bool     `json:"-"`
+	AllowUserTrustedEndpoints bool     `json:"-"`
+	UserTrustedEndpoints      []string `json:"-"`
 }
 
 // newDataSourceData creates a dataSourceData from the plugin API's DatasourceInfo's
@@ -76,6 +79,18 @@ func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) err
 		return fmt.Errorf("invalid datasource endpoint configuration: %w", err)
 	}
 
+	d.AllowUserTrustedEndpoints, err = envBoolOrDefault("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS", false)
+	if err != nil {
+		return fmt.Errorf("invalid value for ALLOW_USER_TRUSTED_ENDPOINTS: %w", err)
+	}
+
+	if d.EnforceTrustedEndpoints && d.AllowUserTrustedEndpoints {
+		d.UserTrustedEndpoints, err = envStringSliceOrDefault("GF_PLUGIN_USER_TRUSTED_ENDPOINTS", []string{})
+		if err != nil {
+			return fmt.Errorf("invalid value for USER_TRUSTED_ENDPOINTS: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -98,5 +113,13 @@ func envBoolOrDefault(key string, defaultValue bool) (bool, error) {
 		return false, fmt.Errorf("environment variable '%s' is invalid bool value '%s'", key, strValue)
 	} else {
 		return value, nil
+	}
+}
+
+func envStringSliceOrDefault(key string, defaultValue []string) ([]string, error) {
+	if strValue := os.Getenv(key); strValue == "" {
+		return defaultValue, nil
+	} else {
+		return strings.Split(strValue, ","), nil
 	}
 }
