@@ -186,14 +186,32 @@ func (s *TestSettingsSuite) TestLoad() {
 				}`),
 			},
 			setupEnv: func() {
-				os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "true")
-				os.Setenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS", "true")
-				os.Setenv("GF_PLUGIN_USER_TRUSTED_ENDPOINTS", "https://custom1.com,https://custom2.com")
+				err := os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "true")
+				if err != nil {
+					panic(err)
+				}
+				err = os.Setenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS", "true")
+				if err != nil {
+					panic(err)
+				}
+				err = os.Setenv("GF_PLUGIN_USER_TRUSTED_ENDPOINTS", "https://custom1.com,https://custom2.com")
+				if err != nil {
+					panic(err)
+				}
 			},
 			cleanupEnv: func() {
-				os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS")
-				os.Unsetenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS")
-				os.Unsetenv("GF_PLUGIN_USER_TRUSTED_ENDPOINTS")
+				err := os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS")
+				if err != nil {
+					panic(err)
+				}
+				err = os.Unsetenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS")
+				if err != nil {
+					panic(err)
+				}
+				err = os.Unsetenv("GF_PLUGIN_USER_TRUSTED_ENDPOINTS")
+				if err != nil {
+					panic(err)
+				}
 			},
 			expectedResult: &DatasourceSettings{
 				ClusterURL:                "https://test.kusto.windows.net",
