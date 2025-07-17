@@ -230,12 +230,24 @@ func (s *TestSettingsSuite) TestLoad() {
 				}`),
 			},
 			setupEnv: func() {
-				os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "true")
-				os.Setenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS", "false")
+				err := os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "true")
+				if err != nil {
+					panic(err)
+				}
+				err = os.Setenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS", "false")
+				if err != nil {
+					panic(err)
+				}
 			},
 			cleanupEnv: func() {
-				os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS")
-				os.Unsetenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS")
+				err := os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS")
+				if err != nil {
+					panic(err)
+				}
+				err = os.Unsetenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS")
+				if err != nil {
+					panic(err)
+				}
 			},
 			expectedResult: &DatasourceSettings{
 				ClusterURL:                "https://test.kusto.windows.net",
@@ -252,10 +264,16 @@ func (s *TestSettingsSuite) TestLoad() {
 				JSONData: []byte(`{}`),
 			},
 			setupEnv: func() {
-				os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "invalid-bool")
+				err := os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "invalid-bool")
+				if err != nil {
+					panic(err)
+				}
 			},
 			cleanupEnv: func() {
-				os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS")
+				err := os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS")
+				if err != nil {
+					panic(err)
+				}
 			},
 			expectedError: "invalid datasource endpoint configuration",
 		},
@@ -265,12 +283,24 @@ func (s *TestSettingsSuite) TestLoad() {
 				JSONData: []byte(`{}`),
 			},
 			setupEnv: func() {
-				os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "true")
-				os.Setenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS", "invalid-bool")
+				err := os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "true")
+				if err != nil {
+					panic(err)
+				}
+				err = os.Setenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS", "invalid-bool")
+				if err != nil {
+					panic(err)
+				}
 			},
 			cleanupEnv: func() {
-				os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS")
-				os.Unsetenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS")
+				err := os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS")
+				if err != nil {
+					panic(err)
+				}
+				err = os.Unsetenv("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS")
+				if err != nil {
+					panic(err)
+				}
 			},
 			expectedError: "invalid value for ALLOW_USER_TRUSTED_ENDPOINTS",
 		},
@@ -373,8 +403,16 @@ func (s *TestSettingsSuite) TestEnvBoolOrDefault() {
 		s.Run(tt.name, func() {
 			// Set up environment variable
 			if tt.envValue != "" {
-				os.Setenv(tt.envKey, tt.envValue)
-				defer os.Unsetenv(tt.envKey)
+				err := os.Setenv(tt.envKey, tt.envValue)
+				if err != nil {
+					panic(err)
+				}
+				defer func() {
+					err := os.Unsetenv(tt.envKey)
+					if err != nil {
+						panic(err)
+					}
+				}()
 			}
 
 			result, err := envBoolOrDefault(tt.envKey, tt.defaultValue)
@@ -434,8 +472,16 @@ func (s *TestSettingsSuite) TestEnvStringSliceOrDefault() {
 		s.Run(tt.name, func() {
 			// Set up environment variable
 			if tt.envValue != "" {
-				os.Setenv(tt.envKey, tt.envValue)
-				defer os.Unsetenv(tt.envKey)
+				err := os.Setenv(tt.envKey, tt.envValue)
+				if err != nil {
+					panic(err)
+				}
+				defer func() {
+					err := os.Unsetenv(tt.envKey)
+					if err != nil {
+						panic(err)
+					}
+				}()
 			}
 
 			result, err := envStringSliceOrDefault(tt.envKey, tt.defaultValue)
