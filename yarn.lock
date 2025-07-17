@@ -3331,10 +3331,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chance@npm:^1.1.6":
-  version: 1.1.6
-  resolution: "@types/chance@npm:1.1.6"
-  checksum: 10c0/9059986f58e7d0a5f591fcaecb74bfb3c678161eb947972bb1f6473183f74516fa6a2176e0bae83aa2825637cdf9f3a5515127e34c0763ef27bb812e8208cb12
+"@types/chance@npm:^1.1.7":
+  version: 1.1.7
+  resolution: "@types/chance@npm:1.1.7"
+  checksum: 10c0/896288f0a0f87a738c873dfd8cb0893154225bfda11b1fac36842f4722bc4d73c3933bb986217a59873ad5bc97861ca8939dad370a09ecc32723a928534938bd
   languageName: node
   linkType: hard
 
@@ -8071,7 +8071,7 @@ __metadata:
     "@testing-library/jest-dom": "npm:6.6.3"
     "@testing-library/react": "npm:16.2.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/chance": "npm:^1.1.6"
+    "@types/chance": "npm:^1.1.7"
     "@types/debounce-promise": "npm:^3.1.9"
     "@types/glob": "npm:^8.0.0"
     "@types/jest": "npm:^29.5.14"
