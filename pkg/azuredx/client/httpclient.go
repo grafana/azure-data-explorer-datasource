@@ -81,6 +81,11 @@ func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.Dat
 		if err != nil {
 			return nil, err
 		}
+
+		if dsSettings.AllowUserTrustedEndpoints && len(dsSettings.UserTrustedEndpoints) > 0 {
+			endpoints = append(endpoints, dsSettings.UserTrustedEndpoints...)
+		}
+
 		err = authOpts.AllowedEndpoints(endpoints)
 		if err != nil {
 			return nil, err
