@@ -186,6 +186,7 @@ func TestGetAuthOpts(t *testing.T) {
 		dsSettings           *models.DatasourceSettings
 		expectError          bool
 		expectedEndpoints    []string
+		customClouds         []*azsettings.AzureCloudSettings
 	}{
 		{
 			name:                 "basic auth options without endpoint enforcement",
@@ -195,7 +196,8 @@ func TestGetAuthOpts(t *testing.T) {
 				ClusterURL:              "https://test.kusto.windows.net",
 				EnforceTrustedEndpoints: false,
 			},
-			expectError: false,
+			expectError:  false,
+			customClouds: nil,
 		},
 		{
 			name:                 "auth options with trusted endpoints enforcement",
@@ -205,7 +207,8 @@ func TestGetAuthOpts(t *testing.T) {
 				ClusterURL:              "https://test.kusto.windows.net",
 				EnforceTrustedEndpoints: true,
 			},
-			expectError: false,
+			expectError:  false,
+			customClouds: nil,
 		},
 		{
 			name:                 "auth options with trusted endpoints and user endpoints",
@@ -217,7 +220,8 @@ func TestGetAuthOpts(t *testing.T) {
 				AllowUserTrustedEndpoints: true,
 				UserTrustedEndpoints:      []string{"https://custom.endpoint.com", "https://another.endpoint.com"},
 			},
-			expectError: false,
+			expectError:  false,
+			customClouds: nil,
 		},
 		{
 			name:                 "auth options with unsupported cloud",
@@ -227,14 +231,92 @@ func TestGetAuthOpts(t *testing.T) {
 				ClusterURL:              "https://test.kusto.windows.net",
 				EnforceTrustedEndpoints: true,
 			},
+			expectError:  true,
+			customClouds: nil,
+		},
+		{
+			name:                 "auth options with unsupported cloud and custom cloud",
+			azureCloud:           "unsupported-cloud",
+			userProvidedEndpoint: true,
+			dsSettings: &models.DatasourceSettings{
+				ClusterURL:              "https://test.kusto.windows.net",
+				EnforceTrustedEndpoints: true,
+			},
 			expectError: true,
+			customClouds: []*azsettings.AzureCloudSettings{
+				{
+					Name:        "customCloud",
+					DisplayName: "Custom Cloud",
+					Properties: map[string]string{
+						"azureDataExplorerSuffix": ".custom.net",
+					},
+				},
+			},
+		},
+		{
+			name:                 "auth options with custom cloud (not selected)",
+			azureCloud:           azsettings.AzurePublic,
+			userProvidedEndpoint: true,
+			dsSettings: &models.DatasourceSettings{
+				ClusterURL:              "https://test.kusto.windows.net",
+				EnforceTrustedEndpoints: true,
+			},
+			expectError: false,
+			customClouds: []*azsettings.AzureCloudSettings{
+				{
+					Name:        "customCloud",
+					DisplayName: "Custom Cloud",
+					Properties: map[string]string{
+						"azureDataExplorerSuffix": ".custom.net",
+					},
+				},
+			},
+		},
+		{
+			name:                 "auth options with custom cloud (selected)",
+			azureCloud:           "customCloud",
+			userProvidedEndpoint: true,
+			dsSettings: &models.DatasourceSettings{
+				ClusterURL:              "https://test.custom.net",
+				EnforceTrustedEndpoints: true,
+			},
+			expectError: false,
+			customClouds: []*azsettings.AzureCloudSettings{
+				{
+					Name:        "customCloud",
+					DisplayName: "Custom Cloud",
+					Properties: map[string]string{
+						"azureDataExplorerSuffix": ".custom.net",
+					},
+				},
+			},
+		},
+		{
+			name:                 "malformed custom cloud url",
+			azureCloud:           "customCloud",
+			userProvidedEndpoint: true,
+			dsSettings: &models.DatasourceSettings{
+				ClusterURL:              "https://test.custom.net",
+				EnforceTrustedEndpoints: true,
+			},
+			expectError: true,
+			customClouds: []*azsettings.AzureCloudSettings{
+				{
+					Name:        "customCloud",
+					DisplayName: "Custom Cloud",
+					Properties: map[string]string{
+						"azureDataExplorerSuffix": "...fai l.html",
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			azureSettings := &azsettings.AzureSettings{
-				Cloud: tt.azureCloud,
+				Cloud:           tt.azureCloud,
+				CustomCloudList: tt.customClouds,
 			}
 
 			authOpts, err := getAuthOpts(azureSettings, tt.dsSettings, tt.azureCloud, tt.userProvidedEndpoint)
