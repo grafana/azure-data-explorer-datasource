@@ -117,9 +117,9 @@ func envBoolOrDefault(key string, defaultValue bool) (bool, error) {
 }
 
 func envStringSliceOrDefault(key string, defaultValue []string) ([]string, error) {
-	if strValue := os.Getenv(key); strValue == "" {
+	strValue := os.Getenv(key)
+	if strValue == "" {
 		return defaultValue, nil
-	} else {
-		return strings.Split(strValue, ","), nil
 	}
+	return strings.Split(strValue, ","), nil
 }
