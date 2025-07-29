@@ -102,7 +102,7 @@ jobs:
         id: resolve-versions
         uses: grafana/plugin-actions/e2e-version@bf335ac99375f0ba8828497abdf1a22897b5d888
         with:
-          version-resolver-type: version-support-policy
+          version-resolver-type: plugin-grafana-dependency
 
   playwright-tests:
     if: ${{!github.event.pull_request.head.repo.fork}}
