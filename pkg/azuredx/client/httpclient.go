@@ -77,10 +77,15 @@ func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.Dat
 
 	// Enforce only trusted Azure Data Explorer endpoints if enabled
 	if userProvidedEndpoint && dsSettings.EnforceTrustedEndpoints {
-		endpoints, err := getAdxEndpoints(azureCloud)
+		endpoints, err := getAdxEndpoints(azureCloud, azureSettings)
 		if err != nil {
 			return nil, err
 		}
+
+		if dsSettings.AllowUserTrustedEndpoints && len(dsSettings.UserTrustedEndpoints) > 0 {
+			endpoints = append(endpoints, dsSettings.UserTrustedEndpoints...)
+		}
+
 		err = authOpts.AllowedEndpoints(endpoints)
 		if err != nil {
 			return nil, err

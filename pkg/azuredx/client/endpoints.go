@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 )
@@ -53,10 +54,19 @@ var azureDataExplorerEndpoints = map[string][]string{
 	},
 }
 
-func getAdxEndpoints(azureCloud string) ([]string, error) {
-	if endpoints, ok := azureDataExplorerEndpoints[azureCloud]; !ok {
-		return nil, fmt.Errorf("the Azure cloud '%s' not supported by Azure Data Explorer datasource", azureCloud)
-	} else {
+func getAdxEndpoints(azureCloud string, settings *azsettings.AzureSettings) ([]string, error) {
+	if endpoints, ok := azureDataExplorerEndpoints[azureCloud]; ok {
 		return endpoints, nil
 	}
+	cloud, err := settings.GetCloud(azureCloud)
+	if err != nil {
+		return nil, fmt.Errorf("the Azure cloud '%s' not supported by Azure Data Explorer datasource", azureCloud)
+	}
+	// The format of the suffix should be ".SUB_DOMAIN.DOMAIN.TLD" (e.g., ".kusto.windows.net")
+	adxEndpoint := fmt.Sprintf("https://*%s", cloud.Properties["azureDataExplorerSuffix"])
+	_, err = url.Parse(adxEndpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse ADX endpoint URL: %w", err)
+	}
+	return []string{adxEndpoint}, nil
 }

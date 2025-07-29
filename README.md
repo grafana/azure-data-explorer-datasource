@@ -13,17 +13,6 @@ This plugin has the following minimum requirements:
 For detailed instructions on how to install the plugin on Grafana Cloud or
 locally, please check out the [Plugin installation docs](https://grafana.com/docs/grafana/latest/plugins/installation/).
 
-### Enforcing trusted Azure Data Explorer endpoints
-
-For additional security, enforcing a list of trusted ADX endpoints against which the cluster URL will be verified is possible. This prevents a request from being redirected to a third-party endpoint.
-
-This can be enabled by setting `enforce_trusted_endpoints` in your Grafana configuration under the `[plugin.grafana-azure-data-explorer-datasource]` section:
-
-```ini
-[plugin.grafana-azure-data-explorer-datasource]
-enforce_trusted_endpoints = true
-```
-
 ## Configure the Azure Data Explorer data source
 
 To configure ADX for using this data source:
@@ -33,7 +22,7 @@ To configure ADX for using this data source:
 1. Use the AAD Application to configure the data source connection in Grafana.
 1. (Optional) To use the dropdown cluster select when creating queries, add reader access to the subscription(s) that contain the clusters.
 
-### Creating an Azure Active Directory Service Principle
+### Creating an Azure Active Directory Service Principal
 
 For detailed instructions on how to set up a Microsoft Entra application and service principal that can access resources, please follow this guide from Microsoft: [Create a Microsoft Entra application and service principal that can access resources](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal)
 
@@ -79,6 +68,34 @@ A real example with a client/app id and tenant id:
 If the command succeeds, you should get a result like this:
 
 ![Azure Data Web Explorer Add result](https://raw.githubusercontent.com/grafana/azure-data-explorer-datasource/main/src/img/config_3_web_ui.png)
+
+### Enforcing trusted Azure Data Explorer endpoints
+
+For additional security, enforcing a list of trusted ADX endpoints against which the cluster URL will be verified is possible. This prevents a request from being redirected to a third-party endpoint.
+
+This can be enabled by setting `enforce_trusted_endpoints` in your Grafana configuration under the `[plugin.grafana-azure-data-explorer-datasource]` section:
+
+```ini
+[plugin.grafana-azure-data-explorer-datasource]
+enforce_trusted_endpoints = true
+```
+
+### Allow user-specified trusted endpoints
+
+There may be cases where an ADX cluster is behind a proxy or load balancer. In this case, it may be necessary to specify a trusted endpoint that is not in the default endpoint allow list.
+
+This functionality can be enabled by setting `allow_user_trusted_endpoints` to `true` and specifying the required endpoints as a comma separated list with the key `user_trusted_endpoints` in your Grafana configuration under the `[plugin.grafana-azure-data-explorer-datasource]` section:
+
+```ini
+[plugin.grafana-azure-data-explorer-datasource]
+enforce_trusted_endpoints = true
+allow_user_trusted_endpoints = true
+user_trusted_endpoints = https://first.endpoint.com,https://endpoint.second.com
+```
+
+{{%/* admonition type="caution" */%}}
+This feature should be used with caution as requests sent to untrusted endpoints may expose authentication tokens to unintended 3rd parties.
+{{%/* /admonition */%}}
 
 ## Configuring Grafana
 
