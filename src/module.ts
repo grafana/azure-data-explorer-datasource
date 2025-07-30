@@ -10,11 +10,7 @@ import { AdxDataSourceOptions, AdxDataSourceSecureOptions, KustoQuery } from './
 import EditorHelp from 'components/QueryEditor/EditorHelp';
 import { analyzeQueries, trackADXMonitorDashboardLoaded } from 'tracking';
 
-// don't load plugin translations in test environments
-// we don't use them anyway, and top-level await won't work currently in jest
-if (process.env.NODE_ENV !== 'test') {
-  await initPluginTranslations(pluginJson.id);
-}
+initPluginTranslations(pluginJson.id);
 
 export const plugin = new DataSourcePlugin<AdxDataSource, KustoQuery, AdxDataSourceOptions, AdxDataSourceSecureOptions>(
   AdxDataSource

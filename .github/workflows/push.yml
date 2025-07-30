@@ -19,4 +19,9 @@ jobs:
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
       go-version: '1.24'
       golangci-lint-version: '2.1.6'
-      run-playwright: false
+      run-playwright: true
+      playwright-secrets: |
+        TENANT_ID=e2e:tenantId
+        CLIENT_ID=e2e:clientId
+        CLIENT_SECRET=e2e:clientSecret
+        CLUSTER_URL=e2e:clusterUrl
