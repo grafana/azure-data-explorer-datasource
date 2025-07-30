@@ -13,8 +13,5 @@ services:
     volumes:
       - ./dist:/var/lib/grafana/plugins/azure-data-explorer-datasource
       - ./provisioning:/etc/grafana/provisioning
-    environment:
-      TENANT_ID: ${TENANT_ID}
-      CLIENT_ID: ${CLIENT_ID}
-      CLIENT_SECRET: ${CLIENT_SECRET}
-      CLUSTER_URL: ${CLUSTER_URL}
+    env_file:
+      - .env
