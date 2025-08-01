@@ -1,4 +1,3 @@
-import { t } from '@grafana/i18n';
 import React, { useState } from 'react';
 
 import { Button, Select } from '@grafana/ui';
@@ -37,18 +36,14 @@ const Timeshift: React.FC<TimeshiftProps> = (props) => {
   return (
     <EditorRow>
       <EditorFieldGroup>
-        <EditorField
-          label={t('components.timeshift.label-timeshift', 'Timeshift')}
-          optional={true}
-          data-testid={selectors.components.queryEditor.timeshift.field}
-        >
+        <EditorField label="Timeshift" optional={true} data-testid={selectors.components.queryEditor.timeshift.field}>
           <InputGroup>
             <Button
               onClick={() => setDisplaySelect(true)}
               variant="secondary"
               size="md"
               icon="plus"
-              aria-label={t('components.timeshift.aria-label-add', 'Add')}
+              aria-label="Add"
               type="button"
               hidden={displaySelect}
             />
@@ -57,24 +52,24 @@ const Timeshift: React.FC<TimeshiftProps> = (props) => {
                 <>
                   <Select
                     width={'auto'}
-                    aria-label={t('components.timeshift.aria-label-timeshift', 'Timeshift')}
+                    aria-label="timeshift"
                     autoFocus={displaySelect}
                     allowCustomValue
                     options={[
                       {
-                        label: t('components.timeshift.label.no-timeshift', 'No timeshift'),
+                        label: 'No timeshift',
                         value: '',
                       },
                       {
-                        label: t('components.timeshift.label.hour-before', 'Hour before'),
+                        label: 'Hour before',
                         value: '1h',
                       },
                       {
-                        label: t('components.timeshift.label.day-before', 'Day before'),
+                        label: 'Day before',
                         value: '1d',
                       },
                       {
-                        label: t('components.timeshift.label.week-before', 'Week before'),
+                        label: 'Week before',
                         value: '7d',
                       },
                     ]}
@@ -82,7 +77,7 @@ const Timeshift: React.FC<TimeshiftProps> = (props) => {
                     onChange={(e) => onChangeValue(e.value)}
                   />
                   <AccessoryButton
-                    aria-label={t('components.timeshift.aria-label-remove', 'Remove')}
+                    aria-label="remove"
                     icon="times"
                     variant="secondary"
                     onClick={() => {

@@ -26,7 +26,7 @@ describe('GroupByItem', () => {
     ];
     render(<GroupByItem {...defaultProps} columns={columns} onChange={onChange} />);
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('Column');
+      const sel = await screen.getByLabelText('column');
       act(() => openMenu(sel));
       (await screen.getByText('foo')).click();
     });
@@ -43,7 +43,7 @@ describe('GroupByItem', () => {
     };
     render(<GroupByItem {...defaultProps} onChange={onChange} templateVariableOptions={templateVariableOptions} />);
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('Column');
+      const sel = await screen.getByLabelText('column');
       act(() => openMenu(sel));
       (await screen.getByText('Template Variables')).click();
       (await screen.findByText('$foo')).click();
@@ -60,7 +60,7 @@ describe('GroupByItem', () => {
     };
     render(<GroupByItem {...defaultProps} onChange={onChange} groupBy={groupBy} />);
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('Interval');
+      const sel = await screen.getByLabelText('interval');
       act(() => openMenu(sel));
       (await screen.getByText('1 minute')).click();
     });

@@ -1,4 +1,3 @@
-import { t } from '@grafana/i18n';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorList, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorReduceExpression } from 'types/expressions';
@@ -84,11 +83,7 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
     <div data-testid="aggregate-section">
       <EditorRow>
         <EditorFieldGroup>
-          <EditorField
-            label={t('components.aggregate-section.label-aggregate', 'Aggregate')}
-            optional={true}
-            data-testid={selectors.components.queryEditor.aggregate.field}
-          >
+          <EditorField label="Aggregate" optional={true} data-testid={selectors.components.queryEditor.aggregate.field}>
             <EditorList
               items={aggregates}
               onChange={onChange}

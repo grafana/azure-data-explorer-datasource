@@ -79,11 +79,11 @@ describe('VariableEditor', () => {
     const props = defaultProps();
     const { rerender } = render(<VariableEditor {...props} />);
     await waitFor(async () => {
-      await screen.getByLabelText('Select query type');
-      const querySelector = await screen.getByLabelText('Select query type');
+      await screen.getByLabelText('select query type');
+      const querySelector = await screen.getByLabelText('select query type');
       act(() => openMenu(querySelector));
 
-      (await screen.getByRole('option', { name: 'Clusters' })).click();
+      (await screen.getByText('Clusters')).click();
       const newQuery = { ...props.query, queryType: AdxQueryType.Clusters };
       rerender(<VariableEditor {...props} query={newQuery} />);
     });
@@ -96,10 +96,10 @@ describe('VariableEditor', () => {
     const props = defaultProps();
     const { rerender } = render(<VariableEditor {...props} />);
     await waitFor(async () => {
-      await screen.getByLabelText('Select query type');
-      const querySelector = await screen.getByLabelText('Select query type');
+      await screen.getByLabelText('select query type');
+      const querySelector = await screen.getByLabelText('select query type');
       act(() => openMenu(querySelector));
-      (await screen.getByRole('option', { name: 'Databases' })).click();
+      (await screen.getByText('Databases')).click();
       const newQuery = { ...props.query, queryType: AdxQueryType.Databases };
       rerender(<VariableEditor {...props} query={newQuery} />);
     });
@@ -113,13 +113,13 @@ describe('VariableEditor', () => {
     props.query = '' as any;
     const { rerender } = render(<VariableEditor {...props} />);
     await waitFor(async () => {
-      await screen.getByLabelText('Select query type');
-      const querySelector = await screen.getByLabelText('Select query type');
+      await screen.getByLabelText('select query type');
+      const querySelector = await screen.getByLabelText('select query type');
       act(() => openMenu(querySelector));
-      (await screen.getByRole('option', { name: 'Tables' })).click();
+      (await screen.getByText('Tables')).click();
       const newQuery = { ...props.query, queryType: AdxQueryType.Tables };
       rerender(<VariableEditor {...props} query={newQuery} />);
-      const databasesSelector = await screen.getByLabelText('Select database');
+      const databasesSelector = await screen.getByLabelText('select database');
       act(() => openMenu(databasesSelector));
       (await screen.getByText('test_db')).click();
       const newerQuery = { ...props.query, database: 'test_db' };
@@ -148,17 +148,17 @@ describe('VariableEditor', () => {
     props.query = '' as any;
     const { rerender } = render(<VariableEditor {...props} />);
     await waitFor(async () => {
-      const querySelector = await screen.getByLabelText('Select query type');
+      const querySelector = await screen.getByLabelText('select query type');
       act(() => openMenu(querySelector));
-      (await screen.getByRole('option', { name: 'Columns' })).click();
+      (await screen.getByText('Columns')).click();
       const newQuery = { ...props.query, queryType: AdxQueryType.Columns };
       rerender(<VariableEditor {...props} query={newQuery} />);
-      const databasesSelector = await screen.getByLabelText('Select database');
+      const databasesSelector = await screen.getByLabelText('select database');
       act(() => openMenu(databasesSelector));
       (await screen.getByText('test_db')).click();
       const newerQuery = { ...props.query, queryType: AdxQueryType.Columns, database: 'test_db' };
       rerender(<VariableEditor {...props} query={newerQuery} />);
-      const tablesSelector = await screen.getByLabelText('Select table');
+      const tablesSelector = await screen.getByLabelText('select table');
       act(() => openMenu(tablesSelector));
       (await screen.getByText('test_table')).click();
       const newestQuery = { ...props.query, queryType: AdxQueryType.Columns, database: 'test_db', table: 'test_table' };

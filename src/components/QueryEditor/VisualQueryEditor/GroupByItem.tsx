@@ -1,4 +1,3 @@
-import { t } from '@grafana/i18n';
 import React from 'react';
 
 import { SelectableValue } from '@grafana/data';
@@ -30,7 +29,7 @@ const GroupByItem: React.FC<GroupByItemProps> = (props) => {
   return (
     <InputGroup>
       <Select
-        aria-label={t('components.group-by-item.aria-label-column', 'Column')}
+        aria-label="column"
         width={'auto'}
         autoFocus={groupBy.focus}
         value={groupBy.property?.name ? valueToDefinition(groupBy.property?.name) : null}
@@ -54,18 +53,18 @@ const GroupByItem: React.FC<GroupByItemProps> = (props) => {
         {groupBy.property?.type === QueryEditorPropertyType.DateTime && (
           <Select
             width={'auto'}
-            aria-label={t('components.group-by-item.aria-label-interval', 'Interval')}
+            aria-label="interval"
             allowCustomValue
             options={[
-              { label: t('components.group-by-item.label.auto', 'auto'), value: '$__timeInterval' },
-              { label: t('components.group-by-item.label.1-minute', '1 minute'), value: '1m' },
-              { label: t('components.group-by-item.label.5-minutes', '5 minutes'), value: '5m' },
-              { label: t('components.group-by-item.label.15-minutes', '15 minutes'), value: '15m' },
-              { label: t('components.group-by-item.label.30-minutes', '30 minutes'), value: '30m' },
-              { label: t('components.group-by-item.label.1-hour', '1 hour'), value: '1h' },
-              { label: t('components.group-by-item.label.6-hours', '6 hours'), value: '6h' },
-              { label: t('components.group-by-item.label.12-hours', '12 hours'), value: '12h' },
-              { label: t('components.group-by-item.label.1-day', '1 day'), value: '1d' },
+              { label: 'auto', value: '$__timeInterval' },
+              { label: '1 minute', value: '1m' },
+              { label: '5 minutes', value: '5m' },
+              { label: '15 minutes', value: '15m' },
+              { label: '30 minutes', value: '30m' },
+              { label: '1 hour', value: '1h' },
+              { label: '6 hours', value: '6h' },
+              { label: '12 hours', value: '12h' },
+              { label: '1 day', value: '1d' },
             ]}
             value={groupBy.interval?.name}
             onChange={(e) => {
@@ -85,12 +84,7 @@ const GroupByItem: React.FC<GroupByItemProps> = (props) => {
           />
         )}
       </>
-      <AccessoryButton
-        aria-label={t('components.group-by-item.aria-label-remove', 'Remove')}
-        icon="times"
-        variant="secondary"
-        onClick={onDelete}
-      />
+      <AccessoryButton aria-label="remove" icon="times" variant="secondary" onClick={onDelete} />
     </InputGroup>
   );
 };

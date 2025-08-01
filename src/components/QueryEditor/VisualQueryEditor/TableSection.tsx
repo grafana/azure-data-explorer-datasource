@@ -1,4 +1,3 @@
-import { Trans, t } from '@grafana/i18n';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpressionType } from 'types/expressions';
@@ -6,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxColumnSchema, AdxDataSourceOptions, defaultQuery, KustoQuery } from 'types';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
-import { Select, TextLink } from '@grafana/ui';
+import { Select } from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 import { defaultTimeSeriesColumns, toColumnNames } from './utils/utils';
 import { selectors } from 'test/selectors';
@@ -77,9 +76,9 @@ const TableSection: React.FC<TableSectionProps> = ({
   return (
     <EditorRow>
       <EditorFieldGroup>
-        <EditorField label={t('components.table-section.label-table', 'Table')}>
+        <EditorField label="Table">
           <Select
-            aria-label={t('components.table-section.aria-label-table', 'Table')}
+            aria-label="Table"
             data-testid={selectors.components.queryEditor.tableFrom.input}
             isLoading={tableSchema.loading}
             value={table}
@@ -102,23 +101,25 @@ const TableSection: React.FC<TableSectionProps> = ({
           />
         </EditorField>
         <EditorField
-          label={t('components.table-section.label-columns', 'Columns')}
+          label="Columns"
           tooltipInteractive={true}
           tooltip={
             <>
-              <Trans i18nKey="components.table-section.tooltip-columns">
-                Select a subset of columns for faster results. Time series requires both time and number values, other
-                columns are rendered as{' '}
-                <TextLink href="https://grafana.com/docs/grafana/latest/basics/timeseries-dimensions/" external>
-                  dimensions
-                </TextLink>
-                .
-              </Trans>
+              Select a subset of columns for faster results. Time series requires both time and number values, other
+              columns are rendered as{' '}
+              <a
+                href="https://grafana.com/docs/grafana/latest/basics/timeseries-dimensions/"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                dimensions
+              </a>
+              .
             </>
           }
         >
           <Select
-            aria-label={t('components.table-section.aria-label-columns', 'Columns')}
+            aria-label="Columns"
             data-testid={selectors.components.queryEditor.columns.input}
             isMulti
             value={query.expression?.columns?.columns ? query.expression?.columns?.columns : []}
@@ -129,7 +130,7 @@ const TableSection: React.FC<TableSectionProps> = ({
                 label: templateVariableOptions.label || '',
                 ...templateVariableOptions,
               })}
-            placeholder={t('components.table-section.placeholder-all', 'All')}
+            placeholder="All"
             onChange={(e) => {
               onChange({
                 ...query,

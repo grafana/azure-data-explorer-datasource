@@ -28,18 +28,20 @@ export const RawQueryEditor: React.FC<RawQueryEditorProps> = (props) => {
   const editorRef = useRef<MonacoEditor | null>(null);
 
   const onRawQueryChange = useCallback(() => {
-    const kql = editorRef.current?.getValue() || '';
-    reportInteraction('grafana_ds_adx_raw_editor_query_blurred');
-    if (kql !== props.query.query) {
-      props.setDirty();
-      props.onChange({
-        ...props.query,
-        query: kql,
-      });
-      props.onRunQuery();
-    }
-  }, [props]);
-
+      const kql = editorRef.current?.getValue() || '';
+      reportInteraction('grafana_ds_adx_raw_editor_query_blurred');
+      if (kql !== props.query.query) {
+        props.setDirty();
+        props.onChange({
+          ...props.query,
+          query: kql,
+        });
+        props.onRunQuery();
+      }
+    },
+    [props]
+  );
+  
   const onKeyDownCapture = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === 'Enter' && e.shiftKey) {

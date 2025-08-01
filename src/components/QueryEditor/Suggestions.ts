@@ -122,11 +122,9 @@ export function getSignatureHelp(
     activeSignature: 0,
     signatures: [
       {
-        // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
         label: '$__timeFilter(timeColumn)',
         parameters: [
           {
-            // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
             label: 'timeColumn',
             documentation:
               'Default is ' +

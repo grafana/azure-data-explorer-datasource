@@ -21,7 +21,7 @@ describe('AggregateItem', () => {
     const onChange = jest.fn();
     render(<AggregateItem {...defaultProps} onChange={onChange} />);
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('Function');
+      const sel = await screen.getByLabelText('function');
       act(() => openMenu(sel));
       (await screen.getByText(AggregateFunctions.Avg)).click();
     });
@@ -40,7 +40,7 @@ describe('AggregateItem', () => {
     ];
     render(<AggregateItem {...defaultProps} columns={columns} onChange={onChange} />);
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('Column');
+      const sel = await screen.getByLabelText('column');
       act(() => openMenu(sel));
       (await screen.getByText('foo')).click();
     });
@@ -66,7 +66,7 @@ describe('AggregateItem', () => {
       />
     );
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('Column');
+      const sel = await screen.getByLabelText('column');
       act(() => openMenu(sel));
       (await screen.getByText('Template Variables')).click();
       (await screen.findByText('$foo')).click();
@@ -83,7 +83,7 @@ describe('AggregateItem', () => {
       reduce: { name: AggregateFunctions.Count, type: QueryEditorPropertyType.Function },
     };
     render(<AggregateItem {...defaultProps} onChange={onChange} aggregate={aggregate} />);
-    expect(screen.queryByLabelText('Column')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('column')).not.toBeInTheDocument();
   });
 
   it('should add a parameter when using a percentile', async () => {
@@ -94,7 +94,7 @@ describe('AggregateItem', () => {
     };
     render(<AggregateItem {...defaultProps} onChange={onChange} aggregate={aggregate} />);
     await waitFor(async () => {
-      const sel = await screen.getByLabelText('Percentile');
+      const sel = await screen.getByLabelText('percentile');
       act(() => openMenu(sel));
       (await screen.getByText('95')).click();
     });
