@@ -52,7 +52,7 @@ describe('KQLFilter', () => {
   it('should remove the filter group when removing the last element', async () => {
     const onChange = jest.fn();
     render(<KQLFilter {...defaultProps} onChange={onChange} />);
-    await act(() => screen.getByLabelText('remove').click());
+    await act(() => screen.getByLabelText('Remove').click());
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange.mock.calls[0][0].expression.where.expressions.length).toBe(0);
   });
@@ -98,7 +98,7 @@ describe('KQLFilter', () => {
     };
     const { rerender } = render(<KQLFilter {...defaultProps} onChange={onChange} index={1} query={query} />);
     expect(screen.getByText('Other')).toBeInTheDocument();
-    await act(() => screen.getByLabelText('remove').click());
+    await act(() => screen.getByLabelText('Remove').click());
     rerender(<KQLFilter {...defaultProps} onChange={onChange} index={0} query={query} />);
     expect(screen.getByText('ActivityName')).toBeInTheDocument();
   });

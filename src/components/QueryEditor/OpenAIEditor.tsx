@@ -1,7 +1,19 @@
+import { Trans, t } from '@grafana/i18n';
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { llm } from '@grafana/llm';
 import { getTemplateSrv, reportInteraction } from '@grafana/runtime';
-import { Alert, Button, CodeEditor, Spinner, Monaco, MonacoEditor, useStyles2, TextArea, Stack } from '@grafana/ui';
+import {
+  Alert,
+  Button,
+  CodeEditor,
+  Spinner,
+  Monaco,
+  MonacoEditor,
+  useStyles2,
+  TextArea,
+  Stack,
+  TextLink,
+} from '@grafana/ui';
 import { AdxDataSource } from 'datasource';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { selectors } from 'test/selectors';
@@ -186,22 +198,29 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
             setErrorMessage(TOKEN_NOT_FOUND);
           }}
           severity="info"
-          title={'You need to enable the LLM plugin to use this feature.'}
+          title={t(
+            'components.open-aieditor.title-enable-plugin-feature',
+            'You need to enable the LLM plugin to use this feature.'
+          )}
         >
-          Install the LLM plugin from the{' '}
-          <a className={styles.link} href="https://grafana.com/grafana/plugins/grafana-llm-app/">
-            catalog
-          </a>
-          . You can then{' '}
-          <a className={styles.link} href="/plugins/grafana-llm-app">
-            enable
-          </a>{' '}
-          it.
+          <Trans i18nKey="components.open-aieditor.alert-enable-plugin-feature">
+            Install the LLM plugin from the{' '}
+            <TextLink href="https://grafana.com/grafana/plugins/grafana-llm-app/" external>
+              catalog
+            </TextLink>
+            . You can then{' '}
+            <TextLink href="/plugins/grafana-llm-app" external>
+              enable
+            </TextLink>{' '}
+            it.
+          </Trans>
         </Alert>
       )}
       <div className={styles.outerMargin}>
         <Stack justifyContent="flex-start" alignItems="flex-start" direction={'row'}>
-          <h5>Ask OpenAI to generate a KQL query</h5>
+          <h5>
+            <Trans i18nKey="components.open-aieditor.open-ai-generate-query">Ask OpenAI to generate a KQL query</Trans>
+          </h5>
           <Button
             className={styles.buttonLeftMargin}
             onClick={generateQuery}
@@ -209,7 +228,8 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
             variant="primary"
             size="sm"
           >
-            {isWaiting && <Spinner className={styles.spinnerSpace} inline={true} />} Generate query
+            {isWaiting && <Spinner className={styles.spinnerSpace} inline={true} />}{' '}
+            <Trans i18nKey="components.open-aieditor.button-generate-query">Generate query</Trans>
           </Button>
         </Stack>
         <TextArea
@@ -221,7 +241,9 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
       </div>
       <div className={styles.dividerSpace}>
         <Stack justifyContent="flex-start" alignItems="flex-start" direction={'row'}>
-          <h5>Generated query</h5>
+          <h5>
+            <Trans i18nKey="components.open-aieditor.generated-query">Generated query</Trans>
+          </h5>
           <Button
             className={styles.buttonLeftMargin}
             variant="primary"
@@ -233,7 +255,7 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
             }}
             data-testid={selectors.components.queryEditor.runQuery.button}
           >
-            Run query
+            <Trans i18nKey="components.open-aieditor.run-query">Run query</Trans>
           </Button>
         </Stack>
         <div className={styles.editorSpace} data-testid={selectors.components.queryEditor.codeEditor.container}>
@@ -259,10 +281,6 @@ const getStyles = (theme: GrafanaTheme2) => {
   return {
     outerMargin: css({
       marginTop: theme.spacing(1),
-    }),
-    link: css({
-      color: theme.colors.text.link,
-      textDecoration: 'underline',
     }),
     innerMargin: css({
       marginTop: theme.spacing(2),

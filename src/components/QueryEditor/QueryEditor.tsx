@@ -1,3 +1,4 @@
+import { t } from '@grafana/i18n';
 import { LoadingState, QueryEditorProps } from '@grafana/data';
 import { Alert, LoadingBar } from '@grafana/ui';
 import { get } from 'lodash';
@@ -31,7 +32,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
 
   const templateVariables = useTemplateVariables(datasource);
   const [dirty, setDirty] = useState(false);
-  const isLoading = useMemo(()=> props.data?.state === LoadingState.Loading, [props.data?.state]);
+  const isLoading = useMemo(() => props.data?.state === LoadingState.Loading, [props.data?.state]);
 
   useEffectOnce(() => {
     let processedQuery = query;
@@ -47,7 +48,16 @@ export const QueryEditor: React.FC<Props> = (props) => {
 
   return (
     <>
-      {schema.error && <Alert title="Could not load datasource schema">{parseSchemaError(schema.error)}</Alert>}
+      {schema.error && (
+        <Alert
+          title={t(
+            'components.query-editor.title-could-not-load-datasource-schema',
+            'Could not load datasource schema'
+          )}
+        >
+          {parseSchemaError(schema.error)}
+        </Alert>
+      )}
       {isLoading ? <LoadingBar width={window.innerWidth} /> : <div style={{ height: 1 }} />}
       <QueryHeader
         query={query}
@@ -105,7 +115,7 @@ const useTemplateVariables = (datasource: AdxDataSource) => {
 
   return useMemo(() => {
     return {
-      label: 'Template Variables',
+      label: t('components.use-template-variables.label.template-variables', 'Template Variables'),
       expanded: false,
       options: variables.map((variable) => {
         return { label: variable, value: variable };

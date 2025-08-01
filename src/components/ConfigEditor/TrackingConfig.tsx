@@ -1,3 +1,4 @@
+import { Trans, t } from '@grafana/i18n';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { ConfigSubSection } from '@grafana/plugin-ui';
 import { Field, Switch } from '@grafana/ui';
@@ -13,14 +14,19 @@ const TrackingConfig: React.FC<TrackingConfigProps> = ({ options, updateJsonData
   const { jsonData } = options;
 
   return (
-    <ConfigSubSection title="Tracking" isCollapsible>
+    <ConfigSubSection title={t('components.tracking-config.title-tracking', 'Tracking')} isCollapsible>
       <Field
-        label="Send username header to host"
+        label={t('components.tracking-config.label-send-username-header-to-host', 'Send username header to host')}
         description={
           <span>
-            With this feature enabled, Grafana will pass the logged in user&#39;s username in the{' '}
-            <code>x-ms-user-id</code> header and in the <code>x-ms-client-request-id</code> header when sending requests
-            to ADX. Can be useful when tracking needs to be done in ADX.
+            <Trans
+              i18nKey="components.tracking-config.description-send-username-header-to-host"
+              values={{ userHeader: 'x-ms-user-id', clientRequestIdHeader: 'x-ms-client-request-id' }}
+            >
+              With this feature enabled, Grafana will pass the logged in user&#39;s username in the{' '}
+              <code>{'{{userHeader}}'}</code> header and in the <code>{'{{clientRequestIdHeader}}'}</code> header when
+              sending requests to ADX. Can be useful when tracking needs to be done in ADX.
+            </Trans>
           </span>
         }
       >
