@@ -1,0 +1,6 @@
+{
+  "extends": "./.config/.eslintrc",
+  "ignorePatterns": [
+    "src/libs"
+  ]
+}

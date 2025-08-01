@@ -187,7 +187,7 @@ describe('VisualQueryEditor', () => {
       // Add a section
       (await within(as).findByLabelText('Add')).click();
     });
-    const selCol = await within(as).findByLabelText('Column');
+    const selCol = await within(as).findByLabelText('column');
     act(() => openMenu(selCol));
     // The column is now displayed in the both selectors
     expect(screen.getAllByText('foobar')).toHaveLength(2);

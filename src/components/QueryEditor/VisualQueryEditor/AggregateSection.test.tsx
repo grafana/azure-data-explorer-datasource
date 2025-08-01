@@ -24,7 +24,7 @@ describe('AggregateSection', () => {
     await waitFor(async () => {
       (await screen.findByLabelText('Add')).click();
       // Select a function
-      const sel = await screen.findByLabelText('Function');
+      const sel = await screen.findByLabelText('function');
       act(() => openMenu(sel));
       (await screen.getByText(AggregateFunctions.Avg)).click();
     });
@@ -37,7 +37,7 @@ describe('AggregateSection', () => {
 
     await waitFor(async () => {
       // Select a column
-      const selCol = await screen.findByLabelText('Column');
+      const selCol = await screen.findByLabelText('column');
       act(() => openMenu(selCol));
       (await screen.findByText('foo')).click();
     });

@@ -1,4 +1,3 @@
-import { t } from '@grafana/i18n';
 import { SelectableValue } from '@grafana/data';
 import { Field, Select } from '@grafana/ui';
 import { QueryEditor } from 'components/QueryEditor/QueryEditor';
@@ -26,23 +25,11 @@ interface VariableOptions<T = string> {
 const VariableEditor = (props: VariableProps) => {
   const { query, onChange, datasource } = props;
   const VARIABLE_TYPE_OPTIONS = [
-    {
-      label: t('components.variable-editor.variable_type_options.label.clusters', 'Clusters'),
-      value: AdxQueryType.Clusters,
-    },
-    {
-      label: t('components.variable-editor.variable_type_options.label.databases', 'Databases'),
-      value: AdxQueryType.Databases,
-    },
-    { label: t('components.variable-editor.variable_type_options.label.tables', 'Tables'), value: AdxQueryType.Tables },
-    {
-      label: t('components.variable-editor.variable_type_options.label.columns', 'Columns'),
-      value: AdxQueryType.Columns,
-    },
-    {
-      label: t('components.variable-editor.variable_type_options.label.kusto-query', 'Kusto Query'),
-      value: AdxQueryType.KustoQuery,
-    },
+    { label: 'Clusters', value: AdxQueryType.Clusters },
+    { label: 'Databases', value: AdxQueryType.Databases },
+    { label: 'Tables', value: AdxQueryType.Tables },
+    { label: 'Columns', value: AdxQueryType.Columns },
+    { label: 'Kusto Query', value: AdxQueryType.KustoQuery },
   ];
   const [variableOptionGroup, setVariableOptionGroup] = useState<{ label: string; options: VariableOptions[] }>({
     label: 'Template Variables',
@@ -73,7 +60,7 @@ const VariableEditor = (props: VariableProps) => {
       }
     });
     setVariableOptionGroup({
-      label: t('components.variable-editor.label.template-variables', 'Template Variables'),
+      label: 'Template Variables',
       options,
     });
   }, [datasource, queryType]);
@@ -165,12 +152,9 @@ const VariableEditor = (props: VariableProps) => {
 
   return (
     <>
-      <Field
-        label={t('components.variable-editor.label-query-type', 'Query Type')}
-        data-testid={selectors.components.variableEditor.queryType.input}
-      >
+      <Field label="Query Type" data-testid={selectors.components.variableEditor.queryType.input}>
         <Select
-          aria-label={t('components.variable-editor.aria-label-select-query-type', 'Select query type')}
+          aria-label="select query type"
           onChange={onQueryTypeChange}
           options={VARIABLE_TYPE_OPTIONS}
           width={25}
@@ -181,12 +165,9 @@ const VariableEditor = (props: VariableProps) => {
         <QueryEditor query={query} onChange={onChange} datasource={datasource} onRunQuery={() => {}} />
       )}
       {requireCluster && (
-        <Field
-          label={t('components.variable-editor.label-cluster', 'Cluster')}
-          data-testid={selectors.components.variableEditor.clusters.input}
-        >
+        <Field label="Cluster" data-testid={selectors.components.variableEditor.clusters.input}>
           <Select
-            aria-label={t('components.variable-editor.aria-label-select-cluster', 'Select cluster')}
+            aria-label="select cluster"
             onChange={onClusterChange}
             options={clusters.concat(variableOptionGroup)}
             width={25}
@@ -195,12 +176,9 @@ const VariableEditor = (props: VariableProps) => {
         </Field>
       )}
       {requireDatabase && (
-        <Field
-          label={t('components.variable-editor.label-database', 'Database')}
-          data-testid={selectors.components.variableEditor.databases.input}
-        >
+        <Field label="Database" data-testid={selectors.components.variableEditor.databases.input}>
           <Select
-            aria-label={t('components.variable-editor.aria-label-select-database', 'Select database')}
+            aria-label="select database"
             onChange={onDatabaseChange}
             options={databases.concat(variableOptionGroup)}
             width={25}
@@ -209,12 +187,9 @@ const VariableEditor = (props: VariableProps) => {
         </Field>
       )}
       {requireTable && (
-        <Field
-          label={t('components.variable-editor.label-table', 'Table')}
-          data-testid={selectors.components.variableEditor.tables.input}
-        >
+        <Field label="Table" data-testid={selectors.components.variableEditor.tables.input}>
           <Select
-            aria-label={t('components.variable-editor.aria-label-select-table', 'Select table')}
+            aria-label="select table"
             onChange={onTableChange}
             options={tables.concat(variableOptionGroup)}
             width={25}

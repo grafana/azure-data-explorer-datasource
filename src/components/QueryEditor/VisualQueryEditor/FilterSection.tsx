@@ -1,4 +1,3 @@
-import { t, Trans } from '@grafana/i18n';
 import { GrafanaTheme2, QueryEditorProps, SelectableValue } from '@grafana/data';
 import { Button, Label, useStyles2 } from '@grafana/ui';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
@@ -32,11 +31,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
     <>
       <EditorRow>
         <EditorFieldGroup>
-          <EditorField
-            label={t('components.filter-section.label-filters', 'Filters')}
-            optional={true}
-            data-testid={selectors.components.queryEditor.filters.field}
-          >
+          <EditorField label="Filters" optional={true} data-testid={selectors.components.queryEditor.filters.field}>
             <>
               {query.expression?.where?.expressions.length ? (
                 <div className={styles.filters}>
@@ -53,9 +48,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                         templateVariableOptions={templateVariableOptions}
                       />
                       {i < query.expression.where.expressions.length - 1 ? (
-                        <Label className={styles.andLabel}>
-                          <Trans i18nKey="components.filter-section.and">AND</Trans>
-                        </Label>
+                        <Label className={styles.andLabel}>AND</Label>
                       ) : null}
                     </div>
                   ))}
@@ -81,7 +74,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   setFocus(true);
                 }}
               >
-                <Trans i18nKey="components.filter-section.add-group">Add group</Trans>
+                Add group
               </Button>
             </>
           </EditorField>

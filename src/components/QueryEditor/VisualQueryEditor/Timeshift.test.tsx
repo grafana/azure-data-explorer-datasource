@@ -30,7 +30,7 @@ describe('TimeshiftItem', () => {
     render(<Timeshift {...defaultProps} onChange={onChange} />);
     await waitFor(async () => {
       (await screen.getByLabelText('Add')).click();
-      const sel = await screen.getByLabelText('Timeshift');
+      const sel = await screen.getByLabelText('timeshift');
       act(() => openMenu(sel));
       (await screen.getByText('Hour before')).click();
     });

@@ -1,4 +1,3 @@
-import { t, Trans } from '@grafana/i18n';
 import React, { useState, useEffect } from 'react';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { Button, useStyles2 } from '@grafana/ui';
@@ -24,13 +23,10 @@ const KQLPreview: React.FC<KQLPreviewProps> = ({ query }) => {
   return (
     <EditorRow>
       <EditorFieldGroup>
-        <EditorField
-          label={t('components.kqlpreview.label-query-preview', 'Query Preview')}
-          data-testid={selectors.components.queryEditor.queryPreview.field}
-        >
+        <EditorField label="Query Preview" data-testid={selectors.components.queryEditor.queryPreview.field}>
           <>
             <Button hidden={!hidden} variant="secondary" onClick={() => setHidden(false)} size="sm">
-              <Trans i18nKey="components.kqlpreview.show">show</Trans>
+              show
             </Button>
             <div className={styles.codeBlock} hidden={hidden}>
               <pre className={styles.code}>
@@ -38,7 +34,7 @@ const KQLPreview: React.FC<KQLPreviewProps> = ({ query }) => {
               </pre>
             </div>
             <Button hidden={hidden} variant="secondary" onClick={() => setHidden(true)} size="sm">
-              <Trans i18nKey="components.kqlpreview.hide">hide</Trans>
+              hide
             </Button>
           </>
         </EditorField>
