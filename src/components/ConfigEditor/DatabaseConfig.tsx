@@ -1,3 +1,4 @@
+import { t, Trans } from '@grafana/i18n';
 import { DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
 import { FetchError, FetchResponse, getBackendSrv, getDataSourceSrv } from '@grafana/runtime';
 import { Alert, Button, Icon, Field, InlineLabel, Input, Select, Switch, Stack } from '@grafana/ui';
@@ -133,27 +134,33 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
 
   return (
     <ConfigSubSection
-      title="Database schema settings"
+      title={t('components.database-config.title-database-schema-settings', 'Database schema settings')}
       isCollapsible
-      description="Configuration for the database schema including the default database."
+      description={t(
+        'components.database-config.description-configuration-database-schema-including-default',
+        'Configuration for the database schema including the default database.'
+      )}
     >
-      <Field label="Default database">
+      <Field label={t('components.database-config.label-default-database', 'Default database')}>
         <div className="width-30" style={{ display: 'flex', gap: '4px' }}>
           <Select
             options={schema.databases}
             value={schema.databases.find((v) => v.value === jsonData.defaultDatabase)}
             onChange={(change: SelectableValue<string>) => updateJsonData('defaultDatabase', change.value || '')}
-            aria-label="choose default database"
+            aria-label={t('components.database-config.aria-label-choose-default-database', 'choose default database')}
           />
           <Button variant="primary" onClick={saveAndUpdateSchema} disabled={!canGetSchema()} type="button" icon="sync">
-            Reload schema
+            <Trans i18nKey="components.database-config.reload-schema">Reload schema</Trans>
           </Button>
         </div>
       </Field>
 
       <Field
-        label="Use managed schema"
-        description="If enabled, allows tables, functions, and materialized views to be mapped to user friendly names."
+        label={t('components.database-config.label-use-managed-schema', 'Use managed schema')}
+        description={t(
+          'components.database-config.description-use-managed-schema',
+          'If enabled, allows tables, functions, and materialized views to be mapped to user friendly names.'
+        )}
       >
         <Switch
           id="adx-use-schema-mapping"
@@ -163,7 +170,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
       </Field>
 
       {jsonData.useSchemaMapping && (
-        <Field label="Schema mappings">
+        <Field label={t('components.database-config.label-schema-mappings', 'Schema mappings')}>
           <Stack gap={0.25} direction={'column'} justifyContent={'flex-start'}>
             {mappings.map((mapping, index) => (
               <Stack gap={0.25} key={index} direction={'row'} justifyContent={'flex-start'}>
@@ -171,7 +178,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
                   value={schema.schemaMappingOptions.find((v) => v.value === mapping.value)}
                   options={schema.schemaMappingOptions}
                   onChange={(change) => handleMappingTargetChange(index, change)}
-                  placeholder="Target"
+                  placeholder={t('components.database-config.placeholder-target', 'Target')}
                   width={50}
                 />
 
@@ -179,7 +186,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
                   <Icon name="arrow-right" />
                 </InlineLabel>
                 <Input
-                  placeholder="Name"
+                  placeholder={t('components.database-config.placeholder-name', 'Name')}
                   value={mapping.displayName}
                   onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
                     handleMappingNameChange(index, ev.target.value)
@@ -190,7 +197,7 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
                   variant="secondary"
                   size="md"
                   icon="trash-alt"
-                  aria-label="Remove"
+                  aria-label={t('components.database-config.aria-label-remove', 'Remove')}
                   type="button"
                   onClick={() => handleRemoveMapping(index)}
                   fullWidth={false}
@@ -205,14 +212,20 @@ const DatabaseConfig: React.FC<DatabaseConfigProps> = (props: DatabaseConfigProp
               type="button"
               style={{ width: '130px' }}
             >
-              Add mapping
+              <Trans i18nKey="components.database-config.add-mapping">Add mapping</Trans>
             </Button>
           </Stack>
         </Field>
       )}
 
       {schemaError && (
-        <Alert severity="error" title="Error updating Azure Data Explorer schema">
+        <Alert
+          severity="error"
+          title={t(
+            'components.database-config.title-error-updating-azure-data-explorer-schema',
+            'Error updating Azure Data Explorer schema'
+          )}
+        >
           {schemaError.message}
         </Alert>
       )}

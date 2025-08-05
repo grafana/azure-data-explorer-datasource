@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [7.0.0]
+
+- Requires Grafana v11.0.0
+- Translations are reinstated
+
 ## [6.2.0]
 
 - Fix: Remove translation code to have compatibility with Grafana v10.4 (These will be added back in v7.0.0 of this data source)

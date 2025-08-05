@@ -23,7 +23,7 @@ describe('GroupBySection', () => {
     await waitFor(async () => {
       screen.getByLabelText('Add').click();
       // Select a function
-      const sel = await screen.getByLabelText('column');
+      const sel = await screen.getByLabelText('Column');
       act(() => openMenu(sel));
       (await screen.getByText('foo')).click();
     });

@@ -15,3 +15,12 @@ pkg/__debug_bin
 /playwright/.cache/
 /playwright/.auth/
 .eslintcache
+
+# yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
