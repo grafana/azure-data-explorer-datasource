@@ -7065,9 +7065,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^51.3.1":
-  version: 51.3.1
-  resolution: "eslint-plugin-jsdoc@npm:51.3.1"
+"eslint-plugin-jsdoc@npm:^52.0.3":
+  version: 52.0.3
+  resolution: "eslint-plugin-jsdoc@npm:52.0.3"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.52.0"
     are-docs-informative: "npm:^0.0.2"
@@ -7081,7 +7081,7 @@ __metadata:
     spdx-expression-parse: "npm:^4.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10c0/c43930c3546028a7423636edd50e1a6a294cfaf6d53db2fd275d9bd3e6b4e615bededcb7682c56d5c09f5d32b4dbc5699694c8708f5aa18ffff03a85e0bf83c8
+  checksum: 10c0/96ce38542a57a1f14b5d7afb15f688cd41d1d999859f16af8e12ac7073a24a12159ae6e91f838f05d9bb64be157a97f801ceafcef14a01cd20eb133438286941
   languageName: node
   linkType: hard
 
@@ -8224,7 +8224,7 @@ __metadata:
     eslint: "npm:^9.31.0"
     eslint-config-prettier: "npm:^10.1.5"
     eslint-plugin-deprecation: "npm:^3.0.0"
-    eslint-plugin-jsdoc: "npm:^51.3.1"
+    eslint-plugin-jsdoc: "npm:^52.0.3"
     eslint-plugin-prettier: "npm:^5.5.1"
     eslint-plugin-react: "npm:^7.37.5"
     eslint-plugin-react-hooks: "npm:^5.2.0"
