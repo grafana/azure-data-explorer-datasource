@@ -2,7 +2,7 @@ import { t, Trans } from '@grafana/i18n';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { AzureCredentials, getAzureClouds } from '@grafana/azure-sdk';
 import { FeatureToggles, DataSourcePluginOptionsEditorProps, SelectableValue } from '@grafana/data';
-import { Switch, InlineField, TextLink } from '@grafana/ui';
+import { Switch, InlineField, TextLink, TagsInput } from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { gte } from 'semver';
 import ConfigHelp from './ConfigHelp';
@@ -85,11 +85,27 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
     updateOptions((options) => updateCredentials(options, credentials));
   };
 
+  const onCookiesChange = (cookies: string[]) => {
+    onOptionsChange({
+      ...options,
+      jsonData: {
+        ...jsonData,
+        keepCookies: cookies,
+      },
+    });
+  };
+
   useEffect(() => {
     if (!hasCredentials(options)) {
       updateOptions((options) => updateCredentials(options, getDefaultCredentials()));
     }
   }, [options, updateOptions]);
+
+  const configSectionStyles = {
+    container: css({
+      maxWidth: 578,
+    }),
+  };
 
   return (
     <>
@@ -117,7 +133,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         title={t('components.config-editor.title-additional-settings', 'Additional settings')}
         description={t(
           'components.config-editor.description-additional-settings',
-          'Additional settings are optional settings that can be configured for more control over your data source. This includes query optimizations, schema settings, tracking configuration, and OpenAI configuration.'
+          'Additional settings are optional settings that can be configured for more control over your data source. This includes query optimizations, schema settings, tracking configuration, OpenAI configuration, request timeout, and forwarded cookies.'
         )}
         isCollapsible
         isInitiallyOpen={hasAdditionalSettings}
@@ -126,6 +142,26 @@ const ConfigEditor: React.FC<ConfigEditorProps> = (props) => {
         <DatabaseConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
         <ApplicationConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
         <TrackingConfig options={options} onOptionsChange={onOptionsChange} updateJsonData={updateJsonData} />
+        {/* Taken from @grafana/plugin-ui as we already have a timeout implementation */}
+        <InlineField
+          htmlFor="advanced-http-cookies"
+          label={t('components.config-editor.label-http-cookies', 'Allowed cookies')}
+          labelWidth={24}
+          tooltip={t(
+            'components.config-editor.tooltip-http-cookies',
+            'Grafana proxy deletes forwarded cookies by default. Specify cookies by name that should be forwarded to the data source.'
+          )}
+          disabled={options.readOnly}
+          grow
+          className={configSectionStyles.container}
+        >
+          <TagsInput
+            id="advanced-http-cookies"
+            placeholder={t('components.config-editor.placeholder-http-cookies', 'New cookie (hit enter to add)')}
+            tags={jsonData.keepCookies}
+            onChange={onCookiesChange}
+          />
+        </InlineField>
       </ConfigSection>
 
       <Divider />
