@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "On-Behalf-Of feature is in beta"
     },
     "config-editor": {
-      "description-additional-settings": "Additional settings are optional settings that can be configured for more control over your data source. This includes query optimizations, schema settings, tracking configuration, and OpenAI configuration.",
+      "description-additional-settings": "Additional settings are optional settings that can be configured for more control over your data source. This includes query optimizations, schema settings, tracking configuration, OpenAI configuration, request timeout, and forwarded cookies.",
       "label-enable": "Enable",
+      "label-http-cookies": "Allowed cookies",
+      "placeholder-http-cookies": "New cookie (hit enter to add)",
       "secure-socks-proxy": "Secure Socks Proxy",
       "title-additional-settings": "Additional settings",
-      "tooltip-enable": "Enable proxying the datasource connection through the secure socks proxy to a different network. See <2>Configure a datasource connection proxy.</2>"
+      "tooltip-enable": "Enable proxying the datasource connection through the secure socks proxy to a different network. See <2>Configure a datasource connection proxy.</2>",
+      "tooltip-http-cookies": "Grafana proxy deletes forwarded cookies by default. Specify cookies by name that should be forwarded to the data source."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Configure the connection in Grafana",

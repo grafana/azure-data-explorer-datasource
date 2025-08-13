@@ -127,6 +127,7 @@ export interface AdxDataSourceOptions extends AzureDataSourceJsonData {
   // legacy options
   azureCloud?: string;
   onBehalfOf?: boolean;
+  keepCookies?: string[];
 }
 
 export interface AdxDataSourceSecureOptions extends AzureDataSourceSecureJsonData {
@@ -167,7 +168,7 @@ export interface AdxFunctionSchema {
   DocString?: string;
 }
 
-export interface AdxFunctionInputParameterSchema extends AdxColumnSchema { }
+export interface AdxFunctionInputParameterSchema extends AdxColumnSchema {}
 
 export type AdxSchemaDefinition = string | AdxSchemaDefinition[] | { [k: string]: AdxSchemaDefinition };
 
