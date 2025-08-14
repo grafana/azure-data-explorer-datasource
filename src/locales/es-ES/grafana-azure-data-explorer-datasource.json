@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "La función «En nombre de» está en fase beta"
     },
     "config-editor": {
-      "description-additional-settings": "Los ajustes adicionales son ajustes opcionales que se pueden configurar para tener un mayor control sobre su fuente de datos. Esto incluye las optimizaciones de las consultas, los ajustes del esquema, la configuración del seguimiento y la configuración de OpenAI.",
+      "description-additional-settings": "",
       "label-enable": "Habilitar",
+      "label-http-cookies": "",
+      "placeholder-http-cookies": "",
       "secure-socks-proxy": "Proxy SOCKS seguro",
       "title-additional-settings": "Ajustes adicionales",
-      "tooltip-enable": "Habilita el proxy de la conexión de la fuente de datos a través del proxy SOCKS seguro a una red diferente. Consulte <2>Configurar un proxy de conexión de fuente de datos.</2>"
+      "tooltip-enable": "Habilita el proxy de la conexión de la fuente de datos a través del proxy SOCKS seguro a una red diferente. Consulte <2>Configurar un proxy de conexión de fuente de datos.</2>",
+      "tooltip-http-cookies": ""
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Configurar la conexión en Grafana",

@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "Funkcja „W imieniu” jest w wersji beta"
     },
     "config-editor": {
-      "description-additional-settings": "Dodatkowe ustawienia to opcje, które można skonfigurować, aby uzyskać większą kontrolę nad źródłem danych. Obejmuje to optymalizacje zapytań, ustawienia schematu, konfigurację śledzenia i konfigurację OpenAI.",
+      "description-additional-settings": "",
       "label-enable": "Włącz",
+      "label-http-cookies": "",
+      "placeholder-http-cookies": "",
       "secure-socks-proxy": "Bezpieczny serwer proxy SOCKS",
       "title-additional-settings": "Ustawienia dodatkowe",
-      "tooltip-enable": "Włącz bezpieczny serwer proxy SOCKS dla połączenia źródła danych z inną siecią. Patrz <2>Konfiguracja serwera proxy dla połączenia ze źródłem danych.</2>"
+      "tooltip-enable": "Włącz bezpieczny serwer proxy SOCKS dla połączenia źródła danych z inną siecią. Patrz <2>Konfiguracja serwera proxy dla połączenia ze źródłem danych.</2>",
+      "tooltip-http-cookies": ""
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Skonfiguruj połączenie w Grafanie",

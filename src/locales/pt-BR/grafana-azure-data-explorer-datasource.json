@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "O recurso \"On-Behalf-Of\" está em versão beta"
     },
     "config-editor": {
-      "description-additional-settings": "As configurações adicionais são opcionais, e você pode defini-las para ter mais controle sobre sua fonte de dados. Isso inclui otimizações de consulta, definições de esquema, configuração de rastreamento e configuração do OpenAI.",
+      "description-additional-settings": "",
       "label-enable": "Ativar",
+      "label-http-cookies": "",
+      "placeholder-http-cookies": "",
       "secure-socks-proxy": "Proxy SOCKS seguro",
       "title-additional-settings": "Configurações adicionais",
-      "tooltip-enable": "Ative o uso de proxy na conexão com a fonte de dados por meio de um proxy SOCKS seguro para acessar uma rede diferente. Consulte <2>Configurar um proxy de conexão de fonte de dados.</2>"
+      "tooltip-enable": "Ative o uso de proxy na conexão com a fonte de dados por meio de um proxy SOCKS seguro para acessar uma rede diferente. Consulte <2>Configurar um proxy de conexão de fonte de dados.</2>",
+      "tooltip-http-cookies": ""
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Configure a conexão na Grafana",

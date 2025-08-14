@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "代理機能はベータ版です"
     },
     "config-editor": {
-      "description-additional-settings": "追加設定は、データソースをより詳細に制御するために設定できるオプション項目です。これには、クエリ最適化、スキーマ設定、トラッキング設定、OpenAI設定が含まれます。",
+      "description-additional-settings": "",
       "label-enable": "有効化",
+      "label-http-cookies": "",
+      "placeholder-http-cookies": "",
       "secure-socks-proxy": "セキュアSOCKSプロキシ",
       "title-additional-settings": "追加設定",
-      "tooltip-enable": "セキュアSOCKSプロキシを介して別のネットワークへデータソース接続をプロキシできるようにします。<2>データソース接続プロキシの設定</2>を参照してください。"
+      "tooltip-enable": "セキュアSOCKSプロキシを介して別のネットワークへデータソース接続をプロキシできるようにします。<2>データソース接続プロキシの設定</2>を参照してください。",
+      "tooltip-http-cookies": ""
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Grafanaで接続を設定",

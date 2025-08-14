@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "Funkce Jménem je v beta verzi"
     },
     "config-editor": {
-      "description-additional-settings": "Další nastavení jsou volitelná nastavení, která lze nakonfigurovat pro větší kontrolu nad zdrojem dat. To zahrnuje optimalizace dotazů, nastavení schématu, konfiguraci sledování a konfiguraci OpenAI.",
+      "description-additional-settings": "",
       "label-enable": "Povolit",
+      "label-http-cookies": "",
+      "placeholder-http-cookies": "",
       "secure-socks-proxy": "Zabezpečený proxy server Socks",
       "title-additional-settings": "Další nastavení",
-      "tooltip-enable": "Povolit proxy připojení zdroje dat prostřednictvím zabezpečeného proxy serveru Socks k jiné síti. Viz <2>Konfigurace proxy připojení ke zdroji dat.</2>"
+      "tooltip-enable": "Povolit proxy připojení zdroje dat prostřednictvím zabezpečeného proxy serveru Socks k jiné síti. Viz <2>Konfigurace proxy připojení ke zdroji dat.</2>",
+      "tooltip-http-cookies": ""
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Nakonfigurujte připojení v Grafaně",
