@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "Fitur Atas Nama berada dalam versi beta"
     },
     "config-editor": {
-      "description-additional-settings": "Pengaturan tambahan adalah pengaturan opsional yang dapat dikonfigurasi agar memiliki kendali lebih besar atas sumber data Anda. Ini termasuk pengoptimalan kueri, pengaturan skema, konfigurasi pelacakan, dan konfigurasi OpenAI.",
+      "description-additional-settings": "",
       "label-enable": "Aktifkan",
+      "label-http-cookies": "",
+      "placeholder-http-cookies": "",
       "secure-socks-proxy": "Proxy SOCKS yang Aman",
       "title-additional-settings": "Pengaturan tambahan",
-      "tooltip-enable": "Aktifkan proxy koneksi sumber data melalui proxy SOCKS yang aman ke jaringan lain. Lihat <2>Konfigurasikan proxy koneksi sumber data.</2>"
+      "tooltip-enable": "Aktifkan proxy koneksi sumber data melalui proxy SOCKS yang aman ke jaringan lain. Lihat <2>Konfigurasikan proxy koneksi sumber data.</2>",
+      "tooltip-http-cookies": ""
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Konfigurasikan koneksi di Grafana",

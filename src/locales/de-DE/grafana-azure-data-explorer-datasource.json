@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "Die Funktion „Im Namen von“ ist in der Beta-Phase"
     },
     "config-editor": {
-      "description-additional-settings": "Zusätzliche Einstellungen sind optionale Einstellungen, die für mehr Kontrolle über Ihre Datenquelle konfiguriert werden können. Dazu gehören Abfrageoptimierungen, Schemaeinstellungen, Tracking-Konfiguration und OpenAI-Konfiguration.",
+      "description-additional-settings": "",
       "label-enable": "Aktivieren",
+      "label-http-cookies": "",
+      "placeholder-http-cookies": "",
       "secure-socks-proxy": "Sicherer SOCKS-Proxy",
       "title-additional-settings": "Zusätzliche Einstellungen",
-      "tooltip-enable": "Aktivieren Sie das Proxying der Datenquellenverbindung über den sicheren SOCKS-Proxy zu einem anderen Netzwerk. Weitere Informationen finden Sie unter <2>Konfiguration eines Datenquellenverbindungs-Proxys.</2>"
+      "tooltip-enable": "Aktivieren Sie das Proxying der Datenquellenverbindung über den sicheren SOCKS-Proxy zu einem anderen Netzwerk. Weitere Informationen finden Sie unter <2>Konfiguration eines Datenquellenverbindungs-Proxys.</2>",
+      "tooltip-http-cookies": ""
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Konfigurieren Sie die Verbindung in Grafana",

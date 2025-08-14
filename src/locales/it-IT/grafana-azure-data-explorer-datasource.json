@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "La funzionalità Per conto di è in versione beta"
     },
     "config-editor": {
-      "description-additional-settings": "Le impostazioni aggiuntive sono impostazioni facoltative che possono essere configurate per un maggiore controllo sull'origine dei dati. Ciò include le ottimizzazioni delle query, le impostazioni dello schema, la configurazione del monitoraggio e la configurazione di OpenAI.",
+      "description-additional-settings": "",
       "label-enable": "Abilita",
+      "label-http-cookies": "",
+      "placeholder-http-cookies": "",
       "secure-socks-proxy": "Proxy Socks sicuro",
       "title-additional-settings": "Impostazioni aggiuntive",
-      "tooltip-enable": "Abilita il proxy della connessione all'origine dati tramite il proxy socks sicuro a una rete diversa. Consulta <2>Configura un proxy di connessione all'origine dati.</2>"
+      "tooltip-enable": "Abilita il proxy della connessione all'origine dati tramite il proxy socks sicuro a una rete diversa. Consulta <2>Configura un proxy di connessione all'origine dati.</2>",
+      "tooltip-http-cookies": ""
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Configura la connessione in Grafana",

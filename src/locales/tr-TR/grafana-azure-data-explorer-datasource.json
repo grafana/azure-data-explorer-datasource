@@ -52,11 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "On-Behalf-Of özelliği beta sürümündedir."
     },
     "config-editor": {
-      "description-additional-settings": "Ek ayarlar, veri kaynağınız üzerinde daha fazla kontrol sağlamak için yapılandırılabilen isteğe bağlı ayarlardır. Bunlar sorgu optimizasyonlarını, şema ayarlarını, izleme yapılandırmasını ve OpenAI yapılandırmasını içerir.",
+      "description-additional-settings": "",
       "label-enable": "Etkinleştir",
+      "label-http-cookies": "",
+      "placeholder-http-cookies": "",
       "secure-socks-proxy": "Secure Socks Proxy",
       "title-additional-settings": "Ek ayarlar",
-      "tooltip-enable": "Veri kaynağı bağlantısının, güvenli SOCKS proxy aracılığıyla farklı bir ağa yönlendirilmesini etkinleştirin. Ayrıntılar için <2>Veri kaynağı bağlantı proxy'sini yapılandırma</2> başlıklı bölüme bakın."
+      "tooltip-enable": "Veri kaynağı bağlantısının, güvenli SOCKS proxy aracılığıyla farklı bir ağa yönlendirilmesini etkinleştirin. Ayrıntılar için <2>Veri kaynağı bağlantı proxy'sini yapılandırma</2> başlıklı bölüme bakın.",
+      "tooltip-http-cookies": ""
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Grafana'da bağlantıyı yapılandırın",
