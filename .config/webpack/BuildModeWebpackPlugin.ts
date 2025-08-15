@@ -1,4 +1,4 @@
-import webpack, { type Compiler } from 'webpack';
+import * as webpack from 'webpack';
 
 const PLUGIN_NAME = 'BuildModeWebpack';
 
