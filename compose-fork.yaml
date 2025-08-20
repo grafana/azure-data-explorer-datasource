@@ -11,5 +11,3 @@ services:
     volumes:
       - ./dist:/var/lib/grafana/plugins/azure-data-explorer-datasource
       - ./provisioning:/etc/grafana/provisioning
-    env_file:
-      - .env
