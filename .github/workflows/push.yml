@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    if: github.event.pull_request.head.repo.fork == false
+    if: github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]'
     with:
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
       go-version: '1.24'
@@ -30,7 +30,7 @@ jobs:
   ci-fork:
     name: CI (Fork)
     uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@main # zizmor: ignore[unpinned-uses]
-    if: github.event.pull_request.head.repo.fork == true
+    if: github.event.pull_request.head.repo.fork == true &&  github.actor != 'dependabot[bot]'
     permissions:
       contents: read
       id-token: write
