@@ -40,4 +40,4 @@ jobs:
       golangci-lint-version: '2.1.6'
       run-playwright: true
       playwright-config: playwright-fork.config.ts
-      playwright-docker-compose-file: docker-compose-fork.yaml
+      playwright-docker-compose-file: compose-fork.yaml
