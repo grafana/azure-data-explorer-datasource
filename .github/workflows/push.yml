@@ -30,7 +30,7 @@ jobs:
   ci-fork:
     name: CI (Fork)
     uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@main # zizmor: ignore[unpinned-uses]
-    if: github.event.pull_request.head.repo.fork == true &&  github.actor != 'dependabot[bot]'
+    if: github.event.pull_request.head.repo.fork == true || github.actor == 'dependabot[bot]'
     permissions:
       contents: read
       id-token: write
