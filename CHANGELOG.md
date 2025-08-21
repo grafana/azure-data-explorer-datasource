@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [7.1.0]
+
+- Add support for cookie forwarding ([#1388](https://github.com/grafana/azure-data-explorer-datasource/pull/1363))
+- Dependency updates
+
 ## [7.0.0]
 
 - Requires Grafana v11.0.0
