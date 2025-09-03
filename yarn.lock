@@ -1636,15 +1636,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/e2e-selectors@npm:^12.1.0-240060":
-  version: 12.1.0-247772
-  resolution: "@grafana/e2e-selectors@npm:12.1.0-247772"
+"@grafana/e2e-selectors@npm:^12.2.0-255920":
+  version: 12.2.0-17389662039
+  resolution: "@grafana/e2e-selectors@npm:12.2.0-17389662039"
   dependencies:
-    "@grafana/tsconfig": "npm:^2.0.0"
     semver: "npm:^7.7.0"
     tslib: "npm:2.8.1"
-    typescript: "npm:5.7.3"
-  checksum: 10c0/45dd3d4118ed17d2d8ec4bfe34642a5b37a83c8ac49598ffaef21aa3c70674dd9e06ddff30c8bb6616b6300fd70244c429d4f6e5ba36f80f1c3b87aa3106672c
+    typescript: "npm:5.9.2"
+  checksum: 10c0/543b8619c4835749fbe26ef03716fee374f1fce390af27f31d22bda2c67ccd85fe9e5212043c77c02545e1133489984532fd8679116c3ed533db04c7145de0ee
   languageName: node
   linkType: hard
 
@@ -1721,35 +1720,35 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/plugin-e2e@npm:^1.19.1":
-  version: 1.19.9
-  resolution: "@grafana/plugin-e2e@npm:1.19.9"
+"@grafana/plugin-e2e@npm:^2.1.10":
+  version: 2.1.10
+  resolution: "@grafana/plugin-e2e@npm:2.1.10"
   dependencies:
-    "@grafana/e2e-selectors": "npm:^12.1.0-240060"
+    "@grafana/e2e-selectors": "npm:^12.2.0-255920"
     semver: "npm:^7.5.4"
     uuid: "npm:^11.0.2"
     yaml: "npm:^2.3.4"
   peerDependencies:
     "@playwright/test": ^1.52.0
-  checksum: 10c0/d1a1a38b0700ec55cd9d663757f28b83fb29c4ef774b5312bb58bc6eb7de45869ebbad8e66a11ae5371075ef508e098133b34a82b121b267ce55b6c27ecf7715
+  checksum: 10c0/0f1cd5b09c1d35e276283e76b7592b3d992d4620411fd0e01534226e1581f8a56b1d22d432da5d35825bc084e3c7f15f09c1d01745bcfd028dd0556fed3cd15e
   languageName: node
   linkType: hard
 
-"@grafana/plugin-meta-extractor@npm:^0.5.0":
-  version: 0.5.6
-  resolution: "@grafana/plugin-meta-extractor@npm:0.5.6"
+"@grafana/plugin-meta-extractor@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "@grafana/plugin-meta-extractor@npm:0.9.0"
   dependencies:
     debug: "npm:^4.3.4"
     typescript: "npm:^5.4.5"
   bin:
     plugin-meta-extractor: ./dist/bin/run.js
-  checksum: 10c0/ff17bf3047adae32d4b4c9076d84310f4f55e41da313776d337c21aa58126fec78674dd6b1cf2949917d002685ce79cc6cec1acd90c5f20df09023b3bd73bd91
+  checksum: 10c0/c3b0b27b62d7d335b26250c43b2c5b75b57df3818947660d8e6932fd9e5360449d6bec27eff4c1ef7e448a0d8ba4d875bca159765d8ac7e68a85871e33198589
   languageName: node
   linkType: hard
 
-"@grafana/plugin-ui@npm:^0.10.4":
-  version: 0.10.6
-  resolution: "@grafana/plugin-ui@npm:0.10.6"
+"@grafana/plugin-ui@npm:^0.10.10":
+  version: 0.10.10
+  resolution: "@grafana/plugin-ui@npm:0.10.10"
   dependencies:
     "@emotion/css": "npm:^11.11.2"
     "@hello-pangea/dnd": "npm:^17.0.0"
@@ -1771,7 +1770,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     rxjs: ^7.8.1
-  checksum: 10c0/21aa4891d8b8af29503b5a3af32d2cd8591f65cdf83babe6c84a9a463a8d504fb59939beb4a47453dbebf5512faf8d3a9ee0258a99cd9554b5a0333caae7917c
+  checksum: 10c0/f26176d537441fff6e8cae37e5b68fae75a07450dfe49804aa2bdb67867b7bfa6559e4eb39a43895644f7fb24aacfe7783c49ed7732bee92819d9bc1d90488b0
   languageName: node
   linkType: hard
 
@@ -1806,12 +1805,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/schema@npm:11.6.4, @grafana/schema@npm:^11.6.0":
+"@grafana/schema@npm:11.6.4":
   version: 11.6.4
   resolution: "@grafana/schema@npm:11.6.4"
   dependencies:
     tslib: "npm:2.8.1"
   checksum: 10c0/95bc1ec6760f15227acd409abb1ad37643c9342b1d94be9faf3ff133cf066aa34f181d88d5c1862bdb68f5538331dba9a78ae96bfd6df7618e997a2e0cc8668c
+  languageName: node
+  linkType: hard
+
+"@grafana/schema@npm:^12.1.0":
+  version: 12.1.1
+  resolution: "@grafana/schema@npm:12.1.1"
+  dependencies:
+    tslib: "npm:2.8.1"
+  checksum: 10c0/e32510fd8058567dd87fd277d0edf39b67a3ce3d51db8df2e4e1d71856f399422e272ae969be22b596dc41871de2f7d50ee5f9e2fa42000e68c838c89c43fab2
   languageName: node
   linkType: hard
 
@@ -8176,11 +8184,11 @@ __metadata:
     "@grafana/eslint-config": "npm:^8.0.0"
     "@grafana/i18n": "npm:12.1.0"
     "@grafana/llm": "npm:^0.14.1"
-    "@grafana/plugin-e2e": "npm:^1.19.1"
-    "@grafana/plugin-meta-extractor": "npm:^0.5.0"
-    "@grafana/plugin-ui": "npm:^0.10.4"
+    "@grafana/plugin-e2e": "npm:^2.1.10"
+    "@grafana/plugin-meta-extractor": "npm:^0.9.0"
+    "@grafana/plugin-ui": "npm:^0.10.10"
     "@grafana/runtime": "npm:^11.6.0"
-    "@grafana/schema": "npm:^11.6.0"
+    "@grafana/schema": "npm:^12.1.0"
     "@grafana/tsconfig": "npm:^2.0.0"
     "@grafana/ui": "npm:^11.6.0"
     "@playwright/test": "npm:1.55.0"
@@ -14208,6 +14216,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:5.9.2":
+  version: 5.9.2
+  resolution: "typescript@npm:5.9.2"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/cd635d50f02d6cf98ed42de2f76289701c1ec587a363369255f01ed15aaf22be0813226bff3c53e99d971f9b540e0b3cc7583dbe05faded49b1b0bed2f638a18
+  languageName: node
+  linkType: hard
+
 "typescript@npm:^5.0.4, typescript@npm:^5.4.5":
   version: 5.8.3
   resolution: "typescript@npm:5.8.3"
@@ -14235,6 +14253,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/6fd7e0ed3bf23a81246878c613423730c40e8bdbfec4c6e4d7bf1b847cbb39076e56ad5f50aa9d7ebd89877999abaee216002d3f2818885e41c907caaa192cc4
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>":
+  version: 5.9.2
+  resolution: "typescript@patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/34d2a8e23eb8e0d1875072064d5e1d9c102e0bdce56a10a25c0b917b8aa9001a9cf5c225df12497e99da107dc379360bc138163c66b55b95f5b105b50578067e
   languageName: node
   linkType: hard
 
