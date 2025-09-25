@@ -2,104 +2,115 @@ import { expect, test } from '@grafana/plugin-e2e';
 import { selectors } from '../../src/test/selectors';
 import { isVersionGtOrEq } from '../../src/version';
 
+const mockClustersResponse = [
+  {
+    name: 'datasourcesgrafana',
+    uri: 'https://datasourcesgrafana.eastus2.kusto.windows.net',
+  },
+];
+const mockDatabasesResponse = {
+  Tables: [
+    {
+      TableName: 'Table_0',
+      Columns: [
+        {
+          ColumnName: 'DatabaseName',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'PersistentStorage',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'Version',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'IsCurrent',
+          DataType: 'Boolean',
+          ColumnType: 'bool',
+        },
+        {
+          ColumnName: 'DatabaseAccessMode',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'PrettyName',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'ReservedSlot1',
+          DataType: 'Boolean',
+          ColumnType: 'bool',
+        },
+        {
+          ColumnName: 'DatabaseId',
+          DataType: 'Guid',
+          ColumnType: 'guid',
+        },
+        {
+          ColumnName: 'InTransitionTo',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'SuspensionState',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+      ],
+      Rows: [['test-db', '', '', false, 'ReadWrite', null, null, '', '', null]],
+    },
+  ],
+  Exceptions: null,
+};
+const mockSchemaResponse = {
+  Tables: [
+    {
+      TableName: 'Table_0',
+      Columns: [
+        {
+          ColumnName: 'DatabaseSchema',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+      ],
+      Rows: [
+        [
+          JSON.stringify({
+            Databases: {
+              'test-db': {
+                Name: 'test-db',
+                Tables: { WORLD_DATA: {} },
+                MajorVersion: 158,
+                MinorVersion: 2896,
+                Functions: {},
+                DatabaseAccessMode: 'ReadWrite',
+                ExternalTables: {},
+                MaterializedViews: {},
+                EntityGroups: {},
+                Graphs: {},
+                StoredQueryResults: {},
+              },
+            },
+          }),
+        ],
+      ],
+    },
+  ],
+  Exceptions: null,
+};
+
 test.describe('Azure Data Explorer queries - smoke', () => {
   test('renders KQL editor', async ({ panelEditPage, page, grafanaVersion }) => {
-    await page.route('*/**/clusters', async (route) => {
-      const json = [
-        {
-          name: 'datasourcesgrafana',
-          uri: 'https://datasourcesgrafana.eastus2.kusto.windows.net',
-        },
-      ];
-      await route.fulfill({ json });
-    });
-    await page.route('*/**/databases', async (route) => {
-      const json = {
-        Tables: [
-          {
-            TableName: 'Table_0',
-            Columns: [
-              {
-                ColumnName: 'DatabaseName',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'PersistentStorage',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'Version',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'IsCurrent',
-                DataType: 'Boolean',
-                ColumnType: 'bool',
-              },
-              {
-                ColumnName: 'DatabaseAccessMode',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'PrettyName',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'ReservedSlot1',
-                DataType: 'Boolean',
-                ColumnType: 'bool',
-              },
-              {
-                ColumnName: 'DatabaseId',
-                DataType: 'Guid',
-                ColumnType: 'guid',
-              },
-              {
-                ColumnName: 'InTransitionTo',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'SuspensionState',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-            ],
-            Rows: [['test-db', '', '', false, 'ReadWrite', null, null, '', '', null]],
-          },
-        ],
-        Exceptions: null,
-      };
-      await route.fulfill({ json });
-    });
-    await page.route('*/**/schema', async (route) => {
-      const json = {
-        Tables: [
-          {
-            TableName: 'Table_0',
-            Columns: [
-              {
-                ColumnName: 'DatabaseSchema',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-            ],
-            Rows: [
-              [
-                '{"Databases":{"test-db":{"Name":"test-db","Tables":{"WORLD_DATA":{}},"MajorVersion":158,"MinorVersion":2896,"Functions":{},"DatabaseAccessMode":"ReadWrite","ExternalTables":{},"MaterializedViews":{},"EntityGroups":{},"Graphs":{},"StoredQueryResults":{}}}',
-              ],
-            ],
-          },
-        ],
-        Exceptions: null,
-      };
-      await route.fulfill({ json });
-    });
+    await panelEditPage.mockResourceResponse('clusters', mockClustersResponse);
+    await panelEditPage.mockResourceResponse('databases', mockDatabasesResponse);
+    await panelEditPage.mockResourceResponse('schema', mockSchemaResponse);
     await panelEditPage.datasource.set('Azure Data Explorer');
 
     const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
@@ -128,102 +139,9 @@ test.describe('Azure Data Explorer queries - smoke', () => {
   });
 
   test('renders builder', async ({ panelEditPage, page, grafanaVersion }) => {
-    await page.route('*/**/clusters', async (route) => {
-      const json = [
-        {
-          name: 'datasourcesgrafana',
-          uri: 'https://datasourcesgrafana.eastus2.kusto.windows.net',
-        },
-      ];
-      await route.fulfill({ json });
-    });
-    await page.route('*/**/databases', async (route) => {
-      const json = {
-        Tables: [
-          {
-            TableName: 'Table_0',
-            Columns: [
-              {
-                ColumnName: 'DatabaseName',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'PersistentStorage',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'Version',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'IsCurrent',
-                DataType: 'Boolean',
-                ColumnType: 'bool',
-              },
-              {
-                ColumnName: 'DatabaseAccessMode',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'PrettyName',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'ReservedSlot1',
-                DataType: 'Boolean',
-                ColumnType: 'bool',
-              },
-              {
-                ColumnName: 'DatabaseId',
-                DataType: 'Guid',
-                ColumnType: 'guid',
-              },
-              {
-                ColumnName: 'InTransitionTo',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-              {
-                ColumnName: 'SuspensionState',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-            ],
-            Rows: [['test-db', '', '', false, 'ReadWrite', null, null, '', '', null]],
-          },
-        ],
-        Exceptions: null,
-      };
-      await route.fulfill({ json });
-    });
-    await page.route('*/**/schema', async (route) => {
-      const json = {
-        Tables: [
-          {
-            TableName: 'Table_0',
-            Columns: [
-              {
-                ColumnName: 'DatabaseSchema',
-                DataType: 'String',
-                ColumnType: 'string',
-              },
-            ],
-            Rows: [
-              [
-                '{"Databases":{"test-db":{"Name":"test-db","Tables":{"WORLD_DATA":{}},"MajorVersion":158,"MinorVersion":2896,"Functions":{},"DatabaseAccessMode":"ReadWrite","ExternalTables":{},"MaterializedViews":{},"EntityGroups":{},"Graphs":{},"StoredQueryResults":{}}}',
-              ],
-            ],
-          },
-        ],
-        Exceptions: null,
-      };
-      await route.fulfill({ json });
-    });
+    await panelEditPage.mockResourceResponse('clusters', mockClustersResponse);
+    await panelEditPage.mockResourceResponse('databases', mockDatabasesResponse);
+    await panelEditPage.mockResourceResponse('schema', mockSchemaResponse);
     await panelEditPage.datasource.set('Azure Data Explorer');
 
     const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
