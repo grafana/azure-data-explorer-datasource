@@ -40,3 +40,19 @@ datasources:
       clientSecret: $CLIENT_SECRET
     type: grafana-azure-data-explorer-datasource
     version: 1
+
+  - editable: true
+    enabled: true
+    uid: ADX1234SMOKE
+    jsonData:
+      clientId: CLIENT_ID
+      tenantId: TENANT_ID
+      tlsAuth: false
+      tlsAuthWithCACert: false
+      clusterUrl: CLUSTER_URL
+      defaultDatabase: 'test-db'
+    name: Azure Data Explorer (Smoke)
+    secureJsonData:
+      clientSecret: CLIENT_SECRET
+    type: grafana-azure-data-explorer-datasource
+    version: 1

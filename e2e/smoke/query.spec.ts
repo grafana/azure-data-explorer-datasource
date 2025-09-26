@@ -111,7 +111,7 @@ test.describe('Azure Data Explorer queries - smoke', () => {
     await panelEditPage.mockResourceResponse('clusters', mockClustersResponse);
     await panelEditPage.mockResourceResponse('databases', mockDatabasesResponse);
     await panelEditPage.mockResourceResponse('schema', mockSchemaResponse);
-    await panelEditPage.datasource.set('Azure Data Explorer');
+    await panelEditPage.datasource.set('Azure Data Explorer (Smoke)');
 
     const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
 
@@ -142,7 +142,7 @@ test.describe('Azure Data Explorer queries - smoke', () => {
     await panelEditPage.mockResourceResponse('clusters', mockClustersResponse);
     await panelEditPage.mockResourceResponse('databases', mockDatabasesResponse);
     await panelEditPage.mockResourceResponse('schema', mockSchemaResponse);
-    await panelEditPage.datasource.set('Azure Data Explorer');
+    await panelEditPage.datasource.set('Azure Data Explorer (Smoke)');
 
     const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
 
