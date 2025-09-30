@@ -46,7 +46,7 @@ test.describe('Azure Data Explorer queries', () => {
     await page.keyboard.insertText('timeFilter(timestamp) | order by timestamp asc');
     await page.getByTestId(selectors.components.queryEditor.runQuery.button).click();
     await page.waitForTimeout(6000);
-    expect(panel.panel.fieldNames).toContainText(['timestamp', 'name', 'index', 'jsonData', 'array', 'static']);
+    expect(panel.panel.fieldNames).toContainText(['timestamp', 'name', 'index', 'jsonData', 'array']);
   });
 
   test('Create a KQL query and run using Shift+Enter', async ({
@@ -96,7 +96,7 @@ test.describe('Azure Data Explorer queries', () => {
     await page.keyboard.insertText('timeFilter(timestamp) | order by timestamp asc');
     await page.keyboard.press('Shift+Enter');
     await page.waitForTimeout(6000);
-    expect(panel.panel.fieldNames).toContainText(['timestamp', 'name', 'index', 'jsonData', 'array', 'static']);
+    expect(panel.panel.fieldNames).toContainText(['timestamp', 'name', 'index', 'jsonData', 'array']);
   });
 
   test('Create a builder query', async ({ dashboardPage, page, readProvisionedDataSource, grafanaVersion }) => {
@@ -138,6 +138,6 @@ test.describe('Azure Data Explorer queries', () => {
 
     await page.getByTestId(selectors.components.queryEditor.runQuery.button).click();
     await page.waitForTimeout(6000);
-    expect(panel.panel.fieldNames).toContainText(['timestamp', 'name', 'index', 'jsonData', 'array', 'static']);
+    expect(panel.panel.fieldNames).toContainText(['timestamp', 'name', 'index', 'jsonData', 'array']);
   });
 });
