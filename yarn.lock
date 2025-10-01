@@ -1132,16 +1132,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@es-joy/jsdoccomment@npm:~0.62.0":
-  version: 0.62.0
-  resolution: "@es-joy/jsdoccomment@npm:0.62.0"
+"@es-joy/jsdoccomment@npm:~0.64.0":
+  version: 0.64.0
+  resolution: "@es-joy/jsdoccomment@npm:0.64.0"
   dependencies:
     "@types/estree": "npm:^1.0.8"
     "@typescript-eslint/types": "npm:^8.44.1"
     comment-parser: "npm:1.4.1"
     esquery: "npm:^1.6.0"
-    jsdoc-type-pratt-parser: "npm:~5.9.0"
-  checksum: 10c0/4bc9d8374cf5b9cbfdbed242477e12f46bc740c0419eb3c9db44990ce25c54c0d033c112e9df3e107c163f1f5f5e77c06cb436c3dce4903d374b3c8090220782
+    jsdoc-type-pratt-parser: "npm:~6.0.0"
+  checksum: 10c0/b11adbc7cfa8ef064693943afd0ed76a5e568ea7a8bf47d9e46ae4c2a83b8e2994161e3b4c860518aa860126892ae8efd7eab294cd00ef80bcae93e2ca740a70
   languageName: node
   linkType: hard
 
@@ -7042,11 +7042,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^60.5.0":
-  version: 60.5.0
-  resolution: "eslint-plugin-jsdoc@npm:60.5.0"
+"eslint-plugin-jsdoc@npm:^60.6.0":
+  version: 60.6.0
+  resolution: "eslint-plugin-jsdoc@npm:60.6.0"
   dependencies:
-    "@es-joy/jsdoccomment": "npm:~0.62.0"
+    "@es-joy/jsdoccomment": "npm:~0.64.0"
     are-docs-informative: "npm:^0.0.2"
     comment-parser: "npm:1.4.1"
     debug: "npm:^4.4.3"
@@ -7060,7 +7060,7 @@ __metadata:
     spdx-expression-parse: "npm:^4.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10c0/8fe765ecfdb9ff6a3b7c7a1f715bb6735caafd9c26d139e8cbccce9fd94b7e379b02d7998810c250886e0d8656688d8bd21b129c7b3b926770f716b9970df2c2
+  checksum: 10c0/085375c6300a3c884c40c9ceca7bf384c519914b0dfaa885f0f6305bec65a5bbf7012d734f7ad5af2501b6cab787108b2bba31a563c9195a34242f19ee7df92a
   languageName: node
   linkType: hard
 
@@ -8184,7 +8184,7 @@ __metadata:
     eslint: "npm:^9.36.0"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-deprecation: "npm:^3.0.0"
-    eslint-plugin-jsdoc: "npm:^60.5.0"
+    eslint-plugin-jsdoc: "npm:^60.6.0"
     eslint-plugin-prettier: "npm:^5.5.1"
     eslint-plugin-react: "npm:^7.37.5"
     eslint-plugin-react-hooks: "npm:^5.2.0"
@@ -9842,10 +9842,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdoc-type-pratt-parser@npm:~5.9.0":
-  version: 5.9.2
-  resolution: "jsdoc-type-pratt-parser@npm:5.9.2"
-  checksum: 10c0/fbd396dee4fc9347d0bcc156391da4f579651a7d2f6500db48c314bd96f6c340206ed7854be0197d1f960e2250eca1e2e22a311a68944ea5c872abfe8f5e4b0d
+"jsdoc-type-pratt-parser@npm:~6.0.0":
+  version: 6.0.1
+  resolution: "jsdoc-type-pratt-parser@npm:6.0.1"
+  checksum: 10c0/c69d1dea3f38d4bf134d913b0cba7ac1daa7163441db842dffc439be592fb4547e37480f948eab0531281d137e26883cbf730619ba458cd7e880468b46a5e966
   languageName: node
   linkType: hard
 
