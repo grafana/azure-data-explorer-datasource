@@ -853,6 +853,7 @@ describe('KustoExpressionParser', () => {
               text: 'usa',
               value: 'USA',
             },
+            name: 'country',
             multi: false,
           },
         ]),
@@ -894,6 +895,7 @@ describe('KustoExpressionParser', () => {
         getVariables: jest.fn().mockReturnValue([
           {
             id: 'country',
+            name: 'country',
             current: {
               text: 'usa',
               value: 'USA',
