@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [7.2.0]
+
+- Improve allowed endpoints support ([#1466](https://github.com/grafana/azure-data-explorer-datasource/pull/1466))
+- Fix variable identification with Scenes ([#1460](https://github.com/grafana/azure-data-explorer-datasource/pull/1460))
+- Dependency updates
+
 ## [7.1.0]
 
 - Add support for cookie forwarding ([#1388](https://github.com/grafana/azure-data-explorer-datasource/pull/1363))
