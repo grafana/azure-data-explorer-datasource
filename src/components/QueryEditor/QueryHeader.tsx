@@ -114,7 +114,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
 
   useEffect(() => {
     datasource.getClusters().then((result: ClusterOption[]) => {
-      const clusters = parseClustersResponse(result);
+      const clusters = parseClustersResponse(result, true, clusterUri);
       setClusters(clusters);
       if (!clusterUri) {
         datasource.getDefaultOrFirstCluster().then((cluster: string) => {
