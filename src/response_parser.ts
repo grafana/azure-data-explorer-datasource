@@ -96,9 +96,23 @@ export class ResponseParser {
   }
 }
 
-export const parseClustersResponse = (res: ClusterOption[], giveNames = true): SelectableValue[] => {
-  if (!res || res.length === 0) {
+export const parseClustersResponse = (
+  res: ClusterOption[],
+  giveNames = true,
+  clusterUri?: string
+): SelectableValue[] => {
+  let clusters: SelectableValue[] = [];
+  if ((!res || res.length === 0) && !clusterUri) {
     return [];
   }
-  return res.map((val: ClusterOption) => ({ label: giveNames ? val.name : val.uri, value: val.uri }));
+  clusters = res.map((val: ClusterOption) => ({ label: giveNames ? val.name : val.uri, value: val.uri }));
+
+  if (clusterUri) {
+    const exists = clusters.find((cluster) => cluster.value === clusterUri);
+    if (!exists) {
+      clusters.push({ label: clusterUri, value: clusterUri });
+    }
+  }
+
+  return clusters;
 };
