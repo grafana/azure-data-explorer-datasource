@@ -14,7 +14,6 @@ import (
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 
 	// 100% compatible drop-in replacement of "encoding/json"
 	json "github.com/json-iterator/go"
@@ -199,12 +198,12 @@ func (c *Client) testManagementClient(ctx context.Context, _ *models.DatasourceS
 func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path string, payload models.RequestPayload, userTrackingEnabled bool, application string) (*models.TableResponse, error) {
 	buf, err := json.Marshal(payload)
 	if err != nil {
-		return nil, errorsource.DownstreamError(fmt.Errorf("no Azure request serial: %w", err), false)
+		return nil, backend.DownstreamError(fmt.Errorf("no Azure request serial: %w", err))
 	}
 
 	fullUrl, err := url.JoinPath(clusterUrl, path)
 	if err != nil {
-		return nil, errorsource.DownstreamError(fmt.Errorf("invalid Azure request URL: %w", err), false)
+		return nil, backend.DownstreamError(fmt.Errorf("invalid Azure request URL: %w", err))
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fullUrl, bytes.NewReader(buf))
@@ -234,7 +233,7 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 
 	resp, err := c.httpClientKusto.Do(req)
 	if err != nil {
-		return nil, errorsource.DownstreamError(err, false)
+		return nil, backend.DownstreamError(err)
 	}
 
 	defer helpers.HandleResponseBodyClose(resp)
@@ -242,15 +241,15 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 	switch {
 	case resp.StatusCode == http.StatusUnauthorized:
 		// HTTP 401 has no error body
-		return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q", resp.Status), false)
+		return nil, backend.DownstreamError(fmt.Errorf("azure HTTP %q", resp.Status))
 
 	case resp.StatusCode/100 != 2:
 		var r models.ErrorResponse
 		err := json.NewDecoder(resp.Body).Decode(&r)
 		if err != nil {
-			return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err), false)
+			return nil, backend.DownstreamError(fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err))
 		}
-		return nil, errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(resp.StatusCode), fmt.Errorf("azure HTTP %q: %q.\nReceived %q: %q", resp.Status, r.Error.Message, r.Error.Type, r.Error.Description), false)
+		return nil, backend.NewErrorWithSource(fmt.Errorf("azure HTTP %q: %q.\nReceived %q: %q", resp.Status, r.Error.Message, r.Error.Type, r.Error.Description), backend.ErrorSourceFromHTTPStatus(resp.StatusCode))
 	}
 
 	return models.TableFromJSON(resp.Body)
@@ -259,17 +258,17 @@ func (c *Client) KustoRequest(ctx context.Context, clusterUrl string, path strin
 func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
 	buf, err := json.Marshal(payload)
 	if err != nil {
-		return nil, errorsource.DownstreamError(fmt.Errorf("no Azure request serial: %w", err), false)
+		return nil, backend.DownstreamError(fmt.Errorf("no Azure request serial: %w", err))
 	}
 
 	resourceManager, ok := c.cloudSettings.Properties["resourceManager"]
 	if !ok {
-		return nil, fmt.Errorf("the Azure cloud '%s' doesn't have the required property for 'resourceManager'", c.cloudSettings.Name)
+		return nil, backend.PluginError(fmt.Errorf("the Azure cloud '%s' doesn't have the required property for 'resourceManager'", c.cloudSettings.Name))
 	}
 
 	u, err := url.Parse(resourceManager)
 	if err != nil {
-		return nil, errorsource.DownstreamError(fmt.Errorf("invalid Azure request URL: %w", err), false)
+		return nil, backend.DownstreamError(fmt.Errorf("invalid Azure request URL: %w", err))
 	}
 
 	// the default path for Azure Resource Graph
@@ -294,7 +293,7 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 
 	resp, err := c.httpClientManagement.Do(req)
 	if err != nil {
-		return nil, errorsource.DownstreamError(err, false)
+		return nil, backend.DownstreamError(err)
 	}
 
 	defer helpers.HandleResponseBodyClose(resp)
@@ -302,15 +301,15 @@ func (c *Client) ARGClusterRequest(ctx context.Context, payload models.ARGReques
 	switch {
 	case resp.StatusCode == http.StatusUnauthorized:
 		// HTTP 401 has no error body
-		return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q", resp.Status), false)
+		return nil, backend.DownstreamError(fmt.Errorf("azure HTTP %q", resp.Status))
 
 	case resp.StatusCode/100 != 2:
 		var r models.ErrorResponse
 		err := json.NewDecoder(resp.Body).Decode(&r)
 		if err != nil {
-			return nil, errorsource.DownstreamError(fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err), false)
+			return nil, backend.DownstreamError(fmt.Errorf("azure HTTP %q with malformed error response: %s", resp.Status, err))
 		}
-		return nil, errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(resp.StatusCode), fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message), false)
+		return nil, backend.NewErrorWithSource(fmt.Errorf("azure HTTP %q: %q", resp.Status, r.Error.Message), backend.ErrorSourceFromHTTPStatus(resp.StatusCode))
 	}
 	var clusterData struct {
 		Data []struct {
