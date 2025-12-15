@@ -389,7 +389,7 @@ var tagsConverter = data.FieldConverter{
 
 		jsonTags := json.RawMessage(marshalledTags)
 
-		return &jsonTags, nil
+		return jsonTags, nil
 	},
 }
 
@@ -445,7 +445,7 @@ var logsConverter = data.FieldConverter{
 
 		jsonTags := json.RawMessage(marshalledLogs)
 
-		return &jsonTags, nil
+		return jsonTags, nil
 	},
 }
 
