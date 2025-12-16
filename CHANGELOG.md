@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [7.2.1]
+
+- Fix cluster URI not persisting in panel UI ([#1514](https://github.com/grafana/azure-data-explorer-datasource/pull/1514))
+- Dependency updates
+
 ## [7.2.0]
 
 - Improve allowed endpoints support ([#1466](https://github.com/grafana/azure-data-explorer-datasource/pull/1466))
