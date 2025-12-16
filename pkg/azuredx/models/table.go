@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
-	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -366,7 +366,7 @@ func parseKeyValue(m map[string]any) []KeyValue {
 }
 
 var tagsConverter = data.FieldConverter{
-	OutputFieldType: data.FieldTypeNullableJSON,
+	OutputFieldType: data.FieldTypeJSON,
 	Converter: func(v interface{}) (interface{}, error) {
 		if v == nil {
 			return nil, nil
@@ -389,7 +389,7 @@ var tagsConverter = data.FieldConverter{
 
 		jsonTags := json.RawMessage(marshalledTags)
 
-		return &jsonTags, nil
+		return jsonTags, nil
 	},
 }
 
@@ -399,7 +399,7 @@ type TraceLog struct {
 }
 
 var logsConverter = data.FieldConverter{
-	OutputFieldType: data.FieldTypeNullableJSON,
+	OutputFieldType: data.FieldTypeJSON,
 	Converter: func(v interface{}) (interface{}, error) {
 		if v == nil {
 			return nil, nil
@@ -445,7 +445,7 @@ var logsConverter = data.FieldConverter{
 
 		jsonTags := json.RawMessage(marshalledLogs)
 
-		return &jsonTags, nil
+		return jsonTags, nil
 	},
 }
 
@@ -565,7 +565,7 @@ func TableFromJSON(rc io.Reader) (*TableResponse, error) {
 		for _, e := range tr.Exceptions {
 			errMsg += e + ". "
 		}
-		return nil, errorsource.DownstreamError(errors.New(errMsg), false)
+		return nil, backend.DownstreamError(errors.New(errMsg))
 	}
 
 	return tr, nil

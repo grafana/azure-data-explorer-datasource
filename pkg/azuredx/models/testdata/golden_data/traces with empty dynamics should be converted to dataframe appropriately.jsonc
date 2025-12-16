@@ -25,13 +25,13 @@
 //  }
 //  Name: 
 //  Dimensions: 12 Fields by 1 Rows
-//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+--------------------------+--------------------------+------------------------+--------------------------+
-//  | Name: startTime  | Name: itemType  | Name: serviceName | Name: duration   | Name: traceID              | Name: spanID      | Name: parentSpanID | Name: operationName | Name: serviceTags        | Name: tags               | Name: itemId           | Name: logs               |
-//  | Labels:          | Labels:         | Labels:           | Labels:          | Labels:                    | Labels:           | Labels:            | Labels:             | Labels:                  | Labels:                  | Labels:                | Labels:                  |
-//  | Type: []*float64 | Type: []*string | Type: []*string   | Type: []*float64 | Type: []*string            | Type: []*string   | Type: []*string    | Type: []*string     | Type: []*json.RawMessage | Type: []*json.RawMessage | Type: []*string        | Type: []*json.RawMessage |
-//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+--------------------------+--------------------------+------------------------+--------------------------+
-//  | 1.68726e+12      | request         | test-app          | 26.7374          | fc5b1c02-57fa-8611c2df33e2 | 92930421e2a400394 | test-id            | service             | []                       | []                       | 11ee-a66c-0022481b10a7 | []                       |
-//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+--------------------------+--------------------------+------------------------+--------------------------+
+//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+-------------------------+-------------------------+------------------------+-------------------------+
+//  | Name: startTime  | Name: itemType  | Name: serviceName | Name: duration   | Name: traceID              | Name: spanID      | Name: parentSpanID | Name: operationName | Name: serviceTags       | Name: tags              | Name: itemId           | Name: logs              |
+//  | Labels:          | Labels:         | Labels:           | Labels:          | Labels:                    | Labels:           | Labels:            | Labels:             | Labels:                 | Labels:                 | Labels:                | Labels:                 |
+//  | Type: []*float64 | Type: []*string | Type: []*string   | Type: []*float64 | Type: []*string            | Type: []*string   | Type: []*string    | Type: []*string     | Type: []json.RawMessage | Type: []json.RawMessage | Type: []*string        | Type: []json.RawMessage |
+//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+-------------------------+-------------------------+------------------------+-------------------------+
+//  | 1.68726e+12      | request         | test-app          | 26.7374          | fc5b1c02-57fa-8611c2df33e2 | 92930421e2a400394 | test-id            | service             | []                      | []                      | 11ee-a66c-0022481b10a7 | []                      |
+//  +------------------+-----------------+-------------------+------------------+----------------------------+-------------------+--------------------+---------------------+-------------------------+-------------------------+------------------------+-------------------------+
 //  
 //  
 //  🌟 This was machine generated.  Do not edit. 🌟
@@ -132,16 +132,14 @@
             "name": "serviceTags",
             "type": "other",
             "typeInfo": {
-              "frame": "json.RawMessage",
-              "nullable": true
+              "frame": "json.RawMessage"
             }
           },
           {
             "name": "tags",
             "type": "other",
             "typeInfo": {
-              "frame": "json.RawMessage",
-              "nullable": true
+              "frame": "json.RawMessage"
             }
           },
           {
@@ -156,8 +154,7 @@
             "name": "logs",
             "type": "other",
             "typeInfo": {
-              "frame": "json.RawMessage",
-              "nullable": true
+              "frame": "json.RawMessage"
             }
           }
         ]

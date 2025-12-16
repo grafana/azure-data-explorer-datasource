@@ -1,6 +1,7 @@
 package azuredx
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -21,7 +22,6 @@ import (
 
 	// 100% compatible drop-in replacement of "encoding/json"
 	json "github.com/json-iterator/go"
-	"golang.org/x/net/context"
 )
 
 // AzureDataExplorer stores reference to plugin and logger
@@ -168,7 +168,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 	database := q.Database
 	if database == "" {
 		if adx.settings.DefaultDatabase == "" {
-			return backend.DataResponse{}, errorsource.DownstreamError(fmt.Errorf("query submitted without database specified and data source does not have a default database"), false)
+			return backend.DataResponse{}, backend.DownstreamError(fmt.Errorf("query submitted without database specified and data source does not have a default database"))
 		}
 		database = adx.settings.DefaultDatabase
 	}
@@ -243,7 +243,7 @@ func (adx *AzureDataExplorer) modelQuery(ctx context.Context, q models.QueryMode
 		for _, f := range originalDFs {
 			formattedDF, err := models.ToADXTimeSeries(f)
 			if err != nil {
-				return resp, errorsource.DownstreamError(err, false)
+				return resp, backend.DownstreamError(err)
 			}
 			resp.Frames = append(resp.Frames, formattedDF)
 		}
