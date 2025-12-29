@@ -45,7 +45,7 @@ func (ar *TableResponse) getTableByName(name string) (Table, error) {
 			return t, nil
 		}
 	}
-	return Table{}, fmt.Errorf("no data as %v table is missing from the the response", name)
+	return Table{}, backend.DownstreamError(fmt.Errorf("no data as %v table is missing from the the response", name))
 }
 
 func (tr *TableResponse) ToDataFrames(executedQueryString string, format string) (data.Frames, error) {
