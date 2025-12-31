@@ -29,7 +29,7 @@
   "license": "Apache",
   "devDependencies": {
     "@babel/core": "^7.28.4",
-    "@eslint/compat": "^1.4.0",
+    "@eslint/compat": "^2.0.0",
     "@grafana/eslint-config": "^8.0.0",
     "@grafana/plugin-e2e": "^3.0.4",
     "@grafana/plugin-meta-extractor": "^0.11.0",
