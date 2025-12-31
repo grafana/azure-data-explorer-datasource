@@ -112,6 +112,107 @@ func TestResponseToFrames(t *testing.T) {
 	})
 }
 
+func TestGetPrimaryResultTable(t *testing.T) {
+	tests := []struct {
+		name              string
+		tables            []Table
+		expectedTableName string
+		expectError       bool
+		errorContains     string
+	}{
+		{
+			name: "returns Table_0 for standard query response",
+			tables: []Table{
+				{TableName: "Table_0", Columns: []Column{{ColumnName: "col1", ColumnType: "string"}}, Rows: []Row{[]interface{}{"value1"}}},
+				{TableName: "Table_1", Columns: []Column{}, Rows: []Row{}},
+			},
+			expectedTableName: "Table_0",
+			expectError:       false,
+		},
+		{
+			name: "returns DataSet_Table_0 for management command response",
+			tables: []Table{
+				{TableName: "DataSet_Table_0", Columns: []Column{{ColumnName: "col1", ColumnType: "string"}}, Rows: []Row{[]interface{}{"value1"}}},
+				{TableName: "DataSet_Table_1", Columns: []Column{}, Rows: []Row{}},
+			},
+			expectedTableName: "DataSet_Table_0",
+			expectError:       false,
+		},
+		{
+			name: "prefers Table_0 when both naming conventions exist",
+			tables: []Table{
+				{TableName: "DataSet_Table_0", Columns: []Column{}, Rows: []Row{}},
+				{TableName: "Table_0", Columns: []Column{{ColumnName: "col1", ColumnType: "string"}}, Rows: []Row{[]interface{}{"value1"}}},
+			},
+			expectedTableName: "Table_0",
+			expectError:       false,
+		},
+		{
+			name: "returns error when neither naming convention exists",
+			tables: []Table{
+				{TableName: "SomeOtherTable", Columns: []Column{}, Rows: []Row{}},
+			},
+			expectError:   true,
+			errorContains: "Table_0 or DataSet_Table_0",
+		},
+		{
+			name:          "returns error for empty response",
+			tables:        []Table{},
+			expectError:   true,
+			errorContains: "Table_0 or DataSet_Table_0",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tr := &TableResponse{Tables: tt.tables}
+			table, err := tr.getPrimaryResultTable()
+
+			if tt.expectError {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tt.errorContains)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tt.expectedTableName, table.TableName)
+			}
+		})
+	}
+}
+
+func TestManagementCommandResponse(t *testing.T) {
+	tests := []struct {
+		name           string
+		testFile       string
+		expectedFields []string
+		expectedRows   int
+	}{
+		{
+			name:           "ToDataFrames works with management command response (DataSet_Table_0)",
+			testFile:       "management_command_response.json",
+			expectedFields: []string{"CommandType", "State"},
+			expectedRows:   1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			respTable, err := tableFromJSONFile(tt.testFile)
+			require.NoError(t, err)
+
+			frames, err := respTable.ToDataFrames("", "")
+			require.NoError(t, err)
+			require.Len(t, frames, 1)
+
+			frame := frames[0]
+			assert.Equal(t, len(tt.expectedFields), len(frame.Fields))
+			for i, fieldName := range tt.expectedFields {
+				assert.Equal(t, fieldName, frame.Fields[i].Name)
+			}
+			require.Equal(t, tt.expectedRows, frame.Rows())
+		})
+	}
+}
+
 func TestTableResponse_ToADXTimeSeries(t *testing.T) {
 	tests := []struct {
 		name                  string

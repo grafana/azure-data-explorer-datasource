@@ -39,17 +39,35 @@ type Column struct {
 	ColumnType string
 }
 
-func (ar *TableResponse) getTableByName(name string) (Table, error) {
-	for _, t := range ar.Tables {
+func (tr *TableResponse) getTableByName(name string) (Table, error) {
+	for _, t := range tr.Tables {
 		if t.TableName == name {
 			return t, nil
 		}
 	}
-	return Table{}, fmt.Errorf("no data as %v table is missing from the the response", name)
+	return Table{}, fmt.Errorf("no data as %v table is missing from the response", name)
+}
+
+// getPrimaryResultTable returns the primary result table from the response.
+// It handles different naming conventions used by ADX for query vs management commands:
+// - Query responses use: Table_0, Table_1, etc.
+// - Management command responses use: DataSet_Table_0, DataSet_Table_1, etc.
+func (tr *TableResponse) getPrimaryResultTable() (Table, error) {
+	// Try standard query response format first
+	if table, err := tr.getTableByName("Table_0"); err == nil {
+		return table, nil
+	}
+
+	// Try management command response format
+	if table, err := tr.getTableByName("DataSet_Table_0"); err == nil {
+		return table, nil
+	}
+
+	return Table{}, fmt.Errorf("no data as primary result table (Table_0 or DataSet_Table_0) is missing from the response")
 }
 
 func (tr *TableResponse) ToDataFrames(executedQueryString string, format string) (data.Frames, error) {
-	table, err := tr.getTableByName("Table_0")
+	table, err := tr.getPrimaryResultTable()
 	if err != nil {
 		return nil, err
 	}
