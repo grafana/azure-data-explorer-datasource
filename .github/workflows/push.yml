@@ -20,8 +20,8 @@ jobs:
       go-version: '1.24'
       golangci-lint-version: '2.1.6'
       run-playwright: true
-      playwright-config: ${{ github.event.pull_request.head.repo.fork == true || github.actor == 'dependabot[bot]' && 'playwright-fork.config.ts' || 'playwright.config.ts' }}
-      playwright-docker-compose-file: ${{ github.event.pull_request.head.repo.fork == true || github.actor == 'dependabot[bot]' && 'compose-fork.yaml' || 'docker-compose.yaml' }}
+      playwright-config: ${{ (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork || github.actor == 'dependabot[bot]')) && 'playwright-fork.config.ts' || 'playwright.config.ts' }}
+      playwright-docker-compose-file: ${{ (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork || github.actor == 'dependabot[bot]')) && 'compose-fork.yaml' || 'docker-compose.yaml' }}
       playwright-secrets: |
         TENANT_ID=e2e:tenantId
         CLIENT_ID=e2e:clientId
