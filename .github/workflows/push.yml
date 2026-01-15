@@ -18,7 +18,7 @@ jobs:
     with:
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
       go-version: '1.25'
-      golangci-lint-version: '2.1.6'
+      golangci-lint-version: '2.8.0'
       run-playwright: true
       playwright-config: ${{ (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork || github.actor == 'dependabot[bot]')) && 'playwright-fork.config.ts' || 'playwright.config.ts' }}
       playwright-docker-compose-file: ${{ (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork || github.actor == 'dependabot[bot]')) && 'compose-fork.yaml' || 'docker-compose.yaml' }}
