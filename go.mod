@@ -1,6 +1,6 @@
 module github.com/grafana/azure-data-explorer-datasource
 
-go 1.25.4
+go 1.25.6
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.19.1
@@ -9,7 +9,6 @@ require (
 	github.com/grafana/grafana-plugin-sdk-go v0.284.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/net v0.48.0
 )
 
 require (
@@ -87,6 +86,7 @@ require (
 	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/exp v0.0.0-20251002181428-27f1f14c8bb9 // indirect
 	golang.org/x/mod v0.30.0 // indirect
+	golang.org/x/net v0.48.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/telemetry v0.0.0-20251111182119-bc8e575c7b54 // indirect
