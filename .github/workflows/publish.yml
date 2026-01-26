@@ -11,10 +11,10 @@ on:
         description: Environment will always publish to all waves (dev + ops + prod). Cloud will publish scoped only to Grafana Cloud, On Prem will publish with Universal scope. Please use Cloud unless emergency fix needed for On Prem customer.
         required: true
         type: choice
-        default: "cloud (recommended)"
+        default: 'cloud (recommended)'
         options:
-          - "cloud (recommended)"
-          - "on-prem (for emergencies fix to On Prem customers)"
+          - 'cloud (recommended)'
+          - 'on-prem (for emergencies fix to On Prem customers)'
       docs-only:
         description: Only publish docs, do not publish the plugin
         default: false
@@ -29,7 +29,7 @@ jobs:
       matrix:
         environment: [dev, ops, prod]
     name: CD
-    uses: grafana/plugin-ci-workflows/.github/workflows/cd.yml@main # zizmor: ignore[unpinned-uses]
+    uses: grafana/plugin-ci-workflows/.github/workflows/cd.yml@ci-cd-workflows/v5.1.0
     permissions:
       contents: write
       id-token: write
@@ -39,7 +39,7 @@ jobs:
       environment: ${{ matrix.environment }}
       docs-only: ${{ fromJSON(github.event.inputs.docs-only) }}
       scopes: ${{ github.event.inputs.environment == 'cloud (recommended)' && 'grafana_cloud' || github.event.inputs.environment == 'on-prem (for emergencies fix to On Prem customers)' && 'universal' }}
-      go-version: "1.24"
-      golangci-lint-version: "2.1.6"
+      go-version: '1.25.6'
+      golangci-lint-version: '2.8.0'
       run-playwright: false
       github-draft-release: false

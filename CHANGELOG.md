@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [7.2.2]
+
+- Fix management commands failing due to `DataSet_Table_0` naming ([#1566](https://github.com/grafana/azure-data-explorer-datasource/pull/1566))
+- Dependency updates
+
 ## [7.2.1]
 
 - Fix cluster URI not persisting in panel UI ([#1514](https://github.com/grafana/azure-data-explorer-datasource/pull/1514))

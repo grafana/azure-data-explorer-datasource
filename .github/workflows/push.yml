@@ -11,17 +11,17 @@ permissions: {}
 jobs:
   ci:
     name: CI
-    uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@main # zizmor: ignore[unpinned-uses]
+    uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@ci-cd-workflows/v5.1.0
     permissions:
       contents: read
       id-token: write
     with:
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
-      go-version: '1.24'
-      golangci-lint-version: '2.1.6'
+      go-version: '1.25.6'
+      golangci-lint-version: '2.8.0'
       run-playwright: true
-      playwright-config: ${{ github.event.pull_request.head.repo.fork == true || github.actor == 'dependabot[bot]' && 'playwright-fork.config.ts' || 'playwright.config.ts' }}
-      playwright-docker-compose-file: ${{ github.event.pull_request.head.repo.fork == true || github.actor == 'dependabot[bot]' && 'compose-fork.yaml' || 'docker-compose.yaml' }}
+      playwright-config: ${{ (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork || github.actor == 'dependabot[bot]')) && 'playwright-fork.config.ts' || 'playwright.config.ts' }}
+      playwright-docker-compose-file: ${{ (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork || github.actor == 'dependabot[bot]')) && 'compose-fork.yaml' || 'docker-compose.yaml' }}
       playwright-secrets: |
         TENANT_ID=e2e:tenantId
         CLIENT_ID=e2e:clientId

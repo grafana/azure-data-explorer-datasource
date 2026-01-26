@@ -39,17 +39,17 @@ type Column struct {
 	ColumnType string
 }
 
-func (ar *TableResponse) getTableByName(name string) (Table, error) {
-	for _, t := range ar.Tables {
-		if t.TableName == name {
-			return t, nil
-		}
+// getPrimaryResultTable returns the first table from the response.
+// This handles both regular queries and management commands regardless of table naming.
+func (tr *TableResponse) getPrimaryResultTable() (Table, error) {
+	if len(tr.Tables) == 0 {
+		return Table{}, fmt.Errorf("no data as response contains no tables")
 	}
-	return Table{}, fmt.Errorf("no data as %v table is missing from the the response", name)
+	return tr.Tables[0], nil
 }
 
 func (tr *TableResponse) ToDataFrames(executedQueryString string, format string) (data.Frames, error) {
-	table, err := tr.getTableByName("Table_0")
+	table, err := tr.getPrimaryResultTable()
 	if err != nil {
 		return nil, err
 	}
