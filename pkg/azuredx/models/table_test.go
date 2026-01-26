@@ -112,6 +112,43 @@ func TestResponseToFrames(t *testing.T) {
 	})
 }
 
+func TestGetPrimaryResultTable(t *testing.T) {
+	tests := []struct {
+		name              string
+		tables            []Table
+		expectedTableName string
+		expectError       bool
+	}{
+		{
+			name: "returns first table",
+			tables: []Table{
+				{TableName: "First", Columns: []Column{{ColumnName: "col1", ColumnType: "string"}}, Rows: []Row{[]interface{}{"value1"}}},
+				{TableName: "Second", Columns: []Column{}, Rows: []Row{}},
+			},
+			expectedTableName: "First",
+		},
+		{
+			name:        "returns error for empty response",
+			tables:      []Table{},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tr := &TableResponse{Tables: tt.tables}
+			table, err := tr.getPrimaryResultTable()
+
+			if tt.expectError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, tt.expectedTableName, table.TableName)
+			}
+		})
+	}
+}
+
 func TestTableResponse_ToADXTimeSeries(t *testing.T) {
 	tests := []struct {
 		name                  string
