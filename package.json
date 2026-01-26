@@ -29,7 +29,7 @@
   "license": "Apache",
   "devDependencies": {
     "@babel/core": "^7.28.4",
-    "@eslint/compat": "^2.0.0",
+    "@eslint/compat": "^2.0.1",
     "@grafana/eslint-config": "^8.0.0",
     "@grafana/plugin-e2e": "^3.1.0",
     "@grafana/plugin-meta-extractor": "^0.11.0",
@@ -57,7 +57,7 @@
     "@typescript-eslint/parser": "^8.52.0",
     "chance": "^1.1.12",
     "copy-webpack-plugin": "^12.0.2",
-    "cspell": "9.4.0",
+    "cspell": "9.6.0",
     "css-loader": "^6.7.3",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
@@ -98,7 +98,7 @@
   },
   "dependencies": {
     "@emotion/css": "11.11.2",
-    "@grafana/azure-sdk": "^0.0.7",
+    "@grafana/azure-sdk": "^0.0.8",
     "@grafana/data": "11.6.8",
     "@grafana/i18n": "12.3.0",
     "@grafana/llm": "^0.14.1",
