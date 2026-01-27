@@ -24,3 +24,4 @@ pkg/__debug_bin
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.env
