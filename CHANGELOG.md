@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [7.2.3]
+
+- Dependency updates
+- Update Go to 1.25.6 ([#1594](https://github.com/grafana/azure-data-explorer-datasource/pull/1594))
+
 ## [7.2.2]
 
 - Fix management commands failing due to `DataSet_Table_0` naming ([#1566](https://github.com/grafana/azure-data-explorer-datasource/pull/1566))
