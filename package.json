@@ -97,7 +97,7 @@
     "webpack-virtual-modules": "^0.6.2"
   },
   "dependencies": {
-    "@emotion/css": "11.11.2",
+    "@emotion/css": "11.13.5",
     "@grafana/azure-sdk": "^0.0.8",
     "@grafana/data": "11.6.10",
     "@grafana/i18n": "12.3.2",
