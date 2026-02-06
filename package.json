@@ -91,7 +91,7 @@
     "typescript": "5.9.3",
     "uuid": "^13.0.0",
     "webpack": "^5.104.1",
-    "webpack-cli": "^5.1.4",
+    "webpack-cli": "^6.0.0",
     "webpack-livereload-plugin": "^3.0.2",
     "webpack-subresource-integrity": "^5.1.0",
     "webpack-virtual-modules": "^0.6.2"
