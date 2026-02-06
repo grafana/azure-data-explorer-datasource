@@ -8248,7 +8248,7 @@ __metadata:
     react-use: "npm:^17.6.0"
     replace-in-file-webpack-plugin: "npm:^1.0.6"
     sass: "npm:1.97.3"
-    sass-loader: "npm:14.1.1"
+    sass-loader: "npm:16.0.6"
     semver: "npm:^7.7.2"
     style-loader: "npm:4.0.0"
     swc-loader: "npm:^0.2.6"
@@ -12766,9 +12766,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass-loader@npm:14.1.1":
-  version: 14.1.1
-  resolution: "sass-loader@npm:14.1.1"
+"sass-loader@npm:16.0.6":
+  version: 16.0.6
+  resolution: "sass-loader@npm:16.0.6"
   dependencies:
     neo-async: "npm:^2.6.2"
   peerDependencies:
@@ -12788,7 +12788,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10c0/303ae65c38019723c1d534d6c70ba051b2744ea52c9e07c1c761303962540e8f3147bd73ff0ce2767c7435bc76f544f5cbc5db03617689f30ec9ffb26494289d
+  checksum: 10c0/a66df6ecc01c80011a2bc9356d2b262753ad425382171d120ec5d4b5015d5131e919384a22cd148d48ecc1cb4fa598acaaa6308b260f8951f3558b5785816bb4
   languageName: node
   linkType: hard
 
