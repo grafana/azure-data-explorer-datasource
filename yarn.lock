@@ -1683,20 +1683,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/llm@npm:^0.14.1":
-  version: 0.14.1
-  resolution: "@grafana/llm@npm:0.14.1"
+"@grafana/llm@npm:^1.0.0":
+  version: 1.0.3
+  resolution: "@grafana/llm@npm:1.0.3"
   dependencies:
-    "@modelcontextprotocol/sdk": "npm:^1.7.0"
+    "@modelcontextprotocol/sdk": "npm:^1.26.0"
+    publint: "npm:^0.3.12"
     react-use: "npm:^17.6.0"
     semver: "npm:^7.6.3"
     uuid: "npm:^11.0.5"
   peerDependencies:
-    "@grafana/data": ^10.4.0 ||^11
-    "@grafana/runtime": ^10.4.0 || ^11
+    "@grafana/data": ^10.4.0 ||^11 || ^12
+    "@grafana/runtime": ^10.4.0 || ^11 || ^12
     react: ^18
-    rxjs: ^7.8.1
-  checksum: 10c0/9aed22d6c41c1821472f8c3c6da1b75a78cf4acb780bc113aa08144ed3fb66e7b8a373aed418f89ccbba2c127decf3ada8b1d3afc7e5639b53aaf18169ab8e61
+    rxjs: ^7.8.2
+  checksum: 10c0/d289165861552f4ce9169e99f29bd5b505328e728238f3f03c4d6a4cc9b3f0d27cf7c88ad46ff01a8cb58f397638f2d51980e3d08c21e6b952b31c6694647e28
   languageName: node
   linkType: hard
 
@@ -1900,12 +1901,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hono/node-server@npm:^1.19.7":
-  version: 1.19.7
-  resolution: "@hono/node-server@npm:1.19.7"
+"@hono/node-server@npm:^1.19.9":
+  version: 1.19.9
+  resolution: "@hono/node-server@npm:1.19.9"
   peerDependencies:
     hono: ^4
-  checksum: 10c0/293818e02a9100122a9319fba7032a3bae86d5f98f55d1a0ff4843c2b729eb6b471978ea15e29f4fb680c6a0be23a6e5a2132f3790ab31e88fb0b6b6fcc6829e
+  checksum: 10c0/de18c06b6b266dc45fe55fb82053bd1da8fe84939c49b6fbab4d2448b679d54ab5affbf8b15de9bead26f29b1755284d770aafb5ad14a8e4b3cfb4f79334554e
   languageName: node
   linkType: hard
 
@@ -2429,11 +2430,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/sdk@npm:^1.7.0":
-  version: 1.25.2
-  resolution: "@modelcontextprotocol/sdk@npm:1.25.2"
+"@modelcontextprotocol/sdk@npm:^1.26.0":
+  version: 1.26.0
+  resolution: "@modelcontextprotocol/sdk@npm:1.26.0"
   dependencies:
-    "@hono/node-server": "npm:^1.19.7"
+    "@hono/node-server": "npm:^1.19.9"
     ajv: "npm:^8.17.1"
     ajv-formats: "npm:^3.0.1"
     content-type: "npm:^1.0.5"
@@ -2441,14 +2442,15 @@ __metadata:
     cross-spawn: "npm:^7.0.5"
     eventsource: "npm:^3.0.2"
     eventsource-parser: "npm:^3.0.0"
-    express: "npm:^5.0.1"
-    express-rate-limit: "npm:^7.5.0"
-    jose: "npm:^6.1.1"
+    express: "npm:^5.2.1"
+    express-rate-limit: "npm:^8.2.1"
+    hono: "npm:^4.11.4"
+    jose: "npm:^6.1.3"
     json-schema-typed: "npm:^8.0.2"
     pkce-challenge: "npm:^5.0.0"
     raw-body: "npm:^3.0.0"
     zod: "npm:^3.25 || ^4.0"
-    zod-to-json-schema: "npm:^3.25.0"
+    zod-to-json-schema: "npm:^3.25.1"
   peerDependencies:
     "@cfworker/json-schema": ^4.1.1
     zod: ^3.25 || ^4.0
@@ -2457,7 +2459,7 @@ __metadata:
       optional: true
     zod:
       optional: false
-  checksum: 10c0/ffc024398e1b7841fb1ff2dc540e2e84f4b97a2a4058ef48e58836ce6077321c536a3858e9155472b7933c4773975b375167815bd4d721c3ca1e92db62e9488c
+  checksum: 10c0/b4098789d9fbbc4d9e0df240b18ba28867e4990ca4305322d6724fd03bba6685bbf21b39e02578b959da620b5a704ab1d565d3dbf377778ee9e4a0677b790728
   languageName: node
   linkType: hard
 
@@ -2886,6 +2888,13 @@ __metadata:
   version: 1.1.0
   resolution: "@protobufjs/utf8@npm:1.1.0"
   checksum: 10c0/a3fe31fe3fa29aa3349e2e04ee13dc170cc6af7c23d92ad49e3eeaf79b9766264544d3da824dba93b7855bd6a2982fb40032ef40693da98a136d835752beb487
+  languageName: node
+  linkType: hard
+
+"@publint/pack@npm:^0.1.3":
+  version: 0.1.4
+  resolution: "@publint/pack@npm:0.1.4"
+  checksum: 10c0/f70b2c8951b5d312ecfd40534e1dd1b0a4fe0fd207879a73c168e3f6979df6202b8b4d4f9a0ee9de6443f0bfb95ef47a0c27c7138c083d9224ef27c67adddefd
   languageName: node
   linkType: hard
 
@@ -7432,16 +7441,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-rate-limit@npm:^7.5.0":
-  version: 7.5.0
-  resolution: "express-rate-limit@npm:7.5.0"
+"express-rate-limit@npm:^8.2.1":
+  version: 8.2.1
+  resolution: "express-rate-limit@npm:8.2.1"
+  dependencies:
+    ip-address: "npm:10.0.1"
   peerDependencies:
-    express: ^4.11 || 5 || ^5.0.0-beta.1
-  checksum: 10c0/3e96afa05b4f577395688ede37e0cb19901f20c350b32575fb076f3d25176209fb88d3648151755c232aaf304147c58531f070757978f376e2f08326449299fd
+    express: ">= 4.11"
+  checksum: 10c0/54185f211c25655382436b8ad1a2136df0d5dc88f4d9d4438ca7cbc87cef0cd34cb01b8fc62d290445326aa6581470d2ff44502c3f1a34a5ed2c2ce56809fa01
   languageName: node
   linkType: hard
 
-"express@npm:^5.0.1":
+"express@npm:^5.2.1":
   version: 5.2.1
   resolution: "express@npm:5.2.1"
   dependencies:
@@ -8189,7 +8200,7 @@ __metadata:
     "@grafana/data": "npm:11.6.10"
     "@grafana/eslint-config": "npm:^8.0.0"
     "@grafana/i18n": "npm:12.3.2"
-    "@grafana/llm": "npm:^0.14.1"
+    "@grafana/llm": "npm:^1.0.0"
     "@grafana/plugin-e2e": "npm:^3.2.1"
     "@grafana/plugin-meta-extractor": "npm:^0.11.0"
     "@grafana/plugin-ui": "npm:^0.13.0"
@@ -8417,6 +8428,13 @@ __metadata:
   dependencies:
     react-is: "npm:^16.7.0"
   checksum: 10c0/fe0889169e845d738b59b64badf5e55fa3cf20454f9203d1eb088df322d49d4318df774828e789898dcb280e8a5521bb59b3203385662ca5e9218a6ca5820e74
+  languageName: node
+  linkType: hard
+
+"hono@npm:^4.11.4":
+  version: 4.11.8
+  resolution: "hono@npm:4.11.8"
+  checksum: 10c0/d83b8def88387713b5f7d8e28cc60a0b049f29827a15f9d53c0ea687a27f16520ec1d7997658f53acf48d75153b00f60394e6f1ec5c650dc3d17a749635c0afd
   languageName: node
   linkType: hard
 
@@ -8846,6 +8864,13 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.0.0"
   checksum: 10c0/5af133a917c0bcf65e84e7f23e779e7abc1cd49cb7fdc62d00d1de74b0d8c1b5ee74ac7766099fb3be1b05b26dfc67bab76a17030d2fe7ea2eef867434362dfc
+  languageName: node
+  linkType: hard
+
+"ip-address@npm:10.0.1":
+  version: 10.0.1
+  resolution: "ip-address@npm:10.0.1"
+  checksum: 10c0/1634d79dae18394004775cb6d699dc46b7c23df6d2083164025a2b15240c1164fccde53d0e08bd5ee4fc53913d033ab6b5e395a809ad4b956a940c446e948843
   languageName: node
   linkType: hard
 
@@ -9842,7 +9867,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:^6.1.1":
+"jose@npm:^6.1.3":
   version: 6.1.3
   resolution: "jose@npm:6.1.3"
   checksum: 10c0/b9577b4a7a5e84131011c23823db9f5951eae3ba796771a6a2401ae5dd50daf71104febc8ded9c38146aa5ebe94a92ac09c725e699e613ef26949b9f5a8bc30f
@@ -10608,6 +10633,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mri@npm:^1.1.0":
+  version: 1.2.0
+  resolution: "mri@npm:1.2.0"
+  checksum: 10c0/a3d32379c2554cf7351db6237ddc18dc9e54e4214953f3da105b97dc3babe0deb3ffe99cf409b38ea47cc29f9430561ba6b53b24ab8f9ce97a4b50409e4a50e7
+  languageName: node
+  linkType: hard
+
 "ms@npm:2.0.0":
   version: 2.0.0
   resolution: "ms@npm:2.0.0"
@@ -11015,6 +11047,13 @@ __metadata:
   version: 1.0.1
   resolution: "package-json-from-dist@npm:1.0.1"
   checksum: 10c0/62ba2785eb655fec084a257af34dbe24292ab74516d6aecef97ef72d4897310bc6898f6c85b5cd22770eaa1ce60d55a0230e150fb6a966e3ecd6c511e23d164b
+  languageName: node
+  linkType: hard
+
+"package-manager-detector@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "package-manager-detector@npm:1.6.0"
+  checksum: 10c0/6419d0b840be64fd45bcdcb7a19f09b81b65456d5e7f7a3daac305a4c90643052122f6ac0308afe548ffee75e36148532a2002ea9d292754f1e385aa2e1ea03b
   languageName: node
   linkType: hard
 
@@ -11530,6 +11569,20 @@ __metadata:
   dependencies:
     punycode: "npm:^2.3.1"
   checksum: 10c0/d8d45a99e4ca62ca12ac3c373e63d80d2368d38892daa40cfddaa1eb908be98cd549ac059783ef3a56cfd96d57ae8e2fd9ae53d1378d90d42bc661ff924e102a
+  languageName: node
+  linkType: hard
+
+"publint@npm:^0.3.12":
+  version: 0.3.17
+  resolution: "publint@npm:0.3.17"
+  dependencies:
+    "@publint/pack": "npm:^0.1.3"
+    package-manager-detector: "npm:^1.6.0"
+    picocolors: "npm:^1.1.1"
+    sade: "npm:^1.8.1"
+  bin:
+    publint: src/cli.js
+  checksum: 10c0/4615412b03c9b417c80d475b00fbaa7cdcc9685794b057c65edfd386e3d3b9b3701525d69c4fa485ce9f91831bb097f62235ac781309947c8cc2720f970cedcc
   languageName: node
   linkType: hard
 
@@ -12701,6 +12754,15 @@ __metadata:
   dependencies:
     tslib: "npm:^2.1.0"
   checksum: 10c0/3c49c1ecd66170b175c9cacf5cef67f8914dcbc7cd0162855538d365c83fea631167cacb644b3ce533b2ea0e9a4d0b12175186985f89d75abe73dbd8f7f06f68
+  languageName: node
+  linkType: hard
+
+"sade@npm:^1.8.1":
+  version: 1.8.1
+  resolution: "sade@npm:1.8.1"
+  dependencies:
+    mri: "npm:^1.1.0"
+  checksum: 10c0/da8a3a5d667ad5ce3bf6d4f054bbb9f711103e5df21003c5a5c1a8a77ce12b640ed4017dd423b13c2307ea7e645adee7c2ae3afe8051b9db16a6f6d3da3f90b1
   languageName: node
   linkType: hard
 
@@ -15118,12 +15180,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod-to-json-schema@npm:^3.25.0":
-  version: 3.25.0
-  resolution: "zod-to-json-schema@npm:3.25.0"
+"zod-to-json-schema@npm:^3.25.1":
+  version: 3.25.1
+  resolution: "zod-to-json-schema@npm:3.25.1"
   peerDependencies:
     zod: ^3.25 || ^4
-  checksum: 10c0/2d2cf6ca49752bf3dc5fb37bc8f275eddbbc4020e7958d9c198ea88cd197a5f527459118188a0081b889da6a6474d64c4134cd60951fa70178c125138761c680
+  checksum: 10c0/711b30e34d1f1211f1afe64bf457f0d799234199dc005cca720b236ea808804c03164039c232f5df33c46f462023874015a8a0b3aab1585eca14124c324db7e2
   languageName: node
   linkType: hard
 
