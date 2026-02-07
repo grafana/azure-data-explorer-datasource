@@ -1627,9 +1627,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/eslint-config@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "@grafana/eslint-config@npm:8.0.0"
+"@grafana/eslint-config@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "@grafana/eslint-config@npm:9.0.0"
   peerDependencies:
     "@stylistic/eslint-plugin-ts": ">=2.9.0"
     "@typescript-eslint/eslint-plugin": ">=6.18.0"
@@ -1638,9 +1638,9 @@ __metadata:
     eslint-config-prettier: ">=8.8.0"
     eslint-plugin-jsdoc: ">=46.8.0"
     eslint-plugin-react: ">=7.33.0"
-    eslint-plugin-react-hooks: ">=4.6.0"
+    eslint-plugin-react-hooks: ">=7.0.0"
     typescript: ">=5.2.0"
-  checksum: 10c0/2933ed41f38ebc825625e4f6fa49f8627e23da813acd635fdbfc2721ea7699cac26cdfd35f467745e958c1e7bb87c2f9a4931d8bcc8f6fcc028bd9e5ec2dfbec
+  checksum: 10c0/a603561418ff4fae279efb91ffeffee721ae35dfbe33078d8bfa18311a69cfe8249e3d4020141c948cea986ee43b366aced8803a92df48f6abf54e4d71ce9ca9
   languageName: node
   linkType: hard
 
@@ -8187,7 +8187,7 @@ __metadata:
     "@eslint/compat": "npm:^2.0.1"
     "@grafana/azure-sdk": "npm:^0.0.8"
     "@grafana/data": "npm:11.6.10"
-    "@grafana/eslint-config": "npm:^8.0.0"
+    "@grafana/eslint-config": "npm:^9.0.0"
     "@grafana/i18n": "npm:12.3.2"
     "@grafana/llm": "npm:^0.14.1"
     "@grafana/plugin-e2e": "npm:^3.2.1"
