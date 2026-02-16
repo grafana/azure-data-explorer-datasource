@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "A Valaki nevében funkció bétaverzióban érhető el"
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "A további beállítások olyan opcionális beállítások, amelyek konfigurálhatók az adatforrás nagyobb mértékű ellenőrzése érdekében. Ez magában foglalja a lekérdezésoptimalizálást, a sémabeállításokat, a nyomkövetési konfigurációt, az OpenAI-konfigurációt, a kérelmek időtúllépését és a továbbított cookie-kat.",
       "label-enable": "Engedélyezés",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "Engedélyezett cookie-k",
+      "placeholder-http-cookies": "Új cookie (nyomja le az Enter billentyűt a hozzáadáshoz)",
       "secure-socks-proxy": "Secure Socks Proxy",
       "title-additional-settings": "További beállítások",
       "tooltip-enable": "Engedélyezze az adatforrás-kapcsolat proxyelérését a biztonságos Socks-proxyn keresztül egy másik hálózathoz. Lásd: <2>Adatforrás-kapcsolat proxyjának konfigurálása.</2>",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "A Grafana-proxy alapértelmezés szerint törli a továbbított cookie-kat. Adja meg az adatforráshoz továbbítandó cookie-kat név szerint."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Konfigurálja a kapcsolatot a Grafanában",

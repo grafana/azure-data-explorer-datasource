@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "Namens-functie is in bèta"
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "Aanvullende instellingen zijn optionele instellingen die kunnen worden geconfigureerd voor meer controle over je gegevensbron. Dit omvat query-optimalisaties, schema-instellingen, trackingconfiguratie, OpenAI-configuratie, time-out van verzoek en doorgestuurde cookies.",
       "label-enable": "Inschakelen",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "Toegestane cookies",
+      "placeholder-http-cookies": "Nieuw cookie (druk op enter om toe te voegen)",
       "secure-socks-proxy": "Secure Socks Proxy",
       "title-additional-settings": "Aanvullende instellingen",
       "tooltip-enable": "Schakel proxying van de gegevensbronverbinding via de beveiligde Socks-proxy naar een ander netwerk in. Zie <2>Een gegevensbronverbindingsproxy configureren.</2>",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "Grafana-proxy verwijdert standaard doorgestuurde cookies. Geef de namen op van de cookies die naar de databron moeten worden doorgestuurd."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Configureer de verbinding in Grafana",

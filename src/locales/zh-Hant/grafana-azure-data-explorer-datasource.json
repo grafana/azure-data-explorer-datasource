@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "「代表」功能處於測試階段"
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "附加設定為選擇性設定，可進行設定以便更妥善掌控您的資料來源。其中包括查詢最佳化、結構描述設定、追蹤設定、OpenAI 設定、要求逾時和轉寄的 Cookie。",
       "label-enable": "啟用",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "允許的 Cookie",
+      "placeholder-http-cookies": "新的 Cookie（按 Enter 鍵新增）",
       "secure-socks-proxy": "安全 Socks 代理",
       "title-additional-settings": "附加設定",
       "tooltip-enable": "啟用透過安全 Socks 代理將資料來源連線代理到其他網路。請參閱<2>設定資料來源連線代理。</2>",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "Grafana 代理預設會刪除轉寄的 Cookie。按名稱指定應轉寄到資料來源的 Cookie。"
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. 在 Grafana 中設定連線",
