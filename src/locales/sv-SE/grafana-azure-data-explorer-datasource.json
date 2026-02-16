@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "På uppdrag av-funktionen är i betastadiet"
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "Ytterligare inställningar är valfria inställningar som kan konfigureras för ökad kontroll över din datakälla. Detta inkluderar frågeoptimeringar, schemainställningar, spårningskonfiguration, OpenAI-konfiguration, tidsgräns för förfrågan och vidarebefordrade cookies.",
       "label-enable": "Aktivera",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "Tillåtna cookies",
+      "placeholder-http-cookies": "Ny cookie (tryck på Enter om du vill lägga till)",
       "secure-socks-proxy": "Secure Socks Proxy",
       "title-additional-settings": "Ytterligare inställningar",
       "tooltip-enable": "Aktivera proxy för datakällans anslutning via den säkra SOCKS-proxyn till ett annat nätverk. Se <2>Konfigurera anslutningsproxy för en datakälla.</2>",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "Grafana proxy raderar som standard vidarebefordrade cookies. Namnge de cookies som ska vidarebefordras till datakällan."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Konfigurera anslutningen i Grafana",

@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "La funzionalità Per conto di è in versione beta"
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "Le impostazioni aggiuntive sono opzionali e possono essere configurate per un maggiore controllo sull'origine dei dati. Ciò include le ottimizzazioni delle query, le impostazioni dello schema, la configurazione del monitoraggio, la configurazione di OpenAI, il timeout della richiesta e i cookie inoltrati.",
       "label-enable": "Abilita",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "Cookie consentiti",
+      "placeholder-http-cookies": "Nuovo cookie (premi Invio per aggiungere)",
       "secure-socks-proxy": "Proxy Socks sicuro",
       "title-additional-settings": "Impostazioni aggiuntive",
       "tooltip-enable": "Abilita il proxy della connessione all'origine dati tramite il proxy socks sicuro a una rete diversa. Consulta <2>Configura un proxy di connessione all'origine dati.</2>",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "Il proxy Grafana elimina i cookie inoltrati per impostazione predefinita. Specifica i cookie per nome che devono essere inoltrati all'origine dati."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Configura la connessione in Grafana",
