@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "代表功能处于测试阶段"
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "附加设置是可选设置，通过配置，可对数据源进行更精细的控制。这包括查询优化、架构设置、跟踪配置、OpenAI 配置、请求超时和转发的 Cookie。",
       "label-enable": "启用",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "允许的 Cookie",
+      "placeholder-http-cookies": "新 Cookie（按 Enter 回车键以添加）",
       "secure-socks-proxy": "安全 Socks 代理",
       "title-additional-settings": "附加设置",
       "tooltip-enable": "启用通过安全 Socks 代理将数据源连接代理到其他网络。请参阅<2>配置数据源连接代理。</2>。",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "Grafana 代理默认情况下会删除转发的 Cookie。按名称指定应转发到数据源的 Cookie。"
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. 在 Grafana 中配置连接",

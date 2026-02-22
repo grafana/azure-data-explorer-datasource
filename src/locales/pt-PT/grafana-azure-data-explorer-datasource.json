@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "A funcionalidade Em nome de está na versão beta"
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "As definições adicionais são definições opcionais que podem ser configuradas para obter mais controlo sobre a sua origem de dados. Isto inclui otimizações de consulta, definições de esquema, configurações de rastreio, configurações de OpenAI, tempo limite de pedido e cookies encaminhados.",
       "label-enable": "Ativar",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "Cookies permitidos",
+      "placeholder-http-cookies": "Novo cookie (prima Enter para adicionar)",
       "secure-socks-proxy": "Proxy Socks seguro",
       "title-additional-settings": "Definições adicionais",
       "tooltip-enable": "Ative o proxy de ligação da origem de dados através de proxy socks seguro para uma rede diferente. Consulte <2>Configurar um proxy de ligação da origem de dados.</2>",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "O proxy da Grafana elimina os cookies encaminhados por predefinição. Especifique os cookies pelo nome que devem ser encaminhados para a origem de dados."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Configure a ligação no Grafana",

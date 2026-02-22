@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "La fonctionnalité « Au nom de » est en version bêta"
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "Les paramètres supplémentaires sont des options facultatives que vous pouvez configurer pour un meilleur contrôle de votre source de données. Cela inclut les optimisations de requêtes, les paramètres de schéma, la configuration du suivi, la configuration OpenAI, le délai d’expiration des requêtes et les cookies transférés.",
       "label-enable": "Activer",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "Cookies autorisés",
+      "placeholder-http-cookies": "Nouveau cookie (appuyez sur Entrée pour l’ajouter)",
       "secure-socks-proxy": "Proxy Socks sécurisé",
       "title-additional-settings": "Paramètres supplémentaires",
       "tooltip-enable": "Activez le proxy sécurisé SOCKS pour acheminer la connexion de la source de données vers un autre réseau. Consultez <2>Configurer un proxy de connexion à la source de données.</2>",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "Le proxy Grafana supprime les cookies transférés par défaut. Indiquez le nom des cookies qui doivent être transférés à la source de données."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Configurez la connexion dans Grafana",
