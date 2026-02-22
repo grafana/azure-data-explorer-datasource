@@ -7077,9 +7077,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^62.5.0":
-  version: 62.5.2
-  resolution: "eslint-plugin-jsdoc@npm:62.5.2"
+"eslint-plugin-jsdoc@npm:^62.6.1":
+  version: 62.7.0
+  resolution: "eslint-plugin-jsdoc@npm:62.7.0"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.84.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -7092,12 +7092,12 @@ __metadata:
     html-entities: "npm:^2.6.0"
     object-deep-merge: "npm:^2.0.0"
     parse-imports-exports: "npm:^0.2.4"
-    semver: "npm:^7.7.3"
+    semver: "npm:^7.7.4"
     spdx-expression-parse: "npm:^4.0.0"
     to-valid-identifier: "npm:^1.0.0"
   peerDependencies:
-    eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10c0/1872627695be78d30f7073e16393564012ea0b4560bec421cc95a8dfdb405272469c00d509e3a128d17f6abbe2c21201c85f37da42b7e572ddbe8e6dec44b4ab
+    eslint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+  checksum: 10c0/1847b7e59f2d01fec502fda347b6c9d44ffdeacb5e1e61a67c81cf504ce7d4540f5e9739f6bea30c95eea88ff7a09c6aafd348eda3d4e726fd773b89436a4de6
   languageName: node
   linkType: hard
 
@@ -8226,7 +8226,7 @@ __metadata:
     eslint: "npm:^9.39.2"
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-deprecation: "npm:^3.0.0"
-    eslint-plugin-jsdoc: "npm:^62.5.0"
+    eslint-plugin-jsdoc: "npm:^62.6.1"
     eslint-plugin-prettier: "npm:^5.5.5"
     eslint-plugin-react: "npm:^7.37.5"
     eslint-plugin-react-hooks: "npm:^7.0.1"
@@ -12880,12 +12880,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.5, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.6.0, semver@npm:^7.6.3, semver@npm:^7.7.0, semver@npm:^7.7.2, semver@npm:^7.7.3":
-  version: 7.7.3
-  resolution: "semver@npm:7.7.3"
+"semver@npm:^7.3.5, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.6.0, semver@npm:^7.6.3, semver@npm:^7.7.0, semver@npm:^7.7.2, semver@npm:^7.7.3, semver@npm:^7.7.4":
+  version: 7.7.4
+  resolution: "semver@npm:7.7.4"
   bin:
     semver: bin/semver.js
-  checksum: 10c0/4afe5c986567db82f44c8c6faef8fe9df2a9b1d98098fc1721f57c696c4c21cebd572f297fc21002f81889492345b8470473bc6f4aff5fb032a6ea59ea2bc45e
+  checksum: 10c0/5215ad0234e2845d4ea5bb9d836d42b03499546ddafb12075566899fc617f68794bb6f146076b6881d755de17d6c6cc73372555879ec7dce2c2feee947866ad2
   languageName: node
   linkType: hard
 
