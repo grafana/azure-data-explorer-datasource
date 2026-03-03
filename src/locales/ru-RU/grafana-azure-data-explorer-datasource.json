@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "Функция «От имени» находится в режиме бета-тестирования"
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "Дополнительные параметры — это необязательные настройки для более точного контроля над источником данных. Сюда входят оптимизация запросов, параметры схемы, настройка отслеживания, конфигурация OpenAI, время ожидания запроса и пересылаемые файлы cookie.",
       "label-enable": "Включить",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "Разрешенные файлы cookie",
+      "placeholder-http-cookies": "Новый файл cookie (нажмите Enter, чтобы добавить)",
       "secure-socks-proxy": "Безопасный Socks-прокси",
       "title-additional-settings": "Дополнительные параметры",
       "tooltip-enable": "Включите проксирование подключения источника данных через безопасный Socks-прокси к другой сети. См. раздел <2>Настройка прокси для подключения источника данных.</2>",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "Прокси-сервер Grafana по умолчанию удаляет пересылаемые файлы cookie. Укажите имя файлов cookie, которые следует переслать в источник данных."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Настройте подключение в Grafana",
