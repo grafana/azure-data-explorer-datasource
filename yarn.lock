@@ -12,6 +12,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@axe-core/playwright@npm:^4.11.1":
+  version: 4.11.1
+  resolution: "@axe-core/playwright@npm:4.11.1"
+  dependencies:
+    axe-core: "npm:~4.11.1"
+  peerDependencies:
+    playwright-core: ">= 1.0.0"
+  checksum: 10c0/8c916cd2dd831d91f8c2ab9e3a07ef19837415bb41d40439e4acb88ed0009af2479696b865670199b13ccad984a247868610fbb34d520fca9f7c02de0f7a9439
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.10.4, @babel/code-frame@npm:^7.12.13, @babel/code-frame@npm:^7.16.7, @babel/code-frame@npm:^7.27.1":
   version: 7.27.1
   resolution: "@babel/code-frame@npm:7.27.1"
@@ -1616,14 +1627,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/e2e-selectors@npm:12.4.0-21513454430":
-  version: 12.4.0-21513454430
-  resolution: "@grafana/e2e-selectors@npm:12.4.0-21513454430"
+"@grafana/e2e-selectors@npm:13.0.0-22358195095":
+  version: 13.0.0-22358195095
+  resolution: "@grafana/e2e-selectors@npm:13.0.0-22358195095"
   dependencies:
     semver: "npm:^7.7.0"
     tslib: "npm:2.8.1"
     typescript: "npm:5.9.2"
-  checksum: 10c0/bb6722f6f535d0fc639879cba7733e1c70f7e241c2f5d2ccecbfe7cc87a449b70b477c6219e8a34f4b851a74e9ae810639053b909187206f8643ac64b7677bd4
+  checksum: 10c0/4fbbba8e94f282e7cc986c688336e66fc838f055a3c4908f048cb4e984d89763101f8d9161474fdf58371ff5a08286307d36b30261ee602b38d716ac24d7b445
   languageName: node
   linkType: hard
 
@@ -1700,17 +1711,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/plugin-e2e@npm:^3.2.1":
-  version: 3.2.1
-  resolution: "@grafana/plugin-e2e@npm:3.2.1"
+"@grafana/plugin-e2e@npm:^3.4.1":
+  version: 3.4.1
+  resolution: "@grafana/plugin-e2e@npm:3.4.1"
   dependencies:
-    "@grafana/e2e-selectors": "npm:12.4.0-21513454430"
+    "@grafana/e2e-selectors": "npm:13.0.0-22358195095"
     semver: "npm:^7.5.4"
     uuid: "npm:^13.0.0"
     yaml: "npm:^2.3.4"
   peerDependencies:
+    "@axe-core/playwright": ^4.11.1
     "@playwright/test": ^1.52.0
-  checksum: 10c0/aaf5e6c176181451d2af153abc6fa04e3597049abc0f2cde41397b938091ae97660328b6015e756e671923435eeda39c294656d04a2dba3bb8accf668442303f
+    axe-core: ^4.11.1
+  checksum: 10c0/e894adb7efc0550f513cf031654358380daf6033561bfd258683c8f6da161fbff7dfe9727a42b1ffeae474a96c22a33add0000fbec3d7a243cbed3ffb8e0d5f3
   languageName: node
   linkType: hard
 
@@ -4832,6 +4845,13 @@ __metadata:
   dependencies:
     possible-typed-array-names: "npm:^1.0.0"
   checksum: 10c0/d07226ef4f87daa01bd0fe80f8f310982e345f372926da2e5296aecc25c41cab440916bbaa4c5e1034b453af3392f67df5961124e4b586df1e99793a1374bdb2
+  languageName: node
+  linkType: hard
+
+"axe-core@npm:~4.11.1":
+  version: 4.11.1
+  resolution: "axe-core@npm:4.11.1"
+  checksum: 10c0/1e6997454b61c7c9a4d740f395952835dcf87f2c04fd81577217d68634d197d602c224f9e8f17b22815db4c117a2519980cfc8911fc0027c54a6d8ebca47c6a7
   languageName: node
   linkType: hard
 
@@ -8182,6 +8202,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "grafana-azure-data-explorer-datasource@workspace:."
   dependencies:
+    "@axe-core/playwright": "npm:^4.11.1"
     "@babel/core": "npm:^7.28.4"
     "@emotion/css": "npm:11.13.5"
     "@eslint/compat": "npm:^2.0.1"
@@ -8190,7 +8211,7 @@ __metadata:
     "@grafana/eslint-config": "npm:^8.0.0"
     "@grafana/i18n": "npm:12.3.2"
     "@grafana/llm": "npm:^0.14.1"
-    "@grafana/plugin-e2e": "npm:^3.2.1"
+    "@grafana/plugin-e2e": "npm:^3.4.1"
     "@grafana/plugin-meta-extractor": "npm:^0.11.0"
     "@grafana/plugin-ui": "npm:^0.13.0"
     "@grafana/runtime": "npm:11.6.10"
