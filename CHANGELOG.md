@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [7.2.4]
+
+- Dependency updates
+
 ## [7.2.3]
 
 - Dependency updates
