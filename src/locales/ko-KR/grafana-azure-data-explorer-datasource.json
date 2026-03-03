@@ -52,14 +52,14 @@
       "title-on-behalf-of-feature-is-in-beta": "대리 기능은 베타 버전입니다."
     },
     "config-editor": {
-      "description-additional-settings": "",
+      "description-additional-settings": "추가 설정은 데이터 소스를 보다 세부적으로 제어하기 위해 구성할 수 있는 선택적 설정입니다. 여기에는 쿼리 최적화, 스키마 설정, 추적 구성, OpenAI 구성, 요청 시간 제한, 전달 쿠키가 포함됩니다.",
       "label-enable": "활성화",
-      "label-http-cookies": "",
-      "placeholder-http-cookies": "",
+      "label-http-cookies": "허용된 쿠키",
+      "placeholder-http-cookies": "새 쿠키(추가하려면 엔터 키를 누르세요)",
       "secure-socks-proxy": "보안 SOCKS 프록시",
       "title-additional-settings": "추가 설정",
       "tooltip-enable": "보안 SOCKS 프록시를 통해 다른 네트워크로의 데이터 소스 연결에 프록시를 사용 설정합니다. <2>데이터 소스 연결 프록시 구성</2>에서 확인할 수 있습니다.",
-      "tooltip-http-cookies": ""
+      "tooltip-http-cookies": "Grafana 프록시는 기본적으로 전달된 쿠키를 삭제합니다. 데이터 소스로 전달할 쿠키의 이름을 명시하세요."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Grafana에서 연결 구성",
