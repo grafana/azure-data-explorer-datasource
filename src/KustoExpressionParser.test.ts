@@ -41,7 +41,11 @@ describe('KustoExpressionParser', () => {
       };
 
       expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
-        'StormEvents' + '\n| where isnotempty(eventType)' + '\n| take 50000' + '\n| distinct eventType' + '\n| take 251'
+        'StormEvents' +
+          '\n| where isnotempty(["eventType"])' +
+          '\n| take 50000' +
+          '\n| distinct ["eventType"]' +
+          '\n| take 251'
       );
     });
 
@@ -61,10 +65,10 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
         'StormEvents' +
-          "\n| where eventType == 'ThunderStorm'" +
-          "\n| where state contains 'TEXAS'" +
+          '\n| where ["eventType"] == \'ThunderStorm\'' +
+          '\n| where ["state"] contains \'TEXAS\'' +
           '\n| take 50000' +
-          '\n| distinct state' +
+          '\n| distinct ["state"]' +
           '\n| take 251'
       );
     });
@@ -91,10 +95,10 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toAutoCompleteQuery(acQuery)).toEqual(
         'StormEvents' +
-          "\n| where eventType == 'ThunderStorm'" +
-          "\n| where state contains 'TEXAS' or eventType == 'Lightning'" +
+          '\n| where ["eventType"] == \'ThunderStorm\'' +
+          '\n| where ["state"] contains \'TEXAS\' or ["eventType"] == \'Lightning\'' +
           '\n| take 50000' +
-          '\n| distinct state' +
+          '\n| distinct ["state"]' +
           '\n| take 251'
       );
     });
@@ -129,8 +133,8 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toAutoCompleteQuery(acQuery, tableSchema)).toEqual(
         'StormEvents' +
-          "\n| where eventType == 'ThunderStorm'" +
-          "\n| where column[\"type\"] contains 'TEXAS' or eventType == 'Lightning'" +
+          '\n| where ["eventType"] == \'ThunderStorm\'' +
+          '\n| where column["type"] contains \'TEXAS\' or ["eventType"] == \'Lightning\'' +
           '\n| take 50000' +
           '\n| distinct tostring(column["type"])' +
           '\n| take 251'
@@ -171,9 +175,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toAutoCompleteQuery(acQuery, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          "\n| where eventType == 'ThunderStorm'" +
-          "\n| where column[\"type\"] contains 'TEXAS' or eventType == 'Lightning'" +
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| where ["eventType"] == \'ThunderStorm\'' +
+          '\n| where column["type"] contains \'TEXAS\' or ["eventType"] == \'Lightning\'' +
           '\n| take 50000' +
           '\n| distinct tostring(column["type"])' +
           '\n| take 251'
@@ -229,10 +233,10 @@ describe('KustoExpressionParser', () => {
       ];
       expect(parser.toAutoCompleteQuery(acQuery, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| mv-expand array_1 = column' +
-          '\n| where isnotempty(array_1)' +
+          '\n| mv-expand array_1 = ["column"]' +
+          '\n| where isnotempty(["array_1"])' +
           '\n| take 50000' +
-          '\n| distinct array_1' +
+          '\n| distinct ["array_1"]' +
           '\n| take 251'
       );
     });
@@ -248,7 +252,7 @@ describe('KustoExpressionParser', () => {
         },
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| project foo, bar');
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| project ["foo"], ["bar"]');
     });
 
     it('should parse expression with where equal to string value', () => {
@@ -257,7 +261,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([createOperator('eventType', '==', 'ThunderStorm')]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where eventType == 'ThunderStorm'");
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["eventType"] == \'ThunderStorm\'');
     });
 
     it('should parse expression with columns with spaces', () => {
@@ -349,7 +353,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([createOperator('isActive', '==', true)]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where isActive == true');
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["isActive"] == true');
     });
 
     it('should parse expression with where equal to numeric value', () => {
@@ -358,7 +362,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([createOperator('count', '==', 10)]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where count == 10');
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["count"] == 10');
     });
 
     it('should parse expression with where in numeric values', () => {
@@ -367,7 +371,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([createOperator('count', 'in', [10, 20])]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where count in (10, 20)');
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["count"] in (10, 20)');
     });
 
     it('should parse expression with where in string values', () => {
@@ -376,7 +380,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([createOperator('events', 'in', ['triggered', 'closed'])]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where events in ('triggered', 'closed')");
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where [\"events\"] in ('triggered', 'closed')");
     });
 
     it('should parse expression with multiple where filters', () => {
@@ -389,7 +393,7 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where isActive == true' + "\n| where events in ('triggered', 'closed')"
+        'StormEvents' + '\n| where ["isActive"] == true' + "\n| where [\"events\"] in ('triggered', 'closed')"
       );
     });
 
@@ -408,9 +412,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression)).toEqual(
         'StormEvents' +
-          '\n| where isActive == true' +
-          "\n| where events in ('triggered', 'closed')" +
-          "\n| where state == 'TEXAS' or state == 'FLORIDA'"
+          '\n| where ["isActive"] == true' +
+          "\n| where [\"events\"] in ('triggered', 'closed')" +
+          '\n| where ["state"] == \'TEXAS\' or ["state"] == \'FLORIDA\''
       );
     });
 
@@ -420,7 +424,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([createOperator('isActive', '==', '')]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where isActive == ''");
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["isActive"] == \'\'');
     });
 
     it('should parse expression with time filter when schema contains time column', () => {
@@ -438,9 +442,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| where isActive == true' +
-          `\n| order by StartTime asc`
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| where ["isActive"] == true' +
+          `\n| order by ["StartTime"] asc`
       );
     });
 
@@ -460,7 +464,7 @@ describe('KustoExpressionParser', () => {
         },
       ];
 
-      expect(parser.toQuery(expression, tableSchema)).toEqual('StormEvents' + '\n| project foo');
+      expect(parser.toQuery(expression, tableSchema)).toEqual('StormEvents' + '\n| project ["foo"]');
     });
 
     it('should parse expression with time filter when schema contains multiple time columns', () => {
@@ -482,9 +486,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| where isActive == true' +
-          `\n| order by StartTime asc`
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| where ["isActive"] == true' +
+          `\n| order by ["StartTime"] asc`
       );
     });
 
@@ -505,7 +509,7 @@ describe('KustoExpressionParser', () => {
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
           '\n| where todatetime(Column["StartTime"]) between ($__timeFrom .. $__timeTo)' +
-          '\n| where isActive == true' +
+          '\n| where ["isActive"] == true' +
           `\n| order by todatetime(Column["StartTime"]) asc`
       );
     });
@@ -530,9 +534,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(SavedTime)' +
-          '\n| where isActive == true' +
-          `\n| order by SavedTime asc`
+          '\n| where $__timeFilter(["SavedTime"])' +
+          '\n| where ["isActive"] == true' +
+          `\n| order by ["SavedTime"] asc`
       );
     });
 
@@ -553,7 +557,7 @@ describe('KustoExpressionParser', () => {
       });
 
       expect(parser.toQuery(expression)).toEqual(
-        'StormEvents' + '\n| where column["isActive"] == true' + `\n| summarize sum(active)`
+        'StormEvents' + '\n| where column["isActive"] == true' + `\n| summarize sum(["active"])`
       );
     });
 
@@ -634,9 +638,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["isActive"] == true' +
-          `\n| project toint(column["level"]["active"]), active`
+          `\n| project toint(column["level"]["active"]), ["active"]`
       );
     });
 
@@ -661,7 +665,7 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["isActive"] == true' +
           `\n| summarize sum(toint(column["level"]["active"]))`
       );
@@ -689,10 +693,10 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["isActive"] == true' +
-          `\n| summarize sum(toint(column["level"]["active"])) by bin(StartTime, 1h)` +
-          `\n| order by StartTime asc`
+          `\n| summarize sum(toint(column["level"]["active"])) by bin(["StartTime"], 1h)` +
+          `\n| order by ["StartTime"] asc`
       );
     });
 
@@ -717,10 +721,10 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["isActive"] == true' +
-          `\n| summarize by bin(StartTime, 1h)` +
-          `\n| order by StartTime asc`
+          `\n| summarize by bin(["StartTime"], 1h)` +
+          `\n| order by ["StartTime"] asc`
       );
     });
 
@@ -745,10 +749,10 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["isActive"] == true' +
-          `\n| summarize by bin(StartTime, 1h), type` +
-          `\n| order by StartTime asc`
+          `\n| summarize by bin(["StartTime"], 1h), ["type"]` +
+          `\n| order by ["StartTime"] asc`
       );
     });
 
@@ -777,10 +781,10 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(EndTime)' +
+          '\n| where $__timeFilter(["EndTime"])' +
           '\n| where column["isActive"] == true' +
-          `\n| summarize by bin(EndTime, 1h), type` +
-          `\n| order by EndTime asc`
+          `\n| summarize by bin(["EndTime"], 1h), ["type"]` +
+          `\n| order by ["EndTime"] asc`
       );
     });
 
@@ -812,7 +816,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where todatetime(column["EndTime"]) between ($__timeFrom .. $__timeTo)' +
           '\n| where column["isActive"] == true' +
-          `\n| summarize by bin(todatetime(column["EndTime"]), 1h), type` +
+          `\n| summarize by bin(todatetime(column["EndTime"]), 1h), ["type"]` +
           `\n| order by todatetime(column["EndTime"]) asc`
       );
     });
@@ -838,7 +842,7 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["isActive"] == true' +
           `\n| summarize by tostring(column["type"])`
       );
@@ -884,7 +888,7 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["country"] == $country' +
           `\n| summarize by tostring(column["type"])`
       );
@@ -932,7 +936,7 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["country"] == \'$country\'' +
           `\n| summarize by tostring(column["type"])`
       );
@@ -959,9 +963,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["country"] == \'sweden\'' +
-          `\n| summarize percentile(amount, 1)`
+          `\n| summarize percentile(["amount"], 1)`
       );
     });
 
@@ -986,9 +990,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["country"] == \'sweden\'' +
-          `\n| summarize percentile(amount, 1, 2)`
+          `\n| summarize percentile(["amount"], 1, 2)`
       );
     });
 
@@ -1013,9 +1017,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["country"] == \'sweden\'' +
-          `\n| summarize percentile(amount, 1)`
+          `\n| summarize percentile(["amount"], 1)`
       );
     });
 
@@ -1040,9 +1044,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
+          '\n| where $__timeFilter(["StartTime"])' +
           '\n| where column["country"] == \'sweden\'' +
-          `\n| summarize percentile(amount, 1, '2')`
+          `\n| summarize percentile(["amount"], 1, '2')`
       );
     });
 
@@ -1066,9 +1070,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| mv-expand array_1 = column' +
-          `\n| summarize percentile(tostring(array_1), 1, '2')`
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| mv-expand array_1 = ["column"]' +
+          `\n| summarize percentile(tostring(["array_1"]), 1, '2')`
       );
     });
 
@@ -1094,10 +1098,10 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| mv-expand array_1 = column' +
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| mv-expand array_1 = ["column"]' +
           '\n| mv-expand array_2 = array_1["foo"]' +
-          `\n| summarize percentile(tostring(array_2), 1, '2')`
+          `\n| summarize percentile(tostring(["array_2"]), 1, '2')`
       );
     });
 
@@ -1117,10 +1121,10 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where StartTime between (($__timeFrom - 2d) .. ($__timeTo - 2d))' +
-          "\n| where country == 'sweden'" +
-          `\n| extend StartTime = StartTime + 2d` +
-          `\n| order by StartTime asc`
+          '\n| where ["StartTime"] between (($__timeFrom - 2d) .. ($__timeTo - 2d))' +
+          '\n| where ["country"] == \'sweden\'' +
+          `\n| extend ["StartTime"] = ["StartTime"] + 2d` +
+          `\n| order by ["StartTime"] asc`
       );
     });
 
@@ -1131,7 +1135,7 @@ describe('KustoExpressionParser', () => {
         timeshift: createProperty('2d'),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + "\n| where country == 'sweden'");
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["country"] == \'sweden\'');
     });
 
     it('should parse expression with timeshift without any valid timeshift value', () => {
@@ -1150,9 +1154,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          "\n| where country == 'sweden'" +
-          `\n| order by StartTime asc`
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| where ["country"] == \'sweden\'' +
+          `\n| order by ["StartTime"] asc`
       );
     });
 
@@ -1171,9 +1175,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| where isnotempty(country)' +
-          `\n| order by StartTime asc`
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| where isnotempty(["country"])' +
+          `\n| order by ["StartTime"] asc`
       );
     });
 
@@ -1193,7 +1197,7 @@ describe('KustoExpressionParser', () => {
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
-        'StormEvents' + '\n| where $__timeFilter(StartTime)' + '\n| summarize dcount(country) by continents'
+        'StormEvents' + '\n| where $__timeFilter(["StartTime"])' + '\n| summarize dcount(["country"]) by ["continents"]'
       );
     });
 
@@ -1213,7 +1217,7 @@ describe('KustoExpressionParser', () => {
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
-        'StormEvents' + '\n| where $__timeFilter(StartTime)' + '\n| summarize dcount(country) by continents'
+        'StormEvents' + '\n| where $__timeFilter(["StartTime"])' + '\n| summarize dcount(["country"]) by ["continents"]'
       );
     });
 
@@ -1233,7 +1237,7 @@ describe('KustoExpressionParser', () => {
       ];
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
-        'StormEvents' + '\n| where $__timeFilter(StartTime)' + '\n| summarize dcount(country) by continents'
+        'StormEvents' + '\n| where $__timeFilter(["StartTime"])' + '\n| summarize dcount(["country"]) by ["continents"]'
       );
     });
 
@@ -1254,8 +1258,8 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents($__from, $__to)' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| summarize dcount(country) by continents'
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| summarize dcount(["country"]) by ["continents"]'
       );
     });
 
@@ -1279,9 +1283,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| mv-expand array_1 = column' +
-          '\n| summarize by tostring(array_1)'
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| mv-expand array_1 = ["column"]' +
+          '\n| summarize by tostring(["array_1"])'
       );
     });
 
@@ -1305,10 +1309,10 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression, tableSchema)).toEqual(
         'StormEvents' +
-          '\n| where $__timeFilter(StartTime)' +
-          '\n| mv-expand array_1 = column' +
+          '\n| where $__timeFilter(["StartTime"])' +
+          '\n| mv-expand array_1 = ["column"]' +
           '\n| mv-expand array_2 = array_1["foo"]' +
-          '\n| summarize by tostring(array_2)'
+          '\n| summarize by tostring(["array_2"])'
       );
     });
 
@@ -1323,7 +1327,7 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression)).toEqual(
         'StormEvents' +
-          '\n| mv-expand array_1 = eventType' +
+          '\n| mv-expand array_1 = ["eventType"]' +
           "\n| where array_1 == 'ThunderStorm'" +
           '\n| project-away array_1'
       );
@@ -1343,8 +1347,8 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression)).toEqual(
         'StormEvents' +
-          '\n| mv-expand array_1 = eventType' +
-          "\n| where array_1 == 'ThunderStorm' or foo == 'bar'" +
+          '\n| mv-expand array_1 = ["eventType"]' +
+          "\n| where array_1 == 'ThunderStorm' or [\"foo\"] == 'bar'" +
           '\n| project-away array_1'
       );
     });
@@ -1366,7 +1370,7 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression)).toEqual(
         'StormEvents' +
-          '\n| mv-expand array_1 = eventType' +
+          '\n| mv-expand array_1 = ["eventType"]' +
           '\n| mv-expand array_2 = array_1["obj"]' +
           "\n| where array_2 == 'ThunderStorm'" +
           '\n| project-away array_1, array_2'
@@ -1391,9 +1395,9 @@ describe('KustoExpressionParser', () => {
 
       expect(parser.toQuery(expression)).toEqual(
         'StormEvents' +
-          '\n| mv-expand array_1 = eventType' +
+          '\n| mv-expand array_1 = ["eventType"]' +
           '\n| mv-expand array_2 = array_1["obj"]' +
-          "\n| where array_2 == 'ThunderStorm' or foo == 'bar'" +
+          "\n| where array_2 == 'ThunderStorm' or [\"foo\"] == 'bar'" +
           '\n| project-away array_1, array_2'
       );
     });
@@ -1407,7 +1411,9 @@ describe('KustoExpressionParser', () => {
         ),
       });
 
-      expect(parser.toQuery(expression)).toEqual('TestDB' + "\n| where TimeValue < datetime('2025-01-01 00:00:00')");
+      expect(parser.toQuery(expression)).toEqual(
+        'TestDB' + '\n| where ["TimeValue"] < datetime(\'2025-01-01 00:00:00\')'
+      );
     });
 
     it('should parse expression with a timespan and a comparison operator', () => {
@@ -1419,7 +1425,7 @@ describe('KustoExpressionParser', () => {
         ),
       });
 
-      expect(parser.toQuery(expression)).toEqual('TestDB' + "\n| where Duration < timespan('00:10:00')");
+      expect(parser.toQuery(expression)).toEqual('TestDB' + '\n| where ["Duration"] < timespan(\'00:10:00\')');
     });
   });
 });
