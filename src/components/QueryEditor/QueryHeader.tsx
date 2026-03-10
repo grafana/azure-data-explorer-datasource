@@ -126,7 +126,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
 
   const onClusterChange = ({ value }: SelectableValue) => {
     setClusterUri(value);
-    onChange({ ...query, clusterUri: value, expression: defaultQuery.expression });
+    onChange({ ...query, clusterUri: value, database: '', expression: defaultQuery.expression });
   };
 
   const onDatabaseChange = ({ value }: SelectableValue) => {
