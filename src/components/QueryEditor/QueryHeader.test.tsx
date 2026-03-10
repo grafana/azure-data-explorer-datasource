@@ -126,6 +126,26 @@ describe('QueryEditor', () => {
       });
       expect(onRunQuery).toHaveBeenCalledTimes(1);
     });
+
+    it('should reset database when cluster changes', async () => {
+      const onChange = jest.fn();
+      const ds = mockDatasource();
+      ds.getClusters = jest.fn().mockResolvedValue([
+        { name: 'cluster-a', uri: 'https://cluster-a.kusto.windows.net' },
+        { name: 'cluster-b', uri: 'https://cluster-b.kusto.windows.net' },
+      ]);
+      const query = { ...mockQuery, database: 'foo', clusterUri: 'https://cluster-a.kusto.windows.net' };
+      await waitFor(async () => {
+        render(<QueryHeader {...defaultProps} datasource={ds} query={query} databases={databases} onChange={onChange} />);
+        await screen.getByText('foo');
+        const sel = screen.getByLabelText('Cluster:');
+        act(() => openMenu(sel));
+        screen.getByText('cluster-b').click();
+      });
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({ clusterUri: 'https://cluster-b.kusto.windows.net', database: '', expression: defaultQuery.expression })
+      );
+    });
   });
 
   describe('format selector', () => {
