@@ -26,8 +26,22 @@ interface ParseContext {
 
 export const DYNAMIC_TYPE_ARRAY_DELIMITER = '["`indexer`"]';
 
+// KQL reserved keywords that must be escaped when used as column names
+const KQL_KEYWORDS = new Set([
+  'and', 'as', 'asc', 'between', 'by', 'contains', 'count', 'database', 'date',
+  'datetime', 'desc', 'distinct', 'double', 'dynamic', 'evaluate', 'extend',
+  'false', 'find', 'fork', 'getschema', 'has', 'in', 'int', 'join', 'let',
+  'limit', 'long', 'not', 'null', 'of', 'on', 'or', 'order', 'parse', 'print',
+  'project', 'range', 'real', 'render', 'search', 'set', 'sort', 'string',
+  'summarize', 'take', 'time', 'timespan', 'top', 'toscalar', 'true', 'type',
+  'union', 'where',
+]);
+
 export const escapeColumn = (column: string) => {
-  return column.match(/[\s\.-]/) ? `["${column}"]` : column;
+  if (column.match(/[\s\.-]/) || KQL_KEYWORDS.has(column.toLowerCase())) {
+    return `["${column}"]`;
+  }
+  return column;
 };
 
 export class KustoExpressionParser {
@@ -419,7 +433,7 @@ const defaultTimeColumn = (columns?: AdxColumnSchema[], expression?: QueryExpres
   });
 
   if (firstLevelColumn) {
-    return firstLevelColumn?.Name;
+    return escapeColumn(firstLevelColumn.Name);
   }
 
   const column = columns?.find((col) => col.CslType === 'datetime');

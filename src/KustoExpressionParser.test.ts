@@ -358,7 +358,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([createOperator('count', '==', 10)]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where count == 10');
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["count"] == 10');
     });
 
     it('should parse expression with where in numeric values', () => {
@@ -367,7 +367,7 @@ describe('KustoExpressionParser', () => {
         where: createWhereArray([createOperator('count', 'in', [10, 20])]),
       });
 
-      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where count in (10, 20)');
+      expect(parser.toQuery(expression)).toEqual('StormEvents' + '\n| where ["count"] in (10, 20)');
     });
 
     it('should parse expression with where in string values', () => {
@@ -441,6 +441,27 @@ describe('KustoExpressionParser', () => {
           '\n| where $__timeFilter(StartTime)' +
           '\n| where isActive == true' +
           `\n| order by StartTime asc`
+      );
+    });
+
+    it('should escape time column name when it is a KQL keyword', () => {
+      const expression = createQueryExpression({
+        from: createProperty('StormEvents'),
+        where: createWhereArray([createOperator('isActive', '==', true)]),
+      });
+
+      const tableSchema: AdxColumnSchema[] = [
+        {
+          Name: 'date',
+          CslType: 'datetime',
+        },
+      ];
+
+      expect(parser.toQuery(expression, tableSchema)).toEqual(
+        'StormEvents' +
+          '\n| where $__timeFilter(["date"])' +
+          '\n| where isActive == true' +
+          `\n| order by ["date"] asc`
       );
     });
 
@@ -747,7 +768,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(StartTime)' +
           '\n| where column["isActive"] == true' +
-          `\n| summarize by bin(StartTime, 1h), type` +
+          `\n| summarize by bin(StartTime, 1h), ["type"]` +
           `\n| order by StartTime asc`
       );
     });
@@ -779,7 +800,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where $__timeFilter(EndTime)' +
           '\n| where column["isActive"] == true' +
-          `\n| summarize by bin(EndTime, 1h), type` +
+          `\n| summarize by bin(EndTime, 1h), ["type"]` +
           `\n| order by EndTime asc`
       );
     });
@@ -812,7 +833,7 @@ describe('KustoExpressionParser', () => {
         'StormEvents' +
           '\n| where todatetime(column["EndTime"]) between ($__timeFrom .. $__timeTo)' +
           '\n| where column["isActive"] == true' +
-          `\n| summarize by bin(todatetime(column["EndTime"]), 1h), type` +
+          `\n| summarize by bin(todatetime(column["EndTime"]), 1h), ["type"]` +
           `\n| order by todatetime(column["EndTime"]) asc`
       );
     });
