@@ -15,7 +15,7 @@ module.exports = [
       'src/libs',
     ],
   },
-  grafanaConfig,
+  ...grafanaConfig,
   {
     files: ['src/**/*.{ts,tsx}'],
     rules: {

@@ -171,6 +171,8 @@
     "Ymax",
     "Ymin",
     "llms",
+    "modelcontextprotocol",
+    "pkce",
     "proxying",
     "nolint",
     "errcheck",
