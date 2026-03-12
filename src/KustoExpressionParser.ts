@@ -27,7 +27,8 @@ interface ParseContext {
 export const DYNAMIC_TYPE_ARRAY_DELIMITER = '["`indexer`"]';
 
 export const escapeColumn = (column: string) => {
-  return column.match(/[\s\.-]/) ? `["${column}"]` : column;
+  // If a column is escaped or a dynamic column with a selector we return it as is
+  return column.match(/\[".*"\]/) ? column : `["${column}"]`;
 };
 
 export class KustoExpressionParser {
@@ -108,7 +109,12 @@ export class KustoExpressionParser {
     if (!timeshift) {
       return;
     }
-    parts.push(`extend ${context.timeColumn} = ${context.timeColumn} + ${timeshift}`);
+
+    if (!context.timeColumn) {
+      return;
+    }
+
+    parts.push(`extend ${escapeColumn(context.timeColumn)} = ${escapeColumn(context.timeColumn)} + ${timeshift}`);
   }
 
   private appendTimeFilter(
@@ -124,16 +130,18 @@ export class KustoExpressionParser {
     const timeshift = detectTimeshift(context, expression);
 
     if (timeshift) {
-      parts.push(`where ${context.timeColumn} between (($__timeFrom - ${timeshift}) .. ($__timeTo - ${timeshift}))`);
+      parts.push(
+        `where ${escapeColumn(context.timeColumn)} between (($__timeFrom - ${timeshift}) .. ($__timeTo - ${timeshift}))`
+      );
       return;
     }
 
     if (context.timeColumn.includes('todatetime')) {
-      parts.push(`where ${context.timeColumn} between ($__timeFrom .. $__timeTo)`);
+      parts.push(`where ${escapeColumn(context.timeColumn)} between ($__timeFrom .. $__timeTo)`);
       return;
     }
 
-    parts.push(`where $__timeFilter(${context.timeColumn})`);
+    parts.push(`where $__timeFilter(${escapeColumn(context.timeColumn)})`);
   }
 
   private appendOrderBy(
@@ -150,7 +158,7 @@ export class KustoExpressionParser {
     const noReduce = Array.isArray(reduce.expressions) && reduce.expressions.length === 0;
 
     if (noGroupBy && noReduce) {
-      parts.push(`order by ${context.timeColumn} asc`);
+      parts.push(`order by ${escapeColumn(context.timeColumn)} asc`);
       return;
     }
 
@@ -162,7 +170,7 @@ export class KustoExpressionParser {
     });
 
     if (hasInterval) {
-      parts.push(`order by ${context.timeColumn} asc`);
+      parts.push(`order by ${escapeColumn(context.timeColumn)} asc`);
       return;
     }
   }
@@ -344,7 +352,7 @@ export class KustoExpressionParser {
   }
 
   private appendMvExpand(expandParts: string[], parts: string[]) {
-    expandParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${p}`));
+    expandParts.forEach((p, i) => parts.push(`mv-expand array_${i + 1} = ${escapeColumn(p)}`));
   }
 
   private appendProject(columns: string[] | undefined, parts: string[]) {
