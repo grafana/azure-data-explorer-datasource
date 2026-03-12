@@ -1,5 +1,12 @@
 # CHANGELOG
 
+
+## [7.2.5]
+
+- Escape columns when building KQL ([#1677](https://github.com/grafana/azure-data-explorer-datasource/pull/1677))
+- Reset database on cluster switch ([#1676](https://github.com/grafana/azure-data-explorer-datasource/pull/1676))
+- Dependency updates
+
 ## [7.2.4]
 
 - Dependency updates
