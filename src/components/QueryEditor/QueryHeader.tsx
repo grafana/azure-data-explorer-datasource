@@ -63,7 +63,7 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
   const [clusters, setClusters] = useState<Array<SelectableValue<string>>>([]);
   const databases = useDatabaseOptions(props.databases);
   const database = useSelectedDatabase(databases, query, datasource);
-  const [formats, setFormats] = useState(EDITOR_FORMATS);
+  const formats = useMemo(() => (rawMode ? EDITOR_FORMATS.concat(adxTimeFormat) : EDITOR_FORMATS), [rawMode]);
   const [showWarning, setShowWarning] = useState(false);
   const [isAiEnabled, setIsAiEnabled] = useState(false);
   const [waiting, setWaiting] = useState(false);
@@ -94,13 +94,6 @@ export const QueryHeader = (props: QueryEditorHeaderProps) => {
     }
   }, [query, database, onChange]);
 
-  useEffect(() => {
-    if (rawMode) {
-      setFormats(EDITOR_FORMATS.concat(adxTimeFormat));
-    } else {
-      setFormats(EDITOR_FORMATS);
-    }
-  }, [rawMode]);
 
   useEffect(() => {
     if (!query.resultFormat) {

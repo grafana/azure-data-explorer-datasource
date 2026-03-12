@@ -4,11 +4,11 @@ import { getTemplateSrv } from '@grafana/runtime';
 import { Alert } from '@grafana/ui';
 import { EditorRows } from '@grafana/plugin-ui';
 import { AdxDataSource } from 'datasource';
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useAsync } from 'react-use';
 import { AdxSchemaResolver } from 'schema/AdxSchemaResolver';
 import { QueryEditorPropertyDefinition } from 'schema/types';
-import { AdxColumnSchema, AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
+import { AdxDataSourceOptions, AdxSchema, KustoQuery } from 'types';
 import FilterSection from './VisualQueryEditor/FilterSection';
 import AggregateSection from './VisualQueryEditor/AggregateSection';
 import GroupBySection from './VisualQueryEditor/GroupBySection';
@@ -43,11 +43,10 @@ export const VisualQueryEditor: React.FC<VisualQueryEditorProps> = (props) => {
     const name = tableMapping?.value ?? tableName;
     return await getTableSchema(datasource, databaseName, name, clusterName);
   }, [datasourceId, databaseName, tableName, tableMapping?.value]);
-  const [tableColumns, setTableColumns] = useState<AdxColumnSchema[]>([]);
-
-  useEffect(() => {
-    setTableColumns(filterColumns(tableSchema.value, query.expression?.columns) || []);
-  }, [tableSchema.value, query.expression?.columns]);
+  const tableColumns = useMemo(
+    () => filterColumns(tableSchema.value, query.expression?.columns) || [],
+    [tableSchema.value, query.expression?.columns]
+  );
 
   useEffect(() => {
     if (tableSchema.value?.length) {

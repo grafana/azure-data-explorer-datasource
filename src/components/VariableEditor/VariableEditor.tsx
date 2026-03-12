@@ -6,7 +6,7 @@ import { AdxDataSource } from 'datasource';
 import { selectors } from 'test/selectors';
 import { get } from 'lodash';
 import { needsToBeMigrated, migrateQuery } from 'migrations/query';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 import { AdxSchemaResolver } from 'schema/AdxSchemaResolver';
 import { AdxQueryType, KustoQuery } from 'types';
@@ -44,18 +44,50 @@ const VariableEditor = (props: VariableProps) => {
       value: AdxQueryType.KustoQuery,
     },
   ];
-  const [variableOptionGroup, setVariableOptionGroup] = useState<{ label: string; options: VariableOptions[] }>({
-    label: 'Template Variables',
-    options: [],
-  });
   const queryType = typeof query === 'string' ? '' : query.queryType;
+  const variableOptionGroup = useMemo(() => {
+    const options: VariableOptions[] = [];
+    datasource.getVariablesRaw().forEach((v) => {
+      if (get(v, 'query.queryType') !== queryType) {
+        options.push({ label: v.label || v.name, value: `$${v.name}` });
+      }
+    });
+    return {
+      label: t('components.variable-editor.label.template-variables', 'Template Variables'),
+      options,
+    };
+  }, [datasource, queryType]);
 
   const [clusters, setClusters] = useState<SelectableValue[]>([]);
   const [databases, setDatabases] = useState<SelectableValue[]>([]);
   const [tables, setTables] = useState<SelectableValue[]>([]);
-  const [requireCluster, setRequireCluster] = useState<boolean>(false);
-  const [requireDatabase, setRequireDatabase] = useState<boolean>(false);
-  const [requireTable, setRequireTable] = useState<boolean>(false);
+  const [prevClusterUri, setPrevClusterUri] = useState(query.clusterUri);
+
+  // Reset the tables list when the cluster changes
+  if (prevClusterUri !== query.clusterUri) {
+    setPrevClusterUri(query.clusterUri);
+    setTables([]);
+  }
+  const { requireCluster, requireDatabase, requireTable } = useMemo(() => {
+    let requireCluster = false;
+    let requireDatabase = false;
+    let requireTable = false;
+    switch (queryType) {
+      case AdxQueryType.Columns:
+        requireDatabase = true;
+        requireTable = true;
+      // falls through
+      case AdxQueryType.Tables:
+        requireDatabase = true;
+      // falls through
+      case AdxQueryType.Databases:
+        requireCluster = true;
+        break;
+      case AdxQueryType.Clusters:
+      case AdxQueryType.KustoQuery:
+    }
+    return { requireCluster, requireDatabase, requireTable };
+  }, [queryType]);
 
   useEffectOnce(() => {
     let processedQuery = query;
@@ -65,36 +97,6 @@ const VariableEditor = (props: VariableProps) => {
     }
   });
 
-  useEffect(() => {
-    const options: VariableOptions[] = [];
-    datasource.getVariablesRaw().forEach((v) => {
-      if (get(v, 'query.queryType') !== queryType) {
-        options.push({ label: v.label || v.name, value: `$${v.name}` });
-      }
-    });
-    setVariableOptionGroup({
-      label: t('components.variable-editor.label.template-variables', 'Template Variables'),
-      options,
-    });
-  }, [datasource, queryType]);
-
-  useEffect(() => {
-    setRequireCluster(false);
-    setRequireDatabase(false);
-    setRequireTable(false);
-    switch (queryType) {
-      case AdxQueryType.Columns:
-        setRequireDatabase(true);
-        setRequireTable(true);
-      case AdxQueryType.Tables:
-        setRequireDatabase(true);
-      case AdxQueryType.Databases:
-        setRequireCluster(true);
-        break;
-      case AdxQueryType.Clusters:
-      case AdxQueryType.KustoQuery:
-    }
-  }, [queryType]);
 
   useEffectOnce(() => {
     datasource
@@ -109,7 +111,6 @@ const VariableEditor = (props: VariableProps) => {
     datasource
       .getDatabases(query.clusterUri)
       .then((databases) => setDatabases(databases.map((db) => ({ label: db.text, value: db.value }))));
-    setTables([]);
   }, [datasource, query.clusterUri, queryType]);
 
   useEffect(() => {

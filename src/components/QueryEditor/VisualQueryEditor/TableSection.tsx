@@ -2,7 +2,7 @@ import { Trans, t } from '@grafana/i18n';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpressionType } from 'types/expressions';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
 import { AdxColumnSchema, AdxDataSourceOptions, defaultQuery, KustoQuery } from 'types';
 import { QueryEditorPropertyDefinition, QueryEditorPropertyType } from 'schema/types';
@@ -29,7 +29,10 @@ const TableSection: React.FC<TableSectionProps> = ({
   onChange,
 }) => {
   const tableOptions = (tables as Array<SelectableValue<string>>).concat(templateVariableOptions);
-  const [tableColumns, setTableColumns] = useState(tableSchema.value);
+  const tableColumns = useMemo(
+    () => (tableSchema.value?.length ? tableSchema.value : undefined),
+    [tableSchema.value]
+  );
 
   useEffect(() => {
     if (
@@ -51,11 +54,6 @@ const TableSection: React.FC<TableSectionProps> = ({
     }
   }, [table?.value, query, onChange]);
 
-  useEffect(() => {
-    if (tableSchema.value?.length) {
-      setTableColumns(tableSchema.value);
-    }
-  }, [tableSchema.value]);
 
   useEffect(() => {
     // For time_series queries, pre-select a set of columns to avoid hitting performance issues when too many
@@ -96,8 +94,6 @@ const TableSection: React.FC<TableSectionProps> = ({
                   },
                 },
               });
-              // Clean up columns in the state while it reloads
-              setTableColumns([]);
             }}
           />
         </EditorField>

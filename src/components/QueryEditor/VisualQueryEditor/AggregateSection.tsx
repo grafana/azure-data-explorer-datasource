@@ -3,7 +3,7 @@ import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorList, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorReduceExpression } from 'types/expressions';
 import { AdxDataSource } from 'datasource';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeAggregate } from './utils/utils';
@@ -32,20 +32,14 @@ const AggregateSection: React.FC<AggregateSectionProps> = ({
   const [aggregates, setAggregates] = useState(expressions);
   const [currentTable, setCurrentTable] = useState(query.expression?.from?.property.name);
 
-  useEffect(() => {
-    if (!aggregates.length && expressions?.length) {
-      setAggregates(expressions);
-    }
-  }, [aggregates?.length, expressions]);
-
-  useEffect(() => {
-    // New table
-    if (currentTable !== query.expression?.from?.property.name) {
-      // Reset state
-      setAggregates([]);
-      setCurrentTable(query.expression?.from?.property.name);
-    }
-  }, [currentTable, query.expression?.from?.property.name]);
+  // Reset aggregates when the selected table changes
+  if (currentTable !== query.expression?.from?.property.name) {
+    setCurrentTable(query.expression?.from?.property.name);
+    setAggregates([]);
+  } else if (!aggregates.length && expressions?.length) {
+    // Re-sync from query expressions when local state is empty
+    setAggregates(expressions);
+  }
 
   const onChange = (newItems: Array<Partial<QueryEditorReduceExpression>>) => {
     const cleaned = newItems.map((v): QueryEditorReduceExpression => {
