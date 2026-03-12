@@ -37,7 +37,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
   useEffectOnce(() => {
     let processedQuery = query;
     if (typeof processedQuery !== 'string' && processedQuery.rawMode === undefined) {
-      processedQuery.rawMode = datasource.getDefaultEditorMode() === EditorMode.Raw;
+      processedQuery = { ...processedQuery, rawMode: datasource.getDefaultEditorMode() === EditorMode.Raw };
     }
     if (needsToBeMigrated(query)) {
       processedQuery = migrateQuery(query);
