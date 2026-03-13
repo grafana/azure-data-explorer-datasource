@@ -8254,7 +8254,7 @@ __metadata:
     eslint-webpack-plugin: "npm:^5.0.2"
     fork-ts-checker-webpack-plugin: "npm:^9.0.2"
     glob: "npm:^13.0.1"
-    i18next-parser: "npm:9.3.0"
+    i18next-parser: "npm:9.4.0"
     identity-obj-proxy: "npm:3.0.0"
     imports-loader: "npm:^5.0.0"
     jest: "npm:^29.7.0"
@@ -8576,9 +8576,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-parser@npm:9.3.0":
-  version: 9.3.0
-  resolution: "i18next-parser@npm:9.3.0"
+"i18next-parser@npm:9.4.0":
+  version: 9.4.0
+  resolution: "i18next-parser@npm:9.4.0"
   dependencies:
     "@babel/runtime": "npm:^7.25.0"
     broccoli-plugin: "npm:^4.0.7"
@@ -8599,7 +8599,7 @@ __metadata:
     vinyl-fs: "npm:^4.0.0"
   bin:
     i18next: bin/cli.js
-  checksum: 10c0/dd9de4d6812da662eaefafcaf6dae9c88d7e98c9907f784257056408bb22ac5ae23659bbfdf975452bfc35595914e280de0ef7c9f313cbd1e4cdb12dd0dadc1e
+  checksum: 10c0/4a9c94d16ea0869e58cd600216d56e6ccb2d815bf5acdb96df1aba0750d053514abd52136434681de3601bc0f5324464b8a42f608bfe6c95961f5c2a2e38e3da
   languageName: node
   linkType: hard
 
