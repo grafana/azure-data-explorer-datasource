@@ -1571,12 +1571,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/azure-sdk@npm:^0.0.8":
-  version: 0.0.8
-  resolution: "@grafana/azure-sdk@npm:0.0.8"
+"@grafana/azure-sdk@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@grafana/azure-sdk@npm:0.1.0"
   dependencies:
-    react-dom: "npm:^19.2.0"
-  checksum: 10c0/534ffc44fb6baf7b325a5949d5a0a6be3a8f6877feeae294ccb1cf0f289e307aa6169c217e4eab38811b1a1245d5c627be3b14732129858ea0a38d1ba175302c
+    react-dom: "npm:18.3.1"
+  checksum: 10c0/474c861e8d795b067d78026f66cd736810136d9c6dec7ac147925408807ec0c6cff4fef5a478e2ac96d48742f1584db4f8c2561d3bf4fef14d2946218f46d741
   languageName: node
   linkType: hard
 
@@ -8206,7 +8206,7 @@ __metadata:
     "@babel/core": "npm:^7.28.4"
     "@emotion/css": "npm:11.13.5"
     "@eslint/compat": "npm:^2.0.1"
-    "@grafana/azure-sdk": "npm:^0.0.8"
+    "@grafana/azure-sdk": "npm:^0.1.0"
     "@grafana/data": "npm:11.6.13"
     "@grafana/eslint-config": "npm:^8.0.0"
     "@grafana/i18n": "npm:12.4.1"
@@ -11951,17 +11951,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.2.0":
-  version: 19.2.3
-  resolution: "react-dom@npm:19.2.3"
-  dependencies:
-    scheduler: "npm:^0.27.0"
-  peerDependencies:
-    react: ^19.2.3
-  checksum: 10c0/dc43f7ede06f46f3acc16ee83107c925530de9b91d1d0b3824583814746ff4c498ea64fd65cd83aba363205268adff52e2827c582634ae7b15069deaeabc4892
-  languageName: node
-  linkType: hard
-
 "react-dropzone@npm:14.3.5":
   version: 14.3.5
   resolution: "react-dropzone@npm:14.3.5"
@@ -12845,13 +12834,6 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.1.0"
   checksum: 10c0/26383305e249651d4c58e6705d5f8425f153211aef95f15161c151f7b8de885f24751b377e4a0b3dd42cce09aad3f87a61dab7636859c0d89b7daf1a1e2a5c78
-  languageName: node
-  linkType: hard
-
-"scheduler@npm:^0.27.0":
-  version: 0.27.0
-  resolution: "scheduler@npm:0.27.0"
-  checksum: 10c0/4f03048cb05a3c8fddc45813052251eca00688f413a3cee236d984a161da28db28ba71bd11e7a3dd02f7af84ab28d39fb311431d3b3772fed557945beb00c452
   languageName: node
   linkType: hard
 
