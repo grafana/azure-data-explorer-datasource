@@ -101,7 +101,7 @@
     "@emotion/css": "11.13.5",
     "@grafana/azure-sdk": "^0.1.0",
     "@grafana/data": "^12.2.0",
-    "@grafana/i18n": "12.3.2",
+    "@grafana/i18n": "12.4.2",
     "@grafana/llm": "^1.0.3",
     "@grafana/plugin-ui": "^0.13.0",
     "@grafana/runtime": "^12.2.0",
