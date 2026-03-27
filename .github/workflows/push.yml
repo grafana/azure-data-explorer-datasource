@@ -25,4 +25,4 @@ jobs:
         CLIENT_ID=e2e:clientId
         CLIENT_SECRET=e2e:clientSecret
         CLUSTER_URL=e2e:clusterUrl
-      run-playwright-with-skip-grafana-react-19-preview-image: true
+      run-playwright-with-skip-grafana-react-19-preview-image: false

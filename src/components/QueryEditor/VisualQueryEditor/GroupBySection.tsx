@@ -3,7 +3,7 @@ import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorList, EditorRow } from '@grafana/plugin-ui';
 import { QueryEditorExpression, QueryEditorExpressionType, QueryEditorGroupByExpression } from 'types/expressions';
 import { AdxDataSource } from 'datasource';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AdxColumnSchema, AdxDataSourceOptions, KustoQuery } from 'types';
 import { QueryEditorPropertyType } from 'schema/types';
 import { sanitizeGroupBy } from './utils/utils';
@@ -32,20 +32,14 @@ const GroupBySection: React.FC<GroupBySectionProps> = ({
   const [groupBys, setGroupBys] = useState(expressions);
   const [currentTable, setCurrentTable] = useState(query.expression?.from?.property.name);
 
-  useEffect(() => {
-    if (!groupBys?.length && expressions?.length) {
-      setGroupBys(expressions);
-    }
-  }, [groupBys?.length, expressions]);
-
-  useEffect(() => {
-    // New table
-    if (currentTable !== query.expression?.from?.property.name) {
-      // Reset state
-      setGroupBys([]);
-      setCurrentTable(query.expression?.from?.property.name);
-    }
-  }, [currentTable, query.expression?.from?.property.name]);
+  // Reset groupBys when the selected table changes
+  if (currentTable !== query.expression?.from?.property.name) {
+    setCurrentTable(query.expression?.from?.property.name);
+    setGroupBys([]);
+  } else if (!groupBys?.length && expressions?.length) {
+    // Re-sync from query expressions when local state is empty
+    setGroupBys(expressions);
+  }
 
   const onChange = (newItems: Array<Partial<QueryEditorGroupByExpression>>) => {
     const cleaned = newItems.map((v): QueryEditorGroupByExpression => {

@@ -67,11 +67,10 @@ export const OpenAIEditor: React.FC<RawQueryEditorProps> = (props) => {
     }
   };
 
-  useEffect(() => {
-    if (schema && !stateSchema) {
-      setStateSchema(cloneDeep(schema));
-    }
-  }, [schema, stateSchema]);
+  // When schema arrives asynchronously after mount, initialize stateSchema
+  if (schema && !stateSchema) {
+    setStateSchema(cloneDeep(schema));
+  }
 
   const generateQuery = () => {
     reportInteraction('grafana_ds_adx_openai_query_generated');

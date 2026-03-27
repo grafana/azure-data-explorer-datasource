@@ -14,7 +14,7 @@
     "playwright-report",
     "src/dashboards/**",
     "src/libs/**",
-    "yarn.lock",
+    "package-lock.json",
     "src/locales/**"
   ],
   "words": [
@@ -171,6 +171,8 @@
     "Ymax",
     "Ymin",
     "llms",
+    "modelcontextprotocol",
+    "pkce",
     "proxying",
     "nolint",
     "errcheck",

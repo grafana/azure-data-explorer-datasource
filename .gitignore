@@ -5,7 +5,7 @@ npm-debug.log
 .vscode
 coverage
 ci
-yarn.lock
+.yarn/
 .d.ts
 .idea
 pkg/__debug_bin
@@ -15,13 +15,4 @@ pkg/__debug_bin
 /playwright/.cache/
 /playwright/.auth/
 .eslintcache
-
-# yarn
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
 .env

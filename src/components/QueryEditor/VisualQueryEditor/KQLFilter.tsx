@@ -66,11 +66,10 @@ const KQLFilter: React.FC<KQLFilterProps> = ({
   const [filters, setFilters] = useState<FilterExpression[]>(expressions);
   const ref = React.createRef<HTMLButtonElement>();
 
-  useEffect(() => {
-    if (!filters?.length && expressions?.length) {
-      setFilters(expressions);
-    }
-  }, [filters.length, expressions]);
+  // Re-sync from query expressions when local state is empty
+  if (!filters?.length && expressions?.length) {
+    setFilters(expressions);
+  }
 
   useEffect(() => {
     if (focusNewGroup && setFocus) {
