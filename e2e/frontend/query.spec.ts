@@ -1,7 +1,12 @@
 import { expect, test } from '@grafana/plugin-e2e';
+import { Locator, Page } from '@playwright/test';
 import { selectors } from '../../src/test/selectors';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from '../../src/types';
 import { isVersionGtOrEq } from '../../src/version';
+
+function queryEditorRow(page: Page): Locator {
+  return page.locator('[data-testid="data-testid Query editor row"], [aria-label="Query editor row"]');
+}
 
 test.describe('Azure Data Explorer queries', () => {
   test('Create a KQL query', async ({ dashboardPage, page, readProvisionedDataSource, grafanaVersion }) => {
@@ -16,23 +21,21 @@ test.describe('Azure Data Explorer queries', () => {
     const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
 
     if (versionValue) {
-      await panel
-        .getQueryEditorRow('A')
+      await queryEditorRow(page)
         .getByTestId(selectors.components.queryEditor.cluster.input.selector)
         .click({ force: true });
     } else {
       // data-testid was not passed to the select component prior to 11.1.0
-      await panel.getQueryEditorRow('A').getByText('Cluster').click({ force: true });
+      await queryEditorRow(page).getByText('Cluster').click({ force: true });
     }
     await page.getByLabel('Select options menu').getByText('adxtestclustere2e').click({ force: true });
     if (versionValue) {
-      await panel
-        .getQueryEditorRow('A')
+      await queryEditorRow(page)
         .getByTestId(selectors.components.queryEditor.database.input.selector)
         .click({ force: true });
     } else {
       // data-testid was not passed to the select component prior to 11.1.0
-      await panel.getQueryEditorRow('A').getByText('Database').click({ force: true });
+      await queryEditorRow(page).getByText('Database').click({ force: true });
     }
     await page.getByLabel('Select options menu').getByText('adx-test-db').click({ force: true });
     await page.getByText('KQL').click({ force: true });
@@ -66,23 +69,21 @@ test.describe('Azure Data Explorer queries', () => {
     const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
 
     if (versionValue) {
-      await panel
-        .getQueryEditorRow('A')
+      await queryEditorRow(page)
         .getByTestId(selectors.components.queryEditor.cluster.input.selector)
         .click({ force: true });
     } else {
       // data-testid was not passed to the select component prior to 11.1.0
-      await panel.getQueryEditorRow('A').getByText('Cluster').click({ force: true });
+      await queryEditorRow(page).getByText('Cluster').click({ force: true });
     }
     await page.getByLabel('Select options menu').getByText('adxtestclustere2e').click({ force: true });
     if (versionValue) {
-      await panel
-        .getQueryEditorRow('A')
+      await queryEditorRow(page)
         .getByTestId(selectors.components.queryEditor.database.input.selector)
         .click({ force: true });
     } else {
       // data-testid was not passed to the select component prior to 11.1.0
-      await panel.getQueryEditorRow('A').getByText('Database').click({ force: true });
+      await queryEditorRow(page).getByText('Database').click({ force: true });
     }
     await page.getByLabel('Select options menu').getByText('adx-test-db').click({ force: true });
     await page.getByText('KQL').click({ force: true });
@@ -110,23 +111,21 @@ test.describe('Azure Data Explorer queries', () => {
     const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
 
     if (versionValue) {
-      await panel
-        .getQueryEditorRow('A')
+      await queryEditorRow(page)
         .getByTestId(selectors.components.queryEditor.cluster.input.selector)
         .click({ force: true });
     } else {
       // data-testid was not passed to the select component prior to 11.1.0
-      await panel.getQueryEditorRow('A').getByText('Cluster').click({ force: true });
+      await queryEditorRow(page).getByText('Cluster').click({ force: true });
     }
     await page.getByLabel('Select options menu').getByText('adxtestclustere2e').click({ force: true });
     if (versionValue) {
-      await panel
-        .getQueryEditorRow('A')
+      await queryEditorRow(page)
         .getByTestId(selectors.components.queryEditor.database.input.selector)
         .click({ force: true });
     } else {
       // data-testid was not passed to the select component prior to 11.1.0
-      await panel.getQueryEditorRow('A').getByText('Database').click({ force: true });
+      await queryEditorRow(page).getByText('Database').click({ force: true });
     }
     await page.getByLabel('Select options menu').getByText('adx-test-db').click({ force: true });
     await page
