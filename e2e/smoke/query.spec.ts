@@ -2,6 +2,14 @@ import { expect, test } from '@grafana/plugin-e2e';
 import { selectors } from '../../src/test/selectors';
 import { isVersionGtOrEq } from '../../src/version';
 
+// dashboardNewLayouts is required for @grafana/plugin-e2e v3.5.x addPanel() to work in Grafana 13.x.
+// Without it, the sidebar that addPanel() waits for is never rendered.
+test.use({
+  featureToggles: {
+    dashboardNewLayouts: true,
+  },
+});
+
 const mockClustersResponse = [
   {
     name: 'datasourcesgrafana',
