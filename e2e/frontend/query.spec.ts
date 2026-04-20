@@ -3,14 +3,6 @@ import { selectors } from '../../src/test/selectors';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from '../../src/types';
 import { isVersionGtOrEq } from '../../src/version';
 
-// dashboardNewLayouts is required for @grafana/plugin-e2e v3.5.x addPanel() to work in Grafana 13.x.
-// Without it, the sidebar that addPanel() waits for is never rendered.
-test.use({
-  featureToggles: {
-    dashboardNewLayouts: true,
-  },
-});
-
 test.describe('Azure Data Explorer queries', () => {
   test('Create a KQL query', async ({ dashboardPage, page, readProvisionedDataSource, grafanaVersion }) => {
     const datasource = await readProvisionedDataSource<AdxDataSourceOptions, AdxDataSourceSecureOptions>({
