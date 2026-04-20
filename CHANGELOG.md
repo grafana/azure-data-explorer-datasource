@@ -1,6 +1,10 @@
 # CHANGELOG
 
 
+## [7.2.6]
+
+- Dependency updates
+
 ## [7.2.5]
 
 - Escape columns when building KQL ([#1677](https://github.com/grafana/azure-data-explorer-datasource/pull/1677))
