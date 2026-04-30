@@ -45,7 +45,7 @@
       "label-authentication-method": "Authenticatiemethode",
       "label-azure-cloud": "Azure Cloud",
       "label-client-secret": "Gebruikerssleutel",
-      "label-directory-tenant-id": "Directory-id (tenant)",
+      "label-directory-tenant-id": "Map-id (houder)",
       "reset": "Resetten",
       "title-authentication": "Authenticatie",
       "title-current-user-authentication-is-experimental": "Huidige gebruikersauthenticatie is experimenteel",

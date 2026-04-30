@@ -46,7 +46,7 @@
       "label-azure-cloud": "Azure Cloud",
       "label-client-secret": "클라이언트 시크릿",
       "label-directory-tenant-id": "디렉터리(테넌트) ID",
-      "reset": "재설정",
+      "reset": "초기화",
       "title-authentication": "인증",
       "title-current-user-authentication-is-experimental": "현재 사용자 인증은 시험 단계입니다.",
       "title-on-behalf-of-feature-is-in-beta": "대리 기능은 베타 버전입니다."
