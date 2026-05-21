@@ -66,6 +66,10 @@ user_identity_client_id = 4fc34037-97bd-4e84-9db4-86238c78e32a
 user_identity_client_secret = 4479f5a6-444c-4271-8790-60eeb42225ae
 ```
 
+## Limitations
+
+Current user authentication uses the identity of the signed-in Grafana user. Grafana features that query the data source without a user in context—such as **alerting**, **recorded queries**, and **reporting**—do not have a user identity available unless **fallback service credentials** are configured in Grafana (`user_identity_fallback_credentials_enabled` in the `[azure]` section). See the [Azure Monitor data source documentation](https://grafana.com/docs/grafana/latest/datasources/azure-monitor/configure/) for how fallback credentials work across Azure data sources.
+
 ## See also
 
 - [User identity authentication in Azure Data Explorer and other Azure datasources](https://github.com/grafana/grafana/discussions/62994)
