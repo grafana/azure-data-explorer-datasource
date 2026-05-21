@@ -36,7 +36,6 @@
         }
       },
       "description-choose-authentication-azure-services": "Azure hizmetleri için kimlik doğrulama türünü seçin",
-      "description-current-user-authentication-is-experimental": "Bazı Grafana özellikleri (örn. uyarı sistemi) beklendiği gibi çalışmayabilir. Bilinen diğer sınırlamalar ve sorunlar, hata raporları veya geri bildirimler için lütfen <2>belgeleri</2> inceleyin.",
       "description-on-behalf-of-feature-is-in-beta": "Bilinen sınırlamalar ve sorunlar, hata raporu veya geri bildirim için lütfen <2>belgeleri</2> inceleyin.",
       "error-client-id-required": "İstemci Kimliği gereklidir",
       "error-client-secret-required": "Gizli anahtar gereklidir",
@@ -48,7 +47,6 @@
       "label-directory-tenant-id": "Dizin (kiracı) kimliği",
       "reset": "Sıfırla",
       "title-authentication": "Kimlik doğrulama",
-      "title-current-user-authentication-is-experimental": "Geçerli kullanıcı kimlik doğrulama özelliği deneyseldir",
       "title-on-behalf-of-feature-is-in-beta": "On-Behalf-Of özelliği beta sürümündedir."
     },
     "config-editor": {

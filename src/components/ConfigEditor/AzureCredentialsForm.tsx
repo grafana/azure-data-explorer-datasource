@@ -158,29 +158,6 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
           />
         </Field>
       )}
-      {credentials.authType === 'currentuser' && (
-        <>
-          <Alert
-            title={t(
-              'components.azure-credentials-form.title-current-user-authentication-is-experimental',
-              'Current user authentication is experimental'
-            )}
-            severity="warning"
-          >
-            <Trans i18nKey="components.azure-credentials-form.description-current-user-authentication-is-experimental">
-              Certain Grafana features (e.g. alerting) may not work as expected. For other known limitations and issues,
-              bug reports, or feedback, please visit{' '}
-              <TextLink
-                href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md"
-                external
-              >
-                the documentation
-              </TextLink>
-              .
-            </Trans>
-          </Alert>
-        </>
-      )}
       {credentials.authType === 'clientsecret-obo' && (
         <>
           <Alert
