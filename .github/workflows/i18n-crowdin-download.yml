@@ -35,5 +35,5 @@ jobs:
           crowdin_token: ${{ env.CROWDIN_TOKEN }}
           crowdin_project_id: 32
           pr_labels: 'i18n'
-          github_board_id: 190 # Partner Datasources project
+          github_board_id: 1085 # Grafana Data Sources project
           github_repo_token: ${{ steps.get-github-app-token.outputs.token }}
