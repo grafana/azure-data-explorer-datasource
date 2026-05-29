@@ -23,7 +23,7 @@
     "e2e": "playwright test"
   },
   "engines": {
-    "node": ">=24.5.0"
+    "node": ">=24.5.0",
     "npm": ">=11.12.1"
   },
   "author": "Grafana Labs",
