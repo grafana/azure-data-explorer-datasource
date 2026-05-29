@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   call-workflow-passing-data:
-    uses: grafana/security-github-actions/.github/workflows/dependabot-automerge.yaml@main
+    uses: grafana/security-github-actions/.github/workflows/dependabot-automerge.yaml@2a582d7d8451217a28d870c75d11b3b5e546cc3f # main
     with:
       repository-merge-method: squash
       #  Add this to define production packages that dependabot can auto-update if the bump is minor
