@@ -24,7 +24,7 @@
   },
   "engines": {
     "node": ">=24",
-    "npm": ">=11.15.0"
+    "npm": ">=11.12.1"
   },
   "author": "Grafana Labs",
   "license": "Apache",
