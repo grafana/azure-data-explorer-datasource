@@ -11,7 +11,7 @@ import (
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 	"github.com/grafana/grafana-azure-sdk-go/v2/aztokenprovider"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azusercontext"
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/config"
 )
 
 type onBehalfOfTokenProvider struct {
@@ -74,7 +74,7 @@ func (provider *onBehalfOfTokenProvider) GetAccessToken(ctx context.Context, sco
 		return "", err
 	}
 
-	grafanaConfig := backend.GrafanaConfigFromContext(ctx)
+	grafanaConfig := config.GrafanaConfigFromContext(ctx)
 	if !grafanaConfig.FeatureToggles().IsEnabled("adxOnBehalfOf") {
 		err := fmt.Errorf("adxOnBehalfOf feature toggle is not enabled")
 		return "", err
