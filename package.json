@@ -103,7 +103,7 @@
     "@grafana/azure-sdk": "0.1.0",
     "@grafana/data": "12.4.2",
     "@grafana/i18n": "12.4.2",
-    "@grafana/llm": "1.0.3",
+    "@grafana/llm": "1.0.9",
     "@grafana/plugin-ui": "0.13.1",
     "@grafana/runtime": "12.4.2",
     "@grafana/schema": "12.4.2",
