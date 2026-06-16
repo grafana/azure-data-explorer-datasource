@@ -1,0 +1,28 @@
+name: Plugins - CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions: {}
+
+jobs:
+  ci:
+    name: CI
+    uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@ci-cd-workflows/v8.0.1
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
+      run-playwright: true
+      playwright-config: ${{ (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork || github.actor == 'dependabot[bot]')) && 'playwright-fork.config.ts' || 'playwright.config.ts' }}
+      playwright-docker-compose-file: ${{ (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork || github.actor == 'dependabot[bot]')) && 'compose-fork.yaml' || 'docker-compose.yaml' }}
+      playwright-secrets: |
+        TENANT_ID=e2e:tenantId
+        CLIENT_ID=e2e:clientId
+        CLIENT_SECRET=e2e:clientSecret
+        CLUSTER_URL=e2e:clusterUrl
+      run-playwright-with-skip-grafana-react-19-preview-image: false

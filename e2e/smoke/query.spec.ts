@@ -1,0 +1,175 @@
+import { expect, test } from '@grafana/plugin-e2e';
+import { selectors } from '../../src/test/selectors';
+import { isVersionGtOrEq } from '../../src/version';
+
+const mockClustersResponse = [
+  {
+    name: 'datasourcesgrafana',
+    uri: 'https://datasourcesgrafana.eastus2.kusto.windows.net',
+  },
+];
+const mockDatabasesResponse = {
+  Tables: [
+    {
+      TableName: 'Table_0',
+      Columns: [
+        {
+          ColumnName: 'DatabaseName',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'PersistentStorage',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'Version',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'IsCurrent',
+          DataType: 'Boolean',
+          ColumnType: 'bool',
+        },
+        {
+          ColumnName: 'DatabaseAccessMode',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'PrettyName',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'ReservedSlot1',
+          DataType: 'Boolean',
+          ColumnType: 'bool',
+        },
+        {
+          ColumnName: 'DatabaseId',
+          DataType: 'Guid',
+          ColumnType: 'guid',
+        },
+        {
+          ColumnName: 'InTransitionTo',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+        {
+          ColumnName: 'SuspensionState',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+      ],
+      Rows: [['test-db', '', '', false, 'ReadWrite', null, null, '', '', null]],
+    },
+  ],
+  Exceptions: null,
+};
+const mockSchemaResponse = {
+  Tables: [
+    {
+      TableName: 'Table_0',
+      Columns: [
+        {
+          ColumnName: 'DatabaseSchema',
+          DataType: 'String',
+          ColumnType: 'string',
+        },
+      ],
+      Rows: [
+        [
+          JSON.stringify({
+            Databases: {
+              'test-db': {
+                Name: 'test-db',
+                Tables: { WORLD_DATA: {} },
+                MajorVersion: 158,
+                MinorVersion: 2896,
+                Functions: {},
+                DatabaseAccessMode: 'ReadWrite',
+                ExternalTables: {},
+                MaterializedViews: {},
+                EntityGroups: {},
+                Graphs: {},
+                StoredQueryResults: {},
+              },
+            },
+          }),
+        ],
+      ],
+    },
+  ],
+  Exceptions: null,
+};
+
+test.describe('Azure Data Explorer queries - smoke', () => {
+  test('renders KQL editor', async ({ panelEditPage, page, grafanaVersion }) => {
+    await panelEditPage.mockResourceResponse('clusters', mockClustersResponse);
+    await panelEditPage.mockResourceResponse('databases', mockDatabasesResponse);
+    await panelEditPage.mockResourceResponse('schema', mockSchemaResponse);
+    await panelEditPage.datasource.set('Azure Data Explorer (Smoke)');
+
+    const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
+
+    if (versionValue) {
+      await expect(
+        panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.cluster.input.selector)
+      ).toBeVisible();
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await expect(panelEditPage.getQueryEditorRow('A').getByText('Cluster')).toBeVisible();
+    }
+    if (versionValue) {
+      await expect(
+        panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
+      ).toBeVisible();
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await expect(panelEditPage.getQueryEditorRow('A').getByText('Database')).toBeVisible();
+    }
+
+    await page.getByText('KQL').click({ force: true });
+    await expect(
+      panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.codeEditor.container)
+    ).toBeVisible();
+  });
+
+  test('renders builder', async ({ panelEditPage, page, grafanaVersion }) => {
+    await panelEditPage.mockResourceResponse('clusters', mockClustersResponse);
+    await panelEditPage.mockResourceResponse('databases', mockDatabasesResponse);
+    await panelEditPage.mockResourceResponse('schema', mockSchemaResponse);
+    await panelEditPage.datasource.set('Azure Data Explorer (Smoke)');
+
+    const versionValue = isVersionGtOrEq(grafanaVersion, '11.1.0');
+
+    if (versionValue) {
+      await expect(
+        panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.cluster.input.selector)
+      ).toBeVisible();
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await expect(panelEditPage.getQueryEditorRow('A').getByText('Cluster')).toBeVisible();
+    }
+    if (versionValue) {
+      await expect(
+        panelEditPage.getQueryEditorRow('A').getByTestId(selectors.components.queryEditor.database.input.selector)
+      ).toBeVisible();
+    } else {
+      // data-testid was not passed to the select component prior to 11.1.0
+      await expect(panelEditPage.getQueryEditorRow('A').getByText('Database')).toBeVisible();
+    }
+
+    await expect(page.getByTestId(selectors.components.queryEditor.tableFrom.input)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.columns.input)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.filters.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.aggregate.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.groupBy.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.timeshift.field)).toBeVisible();
+    await expect(page.getByTestId(selectors.components.queryEditor.queryPreview.field)).toBeVisible();
+    await page.getByTestId(selectors.components.queryEditor.runQuery.button).click();
+  });
+});

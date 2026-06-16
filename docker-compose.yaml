@@ -1,0 +1,15 @@
+services:
+  grafana:
+    container_name: 'azure-data-explorer-datasource'
+    build:
+      args:
+        grafana_version: ${GRAFANA_VERSION:-9.1.2}
+    ports:
+      - 3000:3000/tcp
+    volumes:
+      - ./dist:/var/lib/grafana/plugins/azure-data-explorer-datasource
+    env_file:
+      - .env
+    extends:
+      file: .config/docker-compose-base.yaml
+      service: grafana

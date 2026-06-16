@@ -1,0 +1,269 @@
+{
+  "components": {
+    "aggregate-item": {
+      "aggregate-item-function-aria-label-function": "Function",
+      "aria-label-column": "Column",
+      "aria-label-percentile": "Percentile",
+      "aria-label-remove": "Remove",
+      "of": "of"
+    },
+    "aggregate-section": {
+      "label-aggregate": "Aggregate"
+    },
+    "application-config": {
+      "aria-label-application": "Application",
+      "description-application-displayed": "Application name to be displayed in ADX.",
+      "label-application-name-optional": "Application name (Optional)"
+    },
+    "azure-credentials-form": {
+      "aad-client-id-aria-label-client-id": "Client ID",
+      "aad-client-secret-aria-label-client-secret": "Client Secret",
+      "aad-client-secret-configured-aria-label-client-secret": "Client Secret",
+      "aad-client-secret-configured-placeholder-configured": "configured",
+      "aad-tenant-id-aria-label-tenant-id": "Tenant ID",
+      "aria-label-azure-cloud": "Azure Cloud",
+      "auth-type-options": {
+        "label": {
+          "app-registration-on-behalf-of": "App Registration (On-Behalf-Of)",
+          "current-user": "Current User",
+          "managed-identity": "Managed Identity",
+          "workload-identity": "Workload Identity"
+        },
+        "opts": {
+          "label": {
+            "app-registration": "App Registration"
+          }
+        }
+      },
+      "description-choose-authentication-azure-services": "Choose the type of authentication to Azure services",
+      "description-current-user-authentication-is-experimental": "Certain Grafana features (e.g. alerting) may not work as expected. For other known limitations and issues, bug reports, or feedback, please visit <2>the documentation</2>.",
+      "description-on-behalf-of-feature-is-in-beta": "For known limitations and issues, bug report, or feedback, please visit <2>the documentation</2>.",
+      "error-client-id-required": "Client ID is required",
+      "error-client-secret-required": "Client secret is required",
+      "error-tenant-id-required": "Tenant ID is required",
+      "label-application-client-id": "Application (client) ID",
+      "label-authentication-method": "Authentication Method",
+      "label-azure-cloud": "Azure Cloud",
+      "label-client-secret": "Client Secret",
+      "label-directory-tenant-id": "Directory (tenant) ID",
+      "reset": "Reset",
+      "title-authentication": "Authentication",
+      "title-current-user-authentication-is-experimental": "Current user authentication is experimental",
+      "title-on-behalf-of-feature-is-in-beta": "On-Behalf-Of feature is in beta"
+    },
+    "config-editor": {
+      "description-additional-settings": "Additional settings are optional settings that can be configured for more control over your data source. This includes query optimizations, schema settings, tracking configuration, OpenAI configuration, request timeout, and forwarded cookies.",
+      "label-enable": "Enable",
+      "label-http-cookies": "Allowed cookies",
+      "placeholder-http-cookies": "New cookie (hit enter to add)",
+      "secure-socks-proxy": "Secure Socks Proxy",
+      "title-additional-settings": "Additional settings",
+      "tooltip-enable": "Enable proxying the datasource connection through the secure socks proxy to a different network. See <2>Configure a datasource connection proxy.</2>",
+      "tooltip-http-cookies": "Grafana proxy deletes forwarded cookies by default. Specify cookies by name that should be forwarded to the data source."
+    },
+    "config-help": {
+      "configure-the-connection-in-grafana": "3. Configure the connection in Grafana",
+      "configuring-azure-explorer-database": "Configuring Azure and your Azure Data Explorer Database",
+      "connect-application-database": "2. Connect the AAD Application to a database user",
+      "connect-application-database-description": "Navigate to the Azure Data Explorer Web UI via the Azure Portal. The AAD application that you created in step 1 needs to be given viewer access to your Azure Data Explorer database. This is done using the dot command <1>{{dotCommand}}</1>:",
+      "create-an-aad-application": "1. Create an AAD application",
+      "create-an-aad-application-description": "Details on how to do create one via the Azure portal or with the Azure CLI can be found <2>here.</2>",
+      "detailed-instructions": "Detailed instructions on all three steps can found in <2>in the documentation.</2>",
+      "dot-command-example": "{{dotCommand}} database your_db_name viewers (&lsquo;{{key}}=your_client_id;your_tenant_id&rsquo;)",
+      "save-and-test": "Use the details from the AAD Service Principle from Step 1 to fill in the field below. Then click the Save & Test button.",
+      "title-configuration-help": "Configuration Help"
+    },
+    "connection-config": {
+      "aria-label-cluster-url": "Cluster URL",
+      "description-default-cluster-source": "The default cluster url for this data source.",
+      "label-default-cluster-url-optional": "Default cluster URL (Optional)"
+    },
+    "database-config": {
+      "add-mapping": "Add mapping",
+      "aria-label-choose-default-database": "choose default database",
+      "aria-label-remove": "Remove",
+      "description-configuration-database-schema-including-default": "Configuration for the database schema including the default database.",
+      "description-use-managed-schema": "If enabled, allows tables, functions, and materialized views to be mapped to user friendly names.",
+      "label-default-database": "Default database",
+      "label-schema-mappings": "Schema mappings",
+      "label-use-managed-schema": "Use managed schema",
+      "placeholder-name": "Name",
+      "placeholder-target": "Target",
+      "reload-schema": "Reload schema",
+      "title-database-schema-settings": "Database schema settings",
+      "title-error-updating-azure-data-explorer-schema": "Error updating Azure Data Explorer schema"
+    },
+    "editor-help": {
+      "adx-query-editor-help": "ADX query editor help",
+      "can-return-any-set-of-columns": "Can return any set of columns.",
+      "escape-multi": "{{macro}}($myTemplateVar): $myTemplateVar should be a multi-value template variables that contains illegal characters",
+      "example-adx-time-series-query": "Example ADX Time series query:",
+      "example-time-series-query": "Example Time Series Query:",
+      "format": "Format",
+      "format-as-adx-time-series": "Format as ADX Time series:",
+      "format-as-table": "Format as Table:",
+      "format-as-time-series": "Format as Time series:",
+      "format-as-time-series-description": "Requires exactly one column of Kusto type datetime. (tip: can use Kusto's {{operatorName}} operator to remove columns).",
+      "format-description": "It's possible to modify the format of the data returned by ADX with the \"Format as\" selector. Here are more details of each option:",
+      "macro-examples": "Macro Examples:",
+      "macros": "Macros",
+      "macros-description": "Macros can be used to automatically substitute certain values based on parameters set in Grafana:",
+      "must-have-timestamp": "Must have a datetime column named \"{{requiredColumn}}\"",
+      "optional-string-columns": "May optionally have one or more string columns. Each string column is considered as a key=value tag pair (where the key is the column name, and the value is the value of the column for each row).",
+      "requires-one-number-column": "Requires at least one value column of a number type. Each value column is considered a metric.",
+      "return-time-series": "Used for queries that return Kusto's \"time series\" type, such as the {{operatorName}} operator",
+      "templating-macros": "Templating Macros:",
+      "time-from": "{{macro}}: {{example}}. The start time of the query",
+      "time-interval": "{{macro}}: {{example}}. Grafana's recommended bin size based on the timespan of the query, in ms",
+      "time-macros": "Time Macros:",
+      "time-series-returned": "A time series is returned for each value column and unique set of string column values. Each series has name of valueColumnName stringColumnName=columnValue, ... If there are no string columns in the request, the name will just be valueColumnName.",
+      "time-to": "{{macro}}: {{example}}. The end time of the query",
+      "using-all": "If using the All option, then check the Include All Option checkbox and in the Custom all value field type in: {{valueToType}}. If All is chosen -> 1 == 1"
+    },
+    "filter-item": {
+      "aria-label-column": "Column",
+      "aria-label-column-datetime-value": "Column datetime value",
+      "aria-label-column-number-value": "Column number value",
+      "aria-label-column-value": "Column value",
+      "aria-label-operator": "Operator",
+      "aria-label-remove": "Remove",
+      "or": "OR"
+    },
+    "filter-section": {
+      "add-group": "Add group",
+      "and": "AND",
+      "label-filters": "Filters"
+    },
+    "group-by-item": {
+      "aria-label-column": "Column",
+      "aria-label-interval": "Interval",
+      "aria-label-remove": "Remove",
+      "label": {
+        "1-day": "1 day",
+        "1-hour": "1 hour",
+        "1-minute": "1 minute",
+        "12-hours": "12 hours",
+        "15-minutes": "15 minutes",
+        "30-minutes": "30 minutes",
+        "5-minutes": "5 minutes",
+        "6-hours": "6 hours",
+        "auto": "auto"
+      }
+    },
+    "group-by-section": {
+      "label-group-by": "Group by"
+    },
+    "kqlpreview": {
+      "hide": "hide",
+      "label-query-preview": "Query Preview",
+      "show": "show"
+    },
+    "open-aieditor": {
+      "alert-enable-plugin-feature": "Install the LLM plugin from the <2>catalog</2>. You can then <5>enable</5> it.",
+      "button-generate-query": "Generate query",
+      "generated-query": "Generated query",
+      "open-ai-generate-query": "Ask OpenAI to generate a KQL query",
+      "run-query": "Run query",
+      "title-enable-plugin-feature": "You need to enable the LLM plugin to use this feature."
+    },
+    "query-config": {
+      "data-consistency-options": {
+        "label": {
+          "strong": "Strong",
+          "weak": "Weak"
+        }
+      },
+      "description-cache-max-age": "By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.",
+      "description-data-consistency": "Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more information see the <2>Azure Data Explorer documentation.</2>",
+      "description-default-editor-mode": "This setting dictates which mode the editor will open in. Defaults to Visual.",
+      "description-use-dynamic-caching": "By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored. For time series queries we will use the bin size to widen the time range but also as cache max age.",
+      "description-value-controls-client-query-timeout": "This value controls the client query timeout.",
+      "description-various-settings-for-controlling-query-behavior": "Various settings for controlling query behavior.",
+      "editor-mode-options": {
+        "label": {
+          "raw": "Raw",
+          "visual": "Visual"
+        }
+      },
+      "label-cache-max-age": "Cache max age",
+      "label-data-consistency": "Data consistency",
+      "label-default-editor-mode": "Default editor mode",
+      "label-query-timeout": "Query timeout",
+      "label-use-dynamic-caching": "Use dynamic caching",
+      "title-query-optimizations": "Query Optimizations"
+    },
+    "query-editor": {
+      "title-could-not-load-datasource-schema": "Could not load datasource schema"
+    },
+    "query-header": {
+      "aria-label-cluster": "Cluster",
+      "aria-label-database": "Database",
+      "body-lose-manual-changes": "You will lose manual changes done to the query if you go back to the visual builder.",
+      "confirm-text": "Confirm",
+      "explain-kql": "Explain KQL",
+      "kql-explanation": "KQL Explanation",
+      "label-cluster": "Cluster",
+      "label-database": "Database",
+      "label-format-as": "Format as",
+      "run-query": "Run query",
+      "text-loading": "Loading...",
+      "title-are-you-sure": "Are you sure?"
+    },
+    "table-section": {
+      "aria-label-columns": "Columns",
+      "aria-label-table": "Table",
+      "label-columns": "Columns",
+      "label-table": "Table",
+      "placeholder-all": "All",
+      "tooltip-columns": "Select a subset of columns for faster results. Time series requires both time and number values, other columns are rendered as <2>dimensions</2>."
+    },
+    "timeshift": {
+      "aria-label-add": "Add",
+      "aria-label-remove": "Remove",
+      "aria-label-timeshift": "Timeshift",
+      "label": {
+        "day-before": "Day before",
+        "hour-before": "Hour before",
+        "no-timeshift": "No timeshift",
+        "week-before": "Week before"
+      },
+      "label-timeshift": "Timeshift"
+    },
+    "tracking-config": {
+      "description-send-username-header-to-host": "With this feature enabled, Grafana will pass the logged in user's username in the <2>{{userHeader}}</2> header and in the <4>{{clientRequestIdHeader}}</4> header when sending requests to ADX. Can be useful when tracking needs to be done in ADX.",
+      "label-send-username-header-to-host": "Send username header to host",
+      "title-tracking": "Tracking"
+    },
+    "use-template-variables": {
+      "label": {
+        "template-variables": "Template Variables"
+      }
+    },
+    "variable-editor": {
+      "aria-label-select-cluster": "Select cluster",
+      "aria-label-select-database": "Select database",
+      "aria-label-select-query-type": "Select query type",
+      "aria-label-select-table": "Select table",
+      "label": {
+        "template-variables": "Template Variables"
+      },
+      "label-cluster": "Cluster",
+      "label-database": "Database",
+      "label-query-type": "Query Type",
+      "label-table": "Table",
+      "variable_type_options": {
+        "label": {
+          "clusters": "Clusters",
+          "columns": "Columns",
+          "databases": "Databases",
+          "kusto-query": "Kusto Query",
+          "tables": "Tables"
+        }
+      }
+    },
+    "visual-query-editor": {
+      "title-could-not-load-table-schema": "Could not load table schema",
+      "title-table-schema-loaded-successfully-without-columns": "Table schema loaded successfully but without any columns"
+    }
+  }
+}

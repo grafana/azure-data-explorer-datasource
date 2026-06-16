@@ -1,0 +1,53 @@
+{
+  "error": {
+    "code": "General_BadRequest",
+    "@type": "Kusto.Data.Exceptions.KustoBadRequestException",
+    "message": "Request is invalid and cannot be processed: Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'",
+    "@context": {
+      "timestamp": "2021-05-26T13:23:26.2867367Z",
+      "serviceAlias": "GRAFANAADXDEV",
+      "machineName": "KEngine000000",
+      "processName": "Kusto.WinSvc.Svc",
+      "processId": 5912,
+      "threadId": 5496,
+      "appDomainName": "Kusto.WinSvc.Svc.exe",
+      "clientRequestId": "unspecified;d6ad5874-e639-4bff-b416-0cbc01366931",
+      "activityId": "3e4d89dc-38af-40a3-af81-a7e7d9b04055",
+      "subActivityId": "73bd30e3-f3de-4337-a96d-baea760771f9",
+      "activityType": "DN.FE.ExecuteQuery",
+      "parentActivityId": "bcf895b7-9a74-4dcf-92c2-8ade172102fe",
+      "activityStack": "(Activity stack: CRID=unspecified;d6ad5874-e639-4bff-b416-0cbc01366931 ARID=3e4d89dc-38af-40a3-af81-a7e7d9b04055 > KD.Query.Client.ExecuteQueryAsKustoDataStream/8e7bc1d4-96c4-4053-909a-77c51cbc9dc4 > P.WCF.Service.ExecuteQueryInternalAsKustoDataStream..IClientServiceCommunicationContract/bcf895b7-9a74-4dcf-92c2-8ade172102fe > DN.FE.ExecuteQuery/73bd30e3-f3de-4337-a96d-baea760771f9)"
+    },
+    "@permanent": true,
+    "@text": "PerfTest take 5",
+    "@database": "PerfTest",
+    "@ClientRequestLogger": "",
+    "innererror": {
+      "code": "SYN0002",
+      "message": "A recognition error occurred.",
+      "@type": "Kusto.Data.Exceptions.SyntaxException",
+      "@message": "Syntax error: SYN0002: A recognition error occurred. [line:position=1:9]. Query: 'PerfTest take 5'",
+      "@context": {
+        "timestamp": "2021-05-26T13:23:26.2867367Z",
+        "serviceAlias": "GRAFANAADXDEV",
+        "machineName": "KEngine000000",
+        "processName": "Kusto.WinSvc.Svc",
+        "processId": 5912,
+        "threadId": 5496,
+        "appDomainName": "Kusto.WinSvc.Svc.exe",
+        "clientRequestId": "unspecified;d6ad5874-e639-4bff-b416-0cbc01366931",
+        "activityId": "3e4d89dc-38af-40a3-af81-a7e7d9b04055",
+        "subActivityId": "73bd30e3-f3de-4337-a96d-baea760771f9",
+        "activityType": "DN.FE.ExecuteQuery",
+        "parentActivityId": "bcf895b7-9a74-4dcf-92c2-8ade172102fe",
+        "activityStack": "(Activity stack: CRID=unspecified;d6ad5874-e639-4bff-b416-0cbc01366931 ARID=3e4d89dc-38af-40a3-af81-a7e7d9b04055 > KD.Query.Client.ExecuteQueryAsKustoDataStream/8e7bc1d4-96c4-4053-909a-77c51cbc9dc4 > P.WCF.Service.ExecuteQueryInternalAsKustoDataStream..IClientServiceCommunicationContract/bcf895b7-9a74-4dcf-92c2-8ade172102fe > DN.FE.ExecuteQuery/73bd30e3-f3de-4337-a96d-baea760771f9)"
+      },
+      "@permanent": true,
+      "@line": "1",
+      "@pos": "9",
+      "@errorCode": "SYN0002",
+      "@errorMessage": "A recognition error occurred.",
+      "@token": "take"
+    }
+  }
+}

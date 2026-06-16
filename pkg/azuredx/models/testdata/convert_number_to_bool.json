@@ -1,0 +1,9 @@
+{
+  "Tables": [
+    {
+      "TableName": "Table_0",
+      "Columns": [{ "ColumnName": "XBool", "DataType": "SByte", "ColumnType": "bool" }],
+      "Rows": [[1], [0]]
+    }
+  ]
+}

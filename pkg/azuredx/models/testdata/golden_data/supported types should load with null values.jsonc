@@ -1,0 +1,165 @@
+//  🌟 This was machine generated.  Do not edit. 🌟
+//  
+//  Frame[0] {
+//      "typeVersion": [
+//          0,
+//          0
+//      ],
+//      "custom": {
+//          "ColumnTypes": [
+//              "bool",
+//              "datetime",
+//              "dynamic",
+//              "guid",
+//              "int",
+//              "long",
+//              "real",
+//              "timespan",
+//              "decimal"
+//          ]
+//      }
+//  }
+//  Name: 
+//  Dimensions: 9 Fields by 1 Rows
+//  +---------------+--------------------+----------------+-----------------+----------------+----------------+------------------+-----------------+------------------+
+//  | Name: XBool   | Name: XDateTime    | Name: XDynamic | Name: XGuid     | Name: XInt     | Name: XLong    | Name: XReal      | Name: XTimeSpan | Name: XDecimal   |
+//  | Labels:       | Labels:            | Labels:        | Labels:         | Labels:        | Labels:        | Labels:          | Labels:         | Labels:          |
+//  | Type: []*bool | Type: []*time.Time | Type: []string | Type: []*string | Type: []*int32 | Type: []*int64 | Type: []*float64 | Type: []*string | Type: []*float64 |
+//  +---------------+--------------------+----------------+-----------------+----------------+----------------+------------------+-----------------+------------------+
+//  | null          | null               | null           | null            | null           | null           | null             | null            | null             |
+//  +---------------+--------------------+----------------+-----------------+----------------+----------------+------------------+-----------------+------------------+
+//  
+//  
+//  🌟 This was machine generated.  Do not edit. 🌟
+{
+  "status": 200,
+  "frames": [
+    {
+      "schema": {
+        "meta": {
+          "typeVersion": [
+            0,
+            0
+          ],
+          "custom": {
+            "ColumnTypes": [
+              "bool",
+              "datetime",
+              "dynamic",
+              "guid",
+              "int",
+              "long",
+              "real",
+              "timespan",
+              "decimal"
+            ]
+          }
+        },
+        "fields": [
+          {
+            "name": "XBool",
+            "type": "boolean",
+            "typeInfo": {
+              "frame": "bool",
+              "nullable": true
+            }
+          },
+          {
+            "name": "XDateTime",
+            "type": "time",
+            "typeInfo": {
+              "frame": "time.Time",
+              "nullable": true
+            }
+          },
+          {
+            "name": "XDynamic",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string"
+            }
+          },
+          {
+            "name": "XGuid",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "XInt",
+            "type": "number",
+            "typeInfo": {
+              "frame": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "XLong",
+            "type": "number",
+            "typeInfo": {
+              "frame": "int64",
+              "nullable": true
+            }
+          },
+          {
+            "name": "XReal",
+            "type": "number",
+            "typeInfo": {
+              "frame": "float64",
+              "nullable": true
+            }
+          },
+          {
+            "name": "XTimeSpan",
+            "type": "string",
+            "typeInfo": {
+              "frame": "string",
+              "nullable": true
+            }
+          },
+          {
+            "name": "XDecimal",
+            "type": "number",
+            "typeInfo": {
+              "frame": "float64",
+              "nullable": true
+            }
+          }
+        ]
+      },
+      "data": {
+        "values": [
+          [
+            null
+          ],
+          [
+            null
+          ],
+          [
+            "null"
+          ],
+          [
+            null
+          ],
+          [
+            null
+          ],
+          [
+            null
+          ],
+          [
+            null
+          ],
+          [
+            null
+          ],
+          [
+            null
+          ]
+        ]
+      }
+    }
+  ]
+}

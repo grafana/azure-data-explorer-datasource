@@ -1,0 +1,109 @@
+{
+  "Tables": [
+    {
+      "TableName": "Table_0",
+      "Columns": [
+        { "ColumnName": "XBool", "DataType": "SByte", "ColumnType": "bool" },
+        { "ColumnName": "XString", "DataType": "String", "ColumnType": "string" },
+        { "ColumnName": "XDateTime", "DataType": "DateTime", "ColumnType": "datetime" },
+        { "ColumnName": "XDynamic", "DataType": "Object", "ColumnType": "dynamic" },
+        { "ColumnName": "XGuid", "DataType": "Guid", "ColumnType": "guid" },
+        { "ColumnName": "XInt", "DataType": "Int32", "ColumnType": "int" },
+        { "ColumnName": "XLong", "DataType": "Int64", "ColumnType": "long" },
+        { "ColumnName": "XReal", "DataType": "Double", "ColumnType": "real" },
+        { "ColumnName": "XTimeSpan", "DataType": "TimeSpan", "ColumnType": "timespan" },
+        { "ColumnName": "XDecimal", "DataType": "Decimal", "ColumnType": "decimal" }
+      ],
+      "Rows": [
+        [
+          true,
+          "Grafana",
+          "2006-01-02T22:04:05.1Z",
+          [
+            {
+              "person": "Daniel"
+            },
+            {
+              "cats": 23
+            },
+            {
+              "diagnosis": "cat problem"
+            }
+          ],
+          "74be27de-1e4e-49d9-b579-fe0b331d3642",
+          2147483647,
+          9223372036854775807,
+          1.7976931348623157e308,
+          "00:00:00.0000001",
+          4.52686980609418
+        ]
+      ]
+    },
+    {
+      "TableName": "Table_1",
+      "Columns": [{ "ColumnName": "Value", "DataType": "String", "ColumnType": "string" }],
+      "Rows": [
+        [
+          "{\"Visualization\":null,\"Title\":null,\"XColumn\":null,\"Series\":null,\"YColumns\":null,\"AnomalyColumns\":null,\"XTitle\":null,\"YTitle\":null,\"XAxis\":null,\"YAxis\":null,\"Legend\":null,\"YSplit\":null,\"Accumulate\":false,\"IsQuerySorted\":false,\"Kind\":null,\"Ymin\":\"NaN\",\"Ymax\":\"NaN\"}"
+        ]
+      ]
+    },
+    {
+      "TableName": "Table_2",
+      "Columns": [
+        { "ColumnName": "Timestamp", "DataType": "DateTime", "ColumnType": "datetime" },
+        { "ColumnName": "Severity", "DataType": "Int32", "ColumnType": "int" },
+        { "ColumnName": "SeverityName", "DataType": "String", "ColumnType": "string" },
+        { "ColumnName": "StatusCode", "DataType": "Int32", "ColumnType": "int" },
+        { "ColumnName": "StatusDescription", "DataType": "String", "ColumnType": "string" },
+        { "ColumnName": "Count", "DataType": "Int32", "ColumnType": "int" },
+        { "ColumnName": "RequestId", "DataType": "Guid", "ColumnType": "guid" },
+        { "ColumnName": "ActivityId", "DataType": "Guid", "ColumnType": "guid" },
+        { "ColumnName": "SubActivityId", "DataType": "Guid", "ColumnType": "guid" },
+        { "ColumnName": "ClientActivityId", "DataType": "String", "ColumnType": "string" },
+        { "ColumnName": "XDecimal", "DataType": "Decimal", "ColumnType": "decimal" }
+      ],
+      "Rows": [
+        [
+          "2019-07-29T18:48:51.7322569Z",
+          4,
+          "Info",
+          0,
+          "Query completed successfully",
+          1,
+          "91599917-b164-4cb2-92c4-42fdd3e1086f",
+          "91599917-b164-4cb2-92c4-42fdd3e1086f",
+          "2d6bf91d-56d2-493b-be52-b33935ba3001",
+          "unspecified;f38d060a-83d9-4cc3-ab57-5ce258c47cb9"
+        ],
+        [
+          "2019-07-29T18:48:51.7322569Z",
+          6,
+          "Stats",
+          0,
+          "{\"ExecutionTime\":0.0,\"resource_usage\":{\"cache\":{\"memory\":{\"hits\":0,\"misses\":0,\"total\":0},\"disk\":{\"hits\":0,\"misses\":0,\"total\":0},\"shards\":{\"hitbytes\":0,\"missbytes\":0,\"bypassbytes\":0}},\"cpu\":{\"user\":\"00:00:00\",\"kernel\":\"00:00:00\",\"total cpu\":\"00:00:00\"},\"memory\":{\"peak_per_node\":0}},\"input_dataset_statistics\":{\"extents\":{\"total\":0,\"scanned\":0,\"scanned_min_datetime\":\"0001-01-01T00:00:00.0000000Z\",\"scanned_max_datetime\":\"0001-01-01T00:00:00.0000000Z\"},\"rows\":{\"total\":0,\"scanned\":0},\"rowstores\":{\"scanned_rows\":0,\"scanned_values_size\":0}},\"dataset_statistics\":[{\"table_row_count\":1,\"table_size\":192}]}",
+          1,
+          "91599917-b164-4cb2-92c4-42fdd3e1086f",
+          "91599917-b164-4cb2-92c4-42fdd3e1086f",
+          "2d6bf91d-56d2-493b-be52-b33935ba3001",
+          "unspecified;f38d060a-83d9-4cc3-ab57-5ce258c47cb9"
+        ]
+      ]
+    },
+    {
+      "TableName": "Table_3",
+      "Columns": [
+        { "ColumnName": "Ordinal", "DataType": "Int64", "ColumnType": "long" },
+        { "ColumnName": "Kind", "DataType": "String", "ColumnType": "string" },
+        { "ColumnName": "Name", "DataType": "String", "ColumnType": "string" },
+        { "ColumnName": "Id", "DataType": "String", "ColumnType": "string" },
+        { "ColumnName": "PrettyName", "DataType": "String", "ColumnType": "string" }
+      ],
+      "Rows": [
+        [0, "QueryResult", "PrimaryResult", "80847ade-a5b1-4245-b4d9-f08db839dc1c", ""],
+        [1, "QueryProperties", "@ExtendedProperties", "79860536-5107-4967-9570-b5dde46375d8", ""],
+        [2, "QueryStatus", "QueryStatus", "00000000-0000-0000-0000-000000000000", ""]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "Tables": [
+    {
+      "TableName": "Table_0",
+      "Columns": [
+        {
+          "ColumnName": "_Timestamp_",
+          "DataType": "DateTime",
+          "ColumnType": "datetime"
+        },
+        {
+          "ColumnName": "_val1_",
+          "DataType": "Double",
+          "ColumnType": "real"
+        },
+        {
+          "ColumnName": "_val2_",
+          "DataType": "Double",
+          "ColumnType": "real"
+        },
+        {
+          "ColumnName": "_flag1_",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "_flag2_",
+          "DataType": "String",
+          "ColumnType": "string"
+        }
+      ],
+      "Rows": [
+        ["2011-12-15T03:10:00Z", 9.9812421798706055, 8.8430976867675781, "Clean", "Clean"],
+        ["2018-02-16T03:30:00Z", 3.6511249542236328, 2.4008100032806396, "Clean", "Clean"],
+        ["2008-11-05T04:20:00Z", 0.41963398456573486, 0.80654901266098022, "Clean", "Clean"],
+        ["2013-06-02T04:50:00Z", 8.4751501083374023, 6.987764835357666, "Clean", "Lonely period range deg."],
+        ["2015-11-27T12:00:00Z", 0.37000000476837158, 7.2155637741088867, "Extra severe degradation", "Clean"]
+      ]
+    },
+    {
+      "TableName": "Table_1",
+      "Columns": [
+        {
+          "ColumnName": "Value",
+          "DataType": "String",
+          "ColumnType": "string"
+        }
+      ],
+      "Rows": [
+        [
+          "{\"Visualization\":null,\"Title\":null,\"XColumn\":null,\"Series\":null,\"YColumns\":null,\"AnomalyColumns\":null,\"XTitle\":null,\"YTitle\":null,\"XAxis\":null,\"YAxis\":null,\"Legend\":null,\"YSplit\":null,\"Accumulate\":false,\"IsQuerySorted\":false,\"Kind\":null,\"Ymin\":\"NaN\",\"Ymax\":\"NaN\"}"
+        ]
+      ]
+    },
+    {
+      "TableName": "Table_2",
+      "Columns": [
+        {
+          "ColumnName": "Timestamp",
+          "DataType": "DateTime",
+          "ColumnType": "datetime"
+        },
+        {
+          "ColumnName": "Severity",
+          "DataType": "Int32",
+          "ColumnType": "int"
+        },
+        {
+          "ColumnName": "SeverityName",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "StatusCode",
+          "DataType": "Int32",
+          "ColumnType": "int"
+        },
+        {
+          "ColumnName": "StatusDescription",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "Count",
+          "DataType": "Int32",
+          "ColumnType": "int"
+        },
+        {
+          "ColumnName": "RequestId",
+          "DataType": "Guid",
+          "ColumnType": "guid"
+        },
+        {
+          "ColumnName": "ActivityId",
+          "DataType": "Guid",
+          "ColumnType": "guid"
+        },
+        {
+          "ColumnName": "SubActivityId",
+          "DataType": "Guid",
+          "ColumnType": "guid"
+        },
+        {
+          "ColumnName": "ClientActivityId",
+          "DataType": "String",
+          "ColumnType": "string"
+        }
+      ],
+      "Rows": [
+        [
+          "2021-05-26T13:16:14.5413204Z",
+          4,
+          "Info",
+          0,
+          "Query completed successfully",
+          1,
+          "0cd8db5b-73e3-410f-98e6-ead779a970f0",
+          "0cd8db5b-73e3-410f-98e6-ead779a970f0",
+          "d14af2b0-1d25-433f-9dea-e1c62b8e5b7f",
+          "unspecified;840bc573-e27e-4c52-a61a-c5788a1395a1"
+        ],
+        [
+          "2021-05-26T13:16:14.5413204Z",
+          6,
+          "Stats",
+          0,
+          "{\"ExecutionTime\":0.0,\"resource_usage\":{\"cache\":{\"memory\":{\"hits\":0,\"misses\":0,\"total\":0},\"disk\":{\"hits\":0,\"misses\":0,\"total\":0},\"shards\":{\"hot\":{\"hitbytes\":105190,\"missbytes\":0,\"retrievebytes\":0},\"cold\":{\"hitbytes\":0,\"missbytes\":0,\"retrievebytes\":0},\"bypassbytes\":0}},\"cpu\":{\"user\":\"00:00:00\",\"kernel\":\"00:00:00\",\"total cpu\":\"00:00:00\"},\"memory\":{\"peak_per_node\":0}},\"input_dataset_statistics\":{\"extents\":{\"total\":1,\"scanned\":1,\"scanned_min_datetime\":\"2021-01-11T23:32:19.9301667Z\",\"scanned_max_datetime\":\"2021-01-11T23:32:19.9301667Z\"},\"rows\":{\"total\":496908,\"scanned\":5},\"rowstores\":{\"scanned_rows\":0,\"scanned_values_size\":0},\"shards\":{\"queries_generic\":1,\"queries_specialized\":0}},\"dataset_statistics\":[{\"table_row_count\":5,\"table_size\":223}]}",
+          1,
+          "0cd8db5b-73e3-410f-98e6-ead779a970f0",
+          "0cd8db5b-73e3-410f-98e6-ead779a970f0",
+          "d14af2b0-1d25-433f-9dea-e1c62b8e5b7f",
+          "unspecified;840bc573-e27e-4c52-a61a-c5788a1395a1"
+        ]
+      ]
+    },
+    {
+      "TableName": "Table_3",
+      "Columns": [
+        {
+          "ColumnName": "Ordinal",
+          "DataType": "Int64",
+          "ColumnType": "long"
+        },
+        {
+          "ColumnName": "Kind",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "Name",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "Id",
+          "DataType": "String",
+          "ColumnType": "string"
+        },
+        {
+          "ColumnName": "PrettyName",
+          "DataType": "String",
+          "ColumnType": "string"
+        }
+      ],
+      "Rows": [
+        [0, "QueryResult", "PrimaryResult", "87da110a-92af-4b08-9b98-8c7cb17f7690", ""],
+        [1, "QueryProperties", "@ExtendedProperties", "137dbc6a-5799-4e13-8294-bc4b4a8b6a57", ""],
+        [2, "QueryStatus", "QueryStatus", "00000000-0000-0000-0000-000000000000", ""]
+      ]
+    }
+  ]
+}

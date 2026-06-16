@@ -1,0 +1,20 @@
+{
+  "Tables": [
+    {
+      "TableName": "Table_0",
+      "Columns": [
+        {
+          "ColumnName": "XBool",
+          "DataType": "SByte",
+          "ColumnType": "bool"
+        },
+        {
+          "ColumnName": "XDateTime",
+          "DataType": "DateTime",
+          "ColumnType": "datetime"
+        }
+      ],
+      "Rows": []
+    }
+  ]
+}
