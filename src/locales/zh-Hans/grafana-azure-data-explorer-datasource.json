@@ -1,9 +1,9 @@
 {
   "components": {
     "aggregate-item": {
-      "aggregate-item-function-aria-label-function": "功能",
+      "aggregate-item-function-aria-label-function": "函数",
       "aria-label-column": "列",
-      "aria-label-percentile": "百分比",
+      "aria-label-percentile": "百分位数",
       "aria-label-remove": "移除",
       "of": "/"
     },
@@ -11,7 +11,7 @@
       "label-aggregate": "汇总"
     },
     "application-config": {
-      "aria-label-application": "申请",
+      "aria-label-application": "应用程序",
       "description-application-displayed": "要在 ADX 中显示的应用程序名称。",
       "label-application-name-optional": "应用程序名称（可选）"
     },
@@ -87,7 +87,7 @@
       "label-default-database": "默认数据库",
       "label-schema-mappings": "架构映射",
       "label-use-managed-schema": "使用托管架构",
-      "placeholder-name": "姓名",
+      "placeholder-name": "名称",
       "placeholder-target": "目标",
       "reload-schema": "重新加载架构",
       "title-database-schema-settings": "数据库架构设置",
@@ -116,7 +116,7 @@
       "time-from": "{{macro}}: {{example}}。查询的开始时间",
       "time-interval": "{{macro}}: {{example}}。Grafana 根据查询的时间跨度建议的 bin 大小，单位为 ms",
       "time-macros": "时间宏：",
-      "time-series-returned": "为每个值列和唯一的字符串列值集返回一个时间序列。每个系列都有名称 valueColumnName stringColumnName=columnValue…如果请求中没有字符串列，则名称将仅为 valueColumnName。",
+      "time-series-returned": "为每个值列和唯一的字符串列值集返回一个时间序列。每个序列都有名称 valueColumnName stringColumnName=columnValue…如果请求中没有字符串列，则名称将仅为 valueColumnName。",
       "time-to": "{{macro}}: {{example}}。查询的结束时间",
       "using-all": "如果使用全部选项，则选中包含全部选项复选框，并在自定义全部值字段中输入：{{valueToType}}。如果选择全部 -> 1 == 1"
     },

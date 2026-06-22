@@ -63,8 +63,8 @@
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Grafana'da bağlantıyı yapılandırın",
-      "configuring-azure-explorer-database": "Azure ve Azure Veri Gezgini Veritabanınızı yapılandırma",
-      "connect-application-database": "2. AAD uygulamasını bir veritabanı kullanıcısına bağlayın",
+      "configuring-azure-explorer-database": "Azure ve Azure Veri Gezgini Veri Tabanınızı yapılandırma",
+      "connect-application-database": "2. AAD uygulamasını bir veri tabanı kullanıcısına bağlayın",
       "connect-application-database-description": "Azure Portal üzerinden Azure Veri Gezgini Web Kullanıcı Arayüzüne gidin. 1. adımda oluşturduğunuz AAD uygulamasına, Azure Veri Gezgini veri tabanınızda görüntüleyici erişimi verilmesi gerekir. Bu işlem, <1>{{dotCommand}}</1> nokta komutu kullanılarak yapılır:",
       "create-an-aad-application": "1. Bir AAD uygulaması oluşturun",
       "create-an-aad-application-description": "Azure portalı veya Azure CLI aracılığıyla nasıl oluşturulacağıyla ilgili ayrıntılara <2>buradan</2> ulaşabilirsiniz.",
@@ -116,7 +116,7 @@
       "time-from": "{{macro}}: {{example}}. Sorgunun başlangıç zamanı",
       "time-interval": "{{macro}}: {{example}}. Sorgunun zaman aralığına göre Grafana tarafından önerilen bölme boyutu (ms cinsinden)",
       "time-macros": "Zaman Makroları:",
-      "time-series-returned": "Her bir değer sütunu ve benzersiz dize sütunu değeri kümesi için bir zaman serisi döndürülür. Her serinin adı şu şekilde oluşturulur: değerSütunuAdı stringSütunAdı=sütunDeğeri, ... İstekte dize sütunu yoksa serinin adı yalnızca değerSütunuAdı olur.",
+      "time-series-returned": "Her bir değer sütunu ve benzersiz dize sütunu değeri kümesi için bir zaman serisi döndürülür. Her serinin adı şu şekilde oluşturulur: valueColumnName stringColumnName=columnValue, ... İstekte dize sütunu yoksa serinin adı yalnızca valueColumnName olur.",
       "time-to": "{{macro}}: {{example}}. Sorgunun bitiş zamanı",
       "using-all": "Tümü seçeneğini kullanıyorsanız \"Tümünü Dâhil Et\" onay kutusunu işaretleyin ve Özel tüm değeri alanına şu değeri girin: {{valueToType}}. Tümü seçilirse -> 1 == 1"
     },
@@ -151,7 +151,7 @@
       }
     },
     "group-by-section": {
-      "label-group-by": "Gruplama ölçütü"
+      "label-group-by": "Gruplandırma ölçütü"
     },
     "kqlpreview": {
       "hide": "gizle",
@@ -197,13 +197,13 @@
     },
     "query-header": {
       "aria-label-cluster": "Küme",
-      "aria-label-database": "Veri tabanı",
+      "aria-label-database": "Veri Tabanı",
       "body-lose-manual-changes": "Görsel düzenleyiciye geri dönerseniz sorguda manuel olarak yaptığınız değişiklikler kaybolacaktır.",
       "confirm-text": "Onayla",
       "explain-kql": "KQL'yi açıklayın",
       "kql-explanation": "KQL Açıklaması",
       "label-cluster": "Küme",
-      "label-database": "Veri tabanı",
+      "label-database": "Veri Tabanı",
       "label-format-as": "Farklı biçimlendir",
       "run-query": "Sorgu çalıştır",
       "text-loading": "Yükleniyor...",
@@ -248,7 +248,7 @@
         "template-variables": "Şablon Değişkenleri"
       },
       "label-cluster": "Küme",
-      "label-database": "Veritabanı",
+      "label-database": "Veri Tabanı",
       "label-query-type": "Sorgu Tipi",
       "label-table": "Tablo",
       "variable_type_options": {

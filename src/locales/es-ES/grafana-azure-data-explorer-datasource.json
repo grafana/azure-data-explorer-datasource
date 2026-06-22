@@ -35,9 +35,9 @@
           }
         }
       },
-      "description-choose-authentication-azure-services": "Elija el tipo de autenticación para los servicios de Azure",
-      "description-current-user-authentication-is-experimental": "Es posible que algunas funciones de Grafana (por ejemplo, las alertas) no funcionen como se espera. Para conocer otras limitaciones y problemas conocidos, informes de errores o comentarios, consulte <2>la documentación</2>.",
-      "description-on-behalf-of-feature-is-in-beta": "Para conocer las limitaciones y problemas conocidos, informes de errores o comentarios, consulte <2>la documentación</2>.",
+      "description-choose-authentication-azure-services": "Selecciona el tipo de autenticación para los servicios de Azure.",
+      "description-current-user-authentication-is-experimental": "Es posible que algunas funciones de Grafana (por ejemplo, las alertas) no funcionen como se espera. Para conocer otras limitaciones y problemas conocidos, informes de errores o comentarios, consulta <2>la documentación</2>.",
+      "description-on-behalf-of-feature-is-in-beta": "Para conocer las limitaciones y problemas conocidos, informes de errores o comentarios, consulta <2>la documentación</2>.",
       "error-client-id-required": "Se requiere el ID del cliente",
       "error-client-secret-required": "Se requiere el secreto de cliente",
       "error-tenant-id-required": "Se requiere el ID del inquilino",
@@ -58,19 +58,19 @@
       "placeholder-http-cookies": "Nueva cookie (pulsa Intro para añadirla)",
       "secure-socks-proxy": "Proxy SOCKS seguro",
       "title-additional-settings": "Ajustes adicionales",
-      "tooltip-enable": "Habilita el proxy de la conexión de la fuente de datos a través del proxy SOCKS seguro a una red diferente. Consulte <2>Configurar un proxy de conexión de fuente de datos.</2>",
+      "tooltip-enable": "Habilita el proxy de la conexión de la fuente de datos a través del proxy SOCKS seguro a una red diferente. Consulta <2>Configurar un proxy de conexión de fuente de datos.</2>",
       "tooltip-http-cookies": "El proxy de Grafana elimina las cookies reenviadas de forma predeterminada. Especifica las cookies por nombre que deben reenviarse a la fuente de datos."
     },
     "config-help": {
       "configure-the-connection-in-grafana": "3. Configurar la conexión en Grafana",
       "configuring-azure-explorer-database": "Configuración de Azure y su base de datos de Azure Data Explorer",
       "connect-application-database": "2. Conectar la aplicación AAD a un usuario de la base de datos",
-      "connect-application-database-description": "Acceda a la interfaz de usuario web de Azure Data Explorer a través de Azure Portal. La aplicación AAD que creó en el paso 1 debe tener acceso de visualización a su base de datos de Azure Data Explorer. Para ello, utilice el comando dot <1>{{dotCommand}}</1>:",
+      "connect-application-database-description": "Accede a la interfaz de usuario web de Azure Data Explorer a través de Azure Portal. La aplicación AAD que creaste en el paso 1 debe tener acceso de visualización a tu base de datos de Azure Data Explorer. Para ello, utiliza el comando dot <1>{{dotCommand}}</1>:",
       "create-an-aad-application": "1. Crear una aplicación AAD",
-      "create-an-aad-application-description": "Puede encontrar información sobre cómo crear una a través de Azure Portal o con Azure CLI <2>aquí.</2>",
-      "detailed-instructions": "Puede encontrar instrucciones detalladas sobre los tres pasos <2>en la documentación.</2>",
+      "create-an-aad-application-description": "Puedes encontrar información sobre cómo crear una a través de Azure Portal o con Azure CLI <2>aquí.</2>",
+      "detailed-instructions": "Puedes encontrar instrucciones detalladas sobre los tres pasos <2>en la documentación.</2>",
       "dot-command-example": "{{dotCommand}} base de datos your_db_name visualizadores (&lsquo;{{key}}=your_client_id;your_tenant_id&rsquo;)",
-      "save-and-test": "Utilice los detalles del principio de servicio de AAD del paso 1 para cumplimentar el campo a continuación. A continuación, haga clic en el botón Guardar y probar.",
+      "save-and-test": "Utiliza los detalles del principio de servicio de AAD del paso 1 para cumplimentar el campo a continuación. A continuación, haz clic en el botón Guardar y probar.",
       "title-configuration-help": "Ayuda para la configuración"
     },
     "connection-config": {
@@ -103,7 +103,7 @@
       "format-as-adx-time-series": "Dar formato como series temporales de ADX:",
       "format-as-table": "Dar formato como tabla:",
       "format-as-time-series": "Dar formato como series temporales:",
-      "format-as-time-series-description": "Requiere exactamente una columna de tipo fecha y hora de Kusto. (Sugerencia: Puede utilizar usar el operador {{operatorName}} de Kusto para eliminar columnas).",
+      "format-as-time-series-description": "Requiere exactamente una columna de tipo fecha y hora de Kusto. (Sugerencia: Puedes utilizar usar el operador {{operatorName}} de Kusto para eliminar columnas).",
       "format-description": "Es posible modificar el formato de los datos devueltos por ADX con el selector «Dar formato como». Aquí encontrará más información sobre cada opción:",
       "macro-examples": "Ejemplos de macros:",
       "macros": "Macros",
@@ -118,7 +118,7 @@
       "time-macros": "Macros de tiempo:",
       "time-series-returned": "Se devuelve una serie temporal para cada columna de valores y un conjunto único de valores de columna de cadena. Cada serie tiene un nombre de valueColumnName stringColumnName=columnValue, ... Si no hay columnas de cadena en la solicitud, el nombre será solo valueColumnName.",
       "time-to": "{{macro}}: {{example}}. La hora de finalización de la consulta",
-      "using-all": "////Si se utiliza la opción «Todo», marque la casilla de verificación «Incluir todo» y en el campo Personalizar todos los valores, introduzca: {{valueToType}}. Si se elige «Todo» -> 1 == 1"
+      "using-all": "Si se utiliza la opción «Todo», marca la casilla de verificación «Incluir todo» y en el campo «Personalizar todos los valores», introduce: {{valueToType}}. Si se elige «Todo» -> 1 == 1"
     },
     "filter-item": {
       "aria-label-column": "Columna",
@@ -164,7 +164,7 @@
       "generated-query": "Consulta generada",
       "open-ai-generate-query": "Pedir a OpenAI que genere una consulta KQL",
       "run-query": "Ejecutar consulta",
-      "title-enable-plugin-feature": "Debe habilitar el plugin LLM para utilizar esta función."
+      "title-enable-plugin-feature": "Debes habilitar el plugin LLM para utilizar esta función."
     },
     "query-config": {
       "data-consistency-options": {
@@ -173,8 +173,8 @@
           "weak": "Débil"
         }
       },
-      "description-cache-max-age": "De forma predeterminada, la caché está deshabilitada. Si quiere habilitar el almacenamiento en caché de consultas, especifique un intervalo de tiempo máximo durante el cual la caché estará activa.",
-      "description-data-consistency": "La consistencia de las consultas controla cómo se sincronizan las consultas y las actualizaciones. El valor predeterminado es «Fuerte». Para obtener más información, consulte la <2>documentación de Azure Data Explorer.</2>",
+      "description-cache-max-age": "De forma predeterminada, la caché está deshabilitada. Si quieres habilitar el almacenamiento en caché de consultas, especifica un intervalo de tiempo máximo durante el cual la caché estará activa.",
+      "description-data-consistency": "La consistencia de las consultas controla cómo se sincronizan las consultas y las actualizaciones. El valor predeterminado es «Fuerte». Para obtener más información, consulta la <2>documentación de Azure Data Explorer.</2>",
       "description-default-editor-mode": "Este ajuste determina en qué modo se abrirá el editor. El valor predeterminado es «Visual».",
       "description-use-dynamic-caching": "Al habilitar esta función, Grafana aplicará dinámicamente los ajustes de la caché por consulta y se ignorará la antigüedad máxima de la caché predeterminada. Para las consultas de series temporales, utilizaremos el tamaño del contenedor para ampliar el intervalo de tiempo, pero también como antigüedad máxima de la caché.",
       "description-value-controls-client-query-timeout": "Este valor controla el tiempo de espera de la consulta del cliente.",
@@ -215,7 +215,7 @@
       "label-columns": "Columnas",
       "label-table": "Tabla",
       "placeholder-all": "Todo",
-      "tooltip-columns": "Seleccione un subconjunto de columnas para obtener resultados más rápidos. Las series temporales requieren valores de tiempo y numéricos, y otras columnas se representan como <2>dimensiones</2>."
+      "tooltip-columns": "Selecciona un subconjunto de columnas para obtener resultados más rápidos. Las series temporales requieren valores de tiempo y numéricos, y otras columnas se representan como <2>dimensiones</2>."
     },
     "timeshift": {
       "aria-label-add": "Añadir",
@@ -230,7 +230,7 @@
       "label-timeshift": "Cambio de tiempo"
     },
     "tracking-config": {
-      "description-send-username-header-to-host": "Si esta función habilitada, Grafana transmitirá el nombre de usuario del usuario registrado en el encabezado <2>{{userHeader}}</2> y en el encabezado <4>{{clientRequestIdHeader}}</4> al enviar solicitudes a ADX. Puede ser útil cuando el seguimiento debe realizarse en ADX.",
+      "description-send-username-header-to-host": "Si esta función está habilitada, Grafana transmitirá el nombre de usuario del usuario registrado en el encabezado <2>{{userHeader}}</2> y en el encabezado <4>{{clientRequestIdHeader}}</4> al enviar solicitudes a ADX. Puede ser útil cuando el seguimiento debe realizarse en ADX.",
       "label-send-username-header-to-host": "Enviar encabezado de nombre de usuario al host",
       "title-tracking": "Seguimiento"
     },

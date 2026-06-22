@@ -11,7 +11,7 @@
       "label-aggregate": "Agregovat"
     },
     "application-config": {
-      "aria-label-application": "Použití",
+      "aria-label-application": "Aplikace",
       "description-application-displayed": "Název aplikace, který se má zobrazit v ADX.",
       "label-application-name-optional": "Název aplikace (nepovinné)"
     },
@@ -103,7 +103,7 @@
       "format-as-adx-time-series": "Formátovat jako časovou řadu ADX:",
       "format-as-table": "Formátovat jako tabulku:",
       "format-as-time-series": "Formátovat jako časovou řadu:",
-      "format-as-time-series-description": "Vyžaduje přesně jeden sloupec typu „Kusto datetime“. (Tip: k odstranění sloupců lze použít operátor Kusto {{operatorName}}.)",
+      "format-as-time-series-description": "Vyžaduje přesně jeden sloupec typu „Kusto datetime“. (Tip: k odebrání sloupců lze použít operátor Kusto {{operatorName}}.)",
       "format-description": "Formát dat vrácených ADX lze upravit pomocí voliče „Formátovat jako“. Zde jsou další podrobnosti o jednotlivých možnostech:",
       "macro-examples": "Příklady maker:",
       "macros": "Makra",
