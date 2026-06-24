@@ -29,36 +29,40 @@
       "required": true
     },
     {
-      "id": "jsonData.azureAuthType",
-      "key": "azureAuthType",
+      "id": "jsonData.azureCredentials.authType",
+      "key": "authType",
       "label": "Authentication",
-      "description": "Azure authentication type (clientsecret, msi, currentuser).",
+      "description": "Azure authentication type (clientsecret, msi, workloadidentity, currentuser, clientsecret-obo).",
       "valueType": "string",
-      "target": "jsonData"
+      "target": "jsonData",
+      "section": "azureCredentials"
     },
     {
-      "id": "jsonData.cloudName",
-      "key": "cloudName",
+      "id": "jsonData.azureCredentials.azureCloud",
+      "key": "azureCloud",
       "label": "Azure Cloud",
-      "description": "Azure cloud environment.",
+      "description": "Azure cloud environment (e.g. AzureCloud, AzureChinaCloud, AzureUSGovernment).",
       "valueType": "string",
-      "target": "jsonData"
+      "target": "jsonData",
+      "section": "azureCredentials"
     },
     {
-      "id": "jsonData.tenantId",
+      "id": "jsonData.azureCredentials.tenantId",
       "key": "tenantId",
       "label": "Directory (tenant) ID",
       "description": "Azure Active Directory tenant ID.",
       "valueType": "string",
-      "target": "jsonData"
+      "target": "jsonData",
+      "section": "azureCredentials"
     },
     {
-      "id": "jsonData.clientId",
+      "id": "jsonData.azureCredentials.clientId",
       "key": "clientId",
       "label": "Application (client) ID",
       "description": "Azure AD application client ID.",
       "valueType": "string",
-      "target": "jsonData"
+      "target": "jsonData",
+      "section": "azureCredentials"
     },
     {
       "id": "jsonData.minimalCache",
@@ -134,12 +138,28 @@
       }
     },
     {
-      "id": "secureJsonData.clientSecret",
-      "key": "clientSecret",
+      "id": "jsonData.application",
+      "key": "application",
+      "label": "Application",
+      "description": "Application name sent to Azure Data Explorer for request tracking.",
+      "valueType": "string",
+      "target": "jsonData"
+    },
+    {
+      "id": "secureJsonData.azureClientSecret",
+      "key": "azureClientSecret",
       "label": "Client Secret",
       "description": "Azure AD application client secret.",
       "valueType": "string",
       "role": "auth.oauth2.clientSecret",
+      "target": "secureJsonData"
+    },
+    {
+      "id": "secureJsonData.clientSecret",
+      "key": "clientSecret",
+      "label": "Client Secret (legacy)",
+      "description": "Legacy Azure AD application client secret (superseded by azureClientSecret).",
+      "valueType": "string",
       "target": "secureJsonData"
     }
   ],
@@ -153,10 +173,11 @@
       "id": "auth",
       "title": "Authentication",
       "fieldRefs": [
-        "jsonData.azureAuthType",
-        "jsonData.cloudName",
-        "jsonData.tenantId",
-        "jsonData.clientId",
+        "jsonData.azureCredentials.authType",
+        "jsonData.azureCredentials.azureCloud",
+        "jsonData.azureCredentials.tenantId",
+        "jsonData.azureCredentials.clientId",
+        "secureJsonData.azureClientSecret",
         "secureJsonData.clientSecret"
       ]
     },
@@ -173,7 +194,13 @@
     {
       "id": "advanced",
       "title": "Advanced",
-      "fieldRefs": ["jsonData.useSchemaMapping", "jsonData.enableUserTracking"]
+      "fieldRefs": ["jsonData.useSchemaMapping", "jsonData.enableUserTracking", "jsonData.application"]
+    }
+  ],
+  "instructions": [
+    {
+      "msg": "Supports app registration (clientsecret), managed identity (msi), workload identity (workloadidentity), current user (currentuser), or on-behalf-of (clientsecret-obo) — ask which. But never ask for credentials themselves. Those should be entered in the UI.",
+      "tags": ["llm"]
     }
   ]
 }

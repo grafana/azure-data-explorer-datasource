@@ -1,0 +1,91 @@
+{
+  "spec": {
+    "type": "object",
+    "properties": {
+      "jsonData": {
+        "type": "object",
+        "required": [
+          "clusterUrl",
+          "defaultDatabase"
+        ],
+        "properties": {
+          "application": {
+            "description": "Application name sent to Azure Data Explorer for request tracking.",
+            "type": "string"
+          },
+          "azureCredentials": {
+            "type": "object",
+            "properties": {
+              "authType": {
+                "description": "Azure authentication type (clientsecret, msi, workloadidentity, currentuser, clientsecret-obo).",
+                "type": "string"
+              },
+              "azureCloud": {
+                "description": "Azure cloud environment (e.g. AzureCloud, AzureChinaCloud, AzureUSGovernment).",
+                "type": "string"
+              },
+              "clientId": {
+                "description": "Azure AD application client ID.",
+                "type": "string"
+              },
+              "tenantId": {
+                "description": "Azure Active Directory tenant ID.",
+                "type": "string"
+              }
+            }
+          },
+          "cacheMaxAge": {
+            "description": "Maximum age of cached query results.",
+            "type": "string"
+          },
+          "clusterUrl": {
+            "description": "Azure Data Explorer cluster URL.",
+            "type": "string"
+          },
+          "dataConsistency": {
+            "description": "Query consistency level (strongconsistency or weakconsistency).",
+            "type": "string"
+          },
+          "defaultDatabase": {
+            "description": "Default database for queries.",
+            "type": "string"
+          },
+          "defaultEditorMode": {
+            "description": "Default query editor mode.",
+            "type": "string"
+          },
+          "dynamicCaching": {
+            "description": "Enable dynamic caching of query results.",
+            "type": "boolean"
+          },
+          "enableUserTracking": {
+            "description": "Send Grafana user info with queries.",
+            "type": "boolean"
+          },
+          "minimalCache": {
+            "description": "Minimum cache duration in seconds for query results.",
+            "type": "number"
+          },
+          "queryTimeout": {
+            "description": "Query timeout duration.",
+            "type": "string"
+          },
+          "useSchemaMapping": {
+            "description": "Enable schema mapping for queries.",
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "secureValues": [
+    {
+      "key": "azureClientSecret",
+      "description": "Azure AD application client secret."
+    },
+    {
+      "key": "clientSecret",
+      "description": "Legacy Azure AD application client secret (superseded by azureClientSecret)."
+    }
+  ]
+}

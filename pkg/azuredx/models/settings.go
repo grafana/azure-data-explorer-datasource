@@ -13,16 +13,29 @@ import (
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 )
 
+// AzureCredentials mirrors the nested jsonData.azureCredentials object that the
+// shared grafana-azure-sdk-go parses to build the datasource credentials.
+type AzureCredentials struct {
+	AuthType   string `json:"authType"`
+	AzureCloud string `json:"azureCloud"`
+	TenantID   string `json:"tenantId"`
+	ClientID   string `json:"clientId"`
+}
+
 // DatasourceSettings holds the datasource configuration information for Azure Data Explorer's API
 // that is needed to execute a request against Azure's Data Explorer API.
 type DatasourceSettings struct {
-	ClusterURL         string `json:"clusterUrl"`
-	DefaultDatabase    string `json:"defaultDatabase"`
-	DataConsistency    string `json:"dataConsistency"`
-	CacheMaxAge        string `json:"cacheMaxAge"`
-	DynamicCaching     bool   `json:"dynamicCaching"`
-	EnableUserTracking bool   `json:"enableUserTracking"`
-	Application        string `json:"application"`
+	ClusterURL         string           `json:"clusterUrl"`
+	DefaultDatabase    string           `json:"defaultDatabase"`
+	DataConsistency    string           `json:"dataConsistency"`
+	CacheMaxAge        string           `json:"cacheMaxAge"`
+	DynamicCaching     bool             `json:"dynamicCaching"`
+	EnableUserTracking bool             `json:"enableUserTracking"`
+	Application        string           `json:"application"`
+	MinimalCache       int              `json:"minimalCache"`
+	DefaultEditorMode  string           `json:"defaultEditorMode"`
+	UseSchemaMapping   bool             `json:"useSchemaMapping"`
+	AzureCredentials   AzureCredentials `json:"azureCredentials"`
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
 	// to the server execution timeout.
