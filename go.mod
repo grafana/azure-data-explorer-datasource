@@ -5,7 +5,7 @@ go 1.26.4
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.21.1
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.2
-	github.com/grafana/dsconfig/schema v0.0.5
+	github.com/grafana/dsconfig/schema v0.0.7
 	github.com/grafana/grafana-azure-sdk-go/v2 v2.4.1
 	github.com/grafana/grafana-plugin-sdk-go v0.292.1
 	github.com/json-iterator/go v1.1.12
@@ -52,7 +52,7 @@ require (
 	github.com/google/gnostic-models v0.7.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/grafana/dsconfig/dsconfig v0.0.5 // indirect
+	github.com/grafana/dsconfig/dsconfig v0.0.7 // indirect
 	github.com/grafana/otel-profiling-go v0.5.1 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.11 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.0 // indirect
