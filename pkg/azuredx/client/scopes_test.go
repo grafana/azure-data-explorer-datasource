@@ -26,13 +26,13 @@ func TestGetAzureScopes_KnownClouds(t *testing.T) {
 			description:   "test US Government cloud - Texas",
 			cloud:         azsettings.AzureUSGovernment,
 			clusterUrl:    "https://abc.usgovtexas.kusto.usgovvirginia.net",
-			expectedScope: "https://abc.usgovtexas.kusto.usgovvirginia.net/.default",
+			expectedScope: "https://kusto.kusto.usgovcloudapi.net/.default",
 		},
 		{
 			description:   "test US Government cloud - Virginia",
 			cloud:         azsettings.AzureUSGovernment,
 			clusterUrl:    "https://abc.usgovtexas.kusto.usgovvirginia.net/",
-			expectedScope: "https://abc.usgovtexas.kusto.usgovvirginia.net/.default",
+			expectedScope: "https://kusto.kusto.usgovcloudapi.net/.default",
 		},
 		{
 			description:   "test China cloud",
