@@ -9,7 +9,7 @@ Make sure you have the following dependencies installed first:
 - [Git](https://git-scm.com/)
 - [Go](https://golang.org/dl/) (see [go.mod](../go.mod#L3) for minimum required version)
 - [Mage](https://magefile.org/)
-- [Node.js v22](https://nodejs.org)
+- [Node.js v24](https://nodejs.org)
 - [npm](https://npmjs.com)
 
 ## Frontend
