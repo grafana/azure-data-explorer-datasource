@@ -159,27 +159,26 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
         </Field>
       )}
       {credentials.authType === 'currentuser' && (
-        <>
-          <Alert
-            title={t(
-              'components.azure-credentials-form.title-current-user-authentication-limitations',
-              'Current user authentication has limitations'
-            )}
-            severity="warning"
-          >
-            <Trans i18nKey="components.azure-credentials-form.description-current-user-authentication-limitations">
-              Certain Grafana features (e.g. alerting) may not work as expected. For other known limitations and issues,
-              bug reports, or feedback, please visit{' '}
-              <TextLink
-                href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md"
-                external
-              >
-                the documentation
-              </TextLink>
-              .
-            </Trans>
-          </Alert>
-        </>
+        <Alert
+          title={t(
+            'components.azure-credentials-form.title-current-user-authentication',
+            'Current user authentication'
+          )}
+          severity="info"
+        >
+          <Trans i18nKey="components.azure-credentials-form.description-current-user-authentication">
+            Queries use the signed-in Grafana user&apos;s identity. Certain Grafana features (for example alerting,
+            recorded queries, and reporting) may not work as expected when there is no user in the request context. For
+            setup details and known limitations, see{' '}
+            <TextLink
+              href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md"
+              external
+            >
+              the documentation
+            </TextLink>
+            .
+          </Trans>
+        </Alert>
       )}
       {credentials.authType === 'clientsecret-obo' && (
         <>
