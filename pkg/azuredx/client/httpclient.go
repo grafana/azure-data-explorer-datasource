@@ -69,7 +69,7 @@ func newHttpClientManagement(ctx context.Context, instanceSettings *backend.Data
 func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.DatasourceSettings, azureCloud string, userProvidedEndpoint bool) (*azhttpclient.AuthOptions, error) {
 	authOpts := azhttpclient.NewAuthOptions(azureSettings)
 
-	// Enables support for the experimental user-based authentication feature if the user_identity_enabled flag is set to true in the Grafana configuration
+	// Enables support for current user authentication when user_identity_enabled is set in Grafana configuration
 	authOpts.AllowUserIdentity()
 
 	// TODO: #555 configure on-behalf-of authentication if enabled in AzureSettings
