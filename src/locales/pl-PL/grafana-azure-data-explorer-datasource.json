@@ -36,7 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Wybierz typ uwierzytelniania w usługach Azure",
-      "description-current-user-authentication-is-experimental": "Niektóre funkcje Grafany (np. alerty) mogą nie działać zgodnie z oczekiwaniami. Aby uzyskać informacje o innych znanych ograniczeniach i problemach, raporty o błędach lub informacje zwrotne, zapoznaj się z <2>dokumentacją</2>.",
+      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "Aby uzyskać informacje na temat znanych ograniczeń i problemów, raport o błędach lub informacje zwrotne, zapoznaj się z <2>dokumentacją</2>.",
       "error-client-id-required": "Wymagany jest identyfikator klienta",
       "error-client-secret-required": "Wymagany jest klucz tajny klienta",
@@ -48,7 +48,7 @@
       "label-directory-tenant-id": "Identyfikator katalogu (najemcy)",
       "reset": "Zresetuj",
       "title-authentication": "Uwierzytelnianie",
-      "title-current-user-authentication-is-experimental": "Bieżąca metoda uwierzytelniania użytkownika ma charakter eksperymentalny",
+      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "Funkcja „W imieniu” jest w wersji beta"
     },
     "config-editor": {

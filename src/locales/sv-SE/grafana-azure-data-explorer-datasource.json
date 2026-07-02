@@ -36,7 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Välj typ av autentisering till Azure-tjänster",
-      "description-current-user-authentication-is-experimental": "Vissa Grafana-funktioner (t.ex. aviseringar) kanske inte fungerar som förväntat. Gå till <2>dokumentationen</2> för andra kända begränsningar och problem, felrapporter eller feedback.",
+      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "Gå till <2>dokumentationen</2> för kända begränsningar och problem, felrapporter eller feedback.",
       "error-client-id-required": "Kund-ID krävs",
       "error-client-secret-required": "Klienthemlighet krävs",
@@ -48,7 +48,7 @@
       "label-directory-tenant-id": "Katalog-(hyresgäst-)ID",
       "reset": "Återställ",
       "title-authentication": "Autentisering",
-      "title-current-user-authentication-is-experimental": "Nuvarande användarautentisering är experimentell",
+      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "På uppdrag av-funktionen är i betastadiet"
     },
     "config-editor": {

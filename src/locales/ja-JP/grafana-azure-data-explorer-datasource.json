@@ -36,7 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Azureサービスへの認証タイプを選択",
-      "description-current-user-authentication-is-experimental": "特定のGrafana機能（アラートなど）が期待通りに動作しない可能性があります。その他の既知の制限事項や問題、バグレポート、フィードバックについては、<2>ドキュメント</2>をご覧ください。",
+      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "既知の制限事項や問題、バグレポート、フィードバックについては、<2>ドキュメント</2>をご覧ください。",
       "error-client-id-required": "クライアントIDが必要です",
       "error-client-secret-required": "クライアントシークレットが必要です",
@@ -48,7 +48,7 @@
       "label-directory-tenant-id": "ディレクトリ（テナント）ID",
       "reset": "リセット",
       "title-authentication": "認証",
-      "title-current-user-authentication-is-experimental": "現在のユーザー認証は実験的機能です",
+      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "代理機能はベータ版です"
     },
     "config-editor": {

@@ -36,7 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Выберите тип аутентификации для служб Azure",
-      "description-current-user-authentication-is-experimental": "Некоторые функции Grafana (например, оповещения) могут работать не так, как ожидается. Подробнее о других известных ограничениях и проблемах, отчетах об ошибках и обратной связи см. в <2>документации</2>.",
+      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "Подробнее об известных ограничениях и проблемах, отчетах об ошибках и обратной связи см. в <2>документации</2>.",
       "error-client-id-required": "Требуется идентификатор клиента",
       "error-client-secret-required": "Требуется секрет клиента",
@@ -48,7 +48,7 @@
       "label-directory-tenant-id": "Идентификатор каталога (клиента)",
       "reset": "Сброс",
       "title-authentication": "Аутентификация",
-      "title-current-user-authentication-is-experimental": "Аутентификация текущего пользователя осуществляется в экспериментальном режиме",
+      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "Функция «От имени» находится в режиме бета-тестирования"
     },
     "config-editor": {

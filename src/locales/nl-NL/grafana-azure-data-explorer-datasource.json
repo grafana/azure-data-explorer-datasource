@@ -36,7 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Kies het type authenticatie voor Azure-services",
-      "description-current-user-authentication-is-experimental": "Bepaalde Grafana-functies (bijv. waarschuwingen) werken mogelijk niet zoals verwacht. Ga voor andere bekende beperkingen en problemen, bugrapporten of feedback naar <2>de documentatie</2>.",
+      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "Ga voor bekende beperkingen en problemen, bugrapporten of feedback naar <2>de documentatie</2>.",
       "error-client-id-required": "Client-id is vereist",
       "error-client-secret-required": "Clientgeheim is vereist",
@@ -48,7 +48,7 @@
       "label-directory-tenant-id": "Directory-id (tenant)",
       "reset": "Resetten",
       "title-authentication": "Authenticatie",
-      "title-current-user-authentication-is-experimental": "Huidige gebruikersauthenticatie is experimenteel",
+      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "Namens-functie is in bèta"
     },
     "config-editor": {

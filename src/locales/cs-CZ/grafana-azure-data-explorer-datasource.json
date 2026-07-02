@@ -36,7 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Vyberte typ ověření pro služby Azure",
-      "description-current-user-authentication-is-experimental": "Některé funkce Grafany (např. upozorňování) nemusí fungovat podle očekávání. Další známá omezení a problémy, hlášení chyb nebo zpětnou vazbu najdete v <2>dokumentaci</2>.",
+      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "Známá omezení a problémy, hlášení chyb nebo zpětnou vazbu najdete v <2>dokumentaci</2>.",
       "error-client-id-required": "ID klienta je povinné",
       "error-client-secret-required": "Tajné heslo klienta je povinné",
@@ -48,7 +48,7 @@
       "label-directory-tenant-id": "ID adresáře (tenanta)",
       "reset": "Obnovit",
       "title-authentication": "Ověření",
-      "title-current-user-authentication-is-experimental": "Aktuální ověření uživatele je experimentální",
+      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "Funkce Jménem je v beta verzi"
     },
     "config-editor": {
