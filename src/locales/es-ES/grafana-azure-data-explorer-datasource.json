@@ -36,7 +36,6 @@
         }
       },
       "description-choose-authentication-azure-services": "Elija el tipo de autenticación para los servicios de Azure",
-      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "Para conocer las limitaciones y problemas conocidos, informes de errores o comentarios, consulte <2>la documentación</2>.",
       "error-client-id-required": "Se requiere el ID del cliente",
       "error-client-secret-required": "Se requiere el secreto de cliente",
@@ -48,7 +47,6 @@
       "label-directory-tenant-id": "ID del directorio (inquilino)",
       "reset": "Restablecer",
       "title-authentication": "Autenticación",
-      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "La función «En nombre de» está en fase beta"
     },
     "config-editor": {

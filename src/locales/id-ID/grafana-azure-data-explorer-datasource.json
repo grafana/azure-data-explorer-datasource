@@ -36,7 +36,6 @@
         }
       },
       "description-choose-authentication-azure-services": "Pilih jenis autentikasi ke layanan Azure",
-      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "Untuk keterbatasan dan masalah yang diketahui, laporan bug, atau umpan balik, silakan kunjungi <2>dokumentasi</2>.",
       "error-client-id-required": "ID Klien diperlukan",
       "error-client-secret-required": "Rahasia klien diperlukan",
@@ -48,7 +47,6 @@
       "label-directory-tenant-id": "ID Direktori (tenant)",
       "reset": "Atur ulang",
       "title-authentication": "Autentikasi",
-      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "Fitur Atas Nama berada dalam versi beta"
     },
     "config-editor": {

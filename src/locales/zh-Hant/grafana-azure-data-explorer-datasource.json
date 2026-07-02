@@ -36,7 +36,6 @@
         }
       },
       "description-choose-authentication-azure-services": "選擇 Azure 服務的驗證類型",
-      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "有關已知限制與問題、錯誤報告或意見回饋，請參閱<2>文件</2>。",
       "error-client-id-required": "用戶端 ID 為必填",
       "error-client-secret-required": "用戶端密碼為必填",
@@ -48,7 +47,6 @@
       "label-directory-tenant-id": "目錄（租用戶）ID",
       "reset": "重設",
       "title-authentication": "身分驗證",
-      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "「代表」功能處於測試階段"
     },
     "config-editor": {

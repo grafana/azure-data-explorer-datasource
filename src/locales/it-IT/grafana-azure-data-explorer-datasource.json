@@ -36,7 +36,6 @@
         }
       },
       "description-choose-authentication-azure-services": "Scegli il tipo di autenticazione per i servizi di Azure",
-      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "Per limitazioni e problemi noti, segnalazioni di bug o feedback, consulta <2>la documentazione</2>.",
       "error-client-id-required": "L'ID client è obbligatorio",
       "error-client-secret-required": "Il segreto client è obbligatorio",
@@ -48,7 +47,6 @@
       "label-directory-tenant-id": "ID directory (tenant)",
       "reset": "Ripristina",
       "title-authentication": "Autenticazione",
-      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "La funzionalità Per conto di è in versione beta"
     },
     "config-editor": {

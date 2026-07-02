@@ -36,7 +36,6 @@
         }
       },
       "description-choose-authentication-azure-services": "Válassza ki az Azure-szolgáltatások hitelesítési típusát",
-      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "Ismert korlátozásokkal, problémákkal és hibajelentésekkel kapcsolatban vagy visszajelzésért tekintse meg a <2>dokumentációt</2>.",
       "error-client-id-required": "A kliensazonosító megadása kötelező",
       "error-client-secret-required": "A klienstitok megadása kötelező",
@@ -48,7 +47,6 @@
       "label-directory-tenant-id": "Címtár (bérlő) azonosítója",
       "reset": "Visszaállítás",
       "title-authentication": "Hitelesítés",
-      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "A Valaki nevében funkció bétaverzióban érhető el"
     },
     "config-editor": {

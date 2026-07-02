@@ -36,7 +36,6 @@
         }
       },
       "description-choose-authentication-azure-services": "选择 Azure 服务的身份验证类型",
-      "description-current-user-authentication-limitations": "",
       "description-on-behalf-of-feature-is-in-beta": "如需了解已知限制和问题、错误报告或反馈，请访问<2>文档</2>。",
       "error-client-id-required": "客户端 ID 为必填项",
       "error-client-secret-required": "客户端密码为必填项",
@@ -48,7 +47,6 @@
       "label-directory-tenant-id": "目录（租户）ID",
       "reset": "重置",
       "title-authentication": "认证",
-      "title-current-user-authentication-limitations": "",
       "title-on-behalf-of-feature-is-in-beta": "代表功能处于测试阶段"
     },
     "config-editor": {
