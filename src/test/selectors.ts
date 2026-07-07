@@ -26,6 +26,9 @@ export const components = {
     serviceCredentialsEnabled: {
       switch: 'data-testid fallback-credentials-enabled',
     },
+    serviceCredentialsAuthType: {
+      input: 'data-testid fallback-auth-type',
+    },
   },
   queryEditor: {
     editKQL: {

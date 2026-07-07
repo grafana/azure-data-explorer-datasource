@@ -1,19 +1,88 @@
 import { t, Trans } from '@grafana/i18n';
 import React from 'react';
 
-import { AadCurrentUserCredentials } from '@grafana/azure-sdk';
-import { Alert, Field, Switch, TextLink } from '@grafana/ui';
+import { AadCurrentUserCredentials, AzureAuthType, getDefaultAzureCloud } from '@grafana/azure-sdk';
+import { SelectableValue } from '@grafana/data';
+import { Alert, Field, Select, Switch, TextLink } from '@grafana/ui';
 
 import { selectors } from 'test/selectors';
 
+import { AppRegistrationCredentials } from './AppRegistrationCredentials';
+
+// Auth types valid as fallback service credentials (excludes currentuser and OBO).
+type ServiceCredentials = NonNullable<AadCurrentUserCredentials['serviceCredentials']>;
+
 export interface Props {
   credentials: AadCurrentUserCredentials;
+  managedIdentityEnabled: boolean;
+  workloadIdentityEnabled: boolean;
+  azureCloudOptions?: SelectableValue[];
   onCredentialsChange: (updatedCredentials: AadCurrentUserCredentials) => void;
 }
 
-export const CurrentUserFallbackCredentials = ({ credentials, onCredentialsChange }: Props) => {
+export const CurrentUserFallbackCredentials = ({
+  credentials,
+  managedIdentityEnabled,
+  workloadIdentityEnabled,
+  azureCloudOptions,
+  onCredentialsChange,
+}: Props) => {
+  const defaultServiceCredentials = (): ServiceCredentials => {
+    if (managedIdentityEnabled) {
+      return { authType: 'msi' };
+    }
+    if (workloadIdentityEnabled) {
+      return { authType: 'workloadidentity' };
+    }
+    return { authType: 'clientsecret', azureCloud: getDefaultAzureCloud() };
+  };
+
+  const serviceCredentials = credentials.serviceCredentials ?? defaultServiceCredentials();
+
+  const authTypeOptions: Array<SelectableValue<AzureAuthType>> = [
+    {
+      value: 'clientsecret',
+      label: t('components.azure-credentials-form.auth-type-options.opts.label.app-registration', 'App Registration'),
+    },
+  ];
+  if (managedIdentityEnabled) {
+    authTypeOptions.unshift({
+      value: 'msi',
+      label: t('components.azure-credentials-form.auth-type-options.label.managed-identity', 'Managed Identity'),
+    });
+  }
+  if (workloadIdentityEnabled) {
+    authTypeOptions.unshift({
+      value: 'workloadidentity',
+      label: t('components.azure-credentials-form.auth-type-options.label.workload-identity', 'Workload Identity'),
+    });
+  }
+
   const onServiceCredentialsEnabledChange = (enabled: boolean) => {
-    onCredentialsChange({ ...credentials, serviceCredentialsEnabled: enabled });
+    onCredentialsChange({
+      ...credentials,
+      serviceCredentialsEnabled: enabled,
+      serviceCredentials: enabled ? serviceCredentials : undefined,
+    });
+  };
+
+  const onServiceCredentialsChange = (updatedCredentials: ServiceCredentials) => {
+    onCredentialsChange({ ...credentials, serviceCredentials: updatedCredentials });
+  };
+
+  const onAuthTypeChange = (selected: SelectableValue<AzureAuthType>) => {
+    switch (selected.value) {
+      case 'msi':
+        onServiceCredentialsChange({ authType: 'msi' });
+        break;
+      case 'workloadidentity':
+        onServiceCredentialsChange({ authType: 'workloadidentity' });
+        break;
+      case 'clientsecret':
+      default:
+        onServiceCredentialsChange({ authType: 'clientsecret', azureCloud: getDefaultAzureCloud() });
+        break;
+    }
   };
 
   return (
@@ -53,6 +122,35 @@ export const CurrentUserFallbackCredentials = ({ credentials, onCredentialsChang
           onChange={(e) => onServiceCredentialsEnabledChange(e.currentTarget.checked)}
         />
       </Field>
+      {credentials.serviceCredentialsEnabled && (
+        <>
+          {authTypeOptions.length > 1 && (
+            <Field
+              label={t(
+                'components.current-user-fallback-credentials.label-fallback-auth-type',
+                'Fallback authentication method'
+              )}
+              htmlFor="fallback-auth-type"
+              data-testid={selectors.components.configEditor.serviceCredentialsAuthType.input}
+            >
+              <Select
+                inputId="fallback-auth-type"
+                className="width-15"
+                value={authTypeOptions.find((opt) => opt.value === serviceCredentials.authType)}
+                options={authTypeOptions}
+                onChange={onAuthTypeChange}
+              />
+            </Field>
+          )}
+          {serviceCredentials.authType === 'clientsecret' && (
+            <AppRegistrationCredentials
+              credentials={serviceCredentials}
+              azureCloudOptions={azureCloudOptions}
+              onCredentialsChange={(updated) => onServiceCredentialsChange(updated as ServiceCredentials)}
+            />
+          )}
+        </>
+      )}
     </>
   );
 };
