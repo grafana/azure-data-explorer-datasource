@@ -23,6 +23,9 @@ export const components = {
     clientSecret: {
       input: 'data-testid client-secret',
     },
+    serviceCredentialsEnabled: {
+      switch: 'data-testid fallback-credentials-enabled',
+    },
   },
   queryEditor: {
     editKQL: {
