@@ -3,10 +3,10 @@ import React, { ChangeEvent, FunctionComponent, useMemo } from 'react';
 
 import { AzureAuthType, AzureCredentials } from '@grafana/azure-sdk';
 import { SelectableValue } from '@grafana/data';
-import { Alert, Button, Select, Input, Field, TextLink } from '@grafana/ui';
+import { Alert, Button, Field, Input, Select, TextLink } from '@grafana/ui';
 
-import { selectors } from 'test/selectors';
 import { ConfigSection } from '@grafana/plugin-ui';
+import { selectors } from 'test/selectors';
 
 import { CurrentUserFallbackCredentials } from './CurrentUserFallbackCredentials';
 

@@ -36,7 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Choose the type of authentication to Azure services",
-      "description-current-user-authentication-is-experimental": "Certain Grafana features (e.g. alerting) may not work as expected. For other known limitations and issues, bug reports, or feedback, please visit <2>the documentation</2>.",
+      "description-current-user-authentication": "Queries use the signed-in Grafana user's identity. Certain Grafana features (for example alerting, recorded queries, and reporting) may not work as expected when there is no user in the request context. For setup details and known limitations, see <2>the documentation</2>.",
       "description-on-behalf-of-feature-is-in-beta": "For known limitations and issues, bug report, or feedback, please visit <2>the documentation</2>.",
       "error-client-id-required": "Client ID is required",
       "error-client-secret-required": "Client secret is required",
@@ -48,7 +48,7 @@
       "label-directory-tenant-id": "Directory (tenant) ID",
       "reset": "Reset",
       "title-authentication": "Authentication",
-      "title-current-user-authentication-is-experimental": "Current user authentication is experimental",
+      "title-current-user-authentication": "Current user authentication",
       "title-on-behalf-of-feature-is-in-beta": "On-Behalf-Of feature is in beta"
     },
     "config-editor": {

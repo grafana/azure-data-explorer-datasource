@@ -36,7 +36,6 @@
         }
       },
       "description-choose-authentication-azure-services": "Escolha o tipo de autenticação para os serviços do Azure",
-      "description-current-user-authentication-is-experimental": "É possível que alguns recursos da Grafana (como os alertas) não funcionem como esperado. Para conferir outras limitações e problemas conhecidos, relatórios de bugs ou feedback, acesse <2>a documentação</2>.",
       "description-on-behalf-of-feature-is-in-beta": "Para conferir limitações e problemas conhecidos, relatório de bugs ou feedback, acesse <2>a documentação</2>.",
       "error-client-id-required": "O ID do cliente é obrigatório",
       "error-client-secret-required": "O segredo do cliente é obrigatório",
@@ -48,7 +47,6 @@
       "label-directory-tenant-id": "ID do diretório (locatário)",
       "reset": "Redefinir",
       "title-authentication": "Autenticação",
-      "title-current-user-authentication-is-experimental": "A autenticação do usuário atual está em fase de testes",
       "title-on-behalf-of-feature-is-in-beta": "O recurso \"On-Behalf-Of\" está em versão beta"
     },
     "config-editor": {
