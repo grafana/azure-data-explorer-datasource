@@ -1,7 +1,7 @@
 import { t, Trans } from '@grafana/i18n';
 import React, { ChangeEvent } from 'react';
 
-import { AzureClientSecretCredentials, AzureClientSecretOboCredentials } from '@grafana/azure-sdk';
+import { AzureClientSecretCredentials, AzureClientSecretOboCredentials, AzureCredentials } from '@grafana/azure-sdk';
 import { SelectableValue } from '@grafana/data';
 import { Button, Select, Input, Field } from '@grafana/ui';
 
@@ -12,10 +12,16 @@ type ClientSecretCredentials = AzureClientSecretCredentials | AzureClientSecretO
 export interface Props {
   credentials: ClientSecretCredentials;
   azureCloudOptions?: SelectableValue[];
-  onCredentialsChange: (updatedCredentials: ClientSecretCredentials) => void;
+  onCredentialsChange: (updatedCredentials: AzureCredentials) => void;
+  disabled?: boolean;
 }
 
-export const AppRegistrationCredentials = ({ credentials, azureCloudOptions, onCredentialsChange }: Props) => {
+export const AppRegistrationCredentials = ({
+  credentials,
+  azureCloudOptions,
+  onCredentialsChange,
+  disabled,
+}: Props) => {
   const onAzureCloudChange = (selected: SelectableValue<string>) => {
     onCredentialsChange({ ...credentials, azureCloud: selected.value });
   };
@@ -42,6 +48,7 @@ export const AppRegistrationCredentials = ({ credentials, azureCloudOptions, onC
         <Field
           label={t('components.azure-credentials-form.label-azure-cloud', 'Azure Cloud')}
           htmlFor="azure-cloud-type"
+          disabled={disabled}
           data-testid={selectors.components.configEditor.azureCloud.input}
         >
           <Select
@@ -69,6 +76,7 @@ export const AppRegistrationCredentials = ({ credentials, azureCloudOptions, onC
           placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
           value={credentials.tenantId || ''}
           onChange={onTenantIdChange}
+          disabled={disabled}
           data-testid={selectors.components.configEditor.tenantID.input}
         />
       </Field>
@@ -87,6 +95,7 @@ export const AppRegistrationCredentials = ({ credentials, azureCloudOptions, onC
           placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
           value={credentials.clientId || ''}
           onChange={onClientIdChange}
+          disabled={disabled}
           data-testid={selectors.components.configEditor.clientID.input}
         />
       </Field>
@@ -110,7 +119,7 @@ export const AppRegistrationCredentials = ({ credentials, azureCloudOptions, onC
               )}
               disabled={true}
             />
-            <Button variant="secondary" type="button" onClick={onClientSecretReset}>
+            <Button variant="secondary" type="button" onClick={onClientSecretReset} disabled={disabled}>
               <Trans i18nKey="components.azure-credentials-form.reset">Reset</Trans>
             </Button>
           </div>
@@ -126,11 +135,15 @@ export const AppRegistrationCredentials = ({ credentials, azureCloudOptions, onC
           <Input
             id="aad-client-secret"
             className="width-30"
-            aria-label={t('components.azure-credentials-form.aad-client-secret-aria-label-client-secret', 'Client Secret')}
+            aria-label={t(
+              'components.azure-credentials-form.aad-client-secret-aria-label-client-secret',
+              'Client Secret'
+            )}
             // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
             placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
             value={credentials.clientSecret || ''}
             onChange={onClientSecretChange}
+            disabled={disabled}
             data-testid={selectors.components.configEditor.clientSecret.input}
           />
         </Field>

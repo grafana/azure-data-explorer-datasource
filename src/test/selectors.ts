@@ -24,7 +24,7 @@ export const components = {
       input: 'data-testid client-secret',
     },
     serviceCredentialsEnabled: {
-      switch: 'data-testid fallback-credentials-enabled',
+      button: 'data-testid fallback-credentials-enabled',
     },
     serviceCredentialsAuthType: {
       input: 'data-testid fallback-auth-type',

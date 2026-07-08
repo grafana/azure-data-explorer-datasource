@@ -1,157 +1,196 @@
 import { t, Trans } from '@grafana/i18n';
-import React from 'react';
+import React, { useMemo } from 'react';
 
-import { AadCurrentUserCredentials, AzureAuthType, getDefaultAzureCloud } from '@grafana/azure-sdk';
+import { AadCurrentUserCredentials, AzureCredentials, instanceOfAzureCredential } from '@grafana/azure-sdk';
 import { SelectableValue } from '@grafana/data';
-import { Alert, Field, Select, Switch, TextLink } from '@grafana/ui';
+import { config } from '@grafana/runtime';
+import { ConfigSection } from '@grafana/plugin-ui';
+import { Alert, Field, RadioButtonGroup, Select, Stack, TextLink } from '@grafana/ui';
 
 import { selectors } from 'test/selectors';
 
 import { AppRegistrationCredentials } from './AppRegistrationCredentials';
 
-// Auth types valid as fallback service credentials (excludes currentuser and OBO).
-type ServiceCredentials = NonNullable<AadCurrentUserCredentials['serviceCredentials']>;
+type FallbackCredentialAuthType = 'clientsecret' | 'msi' | 'workloadidentity';
 
 export interface Props {
-  credentials: AadCurrentUserCredentials;
   managedIdentityEnabled: boolean;
   workloadIdentityEnabled: boolean;
+  credentials: AadCurrentUserCredentials;
   azureCloudOptions?: SelectableValue[];
-  onCredentialsChange: (updatedCredentials: AadCurrentUserCredentials) => void;
+  onCredentialsChange: (updatedCredentials: AzureCredentials) => void;
+  disabled?: boolean;
 }
 
-export const CurrentUserFallbackCredentials = ({
-  credentials,
-  managedIdentityEnabled,
-  workloadIdentityEnabled,
-  azureCloudOptions,
-  onCredentialsChange,
-}: Props) => {
-  const defaultServiceCredentials = (): ServiceCredentials => {
+export const CurrentUserFallbackCredentials = (props: Props) => {
+  const {
+    credentials,
+    azureCloudOptions,
+    onCredentialsChange,
+    disabled,
+    managedIdentityEnabled,
+    workloadIdentityEnabled,
+  } = props;
+
+  const authTypeOptions = useMemo(() => {
+    const opts: Array<SelectableValue<FallbackCredentialAuthType>> = [
+      {
+        value: 'clientsecret',
+        label: t('components.azure-credentials-form.auth-type-options.opts.label.app-registration', 'App Registration'),
+      },
+    ];
+
     if (managedIdentityEnabled) {
-      return { authType: 'msi' };
+      opts.push({
+        value: 'msi',
+        label: t('components.azure-credentials-form.auth-type-options.label.managed-identity', 'Managed Identity'),
+      });
     }
+
     if (workloadIdentityEnabled) {
-      return { authType: 'workloadidentity' };
+      opts.push({
+        value: 'workloadidentity',
+        label: t('components.azure-credentials-form.auth-type-options.label.workload-identity', 'Workload Identity'),
+      });
     }
-    return { authType: 'clientsecret', azureCloud: getDefaultAzureCloud() };
-  };
 
-  const serviceCredentials = credentials.serviceCredentials ?? defaultServiceCredentials();
+    return opts;
+  }, [managedIdentityEnabled, workloadIdentityEnabled]);
 
-  const authTypeOptions: Array<SelectableValue<AzureAuthType>> = [
-    {
-      value: 'clientsecret',
-      label: t('components.azure-credentials-form.auth-type-options.opts.label.app-registration', 'App Registration'),
-    },
-  ];
-  if (managedIdentityEnabled) {
-    authTypeOptions.unshift({
-      value: 'msi',
-      label: t('components.azure-credentials-form.auth-type-options.label.managed-identity', 'Managed Identity'),
-    });
-  }
-  if (workloadIdentityEnabled) {
-    authTypeOptions.unshift({
-      value: 'workloadidentity',
-      label: t('components.azure-credentials-form.auth-type-options.label.workload-identity', 'Workload Identity'),
-    });
-  }
-
-  const onServiceCredentialsEnabledChange = (enabled: boolean) => {
-    onCredentialsChange({
+  const onAuthTypeChange = (selected: SelectableValue<FallbackCredentialAuthType>) => {
+    const defaultAuthType: FallbackCredentialAuthType = managedIdentityEnabled
+      ? 'msi'
+      : workloadIdentityEnabled
+        ? 'workloadidentity'
+        : 'clientsecret';
+    const updated: AadCurrentUserCredentials = {
       ...credentials,
-      serviceCredentialsEnabled: enabled,
-      serviceCredentials: enabled ? serviceCredentials : undefined,
-    });
+      serviceCredentials: {
+        authType: selected.value || defaultAuthType,
+      },
+    };
+    onCredentialsChange(updated);
   };
 
-  const onServiceCredentialsChange = (updatedCredentials: ServiceCredentials) => {
-    onCredentialsChange({ ...credentials, serviceCredentials: updatedCredentials });
+  const onServiceCredentialsEnabledChange = (value: boolean) => {
+    let updated: AzureCredentials = { ...credentials, serviceCredentialsEnabled: value };
+    if (!value) {
+      updated = { ...updated, serviceCredentials: undefined };
+    }
+    onCredentialsChange(updated);
   };
 
-  const onAuthTypeChange = (selected: SelectableValue<AzureAuthType>) => {
-    switch (selected.value) {
-      case 'msi':
-        onServiceCredentialsChange({ authType: 'msi' });
-        break;
-      case 'workloadidentity':
-        onServiceCredentialsChange({ authType: 'workloadidentity' });
-        break;
-      case 'clientsecret':
-      default:
-        onServiceCredentialsChange({ authType: 'clientsecret', azureCloud: getDefaultAzureCloud() });
-        break;
+  const onServiceCredentialsChange = (serviceCredentials: AzureCredentials) => {
+    if (!instanceOfAzureCredential('currentuser', serviceCredentials)) {
+      onCredentialsChange({ ...credentials, serviceCredentials });
     }
   };
 
-  return (
-    <>
+  if (!config.azure.userIdentityFallbackCredentialsEnabled) {
+    return (
       <Alert
-        title={t('components.current-user-fallback-credentials.title-current-user', 'Current user authentication')}
         severity="info"
+        title={t(
+          'components.current-user-fallback-credentials.title-fallback-credentials-disabled',
+          'Fallback credentials disabled'
+        )}
       >
-        <Trans i18nKey="components.current-user-fallback-credentials.description-current-user">
-          Queries run using the identity of the signed-in Grafana user. Requests made without a user in context (such as
-          alerting, recorded queries, and reporting) require fallback service credentials to be configured. For more
-          information, see{' '}
+        <Trans i18nKey="components.current-user-fallback-credentials.alert-fallback-credentials-disabled">
+          Fallback credentials have been disabled. As current user authentication only supports requests with a user in
+          context, features such as alerting, recorded queries, and reporting will not function as expected. See the{' '}
           <TextLink
             href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md"
             external
           >
-            the documentation
-          </TextLink>
-          .
+            documentation
+          </TextLink>{' '}
+          for more details.
         </Trans>
       </Alert>
-      <Field
-        label={t(
-          'components.current-user-fallback-credentials.label-enable-fallback',
-          'Enable fallback service credentials'
-        )}
-        description={t(
-          'components.current-user-fallback-credentials.description-enable-fallback',
-          'Configure service credentials to use for requests that have no user in context, e.g. alerting.'
-        )}
-        htmlFor="fallback-credentials-enabled"
-        data-testid={selectors.components.configEditor.serviceCredentialsEnabled.switch}
+    );
+  }
+
+  return (
+    <ConfigSection
+      title={t(
+        'components.current-user-fallback-credentials.title-fallback-service-credentials',
+        'Fallback Service Credentials'
+      )}
+      isCollapsible={true}
+    >
+      <Alert
+        severity="info"
+        title={t('components.current-user-fallback-credentials.title-service-credentials', 'Service Credentials')}
       >
-        <Switch
-          id="fallback-credentials-enabled"
+        <Stack direction={'column'}>
+          <div>
+            <Trans i18nKey="components.current-user-fallback-credentials.body-service-credentials">
+              Current user authentication does not support Grafana features that make requests to the data source without
+              a user in the context of the request. An example of this is alerting. To ensure these features continue to
+              function, provide fallback credentials below.
+            </Trans>
+          </div>
+          <div>
+            <b>
+              <Trans i18nKey="components.current-user-fallback-credentials.note-service-credentials">
+                Note: Features like alerting will be restricted to the access level of the fallback credentials rather
+                than the user.
+              </Trans>
+            </b>
+          </div>
+        </Stack>
+      </Alert>
+      <Field
+        label={t('components.current-user-fallback-credentials.label-service-credentials', 'Service Credentials')}
+        description={t(
+          'components.current-user-fallback-credentials.description-service-credentials',
+          'Choose if fallback service credentials are enabled or disabled for this data source'
+        )}
+        data-testid={selectors.components.configEditor.serviceCredentialsEnabled.button}
+      >
+        <RadioButtonGroup
+          options={[
+            { label: t('components.current-user-fallback-credentials.label-enabled', 'Enabled'), value: true },
+            { label: t('components.current-user-fallback-credentials.label-disabled', 'Disabled'), value: false },
+          ]}
           value={credentials.serviceCredentialsEnabled ?? false}
-          onChange={(e) => onServiceCredentialsEnabledChange(e.currentTarget.checked)}
+          size={'md'}
+          onChange={(val) => onServiceCredentialsEnabledChange(val)}
         />
       </Field>
-      {credentials.serviceCredentialsEnabled && (
+      {credentials.serviceCredentialsEnabled ? (
         <>
-          {authTypeOptions.length > 1 && (
+          {authTypeOptions.length > 0 && (
             <Field
-              label={t(
-                'components.current-user-fallback-credentials.label-fallback-auth-type',
-                'Fallback authentication method'
+              label={t('components.current-user-fallback-credentials.label-authentication', 'Authentication')}
+              description={t(
+                'components.current-user-fallback-credentials.description-authentication',
+                'Choose the type of authentication to Azure services'
               )}
-              htmlFor="fallback-auth-type"
               data-testid={selectors.components.configEditor.serviceCredentialsAuthType.input}
+              htmlFor="fallback-authentication-type"
             >
               <Select
-                inputId="fallback-auth-type"
+                inputId="fallback-authentication-type"
                 className="width-15"
-                value={authTypeOptions.find((opt) => opt.value === serviceCredentials.authType)}
+                value={authTypeOptions.find((opt) => opt.value === credentials.serviceCredentials?.authType)}
                 options={authTypeOptions}
                 onChange={onAuthTypeChange}
+                disabled={disabled}
               />
             </Field>
           )}
-          {serviceCredentials.authType === 'clientsecret' && (
+          {credentials.serviceCredentials?.authType === 'clientsecret' && (
             <AppRegistrationCredentials
-              credentials={serviceCredentials}
+              credentials={credentials.serviceCredentials}
               azureCloudOptions={azureCloudOptions}
-              onCredentialsChange={(updated) => onServiceCredentialsChange(updated as ServiceCredentials)}
+              onCredentialsChange={onServiceCredentialsChange}
+              disabled={disabled}
             />
           )}
         </>
-      )}
-    </>
+      ) : null}
+    </ConfigSection>
   );
 };
 
