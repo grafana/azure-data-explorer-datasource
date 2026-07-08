@@ -66,6 +66,45 @@ user_identity_client_id = 4fc34037-97bd-4e84-9db4-86238c78e32a
 user_identity_client_secret = 4479f5a6-444c-4271-8790-60eeb42225ae
 ```
 
+## What doesn't work (and how to fix it)
+
+With current user authentication, every query runs as the Grafana user who is signed in. That's fine when someone is looking at a dashboard, but some Grafana features run in the background with nobody signed in. The main ones are **alerting**, **recorded queries**, and **reporting**. These have no user to run as, so they fail.
+
+To keep them working, you can set up **fallback service credentials**.
+
+## Fallback service credentials
+
+Fallback credentials are a shared identity (an App Registration, managed identity, or workload identity) that the data source falls back to whenever a request has no signed-in user behind it. Turn them on and your background features (like alerting) keep working instead of failing.
+
+> **Note:** Anything that uses the fallback runs as this shared identity, not as an individual user. So it can see different data than a person querying interactively would.
+
+Setting this up takes three steps.
+
+### 1. Turn fallback on in the Grafana config
+
+In the `[azure]` section, enable fallback credentials. (This is already `true` by default when `user_identity_enabled` is on, but it's fine to set it explicitly.)
+
+```ini
+[azure]
+user_identity_enabled = true
+user_identity_fallback_credentials_enabled = true
+```
+
+### 2. Turn on ID forwarding
+
+Grafana needs a way to tell a real user's request apart from a background job. The `idForwarding` feature toggle gives it that signal:
+
+```ini
+[feature_toggles]
+idForwarding = true
+```
+
+Without `idForwarding`, Grafana can't recognize background requests (like alert evaluations) as having no user, so it never switches to the fallback, and those requests fail.
+
+### 3. Add the credentials in the data source
+
+In the data source settings, choose **Current User**, switch **Fallback service credentials** to **Enabled**, pick the identity type (App Registration, Managed Identity, or Workload Identity), and fill in the details.
+
 ## See also
 
 - [User identity authentication in Azure Data Explorer and other Azure datasources](https://github.com/grafana/grafana/discussions/62994)
