@@ -90,7 +90,7 @@
     "terser-webpack-plugin": "5.4.0",
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
-    "typescript": "5.9.3",
+    "typescript": "7.0.2",
     "uuid": "14.0.0",
     "webpack": "5.105.4",
     "webpack-cli": "7.0.2",
