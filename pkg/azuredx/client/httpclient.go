@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -26,7 +27,15 @@ func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	scopes, err := getAdxScopes(azureCloud, dsSettings.ClusterURL)
+	metadataClient, err := httpclient.NewProvider().New(httpclient.Options{
+		Timeouts: &httpclient.TimeoutOptions{
+			Timeout: 30 * time.Second,
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error creating metadata http client: %w", err)
+	}
+	scopes, err := getAdxScopes(ctx, metadataClient, azureCloud, dsSettings.ClusterURL)
 	if err != nil {
 		return nil, err
 	}

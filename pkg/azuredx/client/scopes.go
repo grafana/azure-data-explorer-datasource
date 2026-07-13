@@ -1,12 +1,15 @@
 package client
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
 
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
 var (
@@ -17,12 +20,19 @@ var (
 	}
 )
 
-func getAdxScopes(azureCloud string, clusterUrl string) ([]string, error) {
-	// Get scopes for the given cloud
+func getAdxScopes(ctx context.Context, httpClient *http.Client, azureCloud string, clusterUrl string) ([]string, error) {
+	metadata, err := fetchAuthMetadata(ctx, httpClient, clusterUrl)
+	if err == nil {
+		return audienceToScopes(metadata.KustoServiceResourceID)
+	}
+
+	backend.Logger.Warn("failed to fetch auth metadata from cluster, falling back to hardcoded scopes", "cluster", clusterUrl, "error", err)
+	return getAdxScopesFallback(azureCloud, clusterUrl)
+}
+
+func getAdxScopesFallback(azureCloud string, clusterUrl string) ([]string, error) {
 	scopeTmpl, ok := "", false
 	if scopeTmpl, ok = adxScopes[azureCloud]; !ok {
-		// AzurePublic, AzureUSGovernment and AzureChina use special scopes, other clouds will expect the clusterUrl in the scope
-		// so fallback to this pattern for all others
 		scopeTmpl = "{clusterUrl}/.default"
 	}
 
