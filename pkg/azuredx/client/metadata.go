@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	json "github.com/json-iterator/go"
 )
 
@@ -44,7 +45,11 @@ func fetchAuthMetadata(ctx context.Context, httpClient *http.Client, clusterURL 
 	if err != nil {
 		return nil, fmt.Errorf("metadata request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			backend.Logger.Error("error closing response body", "error", err)
+		}
+	}()
 
 	if resp.StatusCode/100 != 2 {
 		return nil, fmt.Errorf("metadata endpoint returned HTTP %s", resp.Status)

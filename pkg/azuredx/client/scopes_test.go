@@ -18,7 +18,7 @@ func metadataServer(t *testing.T, kustoServiceResourceID string) *httptest.Serve
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(fmt.Sprintf(`{"AzureAD":{"KustoServiceResourceId":"%s"}}`, kustoServiceResourceID)))
+		_, _ = fmt.Fprintf(w, `{"AzureAD":{"KustoServiceResourceId":"%s"}}`, kustoServiceResourceID)
 	}))
 }
 
