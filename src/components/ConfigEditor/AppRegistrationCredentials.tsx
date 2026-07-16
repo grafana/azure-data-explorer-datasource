@@ -1,16 +1,14 @@
 import { t, Trans } from '@grafana/i18n';
 import React, { ChangeEvent } from 'react';
 
-import { AzureClientSecretCredentials, AzureClientSecretOboCredentials, AzureCredentials } from '@grafana/azure-sdk';
+import { AzureClientSecretCredentials, AzureCredentials } from '@grafana/azure-sdk';
 import { SelectableValue } from '@grafana/data';
 import { Button, Select, Input, Field } from '@grafana/ui';
 
 import { selectors } from 'test/selectors';
 
-type ClientSecretCredentials = AzureClientSecretCredentials | AzureClientSecretOboCredentials;
-
 export interface Props {
-  credentials: ClientSecretCredentials;
+  credentials: AzureClientSecretCredentials;
   azureCloudOptions?: SelectableValue[];
   onCredentialsChange: (updatedCredentials: AzureCredentials) => void;
   disabled?: boolean;

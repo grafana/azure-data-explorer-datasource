@@ -1,7 +1,7 @@
 import { t, Trans } from '@grafana/i18n';
 import React, { FunctionComponent, useMemo } from 'react';
 
-import { AzureAuthType, AzureCredentials } from '@grafana/azure-sdk';
+import { AzureAuthType, AzureClientSecretCredentials, AzureCredentials } from '@grafana/azure-sdk';
 import { SelectableValue } from '@grafana/data';
 import { Alert, Select, Field, TextLink } from '@grafana/ui';
 
@@ -144,7 +144,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
       )}
       {(credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo') && (
         <AppRegistrationCredentials
-          credentials={credentials}
+          credentials={credentials as AzureClientSecretCredentials}
           azureCloudOptions={azureCloudOptions}
           onCredentialsChange={onCredentialsChange}
         />

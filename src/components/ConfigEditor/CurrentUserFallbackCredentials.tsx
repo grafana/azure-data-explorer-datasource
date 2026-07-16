@@ -57,12 +57,12 @@ export const CurrentUserFallbackCredentials = (props: Props) => {
     return opts;
   }, [managedIdentityEnabled, workloadIdentityEnabled]);
 
+  const defaultAuthType: FallbackCredentialAuthType = useMemo(
+    () => (managedIdentityEnabled ? 'msi' : workloadIdentityEnabled ? 'workloadidentity' : 'clientsecret'),
+    [managedIdentityEnabled, workloadIdentityEnabled]
+  );
+
   const onAuthTypeChange = (selected: SelectableValue<FallbackCredentialAuthType>) => {
-    const defaultAuthType: FallbackCredentialAuthType = managedIdentityEnabled
-      ? 'msi'
-      : workloadIdentityEnabled
-        ? 'workloadidentity'
-        : 'clientsecret';
     const updated: AadCurrentUserCredentials = {
       ...credentials,
       serviceCredentials: {
@@ -76,6 +76,8 @@ export const CurrentUserFallbackCredentials = (props: Props) => {
     let updated: AzureCredentials = { ...credentials, serviceCredentialsEnabled: value };
     if (!value) {
       updated = { ...updated, serviceCredentials: undefined };
+    } else if (!credentials.serviceCredentials) {
+      updated = { ...updated, serviceCredentials: { authType: defaultAuthType } };
     }
     onCredentialsChange(updated);
   };
