@@ -105,7 +105,7 @@ idForwarding = true
 
 Without `idForwarding`, Grafana can't recognize background requests (like alert evaluations) as having no user, so it never switches to the fallback, and those requests fail.
 
-### 3. Add the credentials in the data source
+### 3. Add the credentials to the data source
 
 In the data source settings, choose **Current User**, switch **Fallback service credentials** to **Enabled**, pick the identity type (App Registration, Managed Identity, or Workload Identity), and fill in the details.
 
