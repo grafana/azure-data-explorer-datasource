@@ -96,7 +96,7 @@ user_identity_fallback_credentials_enabled = true
 
 ### 2. Enable ID forwarding
 
-Grafana needs a way to tell a real user's request apart from a background job. The `idForwarding` feature toggle gives it that signal:
+Grafana needs a way to distinguish a signed-in user's request from a background job. The `idForwarding` feature toggle provides that signal.
 
 ```ini
 [feature_toggles]
