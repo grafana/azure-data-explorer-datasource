@@ -107,7 +107,12 @@ Without `idForwarding`, Grafana can't recognize background requests (like alert 
 
 ### 3. Add the credentials to the data source
 
-In the data source settings, choose **Current User**, switch **Fallback service credentials** to **Enabled**, pick the identity type (App Registration, Managed Identity, or Workload Identity), and fill in the details.
+In the data source settings:
+
+1. Set **Authentication** to **Current User**.
+1. Set **Fallback service credentials** to **Enabled**.
+1. Select the identity type: **App Registration**, **Managed Identity**, or **Workload Identity**.
+1. Enter the credential details for the identity type you selected.
 
 ## See also
 
