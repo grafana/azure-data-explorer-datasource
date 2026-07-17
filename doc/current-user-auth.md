@@ -94,7 +94,7 @@ user_identity_enabled = true
 user_identity_fallback_credentials_enabled = true
 ```
 
-### 2. Turn on ID forwarding
+### 2. Enable ID forwarding
 
 Grafana needs a way to tell a real user's request apart from a background job. The `idForwarding` feature toggle gives it that signal:
 
