@@ -78,7 +78,9 @@ To keep them working, set up **fallback service credentials**.
 
 Fallback credentials are a shared identity (an App Registration, managed identity, or workload identity) that the data source falls back to whenever a request has no signed-in user behind it. Turn them on and your background features (like alerting) keep working instead of failing.
 
-> **Note:** Anything that uses the fallback runs as this shared identity, not as an individual user. So it can see different data than a person querying interactively would.
+{{< admonition type="note" >}}
+Requests that use the fallback run as this shared identity rather than as an individual user. As a result, they might return different data than an interactive query run by a specific user.
+{{< /admonition >}}
 
 Setting this up takes three steps.
 
