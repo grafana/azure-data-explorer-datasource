@@ -23,6 +23,12 @@ export const components = {
     clientSecret: {
       input: 'data-testid client-secret',
     },
+    serviceCredentialsEnabled: {
+      button: 'data-testid fallback-credentials-enabled',
+    },
+    serviceCredentialsAuthType: {
+      input: 'data-testid fallback-auth-type',
+    },
   },
   queryEditor: {
     editKQL: {
