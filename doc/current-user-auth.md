@@ -82,7 +82,7 @@ Fallback credentials are a shared identity (an App Registration, managed identit
 Requests that use the fallback run as this shared identity rather than as an individual user. As a result, they might return different data than an interactive query run by a specific user.
 {{< /admonition >}}
 
-Setting this up takes three steps.
+To set up fallback credentials, complete the following three steps.
 
 ### 1. Turn fallback on in the Grafana config
 
