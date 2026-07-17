@@ -84,7 +84,7 @@ Requests that use the fallback run as this shared identity rather than as an ind
 
 To set up fallback credentials, complete the following three steps.
 
-### 1. Turn fallback on in the Grafana config
+### 1. Enable fallback credentials in the Grafana configuration
 
 In the `[azure]` section, enable fallback credentials. (This is already `true` by default when `user_identity_enabled` is on, but it's fine to set it explicitly.)
 
