@@ -66,7 +66,7 @@ user_identity_client_id = 4fc34037-97bd-4e84-9db4-86238c78e32a
 user_identity_client_secret = 4479f5a6-444c-4271-8790-60eeb42225ae
 ```
 
-## What doesn't work (and how to fix it)
+## Current user authentication and background features
 
 With current user authentication, every query runs as the Grafana user who is signed in. That's fine when someone is looking at a dashboard, but some Grafana features run in the background with nobody signed in. The main ones are **alerting**, **recorded queries**, and **reporting**. These have no user to run as, so they fail.
 
