@@ -72,7 +72,7 @@ user_identity_client_secret = 4479f5a6-444c-4271-8790-60eeb42225ae
 With current user authentication, every query runs as the Grafana user who is signed in. That works when someone is viewing a dashboard, but some Grafana features run in the background with no signed-in user. The main ones are **alerting**, **recorded queries**, and **reporting**. Because these features have no user to run as, they fail.
 
 
-To keep them working, you can set up **fallback service credentials**.
+To keep them working, set up **fallback service credentials**.
 
 ## Fallback service credentials
 
