@@ -22,6 +22,16 @@ type AzureCredentials struct {
 	ClientID   string `json:"clientId"`
 }
 
+// SchemaMapping mirrors an entry in jsonData.schemaMappings, the managed schema
+// list written by the frontend config editor when useSchemaMapping is enabled.
+type SchemaMapping struct {
+	Type        string `json:"type"`
+	Value       string `json:"value"`
+	Name        string `json:"name"`
+	Database    string `json:"database"`
+	DisplayName string `json:"displayName"`
+}
+
 // DatasourceSettings holds the datasource configuration information for Azure Data Explorer's API
 // that is needed to execute a request against Azure's Data Explorer API.
 type DatasourceSettings struct {
@@ -35,7 +45,17 @@ type DatasourceSettings struct {
 	MinimalCache       int              `json:"minimalCache"`
 	DefaultEditorMode  string           `json:"defaultEditorMode"`
 	UseSchemaMapping   bool             `json:"useSchemaMapping"`
+	SchemaMappings     []SchemaMapping  `json:"schemaMappings"`
+	KeepCookies        []string         `json:"keepCookies"`
 	AzureCredentials   AzureCredentials `json:"azureCredentials"`
+
+	// Legacy top-level credential fields, preserved so datasources provisioned
+	// before the migration to jsonData.azureCredentials continue to parse.
+	AzureCloud    string `json:"azureCloud"`
+	TenantID      string `json:"tenantId"`
+	ClientID      string `json:"clientId"`
+	OnBehalfOf    bool   `json:"onBehalfOf"`
+	OAuthPassThru bool   `json:"oauthPassThru"`
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
 	// to the server execution timeout.

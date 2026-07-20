@@ -23,7 +23,7 @@
       "key": "azureCredentials",
       "label": "Authentication Method",
       "description": "Choose the type of authentication to Azure services",
-      "valueType": "any",
+      "valueType": "object",
       "target": "jsonData",
       "role": "auth.discriminator",
       "help": {

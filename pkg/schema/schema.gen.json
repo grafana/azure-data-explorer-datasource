@@ -16,7 +16,8 @@
               "type": "string"
             },
             "azureCredentials": {
-              "description": "Choose the type of authentication to Azure services"
+              "description": "Choose the type of authentication to Azure services",
+              "type": "object"
             },
             "cacheMaxAge": {
               "description": "By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.",
