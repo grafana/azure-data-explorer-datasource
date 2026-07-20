@@ -6,75 +6,123 @@
       "properties": {
         "jsonData": {
           "type": "object",
-          "required": [
-            "clusterUrl",
-            "defaultDatabase"
-          ],
           "properties": {
             "application": {
-              "description": "Application name sent to Azure Data Explorer for request tracking.",
+              "description": "Application name to be displayed in ADX.",
+              "type": "string"
+            },
+            "azureCloud": {
+              "description": "Legacy Azure cloud discriminator written by the pre-2023 ADX config editor. Resolved by `pkg/azuredx/adxauth/adxcredentials/builder.go:107-121` `resolveLegacyCloudName`: `azuremonitor` → `AzureCloud`, `chinaazuremonitor` → `AzureChinaCloud`, `govazuremonitor` → `AzureUSGovernment`, empty → `AzureCloud`. The modern `AzureCredentialsForm` writes cloud inside `jsonData.azureCredentials.azureCloud` and clears this field.",
               "type": "string"
             },
             "azureCredentials": {
-              "type": "object",
-              "properties": {
-                "authType": {
-                  "description": "Azure authentication type (clientsecret, msi, workloadidentity, currentuser, clientsecret-obo).",
-                  "type": "string"
-                },
-                "azureCloud": {
-                  "description": "Azure cloud environment (e.g. AzureCloud, AzureChinaCloud, AzureUSGovernment).",
-                  "type": "string"
-                },
-                "clientId": {
-                  "description": "Azure AD application client ID.",
-                  "type": "string"
-                },
-                "tenantId": {
-                  "description": "Azure Active Directory tenant ID.",
-                  "type": "string"
-                }
-              }
+              "description": "Choose the type of authentication to Azure services"
             },
             "cacheMaxAge": {
-              "description": "Maximum age of cached query results.",
+              "description": "By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.",
+              "type": "string"
+            },
+            "clientId": {
+              "description": "Legacy top-level client ID (paired with legacy `tenantId`/`secureJsonData.clientSecret`). Preserved so pre-migration datasources continue to authenticate; the current `AzureCredentialsForm` writes client inside `jsonData.azureCredentials.clientId` and clears this field.",
               "type": "string"
             },
             "clusterUrl": {
-              "description": "Azure Data Explorer cluster URL.",
+              "description": "The default cluster url for this data source.",
               "type": "string"
             },
             "dataConsistency": {
-              "description": "Query consistency level (strongconsistency or weakconsistency).",
-              "type": "string"
+              "description": "Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more information see the Azure Data Explorer documentation.",
+              "type": "string",
+              "default": "strongconsistency",
+              "enum": [
+                "strongconsistency",
+                "weakconsistency"
+              ]
             },
             "defaultDatabase": {
-              "description": "Default database for queries.",
               "type": "string"
             },
             "defaultEditorMode": {
-              "description": "Default query editor mode.",
-              "type": "string"
+              "description": "This setting dictates which mode the editor will open in. Defaults to Visual.",
+              "type": "string",
+              "default": "visual",
+              "enum": [
+                "visual",
+                "raw",
+                "openai"
+              ]
             },
             "dynamicCaching": {
-              "description": "Enable dynamic caching of query results.",
-              "type": "boolean"
+              "description": "By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored. For time series queries we will use the bin size to widen the time range but also as cache max age.",
+              "type": "boolean",
+              "default": false
             },
             "enableUserTracking": {
-              "description": "Send Grafana user info with queries.",
-              "type": "boolean"
+              "description": "With this feature enabled, Grafana will pass the logged in user's username in the `x-ms-user-id` header and in the `x-ms-client-request-id` header when sending requests to ADX. Can be useful when tracking needs to be done in ADX.",
+              "type": "boolean",
+              "default": false
+            },
+            "keepCookies": {
+              "description": "Grafana proxy deletes forwarded cookies by default. Specify cookies by name that should be forwarded to the data source.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "minimalCache": {
-              "description": "Minimum cache duration in seconds for query results.",
+              "description": "Declared on `AdxDataSourceOptions` (`src/types/index.ts:115`) but never written by the config editor and never read by the plugin backend (`pkg/azuredx/models/settings.go` reads only `cacheMaxAge`). Dead field; preserved so provisioned datasources with the property still parse.",
               "type": "number"
             },
+            "oauthPassThru": {
+              "description": "Set to `true` by `@grafana/azure-sdk`'s `updateDatasourceCredentials` whenever the selected auth type is `clientsecret-obo` (On-Behalf-Of). The plugin backend enforces `oauthPassThru == true` for OBO in `pkg/azuredx/adxauth/adxcredentials/builder.go:89-98` (`ensureOnBehalfOfSupported`); creation fails otherwise.",
+              "type": "boolean"
+            },
+            "onBehalfOf": {
+              "description": "Legacy On-Behalf-Of flag; when true and paired with legacy top-level `tenantId`/`clientId`/`secureJsonData.clientSecret`, the backend legacy fallback (`pkg/azuredx/adxauth/adxcredentials/builder.go:71-84`) constructs an `AzureClientSecretOboCredentials` instead of a plain `AzureClientSecretCredentials`. The modern form migrates this to `authType: clientsecret-obo`.",
+              "type": "boolean"
+            },
             "queryTimeout": {
-              "description": "Query timeout duration.",
+              "description": "This value controls the client query timeout.",
+              "type": "string",
+              "default": "30s"
+            },
+            "schemaMappings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "database": {
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "function",
+                      "table",
+                      "materializedView"
+                    ]
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                }
+              },
+              "x-dsconfig-depends-on": "jsonData_useSchemaMapping == true"
+            },
+            "tenantId": {
+              "description": "Legacy top-level tenant ID (paired with legacy `clientId`/`secureJsonData.clientSecret`). Preserved so pre-migration datasources continue to authenticate; the current `AzureCredentialsForm` writes tenant inside `jsonData.azureCredentials.tenantId` and clears this field.",
               "type": "string"
             },
             "useSchemaMapping": {
-              "description": "Enable schema mapping for queries.",
-              "type": "boolean"
+              "description": "If enabled, allows tables, functions, and materialized views to be mapped to user friendly names.",
+              "type": "boolean",
+              "default": false
             }
           }
         }
@@ -83,11 +131,15 @@
     "secureValues": [
       {
         "key": "azureClientSecret",
-        "description": "Azure AD application client secret."
+        "description": "Client secret of the App Registration. Written write-only by `@grafana/azure-sdk`'s `AzureCredentialsForm`; check `secureJsonFields.azureClientSecret` on the read side. Used when `jsonData.azureCredentials.authType` is `clientsecret` or `clientsecret-obo`."
       },
       {
         "key": "clientSecret",
-        "description": "Legacy Azure AD application client secret (superseded by azureClientSecret)."
+        "description": "Legacy client secret key. Preserved for backward compatibility with datasources provisioned before the credential migration to `azureClientSecret`. The backend reads it as a fallback in `pkg/azuredx/adxauth/adxcredentials/builder.go:57` (`getFromLegacy`) when no modern `jsonData.azureCredentials` is present."
+      },
+      {
+        "key": "OpenAIAPIKey",
+        "description": "OpenAI API key used by the plugin's `askOpenAI` resource endpoint (`pkg/azuredx/resource_handler.go:55-89`) to power the AI query assistant. There is no config editor UI to set it — the ADX ConfigEditor only inspects `secureJsonFields.OpenAIAPIKey` to decide whether the Additional settings section starts open (`src/components/ConfigEditor/index.tsx:58`). Populate it through provisioning YAML or via the datasource API."
       }
     ]
   }

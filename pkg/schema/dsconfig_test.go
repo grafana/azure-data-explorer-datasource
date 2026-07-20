@@ -17,6 +17,6 @@ func TestPlugin(t *testing.T) {
 		ID:                "grafana-azure-data-explorer-datasource",
 		ConfigSchemaJSON:  configSchemaJSON,
 		SettingsJSONModel: models.DatasourceSettings{},
-		SecureKeys:        []string{"azureClientSecret", "clientSecret"},
+		SecureKeys:        []string{"azureClientSecret", "clientSecret", "OpenAIAPIKey"},
 	})
 }
