@@ -36,7 +36,6 @@
         }
       },
       "description-choose-authentication-azure-services": "Choose the type of authentication to Azure services",
-      "description-current-user-authentication-is-experimental": "Certain Grafana features (e.g. alerting) may not work as expected. For other known limitations and issues, bug reports, or feedback, please visit <2>the documentation</2>.",
       "description-on-behalf-of-feature-is-in-beta": "For known limitations and issues, bug report, or feedback, please visit <2>the documentation</2>.",
       "error-client-id-required": "Client ID is required",
       "error-client-secret-required": "Client secret is required",
@@ -48,7 +47,6 @@
       "label-directory-tenant-id": "Directory (tenant) ID",
       "reset": "Reset",
       "title-authentication": "Authentication",
-      "title-current-user-authentication-is-experimental": "Current user authentication is experimental",
       "title-on-behalf-of-feature-is-in-beta": "On-Behalf-Of feature is in beta"
     },
     "config-editor": {
@@ -77,6 +75,20 @@
       "aria-label-cluster-url": "Cluster URL",
       "description-default-cluster-source": "The default cluster url for this data source.",
       "label-default-cluster-url-optional": "Default cluster URL (Optional)"
+    },
+    "current-user-fallback-credentials": {
+      "alert-fallback-credentials-disabled": "Fallback credentials have been disabled. As current user authentication only supports requests with a user in context, features such as alerting, recorded queries, and reporting will not function as expected. See the <2>documentation</2> for more details.",
+      "body-service-credentials": "Current user authentication does not support Grafana features that make requests to the data source without a user in the context of the request. An example of this is alerting. To ensure these features continue to function, provide fallback credentials below.",
+      "description-authentication": "Choose the type of authentication to Azure services",
+      "description-service-credentials": "Choose if fallback service credentials are enabled or disabled for this data source",
+      "label-authentication": "Authentication",
+      "label-disabled": "Disabled",
+      "label-enabled": "Enabled",
+      "label-service-credentials": "Service Credentials",
+      "note-service-credentials": "Note: Features like alerting will be restricted to the access level of the fallback credentials rather than the user.",
+      "title-fallback-credentials-disabled": "Fallback credentials disabled",
+      "title-fallback-service-credentials": "Fallback Service Credentials",
+      "title-service-credentials": "Service Credentials"
     },
     "database-config": {
       "add-mapping": "Add mapping",
