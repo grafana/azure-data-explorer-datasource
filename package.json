@@ -3,8 +3,8 @@
   "version": "7.2.7",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
-    "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
-    "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
+    "build": "webpack -c ./webpack.config.ts --env production",
+    "dev": "webpack -w -c ./webpack.config.ts --env development",
     "e2e:playwright": "npx --package @playwright/test playwright test",
     "e2e:playwright:ui": "npx --package @playwright/test playwright test --ui",
     "e2e:playwright:report": "npx --package @playwright/test playwright show-report",
