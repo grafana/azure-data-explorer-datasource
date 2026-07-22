@@ -317,9 +317,19 @@ user_trusted_endpoints = https://first.endpoint.com,https://endpoint.second.com
 Use this feature with caution. Requests sent to endpoints that aren't trusted might expose authentication tokens to unintended third parties.
 {{< /admonition >}}
 
+## Private data source connect
+
+{{< admonition type="note" >}}
+Private data source connect is only available to Grafana Cloud users.
+{{< /admonition >}}
+
+Private data source connect (PDC) establishes a private, secured connection between a Grafana Cloud instance, or stack, and an Azure Data Explorer cluster secured within a private network. In the data source connection settings, use the **Private data source connect** drop-down to locate the URL for PDC. To open your PDC connection page, where you can find your configuration details, click **Manage private data source connect**. For more information, refer to [Private data source connect (PDC)](https://grafana.com/docs/grafana-cloud/connect-externally-hosted/private-data-source-connect/).
+
+PDC routes the connection through a secure socks proxy. When the secure socks proxy is enabled in your Grafana instance (Grafana 10.0.0 or later with the `secureSocksDSProxyEnabled` feature toggle), the data source configuration page also shows a **Secure Socks Proxy** section with an **Enable** toggle. To provision this setting, set `enableSecureSocksProxy` to `true` in `jsonData`.
+
 ## Verify the connection
 
-Click **Save & test** to verify the connection. When the connection test succeeds, Grafana displays a **Success** message.
+Click **Save & test** to verify the connection. When the connection test succeeds, Grafana displays a **Success** message. If the test fails, or reports that it connected but couldn't reach Azure Resource Graph to list clusters, refer to [Troubleshooting](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/troubleshooting/).
 
 ## Provision the data source
 
@@ -410,6 +420,8 @@ resource "grafana_data_source" "adx_obo" {
   })
 }
 ```
+
+If you set an explicit `uid` on the resource, keep it to 40 characters or fewer and use only letters, numbers, dashes (`-`), and underscores (`_`). Grafana rejects a data source UID that exceeds 40 characters, which causes provisioning to fail. The same limit applies when you create a data source through the HTTP API.
 
 {{< admonition type="note" >}}
 Manage each data source with a single provisioning method. If you provision a data source with both YAML files and Terraform, the two methods can overwrite each other.
