@@ -54,7 +54,7 @@ Select a database to query. If a default database is set in the data source sett
 
 ### Format as
 
-Use the **Format as** drop-down to format query results as **Table**, **Time series**, **Trace**, or **ADX time series** data.
+Use the **Format as** drop-down to format query results. The **Table**, **Time series**, **Trace**, and **Logs** formats are always available. In **KQL** mode, an additional **ADX Time series** format is available for `make-series` queries.
 
 - **Table** queries are mainly used in the table panel as a list of columns and rows. The following query returns rows with six columns:
 
@@ -83,7 +83,16 @@ Use the **Format as** drop-down to format query results as **Table**, **Time ser
 
   Values for keys are expected to be primitive types. When empty, pass `null`, an empty JSON object for `serviceTags` and `tags`, or an empty array for `logs`.
 
-- **ADX time series** is for queries that use the Kusto `make-series` operator. The query must have exactly one `datetime` column named `Timestamp` and at least one value column. Optionally, string columns are treated as labels:
+- **Logs** formats query results for the logs panel and the **Logs** view in Explore. Include a `datetime` column for the log timestamp and a string column for the log message. The following query returns log rows within the dashboard time range:
+
+  ```kusto
+  MyLogTable
+  | where $__timeFilter(Timestamp)
+  | project Timestamp, Level, Message
+  | order by Timestamp desc
+  ```
+
+- **ADX Time series** is available in **KQL** mode for queries that use the Kusto `make-series` operator. The query must have exactly one `datetime` column named `Timestamp` and at least one value column. Optionally, string columns are treated as labels:
 
   ```kusto
   let T = range Timestamp from $__timeFrom to ($__timeTo + -30m) step 1m
@@ -98,25 +107,26 @@ Use the **Format as** drop-down to format query results as **Table**, **Time ser
   | project-away *residual, *baseline, *seasonal
   ```
 
-## Query types
+## Editor modes
 
-The query editor supports the following ways to build a query:
+Select the editor mode with the mode toggle in the query header. The query editor has three modes:
 
-- **Visual query builder:** Build queries without writing KQL.
-- **KQL editor:** Write raw Kusto Query Language.
-- **OpenAI query generator:** Generate KQL from a natural language prompt.
+- **Builder:** Build queries visually without writing KQL.
+- **KQL:** Write raw Kusto Query Language.
+- **OpenAI:** Generate KQL from a natural language prompt.
 
 ## Visual query builder
 
-The visual query builder lets you build a query by selecting a table, columns, filters, and aggregations.
+Select **Builder** mode to build a query without writing KQL. The builder constructs the query from the table, columns, filters, aggregations, and grouping that you select, and shows a live KQL preview below the builder.
 
 | Field | Description |
 |-------|-------------|
 | **Table** | Select a table. |
-| **Columns** | Select a subset of columns for faster results. Time series requires both time and numeric values; other columns are rendered as dimensions. For more information, refer to [Time series dimensions](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/fundamentals/timeseries-dimensions/). |
+| **Columns** | Select a subset of columns for faster results. Time series requires both time and numeric values; other columns are rendered as dimensions. Leave the field empty to select all columns. For more information, refer to [Time series dimensions](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/fundamentals/timeseries-dimensions/). |
 | **Filters** | Add filters for the selected columns. Filter values are restricted to the column's data type. |
 | **Aggregate** | Add aggregations for the selected columns. Select an aggregation type and a column to aggregate. |
 | **Group by** | Add group-by clauses for the selected columns. For time group-bys, select a time range bucket. |
+| **Timeshift** | Optionally shift the query time range to compare with an earlier period. Select **Hour before**, **Day before**, **Week before**, or enter a custom value such as `2h`. |
 
 The visual query builder supports `dynamic` columns, including arrays, JSON objects, and nested objects within arrays. Only the first 50,000 rows are queried, so only properties in the first 50,000 rows appear as options in the builder selectors. You can manually enter additional values that don't appear by default. Because these queries use `mv-expand`, they can become resource intensive.
 
@@ -124,7 +134,18 @@ For more information about handling dynamic columns in KQL, refer to [Kusto data
 
 ## KQL editor
 
-Write queries in Kusto Query Language. For more information, refer to the [Kusto Query Language (KQL) overview](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/).
+Select **KQL** mode to write queries in Kusto Query Language. The editor provides syntax highlighting and autocompletion for tables, columns, and functions. For more information, refer to the [Kusto Query Language (KQL) overview](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/).
+
+The following query returns the count of events per interval within the dashboard time range:
+
+```kusto
+MyTable
+| where $__timeFilter(Timestamp)
+| summarize count() by bin(Timestamp, 1h)
+| order by Timestamp asc
+```
+
+When the LLM plugin is enabled, click **Explain KQL** to generate a plain-language explanation of the current query.
 
 ## OpenAI query generator
 
@@ -132,7 +153,7 @@ Write queries in Kusto Query Language. For more information, refer to the [Kusto
 You must install and enable the LLM plugin to use this feature.
 {{< /admonition >}}
 
-The OpenAI query generator creates KQL from a natural language prompt. Install the [LLM app](https://grafana.com/grafana/plugins/grafana-llm-app/), then enable it.
+Select **OpenAI** mode to generate KQL from a natural language prompt. Install the [LLM app](https://grafana.com/grafana/plugins/grafana-llm-app/), then enable it.
 
 To use the query generator:
 
@@ -143,7 +164,7 @@ To use the query generator:
 
 ## Macros
 
-Use the following Grafana macros in the `where` clause of a query to simplify time filtering:
+Use the following macros in your queries to work with the dashboard time range:
 
 | Macro | Description |
 |-------|-------------|
