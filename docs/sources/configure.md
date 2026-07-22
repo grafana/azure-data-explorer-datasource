@@ -8,6 +8,7 @@ keywords:
   - configuration
   - authentication
   - provisioning
+  - terraform
 labels:
   products:
     - cloud
@@ -54,15 +55,13 @@ To add the Azure Data Explorer data source:
 1. Select **Azure Data Explorer Datasource**.
 1. Click **Add new data source**.
 
-## Configure settings
+## Configure the connection
 
-Configure the following fields to connect to your cluster:
+Enter a name for the data source, then configure the cluster connection:
 
 | Setting | Description |
 |---------|-------------|
-| **Name** | The name used to refer to the data source in panels and queries. |
-| **Default** | Toggle to make this the default data source for new panels. |
-| **Default cluster** | The cluster used when no cluster is selected in a query. |
+| **Default cluster URL (Optional)** | The default cluster URL for the data source, such as `https://yourcluster.kusto.windows.net`. You can select a different cluster in each query, so this field is optional. |
 
 ## Authentication
 
@@ -256,17 +255,30 @@ Don't set up alerts when the data source uses On-Behalf-Of authentication. Alert
 
 ## Additional settings
 
-Additional settings are optional. To access them, expand the **Additional settings** section at the bottom of the data source configuration page.
+The following settings are optional and grouped into collapsible sections on the data source configuration page.
+
+### Query optimizations
 
 | Setting | Description |
 |---------|-------------|
-| **Query timeout** | Controls the client query timeout. |
+| **Query timeout** | Controls the client query timeout. Defaults to `30s`. |
 | **Use dynamic caching** | When enabled, Grafana applies cache settings per query, and the default cache max age is ignored. The bin size for time series queries widens the time range and is used as the cache max age. |
 | **Cache max age** | The cache is disabled by default. To enable query caching, specify a maximum time span for the cache to live. |
-| **Data consistency** | Controls how queries and updates are synchronized. Defaults to **Strong**. For more information, refer to [Query consistency](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/concepts/queryconsistency). |
-| **Default editor mode** | Sets the mode the editor opens in. Defaults to **Visual**. |
-| **Default database** | The database used when no database is selected. A default cluster is required to select a default database. To load default database options, save the data source with a valid Azure connection. |
+| **Data consistency** | Controls how queries and updates are synchronized, either **Strong** or **Weak**. Defaults to **Strong**. For more information, refer to [Query consistency](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/concepts/queryconsistency). |
+| **Default editor mode** | Sets the mode the query editor opens in, either **Visual** or **Raw**. Defaults to **Visual**. |
+
+### Database schema settings
+
+| Setting | Description |
+|---------|-------------|
+| **Default database** | The database used when no database is selected in a query. To populate the list, save the data source with a valid cluster URL and credentials, then click **Reload schema**. |
 | **Use managed schema** | When enabled, tables, functions, and materialized views are mapped to user-friendly names. |
+| **Schema mappings** | Shown when **Use managed schema** is enabled. Map a target table, function, or materialized view to a display name. |
+
+### Tracking
+
+| Setting | Description |
+|---------|-------------|
 | **Send username header to host** | When enabled, Grafana passes the signed-in user's username in the `x-ms-user-id` and `x-ms-client-request-id` headers when sending requests to Azure Data Explorer. This is useful for tracking in Azure Data Explorer. |
 
 ## Enforce trusted endpoints
@@ -352,3 +364,53 @@ datasources:
       clientSecret: <your client secret>
     version: 1
 ```
+
+### Provision with Terraform
+
+You can also manage the data source with the [Grafana Terraform provider](https://registry.terraform.io/providers/grafana/grafana/latest/docs) using the [`grafana_data_source`](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/data_source) resource. Pass the connection settings as encoded JSON, and keep secrets such as the client secret in `secure_json_data_encoded`.
+
+The following example provisions an App Registration connection:
+
+```hcl
+resource "grafana_data_source" "adx" {
+  type = "grafana-azure-data-explorer-datasource"
+  name = "Azure Data Explorer"
+
+  json_data_encoded = jsonencode({
+    clusterUrl      = "<your cluster URL>"
+    tenantId        = "<your tenant UUID>"
+    clientId        = "<your client UUID>"
+    defaultDatabase = "<your default database>"
+  })
+
+  secure_json_data_encoded = jsonencode({
+    clientSecret = "<your client secret>"
+  })
+}
+```
+
+To provision an On-Behalf-Of connection, add `onBehalfOf` and `oauthPassThru` to `json_data_encoded`:
+
+```hcl
+resource "grafana_data_source" "adx_obo" {
+  type = "grafana-azure-data-explorer-datasource"
+  name = "Azure Data Explorer (OBO)"
+
+  json_data_encoded = jsonencode({
+    onBehalfOf      = true
+    oauthPassThru   = true
+    clusterUrl      = "<your cluster URL>"
+    tenantId        = "<your tenant UUID>"
+    clientId        = "<your client UUID>"
+    defaultDatabase = "<your default database>"
+  })
+
+  secure_json_data_encoded = jsonencode({
+    clientSecret = "<your client secret>"
+  })
+}
+```
+
+{{< admonition type="note" >}}
+Manage each data source with a single provisioning method. If you provision a data source with both YAML files and Terraform, the two methods can overwrite each other.
+{{< /admonition >}}
