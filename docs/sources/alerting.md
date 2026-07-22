@@ -41,6 +41,17 @@ To create an alert rule that uses Azure Data Explorer data:
 
 For complete guidance, refer to [Grafana Alerting](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/).
 
+## Example query
+
+An alert query must return time series data: exactly one `datetime` column and one or more numeric columns. Use an explicit bin size and order the results by time in ascending order. The following query returns the average value per five-minute interval, which you can evaluate against a threshold condition:
+
+```kusto
+MyMetrics
+| where $__timeFilter(Timestamp)
+| summarize avg(Value) by bin(Timestamp, 5m)
+| order by Timestamp asc
+```
+
 ## Authentication requirements for alerting
 
 Alert rules run in the background with no signed-in user. The authentication method you choose determines whether alerting works.
@@ -49,7 +60,7 @@ Alert rules run in the background with no signed-in user. The authentication met
 Alerting isn't supported with On-Behalf-Of authentication. Alert rules stop working after the user who created the rule signs out of Grafana.
 {{< /admonition >}}
 
-If you use Current User authentication, background requests such as alert evaluations have no user to run as, so they fail unless you configure fallback service credentials. To keep alerting working, set up [fallback service credentials](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/configure/#fallback-service-credentials).
+If you use Current User authentication, background features such as alert evaluations, recorded queries, and reporting have no user to run as, so they fail unless you configure fallback service credentials. To keep alerting working, set up [fallback service credentials](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/configure/#fallback-service-credentials).
 
 ## Time interval macros in alert queries
 
