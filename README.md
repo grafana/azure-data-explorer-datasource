@@ -7,6 +7,7 @@
 Full documentation for the Azure Data Explorer data source is available on the Grafana website:
 
 - [Overview](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/)
+- [Install and upgrade](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/install/) - Install, license, and upgrade the Enterprise plugin across environments.
 - [Configure the data source](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/configure/) - Connection, authentication (App Registration, Managed Identity, Workload Identity, Current User with fallback service credentials, and On-Behalf-Of), provisioning, and trusted endpoints.
 - [Query editor](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/query-editor/) - Visual query builder, KQL, the OpenAI query generator, formats, and macros.
 - [Template variables](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/template-variables/)
@@ -21,7 +22,7 @@ Full documentation for the Azure Data Explorer data source is available on the G
 
 ## Installation
 
-For detailed instructions on how to install the plugin on Grafana Cloud or locally, refer to the [Plugin installation docs](https://grafana.com/docs/grafana/latest/administration/plugin-management/).
+The Azure Data Explorer data source is a Grafana Enterprise plugin. For install, licensing, and upgrade instructions across Grafana Cloud, self-managed, Docker, and Kubernetes, refer to [Install and upgrade the Azure Data Explorer data source plugin](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/install/).
 
 ## Contributing
 

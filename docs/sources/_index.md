@@ -50,6 +50,7 @@ Before you use the Azure Data Explorer data source, verify that you meet the fol
 
 The following documents help you get started with the Azure Data Explorer data source:
 
+- [Install and upgrade the Azure Data Explorer data source plugin](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/install/) - Install, license, and upgrade the Enterprise plugin.
 - [Configure the Azure Data Explorer data source](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/configure/) - Set up the connection and authentication.
 - [Azure Data Explorer query editor](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/query-editor/) - Build queries with the visual builder, KQL, or the OpenAI query generator.
 - [Template variables](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/template-variables/) - Create dynamic dashboards with Azure Data Explorer variables.

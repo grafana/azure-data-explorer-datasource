@@ -27,13 +27,10 @@ This document explains how to configure the Azure Data Explorer data source in G
 
 Before you configure the data source, ensure you have the following:
 
-- **Grafana version:** 11.6.11 or later.
-- **License:** A Grafana Cloud Pro or Advanced plan, or a self-managed Grafana Enterprise license that includes `grafana-azure-data-explorer-datasource`. Free and Starter plans don't include Enterprise plugins.
+- **Installed plugin:** The Azure Data Explorer plugin installed and activated. For installation, licensing, and upgrade steps, refer to [Install and upgrade the Azure Data Explorer data source plugin](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/install/).
 - **Grafana permissions:** The `Organization administrator` role to add and configure data sources.
 - **Azure Data Explorer resources:** An Azure Data Explorer cluster and database.
 - **Microsoft Entra identity:** A Microsoft Entra application, managed identity, or workload identity with viewer access to your database.
-
-For installation instructions, refer to [Install Grafana Enterprise plugins](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/plugin-management/#install-grafana-enterprise-plugins).
 
 ## Key concepts
 
