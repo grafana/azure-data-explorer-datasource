@@ -1,0 +1,435 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/dsconfig/refs/tags/dsconfig/v0.0.10/dsconfig/schema.json",
+  "schemaVersion": "v1",
+  "pluginType": "grafana-azure-data-explorer-datasource",
+  "pluginName": "Azure Data Explorer Datasource",
+  "docURL": "https://grafana.com/grafana/plugins/grafana-azure-data-explorer-datasource/",
+  "fields": [
+    {
+      "id": "jsonData_clusterUrl",
+      "key": "clusterUrl",
+      "label": "Default cluster URL (Optional)",
+      "description": "The default cluster url for this data source.",
+      "valueType": "string",
+      "target": "jsonData",
+      "role": "endpoint.baseUrl",
+      "ui": {
+        "component": "input",
+        "placeholder": "https://yourcluster.kusto.windows.net"
+      }
+    },
+    {
+      "id": "jsonData_azureCredentials",
+      "key": "azureCredentials",
+      "label": "Authentication Method",
+      "description": "Choose the type of authentication to Azure services",
+      "valueType": "object",
+      "target": "jsonData",
+      "role": "auth.discriminator",
+      "help": {
+        "markdown": "Discriminated-union object written by the `@grafana/azure-sdk` `AzureCredentialsForm` in `src/components/ConfigEditor/AzureCredentialsForm.tsx`. Shape depends on `authType`:\n\n- `msi` — `{ authType: 'msi' }` (only rendered when Grafana has `azure.managedIdentityEnabled`).\n- `workloadidentity` — `{ authType: 'workloadidentity' }` (only when `azure.workloadIdentityEnabled`).\n- `currentuser` — `{ authType: 'currentuser' }` (only when `azure.userIdentityEnabled`).\n- `clientsecret` — `{ authType: 'clientsecret', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`). Always available.\n- `clientsecret-obo` — `{ authType: 'clientsecret-obo', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`; requires the `adxOnBehalfOf` feature toggle AND `jsonData.oauthPassThru = true`).\n\nSee `src/credentials/AzureCredentials.ts` in `grafana/grafana-azure-sdk-react@0.1.0` and the backend builder in `pkg/azuredx/adxauth/adxcredentials/builder.go`. Note that Azure Data Explorer's editor does **not** expose the `clientcertificate` or `ad-password` auth types offered by the shared SDK."
+      },
+      "tags": ["azure", "sdk-managed"]
+    },
+    {
+      "id": "secureJsonData_azureClientSecret",
+      "key": "azureClientSecret",
+      "label": "Client Secret",
+      "description": "Client secret of the App Registration. Written write-only by `@grafana/azure-sdk`'s `AzureCredentialsForm`; check `secureJsonFields.azureClientSecret` on the read side. Used when `jsonData.azureCredentials.authType` is `clientsecret` or `clientsecret-obo`.",
+      "valueType": "string",
+      "target": "secureJsonData",
+      "tags": ["azure", "sdk-managed"],
+      "ui": {
+        "component": "input",
+        "placeholder": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+      }
+    },
+    {
+      "id": "secureJsonData_clientSecret",
+      "key": "clientSecret",
+      "description": "Legacy client secret key. Preserved for backward compatibility with datasources provisioned before the credential migration to `azureClientSecret`. The backend reads it as a fallback in `pkg/azuredx/adxauth/adxcredentials/builder.go:57` (`getFromLegacy`) when no modern `jsonData.azureCredentials` is present.",
+      "valueType": "string",
+      "target": "secureJsonData",
+      "tags": ["azure", "legacy"]
+    },
+    {
+      "id": "jsonData_oauthPassThru",
+      "key": "oauthPassThru",
+      "description": "Set to `true` by `@grafana/azure-sdk`'s `updateDatasourceCredentials` whenever the selected auth type is `clientsecret-obo` (On-Behalf-Of). The plugin backend enforces `oauthPassThru == true` for OBO in `pkg/azuredx/adxauth/adxcredentials/builder.go:89-98` (`ensureOnBehalfOfSupported`); creation fails otherwise.",
+      "valueType": "boolean",
+      "target": "jsonData",
+      "role": "auth.forwardOAuthToken.enabled",
+      "tags": ["sdk-managed"]
+    },
+    {
+      "id": "jsonData_queryTimeout",
+      "key": "queryTimeout",
+      "label": "Query timeout",
+      "description": "This value controls the client query timeout.",
+      "valueType": "string",
+      "target": "jsonData",
+      "defaultValue": "30s",
+      "ui": {
+        "component": "input",
+        "placeholder": "30s"
+      }
+    },
+    {
+      "id": "jsonData_dynamicCaching",
+      "key": "dynamicCaching",
+      "label": "Use dynamic caching",
+      "description": "By enabling this feature Grafana will dynamically apply cache settings on a per query basis and the default cache max age will be ignored. For time series queries we will use the bin size to widen the time range but also as cache max age.",
+      "valueType": "boolean",
+      "target": "jsonData",
+      "defaultValue": false,
+      "ui": {
+        "component": "switch"
+      }
+    },
+    {
+      "id": "jsonData_cacheMaxAge",
+      "key": "cacheMaxAge",
+      "label": "Cache max age",
+      "description": "By default the cache is disabled. If you want to enable the query caching please specify a max timespan for the cache to live.",
+      "valueType": "string",
+      "target": "jsonData",
+      "ui": {
+        "component": "input",
+        "placeholder": "0m"
+      }
+    },
+    {
+      "id": "jsonData_dataConsistency",
+      "key": "dataConsistency",
+      "label": "Data consistency",
+      "description": "Query consistency controls how queries and updates are synchronized. Defaults to Strong. For more information see the Azure Data Explorer documentation.",
+      "valueType": "string",
+      "target": "jsonData",
+      "defaultValue": "strongconsistency",
+      "validations": [
+        {
+          "type": "allowedValues",
+          "values": ["strongconsistency", "weakconsistency"]
+        }
+      ],
+      "ui": {
+        "component": "select",
+        "options": [
+          {
+            "label": "Strong",
+            "value": "strongconsistency"
+          },
+          {
+            "label": "Weak",
+            "value": "weakconsistency"
+          }
+        ]
+      }
+    },
+    {
+      "id": "jsonData_defaultEditorMode",
+      "key": "defaultEditorMode",
+      "label": "Default editor mode",
+      "description": "This setting dictates which mode the editor will open in. Defaults to Visual.",
+      "valueType": "string",
+      "target": "jsonData",
+      "defaultValue": "visual",
+      "validations": [
+        {
+          "type": "allowedValues",
+          "values": ["visual", "raw", "openai"]
+        }
+      ],
+      "ui": {
+        "component": "select",
+        "options": [
+          {
+            "label": "Visual",
+            "value": "visual"
+          },
+          {
+            "label": "Raw",
+            "value": "raw"
+          }
+        ]
+      }
+    },
+    {
+      "id": "jsonData_defaultDatabase",
+      "key": "defaultDatabase",
+      "label": "Default database",
+      "valueType": "string",
+      "target": "jsonData",
+      "ui": {
+        "component": "select",
+        "allowCustom": true
+      }
+    },
+    {
+      "id": "jsonData_useSchemaMapping",
+      "key": "useSchemaMapping",
+      "label": "Use managed schema",
+      "description": "If enabled, allows tables, functions, and materialized views to be mapped to user friendly names.",
+      "valueType": "boolean",
+      "target": "jsonData",
+      "defaultValue": false,
+      "ui": {
+        "component": "switch"
+      }
+    },
+    {
+      "id": "jsonData_schemaMappings",
+      "key": "schemaMappings",
+      "label": "Schema mappings",
+      "valueType": "array",
+      "target": "jsonData",
+      "dependsOn": "jsonData_useSchemaMapping == true",
+      "item": {
+        "valueType": "object",
+        "fields": [
+          {
+            "id": "jsonData_schemaMappings_item_type",
+            "key": "type",
+            "valueType": "string",
+            "isItemField": true,
+            "validations": [
+              {
+                "type": "allowedValues",
+                "values": ["function", "table", "materializedView"]
+              }
+            ]
+          },
+          {
+            "id": "jsonData_schemaMappings_item_value",
+            "key": "value",
+            "valueType": "string",
+            "isItemField": true
+          },
+          {
+            "id": "jsonData_schemaMappings_item_name",
+            "key": "name",
+            "valueType": "string",
+            "isItemField": true
+          },
+          {
+            "id": "jsonData_schemaMappings_item_database",
+            "key": "database",
+            "valueType": "string",
+            "isItemField": true
+          },
+          {
+            "id": "jsonData_schemaMappings_item_displayName",
+            "key": "displayName",
+            "valueType": "string",
+            "isItemField": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "jsonData_application",
+      "key": "application",
+      "label": "Application name (Optional)",
+      "description": "Application name to be displayed in ADX.",
+      "valueType": "string",
+      "target": "jsonData",
+      "ui": {
+        "component": "input",
+        "placeholder": "Grafana-ADX"
+      }
+    },
+    {
+      "id": "jsonData_enableUserTracking",
+      "key": "enableUserTracking",
+      "label": "Send username header to host",
+      "description": "With this feature enabled, Grafana will pass the logged in user's username in the `x-ms-user-id` header and in the `x-ms-client-request-id` header when sending requests to ADX. Can be useful when tracking needs to be done in ADX.",
+      "valueType": "boolean",
+      "target": "jsonData",
+      "defaultValue": false,
+      "ui": {
+        "component": "switch"
+      }
+    },
+    {
+      "id": "jsonData_keepCookies",
+      "key": "keepCookies",
+      "label": "Allowed cookies",
+      "description": "Grafana proxy deletes forwarded cookies by default. Specify cookies by name that should be forwarded to the data source.",
+      "valueType": "array",
+      "target": "jsonData",
+      "item": {
+        "valueType": "string"
+      },
+      "ui": {
+        "component": "list",
+        "placeholder": "New cookie (hit enter to add)"
+      }
+    },
+    {
+      "id": "secureJsonData_OpenAIAPIKey",
+      "key": "OpenAIAPIKey",
+      "description": "OpenAI API key used by the plugin's `askOpenAI` resource endpoint (`pkg/azuredx/resource_handler.go:55-89`) to power the AI query assistant. There is no config editor UI to set it — the ADX ConfigEditor only inspects `secureJsonFields.OpenAIAPIKey` to decide whether the Additional settings section starts open (`src/components/ConfigEditor/index.tsx:58`). Populate it through provisioning YAML or via the datasource API.",
+      "valueType": "string",
+      "target": "secureJsonData",
+      "tags": ["backend-only"]
+    },
+    {
+      "id": "jsonData_minimalCache",
+      "key": "minimalCache",
+      "description": "Declared on `AdxDataSourceOptions` (`src/types/index.ts:115`) but never written by the config editor and never read by the plugin backend (`pkg/azuredx/models/settings.go` reads only `cacheMaxAge`). Dead field; preserved so provisioned datasources with the property still parse.",
+      "valueType": "number",
+      "target": "jsonData",
+      "tags": ["frontend-only", "deprecated"]
+    },
+    {
+      "id": "jsonData_azureCloud",
+      "key": "azureCloud",
+      "description": "Legacy Azure cloud discriminator written by the pre-2023 ADX config editor. Resolved by `pkg/azuredx/adxauth/adxcredentials/builder.go:107-121` `resolveLegacyCloudName`: `azuremonitor` → `AzureCloud`, `chinaazuremonitor` → `AzureChinaCloud`, `govazuremonitor` → `AzureUSGovernment`, empty → `AzureCloud`. The modern `AzureCredentialsForm` writes cloud inside `jsonData.azureCredentials.azureCloud` and clears this field.",
+      "valueType": "string",
+      "target": "jsonData",
+      "tags": ["legacy"]
+    },
+    {
+      "id": "jsonData_onBehalfOf",
+      "key": "onBehalfOf",
+      "description": "Legacy On-Behalf-Of flag; when true and paired with legacy top-level `tenantId`/`clientId`/`secureJsonData.clientSecret`, the backend legacy fallback (`pkg/azuredx/adxauth/adxcredentials/builder.go:71-84`) constructs an `AzureClientSecretOboCredentials` instead of a plain `AzureClientSecretCredentials`. The modern form migrates this to `authType: clientsecret-obo`.",
+      "valueType": "boolean",
+      "target": "jsonData",
+      "tags": ["legacy"]
+    },
+    {
+      "id": "jsonData_tenantId",
+      "key": "tenantId",
+      "description": "Legacy top-level tenant ID (paired with legacy `clientId`/`secureJsonData.clientSecret`). Preserved so pre-migration datasources continue to authenticate; the current `AzureCredentialsForm` writes tenant inside `jsonData.azureCredentials.tenantId` and clears this field.",
+      "valueType": "string",
+      "target": "jsonData",
+      "tags": ["legacy"]
+    },
+    {
+      "id": "jsonData_clientId",
+      "key": "clientId",
+      "description": "Legacy top-level client ID (paired with legacy `tenantId`/`secureJsonData.clientSecret`). Preserved so pre-migration datasources continue to authenticate; the current `AzureCredentialsForm` writes client inside `jsonData.azureCredentials.clientId` and clears this field.",
+      "valueType": "string",
+      "target": "jsonData",
+      "tags": ["legacy"]
+    }
+  ],
+  "groups": [
+    {
+      "id": "connection",
+      "title": "Connection",
+      "order": 1,
+      "fieldRefs": ["jsonData_clusterUrl"]
+    },
+    {
+      "id": "authentication",
+      "title": "Authentication",
+      "order": 2,
+      "fieldRefs": [
+        "jsonData_azureCredentials",
+        "secureJsonData_azureClientSecret",
+        "secureJsonData_clientSecret",
+        "jsonData_oauthPassThru"
+      ]
+    },
+    {
+      "id": "query-optimizations",
+      "title": "Query Optimizations",
+      "order": 3,
+      "optional": true,
+      "description": "Various settings for controlling query behavior.",
+      "fieldRefs": [
+        "jsonData_queryTimeout",
+        "jsonData_dynamicCaching",
+        "jsonData_cacheMaxAge",
+        "jsonData_dataConsistency",
+        "jsonData_defaultEditorMode"
+      ]
+    },
+    {
+      "id": "database-schema-settings",
+      "title": "Database schema settings",
+      "order": 4,
+      "optional": true,
+      "description": "Configuration for the database schema including the default database.",
+      "fieldRefs": ["jsonData_defaultDatabase", "jsonData_useSchemaMapping", "jsonData_schemaMappings"]
+    },
+    {
+      "id": "application",
+      "title": "Application",
+      "order": 5,
+      "optional": true,
+      "fieldRefs": ["jsonData_application"]
+    },
+    {
+      "id": "tracking",
+      "title": "Tracking",
+      "order": 6,
+      "optional": true,
+      "fieldRefs": ["jsonData_enableUserTracking"]
+    },
+    {
+      "id": "additional-settings",
+      "title": "Additional settings",
+      "order": 7,
+      "optional": true,
+      "description": "Additional settings are optional settings that can be configured for more control over your data source. This includes query optimizations, schema settings, tracking configuration, OpenAI configuration, request timeout, and forwarded cookies.",
+      "fieldRefs": ["jsonData_keepCookies"]
+    },
+    {
+      "id": "openai",
+      "title": "OpenAI (provisioning-only)",
+      "order": 8,
+      "optional": true,
+      "fieldRefs": ["secureJsonData_OpenAIAPIKey"]
+    },
+    {
+      "id": "legacy-credentials",
+      "title": "Legacy top-level credentials",
+      "order": 9,
+      "optional": true,
+      "fieldRefs": ["jsonData_azureCloud", "jsonData_onBehalfOf", "jsonData_tenantId", "jsonData_clientId"]
+    },
+    {
+      "id": "deprecated",
+      "title": "Deprecated / dead fields",
+      "order": 10,
+      "optional": true,
+      "fieldRefs": ["jsonData_minimalCache"]
+    }
+  ],
+  "relationships": [
+    {
+      "type": "group",
+      "fields": [
+        "jsonData_azureCredentials",
+        "secureJsonData_azureClientSecret",
+        "secureJsonData_clientSecret",
+        "jsonData_oauthPassThru"
+      ],
+      "description": "Modern discriminated-union credentials — `jsonData.azureCredentials.authType` selects which secret keys are populated. Managed atomically by `@grafana/azure-sdk`'s `AzureCredentialsForm`. `oauthPassThru` is set to true for `clientsecret-obo` and is a hard requirement enforced by the plugin backend."
+    },
+    {
+      "type": "group",
+      "fields": [
+        "jsonData_azureCloud",
+        "jsonData_onBehalfOf",
+        "jsonData_tenantId",
+        "jsonData_clientId",
+        "secureJsonData_clientSecret"
+      ],
+      "description": "Legacy top-level credentials preserved by the frontend/backend fallbacks (`src/components/ConfigEditor/AzureCredentialsConfig.ts:46-67` `getLegacyCredentials`, `pkg/azuredx/adxauth/adxcredentials/builder.go:40-87` `getFromLegacy`). Saved datasources are migrated to `jsonData.azureCredentials` on next edit."
+    },
+    {
+      "type": "pair",
+      "fields": ["jsonData_useSchemaMapping", "jsonData_schemaMappings"],
+      "description": "`useSchemaMapping` gates whether the editor renders the `schemaMappings` list."
+    }
+  ],
+  "instructions": [
+    {
+      "msg": "The Azure Data Explorer datasource authenticates through the discriminated-union object at `jsonData.azureCredentials` written by the `@grafana/azure-sdk` `AzureCredentialsForm`. Supported `authType` values: `clientsecret` (App Registration + Client Secret — always available), `msi` (Managed Identity — only when Grafana has `azure.managedIdentityEnabled`), `workloadidentity` (only when `azure.workloadIdentityEnabled`), `currentuser` (only when `azure.userIdentityEnabled`), and `clientsecret-obo` (App Registration On-Behalf-Of — only when the `adxOnBehalfOf` Grafana feature toggle is on). Unlike Azure Monitor, this plugin does NOT expose `clientcertificate` or `ad-password` auth types.",
+      "tags": ["llm", "auth"]
+    }
+  ]
+}
