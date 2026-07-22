@@ -36,8 +36,19 @@ To create a query variable:
 1. Click **Add variable**.
 1. Select **Query** as the variable type.
 1. In the **Query options** section, select the Azure Data Explorer data source.
-1. Write the query in the **Query** field. Use `project` to specify one column. The result should be a list of string values.
+1. Select a **Query Type**. The type determines which values the variable returns and which fields you must complete.
+1. Complete the dependent fields, or write a query if you select **Kusto Query**.
 1. Review the preview of returned values at the bottom.
+
+The Azure Data Explorer variable editor supports the following query types:
+
+| Query type | Returns | Required fields |
+|------------|---------|-----------------|
+| **Clusters** | The clusters available to the data source. | None |
+| **Databases** | The databases in the selected cluster. | **Cluster** |
+| **Tables** | The tables in the selected database. | **Cluster**, **Database** |
+| **Columns** | The columns in the selected table. | **Cluster**, **Database**, **Table** |
+| **Kusto Query** | The results of a Kusto query. Use `project` to return a single column of string values. | A Kusto query |
 
 The **Name** field sets the variable name. Use the **Label** field to set a friendly display name.
 
@@ -59,13 +70,15 @@ MyLogs
 
 ## Query for a list of databases
 
-There's no Kusto Query Language function to fetch a list of databases directly. When you create a query variable, use the `databases()` function in the **Query** field to return a list of databases:
+To populate a variable with the databases in a cluster, select the **Databases** query type and choose a cluster. This is the recommended approach.
+
+Alternatively, select the **Kusto Query** type and use the `databases()` function, which returns the list of databases:
 
 ```kusto
 databases()
 ```
 
-You can use this variable in the database drop-down to switch databases without editing the panel query. To use the variable, type the variable name in the drop-down. For example, if the variable is named `database`, type `$database`.
+You can use a database variable in the query header's **Database** drop-down to switch databases without editing the panel query. To use the variable, type its name in the drop-down. For example, if the variable is named `database`, type `$database`.
 
 ## Template variable macros
 
