@@ -1,5 +1,5 @@
 ---
-description: Troubleshooting guide for the Azure Data Explorer data source in Grafana, covering authentication, connection, and query errors.
+description: Troubleshooting guide for the Azure Data Explorer data source in Grafana, covering version compatibility, authentication, connection, query, template variable, and provisioning issues.
 keywords:
   - grafana
   - azure
@@ -22,6 +22,17 @@ review_date: 2026-07-17
 # Troubleshoot Azure Data Explorer data source issues
 
 This document provides solutions to common issues you might encounter when configuring or using the Azure Data Explorer data source. For configuration instructions, refer to [Configure the Azure Data Explorer data source](https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/configure/).
+
+## First troubleshooting steps
+
+If the data source doesn't work and you're not sure where to start, or the error message isn't specific, work through this checklist before deeper troubleshooting:
+
+1. Confirm you're on the latest plugin version and it's compatible with your Grafana version. Refer to [Version and upgrade guidance](#version-and-upgrade-guidance).
+1. Verify the **Default cluster URL** is correct and reachable from the Grafana server.
+1. Confirm the selected authentication method is fully configured, and that the identity has viewer access to the database. Refer to [Authentication errors](#authentication-errors).
+1. Click **Save & test** and note the exact message. Use it to find the matching section in this guide.
+1. Review the Grafana server logs and the browser developer console for plugin errors. Refer to [Enable debug logging](#enable-debug-logging).
+1. Confirm the problem isn't on the Azure side, such as a paused cluster, changed permissions, or a networking change.
 
 ## Version and upgrade guidance
 
@@ -147,17 +158,6 @@ Authorization errors aren't propagated to the end user for security reasons. Rev
 ## Connection errors
 
 These errors occur when Grafana can't reach the Azure Data Explorer cluster.
-
-### Data source not working: connection checklist
-
-If the data source doesn't work and the error message isn't specific, work through this checklist before deeper troubleshooting:
-
-1. Confirm you're on the latest plugin version and it's compatible with your Grafana version. Refer to [Version and upgrade guidance](#version-and-upgrade-guidance).
-1. Verify the **Default cluster URL** is correct and reachable from the Grafana server.
-1. Confirm the selected authentication method is fully configured, and that the identity has viewer access to the database. Refer to [Authentication errors](#authentication-errors).
-1. Click **Save & test** and note the exact message. Use it to find the matching entry in this guide.
-1. Review the Grafana server logs and the browser developer console for plugin errors.
-1. Confirm the problem isn't on the Azure side, such as a paused cluster, changed permissions, or a networking change.
 
 ### Connection refused or timeout errors
 
