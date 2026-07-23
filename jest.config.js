@@ -12,5 +12,7 @@ module.exports = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'require', 'default'],
   },
-  transformIgnorePatterns: [nodeModulesToTransform([...grafanaESModules, '@modelcontextprotocol'])],
+  transformIgnorePatterns: [
+    nodeModulesToTransform([...grafanaESModules, '@modelcontextprotocol', '@marcbachmann/cel-js']),
+  ],
 };
