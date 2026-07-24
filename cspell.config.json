@@ -15,7 +15,8 @@
     "src/dashboards/**",
     "src/libs/**",
     "package-lock.json",
-    "src/locales/**"
+    "src/locales/**",
+    "jest.config.js"
   ],
   "words": [
     "",
