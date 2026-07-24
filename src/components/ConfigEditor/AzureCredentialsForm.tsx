@@ -132,7 +132,7 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
             <Trans i18nKey="components.azure-credentials-form.description-on-behalf-of-feature-is-in-beta">
               For known limitations and issues, bug report, or feedback, please visit{' '}
               <TextLink
-                href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/on-behalf-of.md"
+                href="https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/configure/#on-behalf-of-beta"
                 external
               >
                 the documentation
