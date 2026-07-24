@@ -23,7 +23,7 @@ var (
 func getAdxScopes(ctx context.Context, httpClient *http.Client, azureCloud string, clusterUrl string) ([]string, error) {
 	metadata, err := fetchAuthMetadata(ctx, httpClient, clusterUrl)
 	if err == nil {
-		return audienceToScopes(metadata.KustoServiceResourceID)
+		return []string{fmt.Sprintf("%s/.default", metadata.KustoServiceResourceID)}, nil
 	}
 
 	backend.Logger.Warn("failed to fetch auth metadata from cluster, falling back to hardcoded scopes", "cluster", clusterUrl, "error", err)
