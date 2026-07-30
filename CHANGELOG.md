@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [7.2.8]
+
+- Add fallback service credentials for current user authentication ([#1792](https://github.com/grafana/azure-data-explorer-datasource/pull/1792))
+- Add Kusto endpoint for AzureUSGovernment ([#1782](https://github.com/grafana/azure-data-explorer-datasource/pull/1782))
+- Remove CUA experimental notification ([#1785](https://github.com/grafana/azure-data-explorer-datasource/pull/1785))
+- Dependency updates
+
 ## [7.2.7]
 
 - Dependency updates
