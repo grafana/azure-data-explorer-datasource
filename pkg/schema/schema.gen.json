@@ -58,6 +58,11 @@
               "type": "boolean",
               "default": false
             },
+            "enableSecureSocksProxy": {
+              "description": "Enable proxying the datasource connection through the secure socks proxy to a different network. Consumed by Grafana core rather than the plugin backend (it is absent from `pkg/azuredx/models/settings.go`). The config editor only renders the toggle when the `secureSocksDSProxyEnabled` feature toggle is on (`src/components/ConfigEditor/index.tsx:168`); it can always be set via provisioning. See https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/.",
+              "type": "boolean",
+              "default": false
+            },
             "enableUserTracking": {
               "description": "With this feature enabled, Grafana will pass the logged in user's username in the `x-ms-user-id` header and in the `x-ms-client-request-id` header when sending requests to ADX. Can be useful when tracking needs to be done in ADX.",
               "type": "boolean",

@@ -49,6 +49,10 @@ type DatasourceSettings struct {
 	KeepCookies        []string         `json:"keepCookies"`
 	AzureCredentials   AzureCredentials `json:"azureCredentials"`
 
+	// EnableSecureSocksProxy is consumed by Grafana core rather than this plugin;
+	// it is declared here so the jsonData model stays in sync with the schema.
+	EnableSecureSocksProxy bool `json:"enableSecureSocksProxy"`
+
 	// Legacy top-level credential fields, preserved so datasources provisioned
 	// before the migration to jsonData.azureCredentials continue to parse.
 	AzureCloud    string `json:"azureCloud"`
