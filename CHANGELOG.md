@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [7.2.9]
+
+- Support auto-retrieval of ADX audience ([#1793](https://github.com/grafana/azure-data-explorer-datasource/pull/1793))
+- Dependency updates
+
 ## [7.2.8]
 
 - Add fallback service credentials for current user authentication ([#1792](https://github.com/grafana/azure-data-explorer-datasource/pull/1792))
