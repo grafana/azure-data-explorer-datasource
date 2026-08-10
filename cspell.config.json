@@ -179,6 +179,8 @@
     "errcheck",
     "dsconfig",
     "clientcertificate",
+    "struct",
+    "Struct",
     ""
   ]
 }
