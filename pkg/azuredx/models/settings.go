@@ -16,50 +16,56 @@ import (
 // AzureCredentials mirrors the nested jsonData.azureCredentials object that the
 // shared grafana-azure-sdk-go parses to build the datasource credentials.
 type AzureCredentials struct {
-	AuthType   string `json:"authType"`
-	AzureCloud string `json:"azureCloud"`
-	TenantID   string `json:"tenantId"`
-	ClientID   string `json:"clientId"`
+	AuthType   LenientString `json:"authType"`
+	AzureCloud LenientString `json:"azureCloud"`
+	TenantID   LenientString `json:"tenantId"`
+	ClientID   LenientString `json:"clientId"`
 }
 
 // SchemaMapping mirrors an entry in jsonData.schemaMappings, the managed schema
 // list written by the frontend config editor when useSchemaMapping is enabled.
 type SchemaMapping struct {
-	Type        string `json:"type"`
-	Value       string `json:"value"`
-	Name        string `json:"name"`
-	Database    string `json:"database"`
-	DisplayName string `json:"displayName"`
+	Type        LenientString `json:"type"`
+	Value       LenientString `json:"value"`
+	Name        LenientString `json:"name"`
+	Database    LenientString `json:"database"`
+	DisplayName LenientString `json:"displayName"`
 }
 
 // DatasourceSettings holds the datasource configuration information for Azure Data Explorer's API
 // that is needed to execute a request against Azure's Data Explorer API.
 type DatasourceSettings struct {
-	ClusterURL         string           `json:"clusterUrl"`
-	DefaultDatabase    string           `json:"defaultDatabase"`
-	DataConsistency    string           `json:"dataConsistency"`
-	CacheMaxAge        string           `json:"cacheMaxAge"`
-	DynamicCaching     bool             `json:"dynamicCaching"`
-	EnableUserTracking bool             `json:"enableUserTracking"`
-	Application        string           `json:"application"`
-	MinimalCache       int              `json:"minimalCache"`
-	DefaultEditorMode  string           `json:"defaultEditorMode"`
-	UseSchemaMapping   bool             `json:"useSchemaMapping"`
-	SchemaMappings     []SchemaMapping  `json:"schemaMappings"`
-	KeepCookies        []string         `json:"keepCookies"`
-	AzureCredentials   AzureCredentials `json:"azureCredentials"`
+	ClusterURL         string `json:"clusterUrl"`
+	DefaultDatabase    string `json:"defaultDatabase"`
+	DataConsistency    string `json:"dataConsistency"`
+	CacheMaxAge        string `json:"cacheMaxAge"`
+	DynamicCaching     bool   `json:"dynamicCaching"`
+	EnableUserTracking bool   `json:"enableUserTracking"`
+	Application        string `json:"application"`
+
+	// The fields below are not read by this backend; they exist so the jsonData
+	// model stays in sync with pkg/schema/dsconfig.json. They use the lenient
+	// types from lenient.go so a loosely typed provisioned value cannot fail the
+	// unmarshal and take the datasource down.
+	MinimalCache      LenientInt            `json:"minimalCache"`
+	DefaultEditorMode LenientString         `json:"defaultEditorMode"`
+	UseSchemaMapping  LenientBool           `json:"useSchemaMapping"`
+	SchemaMappings    LenientSchemaMappings `json:"schemaMappings"`
+	KeepCookies       LenientStringSlice    `json:"keepCookies"`
+	AzureCredentials  AzureCredentials      `json:"azureCredentials"`
 
 	// EnableSecureSocksProxy is consumed by Grafana core rather than this plugin;
 	// it is declared here so the jsonData model stays in sync with the schema.
-	EnableSecureSocksProxy bool `json:"enableSecureSocksProxy"`
+	EnableSecureSocksProxy LenientBool `json:"enableSecureSocksProxy"`
 
 	// Legacy top-level credential fields, preserved so datasources provisioned
 	// before the migration to jsonData.azureCredentials continue to parse.
-	AzureCloud    string `json:"azureCloud"`
-	TenantID      string `json:"tenantId"`
-	ClientID      string `json:"clientId"`
-	OnBehalfOf    bool   `json:"onBehalfOf"`
-	OAuthPassThru bool   `json:"oauthPassThru"`
+	// adxcredentials reads these from the raw jsonData map, not from here.
+	AzureCloud    LenientString `json:"azureCloud"`
+	TenantID      LenientString `json:"tenantId"`
+	ClientID      LenientString `json:"clientId"`
+	OnBehalfOf    LenientBool   `json:"onBehalfOf"`
+	OAuthPassThru LenientBool   `json:"oauthPassThru"`
 
 	// QueryTimeoutRaw is a duration string set in the datasource settings and corresponds
 	// to the server execution timeout.
