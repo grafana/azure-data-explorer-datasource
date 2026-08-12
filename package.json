@@ -33,7 +33,7 @@
     "@babel/core": "7.29.0",
     "@eslint/compat": "2.0.3",
     "@grafana/eslint-config": "9.0.0",
-    "@grafana/plugin-e2e": "3.10.0",
+    "@grafana/plugin-e2e": "3.11.0",
     "@grafana/plugin-meta-extractor": "0.13.0",
     "@grafana/tsconfig": "2.2.0",
     "@playwright/test": "1.58.2",
