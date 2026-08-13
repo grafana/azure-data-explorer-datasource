@@ -2,5 +2,16 @@
   "extends": "./.config/tsconfig.json",
   "compilerOptions": {
     "noImplicitAny": false
+  },
+  // ts-node (used by webpack-cli to load webpack.config.ts) compiles to commonjs, which is
+  // incompatible with the "moduleResolution": "bundler" inherited from @grafana/tsconfig v2.
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node10",
+      "target": "es5",
+      "esModuleInterop": true
+    },
+    "transpileOnly": true
   }
 }

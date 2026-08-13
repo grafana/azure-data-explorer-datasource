@@ -177,6 +177,10 @@
     "proxying",
     "nolint",
     "errcheck",
+    "dsconfig",
+    "clientcertificate",
+    "struct",
+    "Struct",
     ""
   ]
 }
