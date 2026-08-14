@@ -48,7 +48,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
 
   return (
     <>
-      {schema.error && (
+      {!schema.loading && schema.error && (
         <Alert
           title={t(
             'components.query-editor.title-could-not-load-datasource-schema',
