@@ -118,12 +118,17 @@ func getHttpClient(ctx context.Context, instanceSettings *backend.DataSourceInst
 	return httpClient, nil
 }
 
+// metadataTimeout bounds both the metadata HTTP client and the detached
+// context used to fetch cluster auth metadata, so a slow or unreachable
+// metadata endpoint falls back to default scopes promptly.
+const metadataTimeout = 10 * time.Second
+
 func newMetadataHTTPClient(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings) (*http.Client, error) {
 	clientOpts, err := instanceSettings.HTTPClientOptions(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error creating metadata http client: %w", err)
 	}
-	clientOpts.Timeouts.Timeout = 30 * time.Second
+	clientOpts.Timeouts.Timeout = metadataTimeout
 
 	metadataClient, err := httpclient.NewProvider().New(clientOpts)
 	if err != nil {

@@ -78,14 +78,21 @@ func fetchAuthMetadata(ctx context.Context, httpClient *http.Client, clusterURL 
 }
 
 func newScopeResolver(azureCloud string, metadataClient *http.Client) azhttpclient.ScopeResolver {
+	cache := newScopeCache(scopeCacheTTL)
 	return func(ctx context.Context, req *http.Request) ([]string, error) {
 		clusterUrl := fmt.Sprintf("%s://%s", req.URL.Scheme, req.URL.Host)
 
-		metadata, err := fetchAuthMetadata(ctx, metadataClient, clusterUrl)
+		scopes, err := cache.resolve(ctx, clusterUrl, func(fetchCtx context.Context) ([]string, error) {
+			metadata, err := fetchAuthMetadata(fetchCtx, metadataClient, clusterUrl)
+			if err != nil {
+				return nil, err
+			}
+			return []string{fmt.Sprintf("%s/.default", metadata.KustoServiceResourceID)}, nil
+		})
 		if err != nil {
 			backend.Logger.FromContext(ctx).Warn("failed to fetch auth metadata from cluster, falling back to default scopes", "cluster", clusterUrl, "error", err)
 			return getDefaultAdxScopes(azureCloud, clusterUrl)
 		}
-		return []string{fmt.Sprintf("%s/.default", metadata.KustoServiceResourceID)}, nil
+		return scopes, nil
 	}
 }
