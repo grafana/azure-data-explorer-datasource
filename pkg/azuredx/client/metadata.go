@@ -6,11 +6,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/grafana/grafana-azure-sdk-go/v2/azhttpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	json "github.com/json-iterator/go"
 )
 
@@ -79,16 +77,7 @@ func fetchAuthMetadata(ctx context.Context, httpClient *http.Client, clusterURL 
 	return &metadata.AzureAD, nil
 }
 
-func newScopeResolver(azureCloud string) (azhttpclient.ScopeResolver, error) {
-	metadataClient, err := httpclient.NewProvider().New(httpclient.Options{
-		Timeouts: &httpclient.TimeoutOptions{
-			Timeout: 30 * time.Second,
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error creating metadata http client: %w", err)
-	}
-
+func newScopeResolver(azureCloud string, metadataClient *http.Client) azhttpclient.ScopeResolver {
 	return func(ctx context.Context, req *http.Request) ([]string, error) {
 		clusterUrl := fmt.Sprintf("%s://%s", req.URL.Scheme, req.URL.Host)
 
@@ -98,5 +87,5 @@ func newScopeResolver(azureCloud string) (azhttpclient.ScopeResolver, error) {
 			return getDefaultAdxScopes(azureCloud, clusterUrl)
 		}
 		return []string{fmt.Sprintf("%s/.default", metadata.KustoServiceResourceID)}, nil
-	}, nil
+	}
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/adxauth"
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
@@ -21,10 +22,16 @@ func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud, true, true)
+	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud, true)
 	if err != nil {
 		return nil, err
 	}
+
+	metadataClient, err := newMetadataHTTPClient(ctx, instanceSettings)
+	if err != nil {
+		return nil, err
+	}
+	authOpts.SetScopeResolver(newScopeResolver(azureCloud, metadataClient))
 
 	scopes, err := getDefaultAdxScopes(azureCloud, dsSettings.ClusterURL)
 	if err != nil {
@@ -47,7 +54,7 @@ func newHttpClientManagement(ctx context.Context, instanceSettings *backend.Data
 		return nil, err
 	}
 
-	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud, false, false)
+	authOpts, err := getAuthOpts(azureSettings, dsSettings, azureCloud, false)
 	if err != nil {
 		return nil, err
 	}
@@ -66,17 +73,8 @@ func newHttpClientManagement(ctx context.Context, instanceSettings *backend.Data
 	return httpClient, nil
 }
 
-func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.DatasourceSettings, azureCloud string, userProvidedEndpoint bool, customScopeResolver bool) (*azhttpclient.AuthOptions, error) {
+func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.DatasourceSettings, azureCloud string, userProvidedEndpoint bool) (*azhttpclient.AuthOptions, error) {
 	authOpts := azhttpclient.NewAuthOptions(azureSettings)
-
-	if customScopeResolver {
-		scopeResolver, err := newScopeResolver(azureCloud)
-		if err != nil {
-			backend.Logger.Error("error creating scope resolver", "error", err)
-		} else {
-			authOpts.SetScopeResolver(scopeResolver)
-		}
-	}
 
 	// Enables support for current user authentication when user_identity_enabled is set in Grafana configuration
 	authOpts.AllowUserIdentity()
@@ -118,4 +116,19 @@ func getHttpClient(ctx context.Context, instanceSettings *backend.DataSourceInst
 	}
 
 	return httpClient, nil
+}
+
+func newMetadataHTTPClient(ctx context.Context, instanceSettings *backend.DataSourceInstanceSettings) (*http.Client, error) {
+	clientOpts, err := instanceSettings.HTTPClientOptions(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("error creating metadata http client: %w", err)
+	}
+	clientOpts.Timeouts.Timeout = 30 * time.Second
+
+	metadataClient, err := httpclient.NewProvider().New(clientOpts)
+	if err != nil {
+		return nil, fmt.Errorf("error creating metadata http client: %w", err)
+	}
+
+	return metadataClient, nil
 }
