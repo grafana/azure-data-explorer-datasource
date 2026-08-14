@@ -319,7 +319,7 @@ func TestGetAuthOpts(t *testing.T) {
 				CustomCloudList: tt.customClouds,
 			}
 
-			authOpts, err := getAuthOpts(azureSettings, tt.dsSettings, tt.azureCloud, tt.userProvidedEndpoint)
+			authOpts, err := getAuthOpts(azureSettings, tt.dsSettings, tt.azureCloud, tt.userProvidedEndpoint, false)
 
 			if tt.expectError {
 				require.Error(t, err)

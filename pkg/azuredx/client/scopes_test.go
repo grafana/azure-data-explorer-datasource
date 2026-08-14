@@ -22,34 +22,29 @@ func metadataServer(t *testing.T, kustoServiceResourceID string) *httptest.Serve
 	}))
 }
 
-func TestGetAdxScopes_MetadataSuccess(t *testing.T) {
+func TestScopeResolver_MetadataSuccess(t *testing.T) {
 	tests := []struct {
 		description            string
-		cloud                  string
 		kustoServiceResourceID string
 		expectedScope          string
 	}{
 		{
 			description:            "metadata returns public cloud audience",
-			cloud:                  azsettings.AzurePublic,
 			kustoServiceResourceID: "https://kusto.kusto.windows.net",
 			expectedScope:          "https://kusto.kusto.windows.net/.default",
 		},
 		{
 			description:            "metadata returns US Government audience",
-			cloud:                  azsettings.AzureUSGovernment,
 			kustoServiceResourceID: "https://kusto.kusto.usgovcloudapi.net",
 			expectedScope:          "https://kusto.kusto.usgovcloudapi.net/.default",
 		},
 		{
 			description:            "metadata returns China audience",
-			cloud:                  azsettings.AzureChina,
 			kustoServiceResourceID: "https://kusto.kusto.chinacloudapi.cn",
 			expectedScope:          "https://kusto.kusto.chinacloudapi.cn/.default",
 		},
 		{
 			description:            "metadata returns custom audience",
-			cloud:                  "CustomCloud",
 			kustoServiceResourceID: "https://kusto.custom.example.com",
 			expectedScope:          "https://kusto.custom.example.com/.default",
 		},
@@ -60,7 +55,13 @@ func TestGetAdxScopes_MetadataSuccess(t *testing.T) {
 			server := metadataServer(t, tt.kustoServiceResourceID)
 			defer server.Close()
 
-			scopes, err := getAdxScopes(context.Background(), server.Client(), tt.cloud, server.URL)
+			resolver, err := newScopeResolver(azsettings.AzurePublic)
+			require.NoError(t, err)
+
+			req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, server.URL, nil)
+			require.NoError(t, err)
+
+			scopes, err := resolver(context.Background(), req)
 			require.NoError(t, err)
 			assert.Len(t, scopes, 1)
 			assert.Equal(t, tt.expectedScope, scopes[0])
@@ -68,7 +69,7 @@ func TestGetAdxScopes_MetadataSuccess(t *testing.T) {
 	}
 }
 
-func TestGetAdxScopes_FallbackToHardcodedScopes(t *testing.T) {
+func TestScopeResolver_MetadataFailureFallsBack(t *testing.T) {
 	failingServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}))
@@ -77,51 +78,45 @@ func TestGetAdxScopes_FallbackToHardcodedScopes(t *testing.T) {
 	tests := []struct {
 		description   string
 		cloud         string
-		clusterUrl    string
 		expectedScope string
 	}{
 		{
 			description:   "falls back to public cloud scope",
 			cloud:         azsettings.AzurePublic,
-			clusterUrl:    failingServer.URL,
 			expectedScope: "https://kusto.kusto.windows.net/.default",
 		},
 		{
 			description:   "falls back to US Government scope",
 			cloud:         azsettings.AzureUSGovernment,
-			clusterUrl:    failingServer.URL,
 			expectedScope: "https://kusto.kusto.usgovcloudapi.net/.default",
 		},
 		{
 			description:   "falls back to China scope",
 			cloud:         azsettings.AzureChina,
-			clusterUrl:    failingServer.URL,
 			expectedScope: "https://kusto.kusto.chinacloudapi.cn/.default",
+		},
+		{
+			// Unknown cloud falls back to the request's own cluster URL.
+			description:   "falls back to cluster url for unknown cloud",
+			cloud:         "Unknown",
+			expectedScope: failingServer.URL + "/.default",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			scopes, err := getAdxScopes(context.Background(), failingServer.Client(), tt.cloud, tt.clusterUrl)
+			resolver, err := newScopeResolver(tt.cloud)
+			require.NoError(t, err)
+
+			req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, failingServer.URL, nil)
+			require.NoError(t, err)
+
+			scopes, err := resolver(context.Background(), req)
 			require.NoError(t, err)
 			assert.Len(t, scopes, 1)
 			assert.Equal(t, tt.expectedScope, scopes[0])
 		})
 	}
-}
-
-func TestGetAdxScopes_FallbackUnknownCloud(t *testing.T) {
-	failingServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError)
-	}))
-	defer failingServer.Close()
-
-	t.Run("falls back to clusterUrl scope for unknown cloud", func(t *testing.T) {
-		scopes, err := getAdxScopes(context.Background(), failingServer.Client(), "Unknown", failingServer.URL)
-		require.NoError(t, err)
-		assert.Len(t, scopes, 1)
-		assert.Equal(t, failingServer.URL+"/.default", scopes[0])
-	})
 }
 
 func TestGetAdxScopesFallback(t *testing.T) {
@@ -165,7 +160,7 @@ func TestGetAdxScopesFallback(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			scopes, err := getAdxScopesFallback(tt.cloud, tt.clusterUrl)
+			scopes, err := getDefaultAdxScopes(tt.cloud, tt.clusterUrl)
 			require.NoError(t, err)
 			assert.Len(t, scopes, 1)
 			assert.Equal(t, tt.expectedScope, scopes[0])
