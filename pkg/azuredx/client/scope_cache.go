@@ -64,7 +64,7 @@ func (c *scopeCache) resolve(ctx context.Context, key string, fetch func(ctx con
 			return scopes, nil
 		}
 
-		fetchCtx, cancel := context.WithTimeout(context.Background(), metadataTimeout)
+		fetchCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), metadataTimeout)
 		defer cancel()
 
 		scopes, err := fetch(fetchCtx)
