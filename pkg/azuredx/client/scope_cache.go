@@ -11,10 +11,13 @@ import (
 // scopeCacheTTL is how long a successfully resolved set of scopes is cached for
 // a given cluster. The cluster's Kusto audience is effectively immutable, so a
 // long TTL is safe.
+// scopeCacheTTL is how long a successfully resolved scope is cached for a given
+// cluster. The cluster's Kusto audience is effectively immutable, so a long TTL
+// is safe.
 const scopeCacheTTL = 1 * time.Hour
 
 type scopeCacheEntry struct {
-	scopes []string
+	scope  string
 	expiry time.Time
 }
 
@@ -75,11 +78,12 @@ func (c *scopeCache) resolve(ctx context.Context, key string, fetch func(ctx con
 
 	select {
 	case <-ctx.Done():
-		return nil, ctx.Err()
+		return "", ctx.Err()
 	case res := <-ch:
 		if res.Err != nil {
-			return nil, res.Err
+			return "", res.Err
 		}
-		return res.Val.([]string), nil
+		entry := res.Val.(scopeCacheEntry)
+		return entry.scope, entry.err
 	}
 }

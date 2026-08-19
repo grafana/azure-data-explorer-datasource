@@ -82,12 +82,12 @@ func newScopeResolver(azureCloud string, metadataClient *http.Client) azhttpclie
 	return func(ctx context.Context, req *http.Request) ([]string, error) {
 		clusterUrl := fmt.Sprintf("%s://%s", req.URL.Scheme, req.URL.Host)
 
-		scopes, err := cache.resolve(ctx, clusterUrl, func(fetchCtx context.Context) ([]string, error) {
+		scope, err := cache.resolve(ctx, clusterUrl, func(fetchCtx context.Context) (string, error) {
 			metadata, err := fetchAuthMetadata(fetchCtx, metadataClient, clusterUrl)
 			if err != nil {
-				return nil, err
+				return "", err
 			}
-			return []string{fmt.Sprintf("%s/.default", metadata.KustoServiceResourceID)}, nil
+			return fmt.Sprintf("%s/.default", metadata.KustoServiceResourceID), nil
 		})
 		if err != nil {
 			// A cancelled caller context isn't a metadata-endpoint problem.
@@ -98,6 +98,6 @@ func newScopeResolver(azureCloud string, metadataClient *http.Client) azhttpclie
 			backend.Logger.FromContext(ctx).Warn("failed to fetch auth metadata from cluster, falling back to default scopes", "cluster", clusterUrl, "error", err)
 			return getDefaultAdxScopes(azureCloud, clusterUrl)
 		}
-		return scopes, nil
+		return []string{scope}, nil
 	}
 }
