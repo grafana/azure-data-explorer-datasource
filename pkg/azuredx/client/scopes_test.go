@@ -55,7 +55,7 @@ func TestScopeResolver_MetadataSuccess(t *testing.T) {
 			server := metadataServer(t, tt.kustoServiceResourceID)
 			defer server.Close()
 
-			resolver := newScopeResolver(azsettings.AzurePublic, server.Client())
+			resolver := newScopeResolver(azsettings.AzurePublic, server.Client(), parseTrustedHosts([]string{server.URL}))
 
 			req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, server.URL, nil)
 			require.NoError(t, err)
@@ -104,7 +104,7 @@ func TestScopeResolver_MetadataFailureFallsBack(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.description, func(t *testing.T) {
-			resolver := newScopeResolver(tt.cloud, failingServer.Client())
+			resolver := newScopeResolver(tt.cloud, failingServer.Client(), parseTrustedHosts([]string{failingServer.URL}))
 
 			req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, failingServer.URL, nil)
 			require.NoError(t, err)

@@ -31,7 +31,7 @@ func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.Data
 	if err != nil {
 		return nil, err
 	}
-	authOpts.SetScopeResolver(newScopeResolver(azureCloud, metadataClient))
+	authOpts.SetScopeResolver(newScopeResolver(azureCloud, metadataClient, newTrustedMetadataHosts(azureCloud, azureSettings, dsSettings)))
 
 	// Seed the default scopes for the datasource's own cluster. The per-request
 	// ScopeResolver above supersedes these for every request (it falls back to
@@ -90,13 +90,9 @@ func getAuthOpts(azureSettings *azsettings.AzureSettings, dsSettings *models.Dat
 
 	// Enforce only trusted Azure Data Explorer endpoints if enabled
 	if userProvidedEndpoint && dsSettings.EnforceTrustedEndpoints {
-		endpoints, err := getAdxEndpoints(azureCloud, azureSettings)
+		endpoints, err := getTrustedEndpoints(azureCloud, azureSettings, dsSettings)
 		if err != nil {
 			return nil, err
-		}
-
-		if dsSettings.AllowUserTrustedEndpoints && len(dsSettings.UserTrustedEndpoints) > 0 {
-			endpoints = append(endpoints, dsSettings.UserTrustedEndpoints...)
 		}
 
 		err = authOpts.AllowedEndpoints(endpoints)

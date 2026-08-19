@@ -172,7 +172,7 @@ func TestScopeResolver_CachesMetadata(t *testing.T) {
 	server, count := countingMetadataServer(t, "https://cluster.example.com")
 	defer server.Close()
 
-	resolver := newScopeResolver(azsettings.AzurePublic, server.Client())
+	resolver := newScopeResolver(azsettings.AzurePublic, server.Client(), parseTrustedHosts([]string{server.URL}))
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, server.URL, nil)
 	require.NoError(t, err)
 
@@ -193,7 +193,7 @@ func TestScopeResolver_FailureNegativeCached(t *testing.T) {
 	}))
 	defer server.Close()
 
-	resolver := newScopeResolver(azsettings.AzurePublic, server.Client())
+	resolver := newScopeResolver(azsettings.AzurePublic, server.Client(), parseTrustedHosts([]string{server.URL}))
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, server.URL, nil)
 	require.NoError(t, err)
 
@@ -206,4 +206,21 @@ func TestScopeResolver_FailureNegativeCached(t *testing.T) {
 	}
 
 	assert.Equal(t, int64(1), atomic.LoadInt64(&count), "failed metadata lookups should be negatively cached within the TTL")
+}
+
+func TestScopeResolver_DeniesUntrustedHost(t *testing.T) {
+	// The server pretends to be a cluster and returns a crafted audience, but
+	// its host is not in the trusted set.
+	server, count := countingMetadataServer(t, "https://management.azure.com")
+	defer server.Close()
+
+	resolver := newScopeResolver(azsettings.AzurePublic, server.Client(), parseTrustedHosts([]string{"https://*.kusto.windows.net"}))
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, server.URL, nil)
+	require.NoError(t, err)
+
+	scopes, err := resolver(context.Background(), req)
+	require.NoError(t, err)
+	// Falls back to default scopes without ever contacting the untrusted host.
+	assert.Equal(t, []string{"https://kusto.kusto.windows.net/.default"}, scopes)
+	assert.Equal(t, int64(0), atomic.LoadInt64(count), "metadata must not be fetched from an untrusted host")
 }
