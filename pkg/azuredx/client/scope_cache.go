@@ -35,16 +35,20 @@ func newScopeCache(ttl time.Duration) *scopeCache {
 	return &scopeCache{ttl: ttl}
 }
 
-func (c *scopeCache) get(key string) ([]string, bool) {
+// get returns the cached entry for key when present and unexpired. Expired
+// entries are deleted on access to keep the map bounded, since the key space is
+// whatever ClusterUri queries specify.
+func (c *scopeCache) get(key string) (scopeCacheEntry, bool) {
 	v, ok := c.entries.Load(key)
 	if !ok {
-		return nil, false
+		return scopeCacheEntry{}, false
 	}
 	entry := v.(scopeCacheEntry)
 	if time.Now().After(entry.expiry) {
-		return nil, false
+		c.entries.Delete(key)
+		return scopeCacheEntry{}, false
 	}
-	return entry.scopes, true
+	return entry, true
 }
 
 // resolve returns cached scopes for key, or invokes fetch to populate the cache
