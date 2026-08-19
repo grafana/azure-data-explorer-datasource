@@ -8,31 +8,40 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
-// scopeCacheTTL is how long a successfully resolved set of scopes is cached for
-// a given cluster. The cluster's Kusto audience is effectively immutable, so a
-// long TTL is safe.
 // scopeCacheTTL is how long a successfully resolved scope is cached for a given
 // cluster. The cluster's Kusto audience is effectively immutable, so a long TTL
 // is safe.
 const scopeCacheTTL = 1 * time.Hour
 
+// negativeCacheTTL bounds how long a failed resolution is cached. Failures are
+// cached only briefly so that a transient metadata-endpoint outage doesn't make
+// every non-overlapping query re-pay the full metadataTimeout, while still
+// recovering quickly once the endpoint becomes healthy again.
+const negativeCacheTTL = 30 * time.Second
+
 type scopeCacheEntry struct {
 	scope  string
+	err    error
 	expiry time.Time
 }
 
-// scopeCache caches resolved scopes per cluster. Reads are lock-free via
-// sync.Map, and concurrent misses for the same key are collapsed into a single
-// fetch via singleflight so that no mutex is held for the duration of a network
-// call. Only successful resolutions are cached; failures are never stored.
+// scopeCache caches the resolved scope per cluster. ADX only ever has a single
+// audience scope, so a plain string is stored and wrapped into a slice at the
+// resolver boundary. Reads are lock-free via sync.Map, and concurrent misses
+// for the same key are collapsed into a single fetch via singleflight so that no
+// mutex is held for the duration of a network call. Both successful resolutions
+// (for scopeCacheTTL) and failures (for negativeCacheTTL) are cached; expired
+// entries are evicted on access so the map does not grow without bound as
+// distinct cluster hosts are resolved.
 type scopeCache struct {
-	ttl     time.Duration
-	entries sync.Map // map[string]scopeCacheEntry
-	group   singleflight.Group
+	ttl         time.Duration
+	negativeTTL time.Duration
+	entries     sync.Map // map[string]scopeCacheEntry
+	group       singleflight.Group
 }
 
-func newScopeCache(ttl time.Duration) *scopeCache {
-	return &scopeCache{ttl: ttl}
+func newScopeCache(ttl, negativeTTL time.Duration) *scopeCache {
+	return &scopeCache{ttl: ttl, negativeTTL: negativeTTL}
 }
 
 // get returns the cached entry for key when present and unexpired. Expired
@@ -51,33 +60,38 @@ func (c *scopeCache) get(key string) (scopeCacheEntry, bool) {
 	return entry, true
 }
 
-// resolve returns cached scopes for key, or invokes fetch to populate the cache
-// on a miss. Concurrent callers for the same key share a single fetch. The
-// fetch runs on a context detached from any individual caller so that one
-// caller's cancellation cannot abort the shared work for the others; each
-// caller still observes its own context cancellation.
-func (c *scopeCache) resolve(ctx context.Context, key string, fetch func(ctx context.Context) ([]string, error)) ([]string, error) {
-	if scopes, ok := c.get(key); ok {
-		return scopes, nil
+// resolve returns the cached scope for key, or invokes fetch to populate the
+// cache on a miss. Concurrent callers for the same key share a single fetch. The
+// fetch runs on a context detached from any individual caller (cancellation is
+// dropped but values such as tracing are retained) so that one caller's
+// cancellation cannot abort the shared work for the others; each caller still
+// observes its own context cancellation. Successful fetches are cached for ttl
+// and failures for negativeTTL.
+func (c *scopeCache) resolve(ctx context.Context, key string, fetch func(ctx context.Context) (string, error)) (string, error) {
+	if entry, ok := c.get(key); ok {
+		return entry.scope, entry.err
 	}
 
 	ch := c.group.DoChan(key, func() (interface{}, error) {
 		// Another caller may have populated the cache between our miss above and
 		// acquiring this flight.
-		if scopes, ok := c.get(key); ok {
-			return scopes, nil
+		if entry, ok := c.get(key); ok {
+			return entry, nil
 		}
 
 		fetchCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), metadataTimeout)
 		defer cancel()
 
-		scopes, err := fetch(fetchCtx)
+		scope, err := fetch(fetchCtx)
 		if err != nil {
-			return nil, err
+			entry := scopeCacheEntry{err: err, expiry: time.Now().Add(c.negativeTTL)}
+			c.entries.Store(key, entry)
+			return entry, nil
 		}
 
-		c.entries.Store(key, scopeCacheEntry{scopes: scopes, expiry: time.Now().Add(c.ttl)})
-		return scopes, nil
+		entry := scopeCacheEntry{scope: scope, expiry: time.Now().Add(c.ttl)}
+		c.entries.Store(key, entry)
+		return entry, nil
 	})
 
 	select {

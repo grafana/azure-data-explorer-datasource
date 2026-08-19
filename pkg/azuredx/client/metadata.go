@@ -78,7 +78,7 @@ func fetchAuthMetadata(ctx context.Context, httpClient *http.Client, clusterURL 
 }
 
 func newScopeResolver(azureCloud string, metadataClient *http.Client) azhttpclient.ScopeResolver {
-	cache := newScopeCache(scopeCacheTTL)
+	cache := newScopeCache(scopeCacheTTL, negativeCacheTTL)
 	return func(ctx context.Context, req *http.Request) ([]string, error) {
 		clusterUrl := fmt.Sprintf("%s://%s", req.URL.Scheme, req.URL.Host)
 

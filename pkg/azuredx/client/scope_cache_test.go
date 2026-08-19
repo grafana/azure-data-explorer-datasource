@@ -17,29 +17,32 @@ import (
 )
 
 func TestScopeCache_GetExpiry(t *testing.T) {
-	c := newScopeCache(50 * time.Millisecond)
+	c := newScopeCache(50*time.Millisecond, negativeCacheTTL)
 
 	if _, ok := c.get("cluster"); ok {
 		t.Fatal("expected miss on empty cache")
 	}
 
-	c.entries.Store("cluster", scopeCacheEntry{scopes: []string{"scope"}, expiry: time.Now().Add(50 * time.Millisecond)})
+	c.entries.Store("cluster", scopeCacheEntry{scope: "scope", expiry: time.Now().Add(50 * time.Millisecond)})
 	got, ok := c.get("cluster")
 	require.True(t, ok)
-	assert.Equal(t, []string{"scope"}, got)
+	assert.Equal(t, "scope", got.scope)
 
-	// Store an already-expired entry and confirm it's treated as a miss.
-	c.entries.Store("cluster", scopeCacheEntry{scopes: []string{"scope"}, expiry: time.Now().Add(-time.Second)})
+	// Store an already-expired entry and confirm it's treated as a miss and
+	// evicted from the map.
+	c.entries.Store("cluster", scopeCacheEntry{scope: "scope", expiry: time.Now().Add(-time.Second)})
 	_, ok = c.get("cluster")
 	assert.False(t, ok)
+	_, stillStored := c.entries.Load("cluster")
+	assert.False(t, stillStored, "expired entries should be evicted on access")
 }
 
 func TestScopeCache_ResolveCachesSuccess(t *testing.T) {
-	c := newScopeCache(time.Hour)
+	c := newScopeCache(time.Hour, negativeCacheTTL)
 	var calls int64
-	fetch := func(_ context.Context) ([]string, error) {
+	fetch := func(_ context.Context) (string, error) {
 		atomic.AddInt64(&calls, 1)
-		return []string{"https://cluster.example.com/.default"}, nil
+		return "https://cluster.example.com/.default", nil
 	}
 
 	first, err := c.resolve(context.Background(), "cluster", fetch)
@@ -52,16 +55,16 @@ func TestScopeCache_ResolveCachesSuccess(t *testing.T) {
 
 	cached, ok := c.get("cluster")
 	require.True(t, ok)
-	assert.Equal(t, []string{"https://cluster.example.com/.default"}, cached)
+	assert.Equal(t, "https://cluster.example.com/.default", cached.scope)
 }
 
 func TestScopeCache_ResolveCollapsesConcurrentMisses(t *testing.T) {
-	c := newScopeCache(time.Hour)
+	c := newScopeCache(time.Hour, negativeCacheTTL)
 	var calls int64
-	fetch := func(_ context.Context) ([]string, error) {
+	fetch := func(_ context.Context) (string, error) {
 		atomic.AddInt64(&calls, 1)
 		time.Sleep(100 * time.Millisecond) // hold the flight open so callers pile up
-		return []string{"scope"}, nil
+		return "scope", nil
 	}
 
 	const workers = 50
@@ -73,13 +76,13 @@ func TestScopeCache_ResolveCollapsesConcurrentMisses(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			<-start
-			scopes, err := c.resolve(context.Background(), "cluster", fetch)
+			scope, err := c.resolve(context.Background(), "cluster", fetch)
 			if err != nil {
 				errs <- err
 				return
 			}
-			if len(scopes) != 1 || scopes[0] != "scope" {
-				errs <- fmt.Errorf("unexpected scopes %v", scopes)
+			if scope != "scope" {
+				errs <- fmt.Errorf("unexpected scope %q", scope)
 			}
 		}()
 	}
@@ -93,33 +96,38 @@ func TestScopeCache_ResolveCollapsesConcurrentMisses(t *testing.T) {
 	assert.Equal(t, int64(1), atomic.LoadInt64(&calls), "concurrent misses should collapse into a single fetch")
 }
 
-func TestScopeCache_ResolveDoesNotCacheFailure(t *testing.T) {
-	c := newScopeCache(time.Hour)
+func TestScopeCache_ResolveNegativeCachesFailure(t *testing.T) {
+	// Short negative TTL so we can observe expiry without a long sleep.
+	c := newScopeCache(time.Hour, 50*time.Millisecond)
 	var calls int64
-	fetch := func(_ context.Context) ([]string, error) {
+	fetch := func(_ context.Context) (string, error) {
 		atomic.AddInt64(&calls, 1)
-		return nil, errors.New("metadata unavailable")
+		return "", errors.New("metadata unavailable")
 	}
 
 	_, err := c.resolve(context.Background(), "cluster", fetch)
 	require.Error(t, err)
+	// Within the negative TTL the failure is served from cache without a new fetch.
 	_, err = c.resolve(context.Background(), "cluster", fetch)
 	require.Error(t, err)
+	assert.Equal(t, int64(1), atomic.LoadInt64(&calls), "failures should be negatively cached within the TTL")
 
-	assert.Equal(t, int64(2), atomic.LoadInt64(&calls), "failures must not be cached")
-	_, ok := c.get("cluster")
-	assert.False(t, ok)
+	// Once the negative entry expires, the next resolve re-attempts the fetch.
+	time.Sleep(60 * time.Millisecond)
+	_, err = c.resolve(context.Background(), "cluster", fetch)
+	require.Error(t, err)
+	assert.Equal(t, int64(2), atomic.LoadInt64(&calls), "expired negative entries should trigger a re-fetch")
 }
 
 func TestScopeCache_ResolveHonorsCallerCancellation(t *testing.T) {
-	c := newScopeCache(time.Hour)
+	c := newScopeCache(time.Hour, negativeCacheTTL)
 	release := make(chan struct{})
 	fetchStarted := make(chan struct{})
 	var once sync.Once
-	fetch := func(_ context.Context) ([]string, error) {
+	fetch := func(_ context.Context) (string, error) {
 		once.Do(func() { close(fetchStarted) })
 		<-release // block until the test lets the shared fetch finish
-		return []string{"scope"}, nil
+		return "scope", nil
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -177,7 +185,7 @@ func TestScopeResolver_CachesMetadata(t *testing.T) {
 	assert.Equal(t, int64(1), atomic.LoadInt64(count), "metadata should be fetched once and then served from cache")
 }
 
-func TestScopeResolver_FailureNotCached(t *testing.T) {
+func TestScopeResolver_FailureNegativeCached(t *testing.T) {
 	var count int64
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		atomic.AddInt64(&count, 1)
@@ -189,11 +197,13 @@ func TestScopeResolver_FailureNotCached(t *testing.T) {
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, server.URL, nil)
 	require.NoError(t, err)
 
+	// Both calls fall back to the default scopes, but the failed metadata lookup
+	// is negatively cached so the endpoint is only hit once within the TTL.
 	for i := 0; i < 2; i++ {
 		scopes, err := resolver(context.Background(), req)
 		require.NoError(t, err)
 		assert.Equal(t, []string{"https://kusto.kusto.windows.net/.default"}, scopes)
 	}
 
-	assert.Equal(t, int64(2), atomic.LoadInt64(&count), "failed metadata lookups must not be cached")
+	assert.Equal(t, int64(1), atomic.LoadInt64(&count), "failed metadata lookups should be negatively cached within the TTL")
 }
