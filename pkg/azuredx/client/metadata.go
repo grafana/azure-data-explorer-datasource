@@ -90,6 +90,11 @@ func newScopeResolver(azureCloud string, metadataClient *http.Client) azhttpclie
 			return []string{fmt.Sprintf("%s/.default", metadata.KustoServiceResourceID)}, nil
 		})
 		if err != nil {
+			// A cancelled caller context isn't a metadata-endpoint problem.
+			// Return the default scopes instead of an error.
+			if ctx.Err() != nil {
+				return getDefaultAdxScopes(azureCloud, clusterUrl)
+			}
 			backend.Logger.FromContext(ctx).Warn("failed to fetch auth metadata from cluster, falling back to default scopes", "cluster", clusterUrl, "error", err)
 			return getDefaultAdxScopes(azureCloud, clusterUrl)
 		}
