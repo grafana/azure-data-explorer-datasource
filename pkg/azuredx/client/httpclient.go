@@ -33,6 +33,12 @@ func newHttpClientAzureCloud(ctx context.Context, instanceSettings *backend.Data
 	}
 	authOpts.SetScopeResolver(newScopeResolver(azureCloud, metadataClient))
 
+	// Seed the default scopes for the datasource's own cluster. The per-request
+	// ScopeResolver above supersedes these for every request (it falls back to
+	// the target cluster's default scopes on error), so this only takes effect
+	// if the SDK is ever changed to surface a resolver error instead of a
+	// fallback. In that case these seeded scopes are the default cluster's
+	// audience and may not match a cross-cluster query.
 	scopes, err := getDefaultAdxScopes(azureCloud, dsSettings.ClusterURL)
 	if err != nil {
 		return nil, err
