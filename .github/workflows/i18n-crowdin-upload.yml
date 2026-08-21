@@ -16,7 +16,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
       - name: 'Get vault secrets'
@@ -28,7 +28,7 @@ jobs:
             repo_secrets: |
                 CROWDIN_TOKEN=grafana-frontend-crowdin-token:access_token
       - name: Upload to Crowdin
-        uses: grafana/grafana-github-actions/crowdin-upload@26e65a1da9ffdf35d3e8cc6dbeffbccf16022d88 # main
+        uses: grafana/grafana-github-actions/crowdin-upload@36cd995b957c918d9f7c83953149d2507a53c2fd # main
         with:
           crowdin_token: ${{ env.CROWDIN_TOKEN }}
           crowdin_project_id: 32
