@@ -23,8 +23,8 @@
     "e2e": "playwright test"
   },
   "engines": {
-    "node": ">=24.5.0",
-    "npm": ">=11"
+    "node": ">=24",
+    "npm": ">=11.16.0"
   },
   "author": "Grafana Labs",
   "license": "Apache",
@@ -123,5 +123,5 @@
     "flatted": "3.4.2",
     "form-data": "4.0.6"
   },
-  "packageManager": "npm@11.16.0"
+  "packageManager": "npm@11.18.0"
 }
