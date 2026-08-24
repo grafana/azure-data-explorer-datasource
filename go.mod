@@ -1,14 +1,15 @@
 module github.com/grafana/azure-data-explorer-datasource
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.22.0
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.2
-	github.com/grafana/grafana-azure-sdk-go/v2 v2.4.1
+	github.com/grafana/grafana-azure-sdk-go/v2 v2.5.0
 	github.com/grafana/grafana-plugin-sdk-go v0.292.2
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.11.1
+	golang.org/x/sync v0.22.0
 )
 
 require (

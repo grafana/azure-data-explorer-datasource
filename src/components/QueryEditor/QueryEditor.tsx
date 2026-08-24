@@ -34,6 +34,8 @@ export const QueryEditor: React.FC<Props> = (props) => {
   const [dirty, setDirty] = useState(false);
   const isLoading = useMemo(() => props.data?.state === LoadingState.Loading, [props.data?.state]);
 
+  const activeSchema = schema.loading ? undefined : schema.value;
+
   useEffectOnce(() => {
     let processedQuery = query;
     if (typeof processedQuery !== 'string' && processedQuery.rawMode === undefined) {
@@ -48,7 +50,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
 
   return (
     <>
-      {schema.error && (
+      {!schema.loading && schema.error && (
         <Alert
           title={t(
             'components.query-editor.title-could-not-load-datasource-schema',
@@ -73,7 +75,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
       {query.OpenAI ? (
         <OpenAIEditor
           {...props}
-          schema={schema.value}
+          schema={activeSchema}
           database={query.database}
           datasource={datasource}
           templateVariableOptions={templateVariables}
@@ -83,7 +85,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
       {query.rawMode ? (
         <RawQueryEditor
           {...props}
-          schema={schema.value}
+          schema={activeSchema}
           database={query.database}
           templateVariableOptions={templateVariables}
           setDirty={() => !dirty && setDirty(true)}
@@ -92,7 +94,7 @@ export const QueryEditor: React.FC<Props> = (props) => {
       {!query.rawMode && !query.OpenAI ? (
         <VisualQueryEditor
           {...props}
-          schema={schema.value}
+          schema={activeSchema}
           database={query.database}
           templateVariableOptions={templateVariables}
         />
