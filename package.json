@@ -24,7 +24,7 @@
   },
   "engines": {
     "node": ">=24.5.0",
-    "npm": ">=11"
+    "npm": ">=11.16.0"
   },
   "author": "Grafana Labs",
   "license": "Apache",
@@ -33,7 +33,7 @@
     "@babel/core": "7.29.0",
     "@eslint/compat": "2.0.3",
     "@grafana/eslint-config": "9.0.0",
-    "@grafana/plugin-e2e": "3.10.0",
+    "@grafana/plugin-e2e": "3.11.0",
     "@grafana/plugin-meta-extractor": "0.13.0",
     "@grafana/tsconfig": "2.2.0",
     "@playwright/test": "1.58.2",
@@ -123,5 +123,5 @@
     "flatted": "3.4.2",
     "form-data": "4.0.6"
   },
-  "packageManager": "npm@11.16.0"
+  "packageManager": "npm@11.18.0"
 }

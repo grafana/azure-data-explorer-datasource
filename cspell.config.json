@@ -178,6 +178,6 @@
     "proxying",
     "nolint",
     "errcheck",
-    ""
+    "mycluster"
   ]
 }
