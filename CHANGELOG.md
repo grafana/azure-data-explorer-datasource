@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [7.2.10]
+
+- Resolve cluster OAuth scope per request from the cluster URL ([#1815](https://github.com/grafana/azure-data-explorer-datasource/pull/1815))
+- Dependency updates
+
 ## [7.2.9]
 
 - Support auto-retrieval of ADX audience ([#1793](https://github.com/grafana/azure-data-explorer-datasource/pull/1793))
