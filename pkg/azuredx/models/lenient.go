@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strconv"
 	"strings"
+
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
 // Load unmarshals all of jsonData at once, so one property whose stored type
@@ -16,6 +18,28 @@ import (
 // rather than erroring. Properties the backend acts on stay strict - a wrong
 // type there is a real error. None define MarshalJSON, so their Go kind still
 // matches the schema valueType that JSONDataTypesMatchStruct checks.
+
+// maxLoggedValueLen keeps a stored object or array from filling a log line.
+const maxLoggedValueLen = 64
+
+func coerced(toValueType, fromValueType string, data []byte) {
+	logLenient(fromValueType, toValueType, "coerced", data)
+}
+
+func dropped(toValueType, fromValueType string, data []byte) {
+	logLenient(fromValueType, toValueType, "dropped", data)
+}
+
+// logLenient records a jsonData value that did not match its declared type, so
+// we can gauge how often provisioning still relies on this leniency.
+func logLenient(fromValueType, toValueType, outcome string, data []byte) {
+	value := string(data)
+	if len(value) > maxLoggedValueLen {
+		value = value[:maxLoggedValueLen] + "…"
+	}
+	backend.Logger.Warn("datasource jsonData value does not match its declared type",
+		"from", fromValueType, "to", toValueType, "outcome", outcome, "value", value)
+}
 
 // LenientBool also accepts the string and numeric spellings of a boolean.
 type LenientBool bool
@@ -31,15 +55,21 @@ func (b *LenientBool) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &str); err == nil {
 		if parsed, err := strconv.ParseBool(strings.TrimSpace(str)); err == nil {
 			*b = LenientBool(parsed)
+			coerced("bool", "string", data)
+			return nil
 		}
+		dropped("bool", "string", data)
 		return nil
 	}
 
 	var number float64
 	if err := json.Unmarshal(data, &number); err == nil {
 		*b = LenientBool(number != 0)
+		coerced("bool", "float64", data)
+		return nil
 	}
 
+	dropped("bool", "unknown", data)
 	return nil
 }
 
@@ -58,9 +88,14 @@ func (i *LenientInt) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &str); err == nil {
 		if parsed, err := strconv.ParseFloat(strings.TrimSpace(str), 64); err == nil {
 			*i = LenientInt(parsed)
+			coerced("int", "string", data)
+			return nil
 		}
+		dropped("int", "string", data)
+		return nil
 	}
 
+	dropped("int", "unknown", data)
 	return nil
 }
 
@@ -76,14 +111,21 @@ func (s *LenientString) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	var scalar any
-	if err := json.Unmarshal(data, &scalar); err == nil {
-		switch scalar.(type) {
-		case float64, bool:
-			*s = LenientString(strings.TrimSpace(string(data)))
-		}
+	var number float64
+	if err := json.Unmarshal(data, &number); err == nil {
+		*s = LenientString(strings.TrimSpace(string(data)))
+		coerced("string", "float64", data)
+		return nil
 	}
 
+	var boolean bool
+	if err := json.Unmarshal(data, &boolean); err == nil {
+		*s = LenientString(strings.TrimSpace(string(data)))
+		coerced("string", "bool", data)
+		return nil
+	}
+
+	dropped("string", "unknown", data)
 	return nil
 }
 
@@ -101,6 +143,7 @@ func (s *LenientStringSlice) UnmarshalJSON(data []byte) error {
 	var str string
 	if err := json.Unmarshal(data, &str); err == nil {
 		*s = splitAndTrim(str)
+		coerced("[]string", "string", data)
 		return nil
 	}
 
@@ -113,8 +156,13 @@ func (s *LenientStringSlice) UnmarshalJSON(data []byte) error {
 			}
 		}
 		*s = result
+		if len(result) < len(mixed) {
+			coerced("[]string", "mixed", data)
+		}
+		return nil
 	}
 
+	dropped("[]string", "unknown", data)
 	return nil
 }
 
@@ -131,6 +179,7 @@ func (m *LenientSchemaMappings) UnmarshalJSON(data []byte) error {
 
 	var raw []json.RawMessage
 	if err := json.Unmarshal(data, &raw); err != nil {
+		dropped("[]SchemaMapping", "unknown", data)
 		return nil
 	}
 
@@ -139,6 +188,8 @@ func (m *LenientSchemaMappings) UnmarshalJSON(data []byte) error {
 		var mapping SchemaMapping
 		if err := json.Unmarshal(entry, &mapping); err == nil {
 			result = append(result, mapping)
+		} else {
+			dropped("SchemaMapping", "unknown", entry)
 		}
 	}
 	*m = result
