@@ -181,6 +181,8 @@
     "clientcertificate",
     "struct",
     "Struct",
-    "mycluster"
+    "mycluster",
+    "unmarshals",
+    "unparseable"
   ]
 }
