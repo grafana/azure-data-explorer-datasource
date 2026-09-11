@@ -1,8 +1,8 @@
+import { render, screen, waitFor } from '@testing-library/react';
 import { mockDatasource, mockQuery } from 'components/__fixtures__/Datasource';
 import React from 'react';
-import { QueryEditor } from './QueryEditor';
-import { render, screen, waitFor } from '@testing-library/react';
 import { AdxQueryType, defaultQuery, EditorMode } from 'types';
+import { QueryEditor } from './QueryEditor';
 
 jest.mock('@grafana/runtime', () => {
   const original = jest.requireActual('@grafana/runtime');
@@ -92,6 +92,32 @@ describe('QueryEditor', () => {
       );
       await waitFor(() => screen.getByText('Could not load datasource schema'));
       await waitFor(() => screen.getByText('Boom!'));
+    });
+
+    it('should not show the schema error while the request is still loading', async () => {
+      const ds = mockDatasource();
+      ds.getClusters = jest.fn().mockResolvedValue([]);
+      let rejectSchema: (reason?: unknown) => void = () => {};
+      ds.getSchema = jest.fn().mockImplementation(
+        () =>
+          new Promise((_, reject) => {
+            rejectSchema = reject;
+          })
+      );
+      render(
+        <QueryEditor
+          {...defaultProps}
+          datasource={ds}
+          query={{
+            ...mockQuery,
+            database: 'test-db',
+          }}
+        />
+      );
+
+      expect(screen.queryByText('Could not load datasource schema')).not.toBeInTheDocument();
+      rejectSchema('Oops');
+      await waitFor(() => screen.getByText('Could not load datasource schema'));
     });
   });
 });

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/models"
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
 )
 
@@ -69,4 +70,17 @@ func getAdxEndpoints(azureCloud string, settings *azsettings.AzureSettings) ([]s
 		return nil, fmt.Errorf("failed to parse ADX endpoint URL: %w", err)
 	}
 	return []string{adxEndpoint}, nil
+}
+
+func getTrustedEndpoints(azureCloud string, azureSettings *azsettings.AzureSettings, dsSettings *models.DatasourceSettings) ([]string, error) {
+	endpoints, err := getAdxEndpoints(azureCloud, azureSettings)
+	if err != nil {
+		return nil, err
+	}
+
+	if dsSettings.AllowUserTrustedEndpoints && len(dsSettings.UserTrustedEndpoints) > 0 {
+		endpoints = append(endpoints, dsSettings.UserTrustedEndpoints...)
+	}
+
+	return endpoints, nil
 }

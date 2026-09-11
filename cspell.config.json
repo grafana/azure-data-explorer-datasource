@@ -181,6 +181,6 @@
     "clientcertificate",
     "struct",
     "Struct",
-    ""
+    "mycluster"
   ]
 }

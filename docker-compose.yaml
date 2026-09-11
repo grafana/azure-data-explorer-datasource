@@ -10,8 +10,6 @@ services:
       - ./dist:/var/lib/grafana/plugins/azure-data-explorer-datasource
     env_file:
       - .env
-    environment:
-      GF_FEATURE_TOGGLES_dashboardNewLayouts: "false"
     extends:
       file: .config/docker-compose-base.yaml
       service: grafana

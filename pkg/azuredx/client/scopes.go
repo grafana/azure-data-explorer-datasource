@@ -1,15 +1,12 @@
 package client
 
 import (
-	"context"
 	"fmt"
-	"net/http"
 	"net/url"
 	"path"
 	"strings"
 
 	"github.com/grafana/grafana-azure-sdk-go/v2/azsettings"
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
 var (
@@ -20,17 +17,7 @@ var (
 	}
 )
 
-func getAdxScopes(ctx context.Context, httpClient *http.Client, azureCloud string, clusterUrl string) ([]string, error) {
-	metadata, err := fetchAuthMetadata(ctx, httpClient, clusterUrl)
-	if err == nil {
-		return []string{fmt.Sprintf("%s/.default", metadata.KustoServiceResourceID)}, nil
-	}
-
-	backend.Logger.Warn("failed to fetch auth metadata from cluster, falling back to hardcoded scopes", "cluster", clusterUrl, "error", err)
-	return getAdxScopesFallback(azureCloud, clusterUrl)
-}
-
-func getAdxScopesFallback(azureCloud string, clusterUrl string) ([]string, error) {
+func getDefaultAdxScopes(azureCloud string, clusterUrl string) ([]string, error) {
 	scopeTmpl, ok := "", false
 	if scopeTmpl, ok = adxScopes[azureCloud]; !ok {
 		scopeTmpl = "{clusterUrl}/.default"
