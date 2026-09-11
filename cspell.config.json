@@ -177,6 +177,12 @@
     "proxying",
     "nolint",
     "errcheck",
-    "mycluster"
+    "dsconfig",
+    "clientcertificate",
+    "struct",
+    "Struct",
+    "mycluster",
+    "unmarshals",
+    "unparseable"
   ]
 }
