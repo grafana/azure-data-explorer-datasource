@@ -36,6 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Välj typ av autentisering till Azure-tjänster",
+      "description-current-user-authentication": "",
       "description-on-behalf-of-feature-is-in-beta": "Gå till <2>dokumentationen</2> för kända begränsningar och problem, felrapporter eller feedback.",
       "error-client-id-required": "Kund-ID krävs",
       "error-client-secret-required": "Klienthemlighet krävs",
@@ -47,6 +48,7 @@
       "label-directory-tenant-id": "Katalog-(hyresgäst-)ID",
       "reset": "Återställ",
       "title-authentication": "Autentisering",
+      "title-current-user-authentication": "",
       "title-on-behalf-of-feature-is-in-beta": "På uppdrag av-funktionen är i betastadiet"
     },
     "config-editor": {
