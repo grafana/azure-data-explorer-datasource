@@ -99,6 +99,7 @@
     "instancemgmt",
     "isnotempty",
     "isnotnull",
+    "jsonencode",
     "jsoniter",
     "kqlpreview",
     "kust",
