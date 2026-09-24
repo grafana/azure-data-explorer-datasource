@@ -27,7 +27,7 @@
       "target": "jsonData",
       "role": "auth.discriminator",
       "help": {
-        "markdown": "Discriminated-union object written by the `@grafana/azure-sdk` `AzureCredentialsForm`. Shape depends on `authType`:\n\n- `msi` — `{ authType: 'msi' }` (only rendered when Grafana has `azure.managedIdentityEnabled`).\n- `workloadidentity` — `{ authType: 'workloadidentity' }` (only when `azure.workloadIdentityEnabled`).\n- `currentuser` — `{ authType: 'currentuser' }` (only when `azure.userIdentityEnabled`).\n- `clientsecret` — `{ authType: 'clientsecret', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`). Always available.\n- `clientsecret-obo` — `{ authType: 'clientsecret-obo', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`; requires the `adxOnBehalfOf` feature toggle AND `jsonData.oauthPassThru = true`).\n\nNote that Azure Data Explorer's editor does **not** expose the `clientcertificate` or `ad-password` auth types offered by the shared SDK."
+        "markdown": "Discriminated-union object written by the `@grafana/azure-sdk` `AzureCredentialsForm`. Shape depends on `authType`:\n\n- `msi` — `{ authType: 'msi' }` (only rendered when Grafana has `azure.managedIdentityEnabled`).\n- `workloadidentity` — `{ authType: 'workloadidentity' }` (only when `azure.workloadIdentityEnabled`).\n- `currentuser` — `{ authType: 'currentuser' }` (only when `azure.userIdentityEnabled`); also requires `jsonData.oauthPassThru = true`. The Azure SDK sets this automatically when the auth type is selected in the UI, but it must be set explicitly when hand-authoring provisioning — omitting it causes authentication to fail because Grafana won't forward the signed-in user's ID token.\n- `clientsecret` — `{ authType: 'clientsecret', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`). Always available.\n- `clientsecret-obo` — `{ authType: 'clientsecret-obo', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`; requires the `adxOnBehalfOf` feature toggle AND `jsonData.oauthPassThru = true`).\n\nNote that Azure Data Explorer's editor does **not** expose the `clientcertificate` or `ad-password` auth types offered by the shared SDK."
       },
       "tags": ["azure", "sdk-managed"]
     },
@@ -55,7 +55,7 @@
     {
       "id": "jsonData_oauthPassThru",
       "key": "oauthPassThru",
-      "description": "Set to `true` by `@grafana/azure-sdk`'s `updateDatasourceCredentials` whenever the selected auth type is `clientsecret-obo` (On-Behalf-Of). The plugin backend enforces `oauthPassThru == true` for OBO (`ensureOnBehalfOfSupported`); creation fails otherwise.",
+      "description": "Set to `true` by `@grafana/azure-sdk`'s `updateDatasourceCredentials` whenever the selected auth type is `clientsecret-obo` (On-Behalf-Of) or `currentuser`. The plugin backend enforces `oauthPassThru == true` for OBO (`ensureOnBehalfOfSupported`); creation fails otherwise. For `currentuser` it isn't enforced by this plugin, but Grafana core needs it to forward the signed-in user's ID token — omitting it causes authentication to fail.",
       "valueType": "boolean",
       "target": "jsonData",
       "role": "auth.forwardOAuthToken.enabled",
@@ -416,7 +416,7 @@
         "secureJsonData_clientSecret",
         "jsonData_oauthPassThru"
       ],
-      "description": "Modern discriminated-union credentials — `jsonData.azureCredentials.authType` selects which secret keys are populated. Managed atomically by `@grafana/azure-sdk`'s `AzureCredentialsForm`. `oauthPassThru` is set to true for `clientsecret-obo` and is a hard requirement enforced by the plugin backend."
+      "description": "Modern discriminated-union credentials — `jsonData.azureCredentials.authType` selects which secret keys are populated. Managed atomically by `@grafana/azure-sdk`'s `AzureCredentialsForm`. `oauthPassThru` is set to true for `clientsecret-obo` (a hard requirement enforced by the plugin backend) and for `currentuser` (required by Grafana core to forward the signed-in user's ID token; not enforced by this plugin)."
     },
     {
       "type": "group",

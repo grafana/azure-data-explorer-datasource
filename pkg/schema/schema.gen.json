@@ -12,7 +12,7 @@
               "type": "string"
             },
             "azureCloud": {
-              "description": "Legacy Azure cloud discriminator written by the pre-2023 ADX config editor. Resolved by `pkg/azuredx/adxauth/adxcredentials/builder.go:107-121` `resolveLegacyCloudName`: `azuremonitor` → `AzureCloud`, `chinaazuremonitor` → `AzureChinaCloud`, `govazuremonitor` → `AzureUSGovernment`, empty → `AzureCloud`. The modern `AzureCredentialsForm` writes cloud inside `jsonData.azureCredentials.azureCloud` and clears this field.",
+              "description": "Legacy Azure cloud discriminator written by the pre-2023 ADX config editor. Resolved by the backend's `resolveLegacyCloudName`: `azuremonitor` → `AzureCloud`, `chinaazuremonitor` → `AzureChinaCloud`, `govazuremonitor` → `AzureUSGovernment`, empty → `AzureCloud`. The modern `AzureCredentialsForm` writes cloud inside `jsonData.azureCredentials.azureCloud` and clears this field.",
               "type": "string"
             },
             "azureCredentials": {
@@ -59,7 +59,7 @@
               "default": false
             },
             "enableSecureSocksProxy": {
-              "description": "Enable proxying the datasource connection through the secure socks proxy to a different network. Consumed by Grafana core rather than the plugin backend (it is absent from `pkg/azuredx/models/settings.go`). The config editor only renders the toggle when the `secureSocksDSProxyEnabled` feature toggle is on (`src/components/ConfigEditor/index.tsx:168`); it can always be set via provisioning. See https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/.",
+              "description": "Enable proxying the datasource connection through the secure socks proxy to a different network. Consumed by Grafana core rather than the plugin backend. The config editor only renders the toggle when the `secureSocksDSProxyEnabled` feature toggle is on; it can always be set via provisioning. See https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/.",
               "type": "boolean",
               "default": false
             },
@@ -76,15 +76,15 @@
               }
             },
             "minimalCache": {
-              "description": "Declared on `AdxDataSourceOptions` (`src/types/index.ts:115`) but never written by the config editor and never read by the plugin backend (`pkg/azuredx/models/settings.go` reads only `cacheMaxAge`). Dead field; preserved so provisioned datasources with the property still parse.",
+              "description": "Declared on `AdxDataSourceOptions` but never written by the config editor and never read by the plugin backend (which reads only `cacheMaxAge`). Dead field; preserved so provisioned datasources with the property still parse.",
               "type": "number"
             },
             "oauthPassThru": {
-              "description": "Set to `true` by `@grafana/azure-sdk`'s `updateDatasourceCredentials` whenever the selected auth type is `clientsecret-obo` (On-Behalf-Of). The plugin backend enforces `oauthPassThru == true` for OBO in `pkg/azuredx/adxauth/adxcredentials/builder.go:89-98` (`ensureOnBehalfOfSupported`); creation fails otherwise.",
+              "description": "Set to `true` by `@grafana/azure-sdk`'s `updateDatasourceCredentials` whenever the selected auth type is `clientsecret-obo` (On-Behalf-Of) or `currentuser`. The plugin backend enforces `oauthPassThru == true` for OBO (`ensureOnBehalfOfSupported`); creation fails otherwise. For `currentuser` it isn't enforced by this plugin, but Grafana core needs it to forward the signed-in user's ID token — omitting it causes authentication to fail.",
               "type": "boolean"
             },
             "onBehalfOf": {
-              "description": "Legacy On-Behalf-Of flag; when true and paired with legacy top-level `tenantId`/`clientId`/`secureJsonData.clientSecret`, the backend legacy fallback (`pkg/azuredx/adxauth/adxcredentials/builder.go:71-84`) constructs an `AzureClientSecretOboCredentials` instead of a plain `AzureClientSecretCredentials`. The modern form migrates this to `authType: clientsecret-obo`.",
+              "description": "Legacy On-Behalf-Of flag; when true and paired with legacy top-level `tenantId`/`clientId`/`secureJsonData.clientSecret`, the backend legacy fallback constructs an `AzureClientSecretOboCredentials` instead of a plain `AzureClientSecretCredentials`. The modern form migrates this to `authType: clientsecret-obo`.",
               "type": "boolean"
             },
             "queryTimeout": {
@@ -141,12 +141,90 @@
       },
       {
         "key": "clientSecret",
-        "description": "Legacy client secret key. Preserved for backward compatibility with datasources provisioned before the credential migration to `azureClientSecret`. The backend reads it as a fallback in `pkg/azuredx/adxauth/adxcredentials/builder.go:57` (`getFromLegacy`) when no modern `jsonData.azureCredentials` is present."
+        "description": "Legacy client secret key. Preserved for backward compatibility with datasources provisioned before the credential migration to `azureClientSecret`. The backend reads it as a fallback (`getFromLegacy`) when no modern `jsonData.azureCredentials` is present."
       },
       {
         "key": "OpenAIAPIKey",
-        "description": "OpenAI API key used by the plugin's `askOpenAI` resource endpoint (`pkg/azuredx/resource_handler.go:55-89`) to power the AI query assistant. There is no config editor UI to set it — the ADX ConfigEditor only inspects `secureJsonFields.OpenAIAPIKey` to decide whether the Additional settings section starts open (`src/components/ConfigEditor/index.tsx:58`). Populate it through provisioning YAML or via the datasource API."
+        "description": "OpenAI API key used by the plugin's `askOpenAI` resource endpoint to power the AI query assistant. There is no config editor UI to set it — the ADX ConfigEditor only inspects `secureJsonFields.OpenAIAPIKey` to decide whether the Additional settings section starts open. Populate it through provisioning YAML or via the datasource API."
       }
     ]
+  },
+  "settingsExamples": {
+    "examples": {
+      "": {
+        "summary": "App Registration + Client Secret",
+        "description": "The default auth type: an Azure AD App Registration authenticating with a client secret. Always available, regardless of Grafana feature toggles.",
+        "value": {
+          "clusterUrl": "https://mycluster.kusto.windows.net",
+          "jsonData": {
+            "azureCredentials": {
+              "authType": "clientsecret",
+              "azureCloud": "AzureCloud",
+              "clientId": "REPLACE_WITH_CLIENT_ID",
+              "tenantId": "REPLACE_WITH_TENANT_ID"
+            }
+          },
+          "secureJsonData": {
+            "azureClientSecret": "REPLACE_WITH_CLIENT_SECRET"
+          }
+        }
+      },
+      "clientSecretObo": {
+        "summary": "App Registration On-Behalf-Of",
+        "description": "An App Registration that exchanges the signed-in user's token for one scoped to Azure Data Explorer. Requires the adxOnBehalfOf Grafana feature toggle. jsonData.oauthPassThru must be true; the plugin backend rejects the datasource otherwise.",
+        "value": {
+          "clusterUrl": "https://mycluster.kusto.windows.net",
+          "jsonData": {
+            "azureCredentials": {
+              "authType": "clientsecret-obo",
+              "azureCloud": "AzureCloud",
+              "clientId": "REPLACE_WITH_CLIENT_ID",
+              "tenantId": "REPLACE_WITH_TENANT_ID"
+            },
+            "oauthPassThru": true
+          },
+          "secureJsonData": {
+            "azureClientSecret": "REPLACE_WITH_CLIENT_SECRET"
+          }
+        }
+      },
+      "currentUser": {
+        "summary": "Current user (identity forwarding)",
+        "description": "Authenticate as the Grafana user viewing the dashboard. Only available when Grafana has the azure.userIdentityEnabled feature toggle. jsonData.oauthPassThru must be set to true — the Azure SDK sets it automatically from the UI, but omitting it here causes authentication to fail because Grafana won't forward the signed-in user's ID token.",
+        "value": {
+          "clusterUrl": "https://mycluster.kusto.windows.net",
+          "jsonData": {
+            "azureCredentials": {
+              "authType": "currentuser"
+            },
+            "oauthPassThru": true
+          }
+        }
+      },
+      "managedIdentity": {
+        "summary": "Managed Identity",
+        "description": "Authenticate with an Azure Managed Identity assigned to the Grafana host. Only available when Grafana has the azure.managedIdentityEnabled feature toggle.",
+        "value": {
+          "clusterUrl": "https://mycluster.kusto.windows.net",
+          "jsonData": {
+            "azureCredentials": {
+              "authType": "msi"
+            }
+          }
+        }
+      },
+      "workloadIdentity": {
+        "summary": "Workload Identity",
+        "description": "Authenticate with an Azure AD Workload Identity federated to the Kubernetes service account Grafana runs as. Only available when Grafana has the azure.workloadIdentityEnabled feature toggle.",
+        "value": {
+          "clusterUrl": "https://mycluster.kusto.windows.net",
+          "jsonData": {
+            "azureCredentials": {
+              "authType": "workloadidentity"
+            }
+          }
+        }
+      }
+    }
   }
 }
