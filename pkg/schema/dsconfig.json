@@ -27,7 +27,7 @@
       "target": "jsonData",
       "role": "auth.discriminator",
       "help": {
-        "markdown": "Discriminated-union object written by the `@grafana/azure-sdk` `AzureCredentialsForm` in `src/components/ConfigEditor/AzureCredentialsForm.tsx`. Shape depends on `authType`:\n\n- `msi` — `{ authType: 'msi' }` (only rendered when Grafana has `azure.managedIdentityEnabled`).\n- `workloadidentity` — `{ authType: 'workloadidentity' }` (only when `azure.workloadIdentityEnabled`).\n- `currentuser` — `{ authType: 'currentuser' }` (only when `azure.userIdentityEnabled`).\n- `clientsecret` — `{ authType: 'clientsecret', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`). Always available.\n- `clientsecret-obo` — `{ authType: 'clientsecret-obo', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`; requires the `adxOnBehalfOf` feature toggle AND `jsonData.oauthPassThru = true`).\n\nSee `src/credentials/AzureCredentials.ts` in `grafana/grafana-azure-sdk-react@0.1.0` and the backend builder in `pkg/azuredx/adxauth/adxcredentials/builder.go`. Note that Azure Data Explorer's editor does **not** expose the `clientcertificate` or `ad-password` auth types offered by the shared SDK."
+        "markdown": "Discriminated-union object written by the `@grafana/azure-sdk` `AzureCredentialsForm`. Shape depends on `authType`:\n\n- `msi` — `{ authType: 'msi' }` (only rendered when Grafana has `azure.managedIdentityEnabled`).\n- `workloadidentity` — `{ authType: 'workloadidentity' }` (only when `azure.workloadIdentityEnabled`).\n- `currentuser` — `{ authType: 'currentuser' }` (only when `azure.userIdentityEnabled`).\n- `clientsecret` — `{ authType: 'clientsecret', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`). Always available.\n- `clientsecret-obo` — `{ authType: 'clientsecret-obo', azureCloud, tenantId, clientId }` (secret in `secureJsonData.azureClientSecret`; requires the `adxOnBehalfOf` feature toggle AND `jsonData.oauthPassThru = true`).\n\nNote that Azure Data Explorer's editor does **not** expose the `clientcertificate` or `ad-password` auth types offered by the shared SDK."
       },
       "tags": ["azure", "sdk-managed"]
     },
@@ -47,7 +47,7 @@
     {
       "id": "secureJsonData_clientSecret",
       "key": "clientSecret",
-      "description": "Legacy client secret key. Preserved for backward compatibility with datasources provisioned before the credential migration to `azureClientSecret`. The backend reads it as a fallback in `pkg/azuredx/adxauth/adxcredentials/builder.go:57` (`getFromLegacy`) when no modern `jsonData.azureCredentials` is present.",
+      "description": "Legacy client secret key. Preserved for backward compatibility with datasources provisioned before the credential migration to `azureClientSecret`. The backend reads it as a fallback (`getFromLegacy`) when no modern `jsonData.azureCredentials` is present.",
       "valueType": "string",
       "target": "secureJsonData",
       "tags": ["azure", "legacy"]
@@ -55,7 +55,7 @@
     {
       "id": "jsonData_oauthPassThru",
       "key": "oauthPassThru",
-      "description": "Set to `true` by `@grafana/azure-sdk`'s `updateDatasourceCredentials` whenever the selected auth type is `clientsecret-obo` (On-Behalf-Of). The plugin backend enforces `oauthPassThru == true` for OBO in `pkg/azuredx/adxauth/adxcredentials/builder.go:89-98` (`ensureOnBehalfOfSupported`); creation fails otherwise.",
+      "description": "Set to `true` by `@grafana/azure-sdk`'s `updateDatasourceCredentials` whenever the selected auth type is `clientsecret-obo` (On-Behalf-Of). The plugin backend enforces `oauthPassThru == true` for OBO (`ensureOnBehalfOfSupported`); creation fails otherwise.",
       "valueType": "boolean",
       "target": "jsonData",
       "role": "auth.forwardOAuthToken.enabled",
@@ -269,7 +269,7 @@
       "id": "jsonData_enableSecureSocksProxy",
       "key": "enableSecureSocksProxy",
       "label": "Enable secure socks proxy",
-      "description": "Enable proxying the datasource connection through the secure socks proxy to a different network. Consumed by Grafana core rather than the plugin backend (it is absent from `pkg/azuredx/models/settings.go`). The config editor only renders the toggle when the `secureSocksDSProxyEnabled` feature toggle is on (`src/components/ConfigEditor/index.tsx:168`); it can always be set via provisioning. See https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/.",
+      "description": "Enable proxying the datasource connection through the secure socks proxy to a different network. Consumed by Grafana core rather than the plugin backend. The config editor only renders the toggle when the `secureSocksDSProxyEnabled` feature toggle is on; it can always be set via provisioning. See https://grafana.com/docs/grafana/next/setup-grafana/configure-grafana/proxy/.",
       "valueType": "boolean",
       "target": "jsonData",
       "defaultValue": false
@@ -277,7 +277,7 @@
     {
       "id": "secureJsonData_OpenAIAPIKey",
       "key": "OpenAIAPIKey",
-      "description": "OpenAI API key used by the plugin's `askOpenAI` resource endpoint (`pkg/azuredx/resource_handler.go:55-89`) to power the AI query assistant. There is no config editor UI to set it — the ADX ConfigEditor only inspects `secureJsonFields.OpenAIAPIKey` to decide whether the Additional settings section starts open (`src/components/ConfigEditor/index.tsx:58`). Populate it through provisioning YAML or via the datasource API.",
+      "description": "OpenAI API key used by the plugin's `askOpenAI` resource endpoint to power the AI query assistant. There is no config editor UI to set it — the ADX ConfigEditor only inspects `secureJsonFields.OpenAIAPIKey` to decide whether the Additional settings section starts open. Populate it through provisioning YAML or via the datasource API.",
       "valueType": "string",
       "target": "secureJsonData",
       "tags": ["backend-only"]
@@ -285,7 +285,7 @@
     {
       "id": "jsonData_minimalCache",
       "key": "minimalCache",
-      "description": "Declared on `AdxDataSourceOptions` (`src/types/index.ts:115`) but never written by the config editor and never read by the plugin backend (`pkg/azuredx/models/settings.go` reads only `cacheMaxAge`). Dead field; preserved so provisioned datasources with the property still parse.",
+      "description": "Declared on `AdxDataSourceOptions` but never written by the config editor and never read by the plugin backend (which reads only `cacheMaxAge`). Dead field; preserved so provisioned datasources with the property still parse.",
       "valueType": "number",
       "target": "jsonData",
       "tags": ["frontend-only", "deprecated"]
@@ -293,7 +293,7 @@
     {
       "id": "jsonData_azureCloud",
       "key": "azureCloud",
-      "description": "Legacy Azure cloud discriminator written by the pre-2023 ADX config editor. Resolved by `pkg/azuredx/adxauth/adxcredentials/builder.go:107-121` `resolveLegacyCloudName`: `azuremonitor` → `AzureCloud`, `chinaazuremonitor` → `AzureChinaCloud`, `govazuremonitor` → `AzureUSGovernment`, empty → `AzureCloud`. The modern `AzureCredentialsForm` writes cloud inside `jsonData.azureCredentials.azureCloud` and clears this field.",
+      "description": "Legacy Azure cloud discriminator written by the pre-2023 ADX config editor. Resolved by the backend's `resolveLegacyCloudName`: `azuremonitor` → `AzureCloud`, `chinaazuremonitor` → `AzureChinaCloud`, `govazuremonitor` → `AzureUSGovernment`, empty → `AzureCloud`. The modern `AzureCredentialsForm` writes cloud inside `jsonData.azureCredentials.azureCloud` and clears this field.",
       "valueType": "string",
       "target": "jsonData",
       "tags": ["legacy"]
@@ -301,7 +301,7 @@
     {
       "id": "jsonData_onBehalfOf",
       "key": "onBehalfOf",
-      "description": "Legacy On-Behalf-Of flag; when true and paired with legacy top-level `tenantId`/`clientId`/`secureJsonData.clientSecret`, the backend legacy fallback (`pkg/azuredx/adxauth/adxcredentials/builder.go:71-84`) constructs an `AzureClientSecretOboCredentials` instead of a plain `AzureClientSecretCredentials`. The modern form migrates this to `authType: clientsecret-obo`.",
+      "description": "Legacy On-Behalf-Of flag; when true and paired with legacy top-level `tenantId`/`clientId`/`secureJsonData.clientSecret`, the backend legacy fallback constructs an `AzureClientSecretOboCredentials` instead of a plain `AzureClientSecretCredentials`. The modern form migrates this to `authType: clientsecret-obo`.",
       "valueType": "boolean",
       "target": "jsonData",
       "tags": ["legacy"]
@@ -427,7 +427,7 @@
         "jsonData_clientId",
         "secureJsonData_clientSecret"
       ],
-      "description": "Legacy top-level credentials preserved by the frontend/backend fallbacks (`src/components/ConfigEditor/AzureCredentialsConfig.ts:46-67` `getLegacyCredentials`, `pkg/azuredx/adxauth/adxcredentials/builder.go:40-87` `getFromLegacy`). Saved datasources are migrated to `jsonData.azureCredentials` on next edit."
+      "description": "Legacy top-level credentials preserved by the frontend/backend fallbacks (`getLegacyCredentials`, `getFromLegacy`). Saved datasources are migrated to `jsonData.azureCredentials` on next edit."
     },
     {
       "type": "pair",
