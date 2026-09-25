@@ -155,17 +155,24 @@
         "summary": "App Registration + Client Secret",
         "description": "The default auth type: an Azure AD App Registration authenticating with a client secret. Always available, regardless of Grafana feature toggles.",
         "value": {
-          "clusterUrl": "https://mycluster.kusto.windows.net",
-          "jsonData": {
-            "azureCredentials": {
-              "authType": "clientsecret",
-              "azureCloud": "AzureCloud",
-              "clientId": "REPLACE_WITH_CLIENT_ID",
-              "tenantId": "REPLACE_WITH_TENANT_ID"
+          "metadata": {
+            "name": "my-datasource"
+          },
+          "secure": {
+            "azureClientSecret": {
+              "create": "REPLACE_WITH_CLIENT_SECRET"
             }
           },
-          "secureJsonData": {
-            "azureClientSecret": "REPLACE_WITH_CLIENT_SECRET"
+          "spec": {
+            "jsonData": {
+              "azureCredentials": {
+                "authType": "clientsecret",
+                "azureCloud": "AzureCloud",
+                "clientId": "REPLACE_WITH_CLIENT_ID",
+                "tenantId": "REPLACE_WITH_TENANT_ID"
+              },
+              "clusterUrl": "https://mycluster.kusto.windows.net"
+            }
           }
         }
       },
@@ -173,18 +180,25 @@
         "summary": "App Registration On-Behalf-Of",
         "description": "An App Registration that exchanges the signed-in user's token for one scoped to Azure Data Explorer. Requires the adxOnBehalfOf Grafana feature toggle. jsonData.oauthPassThru must be true; the plugin backend rejects the datasource otherwise.",
         "value": {
-          "clusterUrl": "https://mycluster.kusto.windows.net",
-          "jsonData": {
-            "azureCredentials": {
-              "authType": "clientsecret-obo",
-              "azureCloud": "AzureCloud",
-              "clientId": "REPLACE_WITH_CLIENT_ID",
-              "tenantId": "REPLACE_WITH_TENANT_ID"
-            },
-            "oauthPassThru": true
+          "metadata": {
+            "name": "my-datasource"
           },
-          "secureJsonData": {
-            "azureClientSecret": "REPLACE_WITH_CLIENT_SECRET"
+          "secure": {
+            "azureClientSecret": {
+              "create": "REPLACE_WITH_CLIENT_SECRET"
+            }
+          },
+          "spec": {
+            "jsonData": {
+              "azureCredentials": {
+                "authType": "clientsecret-obo",
+                "azureCloud": "AzureCloud",
+                "clientId": "REPLACE_WITH_CLIENT_ID",
+                "tenantId": "REPLACE_WITH_TENANT_ID"
+              },
+              "clusterUrl": "https://mycluster.kusto.windows.net",
+              "oauthPassThru": true
+            }
           }
         }
       },
@@ -192,12 +206,17 @@
         "summary": "Current user (identity forwarding)",
         "description": "Authenticate as the Grafana user viewing the dashboard. Only available when Grafana has the azure.userIdentityEnabled feature toggle. jsonData.oauthPassThru must be set to true — the Azure SDK sets it automatically from the UI, but omitting it here causes authentication to fail because Grafana won't forward the signed-in user's ID token.",
         "value": {
-          "clusterUrl": "https://mycluster.kusto.windows.net",
-          "jsonData": {
-            "azureCredentials": {
-              "authType": "currentuser"
-            },
-            "oauthPassThru": true
+          "metadata": {
+            "name": "my-datasource"
+          },
+          "spec": {
+            "jsonData": {
+              "azureCredentials": {
+                "authType": "currentuser"
+              },
+              "clusterUrl": "https://mycluster.kusto.windows.net",
+              "oauthPassThru": true
+            }
           }
         }
       },
@@ -205,10 +224,15 @@
         "summary": "Managed Identity",
         "description": "Authenticate with an Azure Managed Identity assigned to the Grafana host. Only available when Grafana has the azure.managedIdentityEnabled feature toggle.",
         "value": {
-          "clusterUrl": "https://mycluster.kusto.windows.net",
-          "jsonData": {
-            "azureCredentials": {
-              "authType": "msi"
+          "metadata": {
+            "name": "my-datasource"
+          },
+          "spec": {
+            "jsonData": {
+              "azureCredentials": {
+                "authType": "msi"
+              },
+              "clusterUrl": "https://mycluster.kusto.windows.net"
             }
           }
         }
@@ -217,10 +241,15 @@
         "summary": "Workload Identity",
         "description": "Authenticate with an Azure AD Workload Identity federated to the Kubernetes service account Grafana runs as. Only available when Grafana has the azure.workloadIdentityEnabled feature toggle.",
         "value": {
-          "clusterUrl": "https://mycluster.kusto.windows.net",
-          "jsonData": {
-            "azureCredentials": {
-              "authType": "workloadidentity"
+          "metadata": {
+            "name": "my-datasource"
+          },
+          "spec": {
+            "jsonData": {
+              "azureCredentials": {
+                "authType": "workloadidentity"
+              },
+              "clusterUrl": "https://mycluster.kusto.windows.net"
             }
           }
         }
