@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [7.2.11]
+
+- Fix security vulnerabilities (CVE-2026-49356, CVE-2026-85730)
+
 ## [7.2.10]
 
 - Resolve cluster OAuth scope per request from the cluster URL ([#1815](https://github.com/grafana/azure-data-explorer-datasource/pull/1815))
