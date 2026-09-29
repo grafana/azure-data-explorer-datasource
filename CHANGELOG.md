@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [7.2.12]
+
+- Add data source configuration schema (dsconfig) ([#1780](https://github.com/grafana/azure-data-explorer-datasource/pull/1780))
+
 ## [7.2.11]
 
 - Fix security vulnerabilities (CVE-2026-49356, CVE-2026-85730)
