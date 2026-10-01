@@ -27,7 +27,12 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
         const databasesQuery = (queryObj as string).match(/^databases\(\)/i);
         const defaultDatabase = await this.datasource.getDefaultOrFirstDatabase();
         const defaultCluster = await this.datasource.getDefaultOrFirstCluster();
-        const baseQuery = this.datasource.buildQuery(queryObj, {}, defaultDatabase, defaultCluster);
+        const baseQuery = this.datasource.buildQuery(
+          queryObj,
+          { scopedVars: request.scopedVars },
+          defaultDatabase,
+          defaultCluster
+        );
         if (databasesQuery) {
           queryObj = { ...baseQuery, queryType: AdxQueryType.Databases };
         } else {
@@ -76,7 +81,12 @@ export class VariableSupport extends CustomVariableSupport<AdxDataSource, KustoQ
               data: columns.length ? [toDataFrame(columnNames)] : [],
             };
           default:
-            const query = this.datasource.buildQuery(queryObj.query, {}, queryObj.database, queryObj.clusterUri);
+            const query = this.datasource.buildQuery(
+              queryObj.query,
+              { scopedVars: request.scopedVars },
+              queryObj.database,
+              queryObj.clusterUri
+            );
             if (query.query === '') {
               return { data: [] };
             }
