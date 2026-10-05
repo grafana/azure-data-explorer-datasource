@@ -1,6 +1,6 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "7.2.12",
+  "version": "7.2.13",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "webpack -c ./webpack.config.ts --env production",
@@ -120,7 +120,44 @@
     "lodash": "4.18.1",
     "protobufjs": "7.6.1",
     "flatted": "3.4.2",
-    "form-data": "4.0.6"
+    "form-data": "4.0.6",
+    "undici": "7.29.1",
+    "eslint": {
+      "brace-expansion": "1.1.21"
+    },
+    "@eslint/config-array": {
+      "brace-expansion": "1.1.21"
+    },
+    "@eslint/eslintrc": {
+      "brace-expansion": "1.1.21"
+    },
+    "@jest/reporters": {
+      "brace-expansion": "1.1.21"
+    },
+    "eslint-plugin-react": {
+      "brace-expansion": "1.1.21"
+    },
+    "fork-ts-checker-webpack-plugin": {
+      "brace-expansion": "1.1.21"
+    },
+    "jest-config": {
+      "brace-expansion": "1.1.21"
+    },
+    "jest-runtime": {
+      "brace-expansion": "1.1.21"
+    },
+    "matcher-collection": {
+      "brace-expansion": "1.1.21"
+    },
+    "rimraf@3.0.2": {
+      "brace-expansion": "1.1.21"
+    },
+    "test-exclude": {
+      "brace-expansion": "1.1.21"
+    },
+    "walk-sync": {
+      "brace-expansion": "1.1.21"
+    }
   },
   "packageManager": "npm@11.18.0"
 }
