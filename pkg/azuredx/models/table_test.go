@@ -6,6 +6,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana-plugin-sdk-go/experimental"
 	"github.com/stretchr/testify/assert"
@@ -103,6 +104,13 @@ func TestResponseToFrames(t *testing.T) {
 		assert.Contains(t, err.Error(), "Query execution lacks memory resources")
 	})
 
+	t.Run("query with object exceptions", func(t *testing.T) {
+		_, err := tableFromJSONFile("query_with_object_exceptions.json")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "The results of this query exceed the set limit of 500000 records")
+		assert.True(t, backend.IsDownstreamError(err))
+	})
+
 	t.Run("query with no rows", func(t *testing.T) {
 		respTable, err := tableFromJSONFile("no_rows.json")
 		assert.NoError(t, err)
@@ -110,6 +118,48 @@ func TestResponseToFrames(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, frames)
 	})
+}
+
+func TestKustoExceptionUnmarshalJSON(t *testing.T) {
+	tests := []struct {
+		name     string
+		data     string
+		expected KustoException
+	}{
+		{
+			name:     "string",
+			data:     `"Query execution lacks memory resources to complete"`,
+			expected: "Query execution lacks memory resources to complete",
+		},
+		{
+			name:     "object uses the full message",
+			data:     `{"error": {"code": "LimitsExceeded", "message": "Query execution has exceeded the allowed limits", "@message": "Query execution has exceeded the allowed limits (80DA0003): details"}}`,
+			expected: "Query execution has exceeded the allowed limits (80DA0003): details",
+		},
+		{
+			name:     "object without the full message",
+			data:     `{"error": {"code": "TooManyRequests", "message": "Request is denied due to throttling."}}`,
+			expected: "Request is denied due to throttling.",
+		},
+		{
+			name:     "object with only a code",
+			data:     `{"error": {"code": "Internal service error"}}`,
+			expected: "Internal service error",
+		},
+		{
+			name:     "unknown form keeps the raw JSON",
+			data:     `{"unexpected": true}`,
+			expected: `{"unexpected": true}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var e KustoException
+			require.NoError(t, json.Unmarshal([]byte(tt.data), &e))
+			assert.Equal(t, tt.expected, e)
+		})
+	}
 }
 
 func TestGetPrimaryResultTable(t *testing.T) {
