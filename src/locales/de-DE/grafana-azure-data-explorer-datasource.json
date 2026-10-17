@@ -36,6 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Wählen Sie die Art der Authentifizierung für Azure-Dienste",
+      "description-current-user-authentication": "Abfragen verwenden die Identität des angemeldeten Grafana-Nutzers. Bestimmte Grafana-Funktionen (z. B. Warnungen, aufgezeichnete Abfragen und Berichterstattung) funktionieren möglicherweise nicht wie erwartet, wenn kein Nutzer im Abfragekontext ist. Details zur Einrichtung und bekannte Einschränkungen finden Sie in <2>der Dokumentation</2>.",
       "description-on-behalf-of-feature-is-in-beta": "Bekannte Einschränkungen und Probleme, Fehlerberichte oder Feedback finden Sie in <2>der Dokumentation</2>.",
       "error-client-id-required": "Client-ID erforderlich",
       "error-client-secret-required": "Client Secret erforderlich",
@@ -47,6 +48,7 @@
       "label-directory-tenant-id": "ID des Verzeichnisses (Tenant)",
       "reset": "Zurücksetzen",
       "title-authentication": "Authentifizierung",
+      "title-current-user-authentication": "Aktuelle Nutzerauthentifizierung",
       "title-on-behalf-of-feature-is-in-beta": "Die Funktion „Im Namen von“ ist in der Beta-Phase"
     },
     "config-editor": {
