@@ -16,6 +16,7 @@ jobs:
       contents: read
       id-token: write
     with:
+      golangci-lint-version: '2.14.0'
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
       run-playwright: true
       playwright-config: ${{ (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.fork || github.actor == 'dependabot[bot]')) && 'playwright-fork.config.ts' || 'playwright.config.ts' }}
