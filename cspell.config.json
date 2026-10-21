@@ -19,6 +19,8 @@
     "jest.config.js"
   ],
   "words": [
+    "golangci",
+    "GOPATH",
     "",
     "aadapp",
     "aadapp",
