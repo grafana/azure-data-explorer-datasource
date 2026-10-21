@@ -13,8 +13,8 @@ function exit_if_fail {
 
 go get -u github.com/mgechev/revive
 
-# Install the version pinned in tools/go.mod (golangci-lint v2.15.0).
-exit_if_fail go -C tools install github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+# Install the same golangci-lint version used by CI and CD.
+exit_if_fail go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0
 
 # In v2, gofmt is a formatter and unused replaces the retired unused-code linters.
 exit_if_fail $(go env GOPATH)/bin/golangci-lint fmt --diff --enable=gofmt ./pkg/...
