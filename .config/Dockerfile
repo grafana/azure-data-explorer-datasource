@@ -20,6 +20,10 @@ ENV GF_AUTH_BASIC_ENABLED "false"
 # Set development mode so plugins can be loaded without the need to sign
 ENV GF_DEFAULT_APP_MODE "development"
 
+# Avoid SQLite lock contention between datasource provisioning and startup services.
+ENV GF_DATABASE_WAL="true"
+ENV GF_DATABASE_MAX_OPEN_CONN="1"
+
 
 LABEL maintainer="Grafana Labs <hello@grafana.com>"
 
