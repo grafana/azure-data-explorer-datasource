@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [7.2.15]
+
+- Chore: Pin golangci-lint to 2.15.0 in development dependencies and CI/CD pipelines
+
 ## [7.2.14]
 
 - Fix security vulnerabilities in [#1835](https://github.com/grafana/azure-data-explorer-datasource/pull/1835)
