@@ -13,17 +13,15 @@ function exit_if_fail {
 
 go get -u github.com/mgechev/revive
 
-# preferred method for linter install
-curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
+# Install the version pinned in tools/go.mod (golangci-lint v2.15.0).
+exit_if_fail go -C tools install github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 
-# use golangci-when possible
-exit_if_fail $(go env GOPATH)/bin/golangci-lint run --deadline 10m --disable-all \
-  --enable=deadcode\
-  --enable=gofmt\
-  --enable=ineffassign\
-  --enable=structcheck\
-  --enable=unconvert\
-  --enable=varcheck
+# In v2, gofmt is a formatter and unused replaces the retired unused-code linters.
+exit_if_fail $(go env GOPATH)/bin/golangci-lint fmt --diff --enable=gofmt ./pkg/...
+exit_if_fail $(go env GOPATH)/bin/golangci-lint run --timeout 10m --default none \
+  --enable=ineffassign \
+  --enable=unconvert \
+  --enable=unused ./pkg/...
 
 exit_if_fail go vet ./pkg/...
 

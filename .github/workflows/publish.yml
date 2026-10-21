@@ -32,6 +32,7 @@ jobs:
       attestations: write
       pull-requests: read
     with:
+      golangci-lint-version: '2.15.0'
       branch: ${{ github.event.inputs.branch }}
       # prod expands to catalog waves [dev, ops, prod] inside cd.yml
       environment: prod
