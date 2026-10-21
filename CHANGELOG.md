@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [7.2.15]
+
+- Chore: Pin golangci-lint to 2.15.0 in development dependencies and CI/CD pipelines
+
+## [7.2.14]
+
+- Fix security vulnerabilities in [#1835](https://github.com/grafana/azure-data-explorer-datasource/pull/1835)
+
+## [7.2.13]
+
+- Fix security vulnerabilities (CVE-2026-84961, CVE-2026-85014, CVE-2026-84933, CVE-2026-19534, CVE-2026-102278, CVE-2026-102276)
+
 ## [7.2.12]
 
 - Add data source configuration schema (dsconfig) ([#1780](https://github.com/grafana/azure-data-explorer-datasource/pull/1780))

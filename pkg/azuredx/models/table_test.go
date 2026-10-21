@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"os"
 	"path"
+	"strings"
 	"testing"
 
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana-plugin-sdk-go/experimental"
 	"github.com/stretchr/testify/assert"
@@ -103,6 +105,13 @@ func TestResponseToFrames(t *testing.T) {
 		assert.Contains(t, err.Error(), "Query execution lacks memory resources")
 	})
 
+	t.Run("query with object exceptions", func(t *testing.T) {
+		_, err := tableFromJSONFile("query_with_object_exceptions.json")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "The results of this query exceed the set limit of 500000 records")
+		assert.True(t, backend.IsDownstreamError(err))
+	})
+
 	t.Run("query with no rows", func(t *testing.T) {
 		respTable, err := tableFromJSONFile("no_rows.json")
 		assert.NoError(t, err)
@@ -110,6 +119,86 @@ func TestResponseToFrames(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, frames)
 	})
+}
+
+func TestKustoExceptionUnmarshalJSON(t *testing.T) {
+	tests := []struct {
+		name     string
+		data     string
+		expected KustoException
+	}{
+		{
+			name:     "string",
+			data:     `"Query execution lacks memory resources to complete"`,
+			expected: "Query execution lacks memory resources to complete",
+		},
+		{
+			name:     "object uses the full message",
+			data:     `{"error": {"code": "LimitsExceeded", "message": "Query execution has exceeded the allowed limits", "@message": "Query execution has exceeded the allowed limits (80DA0003): details"}}`,
+			expected: "Query execution has exceeded the allowed limits (80DA0003): details",
+		},
+		{
+			name:     "object without the full message",
+			data:     `{"error": {"code": "TooManyRequests", "message": "Request is denied due to throttling."}}`,
+			expected: "Request is denied due to throttling.",
+		},
+		{
+			name:     "object with only a code",
+			data:     `{"error": {"code": "Internal service error"}}`,
+			expected: "Internal service error",
+		},
+		{
+			name:     "object with an empty error keeps the raw JSON",
+			data:     `{"error": {}}`,
+			expected: `{"error": {}}`,
+		},
+		{
+			name:     "unknown form keeps the raw JSON",
+			data:     `{"unexpected": true}`,
+			expected: `{"unexpected": true}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var e KustoException
+			require.NoError(t, json.Unmarshal([]byte(tt.data), &e))
+			assert.Equal(t, tt.expected, e)
+		})
+	}
+}
+
+func TestTableFromJSONExceptions(t *testing.T) {
+	tests := []struct {
+		name     string
+		response string
+		expected string
+	}{
+		{
+			name:     "string",
+			response: `{"Tables": [{"TableName": "Table_0", "Columns": [], "Rows": []}], "Exceptions": ["Query execution lacks memory resources to complete (80DA0007)"]}`,
+			expected: "Query execution lacks memory resources to complete (80DA0007)",
+		},
+		{
+			name:     "several objects",
+			response: `{"Tables": [{"TableName": "Table_0", "Columns": [], "Rows": []}], "Exceptions": [{"error": {"code": "LimitsExceeded", "message": "Query execution has exceeded the allowed limits."}}, {"error": {"code": "TooManyRequests", "message": "Request is denied due to throttling."}}]}`,
+			expected: "Query execution has exceeded the allowed limits. Request is denied due to throttling.",
+		},
+		{
+			name:     "no tables",
+			response: `{"Exceptions": [{"error": {"code": "LimitsExceeded", "message": "Query execution has exceeded the allowed limits."}}]}`,
+			expected: "Query execution has exceeded the allowed limits.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := TableFromJSON(strings.NewReader(tt.response))
+			require.Error(t, err)
+			assert.Equal(t, tt.expected, err.Error())
+			assert.True(t, backend.IsDownstreamError(err))
+		})
+	}
 }
 
 func TestGetPrimaryResultTable(t *testing.T) {
