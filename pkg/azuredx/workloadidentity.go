@@ -18,6 +18,9 @@ import (
 const (
 	tokensvcURLEnv       = "GF_PLUGIN_TOKENSVC_URL"
 	tokensvcMintTokenEnv = "GF_PLUGIN_TOKENSVC_MINT_TOKEN"
+	// stackIDEnv names the stack to ask for when Grafana reports none (local runs). On Cloud the
+	// stack comes from the request's namespace and this is not set.
+	stackIDEnv = "GF_PLUGIN_TOKENSVC_STACK_ID"
 )
 
 // applyAssertionService completes the in-memory workload identity settings with the token
@@ -36,6 +39,9 @@ func applyAssertionService(settings *azsettings.AzureSettings, lookupEnv func(st
 	}
 	if wi.AssertionCallerToken == "" {
 		wi.AssertionCallerToken = strings.TrimSpace(lookupEnv(tokensvcMintTokenEnv))
+	}
+	if wi.StackID == "" {
+		wi.StackID = strings.TrimSpace(lookupEnv(stackIDEnv))
 	}
 }
 
