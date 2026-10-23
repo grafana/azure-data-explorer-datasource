@@ -53,6 +53,7 @@ func NewDatasource(ctx context.Context, instanceSettings backend.DataSourceInsta
 		backend.Logger.Error("failed to read Azure settings from Grafana", "error", err.Error())
 		return nil, err
 	}
+	applyAssertionService(azureSettings, processEnv)
 
 	credentials, err := adxcredentials.FromDatasourceData(jsonData, instanceSettings.DecryptedSecureJSONData)
 	if err != nil {
