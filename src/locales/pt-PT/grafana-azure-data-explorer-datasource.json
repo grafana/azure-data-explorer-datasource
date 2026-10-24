@@ -36,6 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Escolha o tipo de autenticação para os serviços do Azure",
+      "description-current-user-authentication": "As consultas utilizam a identidade do utilizador da Grafana com sessão iniciada. Certas funcionalidades da Grafana (como, por exemplo, os alertas, as consultas registadas e os relatórios) podem não funcionar como esperado quando não há nenhum utilizador no contexto do pedido. Para obter detalhes de configuração e limitações conhecidas, consulte <2>a documentação</2>.",
       "description-on-behalf-of-feature-is-in-beta": "Para problemas e limitações conhecidos, relatórios de erros ou feedback, visite <2>a documentação</2>.",
       "error-client-id-required": "A ID do cliente é necessária",
       "error-client-secret-required": "O segredo do cliente é necessário",
@@ -47,6 +48,7 @@
       "label-directory-tenant-id": "ID (de inquilino) do diretório",
       "reset": "Redefinir",
       "title-authentication": "Autenticação",
+      "title-current-user-authentication": "Autenticação de utilizadores atual",
       "title-on-behalf-of-feature-is-in-beta": "A funcionalidade Em nome de está na versão beta"
     },
     "config-editor": {
