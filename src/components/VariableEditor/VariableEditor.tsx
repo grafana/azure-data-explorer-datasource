@@ -179,7 +179,10 @@ const VariableEditor = (props: VariableProps) => {
         />
       </Field>
       {query.queryType === AdxQueryType.KustoQuery && (
-        <QueryEditor query={query} onChange={onChange} datasource={datasource} onRunQuery={() => {}} />
+        <>
+          Hint: Project the value as column <code>value</code> and the display name as column <code>text</code>.
+          <QueryEditor query={query} onChange={onChange} datasource={datasource} onRunQuery={() => {}} />
+        </>
       )}
       {requireCluster && (
         <Field
