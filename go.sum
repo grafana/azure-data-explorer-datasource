@@ -124,6 +124,8 @@ github.com/grafana/grafana-azure-sdk-go/v2 v2.5.0 h1:O4KdkXTTzo/6oTJ62oquJ9dkv+X
 github.com/grafana/grafana-azure-sdk-go/v2 v2.5.0/go.mod h1:fefvp2xqn/z5F8xrvxq0RCcrACkzYx9m0rabv5TsRxg=
 github.com/grafana/grafana-azure-sdk-go/v2 v2.5.2-0.20261021000355-5a0b0b41e61f h1:lwgS0AEcJ1qqi7/4xgays7QDV6O8NAriPijARttFtEU=
 github.com/grafana/grafana-azure-sdk-go/v2 v2.5.2-0.20261021000355-5a0b0b41e61f/go.mod h1:RHmDfN8D/atOMRq5LZnfo1xzAxirEXKa6xPuoaMPVE8=
+github.com/grafana/grafana-azure-sdk-go/v2 v2.5.2-0.20261026232400-001456ef06d7 h1:5eFU4XUS384gaYujjt1UBwiLqUSjjhXKKyITO4/zjpI=
+github.com/grafana/grafana-azure-sdk-go/v2 v2.5.2-0.20261026232400-001456ef06d7/go.mod h1:RHmDfN8D/atOMRq5LZnfo1xzAxirEXKa6xPuoaMPVE8=
 github.com/grafana/grafana-plugin-sdk-go v0.296.4 h1:3+sYR2lmdb+sIk3m/eA9/lY8sztbhFyGf+6he8nwKuM=
 github.com/grafana/grafana-plugin-sdk-go v0.296.4/go.mod h1:Dza5QLa5L5/0zH6Ce2CZhfTUd6+3FFDhmEHjT0BEBuM=
 github.com/grafana/otel-profiling-go v0.6.0 h1:W7lOZaJj4IJISXMcM1UBk3fJF3tzF2OD6MJBJaQp1H8=
