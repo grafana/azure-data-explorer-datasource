@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [7.2.16]
+
+- Chore: Dependency updates
+
 ## [7.2.15]
 
 - Chore: Pin golangci-lint to 2.15.0 in development dependencies and CI/CD pipelines
