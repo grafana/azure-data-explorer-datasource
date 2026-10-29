@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [7.2.17]
+
+- Fix security vulnerabilities (GHSA-cg2g-xh64-v4q7, GHSA-mrv2-3pqr-j5jr, CVE-2026-111768, CVE-2026-111767, CVE-2026-111181, CVE-2023-54404, CVE-2026-109869)
+
+## [7.2.16]
+
+- Chore: Dependency updates
+
 ## [7.2.15]
 
 - Chore: Pin golangci-lint to 2.15.0 in development dependencies and CI/CD pipelines
