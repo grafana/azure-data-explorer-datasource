@@ -1,6 +1,6 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "7.2.16",
+  "version": "7.2.17",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "webpack -c ./webpack.config.ts --env production",
@@ -121,7 +121,7 @@
     "protobufjs": "7.6.1",
     "flatted": "3.4.2",
     "form-data": "4.0.6",
-    "undici": "7.29.1",
+    "undici": "7.30.1",
     "eslint": {
       "brace-expansion": "1.1.21"
     },
@@ -165,8 +165,10 @@
     "moment": "2.31.0",
     "smol-toml": "1.9.0",
     "fast-uri": "3.1.8",
-    "dompurify": "3.4.16",
-    "@modelcontextprotocol/sdk": "1.31.0",
+    "body-parser": "2.4.0",
+    "zod": "4.6.6",
+    "dompurify": "3.4.17",
+    "@modelcontextprotocol/sdk": "1.32.0",
     "quick-temp": {
       "brace-expansion": "2.1.7"
     },
