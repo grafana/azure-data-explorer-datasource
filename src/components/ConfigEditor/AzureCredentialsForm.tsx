@@ -9,7 +9,9 @@ import { ConfigSection } from '@grafana/plugin-ui';
 import { selectors } from 'test/selectors';
 
 import { AppRegistrationCredentials } from './AppRegistrationCredentials';
+import { AzureWorkloadIdentityCredentialsWithIds, getWorkloadIdentityInMemoryEnabled } from './AzureCredentialsConfig';
 import { CurrentUserFallbackCredentials } from './CurrentUserFallbackCredentials';
+import { WorkloadIdentityCredentials } from './WorkloadIdentityCredentials';
 
 export interface Props {
   userIdentityEnabled: boolean;
@@ -141,6 +143,12 @@ export const AzureCredentialsForm: FunctionComponent<Props> = (props: Props) => 
             </Trans>
           </Alert>
         </>
+      )}
+      {credentials.authType === 'workloadidentity' && getWorkloadIdentityInMemoryEnabled() && (
+        <WorkloadIdentityCredentials
+          credentials={credentials as AzureWorkloadIdentityCredentialsWithIds}
+          onCredentialsChange={onCredentialsChange}
+        />
       )}
       {(credentials.authType === 'clientsecret' || credentials.authType === 'clientsecret-obo') && (
         <AppRegistrationCredentials

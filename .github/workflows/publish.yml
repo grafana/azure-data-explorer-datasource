@@ -8,13 +8,13 @@ on:
         description: Branch to publish from. Can be used to deploy PRs to dev
         default: main
       environment:
-        description: Environment will always publish to all waves (dev + ops + prod). Cloud will publish scoped only to Grafana Cloud, On Prem will publish with Universal scope. Please use Cloud unless emergency fix needed for On Prem customer.
+        description: Environment will only publish to dev - TEMPORARY for testing. Cloud will publish scoped only to Grafana Cloud, On Prem will publish with Universal scope. Please use Cloud unless emergency fix needed for On Prem customer.
         required: true
         type: choice
-        default: "cloud (recommended)"
+        default: 'cloud (recommended)'
         options:
-          - "cloud (recommended)"
-          - "on-prem (for emergencies fix to On Prem customers)"
+          - 'cloud (recommended)'
+          - 'on-prem (for emergencies fix to On Prem customers)'
       docs-only:
         description: Only publish docs, do not publish the plugin
         default: false
@@ -35,7 +35,8 @@ jobs:
       golangci-lint-version: '2.15.0'
       branch: ${{ github.event.inputs.branch }}
       # prod expands to catalog waves [dev, ops, prod] inside cd.yml
-      environment: prod
+      environment: dev # TEMPORARY (do not merge): publish this branch to the dev catalog only, without deploying via Argo
+      trigger-argo: false
       docs-only: ${{ fromJSON(github.event.inputs.docs-only) }}
       scopes: ${{ github.event.inputs.environment == 'cloud (recommended)' && 'grafana_cloud' || github.event.inputs.environment == 'on-prem (for emergencies fix to On Prem customers)' && 'universal' }}
       run-playwright: false

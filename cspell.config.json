@@ -188,6 +188,7 @@
     "mycluster",
     "unmarshals",
     "unparseable",
-    "pluginschema"
+    "pluginschema",
+    "tokensvc"
   ]
 }
