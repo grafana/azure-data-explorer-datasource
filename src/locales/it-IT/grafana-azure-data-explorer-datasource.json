@@ -36,6 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Scegli il tipo di autenticazione per i servizi di Azure",
+      "description-current-user-authentication": "Le query utilizzano l'identità dell'utente di Grafana che ha effettuato l'accesso. Alcune funzionalità di Grafana (ad esempio avvisi, query registrate e report) potrebbero non funzionare come previsto se nel contesto della richiesta non è presente alcun utente. Per i dettagli sulla configurazione e le limitazioni note, consulta <2>la documentazione</2>.",
       "description-on-behalf-of-feature-is-in-beta": "Per limitazioni e problemi noti, segnalazioni di bug o feedback, consulta <2>la documentazione</2>.",
       "error-client-id-required": "L'ID client è obbligatorio",
       "error-client-secret-required": "Il segreto client è obbligatorio",
@@ -47,6 +48,7 @@
       "label-directory-tenant-id": "ID directory (tenant)",
       "reset": "Ripristina",
       "title-authentication": "Autenticazione",
+      "title-current-user-authentication": "Autenticazione dell'utente corrente",
       "title-on-behalf-of-feature-is-in-beta": "La funzionalità Per conto di è in versione beta"
     },
     "config-editor": {
