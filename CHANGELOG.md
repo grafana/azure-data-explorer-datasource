@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+- Fix a connection freeze between Grafana and the plugin under heavy query load by updating google.golang.org/grpc to v1.85.0 ([grpc/grpc-go#9330](https://github.com/grpc/grpc-go/issues/9330))
+
 ## [7.2.17]
 
 - Fix security vulnerabilities (GHSA-cg2g-xh64-v4q7, GHSA-mrv2-3pqr-j5jr, CVE-2026-111768, CVE-2026-111767, CVE-2026-111181, CVE-2023-54404, CVE-2026-109869)
