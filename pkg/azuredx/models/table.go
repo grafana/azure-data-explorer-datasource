@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -19,7 +20,48 @@ import (
 // TableResponse represents the response struct from Azure's Data Explorer REST API.
 type TableResponse struct {
 	Tables     []Table
-	Exceptions []string
+	Exceptions []KustoException
+}
+
+// KustoException is one partial query failure in the Exceptions list of a response.
+type KustoException string
+
+// UnmarshalJSON accepts both forms Kusto sends. Older clusters send a plain string.
+// Current clusters send an object such as
+// {"error": {"code": "LimitsExceeded", "message": "...", "@message": "..."}}.
+// It never fails, so an unknown form cannot hide the query failure behind a decode
+// error: it keeps the raw JSON as the message.
+func (e *KustoException) UnmarshalJSON(data []byte) error {
+	var message string
+	if err := json.Unmarshal(data, &message); err == nil {
+		*e = KustoException(message)
+		return nil
+	}
+
+	var object struct {
+		Error struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+			// Detail is the full message; Message can be a short summary.
+			Detail string `json:"@message"`
+		} `json:"error"`
+	}
+	if err := json.Unmarshal(data, &object); err == nil {
+		switch {
+		case object.Error.Detail != "":
+			*e = KustoException(object.Error.Detail)
+			return nil
+		case object.Error.Message != "":
+			*e = KustoException(object.Error.Message)
+			return nil
+		case object.Error.Code != "":
+			*e = KustoException(object.Error.Code)
+			return nil
+		}
+	}
+
+	*e = KustoException(data)
+	return nil
 }
 
 // Table is a member of TableResponse
@@ -556,16 +598,17 @@ func TableFromJSON(rc io.Reader) (*TableResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(tr.Tables) == 0 {
-		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
+	// Check the exceptions first: a failed query can come back without tables.
+	if len(tr.Exceptions) > 0 {
+		messages := make([]string, len(tr.Exceptions))
+		for i, e := range tr.Exceptions {
+			messages[i] = string(e)
+		}
+		return nil, backend.DownstreamError(errors.New(strings.Join(messages, " ")))
 	}
 
-	if len(tr.Exceptions) > 0 {
-		errMsg := ""
-		for _, e := range tr.Exceptions {
-			errMsg += e + ". "
-		}
-		return nil, backend.DownstreamError(errors.New(errMsg))
+	if len(tr.Tables) == 0 {
+		return nil, fmt.Errorf("unable to parse response, parsed response has no tables")
 	}
 
 	return tr, nil

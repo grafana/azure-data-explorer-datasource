@@ -9,6 +9,11 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
 jobs:
   verify-i18n:
-    uses: grafana/grafana-github-actions/.github/workflows/verify-i18n.yml@3c62d35c5a66e730186a338e45aeb8fa784e2d56 # main
+    if: (github.event_name == 'pull_request' || (github.event_name == 'push' && github.repository == 'grafana/azure-data-explorer-datasource'))
+    uses: grafana/grafana-github-actions/.github/workflows/verify-i18n.yml@26e65a1da9ffdf35d3e8cc6dbeffbccf16022d88

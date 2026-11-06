@@ -3,6 +3,10 @@ import { selectors } from '../../src/test/selectors';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions } from '../../src/types';
 import { isVersionGtOrEq } from '../../src/version';
 
+// Grafana 13.3.0 has a bug in the Monaco web workers, so Kusto autocomplete is unavailable.
+// Fixed in 13.3.1: https://github.com/grafana/grafana/pull/136050
+const skipAutoComplete = (grafanaVersion: string) => grafanaVersion === '13.3.0';
+
 test.describe('Azure Data Explorer queries', () => {
   test('Create a KQL query', async ({ dashboardPage, page, readProvisionedDataSource, grafanaVersion }) => {
     const datasource = await readProvisionedDataSource<AdxDataSourceOptions, AdxDataSourceSecureOptions>({
@@ -41,8 +45,10 @@ test.describe('Azure Data Explorer queries', () => {
     await page.keyboard.press('Control+A');
     await page.keyboard.insertText('adxe2etest | where $__');
     await page.waitForTimeout(10000);
-    await page.keyboard.press('Control+Space');
-    await expect(page.getByText('$__timeFilter')).toBeVisible();
+    if (!skipAutoComplete(grafanaVersion)) {
+      await page.keyboard.press('Control+Space');
+      await expect(page.getByText('$__timeFilter')).toBeVisible();
+    }
     await page.keyboard.insertText('timeFilter(timestamp) | order by timestamp asc');
     await page.getByTestId(selectors.components.queryEditor.runQuery.button).click();
     await page.waitForTimeout(6000);
@@ -91,8 +97,10 @@ test.describe('Azure Data Explorer queries', () => {
     await page.keyboard.press('Control+A');
     await page.keyboard.insertText('adxe2etest | where $__');
     await page.waitForTimeout(10000);
-    await page.keyboard.press('Control+Space');
-    await expect(page.getByText('$__timeFilter')).toBeVisible();
+    if (!skipAutoComplete(grafanaVersion)) {
+      await page.keyboard.press('Control+Space');
+      await expect(page.getByText('$__timeFilter')).toBeVisible();
+    }
     await page.keyboard.insertText('timeFilter(timestamp) | order by timestamp asc');
     await page.keyboard.press('Shift+Enter');
     await page.waitForTimeout(6000);

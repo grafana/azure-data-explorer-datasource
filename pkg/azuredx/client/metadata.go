@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/grafana/grafana-azure-sdk-go/v2/azhttpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	json "github.com/json-iterator/go"
 )
@@ -74,4 +75,34 @@ func fetchAuthMetadata(ctx context.Context, httpClient *http.Client, clusterURL 
 	}
 
 	return &metadata.AzureAD, nil
+}
+
+func newScopeResolver(azureCloud string, metadataClient *http.Client, trustedHosts trustedMetadataHosts) azhttpclient.ScopeResolver {
+	cache := newScopeCache(scopeCacheTTL, negativeCacheTTL)
+	return func(ctx context.Context, req *http.Request) ([]string, error) {
+		clusterUrl := fmt.Sprintf("%s://%s", req.URL.Scheme, req.URL.Host)
+
+		// Only ask trusted ADX endpoints for auth metadata.
+		if !trustedHosts.allows(req.URL.Hostname()) {
+			return getDefaultAdxScopes(azureCloud, clusterUrl)
+		}
+
+		scope, err := cache.resolve(ctx, clusterUrl, func(fetchCtx context.Context) (string, error) {
+			metadata, err := fetchAuthMetadata(fetchCtx, metadataClient, clusterUrl)
+			if err != nil {
+				return "", err
+			}
+			return fmt.Sprintf("%s/.default", metadata.KustoServiceResourceID), nil
+		})
+		if err != nil {
+			// A cancelled caller context isn't a metadata-endpoint problem.
+			// Return the default scopes instead of an error.
+			if ctx.Err() != nil {
+				return getDefaultAdxScopes(azureCloud, clusterUrl)
+			}
+			backend.Logger.FromContext(ctx).Warn("failed to fetch auth metadata from cluster, falling back to default scopes", "cluster", clusterUrl, "error", err)
+			return getDefaultAdxScopes(azureCloud, clusterUrl)
+		}
+		return []string{scope}, nil
+	}
 }

@@ -1,0 +1,67 @@
+{
+  "Tables": [
+    {
+      "TableName": "Table_0",
+      "Columns": [
+        {
+          "ColumnName": "x",
+          "DataType": "Int64",
+          "ColumnType": "long"
+        }
+      ],
+      "Rows": [
+        [1],
+        [2],
+        [3],
+        {
+          "Exceptions": [
+            {
+              "error": {
+                "code": "LimitsExceeded",
+                "message": "Query execution has exceeded the allowed limits (80DA0003): The results of this query exceed the set limit of 500000 records, so not all records were returned (E_QUERY_RESULT_SET_TOO_LARGE, 0x80DA0003). See https://aka.ms/kustoquerylimits for more information and possible solutions..",
+                "@type": "Kusto.Data.Exceptions.KustoServicePartialQueryFailureLimitsExceededException",
+                "@message": "Query execution has exceeded the allowed limits (80DA0003): The results of this query exceed the set limit of 500000 records, so not all records were returned (E_QUERY_RESULT_SET_TOO_LARGE, 0x80DA0003). See https://aka.ms/kustoquerylimits for more information and possible solutions..",
+                "@failureCode": 400,
+                "@context": {
+                  "timestamp": "2026-10-12T01:54:02.0000000Z",
+                  "serviceAlias": "HELP",
+                  "clientRequestId": "KGC.repro;1",
+                  "activityId": "00000000-0000-0000-0000-000000000000",
+                  "subActivityId": "00000000-0000-0000-0000-000000000000",
+                  "activityType": "GW.Http.CallContext",
+                  "parentActivityId": "00000000-0000-0000-0000-000000000000",
+                  "activityStack": "(Activity stack: CRID=KGC.repro;1 ARID=00000000-0000-0000-0000-000000000000 > GW.Http.CallContext/00000000-0000-0000-0000-000000000000)",
+                  "serviceFarm": null
+                },
+                "@permanent": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "Exceptions": [
+    {
+      "error": {
+        "code": "LimitsExceeded",
+        "message": "Query execution has exceeded the allowed limits (80DA0003): The results of this query exceed the set limit of 500000 records, so not all records were returned (E_QUERY_RESULT_SET_TOO_LARGE, 0x80DA0003). See https://aka.ms/kustoquerylimits for more information and possible solutions..",
+        "@type": "Kusto.Data.Exceptions.KustoServicePartialQueryFailureLimitsExceededException",
+        "@message": "Query execution has exceeded the allowed limits (80DA0003): The results of this query exceed the set limit of 500000 records, so not all records were returned (E_QUERY_RESULT_SET_TOO_LARGE, 0x80DA0003). See https://aka.ms/kustoquerylimits for more information and possible solutions..",
+        "@failureCode": 400,
+        "@context": {
+          "timestamp": "2026-10-12T01:54:02.0000000Z",
+          "serviceAlias": "HELP",
+          "clientRequestId": "KGC.repro;1",
+          "activityId": "00000000-0000-0000-0000-000000000000",
+          "subActivityId": "00000000-0000-0000-0000-000000000000",
+          "activityType": "GW.Http.CallContext",
+          "parentActivityId": "00000000-0000-0000-0000-000000000000",
+          "activityStack": "(Activity stack: CRID=KGC.repro;1 ARID=00000000-0000-0000-0000-000000000000 > GW.Http.CallContext/00000000-0000-0000-0000-000000000000)",
+          "serviceFarm": null
+        },
+        "@permanent": false
+      }
+    }
+  ]
+}

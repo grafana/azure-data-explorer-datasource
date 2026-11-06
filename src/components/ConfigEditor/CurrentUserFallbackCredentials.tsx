@@ -101,7 +101,7 @@ export const CurrentUserFallbackCredentials = (props: Props) => {
           Fallback credentials have been disabled. As current user authentication only supports requests with a user in
           context, features such as alerting, recorded queries, and reporting will not function as expected. See the{' '}
           <TextLink
-            href="https://github.com/grafana/azure-data-explorer-datasource/blob/main/doc/current-user-auth.md"
+            href="https://grafana.com/docs/plugins/grafana-azure-data-explorer-datasource/latest/configure/#fallback-service-credentials"
             external
           >
             documentation
