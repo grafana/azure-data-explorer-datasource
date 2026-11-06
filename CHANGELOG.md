@@ -3,7 +3,6 @@
 ## Unreleased
 
 - Fix a connection freeze between Grafana and the plugin under heavy query load by updating google.golang.org/grpc to v1.85.0 ([grpc/grpc-go#9330](https://github.com/grpc/grpc-go/issues/9330))
-
 - Add support for workload identity credentials (tenant and client ID), and backend assertion support when workload in memory is enabled
 
 ## [7.2.17]
