@@ -6,7 +6,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.24.0
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.10.1
 	github.com/grafana/dsconfig/schema v0.0.13
-	github.com/grafana/grafana-azure-sdk-go/v2 v2.5.1
+	github.com/grafana/grafana-azure-sdk-go/v2 v2.6.0
 	github.com/grafana/grafana-plugin-sdk-go v0.298.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.12.1
