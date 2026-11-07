@@ -36,6 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "Válassza ki az Azure-szolgáltatások hitelesítési típusát",
+      "description-current-user-authentication": "A lekérdezések a bejelentkezett Grafana-felhasználó identitását használják. Előfordulhat, hogy bizonyos Grafana-funkciók (például a riasztás, a rögzített lekérdezések és a jelentéskészítés) nem az elvárt módon működnek, ha nincs felhasználó a kérés kontextusában. A beállítás részleteit és az ismert korlátozásokat lásd a <2>dokumentációban</2>.",
       "description-on-behalf-of-feature-is-in-beta": "Ismert korlátozásokkal, problémákkal és hibajelentésekkel kapcsolatban vagy visszajelzésért tekintse meg a <2>dokumentációt</2>.",
       "error-client-id-required": "A kliensazonosító megadása kötelező",
       "error-client-secret-required": "A klienstitok megadása kötelező",
@@ -47,6 +48,7 @@
       "label-directory-tenant-id": "Címtár (bérlő) azonosítója",
       "reset": "Visszaállítás",
       "title-authentication": "Hitelesítés",
+      "title-current-user-authentication": "Jelenlegi felhasználóhitelesítés",
       "title-on-behalf-of-feature-is-in-beta": "A Valaki nevében funkció bétaverzióban érhető el"
     },
     "config-editor": {
