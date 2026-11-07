@@ -167,11 +167,14 @@ describe('variables', () => {
     it('will migrate text query', async () => {
       const buildQuerySpy = jest.spyOn(datasource, 'buildQuery');
       const variableSupport = new VariableSupport(datasource);
-      const req = mockRequest({ targets: ['test' as unknown as KustoQuery] });
+      const scopedVars = { namespace: { text: 'prod', value: 'prod' } };
+      const req = mockRequest({ scopedVars, targets: ['test' as unknown as KustoQuery] });
       const res = await lastValueFrom(variableSupport.query(req));
 
       expect(datasource.getDefaultOrFirstDatabase).toBeCalled();
-      expect(buildQuerySpy).toBeCalledWith('test', { scopedVars: {} }, 'test_db', 'clusterUrl');
+      expect(buildQuerySpy).toHaveBeenLastCalledWith('test', { scopedVars }, 'test_db', 'clusterUrl');
+      const buildQueryOptions = buildQuerySpy.mock.calls[buildQuerySpy.mock.calls.length - 1][1];
+      expect(buildQueryOptions.scopedVars).toBe(scopedVars);
       expect(datasource.query).toBeCalled();
       expect(res.data).toEqual(mockResponse);
     });
@@ -233,6 +236,33 @@ describe('variables', () => {
       });
       const res = await lastValueFrom(variableSupport.query(req));
       expect(res.data).toEqual([toDataFrame([{ Name: 'test_column' }, { Name: 'time' }])]);
+    });
+
+    it('will use scoped variables when building a Kusto variable query', async () => {
+      const buildQuerySpy = jest.spyOn(datasource, 'buildQuery');
+      const variableSupport = new VariableSupport(datasource);
+      const scopedVars = { namespace: { text: 'prod', value: 'prod' } };
+      const query = "test_table | where namespace == '$namespace'";
+      const req = mockRequest({
+        scopedVars,
+        targets: [
+          {
+            ...defaultQuery,
+            database: 'test_db',
+            resultFormat: 'table',
+            refId: '',
+            query,
+            clusterUri: 'clusterUrl',
+          },
+        ],
+      });
+
+      const res = await lastValueFrom(variableSupport.query(req));
+
+      expect(buildQuerySpy).toHaveBeenLastCalledWith(query, { scopedVars }, 'test_db', 'clusterUrl');
+      const buildQueryOptions = buildQuerySpy.mock.calls[buildQuerySpy.mock.calls.length - 1][1];
+      expect(buildQueryOptions.scopedVars).toBe(scopedVars);
+      expect(res.data).toEqual(mockResponse);
     });
   });
 });
