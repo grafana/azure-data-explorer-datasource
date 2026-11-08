@@ -121,7 +121,7 @@
     "protobufjs": "7.6.1",
     "flatted": "3.4.2",
     "form-data": "4.0.6",
-    "undici": "7.30.1",
+    "undici": "8.12.4",
     "eslint": {
       "brace-expansion": "1.1.21"
     },
