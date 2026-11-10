@@ -10,8 +10,8 @@ require (
 	github.com/grafana/grafana-plugin-sdk-go v0.298.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/sync v0.24.0
-	k8s.io/kube-openapi v0.0.0-20261014044854-ca3452a79603
+	golang.org/x/sync v0.25.0
+	k8s.io/kube-openapi v0.0.0-20261104182252-5bee61fc5225
 )
 
 require (
