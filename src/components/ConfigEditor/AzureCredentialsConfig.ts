@@ -1,5 +1,6 @@
 import {
   AzureCredentials,
+  AzureWorkloadIdentityCredentials,
   getClientSecret,
   getDatasourceCredentials,
   getDefaultAzureCloud,
@@ -9,6 +10,15 @@ import {
 import { DataSourceSettings } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import { AdxDataSourceOptions, AdxDataSourceSecureOptions, AdxDataSourceSettings } from 'types';
+
+// The SDK's workload identity credentials only carry the auth type and drop any tenant/client ID on
+// load and save. The backend accepts them in jsonData.azureCredentials, so they are preserved here.
+export type AzureWorkloadIdentityCredentialsWithIds = AzureWorkloadIdentityCredentials & {
+  tenantId?: string;
+  clientId?: string;
+};
+
+export const getWorkloadIdentityInMemoryEnabled = (): boolean => !!config.featureToggles['workloadIdentityInMemory'];
 
 export const getOboEnabled = (): boolean => !!config.featureToggles['adxOnBehalfOf'];
 
@@ -36,7 +46,9 @@ export function getDefaultCredentials(): AzureCredentials {
 export function getCredentials(options: AdxDataSourceSettings): AzureCredentials {
   const credentials = getDatasourceCredentials(options, getOboEnabled());
   if (credentials) {
-    return credentials;
+    return credentials.authType === 'workloadidentity' && getWorkloadIdentityInMemoryEnabled()
+      ? withWorkloadIdentityIds(credentials, options.jsonData.azureCredentials)
+      : credentials;
   }
 
   // If no credentials saved then try to restore legacy credentials, otherwise return default credentials
@@ -70,5 +82,26 @@ export function updateCredentials(
   options: AdxDataSourceSettings,
   credentials: AzureCredentials
 ): AdxDataSourceSettings {
-  return updateDatasourceCredentials(options, credentials, getOboEnabled()) as AdxDataSourceSettings;
+  const updated = updateDatasourceCredentials(options, credentials, getOboEnabled()) as AdxDataSourceSettings;
+  if (credentials.authType !== 'workloadidentity' || !getWorkloadIdentityInMemoryEnabled()) {
+    return updated;
+  }
+
+  const { tenantId, clientId } = credentials as AzureWorkloadIdentityCredentialsWithIds;
+  return {
+    ...updated,
+    jsonData: {
+      ...updated.jsonData,
+      azureCredentials: {
+        ...updated.jsonData.azureCredentials,
+        ...(tenantId && { tenantId }),
+        ...(clientId && { clientId }),
+      } as AzureCredentials,
+    },
+  };
+}
+
+function withWorkloadIdentityIds(credentials: AzureCredentials, saved: unknown): AzureCredentials {
+  const { tenantId, clientId } = (saved ?? {}) as AzureWorkloadIdentityCredentialsWithIds;
+  return { ...credentials, ...(tenantId && { tenantId }), ...(clientId && { clientId }) } as AzureCredentials;
 }

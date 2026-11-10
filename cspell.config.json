@@ -15,9 +15,12 @@
     "src/dashboards/**",
     "src/libs/**",
     "package-lock.json",
-    "src/locales/**"
+    "src/locales/**",
+    "jest.config.js"
   ],
   "words": [
+    "golangci",
+    "GOPATH",
     "",
     "aadapp",
     "aadapp",
@@ -78,6 +81,7 @@
     "fxxx",
     "getschema",
     "getschema",
+    "GHSA",
     "gotest",
     "govazuremonitor",
     "grafana",
@@ -98,6 +102,7 @@
     "instancemgmt",
     "isnotempty",
     "isnotnull",
+    "jsonencode",
     "jsoniter",
     "kqlpreview",
     "kust",
@@ -176,6 +181,14 @@
     "proxying",
     "nolint",
     "errcheck",
-    ""
+    "dsconfig",
+    "clientcertificate",
+    "struct",
+    "Struct",
+    "mycluster",
+    "unmarshals",
+    "unparseable",
+    "pluginschema",
+    "tokensvc"
   ]
 }
