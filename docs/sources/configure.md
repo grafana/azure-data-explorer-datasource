@@ -283,13 +283,17 @@ The following settings are optional and grouped into collapsible sections on the
 
 ## Enforce trusted endpoints
 
-For additional security, you can enforce a list of trusted Azure Data Explorer endpoints against which the cluster URL is verified. This prevents a request from being redirected to a third-party endpoint.
+For additional security, the plugin enforces a list of trusted Azure Data Explorer endpoints against which the cluster URL is verified. This prevents a request from being redirected to a third-party endpoint.
 
-To enable this, set `enforce_trusted_endpoints` in the `[plugin.grafana-azure-data-explorer-datasource]` section of your Grafana configuration file:
+{{< admonition type="caution" >}}
+As of version 8.0.0, trusted endpoint enforcement is **enabled by default**. In earlier versions it was disabled unless you explicitly turned it on. After upgrading, data sources that point to custom or non-default endpoints are blocked unless you allow those endpoints or disable enforcement. Refer to [Allow user-specified trusted endpoints](#allow-user-specified-trusted-endpoints) to keep using custom endpoints.
+{{< /admonition >}}
+
+To disable enforcement, set `enforce_trusted_endpoints` to `false` in the `[plugin.grafana-azure-data-explorer-datasource]` section of your Grafana configuration file:
 
 ```ini
 [plugin.grafana-azure-data-explorer-datasource]
-enforce_trusted_endpoints = true
+enforce_trusted_endpoints = false
 ```
 
 Specify endpoints as URLs with or without ports. A scheme is required. If no port is specified, the scheme must be `http` or `https`, which defaults the port to `80` or `443` respectively.
