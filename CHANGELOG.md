@@ -1,9 +1,11 @@
 # CHANGELOG
 
-## Unreleased
+## [8.0.0]
 
+- **BREAKING CHANGE:** Trusted endpoint enforcement is now enabled by default. Previously it was off unless the configuration toggle was enabled in the Grafana server configuration file. Data sources that query custom or non-default endpoints will now be blocked unless enforcement is disabled or the endpoints are allow-listed. To restore the previous behaviour, disable enforcement via the configuration toggle. To continue enforcing while allowing specific endpoints make use of user-trusted endpoints. Refer to [the documentation for details](./docs/sources/configure.md#enforce-trusted-endpoints). ([#1865](https://github.com/grafana/azure-data-explorer-datasource/pull/1865))
 - Fix a connection freeze between Grafana and the plugin under heavy query load by updating google.golang.org/grpc to v1.85.0 ([grpc/grpc-go#9330](https://github.com/grpc/grpc-go/issues/9330))
 - Add support for workload identity credentials (tenant and client ID), and backend assertion support when workload in memory is enabled
+- Chore: Dependency updates
 
 ## [7.2.17]
 
