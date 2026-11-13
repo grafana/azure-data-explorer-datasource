@@ -1,5 +1,6 @@
 import { AzureCredentials, AzureClientSecretCredentials } from '@grafana/azure-sdk';
 import { DataSourceSettings, KeyValue } from '@grafana/data';
+import { config } from '@grafana/runtime';
 import { hasCredentials, getCredentials, updateCredentials } from './AzureCredentialsConfig';
 
 function dsOptions(
@@ -212,5 +213,63 @@ describe('updateCredentials', () => {
         expect(updatedOptions.secureJsonFields['clientSecret']).toBeFalsy();
       });
     });
+  });
+});
+
+describe('workload identity tenant and client IDs', () => {
+  const workloadIdentityOptions = (azureCredentials: object) =>
+    dsOptions({ azureCredentials: { authType: 'workloadidentity', ...azureCredentials } }, {}, {});
+
+  beforeEach(() => {
+    config.azure.workloadIdentityEnabled = true;
+    config.featureToggles = {
+      ...config.featureToggles,
+      workloadIdentityInMemory: true,
+    } as typeof config.featureToggles;
+  });
+
+  it('should ignore tenantId and clientId when the feature toggle is off', () => {
+    config.featureToggles = {
+      ...config.featureToggles,
+      workloadIdentityInMemory: false,
+    } as typeof config.featureToggles;
+    const options = workloadIdentityOptions({ tenantId: 'tenant-1', clientId: 'client-1' });
+
+    expect(getCredentials(options)).toEqual({ authType: 'workloadidentity' });
+
+    const updated = updateCredentials(options, {
+      authType: 'workloadidentity',
+      tenantId: 'tenant-1',
+      clientId: 'client-1',
+    } as AzureCredentials);
+    expect(updated.jsonData.azureCredentials).toEqual({ authType: 'workloadidentity' });
+  });
+
+  it('should restore saved tenantId and clientId', () => {
+    const options = workloadIdentityOptions({ tenantId: 'tenant-1', clientId: 'client-1' });
+
+    expect(getCredentials(options)).toEqual({
+      authType: 'workloadidentity',
+      tenantId: 'tenant-1',
+      clientId: 'client-1',
+    });
+  });
+
+  it('should persist tenantId and clientId in azureCredentials', () => {
+    const options = workloadIdentityOptions({});
+    const credentials = { authType: 'workloadidentity', tenantId: 'tenant-1', clientId: 'client-1' };
+
+    const updated = updateCredentials(options, credentials as AzureCredentials);
+
+    expect(updated.jsonData.azureCredentials).toEqual(credentials);
+  });
+
+  it('should omit tenantId and clientId when they are cleared', () => {
+    const options = workloadIdentityOptions({ tenantId: 'tenant-1', clientId: 'client-1' });
+    const credentials = { authType: 'workloadidentity', tenantId: '', clientId: '' };
+
+    const updated = updateCredentials(options, credentials as AzureCredentials);
+
+    expect(updated.jsonData.azureCredentials).toEqual({ authType: 'workloadidentity' });
   });
 });

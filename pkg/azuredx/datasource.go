@@ -14,6 +14,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
+	"github.com/grafana/grafana-plugin-sdk-go/config"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 
@@ -41,7 +42,8 @@ func NewDatasource(ctx context.Context, instanceSettings backend.DataSourceInsta
 	}
 
 	datasourceSettings := &models.DatasourceSettings{}
-	err = datasourceSettings.Load(instanceSettings)
+	grafanaConfig := config.GrafanaConfigFromContext(ctx)
+	err = datasourceSettings.Load(instanceSettings, grafanaConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -53,6 +55,7 @@ func NewDatasource(ctx context.Context, instanceSettings backend.DataSourceInsta
 		backend.Logger.Error("failed to read Azure settings from Grafana", "error", err.Error())
 		return nil, err
 	}
+	applyAssertionService(azureSettings, processEnv)
 
 	credentials, err := adxcredentials.FromDatasourceData(jsonData, instanceSettings.DecryptedSecureJSONData)
 	if err != nil {

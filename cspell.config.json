@@ -81,6 +81,7 @@
     "fxxx",
     "getschema",
     "getschema",
+    "GHSA",
     "gotest",
     "govazuremonitor",
     "grafana",
@@ -180,6 +181,9 @@
     "proxying",
     "nolint",
     "errcheck",
+    "mycluster",
+    "featuretoggles",
+    "behaviour",
     "dsconfig",
     "clientcertificate",
     "struct",
@@ -187,6 +191,7 @@
     "mycluster",
     "unmarshals",
     "unparseable",
-    "pluginschema"
+    "pluginschema",
+    "tokensvc"
   ]
 }

@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/config"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/featuretoggles"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -70,6 +72,9 @@ func (s *TestSettingsSuite) TestLoad() {
 		expectedResult *DatasourceSettings
 		setupEnv       func()
 		cleanupEnv     func()
+		// disableToggleEnabled controls whether the "adxDisableTrustedEndpoints"
+		// feature toggle is enabled in the Grafana config passed to Load.
+		disableToggleEnabled bool
 	}{
 		{
 			name: "valid JSON with all fields",
@@ -96,6 +101,8 @@ func (s *TestSettingsSuite) TestLoad() {
 				QueryTimeoutRaw:    "30s",
 				QueryTimeout:       30 * time.Second,
 				ServerTimeoutValue: "00:00:30",
+				// Enforcement is ON by default.
+				EnforceTrustedEndpoints: true,
 			},
 		},
 		{
@@ -109,6 +116,8 @@ func (s *TestSettingsSuite) TestLoad() {
 				ClusterURL:         "https://minimal.kusto.windows.net",
 				QueryTimeout:       30 * time.Second,
 				ServerTimeoutValue: "00:00:30",
+				// Enforcement is ON by default.
+				EnforceTrustedEndpoints: true,
 			},
 		},
 		{
@@ -119,6 +128,8 @@ func (s *TestSettingsSuite) TestLoad() {
 			expectedResult: &DatasourceSettings{
 				QueryTimeout:       30 * time.Second,
 				ServerTimeoutValue: "00:00:30",
+				// Enforcement is ON by default.
+				EnforceTrustedEndpoints: true,
 			},
 		},
 		{
@@ -129,6 +140,8 @@ func (s *TestSettingsSuite) TestLoad() {
 			expectedResult: &DatasourceSettings{
 				QueryTimeout:       30 * time.Second,
 				ServerTimeoutValue: "00:00:30",
+				// Enforcement is ON by default.
+				EnforceTrustedEndpoints: true,
 			},
 		},
 		{
@@ -149,6 +162,8 @@ func (s *TestSettingsSuite) TestLoad() {
 				ClusterURL:         "https://test.kusto.windows.net/",
 				QueryTimeout:       30 * time.Second,
 				ServerTimeoutValue: "00:00:30",
+				// Enforcement is ON by default.
+				EnforceTrustedEndpoints: true,
 			},
 		},
 		{
@@ -259,6 +274,90 @@ func (s *TestSettingsSuite) TestLoad() {
 			},
 		},
 		{
+			// Default behaviour (breaking change): enforcement is ON when neither
+			// the feature toggle nor the Grafana config disables it.
+			name: "enforcement on by default with no toggle or config",
+			config: backend.DataSourceInstanceSettings{
+				JSONData: []byte(`{
+					"clusterUrl": "https://test.kusto.windows.net"
+				}`),
+			},
+			expectedResult: &DatasourceSettings{
+				ClusterURL:              "https://test.kusto.windows.net",
+				QueryTimeout:            30 * time.Second,
+				ServerTimeoutValue:      "00:00:30",
+				EnforceTrustedEndpoints: true,
+			},
+		},
+		{
+			// The feature toggle can disable enforcement.
+			name: "disable feature toggle turns enforcement off",
+			config: backend.DataSourceInstanceSettings{
+				JSONData: []byte(`{
+					"clusterUrl": "https://test.kusto.windows.net"
+				}`),
+			},
+			disableToggleEnabled: true,
+			expectedResult: &DatasourceSettings{
+				ClusterURL:              "https://test.kusto.windows.net",
+				QueryTimeout:            30 * time.Second,
+				ServerTimeoutValue:      "00:00:30",
+				EnforceTrustedEndpoints: false,
+			},
+		},
+		{
+			// The Grafana config can disable enforcement.
+			name: "grafana config set to false turns enforcement off",
+			config: backend.DataSourceInstanceSettings{
+				JSONData: []byte(`{
+					"clusterUrl": "https://test.kusto.windows.net"
+				}`),
+			},
+			setupEnv: func() {
+				if err := os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "false"); err != nil {
+					panic(err)
+				}
+			},
+			cleanupEnv: func() {
+				if err := os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS"); err != nil {
+					panic(err)
+				}
+			},
+			expectedResult: &DatasourceSettings{
+				ClusterURL:              "https://test.kusto.windows.net",
+				QueryTimeout:            30 * time.Second,
+				ServerTimeoutValue:      "00:00:30",
+				EnforceTrustedEndpoints: false,
+			},
+		},
+		{
+			// The Grafana config overrides the feature toggle: the toggle disables
+			// enforcement but the config explicitly re-enables it.
+			name: "grafana config set to true overrides disable feature toggle",
+			config: backend.DataSourceInstanceSettings{
+				JSONData: []byte(`{
+					"clusterUrl": "https://test.kusto.windows.net"
+				}`),
+			},
+			disableToggleEnabled: true,
+			setupEnv: func() {
+				if err := os.Setenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", "true"); err != nil {
+					panic(err)
+				}
+			},
+			cleanupEnv: func() {
+				if err := os.Unsetenv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS"); err != nil {
+					panic(err)
+				}
+			},
+			expectedResult: &DatasourceSettings{
+				ClusterURL:              "https://test.kusto.windows.net",
+				QueryTimeout:            30 * time.Second,
+				ServerTimeoutValue:      "00:00:30",
+				EnforceTrustedEndpoints: true,
+			},
+		},
+		{
 			name: "invalid environment variable for enforce trusted endpoints",
 			config: backend.DataSourceInstanceSettings{
 				JSONData: []byte(`{}`),
@@ -318,8 +417,14 @@ func (s *TestSettingsSuite) TestLoad() {
 				defer tt.cleanupEnv()
 			}
 
+			cfgMap := map[string]string{}
+			if tt.disableToggleEnabled {
+				cfgMap[featuretoggles.EnabledFeatures] = "adxDisableTrustedEndpoints"
+			}
+			grafanaConfig := config.NewGrafanaCfg(cfgMap)
+
 			ds := &DatasourceSettings{}
-			err := ds.Load(tt.config)
+			err := ds.Load(tt.config, grafanaConfig)
 
 			if tt.expectedError != "" {
 				r.Error(err)

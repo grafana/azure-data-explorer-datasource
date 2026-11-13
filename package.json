@@ -1,6 +1,6 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "7.2.15",
+  "version": "8.0.0",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "webpack -c ./webpack.config.ts --env production",
@@ -30,7 +30,7 @@
   "license": "Apache",
   "devDependencies": {
     "@axe-core/playwright": "4.11.1",
-    "@babel/core": "7.29.7",
+    "@babel/core": "8.1.0",
     "@eslint/compat": "2.0.3",
     "@grafana/eslint-config": "9.0.0",
     "@grafana/plugin-e2e": "3.11.0",
@@ -42,7 +42,7 @@
     "@swc/helpers": "0.5.20",
     "@swc/jest": "0.2.38",
     "@testing-library/dom": "10.4.1",
-    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.2",
     "@testing-library/user-event": "14.6.1",
     "@types/chance": "1.1.6",
@@ -59,7 +59,7 @@
     "@typescript-eslint/parser": "8.58.0",
     "chance": "1.1.13",
     "copy-webpack-plugin": "14.0.0",
-    "cspell": "9.7.0",
+    "cspell": "10.4.1",
     "css-loader": "7.1.4",
     "eslint": "9.39.4",
     "eslint-config-prettier": "10.1.8",
@@ -69,7 +69,7 @@
     "eslint-plugin-react-hooks": "7.0.1",
     "eslint-webpack-plugin": "5.0.2",
     "fork-ts-checker-webpack-plugin": "9.1.0",
-    "glob": "13.0.6",
+    "glob": "14.0.2",
     "i18next-parser": "9.4.0",
     "identity-obj-proxy": "3.0.0",
     "imports-loader": "5.0.0",
@@ -81,7 +81,7 @@
     "react-select-event": "5.5.1",
     "replace-in-file-webpack-plugin": "1.0.6",
     "sass": "1.98.0",
-    "sass-loader": "16.0.7",
+    "sass-loader": "17.1.0",
     "semver": "7.7.4",
     "style-loader": "4.0.0",
     "swc-loader": "0.2.6",
@@ -121,7 +121,7 @@
     "protobufjs": "7.6.1",
     "flatted": "3.4.2",
     "form-data": "4.0.6",
-    "undici": "7.29.1",
+    "undici": "7.30.1",
     "eslint": {
       "brace-expansion": "1.1.21"
     },
@@ -165,8 +165,10 @@
     "moment": "2.31.0",
     "smol-toml": "1.9.0",
     "fast-uri": "3.1.8",
-    "dompurify": "3.4.16",
-    "@modelcontextprotocol/sdk": "1.31.0",
+    "body-parser": "2.4.0",
+    "zod": "4.6.6",
+    "dompurify": "3.4.17",
+    "@modelcontextprotocol/sdk": "1.32.0",
     "quick-temp": {
       "brace-expansion": "2.1.7"
     },
@@ -174,5 +176,5 @@
       "brace-expansion": "5.0.12"
     }
   },
-  "packageManager": "npm@11.18.0"
+  "packageManager": "npm@12.2.2"
 }

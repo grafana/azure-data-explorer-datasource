@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## [8.0.0]
+
+- **BREAKING CHANGE:** Trusted endpoint enforcement is now enabled by default. Previously it was off unless the configuration toggle was enabled in the Grafana server configuration file. Data sources that query custom or non-default endpoints will now be blocked unless enforcement is disabled or the endpoints are allow-listed. To restore the previous default, disable enforcement via the configuration toggle. To continue enforcing while allowing specific endpoints make use of user-trusted endpoints. Refer to [the documentation for details](./docs/sources/configure.md#enforce-trusted-endpoints). ([#1865](https://github.com/grafana/azure-data-explorer-datasource/pull/1865))
+- Fix a connection freeze between Grafana and the plugin under heavy query load by updating google.golang.org/grpc to v1.85.0 ([grpc/grpc-go#9330](https://github.com/grpc/grpc-go/issues/9330))
+- Add support for workload identity credentials (tenant and client ID), and backend assertion support when workload in memory is enabled
+- Chore: Dependency updates
+
+## [7.2.17]
+
+- Fix security vulnerabilities (GHSA-cg2g-xh64-v4q7, GHSA-mrv2-3pqr-j5jr, CVE-2026-111768, CVE-2026-111767, CVE-2026-111181, CVE-2023-54404, CVE-2026-109869)
+
+## [7.2.16]
+
+- Chore: Dependency updates
+
 ## [7.2.15]
 
 - Chore: Pin golangci-lint to 2.15.0 in development dependencies and CI/CD pipelines
