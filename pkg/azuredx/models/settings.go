@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/config"
 
 	"github.com/grafana/azure-data-explorer-datasource/pkg/azuredx/helpers"
 )
@@ -88,7 +89,7 @@ type DatasourceSettings struct {
 // JSONData and Encrypted JSONData which contains the information needed to connected to
 // the datasource.
 // It also sets the QueryTimeout and ServerTimeoutValues by parsing QueryTimeoutRaw.
-func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) error {
+func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings, grafanaConfig *config.GrafanaCfg) error {
 	var err error
 	if len(config.JSONData) > 1 {
 		if err := json.Unmarshal(config.JSONData, d); err != nil {
@@ -117,9 +118,23 @@ func (d *DatasourceSettings) Load(config backend.DataSourceInstanceSettings) err
 		return err
 	}
 
-	d.EnforceTrustedEndpoints, err = envBoolOrDefault("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", false)
-	if err != nil {
-		return fmt.Errorf("invalid datasource endpoint configuration: %w", err)
+	// Trusted endpoint enforcement is now ON by default. It can be disabled either via
+	// the feature toggle or the Grafana level config.
+	// TODO: Migrate back to config level only
+	d.EnforceTrustedEndpoints = true
+
+	// The feature toggle can disable enforcement.
+	if grafanaConfig != nil && grafanaConfig.FeatureToggles().IsEnabled("adxDisableTrustedEndpoints") {
+		d.EnforceTrustedEndpoints = false
+	}
+
+	// The Grafana level config overrides the feature toggle, but only when it is
+	// explicitly set. When it is not set, the feature toggle / default value remains.
+	if _, ok := os.LookupEnv("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS"); ok {
+		d.EnforceTrustedEndpoints, err = envBoolOrDefault("GF_PLUGIN_ENFORCE_TRUSTED_ENDPOINTS", true)
+		if err != nil {
+			return fmt.Errorf("invalid datasource endpoint configuration: %w", err)
+		}
 	}
 
 	d.AllowUserTrustedEndpoints, err = envBoolOrDefault("GF_PLUGIN_ALLOW_USER_TRUSTED_ENDPOINTS", false)

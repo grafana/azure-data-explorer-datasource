@@ -128,7 +128,7 @@ func TestLoadToleratesLooselyTypedSettings(t *testing.T) {
 			jsonData := `{` + clusterURL + `,` + tt.jsonData[1:]
 
 			settings := &DatasourceSettings{}
-			err := settings.Load(backend.DataSourceInstanceSettings{JSONData: []byte(jsonData)})
+			err := settings.Load(backend.DataSourceInstanceSettings{JSONData: []byte(jsonData)}, nil)
 			require.NoError(t, err)
 			tt.assert(t, settings)
 		})
@@ -141,6 +141,6 @@ func TestLoadStillRejectsWronglyTypedActiveSettings(t *testing.T) {
 	settings := &DatasourceSettings{}
 	err := settings.Load(backend.DataSourceInstanceSettings{
 		JSONData: []byte(`{"clusterUrl":"https://test.kusto.windows.net","dynamicCaching":"true"}`),
-	})
+	}, nil)
 	require.ErrorContains(t, err, "could not unmarshal DatasourceSettings json")
 }

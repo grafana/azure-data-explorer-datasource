@@ -1,6 +1,6 @@
 {
   "name": "grafana-azure-data-explorer-datasource",
-  "version": "7.2.17",
+  "version": "8.0.0",
   "description": "Grafana data source for Azure Data Explorer",
   "scripts": {
     "build": "webpack -c ./webpack.config.ts --env production",
@@ -81,7 +81,7 @@
     "react-select-event": "5.5.1",
     "replace-in-file-webpack-plugin": "1.0.6",
     "sass": "1.98.0",
-    "sass-loader": "16.0.7",
+    "sass-loader": "17.1.0",
     "semver": "7.7.4",
     "style-loader": "4.0.0",
     "swc-loader": "0.2.6",
@@ -176,5 +176,5 @@
       "brace-expansion": "5.0.12"
     }
   },
-  "packageManager": "npm@11.18.0"
+  "packageManager": "npm@12.2.2"
 }
