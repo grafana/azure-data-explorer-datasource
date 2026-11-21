@@ -221,7 +221,7 @@ func TestNewDatasourceInvalidCredentialsAreDownstreamErrors(t *testing.T) {
 		},
 		{
 			name:     "legacy credentials with an unknown cloud",
-			jsonData: `{"clusterUrl":"https://help.kusto.windows.net","azureCloud":"unknowncloud","tenantId":"test-tenant","clientId":"test-client"}`,
+			jsonData: `{"clusterUrl":"https://help.kusto.windows.net","azureCloud":"unknown-cloud","tenantId":"test-tenant","clientId":"test-client"}`,
 		},
 	}
 
