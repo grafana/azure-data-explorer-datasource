@@ -206,6 +206,43 @@ func TestTrustedEndpoints(t *testing.T) {
 	}
 }
 
+func TestNewDatasourceInvalidCredentialsAreDownstreamErrors(t *testing.T) {
+	tests := []struct {
+		name     string
+		jsonData string
+	}{
+		{
+			name:     "client secret without tenant ID",
+			jsonData: `{"clusterUrl":"https://help.kusto.windows.net","azureCredentials":{"authType":"clientsecret","azureCloud":"AzureCloud","clientId":"test-client"}}`,
+		},
+		{
+			name:     "on-behalf-of without OAuth pass-through",
+			jsonData: `{"clusterUrl":"https://help.kusto.windows.net","azureCredentials":{"authType":"clientsecret-obo","azureCloud":"AzureCloud","tenantId":"test-tenant","clientId":"test-client"}}`,
+		},
+		{
+			name:     "legacy credentials with an unknown cloud",
+			jsonData: `{"clusterUrl":"https://help.kusto.windows.net","azureCloud":"unknowncloud","tenantId":"test-tenant","clientId":"test-client"}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			instanceSettings := backend.DataSourceInstanceSettings{
+				ID:                      1,
+				Name:                    "test-datasource",
+				JSONData:                []byte(tt.jsonData),
+				DecryptedSecureJSONData: map[string]string{"azureClientSecret": "test-secret", "clientSecret": "test-secret"},
+				Type:                    "grafana-azure-data-explorer-datasource",
+			}
+
+			_, err := NewDatasource(context.Background(), instanceSettings)
+
+			require.Error(t, err)
+			require.True(t, backend.IsDownstreamError(err), "error %q is not a downstream error", err)
+		})
+	}
+}
+
 type fakeClient struct{}
 
 func (c *fakeClient) TestKustoRequest(_ context.Context, _ *models.DatasourceSettings, _ *models.Properties, _ map[string]string) error {

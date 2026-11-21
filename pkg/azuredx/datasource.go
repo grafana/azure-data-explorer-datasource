@@ -59,7 +59,7 @@ func NewDatasource(ctx context.Context, instanceSettings backend.DataSourceInsta
 
 	credentials, err := adxcredentials.FromDatasourceData(jsonData, instanceSettings.DecryptedSecureJSONData)
 	if err != nil {
-		return nil, err
+		return nil, backend.DownstreamError(err)
 	} else if credentials == nil {
 		credentials = adxcredentials.GetDefaultCredentials(azureSettings)
 	}
