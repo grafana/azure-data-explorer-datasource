@@ -36,6 +36,7 @@
         }
       },
       "description-choose-authentication-azure-services": "選擇 Azure 服務的驗證類型",
+      "description-current-user-authentication": "查詢會使用目前登入的 Grafana 使用者身分。當要求內容中沒有使用者時，某些 Grafana 功能（例如警示、已記錄查詢和報告）可能無法如預期運作。如需了解設定方式和已知限制，請參閱<2>文件</2>。",
       "description-on-behalf-of-feature-is-in-beta": "有關已知限制與問題、錯誤報告或意見回饋，請參閱<2>文件</2>。",
       "error-client-id-required": "用戶端 ID 為必填",
       "error-client-secret-required": "用戶端密碼為必填",
@@ -47,6 +48,7 @@
       "label-directory-tenant-id": "目錄（租用戶）ID",
       "reset": "重設",
       "title-authentication": "身分驗證",
+      "title-current-user-authentication": "目前使用者驗證",
       "title-on-behalf-of-feature-is-in-beta": "「代表」功能處於測試階段"
     },
     "config-editor": {
