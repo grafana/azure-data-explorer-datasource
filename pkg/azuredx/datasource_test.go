@@ -223,3 +223,15 @@ func (c *fakeClient) KustoRequest(_ context.Context, cluster string, url string,
 func (c *fakeClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
 	return ARGClusterRequestMock(payload, additionalHeaders)
 }
+
+func TestNewDatasourceConfigErrors(t *testing.T) {
+	t.Run("A client secret credential with no tenant id is a downstream error", func(t *testing.T) {
+		_, err := NewDatasource(context.Background(), backend.DataSourceInstanceSettings{
+			JSONData:                []byte(`{"azureCredentials":{"authType":"clientsecret","azureCloud":"AzureCloud","clientId":"client-id"}}`),
+			DecryptedSecureJSONData: map[string]string{"azureClientSecret": "client-secret"},
+		})
+		require.Error(t, err)
+		require.True(t, backend.IsDownstreamError(err), "config errors are fixed by the datasource owner, not by us")
+		require.EqualError(t, err, "the field 'tenantId' should be set")
+	})
+}

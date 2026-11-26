@@ -59,7 +59,8 @@ func NewDatasource(ctx context.Context, instanceSettings backend.DataSourceInsta
 
 	credentials, err := adxcredentials.FromDatasourceData(jsonData, instanceSettings.DecryptedSecureJSONData)
 	if err != nil {
-		return nil, err
+		// Missing or invalid credential fields come from the datasource's own settings, so the owner fixes them.
+		return nil, backend.DownstreamError(err)
 	} else if credentials == nil {
 		credentials = adxcredentials.GetDefaultCredentials(azureSettings)
 	}
