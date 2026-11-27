@@ -164,7 +164,7 @@
     "postcss-selector-parser": "7.1.8",
     "moment": "2.31.0",
     "smol-toml": "1.9.1",
-    "fast-uri": "3.1.9",
+    "fast-uri": "4.2.4",
     "body-parser": "2.4.0",
     "zod": "4.6.7",
     "dompurify": "3.4.17",
