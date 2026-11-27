@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [8.0.1]
+
+- Fix security vulnerabilities in fast-uri, ip-address and hono ([#1874](https://github.com/grafana/azure-data-explorer-datasource/pull/1874))
+- Report invalid saved credentials as downstream errors instead of plugin errors ([#1873](https://github.com/grafana/azure-data-explorer-datasource/pull/1873))
+- Security: update `golang.org/x/crypto` to v0.59.0 ([#1867](https://github.com/grafana/azure-data-explorer-datasource/pull/1867))
+- Chore: Update translations and dependencies
+
 ## [8.0.0]
 
 - **BREAKING CHANGE:** Trusted endpoint enforcement is now enabled by default. Previously it was off unless the configuration toggle was enabled in the Grafana server configuration file. Data sources that query custom or non-default endpoints will now be blocked unless enforcement is disabled or the endpoints are allow-listed. To restore the previous default, disable enforcement via the configuration toggle. To continue enforcing while allowing specific endpoints make use of user-trusted endpoints. Refer to [the documentation for details](./docs/sources/configure.md#enforce-trusted-endpoints). ([#1865](https://github.com/grafana/azure-data-explorer-datasource/pull/1865))
