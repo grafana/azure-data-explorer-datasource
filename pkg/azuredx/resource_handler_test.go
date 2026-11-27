@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -120,4 +121,40 @@ func (c *workingClient) KustoRequest(_ context.Context, _ string, _ string, _ mo
 
 func (c *workingClient) ARGClusterRequest(_ context.Context, payload models.ARGRequestPayload, additionalHeaders map[string]string) ([]models.ClusterOption, error) {
 	panic("not implemented")
+}
+
+type redirectTransport struct {
+	target *url.URL
+	next   http.RoundTripper
+}
+
+func (t redirectTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req = req.Clone(req.Context())
+	req.URL.Scheme = t.target.Scheme
+	req.URL.Host = t.target.Host
+	return t.next.RoundTrip(req)
+}
+
+func TestGenerateQuery(t *testing.T) {
+	var sent openaiBody
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		require.NoError(t, json.NewDecoder(req.Body).Decode(&sent))
+		_, err := rw.Write([]byte(`{"choices":[{"message":{"content":"StormEvents | take 10"}}]}`))
+		require.NoError(t, err)
+	}))
+	defer server.Close()
+
+	target, err := url.Parse(server.URL)
+	require.NoError(t, err)
+	original := http.DefaultTransport
+	http.DefaultTransport = redirectTransport{target: target, next: original}
+	defer func() { http.DefaultTransport = original }()
+
+	adx := AzureDataExplorer{settings: &models.DatasourceSettings{OpenAIAPIKey: "test-key"}}
+	res := httptest.NewRecorder()
+	adx.generateQuery(res, httptest.NewRequest(http.MethodPost, "/generateQuery", strings.NewReader("show ten storms")))
+
+	require.Equal(t, http.StatusOK, res.Code, res.Body.String())
+	require.Contains(t, res.Body.String(), "StormEvents | take 10")
+	require.Equal(t, "gpt-5.6-terra", sent.Model)
 }

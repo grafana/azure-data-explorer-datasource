@@ -23,7 +23,7 @@ const ManagementApiPath = "/v1/rest/mgmt"
 
 const (
 	OpenAIURL   = "https://api.openai.com/v1/chat/completions"
-	OpenAIModel = "gpt-3.5-turbo"
+	OpenAIModel = "gpt-5.6-terra"
 )
 
 type openaiBody struct {
@@ -92,7 +92,7 @@ func (adx *AzureDataExplorer) generateQuery(rw http.ResponseWriter, req *http.Re
 		respondWithError(rw, http.StatusInternalServerError, "Error during query generation", err)
 		return
 	}
-	helpers.HandleResponseBodyClose(resp)
+	defer helpers.HandleResponseBodyClose(resp)
 
 	var content openaiResponse
 
